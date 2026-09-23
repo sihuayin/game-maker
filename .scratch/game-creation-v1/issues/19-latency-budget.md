@@ -81,3 +81,35 @@ Map: ../map.md
 ## Answer
 
 _（待填）_
+
+
+---
+
+## 来自 2026-09-23 实验的重大更新：时间账本要重算
+
+票 22 的实验发现 **`thinking: {"type":"disabled"}`**（DeepSeek 路径）：
+
+| 配置 | 延迟 | content |
+|---|---|---|
+| thinking 开（默认），max_tokens=2600 | 51s | **空**（reasoning 吃光） |
+| thinking 开，max_tokens=8000 | 161s | **空**（reasoning 吃光） |
+| **thinking 关** | **3.5 – 9s** | **有** |
+
+这意味着票 01 测的「deepseek-v4-pro 文本 27-38s」**是在 thinking 开着、
+且 prompt 较短时**的数字。关掉 thinking 后文本调用降到 **个位数秒**。
+
+对账本的直接影响：
+- 第 2 条（maxDurationMs 设多少）：LLM 部分的时间压力**大幅缓解**。
+  6 份资源 5 路并行只要 8s。10 分钟 budget 的主要威胁从 LLM 转移到
+  Playwright 构建/启动/截图（仍未实测）。
+- 第 4 条（降推理开销）：**有答案了** —— 就是 `thinking:{type:"disabled"}`。
+  不需要再探 `reasoning_effort`（实测被忽略）。
+- 第 4 条后半（flash vs pro）：关 thinking 后 pro 已经够快，
+  flash 的速度优势不再重要，**质量优先选 pro** 的理由变强了。
+- **新增待测**：视觉路径（qwen via `/v1/messages`）有没有同开关。
+  票 01 的 StyleSpec 提取花 61s，若可关 thinking 可能砍到 10s 内。
+  这归票 22 问题 5。
+
+⚠️ 但关 thinking 有代价：会加 markdown 围栏、JSON 形状纪律下降。
+第 6 条（重试成本）要吸收这点 —— 关 thinking 后的**一次通过率会低于**
+票 01 测的 9/9，重试预算要按新数字设。

@@ -1,0 +1,77 @@
+{
+  "id": "style-ref",
+  "identity": [
+    "pixel-art",
+    "dystopian",
+    "retro-industrial",
+    "muted-cold",
+    "cluttered-cozy",
+    "narrative-sim"
+  ],
+  "camera": {
+    "mode": "fixed 2D orthographic stage view",
+    "angle": "straight-on eye-level, zero perspective distortion"
+  },
+  "composition": {
+    "layout": "horizontal banding: glazed service window centered upper-middle, full-width counter across mid-frame, dense item grid anchored lower-center, machinery and props clustered at left/right margins",
+    "density": "medium-high, cluttered but grid-ordered"
+  },
+  "palette": [
+    "#7C968E",
+    "#55685F",
+    "#A9B7AC",
+    "#3E3236",
+    "#C3CDC9",
+    "#EAD8A6",
+    "#C4694A",
+    "#4EBBA4",
+    "#6D8F52"
+  ],
+  "lighting": {
+    "direction": "diffuse ambient top-light with localized emissive panels and screens",
+    "contrast": "low-to-medium, soft shadow blocks instead of gradients",
+    "ambience": "dim enclosed interior, cool desaturated cast punctuated by warm accent glows"
+  },
+  "shapeLanguage": [
+    "hard-edged rectangles",
+    "nested panel frames",
+    "pixel-stepped diagonals",
+    "grid-aligned modules",
+    "small rounded corners only on handheld props and buttons"
+  ],
+  "material": [
+    "pixel dithering",
+    "worn painted metal",
+    "rust streaks and grime",
+    "matte concrete wall",
+    "paper poster texture",
+    "CRT emissive screen",
+    "scuffed plastic casings"
+  ],
+  "environment": [
+    "service counter",
+    "glazed service window",
+    "wall-mounted machines and vents",
+    "hanging cables and pipes",
+    "framed posters and signage",
+    "waste bin",
+    "dense item storage grid",
+    "stacked sacks and crates at edges"
+  ],
+  "characterStyle": [
+    "semi-realistic adult proportions (~6 heads)",
+    "medium pixel granularity with clustered shade steps",
+    "minimal dark rim separation from background",
+    "flat color blocks with dithered transitions",
+    "frontal bust framing behind counter"
+  ],
+  "constraints": [
+    "strict uniform pixel grid, no smooth anti-aliasing; transitions via dithering or step shading",
+    "palette locked to desaturated teal-gray dominance; warm orange/cream accents limited to under 15% area",
+    "composition must remain rectilinear panel-based with horizontal banding",
+    "all props silhouette-read with 1px darker rim",
+    "no pure black or pure white; shadows stay tinted green-gray",
+    "keep frontal orthographic staging, never introduce perspective"
+  ],
+  "confidence": 0.92
+}

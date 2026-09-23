@@ -104,6 +104,14 @@ Decisions so far。每张票都必须服从它们。
 - ⚠️ **延迟很大**：视觉 47-63 s（最坏 136 s）、DeepSeek pro 27-38 s、flash 6-8 s。
   主因是推理 token 占输出 ~80%。`max_tokens` 必须给足（≥3000），超时 ≥180 s。
   → 与 Q17 的 10 分钟 budget 冲突，见[票 19](issues/19-latency-budget.md)。
+- ⚠️ **`thinking: {"type":"disabled"}` 是 DeepSeek 路径的生死开关**
+  （2026-09-23 实验发现，见[票 22](issues/22-asset-generator.md)）：
+  开着 thinking 时推理 token **无上限**，长 prompt 下会吃掉 100% 输出预算、
+  `content` 为空、`finish_reason=length`（实测 max_tokens=8000 时 reasoning=8000）。
+  关掉后：`reasoning=0`、有 content、**9s 而非 161s（快 18 倍）**。
+  代价：会加 markdown 围栏、JSON 形状纪律下降（需 few-shot 示例 + 剥围栏 + 形状归一化）。
+  `reasoning_effort` / `chat_template_kwargs` 均被代理**忽略**。
+  **视觉路径（qwen via `/v1/messages`）是否有同开关尚未测。**
 - **鉴权完全不校验**：错误 key、甚至不带鉴权头都返回 200。
   → 探测代理死活**不能**靠鉴权失败，要打 `/v1/models` 或发真实请求（ping ≈ 0.63 s）。
 - **代理活得比 Claude Code 久**（PPID 1，已连跑 2 天），但活不过重启 →

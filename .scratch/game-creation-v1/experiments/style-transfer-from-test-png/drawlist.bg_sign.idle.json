@@ -1,0 +1,115 @@
+{
+ "format": "drawlist+curve/v1",
+ "id": "bg_sign",
+ "state": "idle",
+ "viewBox": [
+  0,
+  0,
+  48,
+  32
+ ],
+ "expectedSize": [
+  48,
+  32
+ ],
+ "ops": [
+  {
+   "op": "rect",
+   "x": 2,
+   "y": 2,
+   "w": 44,
+   "h": 28,
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 5,
+   "y": 5,
+   "w": 38,
+   "h": 22,
+   "fill": "palette:0",
+   "stroke": "palette:4",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 9,
+   "y": 8,
+   "w": 30,
+   "h": 10,
+   "fill": "palette:3",
+   "stroke": "palette:5",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 11,
+   "y": 10,
+   "w": 26,
+   "h": 6,
+   "fill": "palette:7",
+   "stroke": "palette:2",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 9,
+   "y": 21,
+   "w": 14,
+   "h": 3,
+   "fill": "palette:2",
+   "stroke": "palette:4",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 26,
+   "y": 21,
+   "w": 11,
+   "h": 3,
+   "fill": "palette:2",
+   "stroke": "palette:4",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 9,
+   "y": 25,
+   "w": 20,
+   "h": 2,
+   "fill": "palette:4",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 32,
+   "y": 25,
+   "w": 7,
+   "h": 2,
+   "fill": "palette:4",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "line",
+   "x1": 2,
+   "y1": 2,
+   "x2": 46,
+   "y2": 2,
+   "stroke": "palette:5",
+   "strokeWidth": 1
+  },
+  {
+   "op": "line",
+   "x1": 2,
+   "y1": 30,
+   "x2": 46,
+   "y2": 30,
+   "stroke": "palette:5",
+   "strokeWidth": 1
+  }
+ ]
+}

@@ -1,0 +1,90 @@
+{
+ "format": "drawlist+curve/v1",
+ "id": "pickup",
+ "state": "idle",
+ "viewBox": [
+  0,
+  0,
+  16,
+  16
+ ],
+ "expectedSize": [
+  16,
+  16
+ ],
+ "ops": [
+  {
+   "op": "rect",
+   "x": 3,
+   "y": 2,
+   "w": 10,
+   "h": 12,
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 5,
+   "y": 4,
+   "w": 6,
+   "h": 3,
+   "fill": "palette:6",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 5,
+   "y": 8,
+   "w": 6,
+   "h": 4,
+   "fill": "palette:7",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "line",
+   "x1": 6,
+   "y1": 9,
+   "x2": 10,
+   "y2": 9,
+   "stroke": "palette:4",
+   "strokeWidth": 1
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     3,
+     2
+    ],
+    [
+     5,
+     0
+    ],
+    [
+     11,
+     0
+    ],
+    [
+     13,
+     2
+    ]
+   ],
+   "fill": "palette:2",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 7,
+   "y": 13,
+   "w": 2,
+   "h": 1,
+   "fill": "palette:5",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  }
+ ]
+}

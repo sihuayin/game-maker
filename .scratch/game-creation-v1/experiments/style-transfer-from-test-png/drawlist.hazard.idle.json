@@ -1,0 +1,173 @@
+{
+ "format": "drawlist+curve/v1",
+ "id": "hazard",
+ "state": "idle",
+ "viewBox": [
+  0,
+  0,
+  32,
+  12
+ ],
+ "expectedSize": [
+  32,
+  12
+ ],
+ "ops": [
+  {
+   "op": "poly",
+   "points": [
+    [
+     0,
+     12
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     8,
+     12
+    ]
+   ],
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     4,
+     0
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     2,
+     4
+    ]
+   ],
+   "fill": "palette:5",
+   "opacity": 0.35
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     8,
+     12
+    ],
+    [
+     12,
+     0
+    ],
+    [
+     16,
+     12
+    ]
+   ],
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     12,
+     0
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     10,
+     4
+    ]
+   ],
+   "fill": "palette:5",
+   "opacity": 0.35
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     16,
+     12
+    ],
+    [
+     20,
+     0
+    ],
+    [
+     24,
+     12
+    ]
+   ],
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     20,
+     0
+    ],
+    [
+     22,
+     4
+    ],
+    [
+     18,
+     4
+    ]
+   ],
+   "fill": "palette:5",
+   "opacity": 0.35
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     24,
+     12
+    ],
+    [
+     28,
+     0
+    ],
+    [
+     32,
+     12
+    ]
+   ],
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "poly",
+   "points": [
+    [
+     28,
+     0
+    ],
+    [
+     30,
+     4
+    ],
+    [
+     26,
+     4
+    ]
+   ],
+   "fill": "palette:5",
+   "opacity": 0.35
+  }
+ ]
+}

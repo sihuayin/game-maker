@@ -1,0 +1,177 @@
+{
+ "format": "drawlist+curve/v1",
+ "id": "player",
+ "state": "jump",
+ "viewBox": [
+  0,
+  0,
+  24,
+  32
+ ],
+ "expectedSize": [
+  24,
+  32
+ ],
+ "ops": [
+  {
+   "op": "rect",
+   "x": 7,
+   "y": 3,
+   "w": 10,
+   "h": 10,
+   "fill": "palette:2",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 8,
+   "y": 5,
+   "w": 8,
+   "h": 4,
+   "fill": "palette:4",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 10,
+   "y": 8,
+   "w": 2,
+   "h": 2,
+   "fill": "palette:0",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 13,
+   "y": 8,
+   "w": 2,
+   "h": 2,
+   "fill": "palette:0",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 9,
+   "y": 3,
+   "w": 1,
+   "h": 3,
+   "fill": "palette:6",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 14,
+   "y": 3,
+   "w": 1,
+   "h": 3,
+   "fill": "palette:6",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 5,
+   "y": 5,
+   "w": 2,
+   "h": 5,
+   "fill": "palette:5",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 17,
+   "y": 5,
+   "w": 2,
+   "h": 5,
+   "fill": "palette:5",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 7,
+   "y": 13,
+   "w": 10,
+   "h": 5,
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 8,
+   "y": 14,
+   "w": 8,
+   "h": 2,
+   "fill": "palette:4",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 6,
+   "y": 18,
+   "w": 3,
+   "h": 5,
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 15,
+   "y": 18,
+   "w": 3,
+   "h": 5,
+   "fill": "palette:1",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 6,
+   "y": 23,
+   "w": 3,
+   "h": 3,
+   "fill": "palette:3",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "rect",
+   "x": 15,
+   "y": 23,
+   "w": 3,
+   "h": 3,
+   "fill": "palette:3",
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  },
+  {
+   "op": "curve",
+   "points": [
+    [
+     6,
+     13
+    ],
+    [
+     10,
+     15
+    ],
+    [
+     18,
+     13
+    ]
+   ],
+   "closed": false,
+   "stroke": "palette:3",
+   "strokeWidth": 1
+  }
+ ]
+}

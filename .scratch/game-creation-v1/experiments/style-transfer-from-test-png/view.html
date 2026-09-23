@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>风格迁移实验：test.png → 横版跳跃资源</title>
+<style>body{margin:0;padding:28px;background:#14181a;color:#dfe6e2;font:14px/1.6 -apple-system,"PingFang SC",sans-serif}
+h1{font-size:20px;margin:0 0 4px} .sub{color:#8b9a94;font-size:13px;margin-bottom:20px}
+.ref{border:1px solid #2c3538;border-radius:6px;overflow:hidden;margin-bottom:26px}
+.ref img{width:100%;display:block;image-rendering:pixelated}
+.ref .cap{padding:8px 12px;background:#1b2124;font-size:12px;color:#8b9a94}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.c{background:#1b2124;border:1px solid #2c3538;border-radius:6px;overflow:hidden}
+.c .st{display:flex;align-items:center;justify-content:center;min-height:190px;background:repeating-conic-gradient(#20272a 0% 25%,#181e21 0% 50%) 50%/18px 18px}
+.c h3{margin:0;padding:9px 12px;font-size:13px;border-bottom:1px solid #2c3538;background:#171c1f}
+.c h3 .b{color:#69d6a8}.c h3 .r{color:#e07a6a}
+.c pre{margin:0;padding:9px 12px;font:10.5px/1.45 ui-monospace,Menlo,monospace;color:#7d8b86;max-height:130px;overflow:auto;white-space:pre-wrap}
+.pal{display:flex;gap:4px;margin:10px 0 22px}
+.pal div{flex:1;text-align:center;font:10px ui-monospace,monospace;color:#8b9a94}
+.pal span{display:block;height:34px;border-radius:3px;margin-bottom:3px}</style></head><body>
+<h1>风格迁移实验：参考图 → 横版跳跃游戏资源</h1>
+<div class="sub">链路：test.png →（qwen3.8-max 视觉）StyleSpec →（deepseek-v4-pro 文本）drawlist → SVG 渲染。全程无人工修图。</div>
+<div class="ref"><img src="../../../../demo/test.png"><div class="cap">参考图 demo/test.png · 1218×685 · 提取色板见下</div></div>
+<div class="pal"><div><span style="background:#7C968E"></span>0</div><div><span style="background:#55685F"></span>1</div><div><span style="background:#A9B7AC"></span>2</div><div><span style="background:#3E3236"></span>3</div><div><span style="background:#C3CDC9"></span>4</div><div><span style="background:#EAD8A6"></span>5</div><div><span style="background:#C4694A"></span>6</div><div><span style="background:#4EBBA4"></span>7</div><div><span style="background:#6D8F52"></span>8</div></div>
+<div class="grid"><div class="c"><h3>player/idle <span class="b">schema 通过</span></h3><div class="st"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="144" height="192" style="image-rendering:pixelated">
+  <rect x="8" y="2" width="8" height="7" fill="#C3CDC9" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="9" y="6" width="6" height="3" fill="#EAD8A6" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="7" y="9" width="10" height="10" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="8" y="11" width="3" height="5" fill="#C4694A" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="13" y="11" width="3" height="5" fill="#C4694A" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="7" y="19" width="4" height="8" fill="#A9B7AC" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="13" y="19" width="4" height="8" fill="#A9B7AC" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="8" y="27" width="2" height="3" fill="#EAD8A6" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="14" y="27" width="2" height="3" fill="#EAD8A6" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+</svg></div><pre>[{"op":"rect","x":8,"y":2,"w":8,"h":7,"fill":"palette:4","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":9,"y":6,"w":6,"h":3,"fill":"palette:5","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":7,"y":9,"w":10,"h":10,"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":8,"y":11,"w":3,"h":5,"fill":"palette:6","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":13,"y":11,"w":3,"h":5,"fill":"palette:6","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":7,"y":19,"w":4,"h":8,"fill":"palette:2","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":13,"y":19,"w":4,"h":8,"fill":"palette:2","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":8,"y":27,"w":2,"</pre></div><div class="c"><h3>player/jump <span class="b">schema 通过</span></h3><div class="st"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="144" height="192" style="image-rendering:pixelated">
+  <rect x="7" y="3" width="10" height="10" fill="#A9B7AC" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="8" y="5" width="8" height="4" fill="#C3CDC9" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="10" y="8" width="2" height="2" fill="#7C968E" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="13" y="8" width="2" height="2" fill="#7C968E" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="9" y="3" width="1" height="3" fill="#C4694A" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="14" y="3" width="1" height="3" fill="#C4694A" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="5" y="5" width="2" height="5" fill="#EAD8A6" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="17" y="5" width="2" height="5" fill="#EAD8A6" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="7" y="13" width="10" height="5" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="8" y="14" width="8" height="2" fill="#C3CDC9" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="6" y="18" width="3" height="5" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="15" y="18" width="3" height="5" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="6" y="23" width="3" height="3" fill="#3E3236" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="15" y="23" width="3" height="3" fill="#3E3236" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <path d="M6 13 C6.67 13.33, 8.00 15.00, 10 15 C12.00 15.00, 16.67 13.33, 18 13" fill="none" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+</svg></div><pre>[{"op":"rect","x":7,"y":3,"w":10,"h":10,"fill":"palette:2","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":8,"y":5,"w":8,"h":4,"fill":"palette:4","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":10,"y":8,"w":2,"h":2,"fill":"palette:0","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":13,"y":8,"w":2,"h":2,"fill":"palette:0","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":9,"y":3,"w":1,"h":3,"fill":"palette:6","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":14,"y":3,"w":1,"h":3,"fill":"palette:6","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":5,"y":5,"w":2,"h":5,"fill":"palette:5","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":17,"y":5,"w":2,"h":</pre></div><div class="c"><h3>platform/idle <span class="b">schema 通过</span></h3><div class="st"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 16" width="384" height="96" style="image-rendering:pixelated">
+  <rect x="0" y="0" width="64" height="16" fill="#55685F"/>
+  <rect x="0" y="0" width="64" height="5" fill="#7C968E"/>
+  <rect x="0" y="3" width="64" height="2" fill="#C3CDC9"/>
+  <line x1="0" y1="0" x2="64" y2="0" stroke="#A9B7AC" stroke-width="1" stroke-linecap="round"/>
+  <line x1="0" y1="5" x2="64" y2="5" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <line x1="0" y1="16" x2="64" y2="16" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="4" y="9" width="3" height="2" fill="#3E3236"/>
+  <rect x="10" y="7" width="2" height="2" fill="#3E3236"/>
+  <rect x="16" y="12" width="4" height="2" fill="#C4694A"/>
+  <rect x="24" y="8" width="2" height="3" fill="#3E3236"/>
+  <rect x="30" y="10" width="3" height="2" fill="#C4694A"/>
+  <rect x="38" y="6" width="2" height="2" fill="#3E3236"/>
+  <rect x="45" y="11" width="4" height="2" fill="#3E3236"/>
+  <rect x="53" y="9" width="2" height="3" fill="#C4694A"/>
+  <rect x="58" y="7" width="3" height="2" fill="#3E3236"/>
+  <rect x="8" y="5" width="8" height="1" fill="#3E3236"/>
+  <rect x="22" y="5" width="6" height="1" fill="#3E3236"/>
+  <rect x="48" y="5" width="7" height="1" fill="#3E3236"/>
+  <rect x="2" y="8" width="1" height="4" fill="#3E3236"/>
+  <rect x="36" y="9" width="1" height="3" fill="#3E3236"/>
+  <rect x="12" y="13" width="2" height="1" fill="#3E3236"/>
+  <rect x="42" y="13" width="2" height="1" fill="#3E3236"/>
+  <rect x="56" y="14" width="3" height="1" fill="#3E3236"/>
+  <rect x="6" y="11" width="1" height="2" fill="#C4694A"/>
+  <rect x="26" y="12" width="1" height="2" fill="#C4694A"/>
+  <rect x="34" y="7" width="1" height="2" fill="#C4694A"/>
+  <rect x="50" y="10" width="1" height="2" fill="#C4694A"/>
+  <line x1="3" y1="8" x2="5" y2="8" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+  <line x1="19" y1="10" x2="21" y2="10" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+  <line x1="40" y1="7" x2="42" y2="7" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+  <line x1="61" y1="11" x2="63" y2="11" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+</svg></div><pre>[{"op":"rect","x":0,"y":0,"w":64,"h":16,"fill":"palette:1"},{"op":"rect","x":0,"y":0,"w":64,"h":5,"fill":"palette:0"},{"op":"rect","x":0,"y":3,"w":64,"h":2,"fill":"palette:4"},{"op":"line","x1":0,"y1":0,"x2":64,"y2":0,"stroke":"palette:2","strokeWidth":1},{"op":"line","x1":0,"y1":5,"x2":64,"y2":5,"stroke":"palette:3","strokeWidth":1},{"op":"line","x1":0,"y1":16,"x2":64,"y2":16,"stroke":"palette:3","strokeWidth":1},{"op":"rect","x":4,"y":9,"w":3,"h":2,"fill":"palette:3"},{"op":"rect","x":10,"y":7,"w":2,"h":2,"fill":"palette:3"},{"op":"rect","x":16,"y":12,"w":4,"h":2,"fill":"palette:6"},{"op":"rect","x":24,"y":8,"w":2,"h":3,"fill":"palette:3"},{"op":"rect","x":30,"y":10,"w":3,"h":2,"fill":"pal</pre></div><div class="c"><h3>pickup/idle <span class="b">schema 通过</span></h3><div class="st"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="96" height="96" style="image-rendering:pixelated">
+  <rect x="3" y="2" width="10" height="12" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="5" y="4" width="6" height="3" fill="#C4694A" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="5" y="8" width="6" height="4" fill="#4EBBA4" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <line x1="6" y1="9" x2="10" y2="9" stroke="#C3CDC9" stroke-width="1" stroke-linecap="round"/>
+  <polygon points="3,2 5,0 11,0 13,2" fill="#A9B7AC" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="7" y="13" width="2" height="1" fill="#EAD8A6" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+</svg></div><pre>[{"op":"rect","x":3,"y":2,"w":10,"h":12,"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":5,"y":4,"w":6,"h":3,"fill":"palette:6","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":5,"y":8,"w":6,"h":4,"fill":"palette:7","stroke":"palette:3","strokeWidth":1},{"op":"line","x1":6,"y1":9,"x2":10,"y2":9,"stroke":"palette:4","strokeWidth":1},{"op":"poly","points":[[3,2],[5,0],[11,0],[13,2]],"fill":"palette:2","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":7,"y":13,"w":2,"h":1,"fill":"palette:5","stroke":"palette:3","strokeWidth":1}]</pre></div><div class="c"><h3>hazard/idle <span class="b">schema 通过</span></h3><div class="st"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 12" width="192" height="72" style="image-rendering:pixelated">
+  <polygon points="0,12 4,0 8,12" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <polygon points="4,0 6,4 2,4" fill="#EAD8A6" opacity="0.35"/>
+  <polygon points="8,12 12,0 16,12" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <polygon points="12,0 14,4 10,4" fill="#EAD8A6" opacity="0.35"/>
+  <polygon points="16,12 20,0 24,12" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <polygon points="20,0 22,4 18,4" fill="#EAD8A6" opacity="0.35"/>
+  <polygon points="24,12 28,0 32,12" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <polygon points="28,0 30,4 26,4" fill="#EAD8A6" opacity="0.35"/>
+</svg></div><pre>[{"op":"poly","points":[[0,12],[4,0],[8,12]],"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"poly","points":[[4,0],[6,4],[2,4]],"fill":"palette:5","opacity":0.35},{"op":"poly","points":[[8,12],[12,0],[16,12]],"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"poly","points":[[12,0],[14,4],[10,4]],"fill":"palette:5","opacity":0.35},{"op":"poly","points":[[16,12],[20,0],[24,12]],"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"poly","points":[[20,0],[22,4],[18,4]],"fill":"palette:5","opacity":0.35},{"op":"poly","points":[[24,12],[28,0],[32,12]],"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"poly","points":[[28,0],[30,4],[26,4]],"fill</pre></div><div class="c"><h3>bg_sign/idle <span class="b">schema 通过</span></h3><div class="st"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32" width="288" height="192" style="image-rendering:pixelated">
+  <rect x="2" y="2" width="44" height="28" fill="#55685F" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="5" y="5" width="38" height="22" fill="#7C968E" stroke="#C3CDC9" stroke-width="1" stroke-linecap="round"/>
+  <rect x="9" y="8" width="30" height="10" fill="#3E3236" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+  <rect x="11" y="10" width="26" height="6" fill="#4EBBA4" stroke="#A9B7AC" stroke-width="1" stroke-linecap="round"/>
+  <rect x="9" y="21" width="14" height="3" fill="#A9B7AC" stroke="#C3CDC9" stroke-width="1" stroke-linecap="round"/>
+  <rect x="26" y="21" width="11" height="3" fill="#A9B7AC" stroke="#C3CDC9" stroke-width="1" stroke-linecap="round"/>
+  <rect x="9" y="25" width="20" height="2" fill="#C3CDC9" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <rect x="32" y="25" width="7" height="2" fill="#C3CDC9" stroke="#3E3236" stroke-width="1" stroke-linecap="round"/>
+  <line x1="2" y1="2" x2="46" y2="2" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+  <line x1="2" y1="30" x2="46" y2="30" stroke="#EAD8A6" stroke-width="1" stroke-linecap="round"/>
+</svg></div><pre>[{"op":"rect","x":2,"y":2,"w":44,"h":28,"fill":"palette:1","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":5,"y":5,"w":38,"h":22,"fill":"palette:0","stroke":"palette:4","strokeWidth":1},{"op":"rect","x":9,"y":8,"w":30,"h":10,"fill":"palette:3","stroke":"palette:5","strokeWidth":1},{"op":"rect","x":11,"y":10,"w":26,"h":6,"fill":"palette:7","stroke":"palette:2","strokeWidth":1},{"op":"rect","x":9,"y":21,"w":14,"h":3,"fill":"palette:2","stroke":"palette:4","strokeWidth":1},{"op":"rect","x":26,"y":21,"w":11,"h":3,"fill":"palette:2","stroke":"palette:4","strokeWidth":1},{"op":"rect","x":9,"y":25,"w":20,"h":2,"fill":"palette:4","stroke":"palette:3","strokeWidth":1},{"op":"rect","x":32,"y":2</pre></div></div>
+</body></html>
