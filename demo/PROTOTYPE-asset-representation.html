@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>PROTOTYPE · Asset 表达形式对比（票 05）</title>
+<!--
+  ⚠️ PROTOTYPE — THROWAWAY. 不是生产代码。
+  为 wayfinder 票 05「Asset 的表达形式」造的可 react 实物。
+  结论落定后：被选中的表达形式会重写进 demo/src/contracts/，
+  这个 HTML 外壳则归档到 research 分支，不进主干。
+-->
+<style>
+  :root { --accent:#4a7c3f; --ink:#1f2420; --mut:#6b7269; --line:#dfe3dc; --bg:#fafbf8; --warn:#b4531f; --bad:#a33; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:32px 28px 80px; background:var(--bg); color:var(--ink);
+         font:15px/1.65 -apple-system,"PingFang SC","Helvetica Neue",sans-serif; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  h1 { font-size:23px; margin:0 0 4px; letter-spacing:-.2px; }
+  h2 { font-size:14px; margin:34px 0 10px; text-transform:uppercase; letter-spacing:.9px; color:var(--mut); font-weight:600; }
+  .q { background:#fff; border:1px solid var(--line); border-left:3px solid var(--accent);
+       padding:16px 20px; border-radius:5px; margin:14px 0 6px; }
+  .q p { margin:0 0 9px; } .q p:last-child { margin:0; }
+  .q b { color:var(--accent); }
+  .tag { display:inline-block; font-size:11px; padding:1px 7px; border-radius:9px;
+         background:#eef2ec; color:var(--mut); font-family:ui-monospace,Menlo,monospace; }
+  .bar { display:flex; gap:22px; flex-wrap:wrap; align-items:flex-end; background:#fff;
+         border:1px solid var(--line); border-radius:5px; padding:14px 18px; margin:18px 0; }
+  .grp { display:flex; flex-direction:column; gap:5px; }
+  .grp > span { font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:var(--mut); font-weight:600; }
+  .seg { display:flex; gap:0; border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+  .seg button { border:0; background:#fff; padding:6px 13px; font:inherit; font-size:13px; cursor:pointer;
+                color:var(--mut); border-right:1px solid var(--line); }
+  .seg button:last-child { border-right:0; }
+  .seg button[aria-pressed=true] { background:var(--accent); color:#fff; font-weight:600; }
+  button.act { border:1px solid var(--line); background:#fff; padding:6px 13px; border-radius:4px;
+               font:inherit; font-size:13px; cursor:pointer; color:var(--ink); }
+  button.act:hover { border-color:var(--accent); color:var(--accent); }
+  button.act.on { background:#fdf1e7; border-color:var(--warn); color:var(--warn); font-weight:600; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); gap:13px; }
+  
+  .card { background:#fff; border:1px solid var(--line); border-radius:5px; overflow:hidden; display:flex; flex-direction:column; }
+  .card.win { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .ch { padding:9px 13px; border-bottom:1px solid var(--line); background:#fcfdfb; }
+  .ch b { font-size:14px; } .ch .tag { float:right; }
+  .stage { height:150px; display:flex; align-items:center; justify-content:center;
+           background:repeating-conic-gradient(#f2f4f0 0% 25%,#fff 0% 50%) 50%/16px 16px;
+           border-bottom:1px solid var(--line); position:relative; }
+  .stage canvas, .stage svg { display:block; image-rendering:pixelated; }
+  .stage .bb { position:absolute; border:1px dashed var(--bad); pointer-events:none; }
+  .stage .bbl { position:absolute; font:10px/1 ui-monospace,monospace; color:var(--bad); background:#fff; padding:1px 3px; }
+  pre { margin:0; padding:11px 13px; font:11.5px/1.5 ui-monospace,Menlo,monospace; overflow-x:auto;
+        background:#fbfcfa; border-bottom:1px solid var(--line); max-height:250px; overflow-y:auto;
+        white-space:pre-wrap; word-break:break-word; color:#39403a; }
+  .an { padding:10px 13px; font-size:12.5px; }
+  .an table { width:100%; border-collapse:collapse; }
+  .an td { padding:2.5px 0; vertical-align:top; border-bottom:1px dotted #eef0ec; }
+  .an td:first-child { color:var(--mut); width:52%; }
+  .an td:last-child { font-family:ui-monospace,Menlo,monospace; font-size:11.5px; text-align:right; }
+  .ok { color:var(--accent); font-weight:600; } .no { color:var(--bad); font-weight:600; }
+  .mid { color:var(--warn); font-weight:600; }
+  .state { background:#fff; border:1px solid var(--line); border-radius:5px; padding:15px 18px; }
+  .state dl { margin:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:9px 26px; }
+  .state dt { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--mut); font-weight:600; }
+  .state dd { margin:1px 0 0; font-family:ui-monospace,Menlo,monospace; font-size:12px; word-break:break-word; }
+  .sw { display:inline-block; width:11px; height:11px; border-radius:2px; border:1px solid #0002; vertical-align:-1px; margin-right:3px; }
+  .tabs { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:0; }
+  .tabs button { border:1px solid var(--line); border-bottom:0; background:#f4f6f2; padding:7px 13px;
+                 font:inherit; font-size:13px; cursor:pointer; border-radius:4px 4px 0 0; color:var(--mut); }
+  .tabs button[aria-selected=true] { background:#fff; color:var(--accent); font-weight:600; border-color:var(--accent); border-bottom:1px solid #fff; margin-bottom:-1px; position:relative; }
+  .panel { background:#fff; border:1px solid var(--accent); border-radius:0 5px 5px 5px; padding:17px 20px; }
+  .panel p { margin:0 0 12px; } .panel .desc { color:var(--mut); font-size:14px; }
+  .steps { list-style:none; margin:0; padding:0; counter-reset:s; }
+  .steps li { counter-increment:s; display:flex; gap:11px; align-items:flex-start; padding:7px 0; border-top:1px solid #f0f2ee; }
+  .steps li:first-child { border-top:0; }
+  .steps li::before { content:counter(s); flex:0 0 21px; height:21px; border-radius:50%; background:#eef2ec;
+                      color:var(--mut); font:600 11px/21px sans-serif; text-align:center; }
+  .steps li.done::before { background:var(--accent); color:#fff; content:"✓"; }
+  .steps .txt { flex:1; font-size:13.5px; } .steps .txt em { display:block; color:var(--mut); font-size:12.5px; font-style:normal; margin-top:1px; }
+  .steps button { flex:0 0 auto; }
+  .note { font-size:12.5px; color:var(--mut); background:#fcfdfb; border:1px dashed var(--line); padding:9px 13px; border-radius:4px; margin-top:11px; }
+  .flash { background:#fdf6e8; border:1px solid #e8d9b0; border-radius:4px; padding:10px 14px; margin:12px 0; font-size:13.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Asset 的表达形式 —— 四种候选，同一批资源</h1>
+<div class="q">
+  <p><b>这张原型要回答的问题</b>：<code>Asset</code> 已经定了「不是位图，而是绘制代码 + 参数」，
+  但<b>具体长什么样</b>没定。四种候选在下面并排跑，用的是同一批 Cozy Farm 资源
+  （cow / tomato / player）。判断标准<b>不是哪个画得好看</b>，而是：
+  这个表达形式能不能撑住系统真正要对它做的操作 ——
+  多状态切换、色板绑定、<b>不渲染就能静态校验</b>、scale 越界检测、精确的 repair diff、非法输入拒绝。</p>
+  <p>上面四个操作里，「不渲染就能静态校验」是本项目最关键的一条 ——
+  它是 Q11 结构化 Visual QA 的地基，也是「自我迭代能收敛而不是随机游走」的前提。
+  <b>请按下面的场景逐个走一遍</b>，特别留意哪些候选在某些操作下直接<b>失能</b>。</p>
+</div>
+
+<div class="bar">
+  <div class="grp"><span>资源</span><div class="seg" id="segAsset"></div></div>
+  <div class="grp"><span>状态</span><div class="seg" id="segState"></div></div>
+  <div class="grp"><span>StyleSpec 色板</span><div class="seg" id="segPal"></div></div>
+  <div class="grp"><span>注入故障（测校验与修复）</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="act" id="btnScale">scale 越界（文档 §31）</button>
+      <button class="act" id="btnOffpal">色板外颜色</button>
+      <button class="act" id="btnMalformed">非法输入</button>
+      <button class="act" id="btnReset">重置</button>
+    </div>
+  </div>
+</div>
+
+<div class="flash" id="flash" hidden></div>
+
+<div class="grid" id="grid"></div>
+
+<h2>当前完整状态</h2>
+<div class="state"><dl id="statePanel"></dl></div>
+
+<h2>场景演练</h2>
+<div class="tabs" id="tabs"></div>
+<div class="panel">
+  <p class="desc" id="scDesc"></p>
+  <ol class="steps" id="scSteps"></ol>
+  <div class="note" id="scNote"></div>
+</div>
+
+<div class="note" style="margin-top:26px">
+  <b>说明</b>：候选 A（SVG）直接由浏览器原生渲染 —— 这本身就是它的优点。
+  B / C / D 需要各自写 renderer 才能看到像素，这是它们的成本。
+  四张卡片下方的「静态分析」表格<b>全部在不渲染的前提下</b>算出来 —— 那才是本票真正要比较的东西。
+</div>
+
+</div>
+<script>
+/* ==========================================================================
+   PURE MODULE — 这一块是可提升的（liftable）。不含任何 DOM 引用。
+   结论落定后，被选中的表达形式 + analyze() 会重写进 demo/src/contracts/。
+   ========================================================================== */
+
+// ---- StyleSpec.palette：两个色板，用于测「色板绑定」----
+const PALETTES = {
+  cozy: { label:'Cozy Farm', colors:['#6AB04C','#F6E7CB','#8B5E3C','#E74C3C','#2ECC71','#FFFFFF','#2C3E50','#F5CBA7','#E67E22'] },
+  cyber:{ label:'Cyberpunk（反例）', colors:['#12121F','#FF2E88','#00E5FF','#B026FF','#39FF14','#F5F5F5','#0A0A12','#FFD166','#FF6B00'] }
+};
+// 语义槽位名（两种色板共用同一套索引语义，这正是 palette 引用的价值）
+const SLOTS = ['grass','cream','soil','fruitRed','leafGreen','white','darkOutline','skin','straw'];
+
+// ---- 几何真相源：候选 B 的格式（严格 DSL，只有数值图元）----
+// op ∈ {rect, circle, ellipse, poly, line}；颜色一律是 "palette:N" 引用
+const GEOM = {
+  tomato: { viewBox:[0,0,32,32], expectedSize:[32,32], states:{
+    growing:[
+      {op:'line',x1:16,y1:14,x2:16,y2:26,stroke:'palette:4',strokeWidth:2},
+      {op:'poly',points:[[12,16],[16,18.5],[20,16],[16,14.5]],fill:'palette:4'},
+      {op:'circle',cx:16,cy:22,r:4.5,fill:'palette:4'}],
+    ripe:[
+      {op:'line',x1:16,y1:9,x2:16,y2:22,stroke:'palette:4',strokeWidth:2},
+      {op:'circle',cx:16,cy:20,r:8,fill:'palette:3'},
+      {op:'poly',points:[[10,12],[16,15],[22,12],[19,9.5],[16,11],[13,9.5]],fill:'palette:4'},
+      {op:'circle',cx:13,cy:17,r:2,fill:'palette:5',opacity:0.45}],
+    harvested:[
+      {op:'ellipse',cx:16,cy:29,rx:5,ry:2,fill:'palette:2'},
+      {op:'line',x1:16,y1:24,x2:16,y2:28,stroke:'palette:2',strokeWidth:2}]
+  }},
+  cow: { viewBox:[0,0,64,48], expectedSize:[80,80], states:{
+    idle:[
+      {op:'rect',x:22,y:31,w:4,h:11,fill:'palette:5'},{op:'rect',x:30,y:31,w:4,h:11,fill:'palette:5'},
+      {op:'rect',x:40,y:31,w:4,h:11,fill:'palette:5'},{op:'rect',x:47,y:31,w:4,h:11,fill:'palette:5'},
+      {op:'rect',x:22,y:41,w:4,h:3,fill:'palette:6'},{op:'rect',x:30,y:41,w:4,h:3,fill:'palette:6'},
+      {op:'rect',x:40,y:41,w:4,h:3,fill:'palette:6'},{op:'rect',x:47,y:41,w:4,h:3,fill:'palette:6'},
+      {op:'line',x1:52,y1:18,x2:57,y2:31,stroke:'palette:5',strokeWidth:2},
+      {op:'ellipse',cx:33,cy:23,rx:19,ry:11,fill:'palette:5'},
+      {op:'poly',points:[[26,15],[36,13.5],[40,22],[30,26]],fill:'palette:6'},
+      {op:'poly',points:[[40,26],[48,24],[49,31],[42,32]],fill:'palette:6'},
+      {op:'ellipse',cx:44,cy:33,rx:4,ry:3,fill:'palette:7'},
+      {op:'ellipse',cx:12,cy:20,rx:9,ry:8,fill:'palette:5'},
+      {op:'poly',points:[[15,11],[17,6.5],[19.5,11]],fill:'palette:1'},
+      {op:'ellipse',cx:19,cy:13.5,rx:3.5,ry:2,fill:'palette:5'},
+      {op:'ellipse',cx:7,cy:23,rx:5,ry:4,fill:'palette:7'},
+      {op:'circle',cx:5.6,cy:22,r:0.9,fill:'palette:6'},
+      {op:'circle',cx:13,cy:17,r:1.6,fill:'palette:6'}],
+    walking:[
+      {op:'rect',x:19,y:31,w:4,h:11,fill:'palette:5'},{op:'rect',x:31,y:31,w:4,h:11,fill:'palette:5'},
+      {op:'rect',x:42,y:31,w:4,h:11,fill:'palette:5'},{op:'rect',x:45,y:31,w:4,h:11,fill:'palette:5'},
+      {op:'rect',x:19,y:41,w:4,h:3,fill:'palette:6'},{op:'rect',x:31,y:41,w:4,h:3,fill:'palette:6'},
+      {op:'rect',x:42,y:41,w:4,h:3,fill:'palette:6'},{op:'rect',x:45,y:41,w:4,h:3,fill:'palette:6'},
+      {op:'line',x1:52,y1:18,x2:59,y2:27,stroke:'palette:5',strokeWidth:2},
+      {op:'ellipse',cx:33,cy:22,rx:19,ry:11,fill:'palette:5'},
+      {op:'poly',points:[[26,14],[36,12.5],[40,21],[30,25]],fill:'palette:6'},
+      {op:'poly',points:[[40,25],[48,23],[49,30],[42,31]],fill:'palette:6'},
+      {op:'ellipse',cx:44,cy:32,rx:4,ry:3,fill:'palette:7'},
+      {op:'ellipse',cx:12,cy:19,rx:9,ry:8,fill:'palette:5'},
+      {op:'poly',points:[[15,10],[17,5.5],[19.5,10]],fill:'palette:1'},
+      {op:'ellipse',cx:19,cy:12.5,rx:3.5,ry:2,fill:'palette:5'},
+      {op:'ellipse',cx:7,cy:22,rx:5,ry:4,fill:'palette:7'},
+      {op:'circle',cx:5.6,cy:21,r:0.9,fill:'palette:6'},
+      {op:'circle',cx:13,cy:16,r:1.6,fill:'palette:6'}]
+  }},
+  player: { viewBox:[0,0,32,48], expectedSize:[32,48], states:{
+    idle:[
+      {op:'rect',x:12,y:36,w:4,h:8,fill:'palette:2'},{op:'rect',x:17,y:36,w:4,h:8,fill:'palette:2'},
+      {op:'rect',x:11,y:43,w:6,h:3,fill:'palette:6'},{op:'rect',x:17,y:43,w:6,h:3,fill:'palette:6'},
+      {op:'rect',x:7,y:25,w:4,h:10,fill:'palette:7'},{op:'rect',x:21,y:25,w:4,h:10,fill:'palette:7'},
+      {op:'rect',x:11,y:24,w:10,h:13,fill:'palette:0'},
+      {op:'circle',cx:16,cy:18,r:6,fill:'palette:7'},
+      {op:'circle',cx:14,cy:17.4,r:1,fill:'palette:6'},{op:'circle',cx:18.2,cy:17.4,r:1,fill:'palette:6'},
+      {op:'rect',x:6,y:11,w:20,h:3,fill:'palette:8'},
+      {op:'poly',points:[[10,11],[11,4],[21,4],[22,11]],fill:'palette:8'}],
+    walk1:[
+      {op:'rect',x:9,y:35,w:4,h:9,fill:'palette:2'},{op:'rect',x:18,y:36,w:4,h:8,fill:'palette:2'},
+      {op:'rect',x:8,y:43,w:6,h:3,fill:'palette:6'},{op:'rect',x:18,y:43,w:6,h:3,fill:'palette:6'},
+      {op:'rect',x:6,y:24,w:4,h:10,fill:'palette:7'},{op:'rect',x:22,y:26,w:4,h:10,fill:'palette:7'},
+      {op:'rect',x:11,y:24,w:10,h:13,fill:'palette:0'},
+      {op:'circle',cx:16,cy:18,r:6,fill:'palette:7'},
+      {op:'circle',cx:14,cy:17.4,r:1,fill:'palette:6'},{op:'circle',cx:18.2,cy:17.4,r:1,fill:'palette:6'},
+      {op:'rect',x:6,y:11,w:20,h:3,fill:'palette:8'},
+      {op:'poly',points:[[10,11],[11,4],[21,4],[22,11]],fill:'palette:8'}],
+    walk2:[
+      {op:'rect',x:11,y:36,w:4,h:8,fill:'palette:2'},{op:'rect',x:19,y:35,w:4,h:9,fill:'palette:2'},
+      {op:'rect',x:10,y:43,w:6,h:3,fill:'palette:6'},{op:'rect',x:19,y:43,w:6,h:3,fill:'palette:6'},
+      {op:'rect',x:6,y:26,w:4,h:10,fill:'palette:7'},{op:'rect',x:22,y:24,w:4,h:10,fill:'palette:7'},
+      {op:'rect',x:11,y:24,w:10,h:13,fill:'palette:0'},
+      {op:'circle',cx:16,cy:18,r:6,fill:'palette:7'},
+      {op:'circle',cx:14,cy:17.4,r:1,fill:'palette:6'},{op:'circle',cx:18.2,cy:17.4,r:1,fill:'palette:6'},
+      {op:'rect',x:6,y:11,w:20,h:3,fill:'palette:8'},
+      {op:'poly',points:[[10,11],[11,4],[21,4],[22,11]],fill:'palette:8'}]
+  }}
+};
+
+// ---- 候选 D 比 B 多出来的东西：freeform path（SVG `d` 字符串）----
+// 这就是 D 的全部卖点，也是它的全部风险 —— `d` 是一个不透明的字符串。
+// ---- 候选 E：B 的严格 DSL + `curve` op（数值控制点列，仍然零不透明字符串）----
+// 与 D 的区别：D 的曲线是 SVG `d` 字符串（不透明）；E 的曲线是数值点列（可静态分析）
+const CURVE_SWAP = {
+  cow:{ idle:[{drop:o=>o.op==='line', add:[{op:'curve',points:[[52,18],[56.5,23],[55,28.5],[57,33]],stroke:'palette:5',strokeWidth:2,closed:false}]}],
+        walking:[{drop:o=>o.op==='line', add:[{op:'curve',points:[[52,18],[58,20],[59,25],[57.5,29]],stroke:'palette:5',strokeWidth:2,closed:false}]}] },
+  tomato:{ ripe:[{drop:o=>o.op==='poly', add:[{op:'curve',points:[[9.5,12.5],[12.5,9.5],[16,11.6],[19.5,9.5],[22.5,12.5],[16,15]],fill:'palette:4',closed:true},
+                                              {op:'curve',points:[[11,17.5],[12.8,14.8],[15.4,14.3]],stroke:'palette:5',strokeWidth:1.4,closed:false,opacity:0.55}]}],
+           growing:[{drop:o=>o.op==='poly', add:[{op:'curve',points:[[12,16.5],[14,14.2],[16,15],[18,14.2],[20,16.5],[16,17.6]],fill:'palette:4',closed:true}]}],
+           harvested:[] },
+  player:{ idle:[{drop:o=>o.op==='rect'&&o.y===11, add:[{op:'curve',points:[[5,12.5],[10.5,10.2],[16,9.6],[21.5,10.2],[27,12.5],[21.5,14.4],[16,15],[10.5,14.4]],fill:'palette:8',closed:true}]}],
+           walk1:[{drop:o=>o.op==='rect'&&o.y===11, add:[{op:'curve',points:[[5,12.5],[10.5,10.2],[16,9.6],[21.5,10.2],[27,12.5],[21.5,14.4],[16,15],[10.5,14.4]],fill:'palette:8',closed:true}]}],
+           walk2:[{drop:o=>o.op==='rect'&&o.y===11, add:[{op:'curve',points:[[5,12.5],[10.5,10.2],[16,9.6],[21.5,10.2],[27,12.5],[21.5,14.4],[16,15],[10.5,14.4]],fill:'palette:8',closed:true}]}] }
+};
+function toCurveOps(assetId,state,ops){
+  for(const sw of (CURVE_SWAP[assetId]||{})[state]||[]){
+    ops = ops.filter(o=>!sw.drop(o));
+    ops = [...ops, ...deep(sw.add)];
+  }
+  return ops;
+}
+
+const HYBRID_PATHS = {
+  cow: {
+    idle:[{op:'path',d:'M52 18 Q59 24 55.5 32.5 Q54 35 56 36',stroke:'palette:5',strokeWidth:2,fill:'none'},
+          {op:'path',d:'M14 23 Q14 12 33 12 Q52 12 52 23 Q52 34 33 34 Q14 34 14 23 Z',stroke:'palette:6',strokeWidth:0.8,fill:'none',opacity:0.35}],
+    walking:[{op:'path',d:'M52 18 Q61 21 58 28 Q57 31 59 33',stroke:'palette:5',strokeWidth:2,fill:'none'}]
+  },
+  tomato: {
+    ripe:[{op:'path',d:'M9.5 12.5 Q16 7.5 22.5 12.5 Q19 10.8 16 11.6 Q13 10.8 9.5 12.5 Z',fill:'palette:4'},
+          {op:'path',d:'M11 17 Q13 14 15.5 14.5',stroke:'palette:5',strokeWidth:1.4,fill:'none',opacity:0.55}],
+    growing:[{op:'path',d:'M12 16.5 Q16 13.5 20 16.5 Q16 15 12 16.5 Z',fill:'palette:4'}],
+    harvested:[]
+  },
+  player: {
+    idle:[{op:'path',d:'M5 12.5 Q16 9 27 12.5 Q16 15 5 12.5 Z',fill:'palette:8'}],
+    walk1:[{op:'path',d:'M5 12.5 Q16 9 27 12.5 Q16 15 5 12.5 Z',fill:'palette:8'}],
+    walk2:[{op:'path',d:'M5 12.5 Q16 9 27 12.5 Q16 15 5 12.5 Z',fill:'palette:8'}]
+  }
+};
+
+// ---- 候选 A：序列化成 SVG 字符串（颜色是硬编码 hex —— 这正是 A 的软肋）----
+function opsToSVG(assetId, state, pal, fault){
+  const ops = applyFault(deep(GEOM[assetId].states[state]), fault);
+  const C = s => resolveColor(s, pal, fault);
+  const vb = GEOM[assetId].viewBox;
+  const body = ops.map(o=>{
+    const f = o.fill && o.fill!=='none' ? ` fill="${C(o.fill)}"` : ' fill="none"';
+    const op = o.opacity!=null ? ` opacity="${o.opacity}"` : '';
+    const sw = o.stroke ? ` stroke="${C(o.stroke)}" stroke-width="${o.strokeWidth||1}" stroke-linecap="round"` : '';
+    switch(o.op){
+      case 'rect':   return `  <rect x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}"${f}${sw}${op}/>`;
+      case 'circle': return `  <circle cx="${o.cx}" cy="${o.cy}" r="${o.r}"${f}${sw}${op}/>`;
+      case 'ellipse':return `  <ellipse cx="${o.cx}" cy="${o.cy}" rx="${o.rx}" ry="${o.ry}"${f}${sw}${op}/>`;
+      case 'poly':   return `  <polygon points="${o.points.map(p=>p.join(',')).join(' ')}"${f}${sw}${op}/>`;
+      case 'line':   return `  <line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}"${sw}${op}/>`;
+      case 'path':   return `  <path d="${o.d}"${f}${sw}${op}/>`;
+    }
+  }).join('\n');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}" width="${vb[2]}" height="${vb[3]}">\n${body}\n</svg>`;
+}
+
+// ---- 候选 B：严格 DSL（JSON，只有数值图元，颜色只能是 palette:N）----
+function opsToDSL(assetId, state, fault){
+  const ops = applyFault(deep(GEOM[assetId].states[state]), fault);
+  if(fault==='malformed'){ ops[1] = {op:'circle',cx:16,cy:'eighteen',r:8,fill:'palette:3'}; }
+  return JSON.stringify({format:'drawlist/v1', id:assetId, viewBox:GEOM[assetId].viewBox,
+    expectedSize:GEOM[assetId].expectedSize, state, ops}, null, 1);
+}
+
+// ---- 候选 E：严格 DSL + 数值曲线 ----
+function opsToCurve(assetId, state, fault){
+  let ops = toCurveOps(assetId, state, deep(GEOM[assetId].states[state]));
+  ops = applyFault(ops, fault);
+  if(fault==='malformed'){ ops[1] = {op:'circle',cx:16,cy:'eighteen',r:8,fill:'palette:3'}; }
+  return JSON.stringify({format:'drawlist+curve/v1', id:assetId, viewBox:GEOM[assetId].viewBox,
+    expectedSize:GEOM[assetId].expectedSize, state, ops}, null, 1);
+}
+
+// ---- 候选 D：DSL + freeform path（B 的超集，多了不透明的 `d` 字符串）----
+function opsToHybrid(assetId, state, fault){
+  const base = deep(GEOM[assetId].states[state]);
+  const extra = (HYBRID_PATHS[assetId]||{})[state] || [];
+  let ops = [...base.filter(o=>!(o.op==='line'&&assetId==='cow')), ...deep(extra)];
+  ops = applyFault(ops, fault);
+  if(fault==='malformed'){ ops.push({op:'path',d:'M16 8 Q ### 坏的 d 字符串',stroke:'palette:4',fill:'none'}); }
+  return JSON.stringify({format:'drawlist+path/v1', id:assetId, viewBox:GEOM[assetId].viewBox,
+    expectedSize:GEOM[assetId].expectedSize, state, ops}, null, 1);
+}
+
+// ---- 候选 C：TypeScript 纯函数（命令式代码，AI 直接吐函数体）----
+function opsToTS(assetId, state, fault){
+  const ops = applyFault(deep(GEOM[assetId].states[state]), fault);
+  const col = s => (fault==='offpalette' && s==='palette:3') ? '#FF00FF' : (s.startsWith('palette:') ? `P[${s.split(':')[1]}]` : `"${s}"`);
+  const L = ops.map(o=>{
+    const setF = o.fill&&o.fill!=='none' ? `  ctx.fillStyle = ${col(o.fill)};\n` : '';
+    const setS = o.stroke ? `  ctx.strokeStyle = ${col(o.stroke)};\n  ctx.lineWidth = ${o.strokeWidth||1};\n  ctx.lineCap = "round";\n` : '';
+    const alp = o.opacity!=null ? `  ctx.globalAlpha = ${o.opacity};\n` : '';
+    const rst = o.opacity!=null ? `  ctx.globalAlpha = 1;\n` : '';
+    switch(o.op){
+      case 'rect':   return `${setF}${alp}  ctx.fillRect(${o.x}, ${o.y}, ${o.w}, ${o.h});\n${rst}`;
+      case 'circle': return `${setF}${alp}  ctx.beginPath(); ctx.arc(${o.cx}, ${o.cy}, ${o.r}, 0, Math.PI*2); ctx.fill();\n${rst}`;
+      case 'ellipse':return `${setF}${alp}  ctx.beginPath(); ctx.ellipse(${o.cx}, ${o.cy}, ${o.rx}, ${o.ry}, 0, 0, Math.PI*2); ctx.fill();\n${rst}`;
+      case 'poly':   return `${setF}${alp}  ctx.beginPath();\n${o.points.map((p,i)=>`  ctx.${i?'lineTo':'moveTo'}(${p[0]}, ${p[1]});`).join('\n')}\n  ctx.closePath(); ctx.fill();\n${rst}`;
+      case 'line':   return `${setS}${alp}  ctx.beginPath(); ctx.moveTo(${o.x1}, ${o.y1}); ctx.lineTo(${o.x2}, ${o.y2}); ctx.stroke();\n${rst}`;
+      case 'path':   return `${setF}${setS}${alp}  ctx.beginPath(); path2d(ctx, "${o.d}");\n${rst}`;
+    }
+  }).join('');
+  let src = `// AI 产出的资源绘制函数 —— 这是代码，不是数据
+export function draw_${assetId}_${state}(ctx, P) {
+${L.replace(/^/gm,'  ').replace(/\n\n/g,'\n')}}`;
+  if(fault==='malformed'){
+    src = src.replace('ctx.arc(16, 18, 8, 0, Math.PI*2); ctx.fill();','ctx.arc(16, 18, 8, 0, Math.PI*2; ctx.fill();');
+    if(!src.includes('Math.PI*2;')) src = src.replace(/ctx\.fillRect\(([^)]*)\);/, 'ctx.fillRect($1;');
+  }
+  return src;
+}
+
+// ---- 故障注入 ----
+function applyFault(ops, fault){
+  if(fault==='scale') return ops.map(o=>{ const r={...o};
+    for(const k of ['x','y','w','h','cx','cy','r','rx','ry','x1','y1','x2','y2']) if(typeof r[k]==='number') r[k]=+(r[k]*2.8).toFixed(2);
+    if(r.points) r.points=r.points.map(p=>p.map(v=>+(v*2.8).toFixed(2)));
+    return r; });
+  if(fault==='offpalette') return ops.map(o=>{ const r={...o};
+    if(r.fill==='palette:3') r.fill='#FF00FF'; if(r.stroke==='palette:3') r.stroke='#FF00FF'; return r; });
+  return ops;
+}
+function resolveColor(s, pal, fault){
+  if(s && s.startsWith && s.startsWith('palette:')) return pal.colors[+s.split(':')[1]] || '#000';
+  if(fault==='offpalette' && s==='palette:3') return '#FF00FF';
+  return s || '#000';
+}
+const deep = o => JSON.parse(JSON.stringify(o));
+
+// ---- 生成四种候选的产物 ----
+function buildArtifact(kind, assetId, state, pal, fault){
+  if(kind==='A') return {text: opsToSVG(assetId,state,pal,fault), kind:'svg'};
+  if(kind==='B') return {text: opsToDSL(assetId,state,fault), kind:'dsl'};
+  if(kind==='C') return {text: opsToTS(assetId,state,fault), kind:'ts'};
+  if(kind==='E') return {text: opsToCurve(assetId,state,fault), kind:'dsl+curve'};
+  return {text: opsToHybrid(assetId,state,fault), kind:'dsl+path'};
+}
+
+// 从 AI 产出的 TS 源码里取出函数体（不靠脆弱正则：注释行、export、函数名都不影响）
+function fnBody(src){
+  const p = src.indexOf(')');                 // 形参表结束
+  const i = src.indexOf('{', p);              // 函数体起点
+  if(p < 0 || i < 0) throw new Error('不是合法函数定义');
+  const j = src.lastIndexOf('}');
+  if(j <= i) throw new Error('函数体未闭合');
+  return src.slice(i+1, j);
+}
+
+/* ---------- 静态分析器：全部只读产物文本，不渲染 ---------- */
+const NUM_OPS = {rect:['x','y','w','h'], circle:['cx','cy','r'], ellipse:['cx','cy','rx','ry'], line:['x1','y1','x2','y2']};
+const DSL_FIELDS = {rect:['x','y','w','h'],circle:['cx','cy','r'],ellipse:['cx','cy','rx','ry'],
+  line:['x1','y1','x2','y2'],poly:['points'],curve:['points'],path:['d']};
+
+function validateDrawList(o){                       // 相当于 Zod schema 的最小实现
+  const e=[];
+  if(typeof o!=='object'||o===null) return ['根节点不是对象'];
+  if(o.format==null) e.push('缺 format');
+  if(!Array.isArray(o.ops)) { e.push('ops 不是数组'); return e; }
+  o.ops.forEach((op,i)=>{
+    if(!op||typeof op!=='object') return e.push(`ops[${i}] 不是对象`);
+    if(!DSL_FIELDS[op.op]) return e.push(`ops[${i}].op = ${JSON.stringify(op.op)} 不在允许集合内`);
+    for(const f of DSL_FIELDS[op.op]){
+      if(op[f]===undefined) e.push(`ops[${i}].${f} 缺失`);
+      else if(f!=='d' && f!=='points' && typeof op[f]!=='number')
+        e.push(`ops[${i}].${f} = ${JSON.stringify(op[f])}，期望 number`);
+    }
+    if((op.op==='poly'||op.op==='curve') && !(Array.isArray(op.points)&&op.points.length>=2&&op.points.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))))
+      e.push(`ops[${i}].points 不是合法的数值点列`);
+    for(const c of ['fill','stroke'])
+      if(op[c] && op[c]!=='none' && !/^palette:\d+$/.test(op[c]))
+        e.push(`ops[${i}].${c} = ${JSON.stringify(op[c])} —— 不是 palette:N 引用（硬编码颜色）`);
+  });
+  return e;
+}
+function boundsOfOps(ops){
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity, unknown=0;
+  const pt=(x,y)=>{ if(x<x0)x0=x; if(y<y0)y0=y; if(x>x1)x1=x; if(y>y1)y1=y; };
+  for(const o of ops||[]){
+    const sw=(o.strokeWidth||0)/2;
+    if(o.op==='rect'){ pt(o.x-sw,o.y-sw); pt(o.x+o.w+sw,o.y+o.h+sw); }
+    else if(o.op==='circle'){ pt(o.cx-o.r-sw,o.cy-o.r-sw); pt(o.cx+o.r+sw,o.cy+o.r+sw); }
+    else if(o.op==='ellipse'){ pt(o.cx-o.rx-sw,o.cy-o.ry-sw); pt(o.cx+o.rx+sw,o.cy+o.ry+sw); }
+    else if(o.op==='line'){ pt(o.x1-sw,o.y1-sw); pt(o.x2+sw,o.y2+sw); }
+    else if(o.op==='poly'){ for(const p of o.points) pt(p[0],p[1]); }
+    else if(o.op==='curve'){ for(const p of o.points) pt(p[0]-sw,p[1]-sw),pt(p[0]+sw,p[1]+sw); }
+    else if(o.op==='path'){ unknown++; }              // ← `d` 是不透明字符串，静态算不出
+  }
+  if(!isFinite(x0)) return {box:null, unknown};
+  return {box:{x:+x0.toFixed(1),y:+y0.toFixed(1),w:+(x1-x0).toFixed(1),h:+(y1-y0).toFixed(1)}, unknown};
+}
+function resolveRefs(ops, pal){
+  const used=[], off=[];
+  for(const o of ops||[]) for(const c of ['fill','stroke']){
+    const v=o[c]; if(!v||v==='none') continue;
+    if(/^palette:\d+$/.test(v)){ const i=+v.split(':')[1];
+      if(i>=pal.colors.length) off.push(`${v}（索引越界）`); else used.push(pal.colors[i]); }
+    else { used.push(v); if(!pal.colors.includes(v.toUpperCase())&&!pal.colors.includes(v)) off.push(v); }
+  }
+  return {used:[...new Set(used)], off:[...new Set(off)]};
+}
+function analyze(kind, text, pal, expectedSize){
+  const R = {parse:'—',parseOk:null,schemaErrs:[],colors:[],off:[],bound:false,bounds:null,boundsHow:'—',
+             mismatch:null,opaque:0,zod:false,needsExec:false,diffGran:'—',ops:0};
+  if(kind==='B'||kind==='D'||kind==='E'){
+    let o; try{o=JSON.parse(text); R.parseOk=true; R.parse='JSON.parse ✓';}
+    catch(e){R.parseOk=false; R.parse='JSON 解析失败'; R.schemaErrs=[e.message]; return R;}
+    R.schemaErrs = validateDrawList(o);
+    R.zod = true; R.ops = (o.ops||[]).length;
+    const col = resolveRefs(o.ops, pal);
+    R.colors=col.used; R.off=col.off; R.bound = (o.ops||[]).every(x=>['fill','stroke'].every(c=>!x[c]||x[c]==='none'||/^palette:\d+$/.test(x[c])));
+    const b = boundsOfOps(o.ops);
+    const hasCurve=(o.ops||[]).some(x=>x.op==='curve');
+    R.bounds=b.box;
+    R.boundsHow = b.unknown? `数值图元可算，${b.unknown} 个 path 算不出`
+      : hasCurve? '纯数值；curve 用点列凸包（**保守上界**，只会高估不会漏报）'
+      : '纯数值，精确可算';
+    R.opaque = b.unknown;
+    R.mismatch = b.box ? Math.max(b.box.w/expectedSize[0], b.box.h/expectedSize[1]) : null;
+    R.diffGran = b.unknown ? '按 op 定位；path 内部改不了' : '按 op 索引 + 字段名精确定位';
+    return R;
+  }
+  if(kind==='A'){
+    const doc = new DOMParser().parseFromString(text,'image/svg+xml');
+    const err = doc.querySelector('parsererror');
+    if(err){ R.parseOk=false; R.parse='XML 解析失败'; R.schemaErrs=[err.textContent.trim().split('\n')[0]]; return R; }
+    R.parseOk=true; R.parse='DOMParser ✓'; R.zod=false;
+    const els=[...doc.documentElement.querySelectorAll('*')]; R.ops=els.length;
+    const raw=[];
+    for(const el of els) for(const a of ['fill','stroke']){ const v=el.getAttribute(a); if(v&&v!=='none') raw.push(v); }
+    R.colors=[...new Set(raw)]; R.off=[...new Set(raw.filter(c=>!pal.colors.includes(c.toUpperCase())&&c!=='none'))];
+    R.bound=false;
+    // 从数值属性推 bounds；<path> 推不出
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity,unk=0;
+    const pt=(x,y)=>{x=+x;y=+y;if(x<x0)x0=x;if(y<y0)y0=y;if(x>x1)x1=x;if(y>y1)y1=y;};
+    for(const el of els){ const t=el.tagName;
+      if(t==='rect'){pt(el.getAttribute('x'),el.getAttribute('y'));pt(+el.getAttribute('x')+ +el.getAttribute('width'),+el.getAttribute('y')+ +el.getAttribute('height'));}
+      else if(t==='circle'){const c=+el.getAttribute('r');pt(+el.getAttribute('cx')-c,+el.getAttribute('cy')-c);pt(+el.getAttribute('cx')+c,+el.getAttribute('cy')+c);}
+      else if(t==='ellipse'){pt(+el.getAttribute('cx')-+el.getAttribute('rx'),+el.getAttribute('cy')-+el.getAttribute('ry'));pt(+el.getAttribute('cx')+ +el.getAttribute('rx'),+el.getAttribute('cy')+ +el.getAttribute('ry'));}
+      else if(t==='line'){pt(el.getAttribute('x1'),el.getAttribute('y1'));pt(el.getAttribute('x2'),el.getAttribute('y2'));}
+      else if(t==='polygon'){(el.getAttribute('points')||'').trim().split(/\s+/).forEach(p=>{const[a,b]=p.split(',');pt(a,b);});}
+      else if(t==='path')unk++;
+    }
+    R.bounds = isFinite(x0)?{x:+x0.toFixed(1),y:+y0.toFixed(1),w:+(x1-x0).toFixed(1),h:+(y1-y0).toFixed(1)}:null;
+    R.boundsHow = unk? `属性可算，${unk} 个 <path> 算不出` : '从 XML 属性可算（需自己写遍历）';
+    R.opaque=unk; R.mismatch = R.bounds? Math.max(R.bounds.w/expectedSize[0], R.bounds.h/expectedSize[1]) : null;
+    R.schemaErrs = R.off.length? R.off.map(c=>`${c} 不在 StyleSpec.palette 内（只有渲染/解析后才发现）`) : [];
+    R.diffGran='按 XML 节点定位；需先解析成树';
+    return R;
+  }
+  // C：TypeScript 函数
+  R.zod=false;
+  let fn; try{ fn = new Function('ctx','P','path2d', fnBody(text)); R.parseOk=true; R.parse='new Function ✓'; }
+  catch(e){ R.parseOk=false; R.parse='语法错误（import 时才炸）'; R.schemaErrs=[e.message]; return R; }
+  const hex=[...text.matchAll(/#[0-9A-Fa-f]{6}/g)].map(m=>m[0]);
+  const refs=[...text.matchAll(/P\[(\d+)\]/g)].map(m=>pal.colors[+m[1]]);
+  R.colors=[...new Set([...hex,...refs].filter(Boolean))];
+  R.off=[...new Set(hex.filter(h=>!pal.colors.includes(h.toUpperCase())))];
+  R.bound = hex.length===0 && refs.length>0;
+  R.bounds=null; R.boundsHow='**静态不可知** —— 只能渲染后扫描像素';
+  R.needsExec=true; R.opaque=1;
+  R.ops=(text.match(/ctx\.(fillRect|arc|ellipse|beginPath|moveTo|stroke|fill)\(/g)||[]).length;
+  R.schemaErrs = R.off.length? R.off.map(c=>`${c} 硬编码在函数体里，不在色板内`) : [];
+  R.diffGran='**只能整函数重写** —— 没有可定位的字段';
+  R._fn = fn;
+  return R;
+}
+
+/* ---------- 渲染 ---------- */
+function path2d(ctx,d){ try{ const p=new Path2D(d); ctx.stroke(p); }catch(e){ throw new Error('Path2D 解析失败: '+d.slice(0,30)); } }
+function drawOps(ctx, ops, pal){
+  for(const o of ops){
+    const F = o.fill&&o.fill!=='none' ? resolveColor(o.fill,pal) : null;
+    const S = o.stroke ? resolveColor(o.stroke,pal) : null;
+    ctx.globalAlpha = o.opacity!=null?o.opacity:1;
+    if(o.op==='rect'){ if(F){ctx.fillStyle=F;ctx.fillRect(o.x,o.y,o.w,o.h);} }
+    else if(o.op==='circle'){ if(F){ctx.fillStyle=F;ctx.beginPath();ctx.arc(o.cx,o.cy,o.r,0,Math.PI*2);ctx.fill();} }
+    else if(o.op==='ellipse'){ if(F){ctx.fillStyle=F;ctx.beginPath();ctx.ellipse(o.cx,o.cy,o.rx,o.ry,0,0,Math.PI*2);ctx.fill();} }
+    else if(o.op==='poly'){ if(F){ctx.fillStyle=F;ctx.beginPath();o.points.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](p[0],p[1]));ctx.closePath();ctx.fill();} }
+    else if(o.op==='line'){ if(S){ctx.strokeStyle=S;ctx.lineWidth=o.strokeWidth||1;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(o.x1,o.y1);ctx.lineTo(o.x2,o.y2);ctx.stroke();} }
+    else if(o.op==='curve'){ const P=o.points;
+      const trace=()=>{ ctx.beginPath(); ctx.moveTo(P[0][0],P[0][1]);
+        for(let i=0;i<P.length-1;i++){ const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||p2;
+          ctx.bezierCurveTo(p1[0]+(p2[0]-p0[0])/6, p1[1]+(p2[1]-p0[1])/6,
+                            p2[0]-(p3[0]-p1[0])/6, p2[1]-(p3[1]-p1[1])/6, p2[0], p2[1]); }
+        if(o.closed) ctx.closePath(); };
+      trace(); if(F){ctx.fillStyle=F;ctx.fill();} if(S){ctx.strokeStyle=S;ctx.lineWidth=o.strokeWidth||1;ctx.lineCap='round';ctx.stroke();} }
+    else if(o.op==='path'){ const p=new Path2D(o.d);
+      if(F&&F!=='none'){ctx.fillStyle=F;ctx.fill(p);} if(S){ctx.strokeStyle=S;ctx.lineWidth=o.strokeWidth||1;ctx.lineCap='round';ctx.stroke(p);} }
+    ctx.globalAlpha=1;
+  }
+}
+function measureInk(draw, pal, vb){          // 只有渲染完才能知道的事 —— C 的唯一出路
+  const c=document.createElement('canvas'); c.width=vb[2]*3; c.height=vb[3]*3;
+  const x=c.getContext('2d'); x.scale(3,3);
+  try{ draw(x,pal,(ctx,d)=>path2d(ctx,d)); }catch(e){ return {err:e.message}; }
+  const d=x.getImageData(0,0,c.width,c.height).data;
+  let x0=1e9,y0=1e9,x1=-1,y1=-1,n=0;
+  for(let i=3;i<d.length;i+=4) if(d[i]>0){ n++; const p=(i-3)/4, px=p%c.width, py=(p/c.width)|0;
+    if(px<x0)x0=px; if(py<y0)y0=py; if(px>x1)x1=px; if(py>y1)y1=py; }
+  return n? {box:{w:+((x1-x0)/3).toFixed(1),h:+((y1-y0)/3).toFixed(1)}, inkPx:n} : {box:null,inkPx:0};
+}
+
+/* ---------- 故障激活时，每种候选的「结局」 ---------- */
+function verdict(kind, fault, R){
+  if(!fault) return null;
+  if(fault==='scale'){
+    if(kind==='C') return {t:'bad', s:'静态看不出。必须渲染 + 扫描像素才知道画成了多大 —— 而那已经是运行时了'};
+    if(R.bounds) return {t: R.mismatch>1.35?'bad':'ok',
+      s:`静态算出 ${R.bounds.w}×${R.bounds.h}，期望 ${GEOM[S.asset].expectedSize.join('×')} → 超出 ${(R.mismatch*100|0)}%。${R.opaque?`（另有 ${R.opaque} 个 path 未计入，实际可能更大）`:'精确'}`};
+    return {t:'mid', s:'算不出包围盒'};
+  }
+  if(fault==='offpalette'){
+    if(kind==='B'||kind==='E') return {t:'ok', s:'**schema 直接拒绝**：fill 必须是 palette:N。硬编码 hex 根本进不了系统 —— 这条 issue 不可能发生'};
+    if(kind==='D') return {t:'ok', s:'同 B：颜色字段受 schema 约束。（但 `d` 字符串里若藏了颜色则查不到）'};
+    if(kind==='A') return {t:'mid', s:'要 XML 解析 + 遍历属性才能发现，且是**渲染前**的最后关口'};
+    return {t:'bad', s:'要 regex 扫函数体，且无法保证扫全（颜色可以是变量、可以是计算结果）'};
+  }
+  if(fault==='malformed'){
+    if(kind==='B'||kind==='E') return {t:'ok', s:'JSON + schema 双重拒绝，**错误定位到 ops[1].cy**'};
+    if(kind==='D') return {t:'bad', s:'JSON 和 schema 都通过（`d` 只是个字符串）—— **要到渲染时才炸**，报错在 Path2D 里'};
+    if(kind==='A') return {t:'mid', s:'XML 解析器拒绝，但报错是「标签未闭合」，不指向语义'};
+    return {t:'bad', s:'SyntaxError，且是在 **import 时**炸 —— 整个模块加载失败，不是单个资源失败'};
+  }
+}
+
+/* ---------- 页面状态 ---------- */
+const S = {asset:'cow', state:'idle', pal:'cozy', fault:null, sc:0, step:0};
+const KINDS = [
+  {k:'A', name:'SVG 字符串', sub:'AI 吐 <svg> 文本'},
+  {k:'B', name:'严格 DSL', sub:'只有数值图元的 JSON'},
+  {k:'C', name:'TypeScript 纯函数', sub:'命令式绘制代码'},
+  {k:'D', name:'DSL + freeform path', sub:'B 的超集，`d` 是不透明字符串'},
+  {k:'E', name:'B+ 数值曲线 ★', sub:'B 的超集，curve 用数值点列'}
+];
+const SCEN = [
+  {tab:'① 多状态', desc:'AssetSpec.states 要求一个资源有多个状态（番茄 growing → ripe → harvested）。看四种表达各自怎么承载「同一个资源的多个版本」，以及切状态时的 diff 有多大。',
+   note:'关注点：B/D 是「一个 JSON 里挂多个 ops 数组」还是「多个文件」？A 的 SVG 要多份文档还是用 <g display>？C 是多个函数还是一个函数带 switch？—— 这直接影响票 16（Repair）能不能只重生成一个状态。',
+   steps:[
+    {t:'选中 tomato', h:'番茄有三个状态，是最能体现多状态的资源', r:()=>{S.asset='tomato';S.state='growing';S.fault=null;}},
+    {t:'切到 ripe（成熟）', h:'看四张卡片的产物文本各自变了多少', r:()=>{S.state='ripe';}},
+    {t:'切到 harvested（已采摘）', h:'采摘后只剩一个土坑 —— 状态之间差异极大，不是小修补', r:()=>{S.state='harvested';}},
+    {t:'换 cow，看 walking 状态', h:'cow 的 idle / walking 只差腿和尾巴的位置', r:()=>{S.asset='cow';S.state='walking';}}]},
+  {tab:'② 色板绑定', desc:'StyleSpec.palette 是整个视觉世界的约束。把色板从 Cozy Farm 换成 Cyberpunk，看哪些候选**自动跟随**、哪些**纹丝不动**。这是「Novel Asset Style Consistency」能不能被保证的关键。',
+   note:'关注点：B/D 用 palette:N 引用，换色板后资源自动变；A 把 hex 烧死在文本里，换色板必须重新生成整份 SVG；C 若用 P[n] 索引也能跟随，但没人强制它这么写。**「颜色 ∈ palette」在 B/D 里是编译期恒真，在 A/C 里是运行时检查。**',
+   steps:[
+    {t:'选中 cow · idle · Cozy 色板', h:'先记住现在的样子', r:()=>{S.asset='cow';S.state='idle';S.pal='cozy';S.fault=null;}},
+    {t:'换成 Cyberpunk 色板', h:'⚠️ 看哪几张卡片的画面**没变** —— 没变的就是没绑上色板', r:()=>{S.pal='cyber';}},
+    {t:'切到 tomato · ripe', h:'番茄的红在两套色板下应该完全不同', r:()=>{S.asset='tomato';S.state='ripe';}},
+    {t:'换回 Cozy 色板', h:'确认绑定是可逆的、无损的', r:()=>{S.pal='cozy';}}]},
+  {tab:'③ 静态校验', desc:'注入一个「色板外颜色」的故障（#FF00FF 不在任何色板里）。**不做任何渲染**，看四种候选各自能不能发现、什么时候发现、报错有多精确。',
+   note:'关注点：这是 Q11 结构化 Visual QA 的地基。B 的答案最激进 —— 它不是「查出来了」，而是**这种数据根本构造不出来**（schema 不允许硬编码颜色）。一个能让非法状态无法表达的类型，胜过一万个运行时检查。',
+   steps:[
+    {t:'选中 tomato · ripe', h:'番茄的红色是 palette:3', r:()=>{S.asset='tomato';S.state='ripe';S.fault=null;}},
+    {t:'注入「色板外颜色」', h:'把 palette:3 换成硬编码 #FF00FF，然后看四张卡片的「静态分析」表格', r:()=>{S.fault='offpalette';}},
+    {t:'取消故障', h:'对照一下正常状态', r:()=>{S.fault=null;}}]},
+  {tab:'④ scale 越界', desc:'文档 §31 的经典例子：cow 画成了 180×160，但 GameSpec 期望 80×80。注入 ×2.8 的缩放故障，看谁能**在渲染之前**算出包围盒。红色虚线框是静态算出的包围盒。',
+   note:'关注点：C（TS 函数）在这里彻底失能 —— 包围盒只能靠「渲染到离屏 canvas 再逐像素扫 alpha」得到，而那已经是运行时了。B 精确可算。D 有一个盲区：`path` 的 `d` 是不透明字符串，算不出它贡献的范围。A 介于两者之间。',
+   steps:[
+    {t:'选中 cow · idle', h:'cow 的 expectedSize 是 80×80', r:()=>{S.asset='cow';S.state='idle';S.fault=null;}},
+    {t:'注入 scale 越界（×2.8）', h:'看红色虚线框和「包围盒 / 超出百分比」两行', r:()=>{S.fault='scale';}},
+    {t:'切到 player 再看一次', h:'player 的 expectedSize 是 32×48，比例不同', r:()=>{S.asset='player';S.state='idle';}},
+    {t:'取消故障', h:'', r:()=>{S.fault=null;}}]},
+  {tab:'⑤ 非法输入', desc:'AI 会吐坏数据 —— 这不是「如果」而是「多久一次」。票 01 实测纯文本 JSON 是 9/9 通过，但那只是 9 次。注入四种候选各自最典型的坏法，看失败模式的区别。',
+   note:'关注点：失败**时机**比失败本身更重要。B 在解析时失败（最早、最便宜、定位精确）；A 在 XML 解析时失败（早，但报错不指向语义）；D 在**渲染时**才失败（晚 —— 已经进了 build 阶段）；C 在 **import 时**失败（最晚且最糟 —— 一个坏资源会让整个模块加载失败，而不是单个资源失败）。',
+   steps:[
+    {t:'选中 tomato · ripe', h:'', r:()=>{S.asset='tomato';S.state='ripe';S.fault=null;}},
+    {t:'注入非法输入', h:'四张卡片会各自以不同方式、在不同时机崩掉', r:()=>{S.fault='malformed';}},
+    {t:'重置', h:'', r:()=>{S.fault=null;}}]},
+  {tab:'⑥ 表现力', desc:'前面五个场景都在比「可检查性」，但表达形式还得**画得出来**。这个场景不加故障，纯看四种候选画同一批资源的效果差异 —— 特别是 D 比 B 多出来的 freeform path 到底买到了什么。',
+   note:'关注点：B 只有 rect/circle/ellipse/poly/line，画有机曲线（牛尾巴的摆动、帽檐的弧度、番茄叶的自然形状）只能靠折线逼近。D 用 `path` 的 `d` 字符串换来了曲线 —— 代价是那段字符串**静态不可分析**。这就是本票真正的取舍：可检查性 vs 表现力，而 D 是「大部分可检查 + 一小块不可检查」。',
+   steps:[
+    {t:'看 cow · idle（注意尾巴）', h:'B 的尾巴是一条直线；D 的尾巴是曲线', r:()=>{S.asset='cow';S.state='idle';S.fault=null;}},
+    {t:'看 cow · walking', h:'走路时尾巴扬起来 —— 曲线和直线的差别更明显', r:()=>{S.state='walking';}},
+    {t:'看 tomato · ripe（注意叶冠和高光）', h:'D 的叶片是自然曲线，B 是折线', r:()=>{S.asset='tomato';S.state='ripe';}},
+    {t:'看 player · idle（注意帽檐）', h:'D 的帽檐有弧度', r:()=>{S.asset='player';S.state='idle';}}]}
+];
+
+/* ---------- 渲染页面 ---------- */
+function seg(el, opts, cur, set){
+  el.innerHTML='';
+  for(const [v,l] of opts){ const b=document.createElement('button'); b.textContent=l;
+    b.setAttribute('aria-pressed', String(v===cur)); b.onclick=()=>{set(v); render();}; el.appendChild(b); }
+}
+function buildControls(){
+  seg(document.getElementById('segAsset'), Object.keys(GEOM).map(k=>[k,k]), S.asset, v=>{S.asset=v;S.state=Object.keys(GEOM[v].states)[0];});
+  seg(document.getElementById('segState'), Object.keys(GEOM[S.asset].states).map(k=>[k,k]), S.state, v=>S.state=v);
+  seg(document.getElementById('segPal'), Object.entries(PALETTES).map(([k,v])=>[k,v.label]), S.pal, v=>S.pal=v);
+  for(const [id,f] of [['btnScale','scale'],['btnOffpal','offpalette'],['btnMalformed','malformed']])
+    document.getElementById(id).classList.toggle('on', S.fault===f);
+}
+function cardHTML(kind){
+  const meta=KINDS.find(k=>k.k===kind);
+  return `<div class="card" id="card${kind}">
+    <div class="ch"><b>${kind} · ${meta.name}</b><span class="tag">${meta.sub}</span></div>
+    <div class="stage" id="stage${kind}"></div>
+    <pre id="src${kind}"></pre>
+    <div class="an" id="an${kind}"></div></div>`;
+}
+function render(){
+  buildControls();
+  const grid=document.getElementById('grid');
+  if(grid.children.length!==KINDS.length) grid.innerHTML=KINDS.map(k=>cardHTML(k.k)).join('');
+  const pal=PALETTES[S.pal], vb=GEOM[S.asset].viewBox, exp=GEOM[S.asset].expectedSize;
+  const flashes=[];
+  for(const {k} of KINDS){
+    const art=buildArtifact(k, S.asset, S.state, pal, S.fault);
+    let R; try{ R=analyze(k, art.text, pal, exp); }catch(e){ R={parse:'分析器异常',parseOk:false,schemaErrs:[e.message],colors:[],off:[],bounds:null,boundsHow:'—',mismatch:null,opaque:0,zod:false,needsExec:false,diffGran:'—',ops:0}; }
+    // 产物文本
+    document.getElementById('src'+k).textContent = art.text.length>2600 ? art.text.slice(0,2600)+'\n… （截断，共 '+art.text.length+' 字符）' : art.text;
+    // 画面
+    const stage=document.getElementById('stage'+k); stage.innerHTML='';
+    const SC=Math.min(120/vb[2],120/vb[3]);
+    let renderErr=null;
+    if(k==='A'){ const d=document.createElement('div'); d.innerHTML=art.text;
+      const sv=d.firstElementChild; if(sv){ sv.setAttribute('width',vb[2]*SC); sv.setAttribute('height',vb[3]*SC); stage.appendChild(sv);} }
+    else { const c=document.createElement('canvas'); c.width=vb[2]*SC; c.height=vb[3]*SC;
+      const x=c.getContext('2d'); x.scale(SC,SC);
+      try{ if(k==='C'){ const m=measureInk(R._fn||(()=>{}),pal,vb);
+             if(m.err) renderErr=m.err; else { R._fn(x,pal.colors,(ctx,dd)=>path2d(ctx,dd)); if(m.box&&!R.bounds) R.bounds=m.box, R.boundsHow='渲染后扫像素得到（'+m.inkPx+' 个墨水像素）'; } }
+           else drawOps(x, JSON.parse(art.text).ops, pal);
+      }catch(e){ renderErr=e.message; }
+      stage.appendChild(c); }
+    if(renderErr){ const e=document.createElement('div'); e.style.cssText='position:absolute;bottom:4px;left:4px;right:4px;font:11px/1.4 ui-monospace,monospace;color:#a33;background:#fff8f8;border:1px solid #ecc;padding:4px 6px;border-radius:3px';
+      e.textContent='✗ 渲染时失败: '+renderErr.slice(0,110); stage.appendChild(e); }
+    // 静态算出的包围盒（红虚线）
+    if(R.bounds && S.fault==='scale'){ const b=document.createElement('div'); b.className='bb';
+      b.style.cssText=`left:${(vb[2]/2-R.bounds.w/2)*SC+stage.clientWidth/2-vb[2]*SC/2}px;top:${(vb[3]/2-R.bounds.h/2)*SC+15}px;width:${Math.min(R.bounds.w*SC,stage.clientWidth-8)}px;height:${Math.min(R.bounds.h*SC,140)}px`;
+      stage.appendChild(b); }
+    // 分析表
+    const V=verdict(k,S.fault,R);
+    const row=(l,v,c)=>`<tr><td>${l}</td><td class="${c||''}">${v}</td></tr>`;
+    const yn=(b,y,n)=>b?`<span class="ok">${y||'是'}</span>`:`<span class="no">${n||'否'}</span>`;
+    document.getElementById('an'+k).innerHTML = `<table>
+      ${row('解析', R.parse, R.parseOk?'ok':'no')}
+      ${row('Schema 可校验（Zod）', yn(R.zod,'可以，一层','不行'))}
+      ${row('颜色是否绑定色板', R.bound?`<span class="ok">palette:N 引用</span>`:`<span class="no">硬编码 hex</span>`)}
+      ${row('用到的颜色', R.colors.length? R.colors.map(c=>`<span class="sw" style="background:${c}"></span>`).join('') : '—')}
+      ${row('色板外颜色', R.off.length?`<span class="no">${R.off.join(' ')}</span>`:`<span class="ok">无</span>`)}
+      ${row('包围盒（不渲染）', R.bounds?`${R.bounds.w}×${R.bounds.h}`:`<span class="no">不可知</span>`, R.bounds?'':'no')}
+      ${row('　怎么得到的', R.boundsHow.replace(/\*\*/g,''), R.needsExec?'no':'mid')}
+      ${row('vs 期望 '+exp.join('×'), R.mismatch==null?'—':(R.mismatch>1.35?`<span class="no">超出 ${(R.mismatch*100|0)}%</span>`:`<span class="ok">${(R.mismatch*100|0)}%</span>`))}
+      ${row('不透明字符串', R.opaque===0?`<span class="ok">0</span>`:`<span class="mid">${R.opaque}</span>`)}
+      ${row('图元 / 语句数', R.ops)}
+      ${row('Repair diff 粒度', R.diffGran.replace(/\*\*/g,''), R.needsExec?'no':'')}
+    </table>` + (R.schemaErrs.length?`<div style="margin-top:8px;font-size:11.5px;color:#a33;font-family:ui-monospace,monospace;line-height:1.5">${R.schemaErrs.slice(0,4).map(e=>'✗ '+e).join('<br>')}</div>`:'')
+      + (V?`<div style="margin-top:9px;padding:7px 9px;border-radius:4px;font-size:12.5px;line-height:1.55;background:${V.t==='ok'?'#eef5ec':V.t==='mid'?'#fdf6e8':'#fdf0f0'};border:1px solid ${V.t==='ok'?'#cfe0ca':V.t==='mid'?'#e8d9b0':'#ecc9c9'}">${V.s.replace(/\*\*/g,'')}</div>`:'');
+    if(V && S.fault) flashes.push(`${k}: ${V.s.replace(/\*\*/g,'')}`);
+  }
+  // 全局状态面板
+  const pal2=PALETTES[S.pal];
+  document.getElementById('statePanel').innerHTML = [
+    ['资源 (AssetSpec.id)', S.asset],
+    ['状态 (state)', S.state],
+    ['viewBox', GEOM[S.asset].viewBox.join(' ')],
+    ['期望尺寸 (expectedSize)', GEOM[S.asset].expectedSize.join(' × ')],
+    ['StyleSpec.palette', S.pal+' · '+pal2.label],
+    ['色板内容', pal2.colors.map((c,i)=>`<span class="sw" style="background:${c}" title="${SLOTS[i]}"></span>${i}`).join(' ')],
+    ['注入的故障', S.fault? `<span class="no">${({scale:'scale 越界 ×2.8',offpalette:'色板外颜色 #FF00FF',malformed:'非法输入'})[S.fault]}</span>` : '<span class="ok">无</span>'],
+    ['四种候选的产物大小', KINDS.map(({k})=>{const a=buildArtifact(k,S.asset,S.state,pal2,S.fault);return k+'='+a.text.length+'B';}).join('  ')]
+  ].map(([t,d])=>`<div><dt>${t}</dt><dd>${d}</dd></div>`).join('');
+  const fl=document.getElementById('flash');
+  if(S.fault && flashes.length){ fl.hidden=false;
+    fl.innerHTML=`<b>故障「${({scale:'scale 越界',offpalette:'色板外颜色',malformed:'非法输入'})[S.fault]}」在四种候选下的结局：</b><br>`+flashes.map(f=>'· '+f).join('<br>'); }
+  else fl.hidden=true;
+  renderScen();
+}
+function renderScen(){
+  const tabs=document.getElementById('tabs');
+  if(tabs.children.length!==SCEN.length) tabs.innerHTML=SCEN.map((s,i)=>`<button data-i="${i}">${s.tab}</button>`).join('');
+  [...tabs.children].forEach((b,i)=>{ b.setAttribute('aria-selected',String(i===S.sc)); b.onclick=()=>{S.sc=i;S.step=0;renderScen();}; });
+  const sc=SCEN[S.sc];
+  document.getElementById('scDesc').textContent=sc.desc;
+  document.getElementById('scNote').innerHTML='<b>观察要点：</b>'+sc.note;
+  document.getElementById('scSteps').innerHTML='';
+  sc.steps.forEach((st,i)=>{
+    const li=document.createElement('li'); if(i<S.step) li.className='done';
+    const d=document.createElement('div'); d.className='txt';
+    d.innerHTML=`<b>${st.t}</b>${st.h?`<em>${st.h}</em>`:''}`;
+    const b=document.createElement('button'); b.className='act'; b.textContent= i<S.step?'已执行 ✓':'执行这一步';
+    b.disabled = i!==S.step; if(i<S.step) b.disabled=true;
+    b.onclick=()=>{ st.r(); S.step=i+1; render(); };
+    li.appendChild(d); li.appendChild(b); document.getElementById('scSteps').appendChild(li);
+  });
+  const rst=document.createElement('li'); const rd=document.createElement('div'); rd.className='txt';
+  rd.innerHTML='<b>重跑本场景</b><em>回到场景起点</em>';
+  const rb=document.createElement('button'); rb.className='act'; rb.textContent='重置场景';
+  rb.onclick=()=>{S.step=0;renderScen();}; rst.appendChild(rd); rst.appendChild(rb);
+  document.getElementById('scSteps').appendChild(rst);
+}
+for(const [id,f] of [['btnScale','scale'],['btnOffpal','offpalette'],['btnMalformed','malformed']])
+  document.getElementById(id).onclick=()=>{ S.fault = S.fault===f?null:f; render(); };
+document.getElementById('btnReset').onclick=()=>{ S.fault=null; S.pal='cozy'; S.asset='cow'; S.state='idle'; render(); };
+render();
+</script>
+</body>
+</html>
