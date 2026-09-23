@@ -59,9 +59,12 @@ Q3 决定了 Asset **不是位图，而是绘制代码**；Q15 决定了 AI 只�
 
 由人类在看过原型实物后选定（两轮：先选 B，在看到 E 的实测数据后改选 E）。
 
-原型（一次性，已归档）：分支 `prototype/asset-representation`，
-文件 `demo/PROTOTYPE-asset-representation.html`。单文件、零依赖、双击即开。
-取回：`git checkout prototype/asset-representation -- demo/PROTOTYPE-asset-representation.html`
+原型：**`demo/PROTOTYPE-asset-representation.html`**（已在主干上）。
+单文件、零依赖、双击即开。原始提交在分支 `prototype/asset-representation`，
+后按人类要求用 `--no-ff` 合并进主干（合并提交 `705cd4d`），
+**这偏离了 prototype skill「原型留在一次性分支」的约定** ——
+理由是票 20 要从里面提升四个纯函数与真实的几何 fixture，留在主干省去跨分支取文件。
+文件头有 throwaway 声明，不会被误认成生产代码。
 
 ### 为什么不选 A / B / C / D
 
