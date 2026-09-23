@@ -60,3 +60,46 @@ Artifact / ArtifactRef 词条里。**
 ## Answer
 
 _（待填）_
+
+---
+
+## 来自票 05 的更新（2026-09-23）—— 新增一个必须定的粒度问题
+
+票 05 已定 Asset 格式为 `drawlist+curve/v1`，且**一个 `(asset, state)` 一份 JSON 产物**
+（例如 `tomato` 有 growing / ripe / harvested 三份独立产物）。
+文件格式确定为 **`.json`**（不是 `.svg`、不是 `.ts`）。
+
+### ⚠️ 新增：版本目录的粒度
+
+Q9 定的结构是 `assets/<assetId>/v<N>/`。但现在一个 asset 有**多份**产物
+（每个 state 一份），于是有两种可能：
+
+- **① asset 级版本**：`assets/tomato/v1/{growing.json, ripe.json, harvested.json}`
+  一次 repair 只改 `ripe`，也要**整套升 v2**（三份一起拷）。
+  优点：一个版本号对应一个完整一致的 asset，回滚简单。
+  缺点：浪费空间，且「哪个 state 变了」看不出来。
+- **② state 级版本**：`assets/tomato/ripe/v1.json`、`assets/tomato/ripe/v2.json`
+  优点：粒度精确，diff 清晰，只重生成被点名的 state（票 16 需要这个）。
+  缺点：一个 asset 的不同 state 可能停在不同版本号上，
+  「asset 的版本」这个概念就消失了 —— 而 `ArtifactRef.version` 是单值。
+
+**这个选择直接决定票 16（Repair 粒度）和票 17（Best Artifact 回滚粒度）能不能做。**
+票 05 倾向于 ②，但 ② 与现有 `ArtifactRefSchema`
+（`{id, type, path, version, checksum, createdAt}`，version 是单个整数）
+的配合方式需要本票设计清楚：一个 `ArtifactRef` 是指向**一个 state 的一个版本**，
+还是指向**一个 asset 的一组版本**？
+
+### 另外：checksum 现在有了明确对象
+
+票 05 定了产物是单个 `.json` 文件（不是一组文件、不是目录）。
+所以第 3 条的「目录怎么算 checksum」问题**对 Asset 不成立了** ——
+Asset 就是单文件，直接 sha256。
+但 `build/`（vite 产物）**仍然是目录**，那部分的问题依然有效。
+→ 结论可能是「按 artifact type 分别定策略」，本票要给出这张表。
+
+### 另外：diff 现在是可计算的
+
+因为产物是数值 JSON，两个版本之间可以做**结构化 diff**
+（`ops[3].cx: 16 → 18`），不是文本行 diff。
+这对票 17 的 RepairProgress 归因、票 06 的 HTML 报告都有价值。
+要不要在 ArtifactStore 层就提供 `diff(refA, refB)`？还是留给上层？

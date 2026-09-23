@@ -61,10 +61,30 @@ AssetSpec 是「需要什么」，Asset 是「实际做出的东西」。
 缺多少、哪些坏了、哪些没被用到、哪些是 Critical。
 
 **Asset（资源）** ⚠️ 本项目特化含义
-**一段绘制代码 + 一组参数，而不是一张位图。**
-Asset 是可 diff、可静态校验、可精确回滚的**纯函数**：输入 StyleSpec 派生的
-色板与形状规则，输出图形。因此「风格一致性」在本项目里是**可证明的**，
-不是靠视觉模型事后猜的。
+**一份 DrawList（绘制指令数据），不是一张位图，也不是一段代码。**
+Asset 可 diff、可静态校验、可精确回滚。因此「风格一致性」在本项目里
+是**可证明的**，不是靠视觉模型事后猜的。
+一个 Asset 的一个状态 = 一份产物（见 DrawList）。
+
+**DrawList（绘制指令表）**
+Asset 的物理形态：一份 JSON，含 `format` / `id` / `state` / `viewBox` /
+`expectedSize` / `ops`。`ops` 是一串**纯数值图元**
+（`rect` / `circle` / `ellipse` / `poly` / `line` / `curve`）。
+关键性质：**不含任何不透明字符串** —— 连曲线都是数值控制点列，
+不是 SVG 的 `d`。因此它的包围盒、用色、尺寸都能在**不渲染**的前提下算出来。
+代价是包围盒为**凸包上界**（保守高估，只会误报过大、不会漏报过大）。
+
+**Palette Reference（色板引用）**
+DrawList 里表达颜色的唯一合法形式：`palette:N`，指向 `StyleSpec.palette` 的一项。
+**硬编码色值不是「不推荐」，而是根本无法通过 schema** ——
+「颜色 ∈ 色板」因此是一个**构造上恒真**的命题，而非运行时检查项。
+推论：换掉整个 StyleSpec 色板，Asset 的产物文本**一字不变**。
+
+**State（资源状态）**
+同一 Asset 的不同外观（番茄的 growing / ripe / harvested）。
+状态之间是**整份 ops 的替换**，不是补丁 —— 状态差异可能极大
+（成熟果实 → 只剩一个土坑）。产物按 `(asset, state)` 粒度切分，
+以便修复时只重生成被点名的那一个状态。
 
 **ArtifactRef（产物引用）**
 指向一个大型产物的**轻量引用**（id / type / path / version / checksum / createdAt），

@@ -94,3 +94,39 @@ _（待填）_
    级需求并给出 3-9 个实体；pro 只产出 `core` 级、2-4 个实体），
    而延迟只有 pro 的 1/5（6-8 s vs 27-38 s）。
    **compileGame 是否该用 flash 而不是 pro？** 这与 Q8 的分工相反。
+
+---
+
+## 来自票 05 的更新（2026-09-23）—— 新增一条职责边界
+
+票 05 已定 Asset 格式为 `drawlist+curve/v1`（一个 `(asset, state)` 一份 JSON，
+`ops` 是纯数值图元，颜色是 `palette:N` 引用）。
+
+### 新增：**场景组合归 Game Config，不归 Asset**
+
+票 05 暴露了一个真实空白：文档第 63 节说 `scene` 依赖 cow / barn / tree，
+但 **drawlist 的 op 集合里没有「实例化另一个资源」这种 op** ——
+所以「场景」**无法**用 drawlist 表达。
+
+结论：**场景不是一种 Asset。** 场景是 Game Config 的职责（Q15 已把
+「场景布局」划给 Game Config）。因此本票必须回答：
+
+- Game Config 怎么表达「在坐标 (x,y) 放一个 `cow` 资源的 `idle` 状态」？
+  这个「实例化」结构的 schema 是什么？
+- 一个 Asset 实例需要哪些字段？至少：
+  `{assetId, state, x, y, scale?, flipX?, z?}` —— 还有别的吗？
+- `AssetSpec.dependencies`（文档第 63 节）因此**只用于生成顺序**
+  （依赖图排序），**不用于组合**。这个语义收窄要写进契约注释。
+- Game Config 引用 Asset 时，是引用 `assetId` 还是 `assetId + state`？
+  如果是前者，运行时怎么知道该用哪个 state？
+  （建议：Config 给**初始** state，运行时按游戏规则切换 ——
+  但这要求 Config 里声明状态机的转移条件，与第 3 条「交互规则」重叠。）
+
+### 另外：Asset 的 `expectedSize` 谁定？
+
+drawlist 产物自带 `expectedSize`（票 05 子问题 3）。
+但**期望尺寸本质上是设计决策**（ cow 该多大是游戏设计说的，不是画图的人说的）。
+所以它应该**源自 Game Config**，再被写进 drawlist 产物。
+本票要定：Game Config 里的实体定义要不要带 `size` 字段？
+它与 drawlist 的 `expectedSize` 是同一个数的两份拷贝，还是单向派生？
+**两份拷贝会漂移** —— 这是文档第 31 节 scale mismatch 的根源之一。

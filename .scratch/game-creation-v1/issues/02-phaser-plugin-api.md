@@ -46,3 +46,37 @@ AI 生成的代码只调 `bridge.tag(gameObject, 'crop.tomato.01')`。
 ## Answer
 
 _（待填）_
+
+---
+
+## 来自票 05 的更新（2026-09-23）—— 新增一条必查项
+
+票 05 已定：Asset 格式是 **`drawlist+curve/v1`** —— 一份 JSON，
+`ops` 是纯数值图元（`rect` / `circle` / `ellipse` / `poly` / `line` / `curve`），
+其中 `curve` 是**数值控制点列**（Catmull-Rom 转三次贝塞尔），**不是** SVG `d` 字符串。
+颜色一律是 `palette:N` 引用，渲染时才解析成 hex。
+
+**新增第 9 条必查项：Phaser 3 的 `Graphics` 能否重放这份 drawlist？**
+
+需要逐个确认这些 API 是否存在、签名是什么、在 WebGL 与 Canvas 两种 renderer 下
+行为是否一致：
+
+- `fillRect(x,y,w,h)` / `fillCircle(x,y,r)` / `fillEllipse(x,y,w,h)`
+  （注意 Phaser 的 ellipse 参数是**宽高**还是**半径**？）
+- `beginPath()` / `moveTo()` / `lineTo()` / `closePath()`
+- `bezierCurveTo(cx1,cy1,cx2,cy2,x,y)` —— **curve op 全靠它**，必须确认存在
+- `fillPath()` / `strokePath()` / `fillStyle(color, alpha)` / `lineStyle(w, color, alpha)`
+- 颜色是 **number（0xFF0000）还是 string（'#FF0000'）**？
+  drawlist 解析出来是 hex 字符串，如果需要 number 则要做一次转换。
+- `Graphics` 对象能否被复用来画多个实体，还是一个实体一个？
+  （关系到 Q15「手写固定」的 renderer 怎么写。）
+
+**如果 `Graphics` 不够用**（比如没有 `bezierCurveTo`），备选路径是
+「离屏 Canvas2D 画好 → `game.textures.addCanvas()` → `this.add.image()`」。
+Canvas2D 这条路**已被原型实测验证**（原型就是用 Canvas2D 渲染的），
+所以这不会推翻票 05 的决策 —— 但会改变 renderer 的实现方式，需要尽早知道。
+
+顺带：第 6 条（程序化触发输入）与第 3 条（`displayWidth` vs `getBounds()`）
+现在更重要了 —— drawlist 的静态包围盒是**凸包上界**，
+而 `getBounds()` 是渲染后的**真实**包围盒，两者会有小差异。
+Visual QA 需要知道这个差异有多大，才能设容差。

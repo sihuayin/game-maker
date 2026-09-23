@@ -78,3 +78,37 @@ Q15 把修复对象限定成了「数据 + 纯函数」，这**大幅收窄**了
 ## Answer
 
 _（待填）_
+
+---
+
+## 来自票 05 的更新（2026-09-23）—— 修复对象已明确
+
+票 05 已定 Asset 格式为 `drawlist+curve/v1`：一份 JSON，
+`ops` 是纯数值图元数组，颜色是 `palette:N` 引用，一个 `(asset, state)` 一份产物。
+
+这让第 1 条的多个策略变得**具体可执行**：
+
+- **`STYLE_REGENERATION` / `ASSET_REPLACEMENT`** 的修改对象是
+  `ops[i]` 的**具体数值字段**（`cx` / `r` / `points[k]` / `fill` 的索引）。
+  → 精确、可 diff、可回滚，且 diff 粒度是**单个数字**。
+  这是 Q15「数据 + 纯函数」范式兑现价值的地方。
+- **`SCENE_LAYOUT` / `UI_REDESIGN`** 的修改对象是 Game Config（票 09），
+  **不是** drawlist —— 因为票 05 已确认「场景不是 Asset」。
+- **`CODE_FIX` 的存废现在更清楚了**：Q15 下手写代码不由 AI 改，
+  AI 能改的只有 drawlist JSON 和 Game Config JSON —— **两者都是数据**。
+  所以 `CODE_FIX` 在本项目里**没有对应的修改对象**，
+  建议直接删掉，或重定义为「改 drawlist」。这个结论要在本票里正式给出。
+- **`PROMPT_CORRECTION`** 的落点也清楚了：修正的是
+  「生成 drawlist 的 prompt」，而 drawlist 有 schema，
+  所以**修正效果可以被立即验证**（重新生成 → schema 校验 → 静态包围盒比对）。
+  这比修正「生成位图的 prompt」强得多 —— 后者只能靠视觉模型事后打分。
+
+### 新增约束
+
+- **按 state 粒度修复**：产物是 `(asset, state)` 一份，
+  所以「只重生成 tomato.ripe 而不动 tomato.growing」是**天然可行**的。
+  第 4 条（一次修几个）因此可以更细：一轮可以只修一个 asset 的一个 state。
+- **version 目录粒度未定**：票 05 把「`v<N>` 是整个 asset 的版本
+  还是单个 state 的版本」推给了票 18。**本票的第 5 条依赖这个答案** ——
+  如果版本是 per-state 的，那「回滚到 Best」的粒度也是 per-state，
+  这会让票 17 的 Best Artifact 逻辑更细也更复杂。

@@ -81,6 +81,7 @@ Decisions so far。每张票都必须服从它们。
 | Q17 | Budget 收紧到 **3 轮 / 10 分钟** + token 上限（上线前放宽是配置改动，非架构改动） |
 | Q18 | Benchmark **Out of scope** |
 | Q19 | Checkpoint **写入** = in；Resume / Recovery / SQLite = **Out of scope** |
+| **Q20** | **Asset 格式 = `drawlist+curve/v1`**（严格 DSL + 数值曲线 op）。op 集合：`rect`/`circle`/`ellipse`/`poly`/`line`/`curve`；颜色**必须**是 `palette:N` 引用，硬编码色由 schema 直接拒绝；一个 `(asset, state)` 一份 `.json` 产物。详见[票 05](issues/05-asset-representation.md) |
 
 ### 环境事实（已实测查证，不必重查）
 
@@ -128,6 +129,15 @@ Decisions so far。每张票都必须服从它们。
   **纯文本 JSON 9/9 通过**；鉴权完全不校验；延迟 6-136 s（推理 token 占 80%）。
   **两处推翻既有决策**：Q8 的模型分工改为按模态、Q17 的 10 分钟 budget 大概率超支
   （已开[票 19](issues/19-latency-budget.md)）。
+- [Asset 的表达形式：「绘制代码 + 参数」具体长什么样？](issues/05-asset-representation.md)：
+  选 **E = 严格 DSL + 数值曲线**（`drawlist+curve/v1`）。五候选实测对比后，
+  E 拿到 D 的全部表现力而**不透明字符串仍为 0**：曲线用数值控制点列而非 SVG `d`，
+  因此色板绑定、一层 Zod 校验、静态包围盒、解析期拒绝非法输入**全部保留**。
+  A 出局（hex 烧死、换色板须重生成）、C 出局（包围盒不可知、坏资源在 import 期炸掉整个模块）、
+  D 出局（`d` 不透明 → 包围盒**低估**会漏报 scale 越界、坏 `d` 到渲染期才发现）、
+  B 差一步（可检查性满分但画不了有机曲线，与 cozy 圆润风冲突）。
+  唯一代价：包围盒从精确变**凸包上界**（实测高估 2px，方向安全）。
+  原型归档在分支 `prototype/asset-representation`。
 
 ## Not yet specified
 
@@ -142,8 +152,10 @@ Decisions so far。每张票都必须服从它们。
 - **资源并发生成与依赖调度**：文档第 63 节的 dependency graph、P2 的 parallel
   asset generation。串行版本先跑通，才知道并发是不是真瓶颈。
 - **自动 prompt 优化**：文档 P2。取决于票 16（repair 动作集）里 LLM 到底承担多少。
-- **多场景 / 多关卡结构**：V1 是 single scene。「关卡」在单场景内怎么表达
-  （地块解锁？进度门？）会在票 09 里定；**跨场景**的结构要等单场景跑通后才看得清。
+- **多场景 / 多关卡结构**：V1 是 single scene。票 05 已确认「场景不是一种 Asset」
+  —— drawlist 没有「实例化另一个资源」的 op，所以**场景组合归 Game Config**（票 09）。
+  「关卡」在单场景内怎么表达（地块解锁？进度门？）也在票 09 里定；
+  **跨场景**的结构要等单场景跑通后才看得清。
 - **生成范式扩展到 Q15-A 之外**：如果「数据 + 纯函数」范式撑不住某类游戏，
   放宽到哪一档、怎么保证 bridge tag 不被漏挂，现在无从判断。
 - **集成测试策略**：怎么测「AI 生成的产物」而不 flaky。等票 09/12 定了可校验的
