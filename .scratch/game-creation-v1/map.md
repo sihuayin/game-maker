@@ -64,7 +64,7 @@ Decisions so far。每张票都必须服从它们。
 |---|---|
 | Q1 | 终点 = 真跑通的 demo；地图前半决策票、后半执行票 |
 | Q2 | `VisionPort` 抽象：先 `FixtureVisionAdapter`，后 `HttpVisionAdapter` |
-| Q3 | **程序化资源生成** —— AI 产出 SVG/Canvas 绘制代码，**不产出位图** |
+| Q3 | **程序化资源生成** —— AI 产出 SVG/Canvas 绘制代码，**不产出位图**<br>⚠️ **前提已被推翻，部分作废**（2026-09-23）：位图生成**已解锁** —— 千问 `wan2.7-image-pro` 支持参考图风格条件生图，7.8s/张，质量达到人类给的参考基准。Q3 当初的前提是「环境无生图能力」，该前提不再成立。**修正为混合路线**：英雄角色 = 位图 PNG，关卡几何/道具 = drawlist。详见[票 23](issues/23-bitmap-asset-pipeline.md) |
 | Q4 | **Phaser 3 + Vite，不用 React**；Playwright + Chromium 做 Runner |
 | Q5 | 第一个端到端 demo = **Cozy Farm**（文档通篇的参照游戏） |
 | Q6 | 自我迭代 = **单调改进**：RepairProgress + Stalled 检测 + Best Artifact 回滚 |
@@ -104,6 +104,14 @@ Decisions so far。每张票都必须服从它们。
 - ⚠️ **延迟很大**：视觉 47-63 s（最坏 136 s）、DeepSeek pro 27-38 s、flash 6-8 s。
   主因是推理 token 占输出 ~80%。`max_tokens` 必须给足（≥3000），超时 ≥180 s。
   → 与 Q17 的 10 分钟 budget 冲突，见[票 19](issues/19-latency-budget.md)。
+- ✅ **位图生图已解锁**（2026-09-23，推翻 Q3 前提）：
+  千问 Token Plan 的 `wan2.7-image-pro`，端点
+  `…/api/v1/services/aigc/multimodal-generation/generation`
+  （**只有这条路径可用**，OpenAI 兼容的 `/images/generations` 报 url error）。
+  **支持把参考图以 base64 data URI 内联作风格条件**，返回临时 URL 需立即下载。
+  7.8s/张，1024×1024。证据：`experiments/bitmap-asset-via-wan/player_with_reference.png`。
+  凭据探测全记录：MiniMax 余额为零；Google/OpenAI 在 CC Switch 里是空配置无 key；
+  dragoncode 中转未测。
 - ⚠️ **`thinking: {"type":"disabled"}` 是 DeepSeek 路径的生死开关**
   （2026-09-23 实验发现，见[票 22](issues/22-asset-generator.md)）：
   开着 thinking 时推理 token **无上限**，长 prompt 下会吃掉 100% 输出预算、

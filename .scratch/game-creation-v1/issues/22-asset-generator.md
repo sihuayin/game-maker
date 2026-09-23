@@ -1,4 +1,10 @@
-# 22. AssetGenerator：StyleSpec + AssetSpec → drawlist 的生成契约
+# 22. AssetGenerator（drawlist 路线）：StyleSpec + AssetSpec → drawlist 的生成契约
+
+> ⚠️ **范围已收窄**（2026-09-23）：位图生成解锁后，Q3 修正为混合路线 ——
+> **英雄角色走位图（[票 23](23-bitmap-asset-pipeline.md)），本票只负责道具/关卡几何等 drawlist 资源。**
+> 本票的六个问题里，问题 1（多状态同一性）与问题 3（characterStyle）
+> **在位图路线下由票 23 接手**；问题 2（dither 图元）对 drawlist 路线仍是真问题。
+
 
 Type: prototype
 Status: open
