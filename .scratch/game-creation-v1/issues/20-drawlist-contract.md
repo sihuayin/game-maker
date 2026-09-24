@@ -1,9 +1,36 @@
-# 20. 把 DrawList 契约与静态分析器落进 demo/src
+# 20. 把 DrawList 契约与静态分析器落进 packages/contracts
 
 Type: task
 Status: open
-Blocked by: 12
+Blocked by: 24
 Map: ../map.md
+
+> 🔴 **新增一条必须先裁决的**（2026-09-24，[票 24](24-asset-pack-contract.md) 实测）：
+> **带 `opacity` 的 op 会做 alpha 混合、产出色板外颜色** —— 真实产物 `hazard.idle.json` 的
+> 4 个 `opacity: 0.35` poly 产生了 `#7a6c5d` / `#898f78`。这击穿了「颜色 ∈ 色板」的构造恒真性，
+> 而本票正好要写 `fill` / `stroke` 的 schema。三条走法见 map 的「Not yet specified」。
+> **票 24 没有替你定，因为它会改写 `CONTEXT.md` 里被当作卖点的那句话。**
+
+> ✅ **票 24 已 resolved，本票解除阻塞**（2026-09-24）。可以直接开工的是：
+> 色板形状 = 有序数组 + `palette:N` 索引（`#rrggbb` 小写、不得重复色）、
+> `expectedSize` 的比对放在光栅化之后（凸包上界只判过大）。契约草案见
+> [`../experiments/asset-pack-draft/schema.mjs`](../experiments/asset-pack-draft/schema.mjs)。
+
+> ⚠️ **范围已重画**（2026-09-24，R3/R9）：两处变化。
+>
+> **① 目的地变了**：从 `demo/src/` 变成 `packages/contracts/`（R9），
+> 且 drawlist 的地位从「Asset 的**定义**」降为「**创作态**格式」（R3）——
+> 因此本票的产物**不是**「Asset 的类型」，而是「创作态的类型 + 静态分析器」，
+> 交付态（位图）的类型在[票 24](24-asset-pack-contract.md) 的 manifest 里。
+>
+> **② 阻塞关系变了**：原阻塞在票 12（palette 用索引还是槽位名），票 12 已随 R2 出局。
+> 那个决策**没有消失**，只是搬了家 —— 它现在是[票 24](24-asset-pack-contract.md)
+> 资源包契约的一部分（StyleSpec 是资源包的一部分，色板形状由它定）。
+>
+> 其余要求（Zod discriminated union、`boundsOfOps()` 保守上界、
+> `resolveRefs()` 不写两份、硬编码色被拒、`curve` 点数约束、换色板后产物文本一字不变）
+> **全部原样保留** —— 它们在 R2 下不但没过时，反而更重要了：
+> 生成路径上的确定性校验是 R2 唯一留下的质量控制。
 
 ## Question
 

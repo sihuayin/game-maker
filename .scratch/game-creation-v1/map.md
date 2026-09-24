@@ -1,201 +1,294 @@
-# 图片驱动的 AI 游戏创建 Demo（GAME_CREATION_RUNTIME_V1 落地）
+# 图片驱动的游戏创作工具链：两个可独立交付的产物（游戏资源包 / 可运行 demo）
 
 Labels: wayfinder:map
 Tracker: local-markdown
 Effort: game-creation-v1
 
+> **本图为重画版**（2026-09-24）。上一版终点是「一条命令全程无人工干预跑通全链路 +
+> 自我修复让分数上升」，Q1–Q23 张票全部服务于那个终点。人类在 2026-09-24 把终点
+> 改成**两个可独立交付的产物**，因此地图重画：闭环那条脊柱整体出局（见 Out of scope），
+> 7 张票改写、7 张保留、9 张关掉。上一版的 20 项锁定决策里，与闭环无关的仍然有效。
+
 ## Destination
 
-一条命令、全程无人工干预，从「一张风格参考图 + 一段 Cozy Farm 游戏想法」跑通
-compile → generate → build → run → observe → evaluate → gate → repair → re-evaluate
-全链路，产出一个在浏览器里**真的能玩到采摘番茄**的 Phaser 游戏，外加一份静态 HTML
-报告展示评分与**至少一轮让分数上升的自我修复**；模型代理不可用时降级到 fixture
-**仍能跑通全链路**。
+把「图片驱动的游戏创作」做成**两个可以分开交付、分开使用**的产物，每个产物都能被
+**agent** 与**命令行**两种方式调用。
+
+**产物 A —— 游戏资源包。**
+输入「一张风格参考图 + 一段需求」（可选再给一份显式资源清单，或一批**人工导入的位图素材**），
+输出一个**引擎中立**的资源包：
+玩家动画、背景、UI 资源，交付形态是 **PNG + 标准图集/动画元数据**，
+并附带创作态的 drawlist 源文件与 StyleSpec。验收两件事：
+
+1. 包里的资源**能被随便一个引擎直接拿去用** —— 不需要本项目的 runtime。
+2. 包里所有资源**看起来属于同一个视觉世界**，**包括参考图里根本没出现过的新事物**
+   （牛、拖拉机、招牌）。后者是这条链最容易失败、也最容易被忽略的维度。
+
+**产物 B —— 可运行 demo。**
+输入「一个资源包 + 一段需求」，输出一个**静态可托管、打开即玩**的小型横版游戏目录：
+手写固定、永不改变的 runtime 外壳 + AI **只产出的数据**（连一行代码都不生成）。
+验收：一条命令跑完，**起一个静态 HTTP server**（`python3 -m http.server` 级别）打开就能玩，
+且**不吃生图能力**（喂 fixture 资源包也能跑）。
+
+⚠️ **「打开即玩」的准确含义已由[票 03](issues/03-phaser-vite-playwright-chain.md) 实测钉死：
+不是 `file://` 双击打开** —— 那做不到。两个互相独立的原因：Vite 产出的 module script 撞 CORS
+（HTML 规范要求 module script 走 CORS），以及 **Phaser 的 loader 整个建立在 XHR 上——连 PNG 都走 XHR**。
+最阴险的是绕开 Vite 之后：游戏能启动、canvas 出来、横幅正常打印，**却一张图都不加载且不报错**。
+产物 B 的构建实测**亚秒级**（280–459 ms），资源包体积对构建耗时几乎无影响。
+
+**两个产物之间只有数据文件依赖、没有代码依赖。** 仓库以 monorepo 承载，
+资源管线 / demo 管线 / 契约 / CLI / MCP 各自可独立打包。
+
+**本 effort 明确不做**：自动评分、门禁、自我修复闭环 —— 那另开一张地图（见 Out of scope）。
 
 ## Notes
 
 ### 领域与代码位置
 
-- 技术规范：`docs/文档.md`（83 节，中文）。**所有代码路径均相对于 `demo/`**：
-  文档里的 `src/contracts/` 实际是 `demo/src/contracts/`。
-- 现有代码：`demo/`（892 行）。骨架已完整 —— Contracts(Zod)、State Machine、
-  Orchestrator 生命周期循环、Gate 计算、In-memory Store。
-- **7 个 Port 全是 Mock**（见 `demo/src/example.ts`）；
-  `DefaultRepairEngine.execute()` 是空函数。
-- 领域词汇表：`CONTEXT.md`（仓库根）。
+- 技术规范：`docs/文档.md`（83 节，中文）。⚠️ **它是上一版终点的规范，其
+  QA/Gate/Repair/Benchmark 章节（29–51、65–71、74–75）在本地图中已出局**，
+  仍然有效的是契约章节（11–28、52–63）。
+- 现有代码：`demo/`（892 行骨架）。7 个 Port 全是 Mock，`DefaultRepairEngine.execute()`
+  是空函数。**按 Q9 要拆进 `packages/`，见票 07。**
+- 领域词汇表：`CONTEXT.md`（仓库根）。本轮已按 R3 修正 **Asset** 的定义
+  （从「就是一份 DrawList」改为「有创作态与交付态两种表达」）。
 
-### 每个 session 开工前必读（文档第 79 节的强制要求）
+### 每个 session 开工前必读
 
-1. `docs/文档.md`
-2. `demo/src/contracts/index.ts` + `policy.ts`
-3. `demo/src/runtime/state-machine.ts`
-4. `demo/src/runtime/ports.ts`
-5. `demo/src/runtime/orchestrator.ts`
+1. 本图（尤其 R1–R9 锁定决策表）
+2. `CONTEXT.md`
+3. 所claim的票的完整正文 + 它的 blockers 的 Answer
 
 ### 按需调用的 skill
 
 - 架构/接口设计票 → `codebase-design`
 - 术语冲突或新概念 → `domain-modeling`（并同步更新 `CONTEXT.md`）
-- 造具体东西给人react → `prototype`
+- 造具体东西给人 react → `prototype`
 - 查第三方事实 → `research`
 - 压力测试决策 → `grilling`
+- 造像素/动画资源本身 → `game-assets`
 
 ### 版本控制约定
 
 **规划产物（`.scratch/` 与 `CONTEXT.md`）直接提交到 `main`，不走分支 / PR。**
-理由：这张地图是**跨 session 的协调产物** —— 其他 session 靠读它来判断
-哪张票被认领了、哪些决策已锁定。放到分支上就看不见了，协调即失效。
-
-代码改动不在此列（仍按常规流程）。`提交` 与 `推送` 分开：人类说「提交」时
-只 commit，不 push。
+理由：这张地图是**跨 session 的协调产物** —— 其他 session 靠读它判断哪张票被认领了、
+哪些决策已锁定。放到分支上就看不见了，协调即失效。
+`提交` 与 `推送` 分开：人类说「提交」时只 commit，不 push。
+（research 票的产物同理，落在 `.scratch/game-creation-v1/research/`。）
 
 ### 本 effort 的执行模式
 
-**覆盖 wayfinder 的「只规划不执行」默认**：Q1 决定终点是一个真跑通的 demo，
-所以地图后半段包含执行票（`task` 类型会真的写代码）。但执行票只能在其依赖的
-设计票 resolved 之后才建 —— 不要提前把 fog 切成执行票。
+**覆盖 wayfinder 的「只规划不执行」默认**：终点是两个真产物，所以地图里有执行票
+（`task` 类型会真的写代码）。但执行票只能在其依赖的设计票 resolved 之后才建 ——
+不要提前把 fog 切成执行票。
 
-### 已锁定的架构决策（charting 阶段 grilling 产出，19 项，不得重开）
-
-这些是在建图之前与人类 grill 出来的，**不是** ticket 决议，因此不出现在
-Decisions so far。每张票都必须服从它们。
+### 本轮锁定（2026-09-24 grilling 产出，不得重开）
 
 | # | 决策 |
 |---|---|
-| Q1 | 终点 = 真跑通的 demo；地图前半决策票、后半执行票 |
-| Q2 | `VisionPort` 抽象：先 `FixtureVisionAdapter`，后 `HttpVisionAdapter` |
-| Q3 | **程序化资源生成** —— AI 产出 SVG/Canvas 绘制代码，**不产出位图**<br>⚠️ **前提已被推翻，部分作废**（2026-09-23）：位图生成**已解锁** —— 千问 `wan2.7-image-pro` 支持参考图风格条件生图，7.8s/张，质量达到人类给的参考基准。Q3 当初的前提是「环境无生图能力」，该前提不再成立。**修正为混合路线**：英雄角色 = 位图 PNG，关卡几何/道具 = drawlist。详见[票 23](issues/23-bitmap-asset-pipeline.md) |
-| Q4 | **Phaser 3 + Vite，不用 React**；Playwright + Chromium 做 Runner |
-| Q5 | 第一个端到端 demo = **Cozy Farm**（文档通篇的参照游戏） |
-| Q6 | 自我迭代 = **单调改进**：RepairProgress + Stalled 检测 + Best Artifact 回滚 |
-| Q7 | 参考图由人类提供；**未提供 → 程序化造一张**作为默认输入 |
-| Q8 | **三层降级**：HTTP 代理（可达时）→ Fixture → Fail-fast；`deepseek-v4-pro` 做 compile，`deepseek-v4-flash` 做 repair 诊断<br>⚠️ **模型分工部分作废**（见[票 01](issues/01-proxy-api-contract.md)）：视觉与文本走**两个不同上游**，pro/flash 分档只存在于文本路径。实际分工改为**按模态**：`compileStyle` → qwen3.8-max（唯一选择）；`compileGame`/testplan/repair → DeepSeek。三层降级本身**仍然有效且必需** |
-| Q9 | **合一目录** `demo/projects/<projectId>/`；产物全 gitignore，只提交 `inputs/` + `fixtures/` |
-| Q10 | `window.__GAME_RUNTIME__` 由**手写固定的 Phaser 插件 SDK** 实现；AI 只负责调 `bridge.tag()` |
-| Q11 | Visual QA = **结构化静态校验为主 + 截图存档为 evidence**；视觉模型打分降级到 fog |
-| Q12 | **条件迁移**：`repairing → generating`（plan 含 asset/scene/ui action）/ `→ building`（仅 code/runtime）；记 ADR |
-| Q13 | 交付形态 = **CLI + 静态 HTML 报告**（无框架、无服务器） |
-| Q14 | 验收 = 严格版（见 Destination） |
-| Q15 | **AI 只产出「数据 + 纯函数」**：实体绘制函数 + `game-config.json`。Phaser 主 scene、游戏循环、bridge 插件、输入处理、碰撞、vite 配置、build 脚本、runner **全部手写固定** |
-| Q16 | GameplayTestPlan = **规则推导生骨架（保证 critical path 结构性覆盖）+ LLM 补边界 case** |
-| Q17 | Budget 收紧到 **3 轮 / 10 分钟** + token 上限（上线前放宽是配置改动，非架构改动） |
-| Q18 | Benchmark **Out of scope** |
-| Q19 | Checkpoint **写入** = in；Resume / Recovery / SQLite = **Out of scope** |
-| **Q20** | **Asset 格式 = `drawlist+curve/v1`**（严格 DSL + 数值曲线 op）。op 集合：`rect`/`circle`/`ellipse`/`poly`/`line`/`curve`；颜色**必须**是 `palette:N` 引用，硬编码色由 schema 直接拒绝；一个 `(asset, state)` 一份 `.json` 产物。详见[票 05](issues/05-asset-representation.md) |
+| **R1** | 终点 = 两个可独立交付的产物。**重画本图的 Destination，不新开地图** |
+| **R2** | **自我修复 / 门禁闭环整体出局**（另开一张地图）。只保留**生成路径上**的确定性校验：schema 校验、色板引用、包围盒/尺寸越界 |
+| **R3** | **交付态 = 引擎中立的位图**（PNG + 标准图集/动画元数据）；**drawlist = 创作态主干**（可静态校验、可 diff、可精确修），随包交付作源文件。<br>⚠️ **2026-09-24 修正**（[票 35](issues/35-bitmap-provenance.md)）：交付态 PNG **全部**由光栅化器产出；「位图原生创作态」保留但**降格为人工导入通道**，**管线永不调用生图 API** |
+| **R4** | 资源种类：**sprite / animation / background / ui 四类一等公民**；**map 归 Game Config** —— 它是「引用其他资源的布局」，不是可绘制产物 |
+| **R5** | 消费形态：**core 库 → CLI → MCP server**。CLI 与 MCP 都是 core 的薄壳；**MCP 不 shell out 到 CLI**，避免两层进度协议 |
+| **R6** | A 与 B **完全解耦**：A 不需要游戏，B 不需要生图能力，两者之间只有一个可序列化的资源包文件。仓库内置 fixture 资源包 |
+| **R7** | 资源清单**两条路都开**（人给 / 由需求推导），但**清单先落盘成文件**；之后两条路完全同构 |
+| **R8** | demo = **固定 runtime + 数据**，AI **一笔代码都不写**。（Q15 再退一步：从「数据 + 纯函数」退到「只有数据」—— 绘制整体归资源管线） |
+| **R10** | **位图来源 = (c)+(a)**：drawlist 是唯一的**自动生成路径**；位图只经**人工导入通道**（`inputs/`）进来，管线**零生图 API 调用**。排除「换一家商用生图 API」（无付费意愿）与「继续用 Token Plan」（违反条款）。**代价明确接受**：放弃管线全自动产出有手绘质感的角色 |
+| **R11** | **StyleSpec = 人机协作的一次交互产出**：人在 Claude Code 会话里让模型看图、产出 StyleSpec JSON、存成文件，**管线只消费文件**。这本就是条款点名的允许场景，且与 R7「清单两条路都开」同构。**产物 A 的入口因此是「一条命令 + 一次人工提取」，不是全自动** |
+| **R9** | monorepo **按产品切**：`contracts` / `assets` / `demo` / `cli` / `mcp`。npm 包为主；`cli` 额外出单文件 bundle；`mcp` 出 `npx` 可起的 stdio server；**资源包与站点目录是 zip / 目录，不是 npm 包** |
 
-### 环境事实（已实测查证，不必重查）
+### 继承自上一版、仍然有效
 
-**本地代理 = CC Switch**（`/Applications/CC Switch.app`，PID 651，**PPID 1 / launchd**）。
-基址 `ANTHROPIC_BASE_URL`，凭据 `ANTHROPIC_AUTH_TOKEN`。
-全部细节见 [票 01](issues/01-proxy-api-contract.md) 的 Answer，这里只留最容易踩的几条：
+| # | 决策 |
+|---|---|
+| Q4 | **Phaser 3 + Vite，不用 React** |
+| Q6 | 自我迭代 = 单调改进 + Best Artifact 回滚 —— ⚠️ **随 R2 出局**（对将来的闭环地图仍有效） |
+| Q7 | 参考图由人类提供；**未提供 → 程序化造一张**（票 04） |
+| Q9 | 产物全 gitignore，只提交 `inputs/` + `fixtures/` —— 目录形态被 R9 取代，**精神保留** |
+| Q10 | Runtime Bridge = 手写固定 SDK，不由 AI 生成 —— ⚠️ **随 R2 出局** |
+| Q14 | 验收 = 严格版 —— **被新版 Destination 的两条验收取代** |
+| **Q20** | **Asset 创作态格式 = `drawlist+curve/v1`**（严格 DSL + 数值曲线 op）。op 集合：`rect`/`circle`/`ellipse`/`poly`/`line`/`curve`；颜色**必须**是 `palette:N` 引用，硬编码色由 schema 直接拒绝；一个 `(asset, state)` 一份 `.json`。详见[票 05](issues/05-asset-representation.md)<br>⚠️ **R3 降格它**：不再是 Asset 的**定义**，而是创作态表达 |
+| — | **混合路线**：英雄角色位图、关卡几何/道具 drawlist（2026-09-23 由[票 22](issues/22-asset-generator.md)/[票 23](issues/23-bitmap-asset-pipeline.md) 确立）。R3 下升华为「**创作态 / 交付态**」两层 |
 
-- ⚠️ **`/v1/models` 的元数据是误导性的**。它列的两个 deepseek 模型都标
-  `input_modalities: ["text","image"]`，**实测为假**。
-- ⚠️ **不同协议走不同上游**，这是本项目最重要的环境事实：
+### 环境事实（已实测，不必重查 —— 细节全在[票 01](issues/01-proxy-api-contract.md) 与[票 34](issues/34-wan-quota-facts.md)）
 
-  | 端点 | 协议 | 实际上游 | 图像 |
-  |---|---|---|---|
-  | `/v1/messages` | Anthropic | **qwen3.8-max**（请求里的 model 名被忽略） | ✅ **唯一能收图的路** |
-  | `/v1/chat/completions` | OpenAI | **DeepSeek**（`deepseek-v4-pro` / `deepseek-flash`） | ❌ 收到 `[Unsupported Image]` |
-  | `/v1/responses` | OpenAI | DeepSeek | ❌ 同上 |
+> ⚠️ **2026-09-24 06:30 UTC 重新实测，上一版的两条环境事实已被推翻** —— 见下面标 🔴 的两条。
+> 这两个发现改变了「产物 A 怎么拿到 StyleSpec 与位图」的实现路径，
+> 但**没有改变 Destination**，因此不重画地图，只修正事实与相关票的范围。
 
-- ⚠️ **不要用 `tool_choice` 强制 JSON** —— 完整 12 字段 schema 只有 **1/3** 通过。
-  **纯文本 JSON（prompt 描述结构）实测 9/9 通过、零 markdown 围栏。**
-- ⚠️ **延迟很大**：视觉 47-63 s（最坏 136 s）、DeepSeek pro 27-38 s、flash 6-8 s。
-  主因是推理 token 占输出 ~80%。`max_tokens` 必须给足（≥3000），超时 ≥180 s。
-  → 与 Q17 的 10 分钟 budget 冲突，见[票 19](issues/19-latency-budget.md)。
-- ✅ **位图生图已解锁**（2026-09-23，推翻 Q3 前提）：
-  千问 Token Plan 的 `wan2.7-image-pro`，端点
-  `…/api/v1/services/aigc/multimodal-generation/generation`
-  （**只有这条路径可用**，OpenAI 兼容的 `/images/generations` 报 url error）。
-  **支持把参考图以 base64 data URI 内联作风格条件**，返回临时 URL 需立即下载。
-  7.8s/张，1024×1024。证据：`experiments/bitmap-asset-via-wan/player_with_reference.png`。
-  凭据探测全记录：MiniMax 余额为零；Google/OpenAI 在 CC Switch 里是空配置无 key；
-  dragoncode 中转未测。
-- ⚠️ **`thinking: {"type":"disabled"}` 是 DeepSeek 路径的生死开关**
-  （2026-09-23 实验发现，见[票 22](issues/22-asset-generator.md)）：
-  开着 thinking 时推理 token **无上限**，长 prompt 下会吃掉 100% 输出预算、
-  `content` 为空、`finish_reason=length`（实测 max_tokens=8000 时 reasoning=8000）。
-  关掉后：`reasoning=0`、有 content、**9s 而非 161s（快 18 倍）**。
-  代价：会加 markdown 围栏、JSON 形状纪律下降（需 few-shot 示例 + 剥围栏 + 形状归一化）。
-  `reasoning_effort` / `chat_template_kwargs` 均被代理**忽略**。
-  **视觉路径（qwen via `/v1/messages`）是否有同开关尚未测。**
-- **鉴权完全不校验**：错误 key、甚至不带鉴权头都返回 200。
-  → 探测代理死活**不能**靠鉴权失败，要打 `/v1/models` 或发真实请求（ping ≈ 0.63 s）。
-- **代理活得比 Claude Code 久**（PPID 1，已连跑 2 天），但活不过重启 →
-  fixture 降级是**兜底而非常态**，仍然必需。
-- 无任何 OpenAI / Gemini / Replicate / Stability key。
+- **本地代理 = CC Switch**，基址 `ANTHROPIC_BASE_URL`，凭据 `ANTHROPIC_AUTH_TOKEN`。
+- 🔴 **视觉路径当前不可用**（推翻票 01「`/v1/messages` 是唯一能收图的路」）。
+  CC Switch 请求日志显示：**千问 Token Plan**（provider `bcd60069`，唯一能收图的上游）
+  最后一次成功是 **2026-09-24 01:36:33 UTC**，之后 22 次 `429 Throttling.AllocationQuota`，
+  复位时间 **2026-10-15 16:00 UTC**（约 21 天后）；代理已**故障转移到 DeepSeek**
+  （`331fbb23`，7856 次 200，仍在服务）。
+  实测：往 `/v1/messages` 发图片块返回 **200**，但响应 `model` 是 `deepseek-flash`，
+  且它**看不到图** —— 对一张 1×1 的图编出「light pink / salmon」。
+  → **「参考图 → StyleSpec」这一步目前无法自动完成。**
+- 🔴 **千问 Token Plan 的 key 条款禁止管线化调用**（[票 34](issues/34-wan-quota-facts.md)）。
+  官方原文：Token Plan「仅限在编程工具和智能体工具（如 Claude Code、Cursor…）中
+  **交互式使用**，**不可用于自动化脚本、自定义应用程序后端或任何非交互式批量调用场景**」，
+  违者可能导致订阅暂停或 key 封禁。
+  → **即使配额恢复，把生图编进自动化管线也是违规的。** 这是产品决策，工程绕不过去。
+  ⚠️ 注意条款**明确允许** Claude Code 这类工具里的交互式使用 —— 这给了一条合法出路（见[票 35](issues/35-bitmap-provenance.md)）。
+- ✅ **文本路径健康**：DeepSeek 正常服务，`thinking: {"type":"disabled"}` 后 **9s** 出结果。
+  **drawlist 生成、game-config 编译、资源清单推导全都靠它，不受上面两条影响。**
+- ⚠️ **StyleSpec 的 hex 落进管线时统一规范化为小写 `#rrggbb`**（票 24）——
+  否则同一份色板有两种合法文本，checksum 不稳。实验产出的是大写。
+- ⚠️ **不要用 `tool_choice` 强制 JSON**（1/3 通过）。**纯文本 JSON 9/9 通过**。
+- ✅ **位图生图配方本身是通的**（2026-09-23 验证）：千问 `wan2.7-image-pro`，
+  端点 `…/api/v1/services/aigc/multimodal-generation/generation`（**只有这条路径可用**），
+  **支持参考图 base64 内联作风格条件**，7.8s/张，1024×1024。
+  ⚠️ 但受上面两条约束，**它现在既跑不通也不合规**。
+- **鉴权完全不校验**：探测代理死活要打 `/v1/models` 或发真实请求，不能靠鉴权失败。
+- ⚠️ **`/v1/models` 当前返回空列表 `[]`**（票 01 时它列出过 deepseek 模型）——
+  代理的上游配置在变，**不要把它当作稳定事实**。
+- **代理活不过重启** → 生成侧降级（[票 14](issues/14-degradation-chain.md)）仍然必需，
+  且**眼下它就是常态而非常态之外的兜底**。
 - Node v22.23.2、npm 10.9.8、pnpm、bun 可用；**Playwright 未安装**。
-- 仓库里**一张图片都没有**（png/jpg/webp/svg 全查过，零结果）。
 
-### 已知代码缺陷（票 08 处理）
+### 票的状态取值
 
-`state-machine.ts` 只有 `repairing → building`，跳过 `generate`。因此 repair plan
-里的 asset action **永远不会被执行** —— 这正是 `DefaultRepairEngine.execute()`
-是空函数也能「跑通」的原因。
+`open`（可认领）/ `claimed`（已被认领）/ `resolved`（已决议）/ `out-of-scope`（判出局，
+不再毕业，见 Out of scope）。
 
 ## Decisions so far
 
 <!-- 一行一张已关闭的票：够判断相关性即可，细节去票里看 -->
 
-- [本地模型代理的真实调用契约是什么？](issues/01-proxy-api-contract.md)：
-  代理是 CC Switch，**三种协议都通但走不同上游** —— 视觉只能走 `/v1/messages`
-  （实为 qwen3.8-max，`/v1/models` 的 image 模态声明是假的，DeepSeek 收到的是
-  `[Unsupported Image]`）；`tool_choice` 强制 JSON 只有 1/3 可靠，
-  **纯文本 JSON 9/9 通过**；鉴权完全不校验；延迟 6-136 s（推理 token 占 80%）。
-  **两处推翻既有决策**：Q8 的模型分工改为按模态、Q17 的 10 分钟 budget 大概率超支
-  （已开[票 19](issues/19-latency-budget.md)）。
+- [资源包的结构与 manifest 契约](issues/24-asset-pack-contract.md)：**产物 A 的交付物 = 一个目录，
+  入口是 `manifest.json`（`format: "assetpack/v1"`）**。按**表达层次**分两层 ——
+  `delivery/`（引擎直接吃：按 kind 各一份 TexturePacker JSON Hash + PNG）与
+  `authoring/`（本项目读：stylespec + drawlist + 导入原图），两层靠 `assetId` 联结，
+  包**不含 game-config**、**不绑定游戏**。每个资源必带两个诚实字段：
+  `origin`（generated/imported/fixture）与 `paletteBinding`（exact/quantized/unbound），
+  包级 `provenance.mode` **由 origin 唯一派生** ⇒ 「fixture 包谎报身份」是解析不通过。
+  版本目录改成 **per-pack** `v<N>`（改掉 `docs/文档.md` §21 的 per-asset `cow/v1`）。
+  与 §20 的 `AssetManifest` **不是同一个东西**（那个是输入侧 + 旧闭环的过程统计，归票 28）。
+  **实物验证**：用仓库里 12 份真实 drawlist + 1 张真实位图生成了一个真包，
+  两次生成逐字节相同，Zod 校验通过、9 条反例全被拒 —— `experiments/asset-pack-draft/`。
+  **顺带解除了** 20 / 21 / 26 / 27 的阻塞。
+  ⚠️ **票 24 刻意没替票 26 定 state↔animation 的关系**，只保证两者在 manifest 里有落点；
+  也**留下一件需要人类裁决的事**：带 `opacity` 的 op 会做 alpha 混合、产生色板外颜色，
+  这击穿了「颜色 ∈ 色板是构造恒真」那句卖点（见下「Not yet specified」）。
+
 - [Asset 的表达形式：「绘制代码 + 参数」具体长什么样？](issues/05-asset-representation.md)：
-  选 **E = 严格 DSL + 数值曲线**（`drawlist+curve/v1`）。五候选实测对比后，
-  E 拿到 D 的全部表现力而**不透明字符串仍为 0**：曲线用数值控制点列而非 SVG `d`，
-  因此色板绑定、一层 Zod 校验、静态包围盒、解析期拒绝非法输入**全部保留**。
-  A 出局（hex 烧死、换色板须重生成）、C 出局（包围盒不可知、坏资源在 import 期炸掉整个模块）、
-  D 出局（`d` 不透明 → 包围盒**低估**会漏报 scale 越界、坏 `d` 到渲染期才发现）、
-  B 差一步（可检查性满分但画不了有机曲线，与 cozy 圆润风冲突）。
+  选 **E = 严格 DSL + 数值曲线**（`drawlist+curve/v1`）。E 拿到 D 的全部表现力而
+  **不透明字符串仍为 0**：曲线用数值控制点列而非 SVG `d`，因此色板绑定、一层 Zod 校验、
+  静态包围盒、解析期拒绝非法输入**全部保留**。A/C/D 分别因「hex 烧死」、
+  「包围盒不可知且 import 期整模块炸」、「`d` 不透明导致包围盒**低估**（漏报方向）」出局。
   唯一代价：包围盒从精确变**凸包上界**（实测高估 2px，方向安全）。
-  原型归档在分支 `prototype/asset-representation`。
+  ⚠️ **R3 已把它的地位从「Asset 的定义」降为「创作态格式」**。
+- [本地模型代理的真实调用契约是什么？](issues/01-proxy-api-contract.md)：
+  代理是 CC Switch，**三种协议都通但走不同上游**，视觉只能走 `/v1/messages`；
+  `tool_choice` 强制 JSON 只有 1/3 可靠，**纯文本 JSON 9/9 通过**；鉴权完全不校验；
+  延迟 6–136 s。它是本图**环境事实**一节的来源。
+
+- [千问 Token Plan 的生图配额与计费事实](issues/34-wan-quota-facts.md)：
+  两条都会推翻既有假设：[① 配额与聊天**共享同一个 Credits 池**，超了直接阻断]，
+  复位 2026-10-15；**[② 条款禁止管线化调用]**（原文只许「编程/智能体工具中交互式使用」，
+  禁止「自动化脚本、应用后端、非交互式批量调用」），违者封 key。
+  另有可用事实：`wan2.7-image-pro` **0.50 元/张**（按张不按分辨率）、**RPS 5 / 并发 5**、
+  图生图与文生图同价且输入图不计费、局部编辑是 **`bbox_list` 框选不是 mask**。
+  **查不到的**：Token Plan 一张图扣多少 Credits（官方无系数表）→ 票 19 的成本账算不出来。
+  ⚠️ 本票主 session 复核时补充了两条本票未察觉的事实：代理**已故障转移到 DeepSeek**，
+  因此「文本路径照常可用」；以及**条款明确允许 Claude Code 类工具的交互式使用**（见票 35）。
+
+- [产物 B 怎么构建、怎么静态托管？](issues/03-phaser-vite-playwright-chain.md)：
+  **`file://` 双击打开做不到** —— 两个互相独立的原因：Vite 的 module script 撞 CORS，
+  且 Phaser 的 loader 整个建立在 XHR 上（连 PNG 都走 XHR）。
+  所以「打开即玩」= **起一个静态 HTTP server 后打开即玩**。
+  `base: './'` 是必须的（产物目录可整体搬走）；资源包推荐「站点目录 + 同级 pack 目录」，
+  代价是 **HTTP server 的根必须是父目录**（这一条要进契约）。
+  构建耗时 **280–459 ms**，资源包体积对耗时几乎无影响。
+  附带发现：Phaser 打进 1.2 MB chunk 必然触发告警（→票 07）；
+  Phaser 有 `loaderBaseURL` 钩子，**装配 API 应带「包基址」参数而不是写死路径**（→票 33）。
+- [交付格式规格：图集与动画元数据用什么标准？](issues/25-delivery-format-spec.md)：
+  **没有跨引擎标准** —— 事实上的通用层是 **TexturePacker 的 JSON Hash / JSON Array**
+  （Aseprite 的对应导出格式字段名**逐字相同**），**Phaser 3 原生就能读、不需要转换器**。
+  两者唯一差别是 `frames` 是对象还是数组。
+  🎯 **对本图最重要的一条**：**锚点是每帧的 `anchor` 字段**（归一化到未裁剪的 `sourceSize`），
+  而 Phaser 的 `setCurrentFrame` **会逐帧重设 origin** ——
+  所以「角色各帧各自声明锚点」是**原生支持、零运行时代码**的，正合 R8。
+  Aseprite 的 `meta.slices[].pivot` **Phaser 一行都不读**。九宫格 = 每帧 `scale9Borders`，
+  `this.add.nineslice()` 零参数自动读，**仅 WebGL**。
+- [位图从哪来：生图能力的合规使用边界](issues/35-bitmap-provenance.md)：
+  定了 **(c)+(a)** 与**人机协作产出 StyleSpec**（见 R10 / R11）。
+  管线**永不调用生图 API**，位图只经人工导入通道；StyleSpec 由人在会话里产出、管线只消费。
+  **代价明确接受**：放弃管线全自动产出有手绘质感的角色；
+  **换来**今天就能开工、将来也不怕封号的产物 A。
+  附带记下一条**未探的回头路**：CC Switch 里还有 `dragoncode.codes`（票 01 记「未测」）
+  与 Claude Official / Google Official 三个 provider，本次没有探。
 
 ## Not yet specified
 
 朝着 Destination、但现在还不够锐利无法成票的区域。随着前沿推进逐块毕业。
 
-- **CLI 的确切形态**：参数名、进度输出格式、退出码语义、跑完是否自动开浏览器。
-  等降级机制（票 14）定了才好定 —— CLI 需要告诉人类「这次是 fixture run」。
-- **视觉模型打分作为结构化校验的补充**：文档 P2「Advanced visual evaluation」。
-  票 12 会给出结构化校验能覆盖什么，剩下覆盖不了的才轮到视觉模型，届时才知道值不值得。
-- **可选的位图生成 adapter**：Q3 否掉了位图作为主干，但 `AssetGenerator` port 天然
-  可插一个真图像 API adapter 作为增强。要不要插、插哪家，等程序化路线跑通后才有判断依据。
-- **资源并发生成与依赖调度**：文档第 63 节的 dependency graph、P2 的 parallel
-  asset generation。串行版本先跑通，才知道并发是不是真瓶颈。
-- **自动 prompt 优化**：文档 P2。取决于票 16（repair 动作集）里 LLM 到底承担多少。
-- **多场景 / 多关卡结构**：V1 是 single scene。票 05 已确认「场景不是一种 Asset」
-  —— drawlist 没有「实例化另一个资源」的 op，所以**场景组合归 Game Config**（票 09）。
-  「关卡」在单场景内怎么表达（地块解锁？进度门？）也在票 09 里定；
-  **跨场景**的结构要等单场景跑通后才看得清。
-- **生成范式扩展到 Q15-A 之外**：如果「数据 + 纯函数」范式撑不住某类游戏，
-  放宽到哪一档、怎么保证 bridge tag 不被漏挂，现在无从判断。
-- **集成测试策略**：怎么测「AI 生成的产物」而不 flaky。等票 09/12 定了可校验的
-  契约之后才有着力点。
-- **成本折算成钱**：票 01 已确认每条响应都带 usage（token 数可直接记），
-  但代理**不转发定价**。要不要在代码里内置牌价表折算成金额、
-  以及要不要进 HTML 报告 —— 归[票 19](issues/19-latency-budget.md)第 8 条处理。
+- **多关卡 / 多场景结构**：V1 是单关卡还是单场景？跨关卡的结构、关卡之间的资源复用与
+  进度门，等[票 31](issues/31-first-demo-game.md)（第一个游戏是什么）与
+  [票 09](issues/09-game-config-contract.md)（map 归 Game Config）定了「单关卡怎么表达」
+  才看得清。
+- **资源包的增量生成与复用**：已有资源包能不能「再补三个资源」而不重跑全部？
+  增量对 manifest 形状与版本化的要求，等[票 24](issues/24-asset-pack-contract.md)
+  与[票 18](issues/18-artifact-ref-consistency.md)定了才锐利。
+- **⚠️ `opacity` 与「颜色 ∈ 色板」的裁决**（票 24 实测发现，阻塞[票 20](issues/20-drawlist-contract.md)）：
+  真实产物 `hazard.idle.json` 用了 4 个 `opacity: 0.35` 的 `poly`，alpha 混合在色板内
+  产生了两个**色板外颜色**（`#7a6c5d`、`#898f78`）。所以「颜色 ∈ 色板」**只在没有 `opacity` 时**
+  是构造恒真的。三条走法：(a) schema 禁掉 `opacity`（恒真性恢复，最保守）、
+  (b) 混合后吸附回最近色板色、(c) 承认它不是构造恒真、降级为光栅化后扫像素验证。
+  票 20 要写 `fill`/`stroke` 的 schema，必须先把这条定掉；它也会改写 `CONTEXT.md` 里
+  被当作卖点的那句话，所以**不能由执行者顺手定**。
+
+- **新资源的风格一致性怎么判**：R2 砍掉了自动评分，于是「像不像同一个视觉世界」
+  在 R4 的四类资源上没有自动判据 —— 目前只有人眼 + 参考基准。
+  ⚠️ **「引入视觉模型抽查」这条选项现在也断了**（R10/R11：视觉上游不可用且条款受限），
+  所以这个问题在当前环境下**只剩人眼一条路**。等[票 24](issues/24-asset-pack-contract.md)/
+  [票 27](issues/27-asset-spec-kinds.md)定了可校验面，才看得清创作态的结构化校验还差多少。
+- **批量生成的并发与依赖调度**：一次要生 20 个资源，串行可能要几分钟。
+  ⚠️ R10 之后**约束变了** —— 不再受生图配额限制（管线不调生图了），
+  剩下的瓶颈是 LLM 调用（9s/次）与光栅化。依赖图（票 05 结论：依赖只用于**生成顺序**）
+  怎么调度，等[票 28](issues/28-recipe-compilation.md)定了清单形状再说。
+- **生成 prompt 的自动优化**：StyleSpec → 生成调用的 prompt 模板（票 22 问题 4 的
+  schema-to-prompt 渲染器）要不要按失败样本自我改进。
+- **成本折算成钱**：代理不转发定价，要不要内置牌价表把 token 折算成金额。
+  归[票 19](issues/19-latency-budget.md)。
+- **多引擎导出**：R3 让资源包引擎中立，但「中立到什么程度」只有真接第二个引擎时才知道。
+- **多张参考图**：目前假设一张；多张风格图怎么合并成一个 StyleSpec。
 
 ## Out of scope
 
 被**范围**排除在 Destination 之外的东西。永不毕业；只有重画 Destination 才会回来，
 且那时是一张新地图。
 
-- **Benchmark Suite 与 E2E Creation Success Rate**（文档第 65-71、83 节）。
-  文档自己说 benchmark 回答的是「能不能**稳定**创造」，而本地图回答「能不能创造
-  **一个**」；且其前提是有 N 个跑通的游戏，现在连 1 个都没有。
-- **Resume / Recovery / SQLite 持久化**（文档第 49-51 节、P1）。
-  难点不在存，在恢复语义：`RuntimeStateSnapshot` 要能把 Phaser world 还原到
-  「番茄已采摘、背包有 1 个」的中间态，这需要游戏侧支持序列化整个 world，
-  是 Q15-A 范式之外的另一个大工程。（Checkpoint **写入**仍在范围内 —— 票 07。）
-- **Web 控制台 UI**（上传图片、填想法、看实时进度的页面）。
-  Q13 已选 CLI + 静态 HTML 报告；一个交互式前端体量不小于运行时本身。
-- **React**：Q4 已排除。游戏内 UI 用 Phaser 原生 GameObject。
-- **多引擎支持 / 多游戏 case / 跨项目知识复用 / 跨游戏资产库 / 模板市场**
-  （文档第 3、80 节明令禁止的架构漂移）。
-- **多人协作 / 联网 / MMO / 大型 3D**（文档第 3 节）。
-- **完整 Event Sourcing**（文档第 28 节明确 V1 不做）。
+- **自动评分 / 门禁 / 自我修复闭环**（[票 06](issues/06-html-report.md)、
+  [票 08](issues/08-state-machine-conditional-repair.md)、
+  [票 10](issues/10-runtime-bridge-sdk.md)、
+  [票 11](issues/11-semantic-action-mapping.md)、
+  [票 12](issues/12-structural-visual-qa.md)、
+  [票 13](issues/13-gameplay-test-derivation.md)、
+  [票 16](issues/16-repair-actions.md)、
+  [票 17](issues/17-repair-progress-rollback.md)）。
+  由 R2 判出局 —— 它回答的是「AI 能不能**自己**判断做得好不好并改进」，
+  而本图回答「能不能**产出**两个可用的东西」。两者都需要，但**先立产物再立闭环**：
+  闭环的 repair 对象在 R3/R6 之后变成了「资源包」和「demo」两种不同粒度，
+  不先划清产物边界就会重画一次。
+  ⚠️ **票 12 的确定性检查不是丢掉，是搬家** —— 凸包容差、尺寸越界并入
+  [票 27](issues/27-asset-spec-kinds.md) 的 AssetSpec 校验规则。
+- **Runtime Bridge 与语义测试动作、Playwright 驱动的玩法验证**
+  （[票 02](issues/02-phaser-plugin-api.md)、[票 10](issues/10-runtime-bridge-sdk.md)、
+  [票 11](issues/11-semantic-action-mapping.md)）。
+  它们是 QA 的地基，地基随 QA 一起走。R8 之后产物 B 的「能跑」由**外壳恒可运行**结构性保证，
+  不需要观察设施。
+- **Web 控制台 UI**（上传图片、填想法、看实时进度的页面）。R5 已选 CLI + MCP，
+  一个交互式前端体量不小于管线本身。
+- **React**（Q4 已排除）。游戏内 UI 用 Phaser 原生 GameObject。
+- **多引擎运行时 / 多游戏模板 / 跨项目知识复用 / 跨游戏资产库 / 模板市场**
+  （`docs/文档.md` 第 3、80 节明令禁止的架构漂移）。
+  ⚠️ 注意与 R3 的「交付态引擎中立」区分：**产物中立**不等于**运行时支持多引擎**。
+- **多人协作 / 联网 / MMO / 大型 3D**（`docs/文档.md` 第 3 节）。
+- **完整 Event Sourcing**（`docs/文档.md` 第 28 节明确 V1 不做）。
+- **Benchmark Suite 与 E2E Creation Success Rate**（`docs/文档.md` 第 65–71、83 节）。
+  它回答「能不能**稳定**创造」，前提是有 N 个跑通的游戏，现在连 1 个都没有。
+- **Resume / Recovery / SQLite 持久化**（`docs/文档.md` 第 49–51 节）。
+  难点不在存，在恢复语义。

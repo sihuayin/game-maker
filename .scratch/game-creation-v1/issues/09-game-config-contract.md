@@ -1,9 +1,28 @@
-# 09. `game-config.json` 的契约：AI 与手写代码之间唯一的语义接口
+# 09. game-config 契约：AI 与手写 runtime 之间唯一的语义接口
 
 Type: grilling
 Status: open
-Blocked by: 05
+Blocked by: 24, 31
 Map: ../map.md
+
+> ⚠️ **范围已重画**（2026-09-24，R4/R8）：**核心问题原封不动**，但周边全变了。
+>
+> **保留的**：game-config 是 AI 产出的**纯数据**，描述实体清单、场景布局、交互规则、
+> 胜负条件；它是 AI 与手写游戏代码之间**唯一**的语义接口。R8 之后 AI 连纯函数都不写了，
+> 所以这个接口的**完备性要求更高了** —— 凡是 runtime 需要知道的东西，
+> 没有第二个地方可以承载。
+>
+> **新增的负担（R4）**：**map / 关卡归 game-config**。它是「引用其他资源的布局」，
+> 不是可绘制产物 —— 所以地块、实体摆位、关卡结构、进度门都落在这里。
+> 票 05 的结论（drawlist 没有「实例化另一个资源」的 op，场景组合归 Game Config）
+> 从一条注脚变成了本票的主干。
+>
+> **删掉的**：所有与状态机、repair plan、conditional transition 相关的条目（R2 已出局）。
+>
+> **新增的子问题**：game-config 如何**引用资源包**？引用的粒度是
+> `assetId` 还是 `assetId + state`？引用了一个包里不存在的 id 时，
+> 谁来报错、什么时候报（构建期还是运行时）？—— 这条与[票 24](24-asset-pack-contract.md)
+> 是同一个接口的两侧，两票要对齐。
 
 ## Question
 

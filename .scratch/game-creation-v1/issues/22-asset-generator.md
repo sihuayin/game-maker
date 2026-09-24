@@ -11,6 +11,33 @@ Status: open
 Blocked by: —
 Map: ../map.md
 
+> 🔴 **输入侧出现缺口**（2026-09-24，[票 34](34-wan-quota-facts.md)）：
+> 本票的输入是 `StyleSpec`，而 StyleSpec 来自「参考图 → 视觉模型」——
+> 那条路（千问 Token Plan）现在**配额耗尽且条款禁止管线化调用**。
+> 也就是说**本票现在拿不到自动产出的 StyleSpec**。
+>
+> 应对（见[票 35](35-bitmap-provenance.md)）：**StyleSpec 降级为「人机协作的一次交互」** ——
+> 条款明确允许在 Claude Code 这类工具里交互式使用，所以「人在会话里让模型看图、产出
+> StyleSpec JSON、存成文件」是**合法且几乎免费**的，管线只消费这个文件。
+> 本票**不需要等票 35** 就能开工：拿[票 15](15-stylespec-fixture.md) 的 fixture StyleSpec 当输入，
+> 本票要回答的问题（多状态同一性、dither 图元、few-shot 模板）**全都与 StyleSpec 从哪来无关**。
+>
+> 另：本票**问题 5**（视觉路径有没有 thinking 开关）**作废** —— 视觉路径整个不可用了。
+
+> ✅ **本票范围不变，地位上升**（2026-09-24，R3/R7）：drawlist 生成从「Asset 的产出」
+> 变成「**创作态**的产出」，是产物 A 的两条生产线之一（另一条是[票 23](23-bitmap-asset-pipeline.md)）。
+>
+> 票内六个问题在 R3 下的归属：
+> - 问题 1（多状态同一性）：**仍归票 23**（位图路线的帧一致性是同一个问题）
+> - 问题 2（dither 图元）：仍是本票的真问题 —— 且现在多了一层：若材质靠 renderer 叠加，
+>   它只活在**交付态**里，创作态文本不变，票 20 的「换色板产物文本不变」性质会**被绕过**。要判这算不算问题。
+> - 问题 3（characterStyle）：**归票 23**（英雄角色走位图）
+> - 问题 4（few-shot prompt 模板归谁维护）：**仍归本票**，且现在与[票 09](09-game-config-contract.md)、
+>   [票 28](28-recipe-compilation.md) 三票共用同一个模板渲染器，要合成一个决定
+> - 问题 5（thinking 开关在视觉路径上是否存在）：**仍归本票**，答案进[票 19](19-latency-budget.md)
+> - 问题 6（「像不像」谁判）：**改判** —— R2 砍掉了自动评分，
+>   眼下只有人眼 + 参考基准；要不要引入视觉模型**抽查**已移进 fog
+
 ## Question
 
 **这张票是建图时漏掉的。** `ports.ts` 里的 `AssetGenerator.generate(manifest, style)`

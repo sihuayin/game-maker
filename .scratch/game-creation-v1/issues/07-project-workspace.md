@@ -1,9 +1,28 @@
-# 07. 项目工作区目录骨架、gitignore 与落盘 paths 模块
+# 07. 目录迁移：现有 demo/ 拆进 monorepo
 
 Type: task
 Status: open
-Blocked by: —
+Blocked by: 29
 Map: ../map.md
+
+> 📌 **迁移时要一并吃掉的一条**（2026-09-24，[票 03](03-phaser-vite-playwright-chain.md) 实测）：
+> Phaser 会被打进一个 **1.2 MB 的 chunk**，必然触发 Vite 的 `>500 kB` 告警。
+> 要么显式调高 `chunkSizeWarningLimit` 并说明理由，要么拆包 —— 别让它变成一个
+> 「每次构建都刷屏但没人看」的噪音。
+> 另：仓库本机 `.npmrc` 指向 `registry.npmmirror.com`，装 Vite 8 会拉所有平台的
+> `@rolldown/binding-*` 并**卡死 >5 分钟**；加 `--registry=https://registry.npmjs.org` 后 42 秒装完。
+> 这条影响票 29 的工具链选择，值得在 workspace 配置里一次性解决（比如仓库级 `.npmrc`）。
+
+> ⚠️ **范围已重画**（2026-09-24，R9）：从「设计项目工作区目录骨架」变成**一次具体的搬迁**。
+> R9 已定包边界（`contracts` / `assets` / `demo` / `cli` / `mcp`），本票是执行：
+> 把现有 `demo/` 那 892 行骨架按职责拆进对应包，并让测试继续跑通。
+>
+> **搬迁的难点在边界判定，不在复制文件**：现有 `demo/src/` 里的
+> `contracts/` `runtime/` `qa/` `repair/` 是按**上一版终点**分的。
+> `repair/` 与 `qa/` 的大部分（Gate、Evaluator、RepairEngine）随 R2 出局 ——
+> **哪些文件跟着一起删、哪些只是「暂时没人用」**要逐文件判，不能整目录搬。
+> 判据：契约（Zod schema）与生成路径上的确定性校验**留下**；评分、门禁、
+> 修复计划、状态机、编排器**删除**。
 
 ## Question
 

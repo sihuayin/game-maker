@@ -215,3 +215,26 @@ cc-switch 651   sihuayin  1     一 9/21 20:13:01 2026
 ### 新建的票
 
 - **19. 一次完整 run 的时间账本与缓存策略** —— 由发现 B 直接催生。
+
+
+---
+
+## 2026-09-24 事实修订（主 session 实测）
+
+⚠️ **本票 Answer 里的视觉路径结论已经失效，其余仍然有效。**
+
+- ❌ **「`/v1/messages` 实为 qwen3.8-max，是唯一能收图的路」—— 现在这条路打不通了。**
+  CC Switch 请求日志（`~/.cc-switch/cc-switch.db` 的 `proxy_request_logs`）显示：
+  千问 Token Plan provider（`bcd60069`）最后一次成功是 **2026-09-24 01:36:33 UTC**，
+  之后 22 次 `429 Throttling.AllocationQuota`；代理**已故障转移到 DeepSeek**
+  （`331fbb23`，7856 次 200，仍在服务）。
+  实测：往 `/v1/messages` 发图片块仍返回 200，但 `model` 是 `deepseek-flash`
+  且它**看不到图**（对一张 1×1 图编出「light pink / salmon」）。
+- ⚠️ **`/v1/models` 现在返回空列表 `[]`**（本票当时它列出了 deepseek 模型）——
+  代理的上游配置会变，**任何探测结论都要带时间戳**。
+- ✅ **文本路径的行为与延迟结论全部仍然有效**（纯文本 JSON 9/9、
+  `thinking: disabled` 后 9s、鉴权不校验、`tool_choice` 不可靠）。
+- ✅ **位图生图配方本身仍然有效**（端点、base64 参考图、7.8s/张），
+  但**当前跑不通也不合规** —— 见[票 34](34-wan-quota-facts.md) 与[票 35](35-bitmap-provenance.md)。
+- 📌 **教训**：本票把「哪个上游」当成了一个稳定事实记下来。
+  它其实是**配置**，会变。后续所有票引用环境事实时都应注明观测时间。

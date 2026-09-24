@@ -1,0 +1,15 @@
+{
+  "name": "phaser-demo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0",
+    "vite": "^8.3.0"
+  }
+}

@@ -1,9 +1,43 @@
-# 21. DrawList renderer：Canvas2D 与 Phaser 两条消费路径
+# 21. drawlist → PNG 光栅化器（交付态生成器）
 
 Type: task
 Status: open
-Blocked by: 02
+Blocked by: 24
 Map: ../map.md
+
+> ✅ **票 24 已 resolved，本票解除阻塞**（2026-09-24）。交付态图集的形状已定：**按 kind 各一份** TexturePacker JSON Hash + PNG（`delivery/atlas.<kind>.json`），每帧带 `anchor`，`ui` 的帧带 `scale9Borders`。量化与光栅化共用同一份实现。草案实现见 [`../experiments/asset-pack-draft/lib/raster.mjs`](../experiments/asset-pack-draft/lib/raster.mjs) 与 `lib/quantize.mjs`（**不是生产代码，别直接提上去**）。
+
+> 📌 **两条上游约束已确定**（2026-09-24）。
+>
+> 1. **量化规则与[票 23](23-bitmap-asset-pipeline.md) 共用**。票 35 选了 (c)+(a) 之后，
+>    票 23 的「问题 5（像素网格后处理）」原样保留并转移到本票的射程内 ——
+>    「量化到 `StyleSpec.palette` + 最近邻缩放到目标尺寸」对**光栅化产出的图**和
+>    **人工导入的图**是同一个要求，**不要写两份**。而它现在更刚需了：
+>    人给的图颜色**不受色板约束**。
+> 2. **图集组装按[票 25](25-delivery-format-spec.md) 的事实来**：
+>    产出 **TexturePacker JSON Hash/Array**（Phaser 原生读、零转换器），
+>    每帧带 `anchor`（归一化到 `sourceSize`）与 `scale9Borders`（UI 九宫格）。
+>    这让本票的产出直接对接[票 26](26-animation-representation.md) 的锚点与
+>    [票 33](33-runtime-assembly.md) 的装配，中间不需要任何转换代码。
+
+> ⚠️ **范围已重画**（2026-09-24，R3）：**从两条消费路径收窄成一条，但这条的分量重了。**
+>
+> 上一版问「Canvas2D 直画还是离屏渲染成 texture，Phaser 的 Graphics 够不够用」。
+> R3 之后这个问题**消失了**：交付态是 PNG，产物 B 直接加载 PNG，
+> **Phaser 根本不需要认识 drawlist** —— 所以 Phaser Graphics 那条路不用走了，
+> 「票 02 确认 Phaser Graphics API」这个阻塞也随之作废。
+>
+> 收窄成一条之后它反而变成了**交付态的唯一生产者**：drawlist 是创作态，
+> 所有非位图资源（道具、关卡几何、UI 图元、背景图元）都**必须**经过这个光栅化器
+> 才能变成包里那张 PNG。它不是渲染器，是**编译器后端**。
+>
+> **新增的硬要求**：
+> 1. **确定性**：同一份 drawlist 两次光栅化必须**逐字节相同**。否则 checksum（[票 18](18-artifact-ref-consistency.md)）
+>    不成立、「换色板后产物文本不变」的性质也传导不到交付态。
+> 2. **目标尺寸与像素格**：交付的是「像素风」资源，光栅化必须支持最近邻缩放到
+>    32px 之类的网格（与[票 23](23-bitmap-asset-pipeline.md) 问题 5 的后处理是同一件事）。
+> 3. **图集组装**：多张 drawlist 输出拼进一张 atlas PNG + 元数据，拼法由[票 25](25-delivery-format-spec.md) 定。
+> 4. 失败必须**报告是哪个 asset 的哪个 op**，不能让整批崩掉。
 
 ## Question
 

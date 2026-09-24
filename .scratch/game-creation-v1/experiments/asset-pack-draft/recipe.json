@@ -1,0 +1,58 @@
+{
+  "format": "asset-recipe/v1",
+  "_note": "草案形状，正式 schema 归票 28。这就是 R7 里「人给的那份清单」——落盘成文件后与「由需求推导」那条路完全同构。",
+  "id": "dystopian-shop",
+  "styleRef": "../style-transfer-from-test-png/stylespec.json",
+  "assets": [
+    {
+      "id": "player",
+      "kind": "animation",
+      "role": "protagonist",
+      "description": "玩家角色，六帧走路循环",
+      "size": { "w": 24, "h": 32 },
+      "anchor": { "x": 0.5, "y": 0.92 },
+      "required": true,
+      "frames": [
+        { "name": "player.idle",  "state": "idle",  "from": { "kind": "drawlist", "ref": "../animated-player/frame.idle.json" } },
+        { "name": "player.walk1", "state": "walk1", "from": { "kind": "drawlist", "ref": "../animated-player/frame.walk1.json" } },
+        { "name": "player.walk2", "state": "walk2", "from": { "kind": "drawlist", "ref": "../animated-player/frame.walk2.json" } },
+        { "name": "player.walk3", "state": "walk3", "from": { "kind": "drawlist", "ref": "../animated-player/frame.walk3.json" } },
+        { "name": "player.walk4", "state": "walk4", "from": { "kind": "drawlist", "ref": "../animated-player/frame.walk4.json" } },
+        { "name": "player.jump",  "state": "jump",  "from": { "kind": "drawlist", "ref": "../animated-player/frame.jump.json" } }
+      ],
+      "animations": [
+        { "name": "walk", "fps": 8, "loop": true, "frames": ["player.walk1", "player.walk2", "player.walk3", "player.walk4"] },
+        { "name": "idle", "fps": 1, "loop": true, "frames": ["player.idle"] }
+      ]
+    },
+    {
+      "id": "platform", "kind": "sprite", "role": "ground-tile",
+      "description": "地面平台，可横向拼接", "size": { "w": 64, "h": 16 }, "anchor": { "x": 0, "y": 0 },
+      "frames": [ { "from": { "kind": "drawlist", "ref": "../style-transfer-from-test-png/drawlist.platform.idle.json" } } ]
+    },
+    {
+      "id": "pickup", "kind": "sprite", "role": "collectible",
+      "description": "可拾取物，嵌套面板 + CRT 屏", "size": { "w": 16, "h": 16 }, "anchor": { "x": 0.5, "y": 1 },
+      "frames": [ { "from": { "kind": "drawlist", "ref": "../style-transfer-from-test-png/drawlist.pickup.idle.json" } } ]
+    },
+    {
+      "id": "hazard", "kind": "sprite", "role": "hazard",
+      "description": "尖刺危险区，可横向平铺", "size": { "w": 32, "h": 12 }, "anchor": { "x": 0.5, "y": 1 },
+      "frames": [ { "from": { "kind": "drawlist", "ref": "../style-transfer-from-test-png/drawlist.hazard.idle.json" } } ]
+    },
+    {
+      "id": "bg_sign", "kind": "ui", "role": "panel",
+      "description": "带框面板/招牌。⚠️ 归类为 ui 是本次草案的判断（它有 1px 外框 + 嵌套内框，正是九宫格可拉伸的形状），票 27 要正式裁决。",
+      "size": { "w": 48, "h": 32 }, "anchor": { "x": 0, "y": 0 },
+      "scale9Borders": { "x": 2, "y": 2, "w": 44, "h": 28 },
+      "frames": [ { "from": { "kind": "drawlist", "ref": "../style-transfer-from-test-png/drawlist.bg_sign.idle.json" } } ]
+    },
+    {
+      "id": "shop_interior", "kind": "background", "role": "scene-backdrop",
+      "description": "场景尺度背景。走人工导入通道（票 35 的 (a) 路）。",
+      "anchor": { "x": 0, "y": 0 },
+      "paletteBinding": "quantized",
+      "frames": [ { "from": { "kind": "bitmap", "ref": "../../../../demo/test.png" } } ]
+    }
+  ]
+}

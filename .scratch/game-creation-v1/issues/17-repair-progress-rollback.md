@@ -1,9 +1,17 @@
 # 17. RepairProgress / Stalled / Best Artifact 的判定与回滚机制
 
 Type: grilling
-Status: open
-Blocked by: 16
+Status: out-of-scope
+Blocked by: —
 Map: ../map.md
+
+> ⛔ **已判出局**（2026-09-24，R2）。判出局的**不是问题本身，是本图的终点**：
+> 它属于「QA 闭环」那一簇，回答的是「AI 能不能自己判断做得好不好并改进」，
+> 而重画后的终点是「能不能产出两个可用的东西」。
+> Stalled / Best Artifact 是 Repair 循环的判定。
+>
+> **文件保留、不删除** —— 里面的实测数据与分析对将来那张闭环地图仍然有效。
+> 永不毕业：只有重画 Destination 才会回来，且那时是一张新地图。
 
 ## Question
 
