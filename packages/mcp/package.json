@@ -1,0 +1,10 @@
+{
+  "name": "@game-maker/mcp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP 薄壳（stdio server，不 shell out 到 CLI）。",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "dependencies": {"@game-maker/contracts":"workspace:*","@game-maker/assets":"workspace:*","@game-maker/demo":"workspace:*"},
+  "bin": { "game-maker-mcp": "./dist/mcp.mjs" }
+}

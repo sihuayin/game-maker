@@ -30,7 +30,7 @@ const notes = [];
 const byAsset = [];
 for (const a of recipe.assets) {
   const frames = [];
-  const paletteBinding = a.paletteBinding || 'exact';
+  const frameOps = [];
   for (const fr of a.frames || [{}]) {
     const name = fr.name || (fr.state ? `${a.id}.${fr.state}` : a.id);
     let img, src;
@@ -42,6 +42,7 @@ for (const a of recipe.assets) {
         notes.push(`${name}: viewBox ${dl.viewBox[2]}×${dl.viewBox[3]} 与 recipe size ${a.size?.w}×${a.size?.h} 不一致`);
       try { img = rasterize(dl, { palette: PALETTE }); }
       catch (e) { if (e instanceof RasterError) throw new Error(`光栅化失败 —— ${e.message}`); throw e; }
+      frameOps.push(dl.ops);
       // 凸包容差：只判「过大」。票 12 出局时搬过来的规则，落地处归票 27。
       const bb = inkBBox(img);
       const exp = dl.expectedSize;
@@ -50,15 +51,22 @@ for (const a of recipe.assets) {
       src = { kind: 'drawlist', ref: dlPath };
     } else {
       img = decodePNG(fs.readFileSync(path.resolve(HERE, fr.from.ref)));
-      if (paletteBinding === 'quantized') {
+      if ((a.paletteBinding || 'quantized') === 'quantized') {
         const q = quantizeToPalette(img, PALETTE);
         notes.push(`${name}: 量化到 ${PALETTE.length} 色 —— 非透明像素 ${q.opaquePixels}，其中 ${(100 * q.changedPixels / q.opaquePixels).toFixed(2)}% 被改色`);
         img = q;
       }
+      frameOps.push(null);
       src = { kind: 'bitmap', ref: path.resolve(HERE, fr.from.ref) };
     }
     frames.push({ name, state: fr.state, img, src });
   }
+  // paletteBinding 的判定（票 36）：对 drawlist 资源**静态可判** —— 看有没有 op 带 opacity，
+  // 不需要渲染。导出路径（recipe 显式声明）原样尊重。
+  let paletteBinding;
+  if (a.paletteBinding) paletteBinding = a.paletteBinding;
+  else if (frameOps.every((o) => o === null)) paletteBinding = 'quantized';
+  else paletteBinding = frameOps.some((o) => o && o.some((x) => x.opacity != null)) ? 'composited' : 'exact';
   byAsset.push({ spec: a, frames, paletteBinding });
 }
 
@@ -117,14 +125,15 @@ for (const a of byAsset) {
 }
 
 // ── 4. manifest ───────────────────────────────────────────────────────────
-const exactness = new Map();
+// 扫像素从「判据」退化成「对静态判定的测试」（票 36）。
 for (const a of byAsset) {
-  if (a.paletteBinding !== 'exact') continue;
-  for (const f of a.frames) {
-    const e = paletteExactness(f.img, PALETTE);
-    if (!e.exact) notes.push(`${f.name}: paletteBinding=exact 但实测有 ${e.offPalette.length} 种色板外颜色 ${JSON.stringify(e.offPalette)}`);
-  }
-  exactness.set(a.spec.id, true);
+  if (a.paletteBinding !== 'exact' && a.paletteBinding !== 'composited') continue;
+  const off = [];
+  for (const f of a.frames) { const e = paletteExactness(f.img, PALETTE); if (!e.exact) off.push(`${f.name}${JSON.stringify(e.offPalette)}`); }
+  if (a.paletteBinding === 'exact' && off.length)
+    notes.push(`⚠️ ${a.spec.id}: 静态判为 exact，扫像素却有色板外颜色 —— 静态判定错了：${off.join(' ')}`);
+  if (a.paletteBinding === 'composited' && off.length)
+    notes.push(`${a.spec.id}: composited，扫像素确认 ${off.length} 帧的复合色不在色板内（符合预期，来源仍是色板）`);
 }
 
 const mode = byAsset.every((a) => a.spec.origin === 'fixture') ? 'fixture'
@@ -145,11 +154,8 @@ const manifest = {
   },
   palette: {
     ref: 'authoring/stylespec.json#/palette', size: PALETTE.length, values: PALETTE,
-    coverage: {
-      exact: byAsset.filter((a) => a.paletteBinding === 'exact').length,
-      quantized: byAsset.filter((a) => a.paletteBinding === 'quantized').length,
-      unbound: byAsset.filter((a) => a.paletteBinding === 'unbound').length,
-    },
+    coverage: Object.fromEntries(['exact', 'composited', 'quantized', 'unbound']
+      .map((k) => [k, byAsset.filter((a) => a.paletteBinding === k).length])),
   },
   atlases,
   assets: byAsset.map((a) => {

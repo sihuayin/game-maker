@@ -276,11 +276,12 @@ MCP 的返回结构体里。agent 不知道手上这个包是不是 fixture，�
 
 ### 7. 票面附加问题：人工导入的位图颜色不受色板约束
 
-**per-asset `paletteBinding`，取值只有三种：**
+**per-asset `paletteBinding`，取值四种**（第四种 `composited` 由[票 36](36-opacity-and-palette-invariant.md) 补上）：
 
 | 值 | 含义 | 谁保证 |
 |---|---|---|
-| `exact` | 每一帧的**每个非透明像素**颜色 ∈ `StyleSpec.palette` | **光栅化后扫像素实测**，不是承诺 |
+| `exact` | 每一帧的**每个非透明像素**颜色 ∈ `StyleSpec.palette` | **静态**：无任何 op 带 `opacity` |
+| `composited` | 每个非透明像素都是**色板色的 alpha 复合** | **静态**：有 op 带 `opacity`（来源已由 schema 保证） |
 | `quantized` | 交付前被最近邻量化到色板；**原始色留在 `authoring/`** | 量化器 + 记录被改色比例 |
 | `unbound` | 不量化，原样交付 | **必须在 `degradations[]` 里留一条**，否则 schema 拒绝 |
 
@@ -319,7 +320,7 @@ MCP 的返回结构体里。agent 不知道手上这个包是不是 fixture，�
 
 ### 9. 实物验证**暴露**的四件事（纸上推演不会发现的）
 
-**① `opacity` 击穿了「颜色 ∈ 色板」的构造恒真性 —— 这条需要人类裁决。**
+**① `opacity` 击穿了「颜色 ∈ 色板」的构造恒真性。** ✅ **已由[票 36](36-opacity-and-palette-invariant.md) 裁决（2026-09-24）：保留 `opacity`，不变量精确化为「来源 ∈ 色板 ∧ 复合色是色板的确定函数」，两段都构造恒真，且对 drawlist 资源可在解析期静态判定（不需要渲染）。** 原文保留如下。
 `hazard` 用了 4 个 `opacity: 0.35` 的 `poly`。alpha 混合在色板内产生了**两个色板外颜色**
 （`#7a6c5d` × 24px、`#898f78` × 8px，正是 `palette:5` 分别叠在 `palette:3` / `palette:1` 上的结果）。
 所以 `CONTEXT.md` 那句「颜色 ∈ 色板因此是一个**构造上恒真**的命题」**只在没有 `opacity` 时成立**。
@@ -363,7 +364,7 @@ MCP 的返回结构体里。agent 不知道手上这个包是不是 fixture，�
 
 | 票 | 本票给了它什么 |
 |---|---|
-| [20](20-drawlist-contract.md) | 色板形状（有序数组 + `palette:N`）、`expectedSize` 比对时机、**`opacity` 的裁决待你** |
+| [20](20-drawlist-contract.md) | 色板形状（有序数组 + `palette:N`）、`expectedSize` 比对时机、`opacity` 保留 + `paletteBinding` 静态判定（票 36 已裁决）；⚠️ 但本票还等[票 29](29-monorepo-layout.md) —— `packages/` 尚不存在 |
 | [21](21-drawlist-renderer.md) | 交付态图集的形状（per-kind 一份 JSON Hash + PNG）、`anchor` / `scale9Borders` 的落点、量化的落点 |
 | [26](26-animation-representation.md) | `frames[]` / `animations[]` 在 manifest 里的形状、**锚点必须有来源**、state 与 animation 的关系本票**刻意没替它定** |
 | [27](27-asset-spec-kinds.md) | 四类 kind 在包里的分岔点（各自图集、各自打包参数）；`bg_sign` 归类为 `ui` 是本次的判断，**待裁决** |
@@ -377,6 +378,6 @@ MCP 的返回结构体里。agent 不知道手上这个包是不是 fixture，�
 四类 spec 各自要什么（[票 27](27-asset-spec-kinds.md)）、清单怎么推导（[票 28](28-recipe-compilation.md)）、
 逐帧锚点怎么算（[票 26](26-animation-representation.md)）、包的存放路径（[票 29](29-monorepo-layout.md)）。
 
-**本票需要人类签字的四件事**：`opacity` 的裁决（§9①）、`bg_sign` 的归类（§10 表）、
+**本票需要人类签字的四件事**：~~`opacity` 的裁决~~（已由票 36 裁决）、`bg_sign` 的归类（§10 表）、
 `paletteBinding: "unbound"` 这个逃生舱是否该存在（§7）、以及 `CONTEXT.md` 里
 「资源清单」一词分给 Recipe 还是 Manifest（§0）。

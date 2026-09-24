@@ -52,7 +52,7 @@
       "description": "场景尺度背景。走人工导入通道（票 35 的 (a) 路）。",
       "anchor": { "x": 0, "y": 0 },
       "paletteBinding": "quantized",
-      "frames": [ { "from": { "kind": "bitmap", "ref": "../../../../demo/test.png" } } ]
+      "frames": [ { "from": { "kind": "bitmap", "ref": "../../../../fixtures/reference/test.png" } } ]
     }
   ]
 }

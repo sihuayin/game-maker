@@ -2,10 +2,12 @@
 
 Type: task
 Status: open
-Blocked by: 24
+Blocked by: 24, 29, 07
 Map: ../map.md
 
-> ✅ **票 24 已 resolved，本票解除阻塞**（2026-09-24）。交付态图集的形状已定：**按 kind 各一份** TexturePacker JSON Hash + PNG（`delivery/atlas.<kind>.json`），每帧带 `anchor`，`ui` 的帧带 `scale9Borders`。量化与光栅化共用同一份实现。草案实现见 [`../experiments/asset-pack-draft/lib/raster.mjs`](../experiments/asset-pack-draft/lib/raster.mjs) 与 `lib/quantize.mjs`（**不是生产代码，别直接提上去**）。
+> 🔴 **本票还不能开工：`packages/` 尚不存在**（2026-09-24 补连的边）—— 目的地 `packages/assets/` 的形态由 [票 29](29-monorepo-layout.md) 定，`29 → 21` 补上了。
+
+> ✅ **票 24 已 resolved**（2026-09-24）。交付态图集的形状已定：**按 kind 各一份** TexturePacker JSON Hash + PNG（`delivery/atlas.<kind>.json`），每帧带 `anchor`，`ui` 的帧带 `scale9Borders`。量化与光栅化共用同一份实现。草案实现见 [`../experiments/asset-pack-draft/lib/raster.mjs`](../experiments/asset-pack-draft/lib/raster.mjs) 与 `lib/quantize.mjs`（**不是生产代码，别直接提上去**）。
 
 > 📌 **两条上游约束已确定**（2026-09-24）。
 >

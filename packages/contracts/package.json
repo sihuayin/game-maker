@@ -1,0 +1,9 @@
+{
+  "name": "@game-maker/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "契约：Zod schema 与纯类型。唯一的共享代码。",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "dependencies": {"zod":"catalog:"}
+}

@@ -3,6 +3,11 @@ node_modules/
 
 # Build output
 dist/
+*.tsbuildinfo
+
+# 产物 A 与产物 B —— 全部 build 出来的东西都在这，不入库（Q9 精神：
+# 只有 inputs/ 与 fixtures/ 入库）。见票 29。
+out/
 
 # Logs
 *.log

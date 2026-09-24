@@ -2,14 +2,21 @@
 
 Type: task
 Status: open
-Blocked by: 24
+Blocked by: 24, 29, 36, 07
 Map: ../map.md
 
-> 🔴 **新增一条必须先裁决的**（2026-09-24，[票 24](24-asset-pack-contract.md) 实测）：
-> **带 `opacity` 的 op 会做 alpha 混合、产出色板外颜色** —— 真实产物 `hazard.idle.json` 的
-> 4 个 `opacity: 0.35` poly 产生了 `#7a6c5d` / `#898f78`。这击穿了「颜色 ∈ 色板」的构造恒真性，
-> 而本票正好要写 `fill` / `stroke` 的 schema。三条走法见 map 的「Not yet specified」。
-> **票 24 没有替你定，因为它会改写 `CONTEXT.md` 里被当作卖点的那句话。**
+> ✅ **`opacity` 已裁决**（2026-09-24，[票 36](36-opacity-and-palette-invariant.md)）：
+> **保留 `opacity`**。不变量从「渲染后像素 ∈ 色板」精确化为
+> 「来源 ∈ 色板 ∧ 复合色是色板的确定函数」，前两段都构造恒真。
+> 因此本票的 op schema **保留 `opacity: z.number().min(0).max(1).optional()`**，
+> 并把 `paletteBinding` 的四值判定作为一条**纯静态**校验函数一起落地
+> （走一遍 ops 看有没有 `opacity`，不需要渲染）。
+
+> 🔴 **本票还不能开工：`packages/` 尚不存在**（2026-09-24 补连的边）。
+> 本票抬头写明目的地是 `packages/contracts/`，但定义那个目录形态的是
+> [票 29](29-monorepo-layout.md)（它正文第 6 条明说「本票要给出目标形态，否则票 07 无从下手」），
+> 而 `package.json` / `tsconfig` / 包管理器都由票 29 定。
+> 往一个还不存在的目录里写代码就是「先写再改」—— 所以 `29 → 20` 这条边补上了。
 
 > ✅ **票 24 已 resolved，本票解除阻塞**（2026-09-24）。可以直接开工的是：
 > 色板形状 = 有序数组 + `palette:N` 索引（`#rrggbb` 小写、不得重复色）、

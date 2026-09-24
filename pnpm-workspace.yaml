@@ -1,0 +1,11 @@
+packages:
+  - packages/*
+# pnpm 10 默认屏蔽 postinstall。esbuild 需要它才能装二进制。
+onlyBuiltDependencies:
+  - esbuild
+
+# 五个包共用一份版本源，避免版本漂移。
+catalog:
+  zod: ^3.25.76
+  typescript: ^5.9.3
+  vitest: ^3.1.2

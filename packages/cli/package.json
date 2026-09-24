@@ -1,0 +1,10 @@
+{
+  "name": "@game-maker/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CLI 薄壳。",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "dependencies": {"@game-maker/contracts":"workspace:*","@game-maker/assets":"workspace:*","@game-maker/demo":"workspace:*"},
+  "bin": { "game-maker": "./dist/cli.mjs" }
+}

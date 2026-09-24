@@ -1,0 +1,17 @@
+{
+  "//": "只放绝对语义的选项。outDir / rootDir / include 是相对路径，按 base 文件自己的目录解析 —— 必须在各包的 tsconfig 里写（票 29 的 G1）。",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}

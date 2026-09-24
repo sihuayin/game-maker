@@ -10,7 +10,7 @@
 
 ```bash
 mkdir -p /tmp/gen
-base64 -i demo/test.png | tr -d '\n' > /tmp/gen/ref.b64   # 参考图 base64（~1.4MB）
+base64 -i fixtures/reference/test.png | tr -d '\n' > /tmp/gen/ref.b64   # 参考图 base64（~1.4MB）
 node step1_stylespec.mjs    # 参考图 → StyleSpec        （qwen3.8-max 视觉，~61s）
 node step2_assets.mjs       # StyleSpec → 6 份 drawlist （deepseek-v4-pro，关 thinking，5 路并行 ~8s）
 node sheet.mjs              # drawlist → 联系表 sheet.svg

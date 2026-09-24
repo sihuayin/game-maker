@@ -1,7 +1,7 @@
 // assetpack/v1 的 Zod 草案 —— 票 24 的产物。
 //
 // 落进 packages/contracts 要等票 29（monorepo 切分）resolved，这里先立形状。
-// 与现有 AssetManifestSchema（demo/src/contracts/index.ts:69）**不是同一个东西**：
+// 与现有 AssetManifestSchema（已迁到 packages/contracts/src/index.ts）**不是同一个东西**：
 //   - AssetManifest  = 输入侧 + 旧闭环的过程统计（generated/missing/broken/unused）→ 归票 28 的资源清单
 //   - AssetPackManifest = 交付物**自身**的自描述 → 本票
 // 两者不共用类型，也不互相扩展。
@@ -40,8 +40,8 @@ export const AssetPackEntry = z.object({
   role: z.string(),
   /** 谁造的：generated = 本管线从规格产出；imported = 人工导入通道；fixture = 仓库内置的降级件 */
   origin: z.enum(['generated', 'imported', 'fixture']),
-  /** 颜色与色板的关系。exact 是**可验证的**声明（光栅化后扫像素），不是承诺。 */
-  paletteBinding: z.enum(['exact', 'quantized', 'unbound']),
+  /** 颜色与色板的关系（票 36 定四值）。exact / composited 对 drawlist 资源是**解析期静态可判**的。 */
+  paletteBinding: z.enum(['exact', 'composited', 'quantized', 'unbound']),
   required: z.boolean().default(true),
   size: z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).nullable(),
   anchor: Anchor,
@@ -86,7 +86,7 @@ export const AssetPackManifest = z.object({
   }),
   palette: z.object({
     ref: z.string(), size: z.number().int().positive(), values: z.array(z.string().regex(/^#[0-9a-f]{6}$/)),
-    coverage: z.object({ exact: z.number().int(), quantized: z.number().int(), unbound: z.number().int() }),
+    coverage: z.object({ exact: z.number().int(), composited: z.number().int(), quantized: z.number().int(), unbound: z.number().int() }),
   }).superRefine((p, ctx) => {
     if (new Set(p.values).size !== p.values.length) ctx.addIssue({ code: 'custom', message: 'palette has duplicate colors — palette:N would be ambiguous' });
     if (p.values.length !== p.size) ctx.addIssue({ code: 'custom', message: 'palette.size ≠ values.length' });

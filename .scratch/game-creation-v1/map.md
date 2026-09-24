@@ -48,8 +48,8 @@ Effort: game-creation-v1
 - 技术规范：`docs/文档.md`（83 节，中文）。⚠️ **它是上一版终点的规范，其
   QA/Gate/Repair/Benchmark 章节（29–51、65–71、74–75）在本地图中已出局**，
   仍然有效的是契约章节（11–28、52–63）。
-- 现有代码：`demo/`（892 行骨架）。7 个 Port 全是 Mock，`DefaultRepairEngine.execute()`
-  是空函数。**按 Q9 要拆进 `packages/`，见票 07。**
+- 现有代码：`packages/` 五个包（2026-09-24 由票 07 从 `demo/` 迁出）。
+  `contracts` 有真实 schema，`assets` / `demo` / `cli` / `mcp` 是空壳，各自的落地票写在文件头。
 - 领域词汇表：`CONTEXT.md`（仓库根）。本轮已按 R3 修正 **Asset** 的定义
   （从「就是一份 DrawList」改为「有创作态与交付态两种表达」）。
 
@@ -157,6 +157,31 @@ Effort: game-creation-v1
 
 <!-- 一行一张已关闭的票：够判断相关性即可，细节去票里看 -->
 
+- [目录迁移：现有 demo/ 拆进 monorepo](issues/07-project-workspace.md)：
+  **`packages/` 五包骨架已落地，四条验收全过**（`check:deps` / `tsc -b` / 守卫拒绝注入的
+  `assets → demo` / 跨包类型经 `exports`→`dist` 解析）。`demo/` 整体删除 19 个文件 816 行；
+  `contracts` 从 **32 个导出 240 行砍到 9 个 112 行**（随 R2 出局的 23 个 schema 全删），
+  `test.png` → `fixtures/reference/test.png`，票 05 的原型 HTML 归档回它的实验目录。
+  ⚠️ **本票正文写于旧终点，其中四条（`demo/projects/` 目录结构、`FileArtifactStore`、
+  Checkpoint 写入、Store 取舍）已作废**，未按字面执行 —— 逐条交代在 Answer §2。
+  施工撞出五件事，其中一条会影响所有后续票：**空测试套件会让 CI 从一开始就是红的**
+  （`vitest run` 无测试文件时退出码 1）→ 暂用 `--passWithNoTests`，票 20 落真实测试时摘掉。
+  另：`pnpm install` 实测 6 分 49 秒（官方源），esbuild 的 `onlyBuiltDependencies` 白名单有效。
+  **解除阻塞**：20 / 21 / 18。**并暴露一个无主缺口 → 建票 37**。
+
+- [monorepo 切分与构建工具链](issues/29-monorepo-layout.md)：**pnpm workspaces + `exports` → `dist` +
+  TypeScript project references**。依赖方向由**三层结构保证**、不靠 lint：pnpm 的非扁平 `node_modules`
+  （未声明的依赖解析不出来，连 `tsc` 都过不去）· 每个包的 `exports` **只暴露 `"."`**（深层 import 语法上不可达）·
+  一个手写 40 行的 `scripts/check-deps.mjs`（挡住**已声明但被禁止的边** —— R6 唯一的死法）。
+  允许图里 **`mcp` 不依赖 `cli`**（R5：MCP 不 shell out 到 CLI）。产物全在仓库根
+  `out/<gameId>/{pack/v<N>, site}/`（兄弟目录，满足票 03「HTTP server 的根必须是父目录」）。
+  V1 全部 `private: true`，只验证 `pnpm pack` 能打包。**现有 `demo/` 整体消失** ——
+  816 行里只有 `contracts/` 的一部分与 `demo/test.png` 活下来。
+  **实物验证**：五包等价体在 `/tmp` 跑通六条断言，并撞出三个纸上不会发现的坑
+  （`tsconfig.base` 的 `outDir`/`rootDir` 按 base 目录解析、守卫抓出 mcp→cli 违规、
+  pnpm 严格解析连类型检查期都覆盖）—— `experiments/monorepo-probe/`。
+  **解除阻塞**：07 / 20 / 21 / 30。
+
 - [资源包的结构与 manifest 契约](issues/24-asset-pack-contract.md)：**产物 A 的交付物 = 一个目录，
   入口是 `manifest.json`（`format: "assetpack/v1"`）**。按**表达层次**分两层 ——
   `delivery/`（引擎直接吃：按 kind 各一份 TexturePacker JSON Hash + PNG）与
@@ -170,8 +195,21 @@ Effort: game-creation-v1
   两次生成逐字节相同，Zod 校验通过、9 条反例全被拒 —— `experiments/asset-pack-draft/`。
   **顺带解除了** 20 / 21 / 26 / 27 的阻塞。
   ⚠️ **票 24 刻意没替票 26 定 state↔animation 的关系**，只保证两者在 manifest 里有落点；
-  也**留下一件需要人类裁决的事**：带 `opacity` 的 op 会做 alpha 混合、产生色板外颜色，
-  这击穿了「颜色 ∈ 色板是构造恒真」那句卖点（见下「Not yet specified」）。
+  它同时撞出一条需要人类裁决的事，已毕业成票 36（见下）。
+  另：它抬头写的目的地 `packages/contracts/` **尚不存在**，
+  因此本 session 补连了 `29 → 20` 与 `29 → 21`（此前漏连的边）。
+
+- [带 `opacity` 的 op 与「颜色 ∈ 色板」不变量](issues/36-opacity-and-palette-invariant.md)：
+  **保留 `opacity`，把不变量精确化**。从「渲染后像素 ∈ 色板」改成
+  「**所有颜色来源 ∈ 色板**（硬编码 hex 由 schema 拒绝，构造恒真）∧
+  **复合色是色板的确定函数**（构造恒真）」—— 失效的只是前者那个更强的说法，
+  而它本来就只是「没有 opacity 时」的偶然推论。
+  「换色板 → 创作态文本一字不变」「换色板 → 交付态整体换色」两条卖点都还活着。
+  **顺带的好处**：`paletteBinding` 对 drawlist 资源因此变成**解析期静态可判**（看有没有 `opacity`），
+  不需要渲染 —— R2 要的「生成路径上的确定性校验」在解析期就完成了。
+  `paletteBinding` 由 3 值扩成 4 值（新增 `composited`）。
+  **否决**：禁掉 `opacity`（会判现有真实产物 `hazard` 非法，且是拿 schema 表达审美偏好）、
+  混合后吸附回色板（半透明观感直接消失，代价最大）。
 
 - [Asset 的表达形式：「绘制代码 + 参数」具体长什么样？](issues/05-asset-representation.md)：
   选 **E = 严格 DSL + 数值曲线**（`drawlist+curve/v1`）。E 拿到 D 的全部表现力而
@@ -232,14 +270,6 @@ Effort: game-creation-v1
 - **资源包的增量生成与复用**：已有资源包能不能「再补三个资源」而不重跑全部？
   增量对 manifest 形状与版本化的要求，等[票 24](issues/24-asset-pack-contract.md)
   与[票 18](issues/18-artifact-ref-consistency.md)定了才锐利。
-- **⚠️ `opacity` 与「颜色 ∈ 色板」的裁决**（票 24 实测发现，阻塞[票 20](issues/20-drawlist-contract.md)）：
-  真实产物 `hazard.idle.json` 用了 4 个 `opacity: 0.35` 的 `poly`，alpha 混合在色板内
-  产生了两个**色板外颜色**（`#7a6c5d`、`#898f78`）。所以「颜色 ∈ 色板」**只在没有 `opacity` 时**
-  是构造恒真的。三条走法：(a) schema 禁掉 `opacity`（恒真性恢复，最保守）、
-  (b) 混合后吸附回最近色板色、(c) 承认它不是构造恒真、降级为光栅化后扫像素验证。
-  票 20 要写 `fill`/`stroke` 的 schema，必须先把这条定掉；它也会改写 `CONTEXT.md` 里
-  被当作卖点的那句话，所以**不能由执行者顺手定**。
-
 - **新资源的风格一致性怎么判**：R2 砍掉了自动评分，于是「像不像同一个视觉世界」
   在 R4 的四类资源上没有自动判据 —— 目前只有人眼 + 参考基准。
   ⚠️ **「引入视觉模型抽查」这条选项现在也断了**（R10/R11：视觉上游不可用且条款受限），

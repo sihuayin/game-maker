@@ -1,0 +1,17 @@
+{
+  "name": "@game-maker/assets",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "\u8d44\u6e90\u7ba1\u7ebf\uff1adrawlist \u2192 \u9759\u6001\u6821\u9a8c \u2192 \u5149\u6805\u5316 \u2192 \u91cf\u5316 \u2192 \u56fe\u96c6 \u2192 manifest\u3002",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@game-maker/contracts": "workspace:*",
+    "zod": "catalog:"
+  }
+}

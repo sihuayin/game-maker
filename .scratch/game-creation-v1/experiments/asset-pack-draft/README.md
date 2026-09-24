@@ -14,7 +14,7 @@ node preview.mjs         # → out/dystopian-shop/v1/preview.png（放大联系�
 ```
 
 `build.mjs` / `preview.mjs` 只用 Node 内置模块。`validate.mjs` 需要 **zod 3.25.x**
-（与 `demo/package.json` 的 `^3.25.76` 对齐）—— 本机没有装，用软链顶上了：
+（与 `packages/contracts` 的 `catalog:` 对齐）—— 本机没有装，用软链顶上了：
 
 ```bash
 mkdir -p node_modules && ln -sfn /path/to/zod@3.25.76 node_modules/zod
@@ -29,7 +29,7 @@ mkdir -p node_modules && ln -sfn /path/to/zod@3.25.76 node_modules/zod
 | `../../experiments/style-transfer-from-test-png/stylespec.json` | 色板与风格（票 22 实验的真实产出） |
 | `../../experiments/style-transfer-from-test-png/drawlist.*.json` | platform / pickup / hazard / bg_sign 4 份 |
 | `../../experiments/animated-player/frame.*.json` | player 六帧（单次调用生成、帧间同一性实测有效的那套） |
-| `../../../../demo/test.png` | 人工导入通道的场景尺度位图（1218×685） |
+| `../../../../fixtures/reference/test.png` | 人工导入通道的场景尺度位图（1218×685） |
 | `recipe.json` | 资源清单。草案形状，正式 schema 归票 28 |
 
 ## 文件
@@ -60,9 +60,14 @@ mkdir -p node_modules && ln -sfn /path/to/zod@3.25.76 node_modules/zod
 
 ## 它暴露的（写进票 24 的 Answer，别让它们消失）
 
-1. **`opacity` 击穿了「颜色 ∈ 色板」的构造恒真性。** `hazard` 用了 4 个 `opacity: 0.35` 的
-   `poly`，alpha 混合在色板内产生了两个色板外颜色（`#7a6c5d` ×24px、`#898f78` ×8px）。
-   构造恒真只在「没有 opacity」时成立 —— 这会逼出一个 schema 决策。
+1. **`opacity` 击穿了「颜色 ∈ 色板」的构造恒真性** —— 已由[票 36](../../issues/36-opacity-and-palette-invariant.md) 裁决。
+   `hazard` 用了 4 个 `opacity: 0.35` 的 `poly`，alpha 混合在色板内产生了两个色板外颜色
+   （`#7a6c5d` ×24px、`#898f78` ×8px）。裁决是**保留 `opacity`、把不变量说准**：
+   来源 ∈ 色板（构造恒真）∧ 复合色是色板的确定函数（构造恒真），
+   失效的只是「渲染后像素 ∈ 色板」这个更强的说法。
+   结果是 `paletteBinding` 由 3 值扩成 4 值（新增 `composited`），
+   且对 drawlist 资源变成**解析期静态可判** —— `build.mjs` 现在就是静态判的，
+   扫像素退化成对它的测试（见运行输出最后两行）。
 2. **量化不是免费的。** 把 1218×685 的场景图量化到 9 色，**100.00% 的非透明像素被改色**。
    成品能看（见 `preview.png`），但它已经不是原图了 —— `paletteBinding: "quantized"`
    必须让调用方**看得见**这件事。

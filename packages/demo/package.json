@@ -1,0 +1,9 @@
+{
+  "name": "@game-maker/demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "产物 B：固定 runtime 外壳 + 站点构建器。",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "dependencies": {"@game-maker/contracts":"workspace:*"}
+}

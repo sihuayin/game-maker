@@ -1,7 +1,7 @@
 # 07. 目录迁移：现有 demo/ 拆进 monorepo
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 29
 Map: ../map.md
 
@@ -12,6 +12,11 @@ Map: ../map.md
 > 另：仓库本机 `.npmrc` 指向 `registry.npmmirror.com`，装 Vite 8 会拉所有平台的
 > `@rolldown/binding-*` 并**卡死 >5 分钟**；加 `--registry=https://registry.npmjs.org` 后 42 秒装完。
 > 这条影响票 29 的工具链选择，值得在 workspace 配置里一次性解决（比如仓库级 `.npmrc`）。
+
+> 🔴 **正文写于旧终点，其中四条已作废**（2026-09-24 施工时确认）：
+> ① 的 `demo/projects/<id>/{runs,checkpoints,report.html}` 目录结构、④ `FileArtifactStore`、
+> ⑤ Checkpoint 写入、⑥ Store 取舍 —— **全部随闭环出局**，本票没有按字面执行。
+> ③ 的 paths 模块精神保留但对象换成了「包与站点的输出路径」。逐条交代见 Answer §2。
 
 > ⚠️ **范围已重画**（2026-09-24，R9）：从「设计项目工作区目录骨架」变成**一次具体的搬迁**。
 > R9 已定包边界（`contracts` / `assets` / `demo` / `cli` / `mcp`），本票是执行：
@@ -87,3 +92,90 @@ Q9 决定了合一目录结构，Q19 决定了 Checkpoint **写入**在范围内
 ## Answer
 
 _（待填）_
+
+## Answer
+
+**结论：`packages/` 五包骨架已落地，四条验收全过；`demo/` 整体删除（19 个文件），
+只有 `contracts/index.ts` 的一部分（240 → 112 行）与 `test.png` 活下来。**
+
+### 0. 做了什么
+
+| 动作 | 内容 |
+|---|---|
+| 新建仓库根 | `.npmrc`（钉官方源）· `pnpm-workspace.yaml`（`catalog:` + `onlyBuiltDependencies`）· `package.json` · `tsconfig.base.json` · `tsconfig.json`（solution-style）· `.gitignore` · `scripts/check-deps.mjs` |
+| 新建五个包 | `contracts`（真实 schema）/ `assets` / `demo` / `cli` / `mcp`（后四个是空壳，**每个空壳的文件头写明它归哪张票**，避免变成无主代码） |
+| 搬迁 | `demo/test.png` → `fixtures/reference/test.png`；`demo/PROTOTYPE-asset-representation.html` → `experiments/asset-representation/`（那是[票 05](05-asset-representation.md) 的原型，回到它的出处） |
+| 删除 | `demo/` 全部 19 个文件、816 行 |
+
+`demo/` 里的 `src/runtime/`（299 行）· `src/qa/`（79）· `src/repair/`（33）· `src/example.ts`（76）·
+两个旧测试（35）· `src/contracts/policy.ts`（25）按 R2 **整块删除**，不是搬走。
+
+### 1. contracts 里留下了什么
+
+**32 个导出 → 9 个。240 行 → 112 行。**
+
+- **留下**：`RequirementPriority` / `RequirementSchema` / `StyleSpecSchema` / `GameSpecSchema` /
+  `AssetSpecSchema` / `AssetManifestSchema` / `ArtifactType` / `ArtifactRefSchema` / `CreationProjectSchema`
+- **删除（23 个）**：`CreationStatus` · `CreationRunSchema` · `CreationCheckpointSchema` ·
+  `BestStateSchema` · `RepairBudgetSchema` · `RepairPlanSchema` · `RepairActionSchema` ·
+  `CreationEvaluationReportSchema` · `CreationGateResultSchema` · `GateCheckSchema` ·
+  `QualityDimensionSchema` · `VisualReportSchema` / `VisualIssueSchema` · `GameplayReportSchema` ·
+  `GameplayTestPlanSchema` / `GameplayTestCaseSchema` / `TestActionSchema` / `TestAssertionSchema` ·
+  `RequirementCoverageSchema` · `AssetCompletenessReportSchema` · `RuntimeHealthReportSchema` ·
+  `RuntimeObservationSchema` / `RuntimeEntitySchema`
+
+留下的每一个都在文件里带了注释，写明它的归属与未决项（例如 `AssetSpecSchema` 的两个逃生舱归票 27、
+`ArtifactRefSchema` 归票 18）。
+
+### 2. ⚠️ 本票的正文写于旧终点，其中四条已作废
+
+票面正文是上一个终点留下的，本次**没有按字面执行**。逐条交代：
+
+| 正文条目 | 处置 |
+|---|---|
+| ① Q9-A 的目录结构（`demo/projects/<id>/{runs,checkpoints,report.html}`） | **整条作废** —— 没有 run 了。产物形态由[票 24](24-asset-pack-contract.md)（包）与[票 29](29-monorepo-layout.md)（`out/<gameId>/{pack,site}`）取代 |
+| ② gitignore / `.gitkeep` | **部分作废**。`demo/projects/` 不存在了；产物统一进仓库根 `out/`，一条 `.gitignore` 覆盖 |
+| ③ paths 模块（手写、纯函数） | **精神保留，对象换了** —— 现在需要的是「资源包与站点的输出路径」，落地归[票 30](30-cli-and-mcp-surface.md) / [票 33](33-runtime-assembly.md) |
+| ④ FileArtifactStore | **作废**。它服务的 `ArtifactRef` 已被票 24 判定不用于包内；归属权改判给[票 18](18-artifact-ref-consistency.md) |
+| ⑤ Checkpoint 写入（五个时机） | **作废** —— Resume/Recovery 已判出局（map 的 Out of scope） |
+| ⑥ Store 的取舍（内存 vs JSON） | **作废** —— `InMemoryCreationStore` 已随编排器一起删除 |
+
+### 3. 验收（四条，全过）
+
+| # | 检查 | 结果 |
+|---|---|---|
+| ① | `pnpm check:deps` | ✅ 依赖图合法（5 个包） |
+| ② | `pnpm build`（`tsc -b`，跨包 project references） | ✅ 五包各自产出 `dist/*.js` + `*.d.ts` + `.d.ts.map` |
+| ③ | 在真实仓库里注入 R6 禁止的边 `assets → demo` | ✅ 守卫拒绝，退出码 1 |
+| ④ | `packages/assets` import `@game-maker/contracts` 的类型 | ✅ 经 `exports` → `dist/index.d.ts` 解析成功 |
+
+### 4. 施工中撞出的五件事
+
+1. **G1 已按[票 29](29-monorepo-layout.md) 写进 `tsconfig.base.json`** —— base 只放绝对语义的选项，
+   `outDir` / `rootDir` / `include` 在各包的 tsconfig 里。这次一次就过，没有重演那个坑。
+2. **`pnpm install` 实测 6 分 49 秒**（走官方源；本机到 npmjs 的路不近）。
+   esbuild 的 postinstall 正常执行 → `onlyBuiltDependencies` 白名单**有效**，
+   没有它 esbuild 会静默缺二进制。
+3. **`pnpm-lock.yaml` 入库** —— 它是可复现构建的凭据，不属于 Q9 说的「产物」。
+4. **空测试套件会让 CI 从一开始就是红的**：`vitest run` 在无测试文件时退出码 **1**，
+   而本票把所有测试都删了。改成 `vitest run --passWithNoTests`，
+   [票 20](20-drawlist-contract.md) 落真实测试时再摘掉这个开关。
+5. **四个空壳包必须一次建齐**：`check-deps.mjs` 会检查「允许图里的包在 `packages/` 下存在」，
+   所以不能只建 `contracts`。这反过来是好事 —— 目标形态在仓库里是**可见的**，
+   而不是只写在文档里。
+
+### 5. 新发现一个无主缺口 → 建[票 37](37-assetpack-manifest-landing.md)
+
+`AssetPackManifest`（[票 24](24-asset-pack-contract.md) 定的资源包自证 schema）
+**没有任何票负责把它变成真实代码**：票 24 是 grilling（只定形状）、票 20 只管 drawlist、
+票 28 只管 Recipe。而它是产物 A 与产物 B 之间**唯一的接口**。
+
+→ 已建[票 37「把资源包 manifest 契约落进 packages/contracts」](37-assetpack-manifest-landing.md)，
+阻塞于票 20（`paletteBinding` 的静态判定函数要用 drawlist 的 ops 类型），
+并要求把票 24 那 9 条反例原样变成单元测试。
+
+### 6. 解除阻塞
+
+- **[票 20](20-drawlist-contract.md) / [票 21](21-drawlist-renderer.md)** —— `packages/` 已存在，
+  两条 `07 → 20` / `07 → 21` 的边清空，产物 A 的整条代码路径可以开工。
+- **[票 18](18-artifact-ref-consistency.md)** —— 两个阻塞（24 与 07）都清了。

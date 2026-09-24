@@ -128,7 +128,7 @@ h1{font-size:20px;margin:0 0 4px} .sub{color:#8b9a94;font-size:13px;margin-botto
 .pal span{display:block;height:34px;border-radius:3px;margin-bottom:3px}</style></head><body>
 <h1>风格迁移实验：参考图 → 横版跳跃游戏资源</h1>
 <div class="sub">链路：test.png →（qwen3.8-max 视觉）StyleSpec →（deepseek-v4-pro 文本）drawlist → SVG 渲染。全程无人工修图。</div>
-<div class="ref"><img src="data:image/png;base64,${ref}"><div class="cap">参考图 demo/test.png · 1218×685 · 提取色板见下</div></div>
+<div class="ref"><img src="data:image/png;base64,${ref}"><div class="cap">参考图 fixtures/reference/test.png · 1218×685 · 提取色板见下</div></div>
 <div class="pal">${pal.map((c,i)=>`<div><span style="background:${c}"></span>${i}</div>`).join("")}</div>
 <div class="grid">${svgs.map(s=>`<div class="c"><h3>${s.n} <span class="${s.ve.length?"r":"b"}">${s.ve.length?"schema 报错":"schema 通过"}</span></h3><div class="st">${s.svg}</div><pre>${JSON.stringify(s.o.ops,null,0).slice(0,700)}</pre></div>`).join("")}</div>
 </body></html>`;
