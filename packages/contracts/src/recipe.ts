@@ -12,9 +12,26 @@
 // ⚠️ 绝不覆盖：再推导一次产出的是**新文件**，旧的留着（与资源包的 `v<N>` 同一条规矩）。
 import { z } from "zod";
 import { AssetSpecSchema } from "./asset-spec.js";
-import { PackPath } from "./assetpack.js";
+
 
 export const RECIPE_FORMAT = "asset-recipe/v1" as const;
+
+/**
+ * **输入路径** —— 配方引用的东西（StyleSpec、人工导入的位图）在配方**外面**。
+ *
+ * ⚠️ 它与 `PackPath`（包内路径）是**两个概念**，第一版把它们混成了一个：
+ * 包内路径绝不允许 `..`（包要能整体搬走），而输入路径**必然**会有 `..`
+ * （配方在 `out/<id>/recipes/` 下，而参考图风格与位图素材在仓库别处）。
+ * 同样的规则套在两处，结果是一份完全正常的配方被拒。
+ *
+ * 统一约定：**相对于配方文件自身**解析。
+ */
+export const InputPath = z.string().min(1).superRefine((p, ctx) => {
+  const issue = (message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  if (p.startsWith("/")) issue("必须是相对路径（相对于配方文件）");
+  else if (!/^[A-Za-z0-9._/-]+$/.test(p)) issue("只允许 POSIX 相对路径字符（不含空格与反斜杠）");
+  else if (p.split("/").some((s) => s === "")) issue("不允许空路径段");
+});
 
 /** 让管线去造（drawlist 路线）。**不写任何路径** —— 路径是产物，由管线自己产、自己记进 manifest。 */
 export const GenerateSource = z.object({ kind: z.literal("generate") }).strict();
@@ -27,8 +44,8 @@ export const GenerateSource = z.object({ kind: z.literal("generate") }).strict()
  */
 export const ImportSource = z.object({
   kind: z.literal("import"),
-  /** 源图路径。**相对仓库根**，指向包外的输入（`fixtures/` 或项目的 `inputs/`）。 */
-  ref: PackPath,
+  /** 源图路径。**相对于配方文件**（见 `InputPath`）。 */
+  ref: InputPath,
   /** 给了就是「一张 sheet + 网格描述」；不给就是「单张独立 PNG」（1 帧）。 */
   sheet: z.object({
     columns: z.number().int().positive(), rows: z.number().int().positive(),
@@ -59,8 +76,8 @@ export const RecipeEntry = z.object({
 export const AssetRecipe = z.object({
   format: z.literal(RECIPE_FORMAT),
   id: z.string().min(1),
-  /** StyleSpec 文件的位置。推导的输入之一，也是包的一部分。 */
-  styleRef: PackPath,
+  /** StyleSpec 文件的位置，**相对于配方文件**（见 `InputPath`）。 */
+  styleRef: InputPath,
   assets: z.array(RecipeEntry).min(1),
 }).strict().superRefine((r, ctx) => {
   const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message, path });

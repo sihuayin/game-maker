@@ -9,6 +9,9 @@ catalogs:
     '@types/node':
       specifier: ^22.15.21
       version: 22.20.4
+    esbuild:
+      specifier: ^0.28.2
+      version: 0.28.2
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
@@ -23,6 +26,9 @@ importers:
 
   .:
     devDependencies:
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.28.2
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -57,6 +63,13 @@ importers:
       '@game-maker/demo':
         specifier: workspace:*
         version: link:../demo
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.4
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.7(@types/node@22.20.4)
 
   packages/contracts:
     dependencies:
@@ -88,6 +101,13 @@ importers:
       '@game-maker/demo':
         specifier: workspace:*
         version: link:../demo
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.4
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.7(@types/node@22.20.4)
 
 packages:
 

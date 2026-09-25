@@ -31,6 +31,16 @@ export type BuildPackOptions = {
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
   generator?: { name: string; version: string; run?: string };
+  /**
+   * provenance 里由**调用方**决定的两块（票 14）：
+   * 降级记录与传输诊断。降级链在**整包**层面决定，组装只负责如实写下来。
+   */
+  provenance?: {
+    degradations?: { stage: string; assetId?: string; reason: string; fellBackTo: string }[];
+    transport?: { preferred: string; used: string; switches: { from: string; to: string; reason: string }[] };
+  };
+  /** 逐资源的进度回报（MCP 的 `notifications/progress` 用它，票 30）。 */
+  onProgress?: (done: number, total: number, assetId: string) => void;
 };
 
 type AssetSourceLike =
@@ -82,6 +92,18 @@ function framePlan(spec: AssetSpec): { name: string; anim: string | null }[] {
 }
 
 export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackResult> {
+  try {
+    return await buildInto(opts);
+  } catch (e) {
+    // ⚠️ 失败时把工作目录清掉：否则 `.building-*` 会在 out/ 里越积越多。
+    //   （「失败不消耗版本号」是另一半 —— 见 buildInto 末尾那一步改名。）
+    const scratch = path.join(opts.outDir, opts.recipe.id, `.building-${process.pid}-${nextPackVersion(opts.outDir, opts.recipe.id)}`);
+    fs.rmSync(scratch, { recursive: true, force: true });
+    throw e;
+  }
+}
+
+async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   const { recipe, style, outDir, generate } = opts;
   const palette = normalizePalette(style.palette);
   const version = nextPackVersion(outDir, recipe.id);
@@ -100,8 +122,9 @@ export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackR
   type Built = { spec: AssetSpec; origin: "generated" | "imported"; paletteBinding: "exact" | "composited" | "quantized"; frames: { name: string; state?: string; image: RasterImage }[]; animations?: { name: string; frames: string[]; fps?: number; loop: boolean }[]; authoring: { kind: "drawlist" | "bitmap"; ref: string; original?: string }[] };
   const built: Built[] = [];
 
-  for (const entry of recipe.assets) {
+  for (const [idx, entry] of recipe.assets.entries()) {
     const spec = entry.spec;
+    opts.onProgress?.(idx, recipe.assets.length, spec.id);
     const plan = framePlan(spec);
     const frames: Built["frames"] = [];
     const authoring: Built["authoring"] = [];
@@ -206,7 +229,8 @@ export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackR
     provenance: {
       mode: allOf("fixture") ? "fixture" : allOf("generated") ? "generated" : "mixed",
       style: { origin: "human-in-session", ref: "authoring/stylespec.json", stylespecId: style.id, checksum: sha256(Buffer.from(styleDoc)) },
-      degradations: [],
+      degradations: opts.provenance?.degradations ?? [],
+      ...(opts.provenance?.transport ? { transport: opts.provenance.transport } : {}),
     },
     palette: {
       ref: "authoring/stylespec.json#/palette", size: palette.length, values: palette,

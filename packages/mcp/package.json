@@ -3,8 +3,27 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "MCP 薄壳（stdio server，不 shell out 到 CLI）。",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "dependencies": {"@game-maker/contracts":"workspace:*","@game-maker/assets":"workspace:*","@game-maker/demo":"workspace:*"},
-  "bin": { "game-maker-mcp": "./dist/mcp.mjs" }
+  "description": "MCP \u8584\u58f3\uff08stdio server\uff0c\u4e0d shell out \u5230 CLI\uff09\u3002",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@game-maker/contracts": "workspace:*",
+    "@game-maker/assets": "workspace:*",
+    "@game-maker/demo": "workspace:*"
+  },
+  "bin": {
+    "game-maker-mcp": "./dist/server.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  },
+  "scripts": {
+    "bundle": "esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser",
+    "typecheck": "tsc -p tsconfig.spec.json"
+  }
 }

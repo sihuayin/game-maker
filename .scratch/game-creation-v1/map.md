@@ -178,6 +178,37 @@ Effort: game-creation-v1
 
 <!-- 一行一张已关闭的票：够判断相关性即可，细节去票里看 -->
 
+- [对外调用面：CLI 与 MCP](issues/30-cli-and-mcp-surface.md)：**产物 A 现在真的能被调用了** ——
+  CLI 与 MCP 两个壳都是 core（`packages/assets/src/ops.ts`）的薄壳，MCP 不 shell out 到 CLI（R5），
+  两者渲染**同一份** `CommandResult`。四个操作：`derive` / `pack` / `verify` / `inspect`
+  （`site` 刻意**不占位** —— 会报「还没实现」的子命令是在给 agent 埋陷阱）。
+  **降级成功 = 退出码 0**，靠 `--json` 里的 `degraded` 区分（降级是正常运营模式，票 14）；
+  失败不放进 `outcome` —— 它抛，这样「成功」这个类型里没有假货。
+  **路径一律相对 `outRoot`**，理由与票 24 给资源包定的一样（绝对路径把产物绑死在某台机器上）。
+  MCP 长任务用**原生的 `notifications/progress`**，不搞 job id 轮询（stdio 进程短命，作业表是真复杂度）。
+  工具 description 里写死三件事：做什么 / **何时用** / **什么输入会失败** ——
+  `build_asset_pack` 里那句「看到 degraded 为 true 时**不要**当成正常产物汇报」是刻意写的。
+  两个壳都出**单文件 bundle**（esbuild，vite/phaser external，zod 内联，裸 node 能跑）。
+  🔴 **施工抓到三个真 bug**：① **`verify` 校验不过时退出码是 0**（把「失败」塞进了 `degraded`，
+  而它按裁决是成功）—— 篡改过的包能骗过校验脚本；② MCP 的**回复**没走注入的 emitter（只把进度走了）；
+  ③ `--help` 单独用时退 2（把「要了 help」与「不给子命令」并成了一个条件）。
+  **219 条测试全绿**，四个包 typecheck 全过。
+
+- [生成侧降级链](issues/14-degradation-chain.md)：**三层，整包降级，并且现场验证过**（今天上游真的在断）。
+  ① 首选端点 → ② 备用端点（**不算降级，但记进 `provenance.transport`**）→
+  ③ **程序化兜底**（不用 LLM 也出结构完整的包：尺寸/帧数/锚点全对、颜色全在色板内、能进引擎）。
+  为什么不退到仓库内置的 fixture 包：**fixture 是针对特定输入的**，用户换了需求它就对不上，
+  而 demo 会「假装」响应新输入；程序化兜底对**任何** spec 都成立。
+  **整包降级、绝不混着来** —— 半真半假的包在风格上看得出来，而风格一致性正是验收第 2 条看的东西。
+  中途断了整包重试/转兜底；失败的那次既不留工作目录也不吃版本号（补全了票 22 那条）。
+  **「所有 LLM 调用点 × 所需 fixture」的答案是：不需要 fixture** —— 阻断的调用点只剩 2 个
+  （清单推导有人工路径、drawlist 生成有程序化兜底），StyleSpec 按 R11 已移出管线。
+  标注意外地对齐了：**票 24 的 `origin` + `provenance.mode` 本来就是为这个设计的**。
+  另：**重试与降级分工明确** —— 重试吸收偶发抖动（不改变产物来源、不惊动降级链），
+  降级兜底持续不可用（改变来源、必须标注），有测试守着。
+  **现场验证**：`chat-completions` 403 → 切 `messages` 成功出包并记录切换；
+  上游全死 → 兜底包仍过 schema、对账 0 问题。200 条测试全绿。
+
 - [AssetGenerator：drawlist 的生成](issues/22-asset-generator.md)：**产物 A 端到端跑通了（真生成器）**
   —— 77.7s · 8 个资源 · 28 个文件 · spec↔产物对账 0 问题，**14 帧的玩家是同一个角色**。
   四条裁决：**加 `dither` op**（它是像素风里**唯一不出色板**的调色手段 —— 票 36 实测 opacity

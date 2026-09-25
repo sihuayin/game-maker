@@ -5,6 +5,13 @@ Status: open
 Blocked by: —
 Map: ../map.md
 
+> 📌 **票 30 留下的**（2026-09-25）：CLI/MCP 的四个操作现在只覆盖产物 A
+> （`derive` / `pack` / `verify` / `inspect`）。**`site`（构建 demo）刻意没占位** ——
+> 它要的票 32/33 还没落地，而做一个会报「还没实现」的子命令是在给 agent 埋陷阱。
+> 你做第一个游戏时，会顺带把「一份真实需求 + 一份真实 StyleSpec → 一个真包」这条路走通；
+> 那条路现在是 `game-maker derive` →（人过目）→ `game-maker pack`。
+
+
 > 🔴 **票 27 留下的一个空白**（2026-09-24）：那个真包里**一个真实 ui 资源都没有** ——
 > `bg_sign` 已按 R4 的定义（ui = 屏幕空间）改判为 `sprite`。所以四类里
 > animation / sprite / background 都有真实产物验过，**ui 只有规格层验过**。

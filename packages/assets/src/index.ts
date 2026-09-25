@@ -16,3 +16,6 @@ export * from "./pack.js";
 export * from "./prompt.js";
 export * from "./generate.js";
 export * from "./review.js";
+export * from "./procedural.js";
+export * from "./degrade.js";
+export * from "./ops.js";

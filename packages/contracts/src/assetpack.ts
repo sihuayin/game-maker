@@ -135,6 +135,16 @@ export const AssetPackManifest = z.object({
     mode: z.enum(["generated", "fixture", "mixed"]),
     style: z.object({ origin: z.enum(["human-in-session", "fixture"]), ref: PackPath, stylespecId: z.string(), checksum: Checksum }).strict(),
     degradations: z.array(Degradation).default([]),
+    /**
+     * 实际走的是什么传输 —— **诊断信息，不是降级**（票 14）。
+     *
+     * 端点故障转移（主协议被上游拒了、换另一个协议拿回**同样的东西**）不算降级：
+     * 产物一模一样。但不记下来的话，没人知道那天换过端点，下次同一个坑要重新踩一遍。
+     */
+    transport: z.object({
+      preferred: z.string(), used: z.string(),
+      switches: z.array(z.object({ from: z.string(), to: z.string(), reason: z.string() }).strict()).default([]),
+    }).strict().optional(),
   }).strict(),
   palette: z.object({
     ref: z.string(), size: z.number().int().positive(),

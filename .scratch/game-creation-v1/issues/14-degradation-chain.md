@@ -1,7 +1,7 @@
 # 14. 生成侧降级链：生图 / LLM 不可达时退到哪里
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 01
 Map: ../map.md
 
@@ -146,3 +146,137 @@ CC Switch 是一个 GUI 应用，用户可以在界面里**单独切换或关闭
 延迟与 budget 的冲突已单独开成
 [19. 一次完整 run 的时间账本与缓存策略](19-latency-budget.md)，
 本票只管**降级与标注**，不用重复处理时间问题。
+
+## Answer
+
+**结论：降级链落进 `packages/assets`，三层，**整包降级**，并且**现场验证过**——
+今天 `/v1/chat/completions` 正在 403，链子探测到它、切到 `/v1/messages`、成功出包，
+把那次切换如实记进了 `provenance.transport`。**
+
+### 0. 八问的现状：大部分已被落地的票吸收
+
+| 票面问题 | 现状 |
+|---|---|
+| 1 降级发生在哪一层 | **重写成三层链条**（端点 → 备用端点 → 程序化兜底）。原来的「Port / Adapter / Orchestrator」是 run 模型的说法 |
+| 3 中途失败怎么办 | ✅ 裁决：**整包重试 / 转兜底**，绝不保留半成品 |
+| 4 标注机制 | ✅ **已被[票 24](24-asset-pack-contract.md)/[票 37](37-assetpack-manifest-landing.md) 落地**，而且比票 14 当初设想的 evidence 路线更硬：`origin` + `provenance.mode`（**schema 强制自洽**）+ `degradations[]` |
+| 5 fixture 清单 | ✅ 见 §4 —— 现在只有 **2 个**阻断调用点，且**都不需要 fixture** |
+| 6 fixture 的一致性 | ✅ **被绕开了**：程序化兜底对任何输入都成立，没有「对不上」这回事 |
+| 8 测试策略 | ✅ 已是既成事实：`fetchImpl` 注入（票 22）+ 生成器注入（票 38） |
+| 2 / 7 探测与 fail-fast | 见 §3 / §5 |
+
+### 1. 四条裁决
+
+| 问题 | 裁决 |
+|---|---|
+| 上游全不可达时退到哪 | **程序化兜底** —— 不用 LLM 也出一个结构完整的包 |
+| 降级粒度 | **整包**，绝不混着来 |
+| 端点故障转移 | **不算降级**，但要记一笔 |
+| 中途断了 | **整包重试 / 转兜底** |
+
+### 2. 为什么不退到「仓库内置的 fixture 包」
+
+R6 说了仓库存一份 fixture 资源包 —— 但那是**为产物 B 服务的**（B 吃它照样能跑）。
+拿它当 A 的降级产物会撞上**票面问题 6**：fixture 是针对特定输入的。用户换了需求文本，
+那个包就对不上了，而 demo 会**「假装」响应了新输入**。
+
+程序化兜底对**任何** spec 都成立：尺寸对、帧数对、锚点对、颜色全在色板内、能被引擎直接加载。
+只是**难看**。所以不存在「对不上」这回事。
+
+它产出的资源 `origin` 仍是 `generated`（确实是本管线造的），**降级事实记在
+`provenance.degradations[]` 里** —— 那才是它该待的地方。
+
+### 3. 三层链条
+
+```
+① 首选端点   真生成                     → 产物最好
+② 备用端点   换一个协议拿回同样的东西      → 产物一样，但记进 provenance.transport
+③ 程序化兜底 不用 LLM 也出结构完整的包     → 产物难看，记进 provenance.degradations
+```
+
+**探测必须发真实请求**：票 01 实测代理**完全不校验鉴权**（错误 key、甚至不带鉴权头都返回 200），
+所以靠鉴权失败判断死活是错的。`probeEndpoint()` 发一次 `max_tokens: 8` 的真请求，
+超时 ~8s（票 01 实测 0.6s，但那是它当时的上游）。
+
+**「不算降级但要记一笔」需要一个新落点** —— 它既不是降级，`degradations[]` 里放着就是撒谎。
+所以给 `provenance` 加了 `transport: {preferred, used, switches[]}`（可选、附加式，
+旧包不受影响）。产物一模一样，但**不记的话没人知道那天换过端点，下次同一个坑要重新踩**。
+
+### 4. 「所有 LLM 调用点 × 所需 fixture」—— 答案是：**不需要 fixture**
+
+按当前决策，管线里的 LLM 调用点只剩 **2 个**：
+
+| 调用点 | 阻断？ | 挂了怎么办 |
+|---|---|---|
+| **清单推导**（[票 28](28-recipe-compilation.md)） | 是 | 清单是文件 —— **人可以直接写一份**（R7 的两条路本来就同构） |
+| **drawlist 生成**（[票 22](22-asset-generator.md)） | 是 | **程序化兜底** |
+| 抽查（[票 22](22-asset-generator.md) 的 `reviewPack`） | **否** | 跳过 —— 它本来就不阻断 |
+| StyleSpec 提取（[票 15](15-stylespec-fixture.md)） | **不是管线调用** | R11 定它是人在会话里做的，管线只消费文件 |
+
+票 01 当时列的是 4 个调用点（`compileStyle` / `compileGame` / testplan / repair），
+那是 run 模型。**R11 把 StyleSpec 移出了管线，R2 把后两个删掉了。**
+
+所以：**产物 A 的降级不需要任何 fixture** —— 两个阻断调用点，
+一个有人工路径（清单是文件），一个有程序化兜底。
+
+### 5. Fail-fast 与「绝不覆盖」的配合
+
+到第三层还是失败（比如连兜底都出错），`buildPackResilient` 抛出去。
+**失败的那次既不留下工作目录、也不吃版本号** —— 这是[票 22](22-asset-generator.md) 修的那条，
+本票把它补全了：`buildAssetPack` 现在失败时会清掉 `.building-*`。
+所以「绝不覆盖」的版本号只被**成功的包**消耗，`v1` 永远在。
+
+### 6. 🔴 现场验证（不是推演）
+
+**① 端点故障转移**（上游正在 403）：
+
+```
+❌ chat-completions  HTTP 403：{"error":{"message":"… Provider: dragoncode.codes … Insufficient account balance"}}
+✅ messages          HTTP 200
+→ 实际走了：messages · degradations: []
+→ provenance.transport.switches = [{from: "chat-completions", to: "messages", reason: "HTTP 403：…"}]
+```
+
+**② 上游全死**（指向一个死端口）：
+
+```
+→ 实际走了：procedural
+→ 包仍然合法：manifest 过 schema ✅ · spec↔产物对账 ✅ 0 问题
+→ coverage: {exact: 3, composited: 0, quantized: 0, unbound: 0}   ← 兜底产物也全在色板内
+⚠️ 降级（drawlist）：上游全部不可达（messages: fetch failed；chat-completions: fetch failed） → procedural
+```
+
+### 7. 一处需要点名的分工：**重试先吸收抖动，降级兜底真正的坏**
+
+有界重试（票 22，默认 2 次）与降级链**不是一回事**：
+
+- **重试**管的是**偶发**（模型偶尔吐坏 JSON、一次网络抖动）—— 不改变产物来源；
+- **降级**管的是**持续不可用** —— 改变产物来源，因此**必须标注**。
+
+有一条测试专门守着这个分工：第一次失败被重试救回来时，**降级链不该被惊动**
+（`used` 仍是首选、`degradations` 仍为空）；连着两次都失败才整包退到兜底。
+
+### 8. 落地清单与验收
+
+| 文件 | 内容 |
+|---|---|
+| `packages/assets/src/procedural.ts` | **新增** —— 不用 LLM 的兜底生成器 |
+| `packages/assets/src/degrade.ts` | **新增** —— `probeEndpoint()` · `buildPackResilient()` · `explainDegradation()` |
+| `packages/contracts/src/assetpack.ts` | `provenance.transport`（可选，附加式） |
+| `packages/assets/src/pack.ts` | `provenance` 可注入；失败时清工作目录 |
+| `packages/assets/tests/degrade.test.ts` | **新增** 14 条 |
+
+| # | 检查 | 结果 |
+|---|---|---|
+| ① | 全部测试 | ✅ **200 passed** |
+| ② | **现场验证：端点故障转移**（上游真的 403 着） | ✅ 切到备用端点并如实记录 |
+| ③ | **现场验证：上游全死 → 兜底** | ✅ 包仍然过 schema、对账 0 问题 |
+| ④ | `pnpm check` / `typecheck` | ✅ |
+
+### 9. 留给下游
+
+- **[票 30](30-cli-and-mcp-surface.md)**：`explainDegradation()` 已经备好 ——
+  「agent 必须能知道自己拿到的是不是降级产物」这条义务现在有一个现成的落点。
+  建议把 `degradations` 非空与 `transport.used` 直接进 CLI 输出与 MCP 返回结构体。
+- ⚠️ **本票没有解决「上游断了就没人知道」这件事** —— 它解决的是「断了之后产物仍然可用，
+  且产物自己说得清自己是什么」。**告警/重试节奏**不在范围里。
