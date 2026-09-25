@@ -1,0 +1,62 @@
+{
+  "format": "reference-image-provenance/v1",
+  "artifact": "halt-dusk.png",
+  "artifactSha256": "76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0",
+  "note": "票 04 的产物：程序化造的风格参考图，兼作 fixture 参考图（R6：产物 B 的 fixture 资源包源头就是它）。",
+  "world": "黄昏的山间列车小站（题材由人类 2026-09-25 拍板「就用这个题材」）",
+  "composition": "分层剖面 —— 天空 / 候车室内景 / 站台 三条横向带，各带一套光照（选自由人类，三选一）",
+  "how": {
+    "generator": ".scratch/game-creation-v1/experiments/reference-image-draft/generate.mjs",
+    "technique": "Node + 仓库自己的 RasterImage/encodePNG（packages/assets），零第三方依赖，不需要浏览器",
+    "reproduce": "node generate.mjs  # → out/ref-C.png，逐字节可复现",
+    "size": {
+      "w": 480,
+      "h": 270
+    },
+    "resolutionRationale": "实测（probe_scale.mjs）：480×270 原生与 960×540 最近邻 2× 的提取结果没有实质差别 ⇒ 取原生 —— 保住精确的像素网格与 18 色，文件最小，且每个像素都可由仓库自己的解码器验回色板。"
+  },
+  "palette": {
+    "size": 18,
+    "values": [
+      "#2e3b4e",
+      "#4a6076",
+      "#c98b5e",
+      "#e8c39e",
+      "#2a3442",
+      "#3b4a5c",
+      "#4a3222",
+      "#6b4a33",
+      "#8a6244",
+      "#565b60",
+      "#7a7f84",
+      "#9aa0a5",
+      "#d9a441",
+      "#f2d98b",
+      "#3f5c3a",
+      "#557a4a",
+      "#1b2027",
+      "#e6e2d6"
+    ],
+    "usedInImage": 16,
+    "property": "图上**每个像素**都是这 18 色之一 —— 没有插值、没有抗锯齿、没有重编码。这是本 fixture 与 test.png 最大的不同，也是它能当**可验证**基准的原因。"
+  },
+  "whyThisImage": [
+    "它替代 fixtures/reference/test.png 成为 fixture 参考图。test.png 是**某商业游戏的 B 站通关视频截图**（水印在图上、122,240 色），当实验素材可以，当随包交付的 fixture 有版权问题。",
+    "它**故意不包含**牛/拖拉机/谷仓/钓竿这类后续要生成的资源 —— Destination 验收第 2 条（参考图里没出现过的新事物也必须属于同一个视觉世界）要考的就是这个。",
+    "同一个世界的三种构图里，人类选了信息量最大的那张：一张图里三种光照，且明确交代「同一世界的不同空间」。"
+  ],
+  "limits": [
+    "⚠️ 它是**插图**，不是真实游戏截图 —— 没有 UI、没有可玩状态，不代表最终产品的画面密度。",
+    "⚠️ 提取出来的 palette **不可能**与上面这 18 色精确相等：上游会重编码图片（票 04 实测，纯单色图也读不准）。这不是本图的缺陷。"
+  ],
+  "extraction": {
+    "at": "2026-09-25",
+    "modelField": "deepseek-v4-pro",
+    "modelReported": "deepseek-flash",
+    "endpoint": "/v1/messages",
+    "thinking": "disabled",
+    "latencyMs": 2500,
+    "schemaOk": true
+  },
+  "supersedes": "fixtures/reference/test.png（保留，仍被 experiments/ 引用；但不再是 fixture 参考图，且不应随包交付）"
+}

@@ -74,7 +74,19 @@ function normalizePalette(palette: readonly string[]): string[] {
   return out;
 }
 
-/** **绝不覆盖**：扫出已有的最高版本，用它的下一个。 */
+/**
+ * **绝不覆盖**：扫出已有的最高版本，用它的下一个。
+ *
+ * ⚠️ **契约束（票 18）：调用方必须保证同一个 `outDir` 的写入者串行。**
+ * 这个函数读－改－写之间**没有锁**：两个进程同时进来会算出同一个版本号。
+ * 这不是待修的 bug，是一个**被记录的约束** —— 今天没有并发路径（CLI 单次调用、
+ * MCP 是 stdio 短进程、生成是串行的），加锁是为不存在的并发付分布式锁的复杂度，
+ * 而写错的锁比没有锁更糟（会静默地不互斥）。并发真的进范围时，从这里开始改。
+ *
+ * ⚠️ 另一条隐含前提：`buildInto` 的「先建 `.building-*` 工作目录、成功后再 `renameSync`」
+ * **要求工作目录与最终目录在同一个文件系统**（跨设备 rename 会 EXDEV 失败）。
+ * 今天靠「两者都在 `outDir` 下」隐式成立。
+ */
 export function nextPackVersion(outDir: string, packId: string): number {
   const dir = path.join(outDir, packId, "pack");
   if (!fs.existsSync(dir)) return 1;

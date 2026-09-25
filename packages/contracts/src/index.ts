@@ -61,22 +61,13 @@ export type GameSpec = z.infer<typeof GameSpecSchema>;
 // ── 资源规格 ──────────────────────────────────────────────────────────────
 
 
-// ── 产物引用 ──────────────────────────────────────────────────────────────
-/**
- * ⚠️ 归属权在票 18。票 24 已判定资源包内**不用** ArtifactRef（包内每个文件只需
- * path/bytes/checksum，version 与 createdAt 是包级的）。本类型保留给包**之间**的引用，
- * 等票 18 收口。`ArtifactType` 里 evaluation / repair-plan / benchmark 三项随 R2 出局，
- * 一并留给票 18 处置。
- */
-export const ArtifactType = z.enum([
-  "requirement","style-spec","game-spec","asset-manifest","asset","scene",
-  "build","screenshot","evaluation","repair-plan","benchmark"
-]);
-export const ArtifactRefSchema = z.object({
-  id: z.string(), type: ArtifactType, path: z.string(),
-  version: z.number().int().positive(), checksum: z.string(), createdAt: z.string()
-});
-export type ArtifactRef = z.infer<typeof ArtifactRefSchema>;
+// ── 产物引用 ── 已删除（票 18，2026-09-25）──────────────────────────────────
+// 这里曾有 `ArtifactType` + `ArtifactRefSchema`。票 24 先判「资源包内不用 ArtifactRef」
+// （包内每个文件只需 path/bytes/checksum，version 与 createdAt 本来就是包级的），
+// 票 18 再确认它**零消费者**、且字段是为已出局的闭环模型设计的（ArtifactType 里
+// evaluation / repair-plan / benchmark 三项随 R2 出局），遂连同 ArtifactType 一并删除。
+// 「包**之间**的引用」若将来真需要，那时再设计 —— 留一个空壳 schema 只会让下一个
+// 读代码的人以为它是活的。见 CONTEXT.md 的 ArtifactRef 词条。
 
 // ── 创建项目 ──────────────────────────────────────────────────────────────
 export const CreationProjectSchema = z.object({
