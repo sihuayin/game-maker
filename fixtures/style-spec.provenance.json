@@ -1,0 +1,31 @@
+{
+  "format": "stylespec-provenance/v1",
+  "artifact": "style-spec.json",
+  "note": "票 15 要求「连同产出它的那张图的引用、prompt 全文、模型名、时间戳一起存档」—— 这条规矩与票 24 把 version/createdAt 挂在包级而不是逐文件同一道理：provenance 不属于 StyleSpec 契约本身，所以放**兄弟文件**而不是塞进 style-spec.json（塞进去会被 Zod 静默剥掉）。",
+
+  "extractedFrom": {
+    "path": "fixtures/reference/test.png",
+    "size": { "w": 1218, "h": 685 },
+    "sha256": "ce46027c43b51c2b6a807fd3642e76b6945db43015cd6212e4e2c1f415692a8b"
+  },
+  "extraction": {
+    "at": "2026-09-23T00:00:00.000Z",
+    "how": "人在 Claude Code 会话里的一次交互提取（R11）——**不是管线调用**",
+    "modelField": "deepseek-v4-pro",
+    "modelReported": "上游回包里的 model 字段当时是 qwen3.8-max（2026-09-25 复测时已变成 deepseek-flash）",
+    "endpoint": "/v1/messages",
+    "thinking": "默认（开）",
+    "latencyMs": 61000,
+    "script": ".scratch/game-creation-v1/experiments/style-transfer-from-test-png/scripts/step1_stylespec.mjs",
+    "promptSha256": "613fb100d1a53b7a98a7242125bba71f99b604ceb3872659e96d18df93fe2aa2"
+  },
+  "modifications": [
+    "palette 由大写规范化成小写 `#rrggbb`（票 24）。**这是必须的** —— 2026-09-25 实测：原样的大写色板无法通过 StyleSpecSchema，报「色值必须是规范化的小写 #rrggbb」。",
+    "id 保持 `style-ref` 未改。"
+  ],
+  "evidence": {
+    "whyThisOne": "本 fixture **不是** 2026-09-25 重跑的产物，而是 2026-09-23 那次实验的产出 —— 因为它已经在**真实下游**上跑过：out/shift-change-assets/pack/v5、v6 用它生成了 8 个资源、28 个文件、14 帧同一角色的真包。重跑的产出没有下游证据。",
+    "reproduces": "在 out/shift-change-assets/pack/v8/manifest.json 里，provenance.style.checksum 指向按本文件内容算出的 sha256。",
+    "stability": "见 ../.scratch/game-creation-v1/experiments/stylespec-extraction/out/runs.*.json —— 5 次（thinking 关）+ 3 次（thinking 开）"
+  }
+}
