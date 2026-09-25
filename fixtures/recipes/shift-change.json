@@ -1,0 +1,203 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "shift-change-assets",
+  "styleRef": "authoring/stylespec.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-odin",
+        "role": "玩家角色：中年店主 Odin Haraldsson",
+        "description": "戴绿毛线帽、灰绿旧夹克、胸口发光 CRT 显示屏的店主，含待机、走路、跳跃三种动作。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.88
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 5,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 12,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-platform",
+        "role": "可横向拼接的店铺地面平台",
+        "description": "磨损水泥地与旧金属边条构成的横版地面模块，可无缝横向重复拼接。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 64,
+          "h": 16
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "obstacle-crates",
+        "role": "障碍：堆叠货箱",
+        "description": "革命军接管后堆在过道上的木条箱与塑料周转箱堆叠体，留有几道脏污磨痕。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.72
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "obstacle-electric-floor",
+        "role": "障碍：漏电地板",
+        "description": "地面裂开处露出电线和短促电光的漏电区域，踩到会掉血。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.8
+        },
+        "size": {
+          "w": 64,
+          "h": 24
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "pickup-can",
+        "role": "拾取物：罐头",
+        "description": "贴着残旧纸标的小型罐头，可以被玩家捡起。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "pickup-medicine-bottle",
+        "role": "拾取物：药瓶",
+        "description": "深色旧药瓶，瓶身有磨损标签，可以被玩家捡起。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 14,
+          "h": 22
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "store-interior-bg",
+        "role": "一整张店铺内景背景",
+        "description": "被接管的废弃杂货店内景：服务窗口、长柜台、密集货架、海报、通风管道、线缆与堆叠货物。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 640,
+          "h": 360
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "store-sign",
+        "role": "店内招牌：带边框的标语牌",
+        "description": "挂在店里的矩形招牌，带铆钉金属边框，表面可写革命标语或店规。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 96,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "generate"
+      }
+    }
+  ]
+}

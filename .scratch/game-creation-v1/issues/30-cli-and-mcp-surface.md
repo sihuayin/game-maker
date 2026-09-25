@@ -4,6 +4,12 @@ Type: grilling
 Status: open
 Blocked by: 24, 29
 Map: ../map.md
+> 🔴 **票 28 已 resolved —— 操作集合要加一个**（2026-09-24）：
+> `asset-recipe/v1` 的形状已定，且**推导与生成被定成两阶段**（先出清单、人过目、再生成）。
+> 所以 CLI/MCP 至少要暴露三个动作：**推导清单** · **生成资源包** · **构建 demo**。
+> 「推导清单」把 `requirement.md` + StyleSpec 变成一份清单文件（不覆盖旧的）；
+> 「生成资源包」消费清单。契约见 `packages/contracts/src/recipe.ts`。
+
 
 > R5 定了 core 库 → CLI → MCP 三层，且 **MCP 不 shell out 到 CLI**。
 > 本票定**对外到底暴露哪些操作**，以及这些操作在两种形态下分别长什么样。

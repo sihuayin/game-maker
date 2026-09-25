@@ -1,0 +1,126 @@
+// `asset-recipe/v1` —— 一次资源生成要造哪些资源的**完整清单**。
+//
+// R7 定了**两条路都开**（人给 / 由需求推导），但清单**先落盘成文件**，之后两条路完全同构。
+// 所以这个文件是产物 A 的**输入侧**，与 [AssetPackManifest](assetpack.ts)（输出侧）是两层：
+//
+//   AssetRecipe    说「**要做什么**」—— 纯意图 + 帧的来源
+//   AssetPackManifest 说「**做出了什么**」—— 实际的文件、checksum、图集
+//
+// 两者的对账由 `auditAssetSpec()`（audit.ts）做。**一个文件既是输入又是输出会混淆**，
+// 所以它们不共用类型、也不互相扩展。
+//
+// ⚠️ 绝不覆盖：再推导一次产出的是**新文件**，旧的留着（与资源包的 `v<N>` 同一条规矩）。
+import { z } from "zod";
+import { AssetSpecSchema } from "./asset-spec.js";
+import { PackPath } from "./assetpack.js";
+
+export const RECIPE_FORMAT = "asset-recipe/v1" as const;
+
+/** 让管线去造（drawlist 路线）。**不写任何路径** —— 路径是产物，由管线自己产、自己记进 manifest。 */
+export const GenerateSource = z.object({ kind: z.literal("generate") }).strict();
+
+/**
+ * 人给的位图（[票 23](26-animation-representation.md) 定的两种形态）。
+ *
+ * ⚠️ 目标尺寸**不在这里** —— 它就是 `spec.size`。清单只说「从哪来」，
+ * 「要多大」是规格的事，两者分开才不会出现两份互相矛盾的尺寸。
+ */
+export const ImportSource = z.object({
+  kind: z.literal("import"),
+  /** 源图路径。**相对仓库根**，指向包外的输入（`fixtures/` 或项目的 `inputs/`）。 */
+  ref: PackPath,
+  /** 给了就是「一张 sheet + 网格描述」；不给就是「单张独立 PNG」（1 帧）。 */
+  sheet: z.object({
+    columns: z.number().int().positive(), rows: z.number().int().positive(),
+    frameWidth: z.number().int().positive(), frameHeight: z.number().int().positive(),
+    offsetX: z.number().int().nonnegative().optional(), offsetY: z.number().int().nonnegative().optional(),
+    spacingX: z.number().int().nonnegative().optional(), spacingY: z.number().int().nonnegative().optional(),
+    /** **行优先**逐格命名，数量必须 = columns × rows。 */
+    names: z.array(z.string().min(1)).min(1),
+    /** 帧名 → 动画的分组。spec 声明了动画就必须给，且名字与帧数都要对得上。 */
+    animations: z.array(z.object({
+      name: z.string().min(1), frames: z.array(z.string().min(1)).min(1),
+    }).strict()).optional(),
+  }).strict().optional(),
+  /** 抠背景（票 23：只能按容差，实测那类图的背景不是平色）。不给就假定人已经给了透明底。 */
+  background: z.object({ tolerance: z.number().nonnegative() }).strict().optional(),
+  /** alpha 二值化阈值，默认 0.5。`null` = 保留半透明边缘（不推荐，会产出色板外颜色）。 */
+  alphaThreshold: z.number().min(0).max(1).nullable().optional(),
+}).strict();
+
+export const AssetSource = z.discriminatedUnion("kind", [GenerateSource, ImportSource]);
+
+/** 清单的一项 = **纯意图的规格** + **帧从哪来**。两层在文件里就是分开的。 */
+export const RecipeEntry = z.object({
+  spec: AssetSpecSchema,
+  source: AssetSource,
+}).strict();
+
+export const AssetRecipe = z.object({
+  format: z.literal(RECIPE_FORMAT),
+  id: z.string().min(1),
+  /** StyleSpec 文件的位置。推导的输入之一，也是包的一部分。 */
+  styleRef: PackPath,
+  assets: z.array(RecipeEntry).min(1),
+}).strict().superRefine((r, ctx) => {
+  const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message, path });
+
+  const ids = new Set<string>();
+  for (const [i, e] of r.assets.entries()) {
+    if (ids.has(e.spec.id)) issue(["assets", i, "spec", "id"], `资源 id 重复："${e.spec.id}"`);
+    ids.add(e.spec.id);
+  }
+
+  // dependencies **只用于生成顺序，不用于组合**（票 05）—— 所以它引用的必须是清单里真有资源，
+  // 且不能自引用。跨出清单的依赖无处兑现。
+  r.assets.forEach((e, i) => {
+    for (const d of e.spec.dependencies) {
+      if (d === e.spec.id) issue(["assets", i, "spec", "dependencies"], `资源 "${e.spec.id}" 依赖它自己`);
+      else if (!ids.has(d)) issue(["assets", i, "spec", "dependencies"], `资源 "${e.spec.id}" 依赖了清单里没有的 "${d}"`);
+    }
+  });
+
+  r.assets.forEach((e, i) => {
+    const { spec, source } = e;
+    const at = (m: string) => issue(["assets", i], m);
+
+    if (source.kind === "import") {
+      if (source.sheet) {
+        const expect = source.sheet.columns * source.sheet.rows;
+        if (source.sheet.names.length !== expect)
+          at(`sheet 网格有 ${expect} 格，却给了 ${source.sheet.names.length} 个帧名`);
+        if (new Set(source.sheet.names).size !== source.sheet.names.length) at("sheet 的帧名有重复");
+        // 导入的动画分组必须与规格声明的一致（名字与帧数）
+        if (spec.kind === "animation") {
+          if (!source.sheet.animations) at("spec 声明了动画，sheet 却没给 animations 分组");
+          else {
+            const want = new Set(spec.animations.map((a) => a.name));
+            const got = new Set(source.sheet.animations.map((a) => a.name));
+            for (const n of want) if (!got.has(n)) at(`spec 声明了动画 "${n}"，sheet 的分组里没有`);
+            for (const n of got) if (!want.has(n)) at(`sheet 分了动画 "${n}"，spec 里没有`);
+            for (const a of spec.animations) {
+              const b = source.sheet.animations.find((x) => x.name === a.name);
+              if (b && b.frames.length !== a.frames) at(`动画 "${a.name}"：spec 要 ${a.frames} 帧，sheet 分组给了 ${b.frames.length} 帧`);
+            }
+          }
+        } else if (source.sheet.animations) {
+          at(`spec 是 ${spec.kind}（单帧），sheet 却给了动画分组`);
+        }
+      } else if (spec.kind === "animation") {
+        at("animation 类的资源走导入时，必须给 sheet（单张独立 PNG 只有一帧）");
+      }
+    }
+  });
+});
+
+export type AssetRecipe = z.infer<typeof AssetRecipe>;
+export type RecipeEntry = z.infer<typeof RecipeEntry>;
+export type AssetSource = z.infer<typeof AssetSource>;
+export type ImportSource = z.infer<typeof ImportSource>;
+
+export function parseRecipe(input: unknown): { ok: true; value: AssetRecipe } | { ok: false; errors: string[] } {
+  const r = AssetRecipe.safeParse(input);
+  return r.success ? { ok: true, value: r.data } : { ok: false, errors: format(r.error) };
+}
+import { formatIssues } from "./drawlist.js";
+const format = formatIssues;

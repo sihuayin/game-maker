@@ -1,7 +1,7 @@
 # 20. 把 DrawList 契约与静态分析器落进 packages/contracts
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 24, 29, 36, 07
 Map: ../map.md
 
@@ -21,7 +21,7 @@ Map: ../map.md
 > ✅ **票 24 已 resolved，本票解除阻塞**（2026-09-24）。可以直接开工的是：
 > 色板形状 = 有序数组 + `palette:N` 索引（`#rrggbb` 小写、不得重复色）、
 > `expectedSize` 的比对放在光栅化之后（凸包上界只判过大）。契约草案见
-> [`../experiments/asset-pack-draft/schema.mjs`](../experiments/asset-pack-draft/schema.mjs)。
+> `packages/contracts/src/assetpack.ts`（已由[票 37](37-assetpack-manifest-landing.md) 落地）。
 
 > ⚠️ **范围已重画**（2026-09-24，R3/R9）：两处变化。
 >
@@ -87,3 +87,114 @@ Visual QA 的检查项与阈值（票 12）。
 ## Answer
 
 _（待填）_
+
+## Answer
+
+**结论：`drawlist+curve/v1` 的 Zod 契约与静态分析器已落进 `packages/contracts/`，21 条测试全绿、
+`pnpm check` / `typecheck` / `test` 全过。契约接受实验里 6/6 份 style-transfer 真实产物；
+另外 6 份 animated-player 产物被拒 —— 根因是**拆分脚本的 bug**，不是契约太严（§4）。**
+
+### 0. 落地了什么
+
+| 文件 | 内容 |
+|---|---|
+| `packages/contracts/src/drawlist.ts` | 六个 op 的 `discriminatedUnion`（`.strict()`）· `DrawListSchema` · `parseDrawList()` 报错摊平 · `paletteBindingOf()` |
+| `packages/contracts/src/geometry.ts` | `boundsOfOps()`（含 `exact` 标注）· `resolveRefs()` |
+| `packages/contracts/src/index.ts` | 两个模块 re-export |
+| `fixtures/drawlist/*.json` | 原型 `GEOM` 的 8 个 `(asset, state)` 组合，**一份 JSON 一个组合**（Q20 粒度） |
+| `packages/contracts/tests/drawlist.test.ts` | 21 条测试 |
+| `packages/contracts/tsconfig.spec.json` + `typecheck` 脚本 | 测试也进类型检查（构建用的 tsconfig 只管 `src`） |
+
+⚠️ fixture 放在**仓库根 `fixtures/drawlist/`**，不是票面正文写的 `demo/projects/<projectId>/fixtures/`
+（那个路径属于旧终点，已随票 29 的目录形态作废）。仓库根 `fixtures/` 是票 29 定的入库输入位置。
+
+### 1. 票 12 搬家过来的那条规则：`exact` 是**返回值的一部分**
+
+`boundsOfOps()` 返回 `{box, exact}`。`exact: false` 表示含 `curve`，此时 `box` 是
+**控制点凸包 ∪ 描边半宽**的保守上界 —— 只会高估，不会漏报。
+
+做成返回字段而不是注释，是为了让调用方**没机会忘记**：尺寸校验因此只能判「过大」，
+不能判「偏小」。一个把上界当精确值用的调用方会误报「画得太小」。
+
+测试里用密集采样（Catmull-Rom 每 0.01 步）逐点验证了这个上界真的罩得住实际曲线。
+
+**顺带修掉原型的一个 bug**：原型对 `poly` 没有加描边半宽，那会让上界的性质失效
+（描了边的多边形会超出顶点范围）。已修，并加断言守着。
+
+### 2. `opacity` 保留，`paletteBinding` 成为**解析期静态可判**（票 36 的落点）
+
+`paletteBindingOf(ops)` 走一遍 ops 看有没有 `opacity` —— **不需要渲染**。
+它不是「渲染后扫像素」的近似，而是那个扫描的**判据**：扫描退化成对它的测试。
+[票 37](37-assetpack-manifest-landing.md) 落 manifest 时直接 import 这个函数。
+
+判据在真实数据上成立：`tomato.ripe` 有一个 `opacity: 0.45` 的高光 → `composited`；
+其余 7 份 → `exact`。
+
+### 3. `AssetSpec` 与 `DrawList` 的关系（票面第 3 条）
+
+写在 `drawlist.ts` 的文件头注释里：**Spec 与 Artifact 是两层，不互相填充。**
+
+- `AssetSpec.visual` / `.geometry` 是**设计意图**（自由形状，票 27 负责结构化，本票不动它们）
+- `DrawList` 是**产物本身**（有版本、可 diff、可静态分析）
+
+票 20 的原始建议是「取代 vs 填充」二选一；正确答案是**都不是** —— 它们回答不同的问题。
+
+### 4. 🔴 从真实产物里挖出来的东西
+
+票面只要求用原型里 `cow / tomato / player` 的 8 个组合当 fixture。我顺手把
+**实验里那 12 份真实产物**也过了一遍 schema —— 结果 **6 过 6 不过**：
+
+| 来源 | 结果 |
+|---|---|
+| `experiments/style-transfer-from-test-png/drawlist.*.json`（6 份） | ✅ 全部通过 |
+| `experiments/animated-player/frame.*.json`（6 份） | ❌ 全部 `state: Required` |
+
+**根因不是模型吐漏了，是拆分脚本的 bug。** `gen_player.mjs` 第 90 行把多状态响应摊平时：
+`JSON.stringify({...o, states:undefined, ops:st.ops})` —— **忘了写 `state`**。
+
+而模型真正产出的是**另一种形状**：
+`{format, id, viewBox, expectedSize, states:{"<帧名>":{ops}}}` —— 一次调用出全部状态，
+**正是[票 22](22-asset-generator.md) 问题 1 证明「单次调用才能保证帧间同一性」的那个生成形状**。
+
+于是暴露出更大的事：**Q20 的落盘粒度（一个 `(asset, state)` 一份）与生成粒度
+（一个 asset 全部状态一次调用）在真实产物里已经分叉出两种形状。**
+
+**本票的裁决**：形状 A 是唯一**落盘**形态，形状 B 是**生成期的暂存形态**（落盘前必须摊平），
+`state` **必填**。理由：`state` 是最小自描述，且它应当是资源包 manifest 里 `frames[].state` 的
+**主来源** —— 主来源在产物里、索引在 manifest 里；反过来才是制造漂移。缺 `state` 就该在解析期被抓住。
+
+**但这是一个可推翻的裁决**：若[票 26](26-animation-representation.md) 认为形状 B 也该成为落盘形态，
+那 `state` 就变可选、`states` 需要正式 schema。完整的证据与那条 bug 已记进票 26。
+
+### 5. 报错的可定位性（实测输出）
+
+```
+【硬编码色 #FF00FF 混进 fill】  ✗ ops[1].fill: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema
+【坐标被写成字符串】            ✗ ops[1].cy: Expected number, received string
+【curve 只有 1 个点】           ✗ ops[0].points: curve 至少 2 个点
+【op 名拼错】                   ✗ ops[0].op: Invalid discriminator value. Expected 'rect' | 'circle' | …
+【版本号写成 drawlist+path/v1】 ✗ format: Invalid literal value, expected "drawlist+curve/v1"
+```
+
+`formatIssues()` 会把 zod 的 `unionErrors` 摊平 —— 不摊的话 `discriminatedUnion` 的报错会包一层，
+路径就定位不到 `ops[1].cy`，而票面恰恰点名要这条。
+
+### 6. 顺手定的两条（票面没写，但不得不定）
+
+- **`poly` 至少 3 个点**（原型用的是 ≥2）。两个点的「多边形」是退化数据，解析期直接拒。
+- **`.strict()`**：多出未知字段被拒。格式带版本号（`/v1`），未来新增字段属于 v2，
+  不该悄悄出现在 v1 的文档里。
+
+### 7. 发现的缺口（记给下游，不在本票射程内）
+
+- **`StyleSpecSchema.palette` 尚未规范化**（[票 24](24-asset-pack-contract.md) Q3 已定：
+  小写 `#rrggbb` + 不得有重复色）。实测的色板是**大写**，直接收紧会让现有 fixtures 失败，
+  所以它是一次跨票的迁移，不属于本票。已加进[票 37](37-assetpack-manifest-landing.md) 的射程。
+- 本票没有碰 `boundsOfOps` 与 `expectedSize` 的**比对时机与阈值** —— 那是[票 27](27-asset-spec-kinds.md)
+  的搬家规则。本票只保证「上界」这件事在类型上不会被误用。
+
+### 8. 解除阻塞
+
+[票 37](37-assetpack-manifest-landing.md) 可以开工（它的 `paletteBinding` 判定要用本票的 ops 类型）。
+另：`fixtures/` 目录建起来了，[票 14](14-degradation-chain.md) 的降级链与
+[票 23](23-bitmap-asset-pipeline.md) 的导入通道可以直接用。

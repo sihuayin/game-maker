@@ -75,7 +75,7 @@ AssetSpec 是「需要什么」，Asset 是「实际做出的东西」。
 那个是**输入侧**的资产集合 + 旧闭环的过程统计（`generated`/`missing`/`broken`/`unused`），
 归 Recipe；R2 之后那三个计数器没有消费者了。
 manifest **不重复图集里已有的内容**（帧的几何在交付态图集里）、
-**不重复可派生的内容**（没有 `states[]`，「有哪些状态」= `frames[].state` 的去重集合）。
+**不重复可派生的内容**（没有 `states[]`，「有哪些动画」= `animations[].name`）。
 
 ---
 
@@ -131,11 +131,16 @@ DrawList 里表达颜色的唯一合法形式：`palette:N`，指向 `StyleSpec.
 推论：换掉整个 StyleSpec 色板，Asset 的**创作态**文本一字不变
 （交付态会变，因为 PNG 像素确实变了 —— 这正是创作态/交付态分层的意义）。
 
-**State（资源状态）**
-同一 Asset 的不同外观（番茄的 growing / ripe / harvested）。
-状态之间是**整份 ops 的替换**，不是补丁。
-⚠️ **State ≠ Animation**：state 是**静态外观**的枚举，animation 是**按时间播放的帧**。
-两者的关系（是同一维度的两端，还是正交的两维）**待票 26 定**。
+**State（资源状态）** —— ⚠️ **2026-09-24 降格，不再是独立维度**（[票 26](.scratch/game-creation-v1/issues/26-animation-representation.md)）
+一个「状态」就是**一个单帧动画**。番茄的 growing / ripe / harvested 是三个各含一帧的动画；
+player 是 idle / walk / jump 三个动画。
+理由：两者在数据上**没有可区分的差别**（一个命名外观 vs 一个可播放的序列），
+而拆成两套概念要在 manifest、引用语法、装配代码里各走一遍。
+**推论**：drawlist 文件里**没有 `state` 字段**，只有 `frame`（这一帧的名字）；
+manifest 的引用语法从 `{asset, state?, anim?}` 收成 **`{asset, anim?}`**。
+⚠️ 收掉它的直接原因：`state` 这个词在**真实产物里已经被用在两件事上** ——
+style-transfer 的 `player.idle` 是静态外观，animated-player 的 `walk1` 是帧名，
+两者却写进同一个字段。
 
 **Palette Binding（色板绑定）**
 一个资源**交付态像素颜色**与 `StyleSpec.palette` 的关系，三值且**每个资源必填**：
@@ -153,13 +158,22 @@ DrawList 里表达颜色的唯一合法形式：`palette:N`，指向 `StyleSpec.
 **一个不知道自己是 fixture 的包是虚假的包。**
 
 **Frame（帧）**
-动画的一格。帧的来源有二：位图 sheet 里的格子，或一份独立绘制的 drawlist。
-**pivot / 锚点 / 帧间对齐**属于帧的属性，具体形状归票 26。
+一个 Asset 的一格画面。创作态是一条 drawlist，交付态是图集里的一帧。
+帧的**名字**是它在 Asset 内的标识（`player.walk1`），也是产物 B 引用它的名字。
+⚠️ **帧自己不带锚点、不带时长** —— 锚点见 [[Anchor]]，时长属于 [[Animation]] 的播放参数。
 
 **Animation（动画）**
-一组按时间播放的 Frame，带播放参数（fps / 循环方式）。
-它是一等资源种类（见 Asset Kind）。**现有契约里完全没有这个概念**，
-是重画后最大的一块空白，归票 26。
+**一个 Asset 内部唯一的分组概念**：一组**有序**的 [[Frame]] + 播放参数（fps / loop）。
+至少一帧。它是一等资源种类（见 [[Asset Kind]]）。
+播放参数**资源给默认，[[Game Config]] 可以逐引用覆盖** ——
+这样同一个角色在两个游戏里能用不同速度，而资源单独拿出去也是自描述的。
+
+**Anchor（锚点）**
+一个 Asset 的**逐资源**归一化定位点，写进图集 JSON 的**每一帧**
+（交付格式支持逐帧，我们只是不需要逐帧变）。
+⚠️ **它必须被声明，不能从 ink 包围盒自动推** —— 实测证据：player 六帧里
+jump 的包围盒底边比其余五帧高 2px（收腿腾空），自动推会把它钉回地面、**腾空动作消失**，
+而其余五帧看起来完全正常。这类错误不会自己暴露。
 
 ---
 

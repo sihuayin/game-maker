@@ -1,0 +1,55 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "tomato",
+  "frame": "growing",
+  "viewBox": [
+    0,
+    0,
+    32,
+    32
+  ],
+  "expectedSize": [
+    32,
+    32
+  ],
+  "ops": [
+    {
+      "op": "line",
+      "x1": 16,
+      "y1": 14,
+      "x2": 16,
+      "y2": 26,
+      "stroke": "palette:4",
+      "strokeWidth": 2
+    },
+    {
+      "op": "poly",
+      "points": [
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          18.5
+        ],
+        [
+          20,
+          16
+        ],
+        [
+          16,
+          14.5
+        ]
+      ],
+      "fill": "palette:4"
+    },
+    {
+      "op": "circle",
+      "cx": 16,
+      "cy": 22,
+      "r": 4.5,
+      "fill": "palette:4"
+    }
+  ]
+}

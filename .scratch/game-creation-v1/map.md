@@ -118,7 +118,28 @@ Effort: game-creation-v1
 > 但**没有改变 Destination**，因此不重画地图，只修正事实与相关票的范围。
 
 - **本地代理 = CC Switch**，基址 `ANTHROPIC_BASE_URL`，凭据 `ANTHROPIC_AUTH_TOKEN`。
-- 🔴 **视觉路径当前不可用**（推翻票 01「`/v1/messages` 是唯一能收图的路」）。
+- 🔴 **2026-09-24 22:xx 实测：文本路径的 `/v1/chat/completions` 已经不通了 ——
+  代理又故障转移到一个新 provider（`dragoncode.codes`），而那个账号
+  `INSUFFICIENT_BALANCE`（HTTP 403）。** 同一时刻 **`/v1/messages` 仍然可用**
+  （0.7s、干净 JSON、也仍然能收图）。票 01 那份「文本走 chat/completions」的配方因此作废。
+  → 生成器的端点已做成**参数**（默认 `/v1/messages`），因为这条路在变。
+  **这就是「代理活不过重启」的现场重演**：[票 14](issues/14-degradation-chain.md)（降级链）
+  仍然在 frontier 上，而这次它不再是「理论上的兜底」——**它就是眼下的常态**。
+  另：一端 403 期间我连试三次，同一个 provider 也不稳定（同一份 prompt 有时通有时不通）。
+
+- ⚠️ **2026-09-24 21:xx 实测：视觉路径现在通了**（第三次翻转，见下面被划掉的那条）。
+  三次探测：纯红 64×64 → "红色 #D12E2E"；纯青 `#4EBBA4` → "青绿色 #66B0A3"；
+  左青右橙两色块 → "2块。左侧为蓝绿色，右侧为红褐色"（**连左右分界都对**）。
+  响应 `model` 是 `deepseek-flash`（票 01 时视觉走 qwen3.8-max、票 34 时走千问），
+  而 `/v1/models` 现在列的是 **Codex / GPT-5** —— 上游又换了。
+  ⚠️ **两点必须一起记住**：① **色值有偏差**（`#4EBBA4` 被读成 `#66B0A3`，疑似上游对图做了重编码），
+  这对「提取精确色板」是个真风险；② **无法确认现在是谁在计费**，所以
+  [票 34](issues/34-wan-quota-facts.md) 那条「条款禁止管线化调用」**是否仍然适用，未验证**。
+  → 这**推翻了 R11 的立论之一**（「视觉不可用」），但 R11 的另一条腿（条款）悬着。
+  **R11 在锁定表里标了「不得重开」，所以我不擅自改它** —— 由人类决定是否重开。
+  直接后果：[票 15](issues/15-stylespec-fixture.md)（参考图 → StyleSpec）**技术上现在可做**。
+
+- ~~🔴 **视觉路径当前不可用**~~（**已于 2026-09-24 21:xx 被上面那条推翻**；保留原文供追溯）。
   CC Switch 请求日志显示：**千问 Token Plan**（provider `bcd60069`，唯一能收图的上游）
   最后一次成功是 **2026-09-24 01:36:33 UTC**，之后 22 次 `429 Throttling.AllocationQuota`，
   复位时间 **2026-10-15 16:00 UTC**（约 21 天后）；代理已**故障转移到 DeepSeek**
@@ -156,6 +177,143 @@ Effort: game-creation-v1
 ## Decisions so far
 
 <!-- 一行一张已关闭的票：够判断相关性即可，细节去票里看 -->
+
+- [AssetGenerator：drawlist 的生成](issues/22-asset-generator.md)：**产物 A 端到端跑通了（真生成器）**
+  —— 77.7s · 8 个资源 · 28 个文件 · spec↔产物对账 0 问题，**14 帧的玩家是同一个角色**。
+  四条裁决：**加 `dither` op**（它是像素风里**唯一不出色板**的调色手段 —— 票 36 实测 opacity
+  会产出色板外复合色，而两种色板色交替不会，所以含 dither 的资源仍是 `exact`）·
+  **`characterStyle` 当自由文本、头身比从 `spec.size` 推**·
+  **schema-to-prompt 渲染器收成一个模块放 `assets`**（生成与推导共用）·
+  **「像不像」生成后抽查、只出观察清单不打分**。
+  真跑出来的东西：**14 帧同一角色**（一次调用写死进实现）· dither 迁移了但**用过头**（读起来是噪点）。
+  🔴 **抽查真的抓到结构化校验查不出的**：导入的那张背景「有平滑渐变、橙色超标、带透视」——
+  **量化到 9 色不会把一张照片变成像素画**。这正是 `paletteBinding: quantized` 这个字段的意义。
+  施工抓到三件：失败构建白吃版本号（改成成功才改名）· `max_tokens` 8192 截断被误报成
+  「JSON 不合法」（改成读 `stop_reason` 分开报）· 偶发坏 JSON（加了**有界重试**，不是修复循环）。
+  另：抽查工具自己被抓出一个 `Buffer.copy` 参数写反的 bug —— **是抽查替我发现的**。
+  ⚠️ **`/v1/chat/completions` 现已 403（`INSUFFICIENT_BALANCE`，provider 换成了 dragoncode.codes）**，
+  `/v1/messages` 仍可用 ⇒ 端点做成参数。见 Notes 的「环境事实」。
+
+- [资源包的组装](issues/38-asset-pack-assembly.md)：**产物 A 的组装链路端到端通了** ——
+  `buildAssetPack()` 落进 `packages/assets`：清单 + StyleSpec → 一个通过校验、逐字节可复现、
+  能被任何引擎直接吃掉的包。**端到端实测**（真实推导的清单 + 真实 StyleSpec）：
+  215 ms · 28 个文件 · 1106 KiB，生成与导入**两条路都跑到**，spec↔产物对账 **0 问题**。
+  关键设计：**drawlist 生成器是注入的端口**（`DrawListGenerator`）——
+  组装因此可以完全离线测试，而「把网络调用埋在组装里，包为什么长这样就无法被测试」。
+  **它是产物 A 的出口，所以最该被测清楚。**
+  验过：确定性（**含 PNG 逐字节相同**）· 可消费性（TexturePacker JSON Hash，帧字段恰好是
+  Phaser 真读的 6 个）· 可搬走（相对 POSIX）· 绝不覆盖（`v<N>` 递增）。
+  施工抓到两件：`original` 用了 `process.cwd()`（**会让 manifest 随 cwd 变**，破了确定性）；
+  图集文件名与票 24 定的 `delivery/atlas.<name>.json` 不一致（是验证脚本报文件不存在才暴露的）。
+  ⚠️ **产物 A 现在只差票 22**（真 drawlist 生成器）—— 组装跑的是桩。
+  `coverage.unbound` **恒为 0**（本管线产不出它，契约留给别的生产者）。
+  另传给票 18：版本递增是「扫描目录取 max+1」，**未加锁**。
+
+- [需求 → 资源清单的编译](issues/28-recipe-compilation.md)：`asset-recipe/v1` ——
+  **嵌套 `{spec, source}` 两层**。清单**不是** manifest 的输入版（票 20 定的 Spec/Artifact 两层），
+  两者不共用类型、不互相扩展；有测试守着「拿 manifest 形状当清单喂进去会被拒」。
+  `source` 只有 `generate`（**不写任何路径** —— 路径是产物）与 `import`（票 23 的两种形态）；
+  **目标尺寸不写在 source 里**，它就是 `spec.size`，不会出现两份互相矛盾的尺寸。
+  推导的输入 = **需求文本 + 已存在的 StyleSpec 文件**（参考图不进 prompt，R11 定了那条通道的产物就是它）
+  —— 但 StyleSpec 的 `material`/`shapeLanguage` 词汇**明确出现在**推导出的资源描述里。
+  **两阶段**：先出清单、人过目、再生成（清单是最后一个能廉价改主意的地方）。
+  **不承诺幂等，承诺冻结**：再推导产出新文件、绝不覆盖，下游只认文件。
+  `dependencies` 只进清单、只用于生成顺序，且引用的 id 必须在清单里。
+  **实物验证**：真跑了一次推导（需求文本 + 真实 StyleSpec → LLM）——
+  **14.8s、一次通过 schema、8 个资源**；实例固化在 `fixtures/recipes/shift-change.json`。
+  🔴 **两次推导暴露两件事**：① 模型默认会把角色的每个动作**拆成一个资源**，
+  而那正好打掉票 22 的帧间一致性（多状态必须一次调用生成）—— 写进 prompt 规则后自己收成一个资源；
+  ② **锚点是推导里最不可靠的字段**（两次跑，货箱 `(0.5,1)` vs `(0.5,0.72)`）——
+  因为推导发生在产物之前、模型看不到画，而票 26 又裁定锚点不能自动推 ⇒ 两阶段里人该重点看它。
+  **解除阻塞：38（产物 A 最后一个缺口）。**
+  ⚠️ 顺带实测到**一条环境事实翻了**：**视觉路径现在通了**（三次探测全对）——
+  详见 Notes 的「环境事实」，R11 是否重开由人类定。
+
+- [AssetSpec 的四类扩展](issues/27-asset-spec-kinds.md)：`AssetSpec` 扩成四类，
+  **两个逃生舱（`visual` / `geometry`）删除** —— R2 之后确定性校验是唯一的质量控制，
+  而 `z.record(z.unknown())` 正是「校验不到的地方」。
+  四类共用 `id/role/description/styleId/**anchor**/size/dependencies/required`，
+  各自另有 `animations`（动画，帧数是**数量**不是名字）/ `layers`+`tileable`（背景）/
+  `ninePatch`+`screenSpace`（UI）。`kind` 仍是**声明**的（R4 不动），但加了一致性对账。
+  ⚠️ **`bg_sign` 从 `ui` 改判为 `sprite`** —— R4 把 UI 定义成「屏幕空间」，而它是世界空间的道具；
+  判据是它活在屏幕空间还是世界空间，不是它长得像不像面板。代价：那个真包里**再没有真实 ui 样本**了
+  （实验资产的空白，已记给票 31）。
+  **尺寸校验不拍魔法阈值**：票 20 的 `boundsOfOps()` 已经返回 `{box, exact}` ——
+  精确的硬失败、上界的报警告；给百分比容差反而会给最该严的精确图元白送宽容。
+  新增 `audit.ts`（R2 校验的共同的家）：`checkSize()` + **`auditAssetSpec()`（spec ↔ 产物对账）**
+  + UI 九宫格中央区非空。**对账当场抓到两个真问题**：真包 `build.mjs` 对导入资源永远写 `size: null`；
+  而它能存在是因为票 24 把 `size` 定成了 nullable —— **已收紧为必填**。
+  **126 条测试全绿**；真包四类实例对账 0 问题，反证 3/3 抓到。**解除阻塞：28。**
+
+- [动画的表达与来源](issues/26-animation-representation.md)：四条裁决 + **`state` 在三个地方被收掉**。
+  ① **动画是一个 Asset 内部唯一的分组概念**，「状态」降格为**单帧动画**
+  （番茄的三个状态 = 三个单帧动画）；新增结构性规则：**多于一帧的资源每帧都必须归组**，
+  否则那一帧不可达 —— 这条规则当场抓出真包 recipe 里 `player.jump` 一直没被归组。
+  ② **锚点逐资源声明，不能自动推** —— 实测：player 六帧里 jump 的包围盒底边高 2px（收腿腾空），
+  按 bbox 自动推会把它钉回地面、**腾空动作消失**，而其余五帧看起来完全正常。
+  这正是票 23 问题 1 提的那个候选答案，它错得不显眼。③ 播放参数**资源给默认、config 可覆盖**。
+  ④ **维持票 20 的裁定：形状 A 唯一落盘**。
+  落点：`drawlist.state` → `frame` · manifest 的 `frames[].state` 删掉 · 引用语法收成 `{asset, anim?}`。
+  `CONTEXT.md` 的 Frame / Animation / State / Anchor 四词立住（State 标注「已降格」）。
+  **97 条测试全绿**；真包复跑仍合法（`player` 6 帧归成 walk/idle/jump 三个动画）。
+  对票 27 / 28 / 09 各加了一条抬头说明。**解除阻塞：27。**
+
+- [人工导入位图通道](issues/23-bitmap-asset-pipeline.md)：**六问里四问已被上游票溶解**
+  （生成那半随票 35 消失、契约那问票 24 已答、repair 出局、成本随零生图 API 作废）。
+  剩下的两问由原型实测裁决并落进 `packages/assets/src/import.ts`：
+  **降采样 = 面积平均（alpha 加权）→ alpha 阈值 → 量化**、**颜色 = 量化到世界色板**，
+  导入形态收 **单张 PNG（+ 管线容差抠背景）** 与 **一张 sheet + 网格描述** 两种。
+  🔴 **原型推翻了一个隐含假设**：模型给的「像素风」图**没有像素网格** ——
+  实测边缘位置对任何 k 取模都是均匀分布、相邻像素平均色差 15.07、前景 **61152 种颜色**、
+  背景还不是平色（四角 4 种颜色）。所以这条通道不是「重采样回原网格」，
+  是**重建**一个网格（25×48 对应 **16.9 倍**降采样）。
+  不量化时 1200 个格子有 **651~771 种颜色** —— 那不是像素画，这是「必须量化」的直接论据。
+  真实素材按 Q9 精神搬到 `fixtures/import/`；原型在 `experiments/bitmap-import-draft/`。
+  **共 94 条测试全绿。解除阻塞：26。**
+
+- [drawlist → PNG 光栅化器](issues/21-drawlist-renderer.md)：交付态光栅化器落进 `packages/assets`
+  （raster / image / png / quantize / atlas 五块，**73 条测试全绿**）。票面正文里的
+  Canvas2D 与 Phaser 翻译器**两条都作废**（交付态是 PNG，Phaser 不认识 drawlist），
+  真正交付的是**编译器后端**：Node 端跑、零 DOM 依赖。
+  四条硬要求全落地：**逐字节确定**（不抗锯齿 + 浮点累积 + 末次量化，三条测试守着）·
+  **最近邻放大不引入插值色** · **TexturePacker JSON Hash**（只写 Phaser 真读的字段，
+  逐像素核对帧落位）· **失败报 asset + op**（`palette:99` 格式合法但越界，schema 拦不住，
+  必须由光栅化器定位）。`paletteColor()` 全仓库只此一处，量化与 PNG 对两条通道共用。
+  🔴 **移植时修掉一个真 bug**：草案的 `decodePNG` 按**通道数**分支，而 colorType 4（灰度+alpha）
+  与 6（RGBA）通道数都是 4 —— 人工导入的 `test.png` 被当成灰度读，**背景整张变灰**（只剩 5 色）。
+  按 colorType 分支后解出 9 色，整个包从灰度变成青灰+奶油+橙。换实现后所有
+  drawlist 光栅化的 PNG 逐字节没变 —— 移植忠实。
+  **性能基线**：真实产物 0.074 ms/份，一轮 12 份含 PNG 编码 1.85 ms；最坏 ~1 ms/份。
+  **光栅化不是瓶颈** —— 20 个资源约 20 ms vs 一次 LLM 调用 9 s。
+  连带删掉实验里那四份重复实现（`lib/*.mjs`）。**建票 38**（包组装）。
+
+- [把资源包 manifest 契约落进 packages/contracts](issues/37-assetpack-manifest-landing.md)：
+  `assetpack/v1` 的契约落进 `packages/contracts/src/assetpack.ts` —— 票据 24 定的形状一字未改，
+  superRefine 交叉校验**一条没简化**（含 **`provenance.mode` 由 `assets[].origin` 唯一派生**，
+  所以「fixture 包谎报自己是 generated」是解析不通过）。9 条反例原样变成单元测试，另加 8 条，**共 49 条全绿**。
+  **最有分量的证据**：票 24 真跑出来的那个包**原样通过**新契约，不是拿现造 fixture 自证。
+  三处「不写两份」：`PaletteRef` / `formatIssues` / `paletteBindingOf` 全部从票 20 复用；
+  顺带解掉一个命名冲突（`DrawListPaletteBinding` 两值 vs `PaletteBinding` 四值）。
+  **补了票 24 欠的一个落点**：`resolvePackRef()` —— 只给 `asset` 而资源有多个可画的东西时就**失败**，
+  不留到运行时。顺手补上票 24 漏落的 `StyleSpecSchema.palette` 规范化（小写 + 无重复色）。
+  ⚠️ 草案那份 `schema.mjs` **已删除**（两份并存的 schema 必然漂移），
+  实验的 `validate.mjs` 改为 import 真契约。
+
+- [把 DrawList 契约与静态分析器落进 packages/contracts](issues/20-drawlist-contract.md)：
+  `drawlist+curve/v1` 的 Zod 契约（六个 op 的 `discriminatedUnion`，`.strict()`）+
+  `boundsOfOps()` / `resolveRefs()` / `paletteBindingOf()` 落进 `packages/contracts`，
+  **21 条测试全绿**，fixtures 是原型 `GEOM` 的 8 个 `(asset,state)` 组合（仓库根 `fixtures/drawlist/`）。
+  两条关键设计：**`exact` 是 `boundsOfOps()` 返回值的一部分**（含 curve 时 box 是凸包上界，
+  让调用方没机会忘记，尺寸校验因此只能判过大）；`paletteBindingOf()` 是**解析期静态**的
+  （票 36 的落点，票 37 直接 import）。
+  🔴 **挖出一件大事**：把实验里 12 份真实产物过一遍 schema，**6 过 6 不过** ——
+  `animated-player` 那 6 份全缺 `state`，根因是 `gen_player.mjs` 摊平多状态响应时忘了写。
+  而模型真正产出的是**多状态文档**（一次调用出全部状态，正是票 22 证明帧间同一性所需的形状）。
+  即 **Q20 的落盘粒度与生成粒度在真实产物里已分叉出两种形状**。
+  本票裁决形状 A 为唯一落盘形态、`state` 必填（它是 manifest 里 state 的主来源），
+  **但这是可推翻的** —— 完整证据已记进票 26 待它裁决。
+  另：顺带修掉原型一个 bug（`poly` 漏了描边半宽，会让上界失效），
+  发现 `StyleSpecSchema.palette` 尚未规范化（已加进票 37 射程）。
 
 - [目录迁移：现有 demo/ 拆进 monorepo](issues/07-project-workspace.md)：
   **`packages/` 五包骨架已落地，四条验收全过**（`check:deps` / `tsc -b` / 守卫拒绝注入的

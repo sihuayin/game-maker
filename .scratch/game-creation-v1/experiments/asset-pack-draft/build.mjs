@@ -8,10 +8,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { encodePNG, decodePNG } from './lib/png.mjs';
-import { rasterize, RasterError } from './lib/raster.mjs';
-import { buildAtlas } from './lib/atlas.mjs';
-import { quantizeToPalette, paletteExactness } from './lib/quantize.mjs';
+// ⚠️ 这里曾经有四份自己的实现（lib/*.mjs）。它们已经落进 packages/assets 了 ——
+// 两份并存的实现必然漂移，所以已删除，改成 import 真实现。先 `pnpm build`。
+const { encodePNG, decodePNG, rasterize, RasterError, buildAtlas, quantizeToPalette, paletteExactness } =
+  await import('../../../../packages/assets/dist/index.js');
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.resolve(HERE, process.argv.includes('--out') ? process.argv[process.argv.indexOf('--out') + 1] : 'out');
@@ -32,7 +32,7 @@ for (const a of recipe.assets) {
   const frames = [];
   const frameOps = [];
   for (const fr of a.frames || [{}]) {
-    const name = fr.name || (fr.state ? `${a.id}.${fr.state}` : a.id);
+    const name = fr.name || a.id;
     let img, src;
     if (fr.from.kind === 'drawlist') {
       const dlPath = path.resolve(HERE, fr.from.ref);
@@ -59,7 +59,7 @@ for (const a of recipe.assets) {
       frameOps.push(null);
       src = { kind: 'bitmap', ref: path.resolve(HERE, fr.from.ref) };
     }
-    frames.push({ name, state: fr.state, img, src });
+    frames.push({ name, img, src });
   }
   // paletteBinding 的判定（票 36）：对 drawlist 资源**静态可判** —— 看有没有 op 带 opacity，
   // 不需要渲染。导出路径（recipe 显式声明）原样尊重。
@@ -91,7 +91,7 @@ const atlases = [];
 for (const kind of kinds) {
   const group = byAsset.filter((a) => a.spec.kind === kind);
   const frames = group.flatMap((a) => a.frames.map((f) => ({
-    name: f.name, width: f.img.width, height: f.img.height, data: f.img.data,
+    name: f.name, image: f.img,
     anchor: a.spec.anchor, scale9Borders: a.spec.scale9Borders,
   })));
   const { json, image } = buildAtlas(frames);
@@ -164,10 +164,11 @@ const manifest = {
       origin: a.spec.origin || (a.frames[0].src.kind === 'bitmap' ? 'imported' : 'generated'),
       paletteBinding: a.paletteBinding,
       required: a.spec.required !== false,
-      size: a.frames[0].img.width && a.spec.size ? { w: a.frames[0].img.width, h: a.frames[0].img.height } : null,
+      // ⚠️ 曾经写成 `a.spec.size ? ... : null`，于是**导入资源永远是 null** —— 票 27 的对账抓到的。
+      size: { w: a.frames[0].img.width, h: a.frames[0].img.height },
       anchor: a.spec.anchor,
       atlasId: a.atlasId,
-      frames: a.frames.map((f) => (f.state ? { name: f.name, state: f.state } : { name: f.name })),
+      frames: a.frames.map((f) => ({ name: f.name })),
       authoring: authoringRefs.get(a.spec.id),
     };
     if (a.spec.scale9Borders) o.scale9Borders = a.spec.scale9Borders;

@@ -1,0 +1,206 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "cow",
+  "frame": "idle",
+  "viewBox": [
+    0,
+    0,
+    64,
+    48
+  ],
+  "expectedSize": [
+    80,
+    80
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "x": 22,
+      "y": 31,
+      "w": 4,
+      "h": 11,
+      "fill": "palette:5"
+    },
+    {
+      "op": "rect",
+      "x": 30,
+      "y": 31,
+      "w": 4,
+      "h": 11,
+      "fill": "palette:5"
+    },
+    {
+      "op": "rect",
+      "x": 40,
+      "y": 31,
+      "w": 4,
+      "h": 11,
+      "fill": "palette:5"
+    },
+    {
+      "op": "rect",
+      "x": 47,
+      "y": 31,
+      "w": 4,
+      "h": 11,
+      "fill": "palette:5"
+    },
+    {
+      "op": "rect",
+      "x": 22,
+      "y": 41,
+      "w": 4,
+      "h": 3,
+      "fill": "palette:6"
+    },
+    {
+      "op": "rect",
+      "x": 30,
+      "y": 41,
+      "w": 4,
+      "h": 3,
+      "fill": "palette:6"
+    },
+    {
+      "op": "rect",
+      "x": 40,
+      "y": 41,
+      "w": 4,
+      "h": 3,
+      "fill": "palette:6"
+    },
+    {
+      "op": "rect",
+      "x": 47,
+      "y": 41,
+      "w": 4,
+      "h": 3,
+      "fill": "palette:6"
+    },
+    {
+      "op": "line",
+      "x1": 52,
+      "y1": 18,
+      "x2": 57,
+      "y2": 31,
+      "stroke": "palette:5",
+      "strokeWidth": 2
+    },
+    {
+      "op": "ellipse",
+      "cx": 33,
+      "cy": 23,
+      "rx": 19,
+      "ry": 11,
+      "fill": "palette:5"
+    },
+    {
+      "op": "poly",
+      "points": [
+        [
+          26,
+          15
+        ],
+        [
+          36,
+          13.5
+        ],
+        [
+          40,
+          22
+        ],
+        [
+          30,
+          26
+        ]
+      ],
+      "fill": "palette:6"
+    },
+    {
+      "op": "poly",
+      "points": [
+        [
+          40,
+          26
+        ],
+        [
+          48,
+          24
+        ],
+        [
+          49,
+          31
+        ],
+        [
+          42,
+          32
+        ]
+      ],
+      "fill": "palette:6"
+    },
+    {
+      "op": "ellipse",
+      "cx": 44,
+      "cy": 33,
+      "rx": 4,
+      "ry": 3,
+      "fill": "palette:7"
+    },
+    {
+      "op": "ellipse",
+      "cx": 12,
+      "cy": 20,
+      "rx": 9,
+      "ry": 8,
+      "fill": "palette:5"
+    },
+    {
+      "op": "poly",
+      "points": [
+        [
+          15,
+          11
+        ],
+        [
+          17,
+          6.5
+        ],
+        [
+          19.5,
+          11
+        ]
+      ],
+      "fill": "palette:1"
+    },
+    {
+      "op": "ellipse",
+      "cx": 19,
+      "cy": 13.5,
+      "rx": 3.5,
+      "ry": 2,
+      "fill": "palette:5"
+    },
+    {
+      "op": "ellipse",
+      "cx": 7,
+      "cy": 23,
+      "rx": 5,
+      "ry": 4,
+      "fill": "palette:7"
+    },
+    {
+      "op": "circle",
+      "cx": 5.6,
+      "cy": 22,
+      "r": 0.9,
+      "fill": "palette:6"
+    },
+    {
+      "op": "circle",
+      "cx": 13,
+      "cy": 17,
+      "r": 1.6,
+      "fill": "palette:6"
+    }
+  ]
+}

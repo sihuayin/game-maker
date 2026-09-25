@@ -1,0 +1,13 @@
+{
+  "//": "类型检查 src + tests，不产出。构建用的 tsconfig.json 只管 src（composite + rootDir）。",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src", "tests"]
+}

@@ -74,7 +74,11 @@ manifest 里每个资源必带 `origin` 与 `paletteBinding` 两个诚实字段�
 所以「一个不知道自己是 fixture 的包」在 schema 层面**解析不通过**，而不是靠约定。
 契约草案已用仓库里 12 份真实 drawlist + 1 张真实位图**真的生成了一个包**（逐字节可复现），
 并用 Zod 校验通过 + 9 条反例全部被拒。实物在
-[`../experiments/asset-pack-draft/`](../experiments/asset-pack-draft/)。**
+[`../experiments/asset-pack-draft/`](../experiments/asset-pack-draft/)。
+
+> ✅ **契约已由[票 37](37-assetpack-manifest-landing.md) 落进代码**：
+> `packages/contracts/src/assetpack.ts`。草案那份 `schema.mjs` 已删除（两份并存的 schema 必然漂移），
+> 那 9 条反例搬成了 `packages/contracts/tests/assetpack.test.ts` 里的单元测试。**
 
 ---
 

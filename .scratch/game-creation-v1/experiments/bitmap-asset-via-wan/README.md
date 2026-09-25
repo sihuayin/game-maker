@@ -1,6 +1,6 @@
 # 位图资源生成已解锁：Qwen wan2.7-image-pro + 参考图风格条件
 
-2026-09-23 验证。**这张 `player_with_reference.png` 就是证据**：
+2026-09-23 验证。**这张图就是证据**，已按 Q9 的精神归位到 `fixtures/import/wan-player-1024.png`（它是**输入**，不是规划产物；票 23 的导入通道测试直接用它）：
 喂 `fixtures/reference/test.png` 作风格参考，7.8 秒出一张 1024×1024 像素风角色 sprite。
 
 ## 可用配方（凭据在 CC Switch「千问AI平台 Token Plan」行，不入库）

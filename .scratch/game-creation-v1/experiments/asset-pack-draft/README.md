@@ -9,16 +9,15 @@
 
 ```bash
 node build.mjs           # → out/dystopian-shop/v1/
-node validate.mjs        # 用 schema.mjs 校验 manifest + 跑 9 条反例
+pnpm build && node validate.mjs   # 用**已落地的契约**校验刚生成的包（反例测试在 packages/contracts/tests/ 里）
 node preview.mjs         # → out/dystopian-shop/v1/preview.png（放大联系表，供人眼）
 ```
 
-`build.mjs` / `preview.mjs` 只用 Node 内置模块。`validate.mjs` 需要 **zod 3.25.x**
-（与 `packages/contracts` 的 `catalog:` 对齐）—— 本机没有装，用软链顶上了：
+`build.mjs` / `preview.mjs` 只用 Node 内置模块。`validate.mjs` import 的是
+`packages/contracts/dist` —— 先 `pnpm build`。
 
-```bash
-mkdir -p node_modules && ln -sfn /path/to/zod@3.25.76 node_modules/zod
-```
+> ⚠️ **这里曾经有一份 `schema.mjs` 草案，已删除。** `assetpack/v1` 的契约现在只有一处：
+> `packages/contracts/src/assetpack.ts`（票 37 落的）。两份并存的 schema 必然漂移。
 
 `out/` 是产物，已 gitignore；软链的 `node_modules/` 被仓库根 `.gitignore` 覆盖。
 
@@ -37,8 +36,7 @@ mkdir -p node_modules && ln -sfn /path/to/zod@3.25.76 node_modules/zod
 | 文件 | 作用 |
 |---|---|
 | `build.mjs` | 主脚本：recipe → 光栅化/量化 → 按 kind 打包图集 → 写 manifest + checksum |
-| `schema.mjs` | **`assetpack/v1` 的 Zod 草案 —— 本目录真正的产物**。票 29 resolved 后落进 `packages/contracts` |
-| `validate.mjs` | 校验刚生成的 manifest，并跑 9 条反例（硬编码色/绝对路径/谎报 fixture/…） |
+| `validate.mjs` | 用 **`packages/contracts` 里那份真契约**校验刚生成的包（`pnpm build` 之后跑） |
 | `lib/png.mjs` | 最小 PNG 编解码（解码 test.png 用；编码图集用） |
 | `lib/raster.mjs` | drawlist → RGBA8 的确定性光栅化器（逐像素中心判定、无抗锯齿、无缩放） |
 | `lib/atlas.mjs` | 货架打包 + TexturePacker JSON Hash 写出（含 `anchor` / `scale9Borders`） |
@@ -52,11 +50,11 @@ mkdir -p node_modules && ln -sfn /path/to/zod@3.25.76 node_modules/zod
    `authoring/` 里只有 drawlist 与导入原图（本项目读）。两者靠 manifest 的 `assetId` 联结。
 3. **逐字节确定** —— 连跑两次 `build.mjs`，`diff -r` 除 `preview.png` 外无差异（PNG 字节也一样）。
    这是 checksum 成立、以及「换色板后创作态文本不变」能传导到交付态的前提。
-4. **契约是可解析的，不只是「看起来对」** —— `validate.mjs` 让 manifest 过 Zod，
-   并验证 9 条反例**全部被拒**：硬编码色 / 版本号 0 / 指向不存在的图集 / 动画引用不存在的帧 /
-   绝对路径 / `files[]` 漏文件 / 色板重复色 / `unbound` 不记降级 / **fixture 包谎报自己是 generated**。
-   最后一条是由「`provenance.mode` 必须等于 `assets[].origin` 的派生值」这条规则抓到的 ——
-   它让「诚实」成为**结构性**要求而不是约定。
+4. **契约是可解析的，不只是「看起来对」** —— `validate.mjs` 让这个包过**已落地的契约**
+   （`packages/contracts/src/assetpack.ts`）。反例测试（9 条 + 新增 8 条）在
+   `packages/contracts/tests/assetpack.test.ts` 里，全部被拒。
+   其中最关键的一条是 **fixture 包谎报自己是 generated** —— 由「`provenance.mode` 必须等于
+   `assets[].origin` 的派生值」抓住，让「诚实」成为**结构性**要求而不是约定。
 
 ## 它暴露的（写进票 24 的 Answer，别让它们消失）
 

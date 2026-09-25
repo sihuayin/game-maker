@@ -3,7 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "契约：Zod schema 与纯类型。唯一的共享代码。",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "dependencies": {"zod":"catalog:"}
+  "description": "\u5951\u7ea6\uff1aZod schema \u4e0e\u7eaf\u7c7b\u578b\u3002\u552f\u4e00\u7684\u5171\u4eab\u4ee3\u7801\u3002",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.spec.json"
+  }
 }

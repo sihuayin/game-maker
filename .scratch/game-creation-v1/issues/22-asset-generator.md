@@ -7,9 +7,24 @@
 
 
 Type: prototype
-Status: open
+Status: resolved
 Blocked by: —
 Map: ../map.md
+> 🔴 **票 38 已 resolved —— 你是产物 A 的最后一环**（2026-09-24）：
+> 组装链路（`packages/assets/src/pack.ts` 的 `buildAssetPack()`）已经通了，
+> 但它把 drawlist 生成做成一个**注入的端口**，因为那是你的事：
+> ```ts
+> export type DrawListGenerator = (spec: AssetSpec, style: StyleSpec) => DrawList[] | Promise<DrawList[]>;
+> ```
+> **你要交付的就是这个接口的一个实现。** 它的契约约束：
+> ① 返回的帧数必须等于 spec 声明的帧数（`sprite` = 1；`animation` = 各动画帧数之和，**按 animations 声明顺序**）；
+> ② 每份 drawlist 要过 `DrawListSchema`（`format` / `id` / **`frame`** / `viewBox` / `expectedSize` / `ops`）——
+> 注意字段叫 **`frame` 不叫 `state`**（票 26 收掉的）；
+> ③ **同一个 asset 的所有帧必须在一次调用里生成** —— 票 22 你自己的实测结论，
+> 也是票 28 推导那份清单时踩到的坑（模型默认把它们拆成三个资源）；
+> ④ `viewBox` 必须等于 spec 的 `size`，否则锚点的分母就错了（票 27 的对账会报）。
+> 现成的对照：`experiments/pack-assembly/build-pack.mjs` 里那个**桩生成器**（确定性、离线，不是真生成器）。
+
 
 > 🔴 **输入侧出现缺口**（2026-09-24，[票 34](34-wan-quota-facts.md)）：
 > 本票的输入是 `StyleSpec`，而 StyleSpec 来自「参考图 → 视觉模型」——
@@ -118,3 +133,119 @@ Map: ../map.md
 ## Answer
 
 _（待填）_
+
+## Answer
+
+**结论：产物 A 端到端跑通了 —— 用真生成器。** 77.7 秒、8 个资源、28 个文件、spec↔产物对账 0 问题，
+186 条测试全绿。**14 帧的玩家是同一个角色。**
+
+### 0. 四条裁决
+
+| 问题 | 裁决 | 落点 |
+|---|---|---|
+| 材质（dither） | **加 `dither` op** | 契约 + 静态分析 + 光栅化器（三处） |
+| `characterStyle` | **当自由文本用，数值从 `spec.size` 推** | `headCount()` |
+| prompt 渲染器归谁 | **一个共享模块，放进 `assets`** | `packages/assets/src/prompt.ts` |
+| 「像不像」谁判 | **生成后抽查，产出观察清单交给人** | `packages/assets/src/review.ts` |
+
+票面六问里另外两问已被上游证据回答：
+- **问题 1（多帧同一性）**：[票 22](../experiments/animated-player/README.md) 自己的实验证明
+  「一次调用出全部帧」有效，[票 28](28-recipe-compilation.md) 的推导实验又独立撞到同一个坑
+  （模型默认把角色拆成三个资源）。**已写死进实现**：一个 asset 的全部帧一次调用。
+- **问题 5（thinking 开关在视觉路径）**：作废（视觉路径当时不可用；
+  且它现在也通了 —— 见 §5）。
+
+### 1. `dither` 的落地理由：它不只是「多一种画法」
+
+**抖动是像素风里唯一不出色板的调色手段。** [票 36](36-opacity-and-palette-invariant.md) 实测过
+`opacity` 会做 alpha 混合、产出色板外的复合色；而两种**色板色**交替得到第三种观感，
+**每一个像素仍然严格 ∈ 色板** —— 所以含 dither 的资源 `paletteBinding` 仍是 `exact`。
+参考图的核心材质就是 "pixel dithering / rust streaks"，加它之前生成出来全是平涂。
+
+一处改动落到三个模块：`drawlist.ts`（第七种 op）· `geometry.ts`（包围盒精确、`resolveRefs` 收 `colors`）
+· `raster.ts`（逐像素按 Bayer 矩阵二选一）。
+
+### 2. 🔴 真跑：产物 A 端到端
+
+```
+清单 → 真包：77.7s · 8 个资源 · 28 个文件 · 1182.7 KiB
+manifest 过 schema ✅ · 对账（spec ↔ 产物）0 问题
+provenance.mode = mixed · coverage = {exact:4, composited:3, quantized:1, unbound:0}
+```
+
+**14 帧的玩家是同一个角色**（头、帽、躯干、胸口那块 CRT 屏在全部帧里一致，只有四肢在变）
+—— 这是把「一个 asset 的全部帧放一次调用」写死进实现换来的。
+实例与联系表：[`../experiments/real-generation/`](../experiments/real-generation/)。
+
+### 3. 抽查真的抓到了结构化校验查不出的东西
+
+`reviewPack()` 把联系表 + 风格规格给视觉模型，**只要观察、不要分数**。它报的第一条：
+
+> 房间场景（左下角）的墙面和部分道具使用了带有平滑渐变或较高对比度阴影的色块，
+> 并非全部依赖像素抖动；橙色海报与暖黄色发光的面积占比明显超过规格里的 15% 上限。
+
+**那正是人工导入的那张背景。** 它被量化到 9 色，但**量化不会把一张照片变成像素画** ——
+「颜色 ∈ 色板」是构造成立的，而「看起来属于同一个视觉世界」不是。
+这条是这一轮抽查最有价值的产出，也是[票 24](24-asset-pack-contract.md) 的
+`paletteBinding: "quantized"` 这个字段存在的意义：它诚实地标注了「这个资源只是被吸附进来」。
+
+### 4. 施工中抓到的三件事
+
+**① 失败的构建会白吃一个版本号。** 连跑四次失败留下 `v1`–`v4` 四个空目录。
+改成**先建在工作目录里、全部成功才改名过去** —— 这一步之后才对「绝不覆盖」负责。
+
+**② `max_tokens` 默认 8192，而 14 帧要 ~14000 输出 token。** 被截断的表现是
+「JSON 不合法」，极易误判成模型吐坏数据。现在**读 `stop_reason` 分开报**：
+「撞上 max_tokens 被截断」与「返回的不是合法 JSON」是两条不同的错。
+
+**③ 同一个 prompt 三次里有一次返回坏 JSON**（票 01 记的是「9/9 通过」，但那是 9 次）。
+加了**有界重试**（默认 2 次）。⚠️ 这**不是** R2 砍掉的修复循环：重试只是**重采样**，
+不把错误喂回去，模型不会被引导去改上一次的结果。
+
+另外：抽查工具自己被抓出一个 bug —— `packContactSheet` 把 `Buffer.copy` 的参数写反了
+（它是 `src.copy(target, ...)`），静默拷了个空，于是视觉模型看到一张纯色图说「图里没有内容」。
+**是抽查替我发现的**；现在有一条专门的回归测试钉着它。
+
+### 5. 🔴 一条环境事实又翻了：文本路径的 `/v1/chat/completions` 现在不通
+
+实测：那条路 403，报 **`INSUFFICIENT_BALANCE`** —— 代理故障转移到新 provider
+`dragoncode.codes`，而那个账号没钱。**同一时刻 `/v1/messages` 仍然可用**
+（0.7s、干净 JSON、也仍然能收图），所以生成器的端点已做成**参数**（默认走后者）。
+
+**票 01 那份「文本走 chat/completions」的配方因此作废。** 已订正地图的环境事实。
+
+> **这就是「代理活不过重启」的现场重演。** [票 14](14-degradation-chain.md)（降级链）
+> 仍在前沿，而这次它**不再是理论上的兜底 —— 它就是眼下的常态**。
+> 这一票的全部实测都是在「上游随时会断」的条件下做出来的。
+
+### 6. 落地清单与验收
+
+| 文件 | 内容 |
+|---|---|
+| `packages/contracts/src/{drawlist,geometry}.ts` | `dither` op + 包围盒 + 用色收集 |
+| `packages/assets/src/raster.ts` | dither 真的画出来（Bayer 矩阵） |
+| `packages/assets/src/prompt.ts` | **新增** —— schema-to-prompt 渲染器（生成与推导共用） |
+| `packages/assets/src/generate.ts` | **新增** —— `createDrawListGenerator()`，票 38 那个端口的实现 |
+| `packages/assets/src/review.ts` | **新增** —— `packContactSheet()` / `reviewPack()` |
+| `packages/assets/src/pack.ts` | 失败不再消耗版本号 |
+| `experiments/real-generation/` | 真跑的脚本 + 预览（可复跑） |
+
+| # | 检查 | 结果 |
+|---|---|---|
+| ① | 全部测试 | ✅ **186 passed** |
+| ② | **真跑端到端**（真生成器） | ✅ 77.7s · 8 资源 · 对账 0 问题 |
+| ③ | 帧间一致性（14 帧同一角色） | ✅ 人眼 + 联系表 |
+| ④ | 视觉抽查 | ✅ 抓到「导入的背景不像像素画」 |
+| ⑤ | `pnpm check` / `typecheck` | ✅ |
+
+### 7. 已知不足（对着联系表看得见）
+
+- **dither 用过头了**：参考图的 `material` 写着 "pixel dithering"，模型把它铺满整个角色，
+  读起来是噪点纹理而不是「衣服上有锈迹」。prompt 里该给它一个面积上限。
+- 角色的头看起来像头盔面罩，参考图里那张脸没迁移过来。
+
+### 8. 产物 A 现在的状态
+
+**两个产物里，产物 A 的整条链路（清单 → 生成 / 导入 → 光栅化 → 图集 → 包）已经端到端可跑。**
+剩下的是**质量调优**（dither 过度、脸部迁移）与**降级**（票 14）——
+后者因为上游一直在断，已经不是可选项。

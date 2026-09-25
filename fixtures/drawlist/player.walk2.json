@@ -1,0 +1,124 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "player",
+  "frame": "walk2",
+  "viewBox": [
+    0,
+    0,
+    32,
+    48
+  ],
+  "expectedSize": [
+    32,
+    48
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "x": 11,
+      "y": 36,
+      "w": 4,
+      "h": 8,
+      "fill": "palette:2"
+    },
+    {
+      "op": "rect",
+      "x": 19,
+      "y": 35,
+      "w": 4,
+      "h": 9,
+      "fill": "palette:2"
+    },
+    {
+      "op": "rect",
+      "x": 10,
+      "y": 43,
+      "w": 6,
+      "h": 3,
+      "fill": "palette:6"
+    },
+    {
+      "op": "rect",
+      "x": 19,
+      "y": 43,
+      "w": 6,
+      "h": 3,
+      "fill": "palette:6"
+    },
+    {
+      "op": "rect",
+      "x": 6,
+      "y": 26,
+      "w": 4,
+      "h": 10,
+      "fill": "palette:7"
+    },
+    {
+      "op": "rect",
+      "x": 22,
+      "y": 24,
+      "w": 4,
+      "h": 10,
+      "fill": "palette:7"
+    },
+    {
+      "op": "rect",
+      "x": 11,
+      "y": 24,
+      "w": 10,
+      "h": 13,
+      "fill": "palette:0"
+    },
+    {
+      "op": "circle",
+      "cx": 16,
+      "cy": 18,
+      "r": 6,
+      "fill": "palette:7"
+    },
+    {
+      "op": "circle",
+      "cx": 14,
+      "cy": 17.4,
+      "r": 1,
+      "fill": "palette:6"
+    },
+    {
+      "op": "circle",
+      "cx": 18.2,
+      "cy": 17.4,
+      "r": 1,
+      "fill": "palette:6"
+    },
+    {
+      "op": "rect",
+      "x": 6,
+      "y": 11,
+      "w": 20,
+      "h": 3,
+      "fill": "palette:8"
+    },
+    {
+      "op": "poly",
+      "points": [
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          21,
+          4
+        ],
+        [
+          22,
+          11
+        ]
+      ],
+      "fill": "palette:8"
+    }
+  ]
+}

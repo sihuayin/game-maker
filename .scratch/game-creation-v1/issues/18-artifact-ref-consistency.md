@@ -4,6 +4,11 @@ Type: grilling
 Status: open
 Blocked by: 24, 07
 Map: ../map.md
+> 📌 **票 38 交给你的一条事实**（2026-09-24）：版本递增已落地为 `nextPackVersion()`
+> （`packages/assets/src/pack.ts`）—— **扫描目录取 max+1**，也就是你问题 1 里列的第二个候选。
+> ⚠️ **没有加锁**：并发写同一个 `outDir` 会撞。要不要防、怎么防，归你定。
+> 另外：包内的 checksum 粒度已经落地为**逐文件 sha256**（`files[]`，manifest 自身除外）。
+
 
 > ⚠️ **范围已重画**（2026-09-24，R2/R6）：从「run 内 ArtifactRef 与文件系统的一致性」
 > 变成「**交付出去的资源包 / demo 站点**怎么版本化」。

@@ -1,6 +1,7 @@
 // 把包里的交付态图集拼成一张放大联系表 PNG，供人眼看。纯验证工具，不入生产。
 import fs from 'node:fs'; import path from 'node:path';
-import { encodePNG, decodePNG } from './lib/png.mjs';
+// 同上：实现已落进 packages/assets，这里不再留第二份。
+const { encodePNG, decodePNG } = await import('../../../../packages/assets/dist/index.js');
 const PACK = process.argv[2] || 'out/dystopian-shop/v1';
 const atlases = JSON.parse(fs.readFileSync(path.join(PACK, 'manifest.json'), 'utf8')).atlases;
 const SCALE = 6, PAD = 12, BG = [23, 28, 31, 255], FG = [168, 181, 174, 255];

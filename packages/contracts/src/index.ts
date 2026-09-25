@@ -4,6 +4,8 @@
 // （R2），随它出局的 schema 已从本文件删除 —— 明细见票 07 的 Answer。
 // 需要历史的，去 git 历史里找 `demo/src/contracts/index.ts`。
 import { z } from "zod";
+import { PaletteSchema } from "./drawlist.js";
+import { AssetSpecSchema } from "./asset-spec.js";
 
 // ── 需求 ──────────────────────────────────────────────────────────────────
 export const RequirementPriority = z.enum(["core", "important", "optional"]);
@@ -25,7 +27,9 @@ export const StyleSpecSchema = z.object({
   identity: z.array(z.string()),
   camera: z.record(z.unknown()).default({}),
   composition: z.record(z.unknown()).default({}),
-  palette: z.array(z.string()).default([]),
+  // ⚠️ 规范化色板（票 24 Q3 定的落点）：**有序**、小写 `#rrggbb`、不得重复色。
+  // 「换掉整个色板 → 创作态文本一字不变」这条性质全靠它的**顺序**稳定。
+  palette: PaletteSchema.default([]),
   lighting: z.record(z.unknown()).default({}),
   shapeLanguage: z.array(z.string()).default([]),
   material: z.array(z.string()).default([]),
@@ -55,37 +59,7 @@ export const GameSpecSchema = z.object({
 export type GameSpec = z.infer<typeof GameSpecSchema>;
 
 // ── 资源规格 ──────────────────────────────────────────────────────────────
-/**
- * 一个待生成资源的**需求描述**：AssetSpec 是「需要什么」，
- * [[Asset]]（交付态 + 创作态）是「实际做出了什么」。
- *
- * ⚠️ `visual` / `geometry` 两个 `z.record(z.unknown())` 是**已有的逃生舱**。
- * R2 之后确定性校验是唯一留下的质量控制，票 27 要把它们结构化或划清边界。
- */
-export const AssetSpecSchema = z.object({
-  id: z.string(), role: z.string(), description: z.string(),
-  styleId: z.string(), visual: z.record(z.unknown()).default({}),
-  geometry: z.record(z.unknown()).default({}),
-  states: z.array(z.string()).default([]),
-  variants: z.array(z.string()).default([]),
-  dependencies: z.array(z.string()).default([]),
-  required: z.boolean().default(true)
-});
-export type AssetSpec = z.infer<typeof AssetSpecSchema>;
 
-/**
- * ⚠️ **与资源包的自描述 `AssetPackManifest`（票 24）不是同一个东西**：
- * 本类型是**输入侧**的资产集合 + 旧闭环的过程统计。三个计数器在 R2 之后没有消费者，
- * 归属由票 28（资源清单编译）/ 票 18（版本化）收口。
- */
-export const AssetManifestSchema = z.object({
-  id: z.string(), assets: z.array(AssetSpecSchema),
-  generated: z.number().int().nonnegative(),
-  missing: z.number().int().nonnegative(),
-  broken: z.number().int().nonnegative(),
-  unused: z.number().int().nonnegative()
-});
-export type AssetManifest = z.infer<typeof AssetManifestSchema>;
 
 // ── 产物引用 ──────────────────────────────────────────────────────────────
 /**
@@ -110,3 +84,15 @@ export const CreationProjectSchema = z.object({
   referenceImage: z.string().optional(), createdAt: z.string()
 });
 export type CreationProject = z.infer<typeof CreationProjectSchema>;
+
+// ── 创作态：drawlist ──────────────────────────────────────────────────────
+export * from "./drawlist.js";
+export * from "./geometry.js";
+
+// ── 交付态：资源包自描述 ──────────────────────────────────────────────────
+export * from "./assetpack.js";
+
+// ── 资源规格（四类）与确定性校验 ──────────────────────────────────────────
+export * from "./asset-spec.js";
+export * from "./audit.js";
+export * from "./recipe.js";
