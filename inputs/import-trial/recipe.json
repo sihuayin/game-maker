@@ -1,0 +1,43 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "import-trial",
+  "styleRef": "../../fixtures/style-spec.halt-dusk.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "station-keeper",
+        "role": "站务员：黄昏山间小站的当值人员",
+        "description": "厚呢大衣、戴檐帽、手里提着信号灯的小站站务员，正面站立。",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": { "x": 0.5, "y": 0.88 },
+        "size": { "w": 32, "h": 48 },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "station-keeper.png",
+        "background": { "tolerance": 30 }
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "station-signboard",
+        "role": "站牌：写着站名的木制挂牌",
+        "description": "一块悬在横杆下的木制站牌，边缘磨损，正面朝向镜头。",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": { "x": 0.5, "y": 1 },
+        "size": { "w": 96, "h": 24 },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "station-signboard.png",
+        "background": { "tolerance": 30 }
+      }
+    }
+  ]
+}

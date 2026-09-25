@@ -1,0 +1,42 @@
+{
+  "format": "stylespec-provenance/v1",
+  "artifact": "style-spec.halt-dusk.json",
+  "note": "与 fixtures/style-spec.json 并列的**第二份** StyleSpec —— 它对应的是当前 fixture 参考图 halt-dusk.png 的那个世界。provenance 放兄弟文件，不塞进 StyleSpec 本体（塞进去会被 Zod 静默剥掉），与 fixtures/style-spec.provenance.json 同一条规矩。",
+
+  "why": [
+    "⚠️ **仓库里原先只有一份 StyleSpec，而它对应的是 test.png** —— 票 04 把 fixture 参考图换成 halt-dusk.png 之后，参考图与 StyleSpec 就**指向两个不同的世界**了（test.png 是反乌托邦柜台内景，halt-dusk 是黄昏山间列车小站）。",
+    "票 04 交付了参考图与它的 provenance，但**没有**交付从它提取出的 StyleSpec —— 提取结果当时只落在 experiments/reference-image-draft/out/extractions.json（该目录被 .gitignore 排除）。",
+    "本文件把那次提取的 **C 变体**（= 人类拍板用的那张，ref-C.png 与 halt-dusk.png 的 sha256 逐字节相同）取出来、规范化、过一遍 schema，固化成 fixture。",
+    "**它是被 import 通道的试件逼出来的** —— 导入位图会被**默认量化**到世界色板（票 23 裁决，pack.ts 里写死），所以拿一份不对应世界的色板去试，量化会把试件改得面目全非，整个试件就失去意义。"
+  ],
+
+  "source": {
+    "experiment": ".scratch/game-creation-v1/experiments/reference-image-draft/",
+    "file": "out/extractions.json",
+    "key": "C",
+    "extractedFrom": { "path": "fixtures/reference/halt-dusk.png", "sha256": "76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0" },
+    "sameFileAs": "out/ref-C.png（sha256 相同，已核对）"
+  },
+  "extraction": {
+    "at": "2026-09-25",
+    "how": "人在 Claude Code 会话里的一次交互提取（R11）—— **不是管线调用**",
+    "modelField": "deepseek-v4-pro",
+    "modelReported": "deepseek-flash",
+    "endpoint": "/v1/messages",
+    "thinking": "disabled",
+    "latencyMs": 2500,
+    "schemaOk": true
+  },
+  "modifications": [
+    "palette 由大写规范化成小写 `#rrggbb`（票 24 Q3；票 15 实测：原样的大写过不了 StyleSpecSchema）。",
+    "其余字段一字未改。"
+  ],
+  "limits": [
+    "⚠️ 提取出的 palette 只有 8 色，而 halt-dusk.png 图上实际是 18 色 —— 这**不是**缺陷，是票 04 已经钉死的事实：**上游重编码图片 ⇒ 精确读色不可能**（送纯单色图 5 次零命中）。palette 永远是近似，契约只要求「颜色 ∈ 色板（相对于本 StyleSpec）」，从不要求它等于参考图。",
+    "⚠️ 因此它**不能**用来评价 halt-dusk.png 的质量，也**不该**被当成「这张图的真实色板」。"
+  ],
+  "relationship": {
+    "fixtures/style-spec.json": "仍有效、仍被 fixtures/recipes/shift-change.json 使用（那个世界是反乌托邦柜台）。**不覆盖、不取代**它。",
+    "fixtures/reference/halt-dusk.png": "本文件是它的视觉语法；halt-dusk.png 是当前 fixture 参考图。"
+  }
+}
