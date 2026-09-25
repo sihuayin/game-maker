@@ -48,6 +48,31 @@ export const PaletteBinding = z.enum(["exact", "composited", "quantized", "unbou
 /** 谁造的。一个包里的资源可以来源不同，所以这一项是**逐资源**的。 */
 export const AssetOrigin = z.enum(["generated", "imported", "fixture"]);
 
+/**
+ * 包级身份。**由 `assets[].origin` 唯一派生** —— 它是 `origin` 的像，不是另一个独立声明。
+ *
+ * ⚠️ **2026-09-25 补 `"imported"`**：此前只有 `generated / fixture / mixed` 三个值，
+ * 而 `origin` 有三个值 —— 于是「全部来自人工导入」的包**在结构上无法诚实**：
+ * 它既不是 generated 也不是 fixture，唯一的合法写法是 `"mixed"`，可包里根本没有
+ * 「混」这回事。这不是措辞问题：`mixed` 是给「两批来源不同、风格上看得出来」的包用的，
+ * 而一个纯导入的包恰恰是**单一来源**。
+ * 这个洞是「纯导入的包」第一次被真跑出来时才暴露的 —— 在此之前仓库里的包
+ * 要么全是 generated，要么是真混的。
+ */
+export const PackMode = z.enum(["generated", "imported", "fixture", "mixed"]);
+
+/**
+ * `mode` 的**唯一**派生处。写入侧（`pack.ts`）与校验侧（本文件的 superRefine）
+ * 都调它 —— 两边各写一份必然漂移，而漂移的后果是「合法的包被判为矛盾」。
+ */
+export function derivePackMode(origins: readonly z.infer<typeof AssetOrigin>[]): z.infer<typeof PackMode> {
+  const allOf = (v: string): boolean => origins.length > 0 && origins.every((o) => o === v);
+  if (allOf("fixture")) return "fixture";
+  if (allOf("generated")) return "generated";
+  if (allOf("imported")) return "imported";
+  return "mixed";
+}
+
 export const FrameRef = z.object({
   /** 图集里的帧名（`player.walk1`），也是产物 B 引用它的名字。**消费者不许解析它** —— 命名约定只给人眼看。 */
   name: z.string().min(1),
@@ -130,9 +155,9 @@ export const AssetPackManifest = z.object({
   createdAt: z.string().datetime({ offset: true }),
   generator: z.object({ name: z.string(), version: z.string(), run: z.string().optional(), deterministic: z.string().optional() }).strict(),
   provenance: z.object({
-    /** 包级身份。**由 assets[].origin 唯一派生**，见下面的 superRefine ——
+    /** 包级身份。**由 assets[].origin 唯一派生**（见 `derivePackMode`）——
      *  「一个 fixture 包谎报自己是 generated」因此是解析不通过，而不是一条能被忽略的约定。 */
-    mode: z.enum(["generated", "fixture", "mixed"]),
+    mode: PackMode,
     style: z.object({ origin: z.enum(["human-in-session", "fixture"]), ref: PackPath, stylespecId: z.string(), checksum: Checksum }).strict(),
     degradations: z.array(Degradation).default([]),
     /**
@@ -179,10 +204,9 @@ export const AssetPackManifest = z.object({
     for (const id of at.assets)
       if (!assetIds.has(id)) issue(["atlases"], `图集 "${at.id}" 声称包含不存在的资源 "${id}"`);
 
-  // provenance.mode 由 per-asset origin 唯一派生 —— 诚实是结构性的
-  const origins = m.assets.map((a) => a.origin);
-  const allOf = (v: string) => origins.every((o) => o === v);
-  const expectedMode = allOf("fixture") ? "fixture" : allOf("generated") ? "generated" : "mixed";
+  // provenance.mode 由 per-asset origin 唯一派生 —— 诚实是结构性的。
+  // ⚠️ 派生规则**不在这里重写一份**：写入侧用的是同一个 `derivePackMode`。
+  const expectedMode = derivePackMode(m.assets.map((a) => a.origin));
   if (m.provenance.mode !== expectedMode)
     issue(["provenance", "mode"], `provenance.mode="${m.provenance.mode}" 与资源来源矛盾（应为 "${expectedMode}"）`);
 

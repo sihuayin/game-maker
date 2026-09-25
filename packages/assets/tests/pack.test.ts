@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, readdirSync, existsSync, rmSync } from "node:fs";
+import { copyFileSync, mkdtempSync, readFileSync, readdirSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -38,7 +38,7 @@ const smallRecipe = (): AssetRecipe => ({ ...RECIPE, assets: RECIPE.assets.slice
 
 describe("组装出一个完整的包", () => {
   it("目录结构、manifest 过 schema、对账为空", async () => {
-    const { manifest, packDir, audit } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
+    const { manifest, packDir, audit } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     const parsed = parseAssetPack(manifest);
     expect(parsed.ok, parsed.ok ? "" : parsed.errors.join(" / ")).toBe(true);
     expect(audit).toEqual([]);
@@ -53,7 +53,7 @@ describe("组装出一个完整的包", () => {
   });
 
   it("files[] **覆盖包内每一个文件**（checksum 才谈得上完整）", async () => {
-    const { manifest, packDir } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
+    const { manifest, packDir } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     const walk = (dir: string, base = ""): string[] => readdirSync(dir, { withFileTypes: true })
       .flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name), `${base}${d.name}/`) : [`${base}${d.name}`]));
     const onDisk = walk(packDir).filter((p) => p !== "manifest.json").sort();
@@ -62,16 +62,16 @@ describe("组装出一个完整的包", () => {
   });
 
   it("确定性：同一 epoch 两次构建逐字节相同（连 PNG 也一样）", async () => {
-    const a = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
-    const b = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
+    const a = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
+    const b = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     expect(a.manifest.files).toEqual(b.manifest.files);         // 含逐文件 checksum
     expect(JSON.stringify(a.manifest)).toBe(JSON.stringify(b.manifest));
   });
 
   it("⚠️ 绝不覆盖：同一个 outDir 再跑一次落在 v2，v1 还在", async () => {
     const out = tmp();
-    const a = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: out, generate: stub, sourceDateEpoch: EPOCH });
-    const b = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: out, generate: stub, sourceDateEpoch: EPOCH });
+    const a = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: out, recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
+    const b = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: out, recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     expect(a.manifest.version).toBe(1);
     expect(b.manifest.version).toBe(2);
     expect(existsSync(a.packDir)).toBe(true);
@@ -80,7 +80,7 @@ describe("组装出一个完整的包", () => {
   });
 
   it("provenance.mode 由来源派生；覆盖计数自洽", async () => {
-    const { manifest } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
+    const { manifest } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     expect(manifest.provenance.mode).toBe("generated");
     const cov = manifest.palette.coverage;
     expect(cov.unbound).toBe(0);   // 这条管线产不出 unbound
@@ -89,20 +89,20 @@ describe("组装出一个完整的包", () => {
 
   it("色板被规范化进包（大写 → 小写）", async () => {
     expect(STYLE.palette.some((c) => /[A-F]/.test(c))).toBe(true);   // 输入的实测色板是大写
-    const { packDir } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
+    const { packDir } = await buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     const inPack = JSON.parse(readFileSync(path.join(packDir, "authoring/stylespec.json"), "utf8"));
     expect(inPack.palette.every((c: string) => c === c.toLowerCase())).toBe(true);
   });
 
   it("生成器给的帧数与清单对不上 → 报出来，不静默裁剪", async () => {
     const short: DrawListGenerator = (spec) => stubDrawLists(spec).slice(0, 1);
-    await expect(buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), generate: short, sourceDateEpoch: EPOCH }))
+    await expect(buildAssetPack({ recipe: smallRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: short, sourceDateEpoch: EPOCH }))
       .rejects.toThrow(/清单说要有 \d+ 帧，生成器给了 1 帧/);
   });
 
   it("色板有重复色 → 直接失败（palette:N 会变得含糊）", async () => {
     const bad = { ...STYLE, palette: [STYLE.palette[0]!, STYLE.palette[0]!] };
-    await expect(buildAssetPack({ recipe: smallRecipe(), style: bad, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH }))
+    await expect(buildAssetPack({ recipe: smallRecipe(), style: bad, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH }))
       .rejects.toThrow(/重复色/);
   });
 });
@@ -117,7 +117,7 @@ describe("导入通道端到端（真实素材）", () => {
         source: { kind: "import", ref: "fixtures/reference/test.png", background: { tolerance: 30 } },
       }],
     };
-    const { manifest, packDir, audit } = await buildAssetPack({ recipe, style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: EPOCH });
+    const { manifest, packDir, audit } = await buildAssetPack({ recipe, style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
     const a = manifest.assets[0]!;
     expect(a.origin).toBe("imported");
     expect(a.paletteBinding).toBe("quantized");
@@ -126,5 +126,49 @@ describe("导入通道端到端（真实素材）", () => {
     expect(a.authoring[0]!.kind).toBe("bitmap");
     expect(audit).toEqual([]);
     expect(existsSync(path.join(packDir, a.authoring[0]!.ref))).toBe(true);
+  });
+});
+
+/**
+ * 下面两条守的是 2026-09-25 从「纯导入的包」上抓到的两个真 bug。
+ * 它们此前没暴露，是因为仓库里的包要么全是 `generate`，要么导入资源的 `ref`
+ * 恰好写成了 cwd 相对才碰巧能跑。
+ */
+describe("⚠️ 纯导入的包（2026-09-25 抓到的两个 bug）", () => {
+  /** 图片放在一个**和 cwd 无关**的临时目录里，`ref` 只写文件名。 */
+  const imported = (dir: string): AssetRecipe => {
+    copyFileSync(ROOT + "fixtures/import/wan-player-1024.png", path.join(dir, "art.png"));
+    return {
+      ...RECIPE,
+      assets: [{
+        spec: { kind: "sprite", id: "imported-crate", role: "obstacle", description: "从位图导入的木箱", styleId: "style-ref",
+          anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true },
+        source: { kind: "import", ref: "art.png", background: { tolerance: 30 } },
+      }],
+    };
+  };
+  const build = async () => {
+    const dir = tmp();
+    const { manifest } = await buildAssetPack({
+      recipe: imported(dir), style: STYLE, outDir: tmp(), recipeDir: dir, generate: stub, sourceDateEpoch: EPOCH,
+    });
+    return manifest;
+  };
+
+  it("① source.ref 相对**配方文件**解析（契约 InputPath 的规则），不是相对 cwd", async () => {
+    // 旧实现是 `path.resolve(src.ref)`（= 相对 cwd）⇒ 这里会 ENOENT
+    const m = await build();
+    expect(m.assets[0]!.origin).toBe("imported");
+    // `original` 记**清单里的原样字符串**：记绝对路径会让 manifest 随机器与目录变，
+    // 而「同一输入两次生成逐字节相同」是 checksum 成立的前提
+    expect(m.assets[0]!.authoring[0]!.original).toBe("art.png");
+  });
+
+  it('③ provenance.mode 是 "imported"，不是 "mixed"（此前契约里根本没有这个值）', async () => {
+    const m = await build();
+    expect(m.provenance.mode).toBe("imported");
+    // 写入侧（pack.ts）与校验侧（contracts）必须用同一套派生规则，否则合法的包会被判成矛盾
+    const parsed = parseAssetPack(m);
+    expect(parsed.ok, parsed.ok ? "" : parsed.errors.join(" / ")).toBe(true);
   });
 });

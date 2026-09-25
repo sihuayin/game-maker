@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  AssetPackManifest, AssetPackRef, parseAssetPack, resolvePackRef,
+  AssetPackManifest, AssetPackRef, derivePackMode, parseAssetPack, resolvePackRef,
   StyleSpecSchema, PaletteSchema,
   type AssetPackManifest as Manifest,
 } from "../src/index.js";
@@ -86,6 +86,45 @@ describe("AssetPackManifest —— 合法包必须通过", () => {
       m.palette.coverage = { exact: 1, composited: 1, quantized: 0, unbound: 0 };
       m.files = m.files.filter((f) => !f.path.includes("backgrounds") && !f.path.includes("shop"));
     })).ok).toBe(true);
+  });
+});
+
+describe("derivePackMode —— 包级身份的**唯一**派生处", () => {
+  it("单一来源各自映射到自己", () => {
+    expect(derivePackMode(["generated", "generated"])).toBe("generated");
+    expect(derivePackMode(["imported"])).toBe("imported");
+    expect(derivePackMode(["fixture", "fixture"])).toBe("fixture");
+  });
+  it("混了才是 mixed", () => {
+    expect(derivePackMode(["generated", "imported"])).toBe("mixed");
+    expect(derivePackMode(["fixture", "imported"])).toBe("mixed");
+  });
+  it("空数组不落在 fixture 上（旧写法 `every` 对空集恒真，会把它判成 fixture 包）", () => {
+    expect(derivePackMode([])).toBe("mixed");
+  });
+});
+
+describe("⚠️ 纯导入的包 —— 2026-09-25 之前它在结构上无法诚实", () => {
+  /** `validManifest()` 的每一项都改成人工导入。 */
+  const allImported = (m: Manifest): Manifest => {
+    for (const a of m.assets) { a.origin = "imported"; a.paletteBinding = "quantized"; }
+    m.palette.coverage = { exact: 0, composited: 0, quantized: m.assets.length, unbound: 0 };
+    return m;
+  };
+
+  it('mode 写 "imported" → 通过', () => {
+    const m = mutate((x) => { allImported(x); x.provenance.mode = "imported"; });
+    const r = parseAssetPack(m);
+    expect(r.ok, r.ok ? "" : r.errors.join(" / ")).toBe(true);
+  });
+
+  it('⚠️ mode 写 "mixed" → 拒收（此前这是唯一一个能通过的写法，而它是假话）', () => {
+    // validManifest 的 mode 本来就是 "mixed" —— 不改它，直接换来源
+    expect(errorsOf(mutate(allImported))).toMatch(/矛盾/);
+  });
+
+  it('⚠️ mode 写 "generated" → 拒收（谎报自己是管线生成的）', () => {
+    expect(errorsOf(mutate((x) => { allImported(x); x.provenance.mode = "generated"; }))).toMatch(/矛盾/);
   });
 });
 

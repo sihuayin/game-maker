@@ -164,9 +164,16 @@ style-transfer 的 `player.idle` 是静态外观，animated-player 的 `walk1` �
 **Provenance（来源标注）**
 一个资源/一个包**是谁造的**，必填且由 schema 强制自洽：
 资源级 `origin` ∈ `generated`（本管线从规格产出）/ `imported`（人工导入通道）/ `fixture`（仓库内置降级件）；
-包级 `mode` ∈ `generated` / `fixture` / `mixed`，**由 `origin` 唯一派生** ——
+包级 `mode` ∈ `generated` / `imported` / `fixture` / `mixed`，**由 `origin` 唯一派生** ——
 所以「一个 fixture 包谎报自己是 generated」是**解析不通过**，不是一条能被忽略的约定。
 **一个不知道自己是 fixture 的包是虚假的包。**
+
+⚠️ **2026-09-25 补 `imported`**（跑第一个**纯导入**的包时抓到的洞）：此前 `mode` 只有
+三个值，而 `origin` 有三个 —— 于是「全部来自人工导入」的包**在结构上无法诚实**：
+它既不是 generated 也不是 fixture，唯一的合法写法是 `mixed`，可包里根本没有「混」这回事。
+`mixed` 是给「两批来源不同、风格上看得出来是两批」的包用的，而纯导入的包恰恰是**单一来源**。
+派生规则现在只有一处实现（`derivePackMode`，`packages/contracts/src/assetpack.ts`），
+写入侧与校验侧共用 —— 两边各写一份必然漂移，而漂移的后果是**合法的包被判为矛盾**。
 
 **Frame（帧）**
 一个 Asset 的一格画面。创作态是一条 drawlist，交付态是图集里的一帧。

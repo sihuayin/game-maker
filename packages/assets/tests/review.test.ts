@@ -25,7 +25,7 @@ const stub = (): never => ([{
 
 const buildOne = () => buildAssetPack({
   recipe: { id: "t", styleRef: "authoring/stylespec.json", assets: [{ spec: SPECK, source: { kind: "generate" } }] },
-  style: STYLE, outDir: tmp(), generate: stub, sourceDateEpoch: 1790208000,
+  style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: 1790208000,
 });
 
 describe("packContactSheet", () => {

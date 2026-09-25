@@ -55,6 +55,8 @@ export type ResilientOptions = {
   recipe: Parameters<typeof buildAssetPack>[0]["recipe"];
   style: Parameters<typeof buildAssetPack>[0]["style"];
   outDir: string;
+  /** 配方文件所在的目录 —— `source.ref` 相对**它**解析（与 `styleRef` 同一条规则）。 */
+  recipeDir: string;
   transport: { baseUrl: string; apiKey: string };
   /** 依次尝试的端点。默认 `["messages", "chat-completions"]`（今天实测前者通、后者 403）。 */
   endpoints?: Endpoint[];
@@ -68,8 +70,12 @@ export type ResilientOptions = {
 };
 
 export type ResilientResult = BuildPackResult & {
-  /** 实际走的那一层。 */
-  used: Endpoint | "procedural";
+  /**
+   * 实际走的那一层。
+   * `"none"` = **没有任何资源要用生成器**（清单里全是 `import`）——
+   * 这时上游一次都没被碰过，所以既没有降级也没有传输事实可记。
+   */
+  used: Endpoint | "procedural" | "none";
   probes: ProbeResult[];
 };
 
@@ -81,6 +87,30 @@ export type ResilientResult = BuildPackResult & {
  * 而失败的那次既不留工作目录也不吃版本号。
  */
 export async function buildPackResilient(opts: ResilientOptions): Promise<ResilientResult> {
+  // ── 清单里全是导入资源时：不探测、不降级、不记账 ────────────────────────
+  //
+  // ⚠️ **此前这里会整条链走一遍。** 后果有三个，都是实测出来的：
+  //   ① 白探测上游两次（`probeEndpoint` 发的是**真实推理请求**，票 01：鉴权不校验，
+  //      所以只能靠真请求判死活）—— 一个根本不需要上游的包，烧掉两次调用；
+  //   ② 无论探测结果如何，`--offline` 分支都会写一条
+  //      `{stage:"drawlist", reason:"以离线模式构建", fellBackTo:"procedural"}`，
+  //      而这个包里**一个资源都没走生成器** —— 没有任何东西退到 procedural；
+  //   ③ 那条假降级让 `outcome` 变成 `degraded`，按它分支的脚本会被骗。
+  //
+  // 判据是**清单本身**，不是运行时的任何状态：有没有 `source.kind === "generate"` 的资源。
+  if (!opts.recipe.assets.some((e) => e.source.kind === "generate")) {
+    const res = await buildAssetPack({
+      recipe: opts.recipe, style: opts.style, outDir: opts.outDir, recipeDir: opts.recipeDir,
+      // 生成器**故意给一个会抛的**：这份清单里没有 generate 型资源，它被调用
+      // 即说明上面那个判断错了。让它在现场炸，而不是静默产出一堆色块。
+      generate: () => { throw new Error("清单里没有任何 generate 型资源，生成器不该被调用（这是一个 bug）"); },
+      ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
+      // 不传 `provenance`：没有上游参与，就没有降级、也没有传输事实可记。
+      // （传 `transport: {preferred:"offline", used:"procedural"}` 就是那条假账的写法。）
+    });
+    return { ...res, used: "none", probes: [] };
+  }
+
   const endpoints = opts.endpoints ?? (["messages", "chat-completions"] as Endpoint[]);
   const preferred = endpoints[0]!;
   const switches: { from: string; to: string; reason: string }[] = [];
@@ -111,7 +141,8 @@ export async function buildPackResilient(opts: ResilientOptions): Promise<Resili
   for (const layer of [...(chosen === "procedural" ? [] : [chosen]), "procedural"] as (Endpoint | "procedural")[]) {
     try {
       const res = await buildAssetPack({
-        recipe: opts.recipe, style: opts.style, outDir: opts.outDir, generate: makeGenerator(layer),
+        recipe: opts.recipe, style: opts.style, outDir: opts.outDir, recipeDir: opts.recipeDir,
+        generate: makeGenerator(layer),
         ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
         provenance: {
           ...(layer === "procedural" && !opts.offline

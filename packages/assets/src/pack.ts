@@ -11,7 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { paletteBindingOf, type AssetPackManifest, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { derivePackMode, paletteBindingOf, type AssetPackManifest, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importBitmap, sliceGrid } from "./import.js";
@@ -27,6 +27,18 @@ export type BuildPackOptions = {
   /** 产物根目录。**必填** —— 产物不属于任何单个包（票 29），由调用方定。
    *  实际写入 `outDir/<recipe.id>/pack/v<N>/`。 */
   outDir: string;
+  /**
+   * 配方文件所在的目录。**必填**，理由与 `outDir` 同款：不给它，`source.ref`
+   * 就只能按 `process.cwd()` 解析 —— 那是一份**隐式的全局状态**，
+   * 于是「同一个包在哪个目录里跑」会决定它读得到哪张图。
+   *
+   * ⚠️ 契约（`recipe.ts` 的 `InputPath`）写的是「**相对于配方文件**解析」。
+   * 此前只有 `styleRef` 遵守了这条，`source.ref` 是按 cwd 解析的 ——
+   * 同一个文件里两条路径两种规则，而错的那条只有真跑导入资源时才会暴露
+   * （仓库里此前的包要么全是 `generate`，要么导入资源的 ref 恰好写成了
+   * cwd 相对才碰巧能跑）。
+   */
+  recipeDir: string;
   generate: DrawListGenerator;
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
@@ -162,7 +174,8 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       const src = entry.source;
       origin = "imported";
       binding = "quantized";   // 票 23 的裁决：导入位图默认量化到世界色板
-      const srcPath = path.resolve(src.ref);
+      // ⚠️ 相对**配方文件**解析（`BuildPackOptions.recipeDir`），不是相对 cwd —— 见那个字段的注释
+      const srcPath = path.resolve(opts.recipeDir, src.ref);
       const img = decodePNG(fs.readFileSync(srcPath));
       const names = src.sheet?.names ?? [spec.id];
       const crops = src.sheet ? sliceGrid(img, src.sheet) : [img];
@@ -177,8 +190,8 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         });
         const dest = `authoring/imported/${name}${path.extname(srcPath)}`;
         fs.writeFileSync(path.join(packDir, dest), encodePNG(crops[i]!));
-        // `original` 直接写清单里那个仓库相对路径 —— 用 process.cwd() 会让 manifest 随 cwd 变，
-        // 而「同一输入两次生成逐字节相同」是 checksum 成立的前提。
+        // `original` 写**清单里的原样字符串**（即相对配方文件的那个 ref），不写解析后的绝对路径：
+        // 绝对路径会让 manifest 随机器与目录变，而「同一输入两次生成逐字节相同」是 checksum 的前提。
         authoring.push({ kind: "bitmap", ref: dest, original: rel(src.ref) });
         frames.push({ name, state: animOf.get(name), image: r });
       });
@@ -229,8 +242,6 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   fs.writeFileSync(path.join(packDir, "authoring", "stylespec.json"), styleDoc);
 
   // ── manifest ─────────────────────────────────────────────────────────────
-  const origins = built.map((b) => b.origin);
-  const allOf = (v: string) => origins.every((o) => o === v);
   const epoch = opts.sourceDateEpoch ?? Number(process.env.SOURCE_DATE_EPOCH ?? Math.floor(Date.now() / 1000));
   const manifest: AssetPackManifest = {
     format: "assetpack/v1",
@@ -239,7 +250,9 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
     createdAt: new Date(epoch * 1000).toISOString(),
     generator: { name: opts.generator?.name ?? "game-maker", version: opts.generator?.version ?? "0.0.0", ...(opts.generator?.run ? { run: opts.generator.run } : {}) },
     provenance: {
-      mode: allOf("fixture") ? "fixture" : allOf("generated") ? "generated" : "mixed",
+      // ⚠️ 派生规则只有一处（contracts 的 `derivePackMode`）—— 这里不许再写一份，
+      //   否则写入侧与校验侧一漂移，合法的包会被判成「矛盾」。
+      mode: derivePackMode(built.map((b) => b.origin)),
       style: { origin: "human-in-session", ref: "authoring/stylespec.json", stylespecId: style.id, checksum: sha256(Buffer.from(styleDoc)) },
       degradations: opts.provenance?.degradations ?? [],
       ...(opts.provenance?.transport ? { transport: opts.provenance.transport } : {}),

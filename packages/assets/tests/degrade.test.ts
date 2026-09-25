@@ -53,7 +53,7 @@ describe("probeEndpoint —— 必须发真实请求（票 01：鉴权根本不�
 describe("降级链 —— 三层，整包降级", () => {
   it("首选可用 → 用首选，零切换、零降级", async () => {
     const r = await buildPackResilient({
-      recipe: recipe(), style: STYLE, outDir: tmp(), transport: { baseUrl: "http://x", apiKey: "k" },
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" },
       fetchImpl: fetchBy(() => res200({}), () => res200(okJson())),
     });
     expect(r.used).toBe("messages");
@@ -70,7 +70,7 @@ describe("降级链 —— 三层，整包降级", () => {
       return res200(okJson());
     }) as unknown as typeof fetch;
     const r = await buildPackResilient({
-      recipe: recipe(), style: STYLE, outDir: tmp(), transport: { baseUrl: "http://x", apiKey: "k" },
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" },
       endpoints: ["chat-completions", "messages"], fetchImpl: spy,
     });
     expect(r.used).toBe("messages");
@@ -82,7 +82,7 @@ describe("降级链 —— 三层，整包降级", () => {
 
   it("⚠️ 全部不可达 → 程序化兜底，包**仍然完全合法**", async () => {
     const r = await buildPackResilient({
-      recipe: recipe(), style: STYLE, outDir: tmp(), transport: { baseUrl: "http://x", apiKey: "k" },
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" },
       fetchImpl: (async () => boom()) as unknown as typeof fetch,
     });
     expect(r.used).toBe("procedural");
@@ -100,7 +100,7 @@ describe("降级链 —— 三层，整包降级", () => {
     // 第一次生成失败 → 生成器自己重试一次 → 成功。**降级链不该被这种抖动惊动。**
     let transient = 0;
     const ok = await buildPackResilient({
-      recipe: recipe(), style: STYLE, outDir: tmp(), transport: { baseUrl: "http://x", apiKey: "k" },
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" },
       fetchImpl: fetchBy(() => res200({}), () => { transient++; return transient === 1 ? boom() : res200(okJson()); }),
     });
     expect(ok.used).toBe("messages");
@@ -109,7 +109,7 @@ describe("降级链 —— 三层，整包降级", () => {
     // 连着两次都失败（重试额度用完）⇒ 整包退到兜底
     let stuck = 0;
     const r = await buildPackResilient({
-      recipe: recipe(), style: STYLE, outDir: tmp(), transport: { baseUrl: "http://x", apiKey: "k" },
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" },
       fetchImpl: fetchBy(() => res200({}), () => { stuck++; return stuck <= 2 ? boom() : res200(okJson()); }),
     });
     expect(r.used).toBe("procedural");                               // 第一层挂了 ⇒ 整包退到兜底
@@ -118,7 +118,7 @@ describe("降级链 —— 三层，整包降级", () => {
   });
 
   it("离线模式：不探测、直接兜底", async () => {
-    const r = await buildPackResilient({ recipe: recipe(), style: STYLE, outDir: tmp(), offline: true, transport: { baseUrl: "", apiKey: "" } });
+    const r = await buildPackResilient({ recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, offline: true, transport: { baseUrl: "", apiKey: "" } });
     expect(r.used).toBe("procedural");
     expect(r.probes).toEqual([]);
     expect(parseAssetPack(r.manifest).ok).toBe(true);
@@ -126,7 +126,7 @@ describe("降级链 —— 三层，整包降级", () => {
 
   it("失败的那次既不留工作目录、也不吃版本号", async () => {
     const out = tmp();
-    await buildPackResilient({ recipe: recipe(), style: STYLE, outDir: out, transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: (async () => boom()) as unknown as typeof fetch });
+    await buildPackResilient({ recipe: recipe(), style: STYLE, outDir: out, recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: (async () => boom()) as unknown as typeof fetch });
     const dirsOnDisk = readFileSync; // 占位，避免 lint 抱怨未用
     void dirsOnDisk;
     expect(r0(out)).toEqual(["v1"]);
@@ -134,6 +134,51 @@ describe("降级链 —— 三层，整包降级", () => {
 });
 import { readdirSync } from "node:fs";
 const r0 = (out: string) => readdirSync(path.join(out, FULL.id, "pack")).sort();
+
+/**
+ * ⚠️ 2026-09-25：**清单里全是导入资源时，整条降级链都不该被惊动。**
+ *
+ * 此前会走完整条链：白探测两次上游（`probeEndpoint` 发的是真实推理请求），
+ * 然后无论探测结果如何都写一条 `fellBackTo: "procedural"` 的降级 ——
+ * 而这个包里一个资源都没走生成器，没有任何东西退到 procedural。
+ */
+describe("纯导入的清单 —— 不进降级链", () => {
+  const imported = (): AssetRecipe => ({
+    ...FULL,
+    assets: [{
+      spec: { kind: "sprite", id: "imported-crate", role: "obstacle", description: "从位图导入的木箱", styleId: "style-ref",
+        anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true },
+      source: { kind: "import", ref: "fixtures/import/wan-player-1024.png", background: { tolerance: 30 } },
+    }],
+  });
+
+  it("⚠️ 一个网络请求都不发；不记降级、不记传输", async () => {
+    let calls = 0;
+    const r = await buildPackResilient({
+      recipe: imported(), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      transport: { baseUrl: "http://x", apiKey: "k" },
+      fetchImpl: (async () => { calls++; return boom(); }) as unknown as typeof fetch,
+    });
+    expect(calls, "探测都没发 —— 一个不需要上游的包不该烧 token").toBe(0);
+    expect(r.used).toBe("none");
+    expect(r.probes).toEqual([]);
+    expect(r.manifest.provenance.degradations).toEqual([]);      // ← 曾经这里有一条假降级
+    expect(r.manifest.provenance.transport).toBeUndefined();     // 没有上游参与，就没有传输事实
+    expect(parseAssetPack(r.manifest).ok).toBe(true);
+    expect(explainDegradation(r.packDir)).toEqual([]);
+    expect(r.audit).toEqual([]);
+  });
+
+  it("离线也一样：不探测、不记账 —— **不是**「退到 procedural」", async () => {
+    const r = await buildPackResilient({
+      recipe: imported(), style: STYLE, outDir: tmp(), recipeDir: ROOT, offline: true,
+      transport: { baseUrl: "", apiKey: "" },
+    });
+    expect(r.used).toBe("none");
+    expect(r.manifest.provenance.degradations).toEqual([]);
+    expect(r.manifest.provenance.mode).toBe("imported");
+  });
+});
 
 describe("程序化兜底生成器", () => {
   const spec: AssetSpec = FULL.assets.find((a) => a.spec.kind === "animation")!.spec;
@@ -159,13 +204,13 @@ describe("程序化兜底生成器", () => {
 
 describe("explainDegradation —— 票 30 的义务：调用方必须看得见", () => {
   it("降级与传输切换分开说", async () => {
-    const r = await buildPackResilient({ recipe: recipe(), style: STYLE, outDir: tmp(), offline: true, transport: { baseUrl: "", apiKey: "" } });
+    const r = await buildPackResilient({ recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, offline: true, transport: { baseUrl: "", apiKey: "" } });
     const lines = explainDegradation(r.packDir);
     expect(lines.some((l) => /⚠️ 降级（drawlist）/.test(l))).toBe(true);
   });
   it("没降级时返回空数组", async () => {
     const r = await buildPackResilient({
-      recipe: recipe(), style: STYLE, outDir: tmp(), transport: { baseUrl: "http://x", apiKey: "k" },
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, transport: { baseUrl: "http://x", apiKey: "k" },
       fetchImpl: fetchBy(() => res200({}), () => res200(okJson())),
     });
     expect(explainDegradation(r.packDir)).toEqual([]);

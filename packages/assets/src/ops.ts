@@ -167,7 +167,10 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
   const style = JSON.parse(fs.readFileSync(styleAbs, "utf8")) as StyleSpec;
 
   const res = await buildPackResilient({
-    recipe: r.value, style, outDir: opts.outRoot, transport: opts.transport,
+    recipe: r.value, style, outDir: opts.outRoot,
+    // `source.ref` 相对**配方文件**解析（契约 `InputPath` 定的规则，与 `styleRef` 一致）
+    recipeDir: path.dirname(path.resolve(opts.recipePath)),
+    transport: opts.transport,
     ...(opts.endpoints ? { endpoints: opts.endpoints } : {}), ...(opts.fetchImpl ? { fetchImpl: opts.fetchImpl } : {}),
     ...(opts.offline ? { offline: true } : {}),
     ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
