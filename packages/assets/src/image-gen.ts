@@ -318,3 +318,162 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
     throw new ImageGenerationError(`Gemini 生图失败（${attempts} 次内）：${(lastErr as Error)?.message ?? String(lastErr)}`);
   };
 }
+
+// ── OpenAI 形态 ───────────────────────────────────────────────────────────────
+//
+// 2026-09-26 实测的往返（**中转** `api.krill-code.net/v1`，模型 `gpt-image-2.5`）：
+//
+//   POST {baseUrl}/images/generations          Authorization: Bearer <key>
+//   {"model":"gpt-image-2.5","prompt":…,"n":1,"size":"1024x1024"}
+//   → {"created":…, "output_format":"png", "size":"1024x1024", "data":[{"b64_json":"…"}]}
+//
+//   POST {baseUrl}/images/edits                 multipart，**要输入图时走这条**
+//   fields: model / prompt / n / size + `image[]`（可多张，字段名带方括号）
+//   → 形状与上面完全一样，也是 `data[0].b64_json`
+//
+// ⚠️ 六条实测事实（`.scratch/.../openai-trial/`）：
+//   ① **`background:"transparent"` 被原样回显、但不兑现** —— 返回的 PNG 是 `colorType 2`（无 alpha）。
+//      这一条与 DashScope / Gemini 同病。**但这个上游的背景是纯白平场**
+//      （四角 `#fefefe/#fffeff/#fffeff/#ffffff`，离中位色 `p50=0 p95=3`），
+//      比 DashScope 那张渐变洋红好抠得多 —— 容差 20 就能把底抹干净。
+//   ② **慢**：实测 28~48 秒一张（Gemini 是 11~18 秒）。超时必须给够，不然全在排队上失败。
+//   ③ **不认连接不通的兜底 200**：乱写路径是 520 —— 跟真路由分得开，所以形状错会**响**。
+//   ④ **尺寸是离散枚举**：`1024x1024` / `1536x1024` / `1024x1536` 三个**都实测通了**
+//      （回显与实际尺寸一致），没有 `auto` 之外的余地 —— 挑最近的，剩下的交给管线裁框。
+//   ⑤ **输入图只在 `/images/edits` 上有去处**。把图塞进 `generations` 的 body **不会报错** ——
+//      未知字段被静默忽略，回一张和输入毫无关系的图。那是最坏的一种失败：
+//      HTTP 200、有图、东西是错的。所以两条路由是**分开**的，不是「同一条多个字段」。
+//   ⑥ `/images/edits` 的 multipart **必须自带 content-length**（见 `multipartBody` 的注释）：
+//      缺了它 Node 走 chunked，中转的多部件解析器会回 `incomplete multipart stream`（400）——
+//      **那是形态错、不是端点不存在**，别被这个 400 骗过去。
+
+/**
+ * 这个形态认的画布尺寸。
+ *
+ * ⚠️ 与 Gemini 的 `aspectRatio` 不同，这里是**离散枚举**，只能挑最近的 ——
+ * 挑错的代价由管线的**裁到物体包围盒**兜住（真正定生死的是物体的包围盒，不是画布）。
+ */
+const OPENAI_SIZES: readonly { size: string; ar: number }[] = [
+  { size: "1024x1024", ar: 1 },
+  { size: "1536x1024", ar: 1.5 },
+  { size: "1024x1536", ar: 1 / 1.5 },
+];
+
+/** 取最接近目标长宽比的那个尺寸。对数比，2:1 与 1:2 的偏差才对称。 */
+export function openaiSize(size: { w: number; h: number }): string {
+  const want = size.w / size.h;
+  let best = OPENAI_SIZES[0]!;
+  let bestErr = Infinity;
+  for (const s of OPENAI_SIZES) {
+    const err = Math.abs(Math.log(s.ar / want));
+    if (err < bestErr) { bestErr = err; best = s; }
+  }
+  return best.size;
+}
+
+export type OpenAIOptions = {
+  baseUrl: string;
+  apiKey: string;
+  /** 实测这条中转上是 `gpt-image-2.5`。不给则交给上游的默认模型。 */
+  model?: string;
+  /** ⚠️ 默认比别处宽：实测一张 28~48 秒。 */
+  timeoutMs?: number;
+  attempts?: number;
+  /** 走 HTTP 代理。**openai 协议下这在境内几乎是必需的**（见 http.ts）。 */
+  fetchImpl?: typeof fetch;
+};
+
+/** 从 `images/generations` / `images/edits` 的回应里把第一张图抠出来（两者形状相同）。形状错就抛，绝不猜。 */
+function imageFromOpenAI(res: unknown): RasterImage {
+  const d = res as { error?: unknown; data?: { b64_json?: string; url?: string }[] };
+  if (d.error) throw new Error(`上游报错：${JSON.stringify(d.error).slice(0, 300)}`);
+  const first = d.data?.[0];
+  // ⚠️ 只认 b64 —— 实测这条中转回的就是 b64。若哪天回了 url，**不猜**：
+  // 那是另一种形态（要另一次下载、要处理临时链接），静默当成失败比猜错好。
+  if (typeof first?.b64_json !== "string" || !first.b64_json)
+    throw new Error(`回应里没有 b64_json：${JSON.stringify(d).slice(0, 250)}`);
+  return decodePNG(Buffer.from(first.b64_json, "base64"));
+}
+
+/**
+ * 手搓一个 multipart 正文。
+ *
+ * ⚠️ **两条都是实测踩出来的**：
+ *   ① 字段名是 **`image[]`**（带方括号），不是 `image` —— 这是 OpenAI edits 收多图的那个名字。
+ *   ② **必须自己带 `content-length`**。`createProxyFetch` 给的是 Buffer，Node 在缺 content-length 时
+ *      会走 chunked，而这条中转的多部件解析器**不吃 chunked** —— 实测报
+ *      `invalid multipart form: incomplete multipart stream`（HTTP 400），
+ *      补上 content-length 就 200 了。**那是形态错，不是端点不存在**，别被 400 骗过去。
+ */
+function multipartBody(fields: Record<string, string>, files: RasterImage[]): { body: Buffer; contentType: string } {
+  const B = "----game-maker-" + Math.random().toString(16).slice(2) + Date.now().toString(16);
+  const parts: Buffer[] = [];
+  for (const [k, v] of Object.entries(fields))
+    parts.push(Buffer.from(`--${B}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`));
+  files.forEach((img, i) => {
+    parts.push(Buffer.from(`--${B}\r\nContent-Disposition: form-data; name="image[]"; filename="input-${i}.png"\r\nContent-Type: image/png\r\n\r\n`));
+    parts.push(encodePNG(img));
+    parts.push(Buffer.from("\r\n"));
+  });
+  parts.push(Buffer.from(`--${B}--\r\n`));
+  return { body: Buffer.concat(parts), contentType: `multipart/form-data; boundary=${B}` };
+}
+
+export function createOpenAIGenerator(opts: OpenAIOptions): ImageGenerator {
+  const attempts = opts.attempts ?? 3;
+  const base = opts.baseUrl.replace(/\/+$/, "");
+
+  return async ({ prompt, size, negativePrompt, reference, styleReference }) => {
+    const t0 = Date.now();
+    const doFetch = opts.fetchImpl ?? fetch;
+    const requestedSize = openaiSize(size);
+    // 这个形态没有 `negative_prompt` 字段，只能把否定写进正文 —— 与 Gemini 同款处理。
+    const text = negativePrompt ? `${prompt}\n\nAvoid: ${negativePrompt}` : prompt;
+    // ⚠️ 有输入图就走 **`/images/edits`**：`/images/generations` 是纯文本端点，收不下图
+    // （实测把图塞进 generations 的 body 只会被当成未知字段**静默忽略**，回一张和输入毫无关系的图 ——
+    //  那正是最坏的一种失败：HTTP 200、有图、东西是错的）。
+    const inputs = [styleReference, reference].filter((x): x is RasterImage => !!x);
+    // ⚠️ 顺序有语义：**先风格图、后母版**，与 `ImageRequest` 的注释、与 Gemini 客户端一致。
+    const endpoint = inputs.length > 0 ? `${base}/images/edits` : `${base}/images/generations`;
+    const payload: { body: Buffer | string; headers: Record<string, string> } = inputs.length > 0
+      ? (() => {
+          const m = multipartBody({ ...(opts.model ? { model: opts.model } : {}), prompt: text, n: "1", size: requestedSize }, inputs);
+          return { body: m.body, headers: { "content-type": m.contentType, "content-length": String(m.body.length) } };
+        })()
+      : {
+          body: JSON.stringify({ ...(opts.model ? { model: opts.model } : {}), prompt: text, n: 1, size: requestedSize }),
+          headers: { "content-type": "application/json" },
+        };
+
+    let lastErr: unknown;
+    for (let i = 1; i <= attempts; i++) {
+      try {
+        const ac = new AbortController();
+        const timer = setTimeout(() => ac.abort(), opts.timeoutMs ?? 300_000);
+        let res: Response;
+        try {
+          res = await doFetch(endpoint, {
+            method: "POST",
+            headers: { ...payload.headers, authorization: `Bearer ${opts.apiKey}` },
+            body: payload.body,
+            signal: ac.signal,
+          });
+        } finally { clearTimeout(timer); }
+        if (!res.ok) throw new Error(`上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
+        const image = imageFromOpenAI(await res.json());
+        return {
+          image,
+          call: {
+            protocol: "openai", ms: Date.now() - t0, attempts: i,
+            requestedSize: inputs.length > 0 ? `${requestedSize} · edits ${inputs.length} 图` : requestedSize,
+          },
+        };
+      } catch (e) {
+        lastErr = e;
+        const msg = (e as Error).message ?? "";
+        if (i >= attempts || !/HTTP 5\d\d|fetch failed|aborted|network|ECONN|429/i.test(msg)) break;
+      }
+    }
+    throw new ImageGenerationError(`OpenAI 形态生图失败（${attempts} 次内）：${(lastErr as Error)?.message ?? String(lastErr)}`);
+  };
+}

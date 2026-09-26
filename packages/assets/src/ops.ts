@@ -11,7 +11,7 @@ import { createHash } from "node:crypto";
 import { parseAssetPack, parseRecipe, type AssetPackManifest, type StyleSpec } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences } from "./generate.js";
 import { buildAssetPack, type GenerateImage } from "./pack.js";
-import { createDashScopeMcpGenerator, createGeminiGenerator, ImageGenerationError } from "./image-gen.js";
+import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, styleBrief } from "./prompt.js";
@@ -174,9 +174,12 @@ function imageGeneratorFor(t: ImageTransport, fetchImpl?: typeof fetch): Generat
   switch (t.protocol) {
     case "dashscope-mcp": return createDashScopeMcpGenerator(common);
     case "gemini": return createGeminiGenerator({ ...common, ...(t.model ? { model: t.model } : {}) });
-    case "openai":
+    // ⚠️ `minimax` 仍然没写。它不是 "openai 换个 baseUrl" —— Minimax 的
+    // `/v1/image_generation` 是另一个形状（`image_urls`、`aspect_ratio`、回的是 url）。
+    // 没实测过就不猜。
+    case "openai": return createOpenAIGenerator({ ...common, ...(t.model ? { model: t.model } : {}) });
     case "minimax":
-      throw new CommandError("usage", `生图协议 "${t.protocol}" 的客户端**还没写**（只写了实测跑通过的 dashscope-mcp）。不要猜形状 —— 猜错了就是花着钱拿到一个空回应。`);
+      throw new CommandError("usage", `生图协议 "${t.protocol}" 的客户端**还没写**（已有的是 dashscope-mcp / gemini / openai）。不要猜形状 —— 猜错了就是花着钱拿到一个空回应。`);
   }
 }
 

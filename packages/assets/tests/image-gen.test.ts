@@ -2,8 +2,8 @@
 // 唯一没被这里覆盖的是「真上游收不收这种形状」，那需要真 key，见 experiments 里的实跑记录。
 import { describe, expect, it } from "vitest";
 import {
-  ImageGenerationError, createDashScopeMcpGenerator, createGeminiGenerator, encodePNG, emptyImage,
-  geminiAspect, requestSize,
+  ImageGenerationError, createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator,
+  encodePNG, emptyImage, geminiAspect, openaiSize, requestSize,
 } from "../src/index.js";
 
 const SECRET = "sk-THIS-MUST-NEVER-BE-PRINTED-0123456789";
@@ -196,5 +196,128 @@ describe("Gemini 客户端", () => {
       expect(e, name).toBeInstanceOf(ImageGenerationError);
       expect((e as Error).message, name).toMatch(/回应里没有图/);
     }
+  });
+});
+
+describe("OpenAI 形态客户端", () => {
+  const png64 = PNG.toString("base64");
+  const fakeOpenAI = (res: () => Response) => {
+    // ⚠️ body 可能是 JSON（generations）也可能是 Buffer（edits 的 multipart）—— 两种都要认，
+    // 不然这个假上游自己就成了「只测了一条路」的那种测试。
+    const seen: { url: string; auth?: string; json: Record<string, unknown>; raw: Buffer | null; contentType?: string; contentLength?: string }[] = [];
+    const impl = (async (url: string, init?: RequestInit) => {
+      const h = init?.headers as Record<string, string> | undefined;
+      const isBuf = init?.body instanceof Buffer;
+      seen.push({
+        url,
+        ...(h?.authorization ? { auth: h.authorization } : {}),
+        ...(h?.["content-type"] ? { contentType: h["content-type"] } : {}),
+        ...(h?.["content-length"] ? { contentLength: h["content-length"] } : {}),
+        raw: isBuf ? (init!.body as Buffer) : null,
+        json: isBuf ? {} : JSON.parse(String(init?.body)),
+      });
+      return res();
+    }) as unknown as typeof fetch;
+    return { impl, seen };
+  };
+  const g = (f: typeof fetch) => createOpenAIGenerator({ baseUrl: "https://api.example/v1/", apiKey: SECRET, model: "gpt-image-2.5", fetchImpl: f });
+  const ok = () => new Response(JSON.stringify({ created: 1, data: [{ b64_json: png64 }] }), { status: 200 });
+
+  it("尺寸是**离散枚举**，挑最接近的那个（不是按比例算一个出来）", () => {
+    // ⚠️ 与 DashScope 的 `宽*高` / Gemini 的 aspectRatio 都不同：这个形态只认三个固定值。
+    expect(openaiSize({ w: 16, h: 16 })).toBe("1024x1024");
+    expect(openaiSize({ w: 48, h: 48 })).toBe("1024x1024");
+    expect(openaiSize({ w: 32, h: 48 })).toBe("1024x1536");   // 0.667 → 竖版
+    expect(openaiSize({ w: 96, h: 48 })).toBe("1536x1024");   // 2:1 → 横版
+    expect(openaiSize({ w: 192, h: 48 })).toBe("1536x1024");  // 4:1 没有精确对应 —— 靠管线裁到物体包围盒救
+  });
+
+  it("走对端点（baseUrl 末尾的斜杠要吃掉）、带 Bearer、尺寸进 body", async () => {
+    const up = fakeOpenAI(ok);
+    const r = await g(up.impl)({ prompt: "a crate", size: { w: 32, h: 48 } });
+    expect(r.image.width).toBe(8);
+    expect(up.seen[0]!.url).toBe("https://api.example/v1/images/generations");
+    expect(up.seen[0]!.auth).toBe(`Bearer ${SECRET}`);
+    expect(up.seen[0]!.json).toMatchObject({ model: "gpt-image-2.5", n: 1, size: "1024x1536" });
+    expect(r.call).toMatchObject({ protocol: "openai", requestedSize: "1024x1536", attempts: 1 });
+    // ⚠️ key 绝不进记账
+    expect(JSON.stringify(r.call)).not.toContain(SECRET);
+  });
+
+  it("negativePrompt 拼进正文（这个形态也没有 negative_prompt 字段）", async () => {
+    const up = fakeOpenAI(ok);
+    await g(up.impl)({ prompt: "a crate", size: { w: 16, h: 16 }, negativePrompt: "scene, border" });
+    expect(String(up.seen[0]!.json.prompt)).toContain("Avoid: scene, border");
+    // 不传就**不要**出现那一段
+    const up2 = fakeOpenAI(ok);
+    await g(up2.impl)({ prompt: "a crate", size: { w: 16, h: 16 } });
+    expect(String(up2.seen[0]!.json.prompt)).toBe("a crate");
+  });
+
+  it("⚠️ 带参考图 → 走 **/images/edits**，multipart，且**自带 content-length**", async () => {
+    // 实测：/images/generations 收不下图（未知字段被静默忽略，回一张与输入无关的图）；
+    // 输入图只在 /images/edits 上有去处。
+    const up = fakeOpenAI(ok);
+    await g(up.impl)({ prompt: "walk", size: { w: 16, h: 16 }, reference: emptyImage(4, 4) });
+    expect(up.seen[0]!.url).toBe("https://api.example/v1/images/edits");
+    expect(up.seen[0]!.contentType).toMatch(/^multipart\/form-data; boundary=/);
+    // ⚠️ 缺了 content-length，Node 走 chunked，中转的多部件解析器直接 400
+    expect(Number(up.seen[0]!.contentLength)).toBe(up.seen[0]!.raw!.length);
+    const body = up.seen[0]!.raw!.toString("latin1");
+    expect(body).toContain('name="image[]"');       // 字段名带方括号，实测踩过
+    expect(body).toContain("filename=\"input-0.png\"");
+    expect(body).toContain("Content-Type: image/png");
+  });
+
+  it("两张输入图按「先风格图、后母版」的顺序排 —— 与提示词里的点名对得上", async () => {
+    const up = fakeOpenAI(ok);
+    await g(up.impl)({
+      prompt: "walk", size: { w: 16, h: 16 },
+      styleReference: emptyImage(4, 4), reference: emptyImage(6, 6),
+    });
+    const body = up.seen[0]!.raw!.toString("latin1");
+    expect(body.indexOf("input-0.png")).toBeLessThan(body.indexOf("input-1.png"));
+    expect((body.match(/name="image\[\]"/g) ?? []).length).toBe(2);
+  });
+
+  it("记账里写明这次走的是哪条路 —— 「带没带输入图」是两种很不一样的成功", async () => {
+    const withRef = await g(fakeOpenAI(ok).impl)({ prompt: "x", size: { w: 16, h: 16 }, reference: emptyImage(4, 4) });
+    const without = await g(fakeOpenAI(ok).impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(withRef.call.requestedSize).toContain("edits");
+    expect(without.call.requestedSize).not.toContain("edits");
+  });
+
+  it("没带参考图时**不要**走 edits（纯文本端点更省事，少一次多部件编码）", async () => {
+    const up = fakeOpenAI(ok);
+    await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(up.seen[0]!.url).toBe("https://api.example/v1/images/generations");
+    expect(up.seen[0]!.raw).toBeNull();
+  });
+
+  it("形状不对就抛，且带上原文，绝不猜", async () => {
+    for (const [name, body] of [
+      ["只有 url 没有 b64_json", { created: 1, data: [{ url: "https://img.example/a.png" }] }],
+      ["data 是空的", { created: 1, data: [] }],
+      ["上游报错", { error: { message: "insufficient balance" } }],
+    ] as [string, unknown][]) {
+      const up = fakeOpenAI(() => new Response(JSON.stringify(body), { status: 200 }));
+      const e = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
+      expect(e, name).toBeInstanceOf(ImageGenerationError);
+      expect((e as Error).message, name).toMatch(/没有 b64_json|上游报错/);
+    }
+  });
+
+  it("网络抖动重试、5xx 重试，4xx 不重试", async () => {
+    let n = 0;
+    const flaky = (async () => { if (++n === 1) throw new Error("fetch failed"); return ok(); }) as unknown as typeof fetch;
+    expect((await g(flaky)({ prompt: "x", size: { w: 16, h: 16 } })).call.attempts).toBe(2);
+
+    const up500 = fakeOpenAI(() => new Response("boom", { status: 500 }));
+    await expect(g(up500.impl)({ prompt: "x", size: { w: 16, h: 16 } })).rejects.toThrow(ImageGenerationError);
+    expect(up500.seen.length).toBe(3);   // attempts 默认 3
+
+    const up400 = fakeOpenAI(() => new Response("bad", { status: 400 }));
+    await expect(g(up400.impl)({ prompt: "x", size: { w: 16, h: 16 } })).rejects.toThrow(ImageGenerationError);
+    expect(up400.seen.length).toBe(1);
   });
 });

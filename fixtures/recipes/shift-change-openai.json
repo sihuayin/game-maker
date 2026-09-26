@@ -1,0 +1,128 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "shift-change-openai",
+  "styleRef": "../style-spec.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-odin",
+        "role": "玩家角色：中年店主 Odin Haraldsson",
+        "description": "戴绿毛线帽、灰绿旧夹克、胸口发光 CRT 显示屏的店主，含待机、走路、跳跃三种动作。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.88
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 5,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 12,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "obstacle-crates",
+        "role": "障碍：堆叠货箱",
+        "description": "革命军接管后堆在过道上的木条箱与塑料周转箱堆叠体，留有几道脏污磨痕。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.72
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "pickup-can",
+        "role": "拾取物：罐头",
+        "description": "贴着残旧纸标的小型罐头，可以被玩家捡起。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "store-interior-bg",
+        "role": "一整张店铺内景背景",
+        "description": "被接管的废弃杂货店内景：服务窗口、长柜台、密集货架、海报、通风管道、线缆与堆叠货物。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 320,
+          "h": 180
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "../reference/test.png",
+        "background": {
+          "tolerance": 30
+        }
+      }
+    }
+  ]
+}
