@@ -1,7 +1,7 @@
 # 02. Phaser 3 的插件系统能否支撑一个「自动采集」的 Runtime Bridge？
 
 Type: research
-Status: resolved
+Status: out-of-scope
 Blocked by: —
 Map: ../map.md
 

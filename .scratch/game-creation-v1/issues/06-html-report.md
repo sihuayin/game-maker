@@ -1,7 +1,7 @@
 # 06. 静态 HTML 评估报告长什么样？
 
 Type: prototype
-Status: resolved
+Status: out-of-scope
 Blocked by: —
 Map: ../map.md
 

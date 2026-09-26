@@ -2,8 +2,16 @@
 
 Type: task
 Status: open
-Blocked by: 24, 26, 27, 32
+Blocked by: 24, 26, 27, 32, 40
 Map: ../map.md
+
+> 🔴 **2026-09-26（[票 31](31-first-demo-game.md)）—— 本票新增两个前置与一份产出。**
+> ① **要真跑装配，仓库里就得先有那个包** —— 已连阻塞边到[票 40](40-last-train-fixture-pack.md)
+> （产出 `fixtures/packs/last-train/v1/`）。② **last-train 的 fixture game-config 归本票产** ——
+> 关卡布局依赖外壳的**视口尺寸与玩家尺寸**，所以只能等票 32 定完才写得准。
+> ③ 装配要兑现的两条已被票 31 钉死：**三层视差**与**一个会周期性运动的危险物**。
+> 另：R6「换包不重建」有了一次真正的试法 —— 同一份 game-config 吃 **drawlist 版**与
+> **生图版**两个包（后者由票 40 顺带产出），游戏代码一个字不动。
 
 > ✅ **装配 API 的形状已有硬约束**（2026-09-24，[票 03](03-phaser-vite-playwright-chain.md)）。
 >

@@ -1,7 +1,7 @@
 # 12. 结构化 Visual QA：检查什么、怎么量化、阈值多少？
 
 Type: grilling
-Status: resolved
+Status: out-of-scope
 Blocked by: —
 Map: ../map.md
 

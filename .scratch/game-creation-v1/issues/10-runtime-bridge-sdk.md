@@ -1,7 +1,7 @@
 # 10. Runtime Bridge SDK 的 API 设计
 
 Type: grilling
-Status: resolved
+Status: out-of-scope
 Blocked by: —
 Map: ../map.md
 
