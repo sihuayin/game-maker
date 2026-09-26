@@ -4,15 +4,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, deriveRecipe, exitCodeOf, exitCodeOfError, inspectPack, packAssets, verifyPack,
-  type CommandResult, type Endpoint,
+  CommandError, EXIT, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
+  type CommandResult,
 } from "@game-maker/assets";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 用法：
   game-maker derive --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
-  game-maker pack   --recipe <清单.json> [--out <目录>] [--json] [--offline]
+  game-maker pack   --recipe <清单.json> [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
 
@@ -21,8 +21,9 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   --json         输出机器可解析的 JSON（与人类输出是**同一份数据**）
 
 退出码：
-  0  成功（**包括降级成功** —— 脚本要分支就看 JSON 里的 degraded）
+  0  成功
   1  失败   2  参数错   3  上游不可达   4  产物/清单不合法
+  ⚠️ 3 在 2026-09-25 之前从 pack 里返回不出来（上游死活都被降级链兜住、照样出包）。
 
 环境变量：
   ANTHROPIC_BASE_URL · ANTHROPIC_AUTH_TOKEN   文本上游（生成与推导要用）
@@ -33,7 +34,7 @@ type Parsed = { command: string; positionals: string[]; flags: Record<string, st
 export function parseArgs(argv: readonly string[]): Parsed {
   const positional: string[] = [];
   const flags: Record<string, string | boolean> = {};
-  const takesValue = new Set(["requirement", "style", "out", "recipe", "endpoints"]);
+  const takesValue = new Set(["requirement", "style", "out", "recipe"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--help" || a === "-h") { flags.help = true; continue; }
@@ -50,8 +51,6 @@ export function parseArgs(argv: readonly string[]): Parsed {
 export function renderHuman(r: CommandResult): string {
   const out = [...r.summary];
   for (const a of r.artifacts) out.push(`→ ${a.path}`);
-  if (r.transport && r.transport.used !== r.transport.preferred)
-    out.push(`· 传输切换：${r.transport.preferred} → ${r.transport.used}`);
   return out.join("\n");
 }
 
@@ -82,8 +81,13 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
       }
       case "pack": {
         if (typeof flags.recipe !== "string") throw new CommandError("usage", "pack 需要 --recipe");
-        const endpoints = typeof flags.endpoints === "string" ? (flags.endpoints.split(",") as Endpoint[]) : undefined;
-        result = await packAssets({ recipePath: path.resolve(flags.recipe), outRoot, transport, ...(endpoints ? { endpoints } : {}), ...(flags.offline === true ? { offline: true } : {}) });
+        // 生图凭据：文件（已 gitignore）或环境变量，环境变量优先。没配也能跑 —— 只要清单里没有 image 资源。
+        const img = resolveImageTransport({ env: process.env, cwd: process.cwd() });
+        for (const w of img.warnings) io.err(`⚠️ ${w}\n`);
+        result = await packAssets({
+          recipePath: path.resolve(flags.recipe), outRoot, transport,
+          ...(img.transport ? { imageTransport: img.transport } : {}),
+        });
         break;
       }
       case "verify": {
@@ -100,7 +104,7 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
     }
 
     io.out((json ? JSON.stringify(result, null, 2) : renderHuman(result)) + "\n");
-    return exitCodeOf(result);
+    return EXIT.ok;
   } catch (e) {
     const code = exitCodeOfError(e);
     const message = e instanceof Error ? e.message : String(e);

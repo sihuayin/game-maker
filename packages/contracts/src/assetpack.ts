@@ -14,7 +14,17 @@
 import { z } from "zod";
 import { formatIssues, PaletteColor, PaletteRef } from "./drawlist.js";
 
-export const ASSET_PACK_FORMAT = "assetpack/v1" as const;
+/**
+ * 自描述的格式版本。
+ *
+ * ⚠️ **2026-09-25 由 `v1` 升到 `v2`**：`provenance.degradations` 与 `provenance.transport`
+ * 随降级链一起删除，而 `provenance` 是 `.strict()` —— 于是**改动之前生成的包再也解析不过**。
+ * 那不是「旧包坏了」，是**契约变了**，`format` 这个字段存在的意义就是把这件事说出来。
+ * 不升版的话，`verify` 一个完好的旧包会报「多了个不认识的键 degradations」——
+ * 一个像是**包**有毛病的说法，而毛病在契约这边。
+ * 旧包仍原样留在磁盘上（票 24：永不覆盖），只是这个版本的读码器读不了它。
+ */
+export const ASSET_PACK_FORMAT = "assetpack/v2" as const;
 
 // PaletteRef 从 drawlist.ts 复用 —— 同一个概念不写两份。
 
@@ -42,7 +52,10 @@ export const AssetKind = z.enum(["sprite", "animation", "background", "ui"]);
 
 /** 交付态像素颜色与色板的关系（票 36 定四值）。
  *  ⚠️ 前两个对 drawlist 资源是**解析期静态可判**的（`paletteBindingOf()`）；
- *  后两个只可能来自人工导入通道 —— 那正是「颜色 ∈ 色板」不成立的地方，所以要显式记下来。 */
+ *  后两个只可能来自位图通道（人工导入 / 生图）—— 那正是「颜色 ∈ 色板」不成立的地方，所以要显式记下来。
+ *  ⚠️ **`unbound` 保留**（2026-09-25）：曾与「必须有对应的降级记录」绑在一起，那条规则随降级链
+ *  一起删了，但这个**状态**不能删 —— 它是「不量化、颜色不受色板约束」的唯一写法，
+ *  删掉它就等于让这类包在结构上无法诚实，正是 9-25 修掉的 `imported` 那类 bug 的重演。 */
 export const PaletteBinding = z.enum(["exact", "composited", "quantized", "unbound"]);
 
 /** 谁造的。一个包里的资源可以来源不同，所以这一项是**逐资源**的。 */
@@ -143,10 +156,6 @@ export const AtlasEntry = z.object({
   checksum: Checksum,
 }).strict();
 
-const Degradation = z.object({
-  stage: z.string(), assetId: z.string().optional(), reason: z.string(), fellBackTo: z.string(),
-}).strict();
-
 export const AssetPackManifest = z.object({
   format: z.literal(ASSET_PACK_FORMAT),
   id: z.string().min(1),
@@ -159,17 +168,9 @@ export const AssetPackManifest = z.object({
      *  「一个 fixture 包谎报自己是 generated」因此是解析不通过，而不是一条能被忽略的约定。 */
     mode: PackMode,
     style: z.object({ origin: z.enum(["human-in-session", "fixture"]), ref: PackPath, stylespecId: z.string(), checksum: Checksum }).strict(),
-    degradations: z.array(Degradation).default([]),
-    /**
-     * 实际走的是什么传输 —— **诊断信息，不是降级**（票 14）。
-     *
-     * 端点故障转移（主协议被上游拒了、换另一个协议拿回**同样的东西**）不算降级：
-     * 产物一模一样。但不记下来的话，没人知道那天换过端点，下次同一个坑要重新踩一遍。
-     */
-    transport: z.object({
-      preferred: z.string(), used: z.string(),
-      switches: z.array(z.object({ from: z.string(), to: z.string(), reason: z.string() }).strict()).default([]),
-    }).strict().optional(),
+    // ⚠️ `degradations` 与 `transport` 于 2026-09-25 删除 —— 降级链整个拆掉了（票 14 被推翻）。
+    // 此前这里是「这条管线降级过」与「那天换过端点」的唯一落点；没有降级链之后两者都不存在。
+    // 生成的失败现在**就是失败**（退出码 3），不再有「可用的降级产物」这种东西要标注。
   }).strict(),
   palette: z.object({
     ref: z.string(), size: z.number().int().positive(),
@@ -196,9 +197,6 @@ export const AssetPackManifest = z.object({
     if (assetIds.has(a.id)) issue(["assets"], `资源 id 重复："${a.id}"`);
     assetIds.add(a.id);
     if (!atlasIds.has(a.atlasId)) issue(["assets"], `资源 "${a.id}" 指向不存在的图集 "${a.atlasId}"`);
-    // unbound 是「颜色 ∈ 色板」不成立的那一类，必须留下案底
-    if (a.paletteBinding === "unbound" && !m.provenance.degradations.some((d) => d.assetId === a.id))
-      issue(["provenance", "degradations"], `资源 "${a.id}" 的 paletteBinding 是 unbound，却没有对应的降级记录`);
   }
   for (const at of m.atlases)
     for (const id of at.assets)

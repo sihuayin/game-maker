@@ -39,7 +39,7 @@ const SCHEMA = `清单是 JSON，形如：
         "dependencies": [ "<别的资源 id>" ], "required": true,
         "animations": [ { "name": "<英文>", "frames": <整数>, "fps": <数字>, "loop": <布尔> } ]
       },
-      "source": { "kind": "generate" }
+      "source": { "kind": "drawlist" }
     }
   ]
 }

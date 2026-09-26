@@ -33,8 +33,48 @@ export const InputPath = z.string().min(1).superRefine((p, ctx) => {
   else if (p.split("/").some((s) => s === "")) issue("不允许空路径段");
 });
 
-/** 让管线去造（drawlist 路线）。**不写任何路径** —— 路径是产物，由管线自己产、自己记进 manifest。 */
-export const GenerateSource = z.object({ kind: z.literal("generate") }).strict();
+/**
+ * 让管线**画 drawlist**（创作态 = 指令表，可静态校验、可 diff）。
+ * **不写任何路径** —— 路径是产物，由管线自己产、自己记进 manifest。
+ *
+ * ⚠️ **2026-09-25 由 `generate` 改名**：生图路线进来之后，「管线生成」不再有区分度 ——
+ * 判别式要回答的是「**创作态是哪一种**」，答案现在是 drawlist / image / import。
+ */
+export const DrawlistSource = z.object({ kind: z.literal("drawlist") }).strict();
+
+/**
+ * 让管线**调生图模型**产原生位图（创作态 = 位图 + 那次调用的记录）。
+ *
+ * **多帧怎么拿一致性**（2026-09-26 实测，见 `experiments/master-to-animation/`）：
+ * 一次调用画一张「一排 N 个角色」的横图，然后由管线**按墨迹间隙分块**（`segmentRowCells`）。
+ * ⚠️ **不要指望等分切** —— 模型不按格子排版（实测要 6 帧给 5 个、间距还不均匀），
+ * 等分切会让逐帧头宽极差到 144；按间隙切则降到 **4**。
+ * ⚠️ **块数对不上就失败**，不静默取前 N 个 —— 与 drawlist 路线同一条规矩
+ * （「清单说要有 N 帧，生成器给了 M 帧」）。
+ */
+export const ImageSource = z.object({
+  kind: z.literal("image"),
+  /** 覆盖派生的提示词。不给就由 `imagePrompt()` 从 spec + StyleSpec 渲染。 */
+  prompt: z.string().min(1).optional(),
+  /**
+   * 参考图（**母版 → 动画**那条路）。相对**配方文件**解析，与 `import.ref` 同一条规则。
+   *
+   * ⚠️ 只有 Gemini 支持它：参考图是**内联**（base64）传的。DashScope 的 `image_edit`
+   * 硬要公网 URL，本机文件传不进去 —— 实测那家这条路走不通。
+   */
+  reference: InputPath.optional(),
+  /**
+   * 抠背景。**默认不抠**。
+   *
+   * ⚠️ 实测这个上游**没有透明底**（返回的是纯 RGB），所以多半得抠。而抠背景是
+   * `keyBackground`：**全局比色、不是连通域** —— 底色若同时是主体用色，会把主体抠穿。
+   * 实测同类角色的一帧有 73% 的像素就是世界色板的最暗色，所以提示词里的底色
+   * **绝不能在世界色板里**。见 `packages/assets/src/image-gen.ts` 的文件头。
+   */
+  background: z.object({ tolerance: z.number().nonnegative() }).strict().optional(),
+  /** alpha 二值化阈值，默认 0.5。`null` = 保留半透明边缘（不推荐，会产出色板外颜色）。 */
+  alphaThreshold: z.number().min(0).max(1).nullable().optional(),
+}).strict();
 
 /**
  * 人给的位图（[票 23](26-animation-representation.md) 定的两种形态）。
@@ -65,7 +105,7 @@ export const ImportSource = z.object({
   alphaThreshold: z.number().min(0).max(1).nullable().optional(),
 }).strict();
 
-export const AssetSource = z.discriminatedUnion("kind", [GenerateSource, ImportSource]);
+export const AssetSource = z.discriminatedUnion("kind", [DrawlistSource, ImageSource, ImportSource]);
 
 /** 清单的一项 = **纯意图的规格** + **帧从哪来**。两层在文件里就是分开的。 */
 export const RecipeEntry = z.object({

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { EXIT, exitCodeOfError, CommandError } from "@game-maker/assets";
@@ -12,7 +12,14 @@ const capture = (): CliIo & { lines: string[]; errors: string[] } => {
 const runC = (argv: string[]) => { const io = capture(); return run(argv, io).then((code) => ({ code, io })); };
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
-const PACK = ROOT + "out/shift-change-assets/pack/v5";
+// ⚠️ 不写死版本号：包是逐版新增的（票 24 永不覆盖），写死 v5 会在下一次构建后指向一个旧契约的包。
+const PACK = (() => {
+  const base = ROOT + "out/shift-change-assets/pack";
+  try {
+    const vs = readdirSync(base).map((d) => /^v(\d+)$/.exec(d)).filter((m) => m !== null).map((m) => Number(m![1])).sort((a, b) => b - a);
+    return vs.length > 0 ? `${base}/v${vs[0]}` : `${base}/v0`;
+  } catch { return `${base}/v0`; }
+})();
 const hasPack = (() => { try { readFileSync(PACK + "/manifest.json"); return true; } catch { return false; } })();
 
 describe("参数解析（手写，无依赖）", () => {
@@ -31,13 +38,9 @@ describe("参数解析（手写，无依赖）", () => {
 });
 
 describe("人类输出与 JSON 是**同一份数据**", () => {
-  it("renderHuman 只渲染 summary + artifacts + 传输切换", () => {
-    const r = { command: "pack", outcome: "ok" as const, summary: ["甲", "乙"], data: { a: 1 }, artifacts: [{ path: "out/x", kind: "asset-pack" }], degradations: [], transport: { preferred: "messages", used: "chat-completions", switches: [] } };
-    expect(renderHuman(r)).toBe("甲\n乙\n→ out/x\n· 传输切换：messages → chat-completions");
-  });
-  it("传输没切换时不提它", () => {
-    const r = { command: "pack", outcome: "ok" as const, summary: ["甲"], data: {}, artifacts: [], degradations: [], transport: { preferred: "messages", used: "messages", switches: [] } };
-    expect(renderHuman(r)).not.toMatch(/传输切换/);
+  it("renderHuman 只渲染 summary + artifacts —— 没有第二套数据", () => {
+    const r = { command: "pack", summary: ["甲", "乙"], data: { a: 1 }, artifacts: [{ path: "out/x", kind: "asset-pack" }] };
+    expect(renderHuman(r)).toBe("甲\n乙\n→ out/x");
   });
 });
 

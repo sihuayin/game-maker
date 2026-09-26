@@ -1,7 +1,7 @@
 {
   "format": "asset-recipe/v1",
-  "id": "shift-change-assets",
-  "styleRef": "authoring/stylespec.json",
+  "id": "shift-change-image-anim",
+  "styleRef": "../style-spec.json",
   "assets": [
     {
       "spec": {
@@ -42,7 +42,11 @@
         ]
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "reference": "../../inputs/master-to-animation/player-master.png",
+        "background": {
+          "tolerance": 40
+        }
       }
     },
     {
@@ -64,7 +68,10 @@
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
       }
     },
     {
@@ -86,7 +93,10 @@
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
       }
     },
     {
@@ -108,7 +118,10 @@
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
       }
     },
     {
@@ -130,7 +143,10 @@
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
       }
     },
     {
@@ -152,7 +168,10 @@
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
       }
     },
     {
@@ -167,14 +186,18 @@
           "y": 0
         },
         "size": {
-          "w": 640,
-          "h": 360
+          "w": 320,
+          "h": 180
         },
         "dependencies": [],
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "import",
+        "ref": "../reference/test.png",
+        "background": {
+          "tolerance": 30
+        }
       }
     },
     {
@@ -196,7 +219,10 @@
         "required": true
       },
       "source": {
-        "kind": "drawlist"
+        "kind": "image",
+        "background": {
+          "tolerance": 40
+        }
       }
     }
   ]

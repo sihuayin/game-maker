@@ -23,7 +23,7 @@ describe("清单接收真实推导出来的实例", () => {
   it("形状确实是 {spec, source} 两层", () => {
     for (const e of DERIVED.assets) {
       expect(Object.keys(e).sort()).toEqual(["source", "spec"]);
-      expect(e.source.kind).toBe("generate");
+      expect(e.source.kind).toBe("drawlist");
     }
   });
 
@@ -147,7 +147,7 @@ describe("AssetRecipe 与 AssetPackManifest 不共用类型（Spec 与 Artifact 
   it("拿一份 **manifest 形状**的对象当清单喂进去会被拒 —— 两者不共用类型", () => {
     // 一个最小的「包自描述」：有 atlasId / paletteBinding / checksum，没有 spec / source
     const manifestShaped = {
-      format: "assetpack/v1", id: "x", version: 1,
+      format: "assetpack/v2", id: "x", version: 1,
       assets: [{ id: "player", kind: "animation", paletteBinding: "exact", atlasId: "animations" }],
     };
     expect(parseRecipe(manifestShaped).ok).toBe(false);

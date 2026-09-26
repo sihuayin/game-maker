@@ -2,8 +2,9 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  cropToBox, decodePNG, downscaleArea, emptyImage, importBitmap, inkBBox, keyBackground,
-  paletteExactness, quantizeToPalette, sliceGrid, thresholdAlpha, trimToInk,
+  cropToBox, decodePNG, downscaleArea, emptyImage, importBitmap, importFrames, inkBBox,
+  keyBackground, paletteExactness, quantizeToPalette, sliceGrid, thresholdAlpha, trimToInk,
+  unionInkBBox,
 } from "../src/index.js";
 import type { RasterImage } from "../src/index.js";
 
@@ -100,6 +101,33 @@ describe("裁剪", () => {
     const empty = emptyImage(5, 5);
     expect(trimToInk(empty)).toBe(empty);
   });
+
+  it("trimToInk 的 floor：极淡的 alpha 不算墨（它过不了后续的二值化）", () => {
+    const img = emptyImage(10, 10);
+    for (let y = 3; y < 6; y++) for (let x = 4; x < 8; x++) setPx(img, x, y, [9, 9, 9, 255]);
+    setPx(img, 0, 0, [9, 9, 9, 1]);                       // 角落一颗肉眼不可见的孤点
+    const loose = trimToInk(img);                         // 旧判据：被那颗孤点撑到画布左上角
+    expect([loose.width, loose.height]).toEqual([8, 6]);  // 方块本占 x4~7 / y3~5，现在 x0~7 / y0~5
+    const t = trimToInk(img, { floor: 128 });             // 新判据：孤点不算墨，方块原样
+    expect([t.width, t.height]).toEqual([4, 3]);
+  });
+});
+
+describe("⚠️ alpha 孤点不得改变构图（2026-09-25 修正）", () => {
+  it("一颗 alpha=1 的孤点曾把角色缩到原大的 59%×88%", () => {
+    // 这条只有拿**真实素材**跑才暴露得了 —— 模型给的透明底 PNG 常有这类极淡噪点，
+    // 而合成的小图里没人会去种一颗 alpha=1 的像素。
+    const keyed = keyBackground(REAL, { tolerance: 30 }).image;
+    const speckled: RasterImage = { width: keyed.width, height: keyed.height, data: Buffer.from(keyed.data) };
+    speckled.data[3] = 90; speckled.data[4] = 106; speckled.data[5] = 138; speckled.data[6] = 1;   // 左上角
+
+    const opt = { targetHeight: 48, palette: PALETTE, background: { tolerance: 30 } } as const;
+    const clean = importBitmap(REAL, opt).report.trimmedTo;
+    const dirty = importBitmap({ ...speckled, width: keyed.width, height: keyed.height }, opt).report.trimmedTo;
+
+    expect(clean).toEqual({ w: 428, h: 809 });
+    expect(dirty).toEqual(clean);   // 孤点不得改变裁到哪
+  });
 });
 
 describe("sliceGrid —— 只在图真有网格时成立", () => {
@@ -195,5 +223,60 @@ describe("importBitmap —— 端到端，用真实素材", () => {
   it("pixelScale 做整数倍放大（像素风放大）", () => {
     const r = importBitmap(REAL, { targetHeight: 48, palette: PALETTE, background: {}, pixelScale: 2 });
     expect([r.width, r.height]).toEqual([50, 96]);
+  });
+});
+
+describe("⚠️ 多帧必须共用裁框（2026-09-25 修）", () => {
+  /** 真实素材抠完背景的样子 —— 它是**一个**角色，包围盒 428×809 @ (298,113)。 */
+  const keyed = keyBackground(REAL, { tolerance: 30 }).image;
+  /** 把右边缘一条墨抹掉：模拟走路循环里「腿并拢」那一帧 —— 包围盒**变窄**，但角色本身没动。 */
+  const narrower = (() => {
+    const img: RasterImage = { width: keyed.width, height: keyed.height, data: Buffer.from(keyed.data) };
+    for (let y = 0; y < img.height; y++) for (let x = 700; x < 730; x++) img.data[(y * img.width + x) * 4 + 3] = 0;
+    return img;
+  })();
+
+  // ⚠️ 判据取「**同一个特征**被画成多宽」，不能取「整帧的 ink 包围盒」——
+  // 后者两帧本来就该不同（b 的墨真的少了），测它等于测错了东西。
+  // 头部在两次里都是同一批像素，它被画成多宽**只**反映源图到交付网格的缩放系数。
+  const opt = { targetWidth: 32, targetHeight: 48, palette: PALETTE } as const;
+  const headWidth = (img: RasterImage) => {
+    const b = inkBBox(img)!;
+    let lo = Infinity, hi = -Infinity;
+    for (let y = b.y; y < b.y + Math.max(1, Math.round(b.h * 0.3)); y++)
+      for (let x = 0; x < img.width; x++)
+        if (img.data[(y * img.width + x) * 4 + 3] !== 0) { if (x < lo) lo = x; if (x > hi) hi = x; }
+    return hi - lo + 1;
+  };
+
+  it("逐帧各裁各的：同一个头被画成不同宽度（这就是那个 bug）", () => {
+    const a = headWidth(importBitmap(keyed, opt));
+    const b = headWidth(importBitmap(narrower, opt));
+    expect(a).not.toEqual(b);      // 实测 22 vs 23 —— 播起来就是逐帧缩放脉动
+  });
+
+  it("共用裁框：同一个头两帧画成同样的宽度", () => {
+    const [a, b] = importFrames([keyed, narrower], opt) as [RasterImage, RasterImage];
+    expect(headWidth(a)).toEqual(headWidth(b));      // 实测两帧都是 22
+    // 比例保住了，不代表内容相同 —— 窄掉的那条边是真没了
+    expect(a.data.equals(b.data)).toBe(false);
+  });
+
+  it("单帧走 importFrames 与走 importBitmap 等价", () => {
+    const one = importBitmap(keyed, opt);
+    const many = importFrames([keyed], opt)[0]!;
+    expect(many.data.equals(one.data)).toBe(true);
+  });
+
+  it("各帧尺寸必须一致 —— 不同尺寸无从并起，要报错而不是算出一个错的框", () => {
+    expect(() => importFrames([keyed, emptyImage(10, 10)], opt)).toThrow(/尺寸必须一致/);
+    expect(() => importFrames([], opt)).toThrow(/至少要有一帧/);
+  });
+
+  it("unionInkBBox 与 inkBBox 在单帧时一致；显式裁框越界要报错", () => {
+    expect(unionInkBBox([keyed])).toEqual(inkBBox(keyed));
+    expect(unionInkBBox([emptyImage(4, 4)])).toBeNull();
+    expect(() => importBitmap(keyed, { ...opt, trimBox: { x: 0, y: 0, w: 9999, h: 9999 } }))
+      .toThrow(/超出图像/);
   });
 });

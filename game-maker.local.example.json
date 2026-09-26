@@ -1,0 +1,32 @@
+{
+  "_说明": "复制成 game-maker.local.json 再填。那个文件名**已被 .gitignore 忽略**（本模板不忽略）。",
+  "_优先级": "环境变量 GAME_MAKER_IMAGE_* 优先于本文件。",
+  "_shape": "protocol 必填，三选一；不同协议下 baseUrl 的含义不同，见下。",
+  "image": {
+    "protocol": "openai",
+    "baseUrl": "https://api.openai.com/v1",
+    "apiKey": "<在这里填，不要提交>",
+    "model": "gpt-image-2.5",
+    "proxy": "http://127.0.0.1:9098"
+  },
+  "_minimax": {
+    "protocol": "minimax",
+    "baseUrl": "https://api.minimaxi.com/v1",
+    "apiKey": "<sk-...>",
+    "model": "image-01"
+  },
+  "_dashscope-mcp": {
+    "protocol": "dashscope-mcp",
+    "baseUrl": "https://dashscope.aliyuncs.com/api/v1/mcps/TextGenerateImage/mcp",
+    "apiKey": "<sk-...（必须是按量付费的 sk-，不是 Token Plan 的 sk-sp-）>"
+  },
+  "_proxy": "OpenAI 在境内直连不通、且 Node 原生 fetch 不认 HTTPS_PROXY，所以这一项对 openai 协议是必需的",
+  "_gemini": {
+    "_baseUrl": "Google AI Studio 是 https://generativelanguage.googleapis.com/v1beta；走中转就填中转的地址",
+    "protocol": "gemini",
+    "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+    "apiKey": "<AIza... 或中转的 key>",
+    "model": "gemini-2.5-flash-image",
+    "proxy": "http://127.0.0.1:9098"
+  }
+}

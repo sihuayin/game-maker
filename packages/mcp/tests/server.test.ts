@@ -1,10 +1,17 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { handle } from "../src/server.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
-const PACK = ROOT + "out/shift-change-assets/pack/v5";
+// ⚠️ 不写死版本号（同 cli.test.ts 的理由）
+const PACK = (() => {
+  const base = ROOT + "out/shift-change-assets/pack";
+  try {
+    const vs = readdirSync(base).map((d) => /^v(\d+)$/.exec(d)).filter((m) => m !== null).map((m) => Number(m![1])).sort((a, b) => b - a);
+    return vs.length > 0 ? `${base}/v${vs[0]}` : `${base}/v0`;
+  } catch { return `${base}/v0`; }
+})();
 const hasPack = (() => { try { readFileSync(PACK + "/manifest.json"); return true; } catch { return false; } })();
 
 /** 收下服务端发出的所有消息。 */
@@ -39,11 +46,12 @@ describe("MCP 协议面", () => {
     }
   });
 
-  it("⚠️ build_asset_pack 的 description 明确警告降级 —— agent 不能把兜底产物当正常产物", async () => {
+  it("⚠️ build_asset_pack 的 description 说明**没有兜底** —— 上游不可达就是失败，不是降级", async () => {
     const [r] = await drive([{ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }]);
     const build = r.result.tools.find((t: { name: string }) => t.name === "build_asset_pack");
-    expect(build.description).toMatch(/降级/);
-    expect(build.description).toMatch(/不要.*当成正常产物/);
+    expect(build.description).toMatch(/没有兜底/);
+    expect(build.description).toMatch(/退出码 3/);
+    expect(build.description).not.toMatch(/降级链是自动的/);
   });
 
   it("不认识的方法 → -32601；不认识的工具 → -32602", async () => {

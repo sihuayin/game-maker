@@ -9,6 +9,10 @@ dist/
 # 只有 inputs/ 与 fixtures/ 入库）。见票 29。
 out/
 
+# 本地凭据 —— **永不入库**（生图上游的 baseUrl 与 key，见 packages/assets/src/image-config.ts）
+game-maker.local.json
+*.local.json
+
 # Logs
 *.log
 

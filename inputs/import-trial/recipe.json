@@ -17,8 +17,7 @@
       },
       "source": {
         "kind": "import",
-        "ref": "station-keeper.png",
-        "background": { "tolerance": 30 }
+        "ref": "station-keeper.png"
       }
     },
     {
@@ -35,8 +34,7 @@
       },
       "source": {
         "kind": "import",
-        "ref": "station-signboard.png",
-        "background": { "tolerance": 30 }
+        "ref": "station-signboard.png"
       }
     }
   ]

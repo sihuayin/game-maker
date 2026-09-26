@@ -36,18 +36,16 @@ const TOOLS = [
     name: "build_asset_pack",
     description:
       "把一份资源清单变成一整个**资源包**（PNG 图集 + TexturePacker JSON + manifest + 创作态源文件）。\n" +
-      "**降级链是自动的**：首选端点 → 备用端点 → 不用 LLM 的程序化兜底。\n" +
-      "⚠️ **降级成功仍然是成功** —— 返回值里的 degraded / degradations 会告诉你是哪一层，" +
-      "以及产物是不是兜底画出来的色块。看到 degraded 为 true 时**不要**当成正常产物汇报。\n" +
+      "⚠️ **没有兜底**（2026-09-25 起）：文本上游不可达就直接失败，退出码 3。" +
+      "此前有一条「换端点 → 程序化兜底」的降级链，会照样吐出一个颜色方块拼的包 —— 那条已经拆掉。\n" +
       "何时用：清单已经过目、定稿了。\n" +
-      "会失败的情况：清单不过 schema；清单里 source.kind 是 import 而那个位图文件不存在。",
+      "会失败的情况：清单不过 schema；source.kind 是 import 而那个位图文件不存在；" +
+      "source.kind 是 drawlist 而文本上游不可达。",
     inputSchema: {
       type: "object",
       properties: {
         recipePath: { type: "string", description: "资源清单 JSON 的路径" },
         outDir: { type: "string", description: "产物根目录，默认 ./out" },
-        endpoints: { type: "array", items: { type: "string", enum: ["messages", "chat-completions"] }, description: "按顺序尝试的上游端点，默认 [messages, chat-completions]" },
-        offline: { type: "boolean", description: "跳过网络、直接走程序化兜底（离线构建）" },
       },
       required: ["recipePath"],
     },
@@ -116,8 +114,6 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             result = await packAssets({
               recipePath: String(args.recipePath), outRoot: String(args.outDir ?? "out"),
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
-              ...(Array.isArray(args.endpoints) ? { endpoints: args.endpoints as never } : {}),
-              ...(args.offline === true ? { offline: true } : {}),
               onProgress: (done, total, assetId) => tick(done / total, `正在生成 ${assetId}（${done + 1}/${total}）`),
             });
             break;

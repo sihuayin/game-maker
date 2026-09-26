@@ -88,13 +88,13 @@ Effort: game-creation-v1
 |---|---|
 | **R1** | 终点 = 两个可独立交付的产物。**重画本图的 Destination，不新开地图** |
 | **R2** | **自我修复 / 门禁闭环整体出局**（另开一张地图）。只保留**生成路径上**的确定性校验：schema 校验、色板引用、包围盒/尺寸越界 |
-| **R3** | **交付态 = 引擎中立的位图**（PNG + 标准图集/动画元数据）；**drawlist = 创作态主干**（可静态校验、可 diff、可精确修），随包交付作源文件。<br>⚠️ **2026-09-24 修正**（[票 35](issues/35-bitmap-provenance.md)）：交付态 PNG **全部**由光栅化器产出；「位图原生创作态」保留但**降格为人工导入通道**，**管线永不调用生图 API** |
+| **R3** | **交付态 = 引擎中立的位图**（PNG + 标准图集/动画元数据）；**drawlist = 创作态主干**（可静态校验、可 diff、可精确修），随包交付作源文件。<br>⚠️ **2026-09-24 修正**（[票 35](issues/35-bitmap-provenance.md)）：交付态 PNG **全部**由光栅化器产出；「位图原生创作态」保留但**降格为人工导入通道**，**管线永不调用生图 API**。 <br>⚠️ **2026-09-25 再修正**（见 R10）：位图原生创作态**新增一条「管线直调生图模型」的来源**，与人工导入并列；「交付态 PNG 全部由光栅化器产出」仍然成立（生图产物同样要过那条重建管线） |
 | **R4** | 资源种类：**sprite / animation / background / ui 四类一等公民**；**map 归 Game Config** —— 它是「引用其他资源的布局」，不是可绘制产物 |
 | **R5** | 消费形态：**core 库 → CLI → MCP server**。CLI 与 MCP 都是 core 的薄壳；**MCP 不 shell out 到 CLI**，避免两层进度协议 |
 | **R6** | A 与 B **完全解耦**：A 不需要游戏，B 不需要生图能力，两者之间只有一个可序列化的资源包文件。仓库内置 fixture 资源包 |
 | **R7** | 资源清单**两条路都开**（人给 / 由需求推导），但**清单先落盘成文件**；之后两条路完全同构 |
 | **R8** | demo = **固定 runtime + 数据**，AI **一笔代码都不写**。（Q15 再退一步：从「数据 + 纯函数」退到「只有数据」—— 绘制整体归资源管线） |
-| **R10** | **位图来源 = (c)+(a)**：drawlist 是唯一的**自动生成路径**；位图只经**人工导入通道**（`inputs/`）进来，管线**零生图 API 调用**。排除「换一家商用生图 API」（无付费意愿）与「继续用 Token Plan」（违反条款）。**代价明确接受**：放弃管线全自动产出有手绘质感的角色 |
+| **R10** | ~~**位图来源 = (c)+(a)**：drawlist 是唯一的**自动生成路径**；位图只经**人工导入通道**（`inputs/`）进来，管线**零生图 API 调用**。排除「换一家商用生图 API」（无付费意愿）与「继续用 Token Plan」（违反条款）。~~ <br>⚠️ **2026-09-25 修正（人类拍板）**：**推翻**。管线**自己调生图模型**（OpenAI），位图不再只从 `inputs/` 进来。排除 (b) 的那条腿是「**无付费意愿**」—— 人类已选定 OpenAI 并具备 key，那条腿消失；条款那条腿只约束千问 Token Plan，与 OpenAI 无关。**drawlist 路线保留**，与新路线**并列、各自都是显式选择**（不互相兜底）。**新增代价**：产物 A 从此**会失败**（生图不可用 = 整包失败 = 退出码 3），且钱与网络成为硬依赖 |
 | **R11** | **StyleSpec = 人机协作的一次交互产出**：人在 Claude Code 会话里让模型看图、产出 StyleSpec JSON、存成文件，**管线只消费文件**。这本就是条款点名的允许场景，且与 R7「清单两条路都开」同构。**产物 A 的入口因此是「一条命令 + 一次人工提取」，不是全自动** |
 | **R9** | monorepo **按产品切**：`contracts` / `assets` / `demo` / `cli` / `mcp`。npm 包为主；`cli` 额外出单文件 bundle；`mcp` 出 `npx` 可起的 stdio server；**资源包与站点目录是 zip / 目录，不是 npm 包** |
 
@@ -118,13 +118,31 @@ Effort: game-creation-v1
 > 但**没有改变 Destination**，因此不重画地图，只修正事实与相关票的范围。
 
 - **本地代理 = CC Switch**，基址 `ANTHROPIC_BASE_URL`，凭据 `ANTHROPIC_AUTH_TOKEN`。
+
+- 🔴 **2026-09-25 实测（生图凭据三连否）** —— 今天试过的每一条路都不通，**各不相同的理由**，
+  所以下次别再重查：
+  | 上游 | 结果 | 理由 |
+  |---|---|---|
+  | CC Switch `krill`（三台主机都试了） | 各 200/0、524、500 | `/v1/models` 里**列着** `gpt-image-2` / `gpt-image-2.5`，但**没有可用路由**：一台秒回兜底 200（与乱写路径无异），一台 126s 后 524（源站无响应），一台 60~78s 后 500 `image generation service unavailable`。Responses API 那条路把 `image_generation` 工具**剥成 `[]`** |
+  | DashScope 公共 MCP `…/mcps/TextGenerateImage/mcp` | **401 `InvalidApiKey`** | Token Plan 的 key 是 `sk-sp-` 前缀，**只在自己主机上有效**；`dashscope.aliyuncs.com` 只认按量付费的 `sk-`。鉴权头是对的（`Authorization: Bearer`；`X-DashScope-API-Key` 那根它压根不读，回的是「**No** API-key provided」） |
+  | Token Plan 自己主机 | **429 `Throttling.AllocationQuota`** | 认证**通过**，但「1-month quota has been exhausted，**复位 2026-10-15 16:00 UTC**」（官方原文，比票 34 当时的记录更硬） |
+  | MiniMax | 200 但 `insufficient balance`(1008) | 端点与模型名都对（`POST /v1/image_generation`、`model: image-01`），**只差余额** |
+  | dragoncode.codes | 403 `INSUFFICIENT_BALANCE` | 同上 |
+  | CC Switch 里的 OpenAI / Google Official | 配置是空的 | 没有凭据 |
+  **能够解锁生图的最小动作**：① 开一把 DashScope 按量付费 key（`sk-`）→ 上面那个 MCP 端点就能用；
+  ② 或 OpenAI 官方 key；③ 或给 MiniMax 充值。
+  **不需要钱、今天就能用的那条**是交互式路线（人在网页出图 → `inputs/` → 导入通道），
+  通道已端到端验通。
 - 🔴 **2026-09-24 22:xx 实测：文本路径的 `/v1/chat/completions` 已经不通了 ——
   代理又故障转移到一个新 provider（`dragoncode.codes`），而那个账号
   `INSUFFICIENT_BALANCE`（HTTP 403）。** 同一时刻 **`/v1/messages` 仍然可用**
   （0.7s、干净 JSON、也仍然能收图）。票 01 那份「文本走 chat/completions」的配方因此作废。
   → 生成器的端点已做成**参数**（默认 `/v1/messages`），因为这条路在变。
-  **这就是「代理活不过重启」的现场重演**：[票 14](issues/14-degradation-chain.md)（降级链）
-  仍然在 frontier 上，而这次它不再是「理论上的兜底」——**它就是眼下的常态**。
+  ~~**这就是「代理活不过重启」的现场重演**：票 14（降级链）仍然在 frontier 上，
+  而这次它不再是「理论上的兜底」——**它就是眼下的常态**。~~
+  ⚠️ **2026-09-25 已废**：降级链整个拆除（见 R10 修正）。上游不可达现在**就是失败**，
+  不再有「照样出包、只是难看」这回事。这条现象的真正后果因此变了 —— 它不再是
+  「产物会难看」，而是**「产物会没有」**。
   另：一端 403 期间我连试三次，同一个 provider 也不稳定（同一份 prompt 有时通有时不通）。
 
 - ⚠️ **2026-09-24 21:xx 实测：视觉路径现在通了**（第三次翻转，见下面被划掉的那条）。

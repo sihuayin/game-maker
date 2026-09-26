@@ -28,11 +28,16 @@ export function resizeNearest(img: RasterImage, width: number, height: number): 
 }
 
 /** 非透明像素的包围盒。全透明时返回 null。 */
-export function inkBBox(img: RasterImage): { x: number; y: number; w: number; h: number } | null {
+export function inkBBox(
+  img: RasterImage,
+  /** alpha 下限。`1` = 任何非零 alpha 都算墨（缺省，向后兼容）。 */
+  opts: { floor?: number } = {},
+): { x: number; y: number; w: number; h: number } | null {
+  const floor = opts.floor ?? 1;
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (let y = 0; y < img.height; y++)
     for (let x = 0; x < img.width; x++)
-      if (img.data[(y * img.width + x) * 4 + 3] !== 0) {
+      if (img.data[(y * img.width + x) * 4 + 3]! >= floor) {
         if (x < x0) x0 = x;
         if (y < y0) y0 = y;
         if (x > x1) x1 = x;

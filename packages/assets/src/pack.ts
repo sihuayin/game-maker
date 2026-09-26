@@ -11,15 +11,21 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { derivePackMode, paletteBindingOf, type AssetPackManifest, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { ASSET_PACK_FORMAT, derivePackMode, paletteBindingOf, type AssetPackManifest, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
-import { importBitmap, sliceGrid } from "./import.js";
+import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
+import { segmentRowCells } from "./sheet.js";
+import { imageNegativePrompt, imagePrompt } from "./prompt.js";
+import type { ImageGenCall, ImageRequest } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
 import { rasterize } from "./raster.js";
 
 /** drawlist 的生成端口。**由票 22 提供实现**；本模块只调用。 */
 export type DrawListGenerator = (spec: AssetSpec, style: StyleSpec) => DrawList[] | Promise<DrawList[]>;
+
+/** 生图端口。**由调用方提供实现**（本模块只调）。一个资源一次调用、出一张原图。 */
+export type GenerateImage = (req: ImageRequest) => Promise<{ image: RasterImage; call: ImageGenCall }>;
 
 export type BuildPackOptions = {
   recipe: { id: string; styleRef: string; assets: readonly { spec: AssetSpec; source: AssetSourceLike }[] };
@@ -40,23 +46,18 @@ export type BuildPackOptions = {
    */
   recipeDir: string;
   generate: DrawListGenerator;
+  /** 清单里有 `kind: "image"` 的资源时必填，否则**开跑前**就失败（不静默跳过）。 */
+  generateImage?: GenerateImage;
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
   generator?: { name: string; version: string; run?: string };
-  /**
-   * provenance 里由**调用方**决定的两块（票 14）：
-   * 降级记录与传输诊断。降级链在**整包**层面决定，组装只负责如实写下来。
-   */
-  provenance?: {
-    degradations?: { stage: string; assetId?: string; reason: string; fellBackTo: string }[];
-    transport?: { preferred: string; used: string; switches: { from: string; to: string; reason: string }[] };
-  };
   /** 逐资源的进度回报（MCP 的 `notifications/progress` 用它，票 30）。 */
   onProgress?: (done: number, total: number, assetId: string) => void;
 };
 
 type AssetSourceLike =
-  | { kind: "generate" }
+  | { kind: "drawlist" }
+  | { kind: "image"; prompt?: string; reference?: string; background?: { tolerance: number }; alphaThreshold?: number | null }
   | {
       kind: "import"; ref: string;
       sheet?: { columns: number; rows: number; frameWidth: number; frameHeight: number; offsetX?: number; offsetY?: number; spacingX?: number; spacingY?: number; names: string[]; animations?: { name: string; frames: string[] }[] };
@@ -67,6 +68,8 @@ type AssetSourceLike =
 export type BuildPackResult = {
   manifest: AssetPackManifest;
   packDir: string;
+  /** 生图调用的事实记录（几个资源、几次调用、各自多久）—— 这是**钱**的账，交调用方报出来。 */
+  imageCalls: ({ assetId: string } & ImageGenCall)[];
   /** spec ↔ 产物的对账结果（`auditAssetSpec`）。**有内容不等于失败** —— 交调用方决定。 */
   audit: string[];
 };
@@ -142,9 +145,13 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   fs.mkdirSync(path.join(packDir, "delivery"), { recursive: true });
   fs.mkdirSync(path.join(packDir, "authoring", "drawlist"), { recursive: true });
   fs.mkdirSync(path.join(packDir, "authoring", "imported"), { recursive: true });
+  // 生图产物的原图与提示词落在这里（这两个目录是**创作态**，与 imported/ 并列）
+  fs.mkdirSync(path.join(packDir, "authoring", "generated"), { recursive: true });
 
   type Built = { spec: AssetSpec; origin: "generated" | "imported"; paletteBinding: "exact" | "composited" | "quantized"; frames: { name: string; state?: string; image: RasterImage }[]; animations?: { name: string; frames: string[]; fps?: number; loop: boolean }[]; authoring: { kind: "drawlist" | "bitmap"; ref: string; original?: string }[] };
   const built: Built[] = [];
+  /** 生图调用的账 —— 一次调用就是一笔钱，逐条记下来交调用方报出来。 */
+  const imageCalls: ({ assetId: string } & ImageGenCall)[] = [];
 
   for (const [idx, entry] of recipe.assets.entries()) {
     const spec = entry.spec;
@@ -155,7 +162,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
     let origin: Built["origin"] = "generated";
     let binding: Built["paletteBinding"] = "exact";
 
-    if (entry.source.kind === "generate") {
+    if (entry.source.kind === "drawlist") {
       const drawlists = await generate(spec, style);
       if (drawlists.length !== plan.length)
         throw new Error(`资源 "${spec.id}"：清单说要有 ${plan.length} 帧，生成器给了 ${drawlists.length} 帧`);
@@ -169,6 +176,76 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       });
       // 票 36：对 drawlist 资源，绑定关系是**解析期静态**的 —— 不需要渲染后再扫
       binding = drawlists.some((d) => paletteBindingOf(d.ops) === "composited") ? "composited" : "exact";
+    } else if (entry.source.kind === "image") {
+      const src = entry.source;
+      if (!opts.generateImage)
+        throw new Error(`资源 "${spec.id}" 是 source.kind="image"，但调用方没给 generateImage —— 这是**调用方的 bug**，不静默跳过`);
+      origin = "generated";
+      // 生图产物**同样过那条重建管线**（抠背景 → 裁框 → 降采样 → 二值化 → 量化），
+      // 所以它与导入通道在结构上是同一种东西：都是「原生位图」这一创作态。
+      binding = "quantized";
+      const reference = src.reference
+        ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
+        : undefined;
+      // ⚠️ **一个动画一次调用**，不是一个资源一次。实测把 14 帧塞进一次调用，模型只给回来 1 个角色。
+      const units: { anim?: string; frames: number; raw: string }[] =
+        spec.kind === "animation"
+          ? spec.animations.map((a) => ({ anim: a.name, frames: a.frames, raw: `authoring/generated/${spec.id}.${a.name}.png` }))
+          : [{ frames: 1, raw: `authoring/generated/${spec.id}.png` }];
+
+      // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
+      // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
+      const batches: RasterImage[][] = [];
+      for (const u of units) {
+        const prompt = src.prompt ?? imagePrompt(spec, style, u.anim);
+        const { image, call } = await opts.generateImage({
+          prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
+          negativePrompt: imageNegativePrompt(), ...(reference ? { reference } : {}),
+        });
+        // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
+        fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));
+        fs.writeFileSync(path.join(packDir, u.raw.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
+        const cells: RasterImage[] = [];
+        batches.push(cells);
+        if (u.frames === 1) { cells.push(image); }
+        else {
+          // ⚠️ **按墨迹间隙分块**，不等分 —— 实测模型不按格子排版（见 sheet.ts 的文件头）。
+          // ⚠️ 分块看的是 alpha，所以要先**抠一份**出来当探针；原图（纯 RGB）每一列都有"墨"。
+          if (!src.background)
+            throw new Error(
+              `资源 "${spec.id}" 的动画 "${u.anim}" 是多帧，但 source 没给 \`background\` —— ` +
+              "分块靠的是抠掉背景之后的 alpha，不抠就切不开（实测会把一整排 4 个角色判成 1 块）。",
+            );
+          const probe = keyBackground(image, src.background).image;
+          const seg = segmentRowCells(image, probe);
+          if (seg.cells.length !== u.frames)
+            throw new Error(
+              `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
+              "生图模型的帧数不可信（实测要 6 给 5）。要么重出这张图，要么把 spec 的帧数改成它真能画出来的数量 —— " +
+              "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。",
+            );
+          cells.push(...seg.cells);
+        }
+        imageCalls.push({ assetId: spec.id, ...call });
+      }
+      const raw = units[0]!.raw;
+      const results = batches.flatMap((cells) =>
+        importFrames(cells, {
+          palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
+          ...(src.background !== undefined ? { background: src.background } : {}),
+          ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
+        }),
+      );
+      const stateOf = new Map<string, string>();
+      if (spec.kind === "animation") {
+        let k = 0;
+        for (const a of spec.animations) for (let i = 0; i < a.frames; i++) stateOf.set(plan[k++]!.name, a.name);
+      }
+      plan.forEach((p, i) => {
+        // 创作态落一次就够（多帧时帧名不同，都指向同一批原图）
+        if (i === 0) authoring.push({ kind: "bitmap", ref: raw, original: units.length > 1 ? `生图 · ${units.length} 个动画各一次调用` : "生图" });
+        frames.push({ name: p.name, state: stateOf.get(p.name), image: results[i]! });
+      });
     } else {
       // ⚠️ 先把 source 取出来再进闭包 —— 闭包里会丢掉判别式的收窄
       const src = entry.source;
@@ -182,12 +259,16 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       if (crops.length !== names.length) throw new Error(`资源 "${spec.id}"：网格切出 ${crops.length} 帧，清单给了 ${names.length} 个名字`);
       const animOf = new Map<string, string>();
       for (const a of src.sheet?.animations ?? []) for (const n of a.frames) animOf.set(n, a.name);
+      // ⚠️ 全部帧**一次过** `importFrames`：它让各帧共用同一个裁框。
+      // 逐帧各裁各的会让同一角色在帧间改变位置**与缩放**（`tw/th` 是从裁完的图推的），
+      // 而且会让逐资源声明的 `spec.anchor` 每帧落在角色身上不同的位置。
+      const imported = importFrames(crops, {
+        palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
+        ...(src.background !== undefined ? { background: src.background } : {}),
+        ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
+      });
       names.forEach((name, i) => {
-        const r = importBitmap(crops[i]!, {
-          palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
-          ...(src.background !== undefined ? { background: src.background } : {}),
-          ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
-        });
+        const r = imported[i]!;
         const dest = `authoring/imported/${name}${path.extname(srcPath)}`;
         fs.writeFileSync(path.join(packDir, dest), encodePNG(crops[i]!));
         // `original` 写**清单里的原样字符串**（即相对配方文件的那个 ref），不写解析后的绝对路径：
@@ -244,7 +325,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   // ── manifest ─────────────────────────────────────────────────────────────
   const epoch = opts.sourceDateEpoch ?? Number(process.env.SOURCE_DATE_EPOCH ?? Math.floor(Date.now() / 1000));
   const manifest: AssetPackManifest = {
-    format: "assetpack/v1",
+    format: ASSET_PACK_FORMAT,
     id: recipe.id,
     version,
     createdAt: new Date(epoch * 1000).toISOString(),
@@ -254,8 +335,6 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       //   否则写入侧与校验侧一漂移，合法的包会被判成「矛盾」。
       mode: derivePackMode(built.map((b) => b.origin)),
       style: { origin: "human-in-session", ref: "authoring/stylespec.json", stylespecId: style.id, checksum: sha256(Buffer.from(styleDoc)) },
-      degradations: opts.provenance?.degradations ?? [],
-      ...(opts.provenance?.transport ? { transport: opts.provenance.transport } : {}),
     },
     palette: {
       ref: "authoring/stylespec.json#/palette", size: palette.length, values: palette,
@@ -302,5 +381,5 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   // 全部成功才搬过去 —— 这一步之后才对「绝不覆盖」的版本号负责
   fs.mkdirSync(path.dirname(finalDir), { recursive: true });
   fs.renameSync(packDir, finalDir);
-  return { manifest, packDir: finalDir, audit };
+  return { manifest, packDir: finalDir, audit, imageCalls };
 }

@@ -97,9 +97,20 @@ export function cropToBox(img: RasterImage, box: Box): RasterImage {
   return out;
 }
 
-/** 裁到非透明像素的包围盒。全透明则原样返回（那是上游出错了，不该在这里静默产出 0×0）。 */
-export function trimToInk(img: RasterImage): RasterImage {
-  const box = inkBBox(img);
+/**
+ * 裁到非透明像素的包围盒。全透明则原样返回（那是上游出错了，不该在这里静默产出 0×0）。
+ *
+ * ⚠️ **`floor` 取的是「会活下来的」alpha 下限，不是 `!== 0`**（2026-09-25 修正）。
+ * 判据 `alpha !== 0` 与紧随其后的 `thresholdAlpha` 不自洽：一颗 alpha=1 的孤点会被它算作墨，
+ * 于是包围盒被撑满整张画布，而那个像素在二值化后**根本不会出现**。
+ * 实测（`experiments/real-generation/measure-import.mjs`）：一颗这样的孤点把角色在 32×48 里
+ * 从 32×48 缩到 19×42，即**角色被缩到原大的 59%×88%**。
+ * 模型给的透明底 PNG 常有这类极淡的 alpha 噪点，所以这条通道上它会真的发生。
+ * 取 `alphaThreshold`（默认 0.5 ⇒ 128）之后，判据变成「这一像素自己就能通过二值化」——
+ * 与最终结果一致，而不是与一个将被丢弃的中间量一致。
+ */
+export function trimToInk(img: RasterImage, opts: { floor?: number } = {}): RasterImage {
+  const box = inkBBox(img, opts);
   return box ? cropToBox(img, box) : img;
 }
 
@@ -145,6 +156,13 @@ export type ImportOptions = {
   alphaThreshold?: number | null;
   /** 裁到非透明包围盒，默认 true。 */
   trim?: boolean;
+  /**
+   * 指定的裁框。给了就**不再按本帧自己的 ink 包围盒裁**。
+   *
+   * ⚠️ 多帧资源**必须**走这条路（经 `importFrames`）—— 逐帧各裁各的会让同一角色
+   * 在帧与帧之间改变位置与缩放，见 `importFrames` 的注释。
+   */
+  trimBox?: Box;
   /** 整数倍放大（像素风放大），默认 1。 */
   pixelScale?: number;
 };
@@ -162,29 +180,56 @@ export type ImportResult = RasterImage & {
   };
 };
 
-/**
- * 导入管线：抠背景 → 裁到包围盒 → 面积平均降采样 → alpha 二值化 → 量化到色板。
- *
- * 顺序不是随意的：**先降采样再量化**，而不是反过来。
- * 反过来的话，被量化掉的颜色在降采样时还会参与平均 —— 等于用一堆已经丢掉的信息
- * 去决定每一格的颜色。实测（票 23 原型）三种降采样策略的对比见
- * `experiments/bitmap-import-draft/`。
- */
-export function importBitmap(img: RasterImage, opts: ImportOptions): ImportResult {
+/** 裁框判据的 alpha 下限 —— 与 `thresholdAlpha` 同一把尺子（见 `trimToInk` 的注释）。 */
+function inkFloor(alphaThreshold: number | null | undefined): number {
+  return alphaThreshold === null ? 1 : Math.max(1, Math.round((alphaThreshold ?? 0.5) * 255));
+}
+
+/** 几帧的 ink 包围盒的**并集**（同一坐标系里算 —— 调用方须保证各帧同尺寸）。全透明返回 null。 */
+export function unionInkBBox(images: readonly RasterImage[], opts: { floor?: number } = {}): Box | null {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const img of images) {
+    const b = inkBBox(img, opts);
+    if (!b) continue;
+    if (b.x < x0) x0 = b.x;
+    if (b.y < y0) y0 = b.y;
+    if (b.x + b.w - 1 > x1) x1 = b.x + b.w - 1;
+    if (b.y + b.h - 1 > y1) y1 = b.y + b.h - 1;
+  }
+  return x1 < x0 ? null : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+type Prepared = { keyed: RasterImage; report: ImportResult["report"] };
+
+/** 抠背景那一段。单独拆出来是因为多帧要先知道**每帧**的 ink 在哪，才能算并集框。 */
+function prepareFrame(img: RasterImage, opts: ImportOptions): Prepared {
   const report: ImportResult["report"] = {
     sourceSize: { w: img.width, h: img.height }, keyedPixels: 0, backgroundColors: [],
     trimmedTo: null, distinctColorsBeforeQuantize: 0,
   };
-  let cur = img;
-  if (opts.background) {
-    const k = keyBackground(cur, opts.background);
-    cur = k.image;
-    report.keyedPixels = k.keyedPixels;
-    report.backgroundColors = k.backgroundColors;
-  }
+  if (!opts.background) return { keyed: img, report };
+  const k = keyBackground(img, opts.background);
+  report.keyedPixels = k.keyedPixels;
+  report.backgroundColors = k.backgroundColors;
+  return { keyed: k.image, report };
+}
+
+/** 裁框 → 降采样 → 二值化 → 量化那一段。`box` 是同资源各帧共用的并集框；null = 各帧裁自己的。 */
+function finishFrame(prepared: Prepared, opts: ImportOptions, box: Box | null): ImportResult {
+  const { report } = prepared;
+  let cur = prepared.keyed;
   if (opts.trim !== false) {
     const before = { w: cur.width, h: cur.height };
-    cur = trimToInk(cur);
+    // 优先用**显式框**，其次用**同资源共用框**，都没有才裁到本帧自己的包围盒。
+    // 裁框判据用「会活下来的」像素 —— 与下面的 thresholdAlpha 同一把尺子（见 trimToInk 的注释）。
+    const use = opts.trimBox ?? box;
+    if (use) {
+      if (use.x < 0 || use.y < 0 || use.x + use.w > cur.width || use.y + use.h > cur.height)
+        throw new Error(`裁框 ${use.x},${use.y} ${use.w}×${use.h} 超出图像 ${cur.width}×${cur.height}`);
+      cur = cropToBox(cur, use);
+    } else {
+      cur = trimToInk(cur, { floor: inkFloor(opts.alphaThreshold) });
+    }
     if (cur.width !== before.w || cur.height !== before.h) report.trimmedTo = { w: cur.width, h: cur.height };
   }
 
@@ -204,4 +249,46 @@ export function importBitmap(img: RasterImage, opts: ImportOptions): ImportResul
   const scale = opts.pixelScale ?? 1;
   const final = scale === 1 ? quantized : resizeNearest(quantized, tw * scale, th * scale);
   return Object.assign(final, { grid, report });
+}
+
+/**
+ * 导入管线：抠背景 → 裁到包围盒 → 面积平均降采样 → alpha 二值化 → 量化到色板。
+ *
+ * 顺序不是随意的：**先降采样再量化**，而不是反过来。
+ * 反过来的话，被量化掉的颜色在降采样时还会参与平均 —— 等于用一堆已经丢掉的信息
+ * 去决定每一格的颜色。实测（票 23 原型）三种降采样策略的对比见
+ * `experiments/bitmap-import-draft/`。
+ *
+ * ⚠️ **单帧**用这个；多帧用 `importFrames`（各帧必须共用裁框，理由见那里）。
+ */
+export function importBitmap(img: RasterImage, opts: ImportOptions): ImportResult {
+  return finishFrame(prepareFrame(img, opts), opts, null);
+}
+
+/**
+ * 一次导入**一个资源的多帧** —— 全部帧共用同一个裁框。
+ *
+ * ⚠️ **为什么必须共用**（2026-09-25 修）：此前 `pack.ts` 逐帧调 `importBitmap`，
+ * 它逐帧裁到各自的 ink 包围盒，而 `tw/th` 又是从**裁完的**图推的 ——
+ * 于是「腿并拢」与「腿分开」两帧不只位置不同，**缩放也不同**，同一角色逐帧脉动。
+ * 更根本的是 `AssetSpec.anchor` 是**逐资源**声明的：逐帧裁框让同一个 anchor
+ * 在每一帧落在角色身上不同的位置，**anchor 语义在动画资源上因此失效**。
+ * 共用并集框之后，各帧之间的相对位置与比例被原样保留，anchor 才有的放矢。
+ *
+ * 代价：并集框比任何单帧的都大，所以单看某帧角色会略小 —— 那是这个动画的**真实**范围。
+ */
+export function importFrames(images: readonly RasterImage[], opts: ImportOptions): ImportResult[] {
+  if (images.length === 0) throw new Error("importFrames: 至少要有一帧");
+  const { width, height } = images[0]!;
+  for (const img of images)
+    if (img.width !== width || img.height !== height)
+      throw new Error(
+        `importFrames: 各帧尺寸必须一致（第一帧 ${width}×${height}，有一帧是 ${img.width}×${img.height}）—— ` +
+        "并集裁框是在同一个坐标系里算的，尺寸不同就无从并起",
+      );
+  const prepared = images.map((img) => prepareFrame(img, opts));
+  const box = opts.trim === false
+    ? null
+    : unionInkBBox(prepared.map((p) => p.keyed), { floor: inkFloor(opts.alphaThreshold) });
+  return prepared.map((p) => finishFrame(p, opts, box));
 }

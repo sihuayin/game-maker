@@ -10,7 +10,7 @@ const SHA = (c: string) => "sha256:" + c.repeat(64);
 /** 一个最小的、合法的包。**每一处 mutation 都从它深拷一份** —— 反例才有意义。 */
 function validManifest(): Manifest {
   return {
-    format: "assetpack/v1",
+    format: "assetpack/v2",
     id: "dystopian-shop",
     version: 1,
     createdAt: new Date(1790208000_000).toISOString(),
@@ -18,7 +18,7 @@ function validManifest(): Manifest {
     provenance: {
       mode: "mixed",
       style: { origin: "human-in-session", ref: "authoring/stylespec.json", stylespecId: "style-ref", checksum: SHA("b") },
-      degradations: [],
+      // ⚠️ 这里曾有 `degradations: []` —— 随降级链于 2026-09-25 删除（format 因此升到 v2）
     },
     palette: {
       ref: "authoring/stylespec.json#/palette", size: 3, values: ["#7c968e", "#55685f", "#ead8a6"],
@@ -157,8 +157,11 @@ describe("反例 —— 票 24 那 9 条，原样搬成测试", () => {
     expect(errorsOf(mutate((m) => { m.palette.values[1] = m.palette.values[0]!; }))).toMatch(/重复色/);
   });
 
-  it("⑧ paletteBinding 是 unbound 却没记降级", () => {
-    expect(errorsOf(mutate((m) => { m.assets[0]!.paletteBinding = "unbound"; }))).toMatch(/降级记录/);
+  it("⑧（已废）paletteBinding 是 unbound 却没记降级 —— 那条规则随降级链一起删了", () => {
+    // 2026-09-25：`unbound` 不再与「必须有降级记录」绑定。它现在是一个**独立成立的状态**：
+    // 「不量化、颜色不受色板约束」。删掉规则、不删状态 —— 删状态会让这类包无法诚实。
+    // ⚠️ 因此这条用的是**直接断言**，不是 `errorsOf`（那个助手的语义是「本该被拒」）。
+    expect(parseAssetPack(mutate((m) => { m.assets[0]!.paletteBinding = "unbound"; })).ok).toBe(true);
   });
 
   it("⑨ 包谎报自己是 generated（来源里混着 imported）", () => {
