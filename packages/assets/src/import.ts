@@ -32,8 +32,25 @@ const pixel = (img: RasterImage, x: number, y: number): [number, number, number,
 export function keyBackground(img: RasterImage, { tolerance = 30 }: { tolerance?: number } = {}): {
   image: RasterImage; backgroundColors: [number, number, number][]; keyedPixels: number;
 } {
-  const corners = [[2, 2], [img.width - 3, 2], [2, img.height - 3], [img.width - 3, img.height - 3]] as const;
-  const refs = corners.map(([x, y]) => pixel(img, x, y).slice(0, 3) as [number, number, number]);
+  // ⚠️ **必须跳过全透明的像素**（2026-09-26 修）。四角取样曾经直接读 RGB，不看 alpha ——
+  // 而 `cellsFromBoxes` 会把每格**居中补白**到统一宽度，补出来的是全透明（RGB=0）。
+  // 于是「背景色」被读成黑色，抠掉的是**角色的暗部**，真正的背景原地不动，
+  // 最后被量化成色板里的橙色（洋红离橙最近）。实测：交付帧 94% 不透明、主色 #c4694a。
+  // 沿对角线往里走，找到第一个不透明像素为止。
+  const opaqueFrom = (x0: number, y0: number, dx: number, dy: number): [number, number, number] => {
+    const max = Math.min(img.width, img.height);
+    for (let i = 0; i < max; i++) {
+      const x = x0 + dx * i, y = y0 + dy * i;
+      if (x < 0 || y < 0 || x >= img.width || y >= img.height) break;
+      const p = pixel(img, x, y);
+      if (p[3]! >= 128) return p.slice(0, 3) as [number, number, number];
+    }
+    return pixel(img, Math.min(x0, img.width - 1), Math.min(y0, img.height - 1)).slice(0, 3) as [number, number, number];
+  };
+  const refs = [
+    opaqueFrom(2, 2, 1, 1), opaqueFrom(img.width - 3, 2, -1, 1),
+    opaqueFrom(2, img.height - 3, 1, -1), opaqueFrom(img.width - 3, img.height - 3, -1, -1),
+  ];
   const out: RasterImage = { width: img.width, height: img.height, data: Buffer.from(img.data) };
   let keyed = 0;
   for (let i = 0; i < img.width * img.height; i++) {

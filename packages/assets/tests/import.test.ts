@@ -117,13 +117,21 @@ describe("⚠️ alpha 孤点不得改变构图（2026-09-25 修正）", () => {
   it("一颗 alpha=1 的孤点曾把角色缩到原大的 59%×88%", () => {
     // 这条只有拿**真实素材**跑才暴露得了 —— 模型给的透明底 PNG 常有这类极淡噪点，
     // 而合成的小图里没人会去种一颗 alpha=1 的像素。
-    const keyed = keyBackground(REAL, { tolerance: 30 }).image;
-    const speckled: RasterImage = { width: keyed.width, height: keyed.height, data: Buffer.from(keyed.data) };
-    speckled.data[3] = 90; speckled.data[4] = 106; speckled.data[5] = 138; speckled.data[6] = 1;   // 左上角
+    //
+    // ⚠️ 2026-09-26：原版比较的是「原图」与「先抠过再种孤点的图」—— 两条**不同的**路径，
+    // 只是当时恰好撞成同一个结果。四角取样改成跳过全透明像素之后就露馅了。
+    // 现在两边走同一条路径（原图 / 原图+孤点），这才是这条不变量真正的意思。
+    const speckled: RasterImage = { width: REAL.width, height: REAL.height, data: Buffer.from(REAL.data) };
+    // ⚠️ **下标是像素 0 的 RGBA 四个字节**。原版写成 data[3..6] —— 那是**跨像素**的：
+    // data[3] 是像素 0 的 alpha，data[4..6] 已经是像素 1 的 RGB。于是孤点被种成了一个
+    // **不透明的怪色像素**，把包围盒从 428×809 撑到 725×922 —— 而那条"孤点不得改变构图"
+    // 的断言居然一直是过的，因为它当时比的是两条**不同的**路径（原图 vs 先抠过再种点的图），
+    // 两个错误恰好抵消。2026-09-26 把两条路径统一之后才露出来。
+    speckled.data[0] = 90; speckled.data[1] = 106; speckled.data[2] = 138; speckled.data[3] = 1;   // 左上角，alpha=1
 
     const opt = { targetHeight: 48, palette: PALETTE, background: { tolerance: 30 } } as const;
     const clean = importBitmap(REAL, opt).report.trimmedTo;
-    const dirty = importBitmap({ ...speckled, width: keyed.width, height: keyed.height }, opt).report.trimmedTo;
+    const dirty = importBitmap(speckled, opt).report.trimmedTo;
 
     expect(clean).toEqual({ w: 428, h: 809 });
     expect(dirty).toEqual(clean);   // 孤点不得改变裁到哪
@@ -278,5 +286,28 @@ describe("⚠️ 多帧必须共用裁框（2026-09-25 修）", () => {
     expect(unionInkBBox([emptyImage(4, 4)])).toBeNull();
     expect(() => importBitmap(keyed, { ...opt, trimBox: { x: 0, y: 0, w: 9999, h: 9999 } }))
       .toThrow(/超出图像/);
+  });
+});
+
+describe("⚠️ 抠背景的四角必须跳过全透明像素（2026-09-26 修）", () => {
+  it("补白过的格子四角是全透明，按 RGB 读会读成黑色 —— 于是抠的是角色的暗部，背景原地不动", () => {
+    // 这是真跑一个生图动画包时抓到的：`cellsFromBoxes` 把每格**居中补白**到统一宽度，
+    // 补出来的是全透明（RGB=0）。旧的四角取样不看 alpha，于是「背景色」被读成黑色。
+    // 实测后果：交付帧 94% 不透明、主色是色板里的橙（洋红背景被量化成的），角色反而被啃。
+    const img = emptyImage(20, 20);
+    // 背景：一片洋红（跟实测里模型给的一样）
+    for (let y = 0; y < 20; y++) for (let x = 0; x < 20; x++) setPx(img, x, y, [201, 42, 143, 255]);
+    // 角色：中间一块深色
+    for (let y = 8; y < 13; y++) for (let x = 8; x < 13; x++) setPx(img, x, y, [62, 50, 54, 255]);
+    // 左边两列「补白」—— 全透明
+    for (let y = 0; y < 20; y++) for (let x = 0; x < 2; x++) setPx(img, x, y, [0, 0, 0, 0]);
+
+    const { image, backgroundColors } = keyBackground(img, { tolerance: 40 });
+    // 参考色必须是洋红，**不是**补白列的 (0,0,0)
+    for (const c of backgroundColors) expect(c.join(",")).not.toBe("0,0,0");
+    // 洋红被抠掉、角色留下
+    expect(px(image, 10, 10)[3]).toBe(255);            // 角色
+    expect(px(image, 15, 15)[3]).toBe(0);              // 洋红背景
+    expect(px(image, 0, 10)[3]).toBe(0);               // 补白列本来就没东西
   });
 });
