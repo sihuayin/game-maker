@@ -32,14 +32,14 @@ const INTERIOR: AssetSpec = {
   kind: "background", id: "shop_interior", role: "scene-backdrop", description: "商店内景",
   styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 1218, h: 685 },
   dependencies: [], required: true,
-  layers: [{ parallax: 0.2 }, { parallax: 1 }],
+  layers: [{ name: "wall", parallax: 0.2 }, { name: "counter", parallax: 1 }],
 };
 /** 一个真正**屏幕空间**的面板（带九宫格）。 */
 const PANEL: AssetSpec = {
   kind: "ui", id: "hud_panel", role: "panel", description: "HUD 面板",
   styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 },
   dependencies: [], required: true,
-  ninePatch: { left: 4, right: 4, top: 4, bottom: 4 }, screenSpace: true,
+  ninePatch: { left: 4, right: 4, top: 4, bottom: 4 },
 };
 
 describe("四类都能装下真实产物", () => {
@@ -75,8 +75,26 @@ describe("按类的硬要求", () => {
     expect(AssetSpecSchema.safeParse({ ...without, animations: [] }).success).toBe(false);
   });
 
-  it("背景可以声明分层视差与可平铺", () => {
-    expect(AssetSpecSchema.safeParse({ ...INTERIOR, tileable: { x: true, y: false } }).success).toBe(true);
+  it("背景的分层：一层一帧、帧名带层名，且**平铺声明在层上**（票 42）", () => {
+    expect(AssetSpecSchema.safeParse(INTERIOR).success).toBe(true);
+    expect(AssetSpecSchema.safeParse({
+      ...INTERIOR,
+      layers: [{ name: "sky", parallax: 0 },
+               { name: "ground", parallax: 1, tileable: { x: true, y: false } }],
+    }).success).toBe(true);
+  });
+
+  it("资源级的 tileable 已删除 —— 它表达不了「天空不平铺、地平铺」（票 42）", () => {
+    expect(AssetSpecSchema.safeParse({ ...INTERIOR, tileable: { x: true, y: false } }).success).toBe(false);
+  });
+
+  it("screenSpace 已删除 —— 它是同义反复（`kind: ui` 就是「屏幕空间」）（票 42）", () => {
+    expect(AssetSpecSchema.safeParse({ ...PANEL, screenSpace: false }).success).toBe(false);
+  });
+
+  it("层没有名字、或名字是空的，都过不了", () => {
+    expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ parallax: 0 }] }).success).toBe(false);
+    expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ name: "", parallax: 0 }] }).success).toBe(false);
   });
 });
 
@@ -93,6 +111,67 @@ describe("UI 九宫格：中央区不能空", () => {
 
   it("上下内缩之和 ≥ 高度被拒", () => {
     expect(AssetSpecSchema.safeParse({ ...PANEL, ninePatch: { left: 2, right: 2, top: 16, bottom: 16 } }).success).toBe(false);
+  });
+});
+
+describe("auditAssetSpec —— 分层背景（票 42）", () => {
+  /**
+   * ⚠️ 这一族守的是一个**当时既产不出来、也过不了对账**的东西：
+   * `framePlan()` 对非 animation 恒定只给一帧，而这里有条「非 animation 不该有多帧」——
+   * 于是「天空 / 墙面 / 地面」三层背景在两头都被堵死。
+   */
+  const STATION: AssetSpec = {
+    kind: "background", id: "station", role: "backdrop", description: "黄昏站台，三层",
+    styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 },
+    dependencies: [], required: true,
+    layers: [
+      { name: "sky", parallax: 0 },
+      { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+      { name: "ground", parallax: 1, tileable: { x: true, y: false } },
+    ],
+  };
+  const bgEntry = (over: Partial<AssetPackEntry> = {}): AssetPackEntry => ({
+    id: "station", kind: "background", role: "backdrop", origin: "generated", paletteBinding: "exact",
+    required: true, size: { w: 320, h: 180 }, anchor: { x: 0, y: 0 }, atlasId: "backgrounds",
+    frames: [{ name: "station.sky" }, { name: "station.wall" }, { name: "station.ground" }],
+    layers: [
+      { name: "sky", parallax: 0 },
+      { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+      { name: "ground", parallax: 1, tileable: { x: true, y: false } },
+    ],
+    authoring: [{ kind: "drawlist", ref: "authoring/drawlist/station.sky.json" }],
+    ...over,
+  });
+
+  it("三层对三层 → 没有意见（**多帧不再被误报**）", () => {
+    expect(auditAssetSpec(STATION, bgEntry())).toEqual([]);
+  });
+
+  it("层数对不上被报出来", () => {
+    expect(auditAssetSpec(STATION, bgEntry({ layers: undefined })).join()).toMatch(/声明了 3 层，产物却有 0 层/);
+  });
+
+  it("层名对不上被报出来（靠位置对帧是一条没写在契约里的约定，所以帧名要能对）", () => {
+    const renamed = bgEntry({ layers: [{ name: "sky", parallax: 0 },
+      { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+      { name: "GROUND", parallax: 1, tileable: { x: true, y: false } }] });
+    expect(auditAssetSpec(STATION, renamed).join()).toMatch(/第 2 层应当是 "ground"/);
+  });
+
+  it("视差与平铺声明对不上被报出来", () => {
+    const wrong = bgEntry({ layers: [{ name: "sky", parallax: 0.9 },
+      { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+      { name: "ground", parallax: 1, tileable: { x: true, y: false } }] });
+    expect(auditAssetSpec(STATION, wrong).join()).toMatch(/层 "sky" 的视差应当是 0/);
+    const untiled = bgEntry({ layers: [{ name: "sky", parallax: 0 },
+      { name: "wall", parallax: 0.5 },
+      { name: "ground", parallax: 1, tileable: { x: true, y: false } }] });
+    expect(auditAssetSpec(STATION, untiled).join()).toMatch(/层 "wall" 的平铺声明与 spec 不一致/);
+  });
+
+  it("**没**声明分层的背景，产物不该有多帧（原来的那条规则还在）", () => {
+    const { layers: _drop, ...plain } = STATION as Extract<AssetSpec, { kind: "background" }>;
+    expect(auditAssetSpec(plain, bgEntry()).join()).toMatch(/产物却有 3 帧/);
   });
 });
 

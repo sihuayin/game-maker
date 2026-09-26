@@ -48,6 +48,12 @@ Map: ../map.md
 - **外壳** —— 归票 32 / 33。
 - **三个零消费者的 schema 的删除**（`GameSpec`/`Requirement`/`CreationProject`）—— 见下。
 
+### ⚠️ 已由票 42 做完的一条
+
+`UiSpec.screenSpace` 原计划归本票删（它是同义反复：`kind: "ui"` 就是「屏幕空间」），
+**票 42 顺手删掉了** —— 它当时正在改同一个文件、同一条 `.strict()` 的测试，分开做只会把
+一个文件的改动切成两半。本票**不要再删一次**。
+
 ### ⚠️ 顺带要做的删除
 
 票 09 裁决 4 判了 `GameSpecSchema` / `RequirementSchema` / `CreationProjectSchema` **全删**

@@ -13,7 +13,7 @@ Map: ../map.md
 > ③ **九宫格面板的尺寸是 config 给的**（`hud.panel.size`）—— 这是票 09 那条
 > 「资源自身性质归包」的**唯一例外**，而它正是九宫格的定义：四边不拉伸、中央拉伸。
 > ⚠️ 九宫格**只能走 WebGL**，且边框来自交付态图集的 `scale9Borders`
-> （`add.nineslice()` **零参数自动读**）—— 那个字段今天**还没被写出来**，归[票 42](42-background-layers-and-ninepatch.md)。
+> （`add.nineslice()` **零参数自动读**）—— 那个字段已由[票 42](42-background-layers-and-ninepatch.md) 补齐（图集与 manifest 两处都有）。
 
 > 🔴 **2026-09-26（[票 31](31-first-demo-game.md)）—— 外壳的形状被第一个 demo 收窄了。**
 > `last-train` 要求外壳能表达四件事：**三层视差**（每层一个 `scrollFactor`，是数据不是代码）·

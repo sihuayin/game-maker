@@ -109,12 +109,28 @@ export function nextPackVersion(outDir: string, packId: string): number {
   return versions.length === 0 ? 1 : Math.max(...versions) + 1;
 }
 
-/** 一个资源在清单里声明的帧名（生成路径：按 spec 的 animations 顺序分配）。 */
+/** `UiSpec.ninePatch`（四边内缩）→ TexturePacker 的 `scale9Borders`（中央矩形）。**只此一处**。 */
+function scale9Of(spec: AssetSpec): { x: number; y: number; w: number; h: number } | null {
+  if (spec.kind !== "ui" || !spec.ninePatch) return null;
+  const { left, right, top, bottom } = spec.ninePatch;
+  return { x: left, y: top, w: spec.size.w - left - right, h: spec.size.h - top - bottom };
+}
+
+/**
+ * 一个资源在清单里声明的帧名。
+ * · `animation` —— 按 spec 的 animations 顺序分配；
+ * · `background` 带 `layers` —— **一层一帧**，帧名 `<资源 id>.<层名>`（与动画的命名规则同构）；
+ * · 其余 —— 一帧，帧名就是资源 id。
+ */
 function framePlan(spec: AssetSpec): { name: string; anim: string | null }[] {
   if (spec.kind === "animation") {
     return spec.animations.flatMap((a) =>
       Array.from({ length: a.frames }, (_, i) => ({ name: `${spec.id}.${a.name}${a.frames > 1 ? i + 1 : ""}`, anim: a.name })));
   }
+  // ⚠️ 没有这一支的话，声明了三层的背景会被分配成 **1 帧** —— 而 drawlist 路线会因此
+  //    直接抛「清单说要 1 帧、生成器给了 3 帧」，**三层背景根本产不出来**（票 42 实测）。
+  if (spec.kind === "background" && spec.layers)
+    return spec.layers.map((l) => ({ name: `${spec.id}.${l.name}`, anim: null }));
   return [{ name: spec.id, anim: null }];
 }
 
@@ -305,14 +321,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
     // ⚠️ 文件名带 `atlas.` 前缀 —— 票 24 定的 `delivery/atlas.<name>.json`。
     //    （曾经写成 `delivery/sprites.json`，与契约和草案实验都不一致。）
     const base = `atlas.${ATLAS_NAME[kind]!}`;
-    const { json, image } = buildAtlas(group.flatMap((b) => b.frames.map((f) => ({
-      name: f.name, image: f.image, anchor: b.spec.anchor,
-      ...(b.spec.kind === "ui" && b.spec.ninePatch
-        ? { scale9Borders: { x: b.spec.ninePatch.left, y: b.spec.ninePatch.top,
-            w: b.spec.size.w - b.spec.ninePatch.left - b.spec.ninePatch.right,
-            h: b.spec.size.h - b.spec.ninePatch.top - b.spec.ninePatch.bottom } }
-        : {}),
-    }))));
+    const { json, image } = buildAtlas(group.flatMap((b) => {
+      const s9 = scale9Of(b.spec);
+      return b.frames.map((f) => ({ name: f.name, image: f.image, anchor: b.spec.anchor, ...(s9 ? { scale9Borders: s9 } : {}) }));
+    }));
     json.meta.image = `${base}.png`;
     const png = encodePNG(image);
     fs.writeFileSync(path.join(packDir, "delivery", `${base}.json`), jstr(json));
@@ -354,18 +366,27 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       },
     },
     atlases,
-    assets: built.map((b) => ({
+    assets: built.map((b) => {
+      const s9 = scale9Of(b.spec);
+      return {
       id: b.spec.id, kind: b.spec.kind, role: b.spec.role, origin: b.origin,
       paletteBinding: b.paletteBinding, required: b.spec.required,
       // ⚠️ 尺寸取**实际产出**的，不是 spec 声明的 —— 对账时两者不一致才有意义
       size: { w: b.frames[0]!.image.width, h: b.frames[0]!.image.height },
       anchor: b.spec.anchor,
+      // 分层背景的层表 —— 它是「资源固有性质」里**唯一**读不到于图集 JSON 的那一条
+      // （TexturePacker 没有视差这个概念），壳子只读 manifest，所以必须落在这里。
+      ...(b.spec.kind === "background" && b.spec.layers ? { layers: b.spec.layers } : {}),
       atlasId: atlasIdOf.get(b.spec.id)!,
       // 帧只有名字（票 26：`state` 已降格为单帧动画，不是帧的属性）
       frames: b.frames.map((f) => ({ name: f.name })),
       ...(b.animations ? { animations: b.animations } : {}),
+      // ⚠️ 与图集里那份**同源同算**（`scale9Of`）—— 声明了却不写，会让 `add.nineslice()`
+      //    的读者以为 manifest 有这个信息而图集没有；写了却算得不一样，是更坏的一种漂移。
+      ...(s9 ? { scale9Borders: s9 } : {}),
       authoring: b.authoring,
-    })),
+      };
+    }),
     files: [],
   };
   // ── files[]：逐文件 checksum（manifest.json 自身除外，自指）──────────────

@@ -66,7 +66,24 @@ export function auditAssetSpec(spec: AssetSpec, entry: AssetPackEntry, drawlists
   } else if (produced.length > 0) {
     at(`声明为 ${spec.kind}，产物却带了动画（${produced.map((a) => a.name).join(", ")}）`);
   }
-  if (spec.kind !== "animation" && entry.frames.length > 1)
+
+  // ── 分层背景：层与帧一一对应（票 42）────────────────────────────────────
+  // ⚠️ 这一族必须先算出来，因为下面那条「非 animation 不该有多帧」要**避开**分层背景 ——
+  //    否则一个完全正确的三层背景会被报成问题（票 42 实测：它当时既产不出来，也过不了对账）。
+  const wantLayers = spec.kind === "background" ? spec.layers ?? [] : [];
+  const gotLayers = entry.layers ?? [];
+  if (wantLayers.length !== gotLayers.length)
+    at(`声明了 ${wantLayers.length} 层，产物却有 ${gotLayers.length} 层`);
+  else
+    wantLayers.forEach((l, i) => {
+      const g = gotLayers[i]!;
+      if (g.name !== l.name) at(`第 ${i} 层应当是 "${l.name}"，产物是 "${g.name}"`);
+      if (g.parallax !== l.parallax) at(`层 "${l.name}" 的视差应当是 ${l.parallax}，产物是 ${g.parallax}`);
+      if (JSON.stringify(g.tileable) !== JSON.stringify(l.tileable))
+        at(`层 "${l.name}" 的平铺声明与 spec 不一致（spec ${JSON.stringify(l.tileable)}，产物 ${JSON.stringify(g.tileable)}）`);
+    });
+
+  if (spec.kind !== "animation" && entry.frames.length > 1 && wantLayers.length === 0)
     at(`声明为 ${spec.kind}，产物却有 ${entry.frames.length} 帧`);
 
   // ── drawlist 的画布与声明的尺寸 ──────────────────────────────────────────

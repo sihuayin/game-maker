@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { parseAssetPack, type AssetSpec, type AssetRecipe, type DrawList, type StyleSpec } from "@game-maker/contracts";
-import { buildAssetPack, nextPackVersion, type DrawListGenerator } from "../src/index.js";
+import { buildAssetPack, nextPackVersion, verifyPack, type DrawListGenerator } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const RECIPE: AssetRecipe = JSON.parse(readFileSync(ROOT + "fixtures/recipes/shift-change.json", "utf8"));
@@ -21,7 +21,8 @@ afterAll(() => { for (const d of dirs) rmSync(d, { recursive: true, force: true 
  */
 /** 纯函数版本 —— 端口返回的是 `DrawList[] | Promise<DrawList[]>`，取用时要分开。 */
 const stubDrawLists = (spec: AssetSpec): DrawList[] => {
-  const n = spec.kind === "animation" ? spec.animations.reduce((s, a) => s + a.frames, 0) : 1;
+  const n = spec.kind === "animation" ? spec.animations.reduce((s, a) => s + a.frames, 0)
+    : spec.kind === "background" && spec.layers ? spec.layers.length : 1;
   return Array.from({ length: n }, (_, i) => ({
     format: "drawlist+curve/v1", id: spec.id, frame: `f${i}`,
     viewBox: [0, 0, spec.size.w, spec.size.h], expectedSize: [spec.size.w, spec.size.h],
@@ -170,5 +171,71 @@ describe("⚠️ 纯导入的包（2026-09-25 抓到的两个 bug）", () => {
     // 写入侧（pack.ts）与校验侧（contracts）必须用同一套派生规则，否则合法的包会被判成矛盾
     const parsed = parseAssetPack(m);
     expect(parsed.ok, parsed.ok ? "" : parsed.errors.join(" / ")).toBe(true);
+  });
+});
+
+/**
+ * 这两条守的是票 42 的两个发现：
+ * ① **分层背景当时既产不出来、也过不了对账** —— `framePlan()` 对非 animation 恒定只给一帧，
+ *    而 `auditAssetSpec()` 有一条「非 animation 不该有多帧」。两处各堵一头。
+ * ② **`UiSpec.ninePatch` → 交付态图集 `scale9Borders` 这条连线从没被走过**（零 ui 资源），
+ *    而 manifest 上那个同名字段当时**声明了却从没被写入**。
+ */
+describe("分层背景与九宫格：两条从配方到交付态的连线（票 42）", () => {
+  const recipe = (): AssetRecipe => ({
+    ...RECIPE,
+    assets: [
+      { spec: {
+          kind: "background", id: "station", role: "backdrop", description: "黄昏站台，三层",
+          styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 },
+          dependencies: [], required: true,
+          layers: [
+            { name: "sky", parallax: 0 },
+            { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+            { name: "ground", parallax: 1, tileable: { x: true, y: false } },
+          ],
+        }, source: { kind: "drawlist" } },
+      { spec: {
+          kind: "ui", id: "hud", role: "hud-panel", description: "HUD 面板",
+          styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 },
+          dependencies: [], required: true,
+          ninePatch: { left: 4, right: 4, top: 4, bottom: 4 },
+        }, source: { kind: "drawlist" } },
+    ],
+  });
+
+  it("三层背景：一层一帧、帧名带层名、层表进 manifest、图集里三帧都在", async () => {
+    const { manifest, packDir, audit } = await buildAssetPack({ recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
+    expect(audit).toEqual([]);
+    const parsed = parseAssetPack(manifest);
+    expect(parsed.ok, parsed.ok ? "" : parsed.errors.join(" / ")).toBe(true);
+
+    const bg = manifest.assets.find((a) => a.id === "station")!;
+    expect(bg.frames.map((f) => f.name)).toEqual(["station.sky", "station.wall", "station.ground"]);
+    expect(bg.layers?.map((l) => l.name)).toEqual(["sky", "wall", "ground"]);
+    expect(bg.layers?.[1]!.parallax).toBe(0.5);
+    expect(bg.layers?.[1]!.tileable).toEqual({ x: true, y: false });
+    // 天空那一层**没有** tileable —— 资源级的一个布尔表达不了这件事，这正是它下沉到层的原因
+    expect(bg.layers?.[0]!.tileable).toBeUndefined();
+
+    const atlas = JSON.parse(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.json"), "utf8"));
+    expect(Object.keys(atlas.frames).sort()).toEqual(["station.ground", "station.sky", "station.wall"]);
+
+    // 试件真的过 verify（不是只过 schema）—— checksum 与 files[] 都对得上才算数
+    expect(verifyPack({ packDir }).data.ok).toBe(true);
+  });
+
+  it("九宫格：UiSpec.ninePatch 一路走到图集与 manifest 的 scale9Borders", async () => {
+    const { manifest, packDir, audit } = await buildAssetPack({ recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
+    expect(audit).toEqual([]);
+    const want = { x: 4, y: 4, w: 40, h: 24 };   // 48-4-4 × 32-4-4
+
+    const ui = manifest.assets.find((a) => a.id === "hud")!;
+    expect(ui.scale9Borders).toEqual(want);
+
+    const atlas = JSON.parse(readFileSync(path.join(packDir, "delivery/atlas.ui.json"), "utf8"));
+    expect(atlas.frames["hud"].scale9Borders).toEqual(want);
+
+    expect(verifyPack({ packDir }).data.ok).toBe(true);
   });
 });

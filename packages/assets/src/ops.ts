@@ -90,10 +90,11 @@ ${styleBrief(style)}
 每个 spec 只许有这些键：kind / id / role / description / styleId / anchor / size / dependencies / required。
 按类可以另加，且**形状必须逐字如下**：
   animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
-  background → "layers":[{"parallax":0.3},{"parallax":1}]   ← **数组**，每项是对象
-               "tileable":{"x":true,"y":false}               ← **对象**，不是 true/false
+  background → "layers":[{"name":"sky","parallax":0.3},
+                         {"name":"ground","parallax":1,"tileable":{"x":true}}]
+               ← **数组**，每项是对象，**从远到近**排序；层名会拼成帧名 \`<资源 id>.<层名>\`
+               ← 不平铺的层**别写 tileable**（三层里通常只有墙与地平铺，天空不平铺）
   ui         → "ninePatch":{"left":4,"right":4,"top":4,"bottom":4}
-               "screenSpace":true
 **多余一个键、或形状不对，就会被拒收。**`;
 
   // ⚠️ 有界重试，与生成器同一条道理：推导是**重采样**，不是修复循环（不把错误喂回去）。

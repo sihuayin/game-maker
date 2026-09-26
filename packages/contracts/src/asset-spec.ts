@@ -9,7 +9,7 @@
 //   质量控制，而 `z.record(z.unknown())` 正是「校验不到的地方」。现在四类各有自己的字段，
 //   任何一个字段都能被校验，就没地方藏东西了。
 import { z } from "zod";
-import { Anchor } from "./assetpack.js";
+import { Anchor, Layer } from "./assetpack.js";
 
 /** 四类的**公共部分** —— 抽出来当基类，因为「生成它必须知道的信息」里有一半是四类共有的。 */
 const COMMON = {
@@ -51,10 +51,17 @@ export const AnimatedSpec = z.object({
 /** 场景尺度。与 `sprite` 的分野是**尺寸级别与镜头关系**，不是画法。 */
 export const BackgroundSpec = z.object({
   kind: z.literal("background"), ...COMMON,
-  /** 分层视差：从远到近各层的视差系数（0 = 完全跟随镜头）。缺省 = 单层、无视差。 */
-  layers: z.array(z.object({ parallax: z.number().min(0) }).strict()).optional(),
-  /** 可平铺的轴。⚠️ 目前只是**声明** —— 接缝一致性检查需要渲染后扫像素，尚未实现。 */
-  tileable: z.object({ x: z.boolean(), y: z.boolean() }).strict().optional(),
+  /**
+   * 分层视差：**从远到近**各层。缺省 = 单层、无视差。**一层一帧**，
+   * 帧名 = `<资源 id>.<层名>`（与 animation 的帧命名规则同构）。
+   *
+   * ⚠️ 层的形状与 manifest 里那份**共用一个定义**（`Layer`，见 assetpack.ts）。
+   * ⚠️ **所有层共用 `spec.size`** —— 与 drawlist 的 `viewBox` 模型一致（内容可以比画布小），
+   *   不引入第二套尺寸。要让一层铺满更宽的世界，用的是这一层自己的 `tileable`。
+   * ⚠️ **2026-09-26（票 42）**：`tileable` 从**资源级下沉到层**。资源级那个表达不了
+   *   「天空不平铺、墙和地平铺」—— 而三层背景里这恰恰是常态，且它当时零消费者。
+   */
+  layers: z.array(Layer).optional(),
 }).strict();
 
 /**
@@ -65,14 +72,20 @@ export const BackgroundSpec = z.object({
  */
 export const UiSpec = z.object({
   kind: z.literal("ui"), ...COMMON,
-  /** 九宫格四边内缩（像素）。中央区必须非空 —— 检查在 union 那一层做（见下）。 */
+  /**
+   * 九宫格四边内缩（像素）。中央区必须非空 —— 检查在 union 那一层做（见下）。
+   * 它会被算成中央矩形的 `{x,y,w,h}` 写进交付态图集的 `scale9Borders`
+   * （Phaser 的 `add.nineslice()` 零参数自动读）。
+   */
   ninePatch: z.object({
     left: z.number().int().nonnegative(), right: z.number().int().nonnegative(),
     top: z.number().int().nonnegative(), bottom: z.number().int().nonnegative(),
   }).strict().optional(),
-  /** 尺寸按视口算而不是世界坐标。四类里只有 UI 是屏幕空间，所以默认 true。 */
-  screenSpace: z.boolean().default(true),
 }).strict();
+// ⚠️ **`screenSpace` 已删除**（2026-09-26，票 42）：本类的**判据**就是
+//   「它活在屏幕空间还是世界空间」（票 27 对 `bg_sign` 的裁决），所以 `kind: "ui"`
+//   与「屏幕空间」本来就同义，那个字段是同义反复 —— 而它唯一非默认的取值
+//   （`false`，即一个「世界空间的 ui」）描述的东西按定义是个 `sprite`。
 
 // ⚠️ 九宫格那条检查必须放在 **union 这一层**：`.superRefine()` 会把成员变成 `ZodEffects`，
 // 而 `discriminatedUnion` 只接受 `ZodObject`。放在这里反而更清楚 —— 它是**类级**的规则。

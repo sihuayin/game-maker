@@ -7,8 +7,11 @@
 // 两者不共用类型，也不互相扩展。
 //
 // 三条设计原则（都是为了「不漂移」）：
-//   1. 不重复图集里已有的内容 —— 帧的 x/y/w/h 与 anchor/scale9Borders 都在 TexturePacker JSON 里，
-//      这里只做索引（帧名 → 属于哪个 atlas）。
+//   1. 不重复图集里已有的内容 —— 帧的 x/y/w/h 只在 TexturePacker JSON 里，这里只做索引
+//      （帧名 → 属于哪个 atlas）。⚠️ 例外是 `anchor` / `scale9Borders` / `layers` 三项：
+//      它们按**资源**写一份，因为壳子不该为了拿这三个数去开图集
+//      （而 `layers` 更是图集里**根本没有**的东西 —— TexturePacker 没有视差这个概念）。
+//      它们与图集那份**同源同算**（`pack.ts` 的 `scale9Of()` / 同一个 `spec`），不构成第二份真相。
 //   2. 不重复**可派生**的内容 —— 没有 `states[]` 字段，「有哪些状态」= `frames[].state` 的去重集合。
 //   3. 所有路径都是**相对包根**的 POSIX 路径，绝对路径与 `..` 由 schema 直接拒 —— 包要能整体搬走。
 import { z } from "zod";
@@ -46,6 +49,24 @@ export const Anchor = z.object({ x: z.number().min(0).max(1), y: z.number().min(
 export const NinePatch = z.object({
   x: z.number().int().nonnegative(), y: z.number().int().nonnegative(),
   w: z.number().int().positive(), h: z.number().int().positive(),
+}).strict();
+
+/**
+ * 背景的**一层**。它与 `frames[]` **一一对应**：第 i 层 = 第 i 帧，帧名是 `<背景 id>.<层名>`。
+ *
+ * ⚠️ **它同时是 AssetSpec 里那份的定义**（asset-spec.ts 直接 import）—— 两边各写一份必然漂移，
+ * 而漂移的后果是**合法的包被判为矛盾**（票 24 的 `derivePackMode` 是同一个教训）。
+ *
+ * ⚠️ **视差因子住在包里、不住 game-config**（票 09 裁决 6）：
+ * 「这一层有多远」是**画出来的东西的一部分** —— 天空在墙后面，换一个游戏用它天空还在墙后面。
+ * `parallax` 就是「多远」的可执行形式。
+ */
+export const Layer = z.object({
+  name: z.string().min(1),
+  /** 0 = 完全跟随镜头（最远），1 = 与镜头同速（最近）。 */
+  parallax: z.number().min(0),
+  /** 可平铺的轴。缺省 = 不平铺。⚠️ **逐层**声明 —— 三层里通常只有墙与地平铺，天空不平铺。 */
+  tileable: z.object({ x: z.boolean(), y: z.boolean() }).strict().optional(),
 }).strict();
 
 export const AssetKind = z.enum(["sprite", "animation", "background", "ui"]);
@@ -113,6 +134,13 @@ export const AssetPackEntry = z.object({
   size: z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict(),
   anchor: Anchor,
   scale9Borders: NinePatch.optional(),
+  /**
+   * **分层背景的层表**，从远到近。缺省 = 单层背景。
+   *
+   * ⚠️ 它是「资源的固有性质」里**唯一**没法从图集 JSON 读出来的那一条
+   * （TexturePacker 没有视差这个概念），所以必须写在这里 —— 壳子只读 manifest。
+   */
+  layers: z.array(Layer).optional(),
   atlasId: z.string().min(1),
   frames: z.array(FrameRef).min(1),
   animations: z.array(Animation).optional(),
@@ -135,10 +163,31 @@ export const AssetPackEntry = z.object({
       if (!names.has(fn)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `动画 "${an.name}" 引用了不存在的帧 "${fn}"`, path: ["animations"] });
       grouped.add(fn);
     }
+  // 分层背景：帧与层**一一对应**，且帧名必须是 `<背景 id>.<层名>`。
+  // 这条不查的话，「第 i 层配第 i 帧」就成了一条**没写在任何契约里的约定** ——
+  // 而壳子按名字取帧，它对不上时是静默的。
+  if (a.layers) {
+    if (a.kind !== "background")
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `只有 background 能有 layers（这是 ${a.kind}）`, path: ["layers"] });
+    const seen = new Set<string>();
+    for (const l of a.layers) {
+      if (seen.has(l.name)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `层名重复："${l.name}"`, path: ["layers"] });
+      seen.add(l.name);
+    }
+    if (a.layers.length !== a.frames.length)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `声明了 ${a.layers.length} 层，却有 ${a.frames.length} 帧 —— 层与帧必须一一对应`, path: ["layers"] });
+    a.layers.forEach((l, i) => {
+      const want = `${a.id}.${l.name}`;
+      if (a.frames[i] && a.frames[i]!.name !== want)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `第 ${i} 层的帧应当是 "${want}"，实际是 "${a.frames[i]!.name}"`, path: ["frames"] });
+    });
+  }
+
   // 票 26：动画是**一个 Asset 内部唯一的分组概念**。所以多于一帧时，
   // 每一帧都必须至少属于一个动画 —— 否则那一帧是不可达的（画不出来，也没人引用得到）。
   // 单帧资源不需要分组：它本身就是「一个单帧动画」。
-  if (a.frames.length > 1)
+  // ⚠️ 分层背景是**另一条**多帧的理由（票 09 裁决 6）：它的帧由 `layers` 组织，不归动画管。
+  if (a.frames.length > 1 && !a.layers)
     for (const f of a.frames)
       if (!grouped.has(f.name))
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: `帧 "${f.name}" 不属于任何动画 —— 它不可达（多于一帧的资源必须把每帧都分组）`, path: ["frames"] });
