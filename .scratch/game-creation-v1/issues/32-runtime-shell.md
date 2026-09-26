@@ -5,6 +5,14 @@ Status: open
 Blocked by: 09, 31
 Map: ../map.md
 
+> 🔴 **2026-09-26（[票 40](40-last-train-fixture-pack.md)）—— 外壳要读的形状现在有真产物了。**
+> `fixtures/packs/last-train/v2/` 就是外壳要吃的那个包，里面每一项都定死了：
+> 背景 `layers` 三项（`sky@0` / `wall@0.6+tileable` / `ground@1+tileable`，**帧名 `<包id>.<层名>`**）·
+> `hud-lost-slots` 的 `scale9Borders {x:4,y:4,w:64,h:24}`（`add.nineslice()` 零参数读）·
+> 玩家的 `player-traveler.idle/run/jump` 三个动画名 ·
+> 以及 **信号灯是 `animation` 类、带 `red`/`green` 两个动画** ——
+> 票 26「一个状态就是一个单帧动画」的番茄先例，在这里第一次落到真产物上。
+
 > 🔴 **2026-09-26（[票 09](09-game-config-contract.md)）—— 外壳的变量表又多三条。**
 > ① **视口多大由本票定**，而票 09 已把世界坐标钉成「**交付态像素、1:1、整数、单屏高、只横向滚动**」——
 > 两票合起来才是完整的尺度契约。

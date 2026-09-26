@@ -16,7 +16,7 @@ import { buildAtlas } from "./atlas.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
-import { imageNegativePrompt, imagePrompt } from "./prompt.js";
+import { framePlan, imageNegativePrompt, imagePrompt } from "./prompt.js";
 import type { ImageGenCall, ImageRequest } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
 import { rasterize } from "./raster.js";
@@ -116,24 +116,6 @@ function scale9Of(spec: AssetSpec): { x: number; y: number; w: number; h: number
   return { x: left, y: top, w: spec.size.w - left - right, h: spec.size.h - top - bottom };
 }
 
-/**
- * 一个资源在清单里声明的帧名。
- * · `animation` —— 按 spec 的 animations 顺序分配；
- * · `background` 带 `layers` —— **一层一帧**，帧名 `<资源 id>.<层名>`（与动画的命名规则同构）；
- * · 其余 —— 一帧，帧名就是资源 id。
- */
-function framePlan(spec: AssetSpec): { name: string; anim: string | null }[] {
-  if (spec.kind === "animation") {
-    return spec.animations.flatMap((a) =>
-      Array.from({ length: a.frames }, (_, i) => ({ name: `${spec.id}.${a.name}${a.frames > 1 ? i + 1 : ""}`, anim: a.name })));
-  }
-  // ⚠️ 没有这一支的话，声明了三层的背景会被分配成 **1 帧** —— 而 drawlist 路线会因此
-  //    直接抛「清单说要 1 帧、生成器给了 3 帧」，**三层背景根本产不出来**（票 42 实测）。
-  if (spec.kind === "background" && spec.layers)
-    return spec.layers.map((l) => ({ name: `${spec.id}.${l.name}`, anim: null }));
-  return [{ name: spec.id, anim: null }];
-}
-
 export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackResult> {
   try {
     return await buildInto(opts);
@@ -209,6 +191,15 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
         : undefined;
       // ⚠️ **一个动画一次调用**，不是一个资源一次。实测把 14 帧塞进一次调用，模型只给回来 1 个角色。
+      // ⚠️ **分层背景在这条路上还不成立**（票 40 撞到的）：下面这一支对非 animation 只出
+      //   **一张图**，而 `plan` 对三层背景有 3 项 —— `results[i]` 会越界成 `undefined`，
+      //   一路带到 `buildAtlas` 才炸成一个**说不清是哪里错**的 TypeError。
+      //   与其让它那样死，不如在这里说清楚：显式拒绝，并指向那张要把它做出来的票。
+      if (spec.kind === "background" && spec.layers)
+        throw new Error(
+          `资源 "${spec.id}" 是**分层背景**，而生图路线还不支持它 —— ` +
+          `它一个资源一次调用只出一张图，而分层背景一层一张。见票 43。`,
+        );
       const units: { anim?: string; frames: number; raw: string }[] =
         spec.kind === "animation"
           ? spec.animations.map((a) => ({ anim: a.name, frames: a.frames, raw: `authoring/generated/${spec.id}.${a.name}.png` }))

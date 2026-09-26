@@ -1,0 +1,698 @@
+{
+  "format": "assetpack/v2",
+  "id": "last-train",
+  "version": 2,
+  "createdAt": "2026-09-26T11:39:59.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated",
+    "style": {
+      "origin": "human-in-session",
+      "ref": "authoring/stylespec.json",
+      "stylespecId": "flat-pixel-side-scroller",
+      "checksum": "sha256:3793af5aa1fc83e9e2397d49ef52c30a8468955f8f34040a2cc634037c6524bf"
+    }
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 8,
+    "values": [
+      "#3a3f5c",
+      "#6b4a3a",
+      "#9e9ea6",
+      "#1c1c28",
+      "#d4a64a",
+      "#e0c08a",
+      "#4a5a7a",
+      "#5a6a8a"
+    ],
+    "coverage": {
+      "exact": 6,
+      "composited": 3,
+      "quantized": 0,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 64,
+        "h": 328
+      },
+      "frames": 14,
+      "assets": [
+        "hazard-sweeping-carriage",
+        "player-traveler",
+        "signal-endlight"
+      ],
+      "checksum": "sha256:f258c05e6b93f5616108cae00d41812528173a0ea4906d674e3ca98255fedf54"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 480,
+        "h": 810
+      },
+      "frames": 3,
+      "assets": [
+        "bg-dusk-halt"
+      ],
+      "checksum": "sha256:ddc5b3637e61bac739f883ec367e2bd97a19a36d7a1a2d940954980ce91a943a"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 56,
+        "h": 88
+      },
+      "frames": 3,
+      "assets": [
+        "pickup-suitcase",
+        "prop-awning-steps",
+        "prop-luggage-pile"
+      ],
+      "checksum": "sha256:fcaf00ee75c4cae7a8988fc1839f073c3f4e841a28fe5af97db1fca3770afab6"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 72,
+        "h": 44
+      },
+      "frames": 2,
+      "assets": [
+        "hud-lost-slots",
+        "hud-pip"
+      ],
+      "checksum": "sha256:10c80d20d5befad0a0e72f3f46a3d5be810bcb97d8a8c433a0196a659e763b77"
+    }
+  ],
+  "assets": [
+    {
+      "id": "player-traveler",
+      "kind": "animation",
+      "role": "玩家角色：赶末班车的旅客，大衣与背上行李卷",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-traveler.idle1"
+        },
+        {
+          "name": "player-traveler.idle2"
+        },
+        {
+          "name": "player-traveler.run1"
+        },
+        {
+          "name": "player-traveler.run2"
+        },
+        {
+          "name": "player-traveler.run3"
+        },
+        {
+          "name": "player-traveler.run4"
+        },
+        {
+          "name": "player-traveler.jump1"
+        },
+        {
+          "name": "player-traveler.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "player-traveler.idle1",
+            "player-traveler.idle2"
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "player-traveler.run1",
+            "player-traveler.run2",
+            "player-traveler.run3",
+            "player-traveler.run4"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "player-traveler.jump1",
+            "player-traveler.jump2"
+          ],
+          "fps": 6,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.idle1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.idle2.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.run1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.run2.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.run3.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.run4.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.jump1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/player-traveler.jump2.json"
+        }
+      ]
+    },
+    {
+      "id": "bg-dusk-halt",
+      "kind": "background",
+      "role": "三层视差背景：远天、候车室外墙、站台地面与铁轨",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 480,
+        "h": 270
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0
+        },
+        {
+          "name": "wall",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "ground",
+          "parallax": 1,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "bg-dusk-halt.sky"
+        },
+        {
+          "name": "bg-dusk-halt.wall"
+        },
+        {
+          "name": "bg-dusk-halt.ground"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/bg-dusk-halt.sky.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/bg-dusk-halt.wall.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/bg-dusk-halt.ground.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-luggage-pile",
+      "kind": "sprite",
+      "role": "高度差障碍一：一摞行李，可跳上",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 40,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-luggage-pile"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-luggage-pile.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-awning-steps",
+      "kind": "sprite",
+      "role": "高度差障碍二：拱起的雨棚台阶，可跳上",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 56,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-awning-steps"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-awning-steps.json"
+        }
+      ]
+    },
+    {
+      "id": "pickup-suitcase",
+      "kind": "sprite",
+      "role": "失物收集物：皮箱，摆三处",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "pickup-suitcase"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/pickup-suitcase.json"
+        }
+      ]
+    },
+    {
+      "id": "hazard-sweeping-carriage",
+      "kind": "animation",
+      "role": "危险：周期性扫过站台一段的进站车厢",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "hazard-sweeping-carriage.sweep1"
+        },
+        {
+          "name": "hazard-sweeping-carriage.sweep2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "sweep",
+          "frames": [
+            "hazard-sweeping-carriage.sweep1",
+            "hazard-sweeping-carriage.sweep2"
+          ],
+          "fps": 3,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hazard-sweeping-carriage.sweep1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hazard-sweeping-carriage.sweep2.json"
+        }
+      ]
+    },
+    {
+      "id": "signal-endlight",
+      "kind": "animation",
+      "role": "站台尽头的信号灯：红转绿判定过关",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "signal-endlight.red1"
+        },
+        {
+          "name": "signal-endlight.red2"
+        },
+        {
+          "name": "signal-endlight.green1"
+        },
+        {
+          "name": "signal-endlight.green2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "red",
+          "frames": [
+            "signal-endlight.red1",
+            "signal-endlight.red2"
+          ],
+          "fps": 2,
+          "loop": true
+        },
+        {
+          "name": "green",
+          "frames": [
+            "signal-endlight.green1",
+            "signal-endlight.green2"
+          ],
+          "fps": 2,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/signal-endlight.red1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/signal-endlight.red2.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/signal-endlight.green1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/signal-endlight.green2.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-lost-slots",
+      "kind": "ui",
+      "role": "屏幕左下角 HUD 面板，三个槽位显示失物收集进度",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 72,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-lost-slots"
+        }
+      ],
+      "scale9Borders": {
+        "x": 4,
+        "y": 4,
+        "w": 64,
+        "h": 24
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-lost-slots.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-pip",
+      "kind": "ui",
+      "role": "HUD 槽位点亮标记：捡到一件失物时叠在对应槽位上",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-pip"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-pip.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/bg-dusk-halt.ground.json",
+      "bytes": 2069,
+      "checksum": "sha256:e21b9d91215f2abb725ca041348b1549bc232501e563677e4ac3f49ef1cb34af"
+    },
+    {
+      "path": "authoring/drawlist/bg-dusk-halt.sky.json",
+      "bytes": 3143,
+      "checksum": "sha256:d75422fa41da27f92ba0b44ee68454b687e99887b16bcf8645a237fb10d79e2f"
+    },
+    {
+      "path": "authoring/drawlist/bg-dusk-halt.wall.json",
+      "bytes": 3270,
+      "checksum": "sha256:5bb51b0f5479d57259bac5ea7f07b4d9b3b3580e5426e0d8f695fbb1316a15c0"
+    },
+    {
+      "path": "authoring/drawlist/hazard-sweeping-carriage.sweep1.json",
+      "bytes": 2673,
+      "checksum": "sha256:ede0dd7f0bf2b2071f7b5687003cded5df3003f258a19de6ddb873fecbeacb47"
+    },
+    {
+      "path": "authoring/drawlist/hazard-sweeping-carriage.sweep2.json",
+      "bytes": 2673,
+      "checksum": "sha256:1b15405300bafb3d3f17c1f60f885bef954e7890213837040a902a2dd121076c"
+    },
+    {
+      "path": "authoring/drawlist/hud-lost-slots.json",
+      "bytes": 2564,
+      "checksum": "sha256:c96bf22bc2f92ef1d732f8e072932b3e5dd8c7e377d5692d122e47f403dcd6b0"
+    },
+    {
+      "path": "authoring/drawlist/hud-pip.json",
+      "bytes": 1863,
+      "checksum": "sha256:34dbb28a82100aae3e2ac2b855314d75bbce1a2cc7ccb0f5172804312c8857de"
+    },
+    {
+      "path": "authoring/drawlist/pickup-suitcase.json",
+      "bytes": 2481,
+      "checksum": "sha256:c2c13c33bd3fe3aa5225257ce1c4a910f139798ad51af88442e14a6706bac638"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.idle1.json",
+      "bytes": 2350,
+      "checksum": "sha256:fc546a0f3d7fd4b1b40061b07c38bb7b1fd759412499c3b78be9518df9a0271b"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.idle2.json",
+      "bytes": 2350,
+      "checksum": "sha256:49c67d4501b49507275a7ecec6b16f9124ce1ea8ef0420e0d79e7ffcbb5dfcaa"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.jump1.json",
+      "bytes": 2520,
+      "checksum": "sha256:5007c72211d19a4078148c436b9f25f46bb6bad93f2766fde05294b447b4b58d"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.jump2.json",
+      "bytes": 2351,
+      "checksum": "sha256:2acd3e171cfe10743cb1ce6fb34004445df14298a092dfa55563a8e2b9aff0e2"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.run1.json",
+      "bytes": 2515,
+      "checksum": "sha256:1d0f179014a33809866c28f5538ee2405ba23ed7bae7962a05ca7b8d0e07252b"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.run2.json",
+      "bytes": 2349,
+      "checksum": "sha256:657a98eb96475b88aea53e02a3b341d4a72571ec060b3ca0b63cb1e57ae5c9c8"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.run3.json",
+      "bytes": 2347,
+      "checksum": "sha256:d4f524b22bb1487aa49dc04352c350f21a271b1ec9cc2e2c8ba9db70ee762953"
+    },
+    {
+      "path": "authoring/drawlist/player-traveler.run4.json",
+      "bytes": 2349,
+      "checksum": "sha256:1d56ce2e0d2bbe204877af42e786e936485d95ccc8ee7e9903df526025ee3e07"
+    },
+    {
+      "path": "authoring/drawlist/prop-awning-steps.json",
+      "bytes": 3988,
+      "checksum": "sha256:9774548bbf0170144112402895470e3ec049384d6abf63158fff4213b8ce2deb"
+    },
+    {
+      "path": "authoring/drawlist/prop-luggage-pile.json",
+      "bytes": 4044,
+      "checksum": "sha256:0d5ae854df06c5e56fdddea2dadd80a972846a58247ea015c6ba23d77c38d394"
+    },
+    {
+      "path": "authoring/drawlist/signal-endlight.green1.json",
+      "bytes": 2376,
+      "checksum": "sha256:ef4552f4ed53fda16378b9e01ec47962ff3ea129fadb7d0e1a7eafae5156e9fb"
+    },
+    {
+      "path": "authoring/drawlist/signal-endlight.green2.json",
+      "bytes": 2481,
+      "checksum": "sha256:479fd780fcb327580e97fc0250d1d9ebbd84b602922a5b0652809febcd7bd02d"
+    },
+    {
+      "path": "authoring/drawlist/signal-endlight.red1.json",
+      "bytes": 2374,
+      "checksum": "sha256:9db6d00218daf5bb30b76d7018770e04b466a8e52e7f2e890b344904db8f9403"
+    },
+    {
+      "path": "authoring/drawlist/signal-endlight.red2.json",
+      "bytes": 2479,
+      "checksum": "sha256:1b0cdfad53a130438dc9659c070661acc1b7022c02caa97426b713d2e1c08085"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1418,
+      "checksum": "sha256:3793af5aa1fc83e9e2397d49ef52c30a8468955f8f34040a2cc634037c6524bf"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5910,
+      "checksum": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 1400,
+      "checksum": "sha256:f258c05e6b93f5616108cae00d41812528173a0ea4906d674e3ca98255fedf54"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1425,
+      "checksum": "sha256:cc8c7861ecff8e53652131ad8f93e26dedf0d06a25da7b4d34b18a08f015dc29"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 5115,
+      "checksum": "sha256:ddc5b3637e61bac739f883ec367e2bd97a19a36d7a1a2d940954980ce91a943a"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 1402,
+      "checksum": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 533,
+      "checksum": "sha256:fcaf00ee75c4cae7a8988fc1839f073c3f4e841a28fe5af97db1fca3770afab6"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1082,
+      "checksum": "sha256:544d803612a66ab3125a71b487f694381693e168d1688ab2a68351c941648ea8"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 290,
+      "checksum": "sha256:10c80d20d5befad0a0e72f3f46a3d5be810bcb97d8a8c433a0196a659e763b77"
+    }
+  ]
+}

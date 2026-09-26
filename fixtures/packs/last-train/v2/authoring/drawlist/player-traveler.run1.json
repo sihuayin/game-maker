@@ -1,0 +1,164 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "player-traveler",
+  "frame": "run1",
+  "viewBox": [
+    0,
+    0,
+    32,
+    48
+  ],
+  "expectedSize": [
+    32,
+    48
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 9,
+      "y": 6,
+      "w": 14,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 8,
+      "y": 7,
+      "w": 16,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 10,
+      "y": 12,
+      "w": 12,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 7,
+      "y": 14,
+      "w": 18,
+      "h": 16
+    },
+    {
+      "op": "dither",
+      "x": 7,
+      "y": 14,
+      "w": 18,
+      "h": 16,
+      "colors": [
+        "palette:0",
+        "palette:6"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 20,
+      "y": 4,
+      "w": 8,
+      "h": 7
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 22,
+      "y": 6,
+      "w": 4,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 9,
+      "y": 28,
+      "w": 14,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 7,
+      "y": 31,
+      "w": 4,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 14,
+      "y": 31,
+      "w": 4,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 20,
+      "y": 31,
+      "w": 4,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 6,
+      "y": 39,
+      "w": 5,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 19,
+      "y": 40,
+      "w": 5,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 6,
+      "y": 16,
+      "w": 2,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 24,
+      "y": 16,
+      "w": 2,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 13,
+      "y": 17,
+      "w": 6,
+      "h": 2
+    }
+  ]
+}

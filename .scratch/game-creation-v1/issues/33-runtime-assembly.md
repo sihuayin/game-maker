@@ -5,6 +5,13 @@ Status: open
 Blocked by: 24, 26, 27, 32, 40, 41
 Map: ../map.md
 
+> 🔴 **2026-09-26（[票 40](40-last-train-fixture-pack.md)）—— 一条**包自己管不了**的几何约束。**
+> **不平铺的层必须 `parallax = 0`。** 视差 `p` 的层要覆盖住宽 `W` 的世界（画布宽 `w`、滚动行程 `W-w`），
+> 需要 `(W-w)·p + w ≥ W - ...` 化简下来就是 `p = 0` 才恒成立（票 40 里对 last-train 算过一次：
+> `c·0.3 + 480 ≥ c + 480` 只有 `c = 0` 成立）。`tileable` 的层不受这条约束。
+> ⚠️ **世界多宽只有 game-config 知道**，所以这条检查**只能落在本票的装配期** ——
+> 它属于票 09 那三族校验之外的**第四族：几何可行性**。
+
 > 🔴 **2026-09-26（[票 31](31-first-demo-game.md)）—— 本票新增两个前置与一份产出。**
 > ① **要真跑装配，仓库里就得先有那个包** —— 已连阻塞边到[票 40](40-last-train-fixture-pack.md)
 > （产出 `fixtures/packs/last-train/v1/`）。② **last-train 的 fixture game-config 归本票产** ——

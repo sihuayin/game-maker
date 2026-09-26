@@ -1,0 +1,275 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "last-train",
+  "styleRef": "../style-spec.halt-dusk.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-traveler",
+        "role": "玩家角色：赶末班车的旅客，大衣与背上行李卷",
+        "description": "极简像素风横版侧视旅客，扁平色块拼贴，无描边，哑光低饱和大衣色块，背后一个矩形行李卷；站立、奔跑、起跳三组动作，帧间仅位移与腿部色块变化",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-dusk-halt",
+        "role": "三层视差背景：远天、候车室外墙、站台地面与铁轨",
+        "description": "正交侧视三层叠合；最远为山脊剪影与落日色块，不平铺；中景为候车室外墙，含窗、挂画、路灯，横向平铺；近景为站台地面与下方铁轨，横向平铺",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "dependencies": [],
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0
+          },
+          {
+            "name": "wall",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "ground",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-luggage-pile",
+        "role": "高度差障碍一：一摞行李，可跳上",
+        "description": "极简像素风一摞叠放的行李色块，矩形主导，无描边，哑光低饱和，顶面平整可站立",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 40,
+          "h": 40
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-awning-steps",
+        "role": "高度差障碍二：拱起的雨棚台阶，可跳上",
+        "description": "极简像素风一段拱起的雨棚台阶，几何构成，横平竖直的踏面与极简三角斜面，无描边色块",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 56,
+          "h": 32
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "pickup-suitcase",
+        "role": "失物收集物：皮箱，摆三处",
+        "description": "极简像素风一只小皮箱，扁平矩形色块加一条提手色块，无渐变无高光，可三处重复摆放",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "hazard-sweeping-carriage",
+        "role": "危险：周期性扫过站台一段的进站车厢",
+        "description": "极简像素风横版车厢侧面，扁平色块矩形构成，窗为规则方点；沿站台一段周期性扫过，接触即触发失败",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "dependencies": [],
+        "required": true,
+        "animations": [
+          {
+            "name": "sweep",
+            "frames": 2,
+            "fps": 3,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "signal-endlight",
+        "role": "站台尽头的信号灯：红转绿判定过关",
+        "description": "极简像素风立式信号灯，竖杆与方形灯头；红灯常亮，集齐失物后切绿灯，过关判定点",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 40
+        },
+        "dependencies": [],
+        "required": true,
+        "animations": [
+          {
+            "name": "red",
+            "frames": 2,
+            "fps": 2,
+            "loop": true
+          },
+          {
+            "name": "green",
+            "frames": 2,
+            "fps": 2,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-lost-slots",
+        "role": "屏幕左下角 HUD 面板，三个槽位显示失物收集进度",
+        "description": "极简像素风屏幕空间面板，矩形底块内三个方形槽位；捡到一件点亮一格，无渐变无高光",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0,
+          "y": 1
+        },
+        "size": {
+          "w": 72,
+          "h": 32
+        },
+        "dependencies": [],
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-pip",
+        "role": "HUD 槽位点亮标记：捡到一件失物时叠在对应槽位上",
+        "description": "极简像素风屏幕空间小方块标记，方正实心色块加一圈更亮的描边，扁平无渐变无高光；叠在空槽位上表示该格已点亮",
+        "styleId": "flat-pixel-side-scroller",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "dependencies": [],
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ]
+}

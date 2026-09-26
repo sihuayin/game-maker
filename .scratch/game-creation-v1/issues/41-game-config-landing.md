@@ -5,6 +5,16 @@ Status: open
 Blocked by: —
 Map: ../map.md
 
+> 🔴 **2026-09-26（[票 40](40-last-train-fixture-pack.md)）—— 票 09 的一条形状**建不出来**，落地时要改。**
+> 票 09 写的是 `hud: { panel:{…}, slot:{asset, anims:{empty, filled}} }`，而
+> **`ui` 类不允许声明动画**（票 27：动画只归 `animation` 类），一个 ui 资源**只有一张图** ——
+> 所以「一个两态的槽位资源」在契约里不存在。
+> 落地时改成**两个 ui 资源的引用**。票 40 的真产物就是这么做的：
+> `hud-lost-slots`（九宫格面板，画着三个空槽）+ `hud-pip`（点亮标记，叠上去）。
+> ⚠️ 顺带确认一条**能用**的写法：**信号灯是 `animation` 类带 `red`/`green` 两个动画** ——
+> 票 26「一个状态就是一个单帧动画」（番茄 growing/ripe/harvested）那条先例，
+> 对**世界空间**的东西成立。判据仍然是票 27 那句「它活在屏幕空间还是世界空间」。
+
 > 由[票 09](09-game-config-contract.md) 毕业。它把形状定死了，本票把形状变成代码。
 > 与[票 37](37-assetpack-manifest-landing.md)（把 manifest 契约落地）同构。
 

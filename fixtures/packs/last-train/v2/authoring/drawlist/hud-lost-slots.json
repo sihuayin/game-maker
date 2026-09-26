@@ -1,0 +1,168 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-lost-slots",
+  "frame": "hud-lost-slots",
+  "viewBox": [
+    0,
+    0,
+    72,
+    32
+  ],
+  "expectedSize": [
+    72,
+    32
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 20,
+      "w": 72,
+      "h": 12
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 20,
+      "w": 72,
+      "h": 12,
+      "colors": [
+        "palette:0",
+        "palette:6"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 0,
+      "y": 20,
+      "w": 4,
+      "h": 12
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 68,
+      "y": 20,
+      "w": 4,
+      "h": 12
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 20,
+      "w": 64,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 28,
+      "w": 64,
+      "h": 4
+    },
+    {
+      "op": "line",
+      "stroke": "palette:2",
+      "strokeWidth": 1,
+      "x1": 4,
+      "y1": 24,
+      "x2": 68,
+      "y2": 24
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 4,
+      "y1": 23,
+      "x2": 68,
+      "y2": 23
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:2",
+      "strokeWidth": 1,
+      "x": 6,
+      "y": 25,
+      "w": 8,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 7,
+      "y": 26,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:2",
+      "strokeWidth": 1,
+      "x": 32,
+      "y": 25,
+      "w": 8,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 33,
+      "y": 26,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:2",
+      "strokeWidth": 1,
+      "x": 58,
+      "y": 25,
+      "w": 8,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 59,
+      "y": 26,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "dither",
+      "x": 18,
+      "y": 25,
+      "w": 10,
+      "h": 6,
+      "colors": [
+        "palette:6",
+        "palette:0"
+      ],
+      "ratio": 0.3,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 44,
+      "y": 25,
+      "w": 10,
+      "h": 6,
+      "colors": [
+        "palette:6",
+        "palette:0"
+      ],
+      "ratio": 0.3,
+      "pattern": "checker"
+    }
+  ]
+}

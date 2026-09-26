@@ -154,10 +154,85 @@ describe("小工具", () => {
     expect(stripFences("```\n{\"a\":1}\n```")).toBe('{"a":1}');
   });
   it("framePlan：sprite 一帧，animation 按 animations 顺序展开", () => {
-    expect(framePlan({ ...PLAYER, kind: "sprite" } as AssetSpec)).toEqual([{ anim: null, index: 0, total: 1 }]);
+    expect(framePlan({ ...PLAYER, kind: "sprite" } as AssetSpec)).toEqual([{ name: "player", anim: null, layer: null, index: 0, total: 1 }]);
     expect(framePlan(PLAYER)).toEqual([
-      { anim: "idle", index: 0, total: 1 },
-      { anim: "walk", index: 0, total: 2 }, { anim: "walk", index: 1, total: 2 },
+      { name: "player.idle", anim: "idle", layer: null, index: 0, total: 1 },
+      { name: "player.walk1", anim: "walk", layer: null, index: 0, total: 2 },
+      { name: "player.walk2", anim: "walk", layer: null, index: 1, total: 2 },
     ]);
+  });
+});
+
+/**
+ * 票 40 在「真跑第一个包」时抓到的：`framePlan` 曾有**两份实现**（`prompt.ts` 与 `pack.ts`），
+ * 而票 42 给「分层背景」加那一支时**只改了一半** —— 提示词仍然告诉模型「只需一帧」，
+ * 组装侧却期待三帧。两边各写一份必然漂移，这一次漂的是**提示词与组装之间**。
+ */
+describe("framePlan：帧名只此一份（票 40）", () => {
+  it("animation：按动画顺序分配，多帧带序号、单帧不带", () => {
+    expect(framePlan(PLAYER).map((p) => p.name)).toEqual(["player.idle", "player.walk1", "player.walk2"]);
+  });
+
+  it("分层背景：一层一帧，帧名 `<资源 id>.<层名>`，且带上层名给提示词用", () => {
+    const bg: AssetSpec = {
+      kind: "background", id: "station", role: "backdrop", description: "站台", styleId: "s-ref",
+      anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, dependencies: [], required: true,
+      layers: [{ name: "sky", parallax: 0 }, { name: "wall", parallax: 0.5, tileable: { x: true, y: false } }],
+    };
+    const plan = framePlan(bg);
+    expect(plan.map((p) => p.name)).toEqual(["station.sky", "station.wall"]);
+    expect(plan.map((p) => p.layer)).toEqual(["sky", "wall"]);
+    expect(plan.every((p) => p.anim === null)).toBe(true);
+  });
+
+  it("单帧资源：帧名就是资源 id", () => {
+    const s: AssetSpec = {
+      kind: "sprite", id: "crate", role: "prop", description: "货箱", styleId: "s-ref",
+      anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true,
+    };
+    expect(framePlan(s).map((p) => p.name)).toEqual(["crate"]);
+  });
+
+  it("提示词要为分层背景说「一次给全部层」，且说清每层都画满整块画布", () => {
+    const bg: AssetSpec = {
+      kind: "background", id: "station", role: "backdrop", description: "黄昏站台", styleId: "s-ref",
+      anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, dependencies: [], required: true,
+      layers: [{ name: "sky", parallax: 0 }, { name: "ground", parallax: 1, tileable: { x: true, y: false } }],
+    };
+    const p = renderPrompt(bg, STYLE);
+    expect(p).toMatch(/2 层/);
+    expect(p).toMatch(/层名 sky/);
+    expect(p).toMatch(/不要把画布横切成几条/);
+  });
+
+  it("提示词要为九宫格说清「四边原样、中央被拉伸」", () => {
+    const ui: AssetSpec = {
+      kind: "ui", id: "hud-panel", role: "hud", description: "HUD 面板", styleId: "s-ref",
+      anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 }, dependencies: [], required: true,
+      ninePatch: { left: 4, right: 4, top: 4, bottom: 4 },
+    };
+    const p = renderPrompt(ui, STYLE);
+    expect(p).toMatch(/九宫格/);
+    expect(p).toMatch(/只有中央区会被拉伸/);
+    // 单帧资源不该被说成「多层」
+    expect(p).not.toMatch(/层名/);
+  });
+});
+
+/** 票 40：锚点此前**从没进过提示词** —— 于是模型自己挑了一个位置画，
+ *  而清单声明的锚点在另一处，壳子对齐的是声明的那条线，角色就悬空了 4.6px。 */
+describe("锚点要进提示词（票 40）", () => {
+  const crate: AssetSpec = {
+    kind: "sprite", id: "crate", role: "prop", description: "货箱", styleId: "s-ref",
+    anchor: { x: 0.5, y: 0.8 }, size: { w: 40, h: 40 }, dependencies: [], required: true,
+  };
+  it("把归一化锚点换算成画布上的行与列说清楚", () => {
+    const p = renderPrompt(crate, STYLE);
+    expect(p).toMatch(/第 32\.0 行/);      // 0.8 × 40
+    expect(p).toMatch(/第 20\.0 列/);      // 0.5 × 40
+    expect(p).toMatch(/底边就压在那条横线上/);
+  });
+  it("明确说腾空的帧是例外 —— 否则 jump 会被画成站在地上，腾空动作消失", () => {
+    expect(renderPrompt(PLAYER, STYLE)).toMatch(/腾空的帧例外/);
   });
 });

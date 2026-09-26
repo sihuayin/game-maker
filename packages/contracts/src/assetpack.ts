@@ -65,8 +65,14 @@ export const Layer = z.object({
   name: z.string().min(1),
   /** 0 = 完全跟随镜头（最远），1 = 与镜头同速（最近）。 */
   parallax: z.number().min(0),
-  /** 可平铺的轴。缺省 = 不平铺。⚠️ **逐层**声明 —— 三层里通常只有墙与地平铺，天空不平铺。 */
-  tileable: z.object({ x: z.boolean(), y: z.boolean() }).strict().optional(),
+  /**
+   * 可平铺的轴。缺省 = 不平铺。⚠️ **逐层**声明 —— 三层里通常只有墙与地平铺，天空不平铺。
+   *
+   * ⚠️ 两个轴**各自默认 false**（票 40 抓到的）：写 `{"x":true}` 是自然的写法，
+   * 而两个轴都必填时它会被拒收 —— 提示词里的示例正是这么写的，于是**教模型写一个
+   * 会被自己拒收的形状**。省略的轴 = 不平铺，这是唯一说得通的默认。
+   */
+  tileable: z.object({ x: z.boolean().default(false), y: z.boolean().default(false) }).strict().optional(),
 }).strict();
 
 export const AssetKind = z.enum(["sprite", "animation", "background", "ui"]);

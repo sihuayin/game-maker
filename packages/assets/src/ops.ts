@@ -91,7 +91,7 @@ ${styleBrief(style)}
 按类可以另加，且**形状必须逐字如下**：
   animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
   background → "layers":[{"name":"sky","parallax":0.3},
-                         {"name":"ground","parallax":1,"tileable":{"x":true}}]
+                         {"name":"ground","parallax":1,"tileable":{"x":true,"y":false}}]
                ← **数组**，每项是对象，**从远到近**排序；层名会拼成帧名 \`<资源 id>.<层名>\`
                ← 不平铺的层**别写 tileable**（三层里通常只有墙与地平铺，天空不平铺）
   ui         → "ninePatch":{"left":4,"right":4,"top":4,"bottom":4}
