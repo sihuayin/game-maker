@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Blocked by: 24, 26, 27, 32, 40
+Blocked by: 24, 26, 27, 32, 40, 41
 Map: ../map.md
 
 > 🔴 **2026-09-26（[票 31](31-first-demo-game.md)）—— 本票新增两个前置与一份产出。**

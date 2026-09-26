@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Blocked by: —
+Blocked by: 42
 Map: ../map.md
 
 > 由[票 31](31-first-demo-game.md) 毕业。它定了「第一个 demo 是什么」，
