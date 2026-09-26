@@ -1,7 +1,7 @@
 # 13. GameplayTestPlan 的规则推导模板集
 
 Type: grilling
-Status: out-of-scope
+Status: resolved
 Blocked by: —
 Map: ../map.md
 

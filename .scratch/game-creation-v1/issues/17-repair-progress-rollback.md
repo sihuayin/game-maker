@@ -1,7 +1,7 @@
 # 17. RepairProgress / Stalled / Best Artifact 的判定与回滚机制
 
 Type: grilling
-Status: out-of-scope
+Status: resolved
 Blocked by: —
 Map: ../map.md
 

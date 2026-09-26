@@ -1,7 +1,7 @@
 # 11. 语义 TestAction 到 Phaser 的映射：走不走真实输入系统？
 
 Type: grilling
-Status: out-of-scope
+Status: resolved
 Blocked by: —
 Map: ../map.md
 

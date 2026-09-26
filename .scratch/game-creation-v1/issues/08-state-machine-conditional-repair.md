@@ -1,7 +1,7 @@
 # 08. 修状态机缺陷：repair 跳过 generate，并记 ADR
 
 Type: task
-Status: out-of-scope
+Status: resolved
 Blocked by: —
 Map: ../map.md
 

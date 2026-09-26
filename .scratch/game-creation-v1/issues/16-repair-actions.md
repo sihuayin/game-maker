@@ -1,7 +1,7 @@
 # 16. Repair 动作集：在「数据 + 纯函数」范式下，修什么、谁来修？
 
 Type: grilling
-Status: out-of-scope
+Status: resolved
 Blocked by: —
 Map: ../map.md
 
