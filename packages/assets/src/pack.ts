@@ -28,7 +28,7 @@ export type DrawListGenerator = (spec: AssetSpec, style: StyleSpec) => DrawList[
 export type GenerateImage = (req: ImageRequest) => Promise<{ image: RasterImage; call: ImageGenCall }>;
 
 export type BuildPackOptions = {
-  recipe: { id: string; styleRef: string; assets: readonly { spec: AssetSpec; source: AssetSourceLike }[] };
+  recipe: { id: string; styleRef: string; referenceImage?: string; assets: readonly { spec: AssetSpec; source: AssetSourceLike }[] };
   style: StyleSpec;
   /** 产物根目录。**必填** —— 产物不属于任何单个包（票 29），由调用方定。
    *  实际写入 `outDir/<recipe.id>/pack/v<N>/`。 */
@@ -184,6 +184,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       // 生图产物**同样过那条重建管线**（抠背景 → 裁框 → 降采样 → 二值化 → 量化），
       // 所以它与导入通道在结构上是同一种东西：都是「原生位图」这一创作态。
       binding = "quantized";
+      // 世界的风格参考图（配方级）。给了就内联进每一次生图请求 —— 让模型**看着那个世界**画，
+      // 而不是听一个文字转述（实测后者会走样成一张场景插画）。
+      const styleReference = recipe.referenceImage
+        ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, recipe.referenceImage)))
+        : undefined;
       const reference = src.reference
         ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
         : undefined;
@@ -200,7 +205,8 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         const prompt = src.prompt ?? imagePrompt(spec, style, u.anim);
         const { image, call } = await opts.generateImage({
           prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
-          negativePrompt: imageNegativePrompt(), ...(reference ? { reference } : {}),
+          negativePrompt: imageNegativePrompt(),
+          ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
         });
         // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
         fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));

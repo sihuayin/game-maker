@@ -49,6 +49,14 @@ export type ImageRequest = {
    * ⚠️ 只有 Gemini 支持它：DashScope 的 `image_edit` 要公网 URL，本机文件传不进去。
    */
   reference?: RasterImage;
+  /**
+   * 世界的**风格参考图**（整张场景图）。与 `reference` 是两个东西：
+   * `reference` 是「照这个角色画」，`styleReference` 是「照这个世界的**色彩与质感**画，
+   * 但**不要画它里面的任何东西**」。
+   *
+   * ⚠️ 顺序有语义：两个都给时，**先风格图、后母版**，提示词里按这个顺序点名。
+   */
+  styleReference?: RasterImage;
 };
 export type ImageGenerator = (req: ImageRequest) => Promise<{ image: RasterImage; call: ImageGenCall }>;
 
@@ -258,13 +266,20 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
   const attempts = opts.attempts ?? 4;   // 见 GeminiOptions.attempts 的注释：实测 8% 的秒拒率
   const model = opts.model ?? "gemini-2.5-flash-image";
 
-  return async ({ prompt, size, negativePrompt, reference }) => {
+  return async ({ prompt, size, negativePrompt, reference, styleReference }) => {
     const t0 = Date.now();
     const doFetch = opts.fetchImpl ?? fetch;
     const url = `${opts.baseUrl.replace(/\/+$/, "")}/models/${model}:generateContent`;
-    const parts: unknown[] = [{ text: negativePrompt ? `${prompt}\n\nAvoid: ${negativePrompt}` : prompt }];
+    // ⚠️ 图与提示词的**顺序必须对上**：正文里按「先风格图、后母版」点名，这里就按这个顺序塞。
+    const notes: string[] = [];
+    if (styleReference) notes.push("附件第 1 张是这个游戏世界的**风格参考图** —— **只借它的色彩、材质与渲染质感**，" +
+      "绝对不要画它里面的任何东西（不要画房间、柜台、货架、海报、文字）。它只是调色与质感的依据。");
+    if (reference) notes.push(`附件第 ${styleReference ? 2 : 1} 张是要照画的**角色本身** —— 保持它的形象与配色。`);
+    const head = [prompt, ...notes].join("\n\n");
+    const parts: unknown[] = [{ text: negativePrompt ? `${head}\n\nAvoid: ${negativePrompt}` : head }];
     // ⚠️ 参考图**内联**，不走 URL（那正是 DashScope 那条路断掉的地方）。
-    if (reference) parts.push({ inline_data: { mime_type: "image/png", data: encodePNG(reference).toString("base64") } });
+    for (const img of [styleReference, reference])
+      if (img) parts.push({ inline_data: { mime_type: "image/png", data: encodePNG(img).toString("base64") } });
     const body = {
       contents: [{ parts }],
       generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: geminiAspect(size) } },

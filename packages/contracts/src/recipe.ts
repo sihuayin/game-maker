@@ -118,6 +118,18 @@ export const AssetRecipe = z.object({
   id: z.string().min(1),
   /** StyleSpec 文件的位置，**相对于配方文件**（见 `InputPath`）。 */
   styleRef: InputPath,
+  /**
+   * 世界的**风格参考图**（通常就是当初提取 StyleSpec 的那张图）。相对**配方文件**解析。
+   *
+   * ⚠️ 它是**给生图模型看的**，而不是给人看的：`StyleSpec` 是**文字转述**的风格
+   * （色板 hex + identity/material 这些词），而实测「文字转述的风格」会走样 ——
+   * 曾经产出过一张带边框的场景插画而不是一件道具。
+   * 有了它，生图请求里会**内联**这张图，让模型直接看着那个世界画。
+   *
+   * ⚠️ 只有 Gemini 支持内联（实测过）；DashScope 那条 `image_edit` 要公网 URL，收不到。
+   * 给了它但上游不支持时，管线**不报错**（那是能力差异，不是清单错误），只是不起作用。
+   */
+  referenceImage: InputPath.optional(),
   assets: z.array(RecipeEntry).min(1),
 }).strict().superRefine((r, ctx) => {
   const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message, path });

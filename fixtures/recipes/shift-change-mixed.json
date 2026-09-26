@@ -2,6 +2,7 @@
   "format": "asset-recipe/v1",
   "id": "shift-change-mixed",
   "styleRef": "../style-spec.json",
+  "referenceImage": "../reference/test.png",
   "assets": [
     {
       "spec": {
