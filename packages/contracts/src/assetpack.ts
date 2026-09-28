@@ -342,6 +342,13 @@ export function resolvePackRef(ref: AssetPackRef, manifest: AssetPackManifest): 
   }
 
   // 没给 anim：只有在它确实只有一个「可画的东西」时才无歧义
+  //
+  // ⚠️ **背景的多帧不是「多个可画的动画」，而是叠在一起的一摞层** —— 它们**同时**画出来
+  //   （第 i 层 = 第 i 帧，见上面 `Layer` 的注释），所以 `{ asset }` 本来就无歧义。
+  //   票 09 的形状里 `scene.background` 正是**只给 `asset`** 的，而票 40 的真包
+  //   `bg-dusk-halt` 有三层 —— 少了这一支，**任何一个分层背景都解不开**，
+  //   而且报出来的是「必须指明 anim」：背景**根本没有 anim 可指**，人被指向一个不存在的出路。
+  if (asset.kind === "background") return { ok: true, asset, frames: asset.frames, animation: null };
   if (animations.length === 1) return collect(animations[0]!.frames, animations[0]!);
   if (animations.length === 0 && asset.frames.length === 1) return { ok: true, asset, frames: asset.frames, animation: null };
   return {

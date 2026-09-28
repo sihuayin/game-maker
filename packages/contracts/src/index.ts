@@ -7,13 +7,10 @@ import { z } from "zod";
 import { PaletteSchema } from "./drawlist.js";
 import { AssetSpecSchema } from "./asset-spec.js";
 
-// ── 需求 ──────────────────────────────────────────────────────────────────
-export const RequirementPriority = z.enum(["core", "important", "optional"]);
-export const RequirementSchema = z.object({
-  id: z.string(), description: z.string(), priority: RequirementPriority,
-  acceptance: z.array(z.string()).default([])
-});
-export type Requirement = z.infer<typeof RequirementSchema>;
+// ── 需求 ── 结构化类型已删除（票 09，2026-09-26）────────────────────────────
+// 这里曾有 `RequirementPriority` + `RequirementSchema`。删它的理由：需求今天就是
+// **一段文本**（`derive` 的输入），R2 之后没有任何消费者要结构化的它。
+// 详见证 09 的 Answer §1。
 
 // ── 风格 ──────────────────────────────────────────────────────────────────
 /**
@@ -40,23 +37,13 @@ export const StyleSpecSchema = z.object({
 });
 export type StyleSpec = z.infer<typeof StyleSpecSchema>;
 
-// ── 游戏 ──────────────────────────────────────────────────────────────────
-export const GameSpecSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  coreLoop: z.array(z.string()),
-  world: z.record(z.unknown()).default({}),
-  player: z.record(z.unknown()).default({}),
-  mechanics: z.array(z.string()),
-  entities: z.array(z.record(z.unknown())),
-  scenes: z.array(z.record(z.unknown())),
-  ui: z.array(z.record(z.unknown())),
-  rules: z.array(z.string()),
-  winConditions: z.array(z.string()),
-  loseConditions: z.array(z.string()),
-  requirements: z.array(RequirementSchema)
-});
-export type GameSpec = z.infer<typeof GameSpecSchema>;
+// ── 游戏 ── `GameSpecSchema` 已删除（票 09，2026-09-26）──────────────────────
+// 这里曾有 `GameSpecSchema`（设计文档：coreLoop / world / player / mechanics / entities /
+// scenes / ui / rules / winConditions / loseConditions / requirements）。删它的理由：
+// 它描述的是「这个游戏**设计上**是什么」（大半字段是 `z.record(z.unknown())` 逃生舱），
+// 而 [[Game Config]] 描述的是「**外壳要执行的数据**是什么」—— **两件事，不是一件事的
+// 粗细两个版本**。游戏配置现在是 `game-config.ts`，只读 manifest 与它两个东西。
+// 详见证 09 的 Answer §1。
 
 // ── 资源规格 ──────────────────────────────────────────────────────────────
 
@@ -69,12 +56,10 @@ export type GameSpec = z.infer<typeof GameSpecSchema>;
 // 「包**之间**的引用」若将来真需要，那时再设计 —— 留一个空壳 schema 只会让下一个
 // 读代码的人以为它是活的。见 CONTEXT.md 的 ArtifactRef 词条。
 
-// ── 创建项目 ──────────────────────────────────────────────────────────────
-export const CreationProjectSchema = z.object({
-  id: z.string(), title: z.string(), requirement: z.string(),
-  referenceImage: z.string().optional(), createdAt: z.string()
-});
-export type CreationProject = z.infer<typeof CreationProjectSchema>;
+// ── 创建项目 ── `CreationProjectSchema` 已删除（票 09，2026-09-26）──────────
+// 曾是一个顶层容器（标题 + 需求文本 + 参考图）。它的字段为旧的闭环模型设计，
+// **零消费者**，而地图说它的粒度「归票 24 / 28」——那两票都已 resolved 且没有给它留位置。
+// 今天「一次创建」的载体是两样具体的东西：一份**资源清单**（输入侧）与一个**资源包**（输出侧）。
 
 // ── 创作态：drawlist ──────────────────────────────────────────────────────
 export * from "./drawlist.js";
@@ -82,6 +67,9 @@ export * from "./geometry.js";
 
 // ── 交付态：资源包自描述 ──────────────────────────────────────────────────
 export * from "./assetpack.js";
+
+// ── 游戏配置：AI 与手写 runtime 之间唯一的语义接口 ─────────────────────────
+export * from "./game-config.js";
 
 // ── 资源规格（四类）与确定性校验 ──────────────────────────────────────────
 export * from "./asset-spec.js";
