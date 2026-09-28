@@ -3,7 +3,25 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "产物 B：固定 runtime 外壳 + 站点构建器。",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "dependencies": {"@game-maker/contracts":"workspace:*"}
+  "description": "产物 B：固定 runtime 外壳（票 44）+ 站点构建器（票 33）。",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@game-maker/contracts": "workspace:*",
+    "phaser": "^3.90.0"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json",
+    "bundle": "esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js",
+    "smoke": "node probe/smoke.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "esbuild": "catalog:",
+    "vitest": "catalog:"
+  }
 }

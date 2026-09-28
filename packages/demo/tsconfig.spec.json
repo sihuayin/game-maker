@@ -1,0 +1,13 @@
+{
+  "//": "类型检查**纯层 + 测试**，不产出（与其它包同款）。⚠️ 有意**不含 `src/shell`** —— 它要 DOM，走 tsconfig.shell.json。这一刀就是「纯函数不许碰 DOM」的守门人。",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src/index.ts", "src/world.ts", "tests"]
+}

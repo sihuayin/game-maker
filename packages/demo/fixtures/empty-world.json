@@ -1,0 +1,56 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 480,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "__不存在__"
+    }
+  },
+  "player": {
+    "asset": "__不存在__",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 270
+    }
+  },
+  "terrain": [],
+  "entities": [],
+  "hud": {
+    "panel": {
+      "asset": "__不存在__",
+      "at": {
+        "x": 8,
+        "y": 262
+      },
+      "size": {
+        "w": 72,
+        "h": 32
+      }
+    },
+    "pip": {
+      "asset": "__不存在__",
+      "at": {
+        "x": 12,
+        "y": 250
+      },
+      "step": {
+        "x": 20,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "__不存在__"
+  }
+}

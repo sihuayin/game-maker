@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "//": "渲染层与入口：**要** DOM 与 Phaser。它不产出声明文件（产物是 esbuild 打的 dist/shell.js），只做类型检查 —— 于是「纯层无 DOM」这条缝是编译器看着的。",
+  "include": ["src/shell"]
+}

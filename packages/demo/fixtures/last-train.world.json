@@ -1,0 +1,25 @@
+{
+  "format": "game-config/v1",
+  "world": { "size": { "w": 1440, "h": 270 } },
+  "scene": { "background": { "asset": "bg-dusk-halt" } },
+  "player": {
+    "asset": "player-traveler",
+    "anims": { "idle": "idle", "run": "run", "jump": "jump" },
+    "at": { "x": 40, "y": 250 }
+  },
+  "terrain": [{ "x": 0, "y": 250, "w": 1440, "h": 20 }],
+  "entities": [
+    { "id": "suitcase-1", "kind": "pickup", "at": { "x": 300, "y": 250 }, "asset": "pickup-suitcase" },
+    { "id": "suitcase-2", "kind": "pickup", "at": { "x": 700, "y": 250 }, "asset": "pickup-suitcase" },
+    { "id": "suitcase-3", "kind": "pickup", "at": { "x": 1100, "y": 250 }, "asset": "pickup-suitcase" },
+    { "id": "luggage", "kind": "solid", "at": { "x": 500, "y": 250 }, "asset": "prop-luggage-pile" },
+    { "id": "carriage", "kind": "hazard", "at": { "x": 800, "y": 250 }, "asset": "hazard-sweeping-carriage", "anim": "sweep",
+      "motion": { "kind": "cycle", "axis": "x", "distance": 200, "periodMs": 4000 } },
+    { "id": "signal", "kind": "goal", "at": { "x": 1400, "y": 250 }, "asset": "signal-endlight", "anim": "red" }
+  ],
+  "hud": {
+    "panel": { "asset": "hud-lost-slots", "at": { "x": 8, "y": 262 }, "size": { "w": 72, "h": 32 } },
+    "pip": { "asset": "hud-pip", "at": { "x": 12, "y": 250 }, "step": { "x": 20, "y": 0 } }
+  },
+  "objective": { "kind": "collect-then-reach", "gate": "signal" }
+}
