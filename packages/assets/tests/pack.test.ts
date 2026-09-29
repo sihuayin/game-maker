@@ -329,6 +329,22 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
     expect(prompts[0], "不平铺的层不必接缝").toMatch(/不平铺/);
   });
 
+  it("⚠️ **最远那层不许再说「别拿天空色去填」**（票 51：那句话字面上就是「别画天空」）", async () => {
+    // 票 51 量了四次：把「画满」说硬（70.3%）、改成「天空就是内容」（66.9%）**全都没用**，
+    // 而**只拆掉那句禁色** ⇒ **100%**。所以这条钉的不是措辞好不好听，是**那个矛盾在不在了**。
+    const { prompts, gen } = call(1);
+    await buildAssetPack({ recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: stub, generateImage: gen, sourceDateEpoch: EPOCH });
+    const [sky, wall] = prompts as [string, string, string];
+
+    // 最远那层：说清「天空就是这一层的内容」，且**不许**出现那句自相矛盾的禁色
+    expect(sky).toMatch(/天空本身就是你要画的东西/);
+    expect(sky, "「不要拿…天空色…去填」对天层是**反的**").not.toMatch(/天空色/);
+    // ⚠️ 其余层**必须保留**那句 —— 墙的空白处不许拿天色糊上去（那会盖住真正的天层）
+    expect(wall, "对墙层，那句话是对的，不许一起改掉").toMatch(/天空色/);
+    expect(wall).not.toMatch(/天空本身就是你要画的东西/);
+  });
+
   it("**每一层**的原图都声明成创作态 —— 不是一个资源只记第一张", async () => {
     const { gen } = call(1);
     const { manifest } = await buildAssetPack({
