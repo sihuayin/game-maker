@@ -6,7 +6,7 @@
 // ⚠️ 唯一的例外是**能力探测**（这个帧有没有九宫格数据、这个纹理建没建过）——
 //   那是渲染器自己的事，与数据无关。
 import Phaser from "phaser";
-import { formatIssue, type Box, type Drawn, type WorldDescription } from "../world.js";
+import { BACKDROP, formatIssue, type Box, type Drawn, type WorldDescription } from "../world.js";
 
 /** 占位符的纹理名。**品红/黑棋盘** —— 票 32 裁决 3 要的是「刺眼」，不是好看。 */
 const PLACEHOLDER = "__placeholder__";
@@ -53,6 +53,9 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
 
       // 玩家
       this.addPlayer();
+
+      // 底色（票 50）—— 在**铺任何东西之前**定下来：什么都没有画的地方透过去就是它
+      this.cameras.main.setBackgroundColor(BACKDROP);
 
       // HUD
       this.addHud();

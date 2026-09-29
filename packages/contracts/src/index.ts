@@ -70,6 +70,7 @@ export * from "./assetpack.js";
 
 // ── 一次资源生成「花了什么」的账（跟着包走的收据）──────────────────────────
 export * from "./ledger.js";
+export * from "./coverage.js";
 
 // ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────
 export * from "./command.js";

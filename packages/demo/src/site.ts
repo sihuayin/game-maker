@@ -14,10 +14,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, auditGameConfig, parseAssetPack, parseGameConfig,
-  type AssetPackManifest, type CommandResult, type ConfigIssue, type GameConfig,
+  CommandError, auditGameConfig, parseAssetPack, parseCoverage, parseGameConfig,
+  FILLED,
+  type AssetPackManifest, type CommandResult, type ConfigIssue, type GameConfig, type LayerCoverage,
 } from "@game-maker/contracts";
-import { SHELL_VERSION, VIEWPORT, buildWorld, type Box, type WorldDescription } from "./world.js";
+import { BACKDROP, SHELL_VERSION, VIEWPORT, buildWorld, type Box, type WorldDescription } from "./world.js";
 
 // ── 第四族 · 几何可行性 ─────────────────────────────────────────────────────
 //
@@ -34,7 +35,7 @@ function coveredExtent(drawn: number, parallax: number, travel: number): number 
   return drawn - parallax * travel;
 }
 
-export function auditGeometry(world: WorldDescription): ConfigIssue[] {
+export function auditGeometry(world: WorldDescription, coverage?: readonly LayerCoverage[]): ConfigIssue[] {
   const out: ConfigIssue[] = [];
   const err = (where: string, message: string) => out.push({ severity: "error", where, message });
   const warn = (where: string, message: string) => out.push({ severity: "warning", where, message });
@@ -55,6 +56,25 @@ export function auditGeometry(world: WorldDescription): ConfigIssue[] {
         `${Math.round(coverX)}×${Math.round(coverY)}px，而视口要 ${V.w}×${V.h}px。` +
         `—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）`);
   });
+
+  // ── 最远的那一层必须画满（票 50）────────────────────────────────────────
+  //
+  // ⚠️ **只查最远那层**。`layers` 是从远到近排的 ⇒ `layers[0]` 后面**什么都没有**，
+  //   它的透明透过去就是外壳的底色。而**其余层的留白是设计** ——
+  //   实测 drawlist 真包的 `wall` 只有 42%、`ground` 只有 14%，那**正是它该有的样子**。
+  //   ⇒「所有层都必须满」会当场拒掉那个包 —— 那是**错的**判据（票 50 量出来的）。
+  //
+  // ⚠️ **覆盖率的算法不在这里**（`@game-maker/demo` 没有 PNG 解码器）——
+  //   它由 `pack` 算好写进包根的 `coverage.json`，这里**只判**。
+  if (coverage && world.background.length > 0) {
+    const far = world.background[0]!;
+    const name = far.draw.missing ? null : far.draw.frame;
+    const c = name === null ? undefined : coverage.find((x) => x.frame === name);
+    if (c && c.ratio < FILLED)
+      err("scene.background[0]", `**最远的那一层没画满**："${c.frame}" 只有 ${(100 * c.ratio).toFixed(1)}% 的像素画了东西，` +
+        `而它后面没有别的层 —— 透过去就是外壳的底色（${BACKDROP}）。` +
+        `⚠️ 其余层的留白是设计；**只有最远这层必须满**（票 50）`);
+  }
 
   // ── HUD：**屏幕空间**的，尺子是视口不是世界 ──────────────────────────────
   //
@@ -150,9 +170,22 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   //
   // ⚠️ 三族就在**这里**跑 —— 票 32 划的缝：「原问 4 引用校验」是**构建期**的事。
   const audit = auditGameConfig(config, manifest);
+
+  // ⚠️ **覆盖率由 `pack` 算好写进包里**（票 50）—— 这里**没有 PNG 解码器**，只能读。
+  //   没有它**不算错**：票 50 之前产的包都不带它（与 ledger.json 同一条规矩）。
+  const coveragePath = path.join(opts.packDir, "coverage.json");
+  let coverageLayers: LayerCoverage[] | undefined;
+  if (fs.existsSync(coveragePath)) {
+    const c = parseCoverage(JSON.parse(fs.readFileSync(coveragePath, "utf8")));
+    if (!c.ok) throw new CommandError("invalid", `coverage.json 不过 schema：${c.errors.slice(0, 4).join("；")}`);
+    if (c.value.packId !== manifest.id || c.value.packVersion !== manifest.version)
+      throw new CommandError("invalid", `覆盖率与包对不上：coverage.json 说自己是 "${c.value.packId}" v${c.value.packVersion}，而 manifest 是 "${manifest.id}" v${manifest.version}`);
+    coverageLayers = c.value.layers;
+  }
+
   const geometryIssues = auditGeometry(buildWorld(manifest, config, {
     packBase: `../../pack/${packVersion}/`,
-  }));
+  }), coverageLayers);
   const all = [...audit, ...geometryIssues];
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);
@@ -196,7 +229,8 @@ export function assembleSite(opts: SiteOptions): CommandResult {
     summary: [
       `站点：${rel(outRoot, siteDir)}（${packCopied ? "拷入" : "复用已存在的"}包 ${rel(outRoot, packDest)}）`,
       `消费：外壳 v${SHELL_VERSION} · 资源包 ${packVersion}（${manifest.assets.length} 个资源）`,
-      `校验：三族 + 第四族（几何）+ 第五族（HUD 屏幕空间）全过${warnings.length ? `；${warnings.length} 条警告` : ""}`,
+      `校验：三族 + 第四族（几何）+ 第五族（HUD 屏幕空间）全过${warnings.length ? `；${warnings.length} 条警告` : ""}` +
+        (coverageLayers ? "" : " ⚠️（这个包没有 coverage.json，「最远层画满」那条没查 —— 它不是错，老包都不带）"),
       ...warnings.map((i) => `  ⚠️ ${i.where}: ${i.message}`),
       `⚠️ 起服务时 **HTTP server 的根必须是 ${rel(outRoot, gameDir)}/** —— ` +
         `打开 /site/v${n}/index.html（根指到 site 里面会 404，而 Phaser 静默失败）`,

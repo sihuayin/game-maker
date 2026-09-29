@@ -21,4 +21,5 @@ export * from "./pack.js";
 export * from "./prompt.js";
 export * from "./generate.js";
 export * from "./review.js";
+export * from "./coverage.js";
 export * from "./ops.js";

@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { CommandError } from "@game-maker/contracts";
-import { assembleSite, type SiteOptions } from "../src/index.js";
+import { assembleSite, auditGeometry, buildWorld, type SiteOptions } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 /** ⚠️ 真产物：票 40 的包 + 票 33 的配置。**不现造**（票 37 立的规矩）。 */
@@ -159,5 +159,55 @@ describe("输入不对时给的是**用法错**（2），不是产物不合法�
       expect((e as CommandError).kind).toBe("usage");
       expect((e as CommandError).message).toMatch(/先跑 pnpm --filter @game-maker\/demo bundle/);
     }
+  });
+});
+
+/**
+ * 票 50：**最远的那一层必须画满**。
+ *
+ * ⚠️ 这条的依据是一组**量出来的对比**，而它当场证伪了最自然的那个检查：
+ *   `fixtures/packs/last-train/v2`（所有东西都建在它上面）的 `wall` 只有 **42%**、`ground` 只有 **14%** ——
+ *   因为**墙本来就只占中间那带、上面留给天**。⇒「所有层都必须满」会拒掉它。
+ *   而 `out/last-train-image/pack/v2` 的 `sky`（**最远那层**）只有 **68%** —— 那才是洞。
+ */
+describe("最远的那一层必须画满（票 50）", () => {
+  // ⚠️ 第一个参数是 **manifest**、第二个才是 config —— 我在这儿写反过一次（传了两份 config），
+  //   于是 `buildWorld` 拿到一个过不了 schema 的「包」，产出**空背景**，检查**永远不触发**，
+  //   而「画满 ⇒ 通过」那条会**假通过**。测试里最容易骗过自己的就是这种：
+  //   断言的是「没有报错」，而它没报错是因为**它根本没跑**。
+  const world = () => buildWorld(readJson(path.join(PACK, "manifest.json")), readJson(CONFIG), { packBase: "" });
+  const layer = (frame: string, ratio: number) =>
+    ({ asset: "bg-dusk-halt", frame, w: 480, h: 270, opaque: Math.round(129600 * ratio), ratio });
+  const FARTHEST = "bg-dusk-halt.sky";
+
+  it("最远层画满 ⇒ 通过（**哪怕别的层只有 14%** —— 那是设计，不是洞）", () => {
+    // 这一条就是「所有层都必须满」会挂掉的地方 —— 它钉的是**判据的边界**。
+    const issues = auditGeometry(world(), [
+      layer(FARTHEST, 1), layer("bg-dusk-halt.wall", 0.42), layer("bg-dusk-halt.ground", 0.14),
+    ]);
+    expect(issues.filter((i) => i.severity === "error")).toEqual([]);
+  });
+
+  it("最远层没画满 ⇒ 硬失败，且说得清「它后面没有别的层」", () => {
+    const issues = auditGeometry(world(), [
+      layer(FARTHEST, 0.682), layer("bg-dusk-halt.wall", 0.617), layer("bg-dusk-halt.ground", 0.609),
+    ]);
+    const e = issues.filter((i) => i.severity === "error");
+    expect(e).toHaveLength(1);
+    expect(e[0]!.where).toBe("scene.background[0]");
+    expect(e[0]!.message).toMatch(/最远的那一层没画满/);
+    expect(e[0]!.message).toMatch(/68\.2%/);
+    expect(e[0]!.message).toMatch(/只有最远这层必须满/);
+  });
+
+  it("⚠️ **没有 coverage.json 就不查** —— 老包都不带它，那不是错", () => {
+    // 与 ledger.json 同一条规矩（票 45）：磁盘上已有的包必须照常通过。
+    expect(auditGeometry(world(), undefined).filter((i) => i.severity === "error")).toEqual([]);
+    expect(auditGeometry(world(), []).filter((i) => i.severity === "error")).toEqual([]);
+  });
+
+  it("覆盖率**对不上帧名**（比如包换了）⇒ 不误报", () => {
+    const issues = auditGeometry(world(), [layer("别的背景.sky", 0.1)]);
+    expect(issues.filter((i) => i.severity === "error")).toEqual([]);
   });
 });

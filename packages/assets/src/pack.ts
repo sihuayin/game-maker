@@ -12,10 +12,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  ASSET_PACK_FORMAT, LEDGER_FORMAT, derivePackMode, paletteBindingOf, summarizeCalls,
+  ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, derivePackMode, paletteBindingOf, summarizeCalls,
   type AssetPackManifest, type AssetSpec, type DrawList, type Ledger, type LedgerCall, type StyleSpec,
 } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
+import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
@@ -508,6 +509,18 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       }
     : undefined;
   if (ledgerDoc) fs.writeFileSync(path.join(packDir, "ledger.json"), jstr(ledgerDoc));
+
+  // ── 覆盖率：包根的 sidecar `coverage.json`（票 50）─────────────────────────
+  //
+  // ⚠️ **由 `pack` 算，不由装配期算** —— `@game-maker/demo` 里没有 PNG 解码器
+  //   （它的依赖只有 contracts 与 phaser，而依赖图写死 demo 只能依赖 contracts）。
+  //   像素是在这里诞生的，**算在产它的地方**。
+  // ⚠️ 与账本同一个形状：**不放 manifest**（票 24 原则 2：不重复**可派生**的内容 ——
+  //   覆盖率可以从图集像素算出来），而包根的 sidecar 靠 `files[]` 的穷举**白拿** checksum 覆盖。
+  fs.writeFileSync(path.join(packDir, "coverage.json"), jstr({
+    format: COVERAGE_FORMAT, packId: recipe.id, packVersion: version,
+    layers: backgroundCoverage(packDir, manifest),
+  }));
 
   // ── files[]：逐文件 checksum（manifest.json 自身除外，自指）──────────────
   const walk = (dir: string, base = ""): string[] => fs.readdirSync(dir, { withFileTypes: true })

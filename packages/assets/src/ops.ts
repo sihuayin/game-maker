@@ -15,6 +15,7 @@ import {
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
+import { backgroundCoverage } from "./coverage.js";
 import { buildAssetPack, type GenerateImage } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
@@ -619,6 +620,16 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
     lines.push(`  ${a.id} · ${a.kind} · ${a.size.w}×${a.size.h} · ${a.origin}/${a.paletteBinding} · ${a.frames.length} 帧${anim}${uses}`);
   }
   // ⚠️ 这一块是**观察**不是判据（票 39）—— 不打分、不阻断，只是把人眼判「像不像同一个世界」时要看的事实摆出来
+  // 每一层背景画得有多满（票 50）—— ⚠️ 这个量**是判据**（装配期会硬失败），
+  //   这里只是让人先看见它。**同一个 helper**，不另算一份。
+  const bg = backgroundCoverage(opts.packDir, m);
+  if (bg.length > 0) {
+    lines.push(`背景层：整帧有多少像素是真画了东西的（最远那层**必须 100%** —— 它后面没东西）：`);
+    const farthest = m.assets.find((a) => a.kind === "background" && a.layers?.length)?.layers?.[0]?.name;
+    for (const c of bg)
+      lines.push(`  ${c.frame.padEnd(24)} ${c.w}×${c.h}  ${(100 * c.ratio).toFixed(1)}%` +
+        (c.frame.endsWith(`.${farthest}`) ? (c.ratio >= 1 ? "  ✅ 最远层画满了" : "  ⚠️ **最远层没画满** —— 装配期会拦下") : ""));
+  }
   lines.push(`色板 ${m.palette.values.length} 色 · 交付态实际用到的像素分布（**观察，不是判据**）：`);
   for (const c of usage.perColor)
     lines.push(`  ${c.color} · ${c.assets}/${m.assets.length} 个资源用到 · 占全部不透明像素 ${(100 * c.share).toFixed(1)}%`);
@@ -630,7 +641,7 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
       assets: m.assets.map((a) => ({ id: a.id, kind: a.kind, size: a.size, origin: a.origin,
         paletteBinding: a.paletteBinding, frames: a.frames.length,
         animations: (a.animations ?? []).map((x) => ({ name: x.name, frames: x.frames.length, fps: x.fps ?? null, loop: x.loop })) })),
-      paletteUsage: usage,
+      paletteUsage: usage, layerCoverage: backgroundCoverage(opts.packDir, m),
     },
     artifacts: [{ path: rel(root, opts.packDir), kind: "asset-pack" }],
   };

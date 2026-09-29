@@ -23,6 +23,19 @@ export const VIEWPORT = { w: 480, h: 270 } as const;
  */
 export const SHELL_VERSION = "1";
 
+/**
+ * 屏幕**底色**（票 50）—— 什么都没有画的地方透过去是什么。
+ *
+ * ⚠️ 它一直是**黑**，但一直是**「默认值碰巧的结果」**：canvas 什么都不画就是黑，
+ *   而没有人做过这个决定。给它一个名字，是为了让「这是选的」变成事实。
+ * ⚠️ **它是外壳的常量，不是数据** —— 与 `VIEWPORT` 同一条规矩（票 32 裁决 1）：
+ *   让「这个世界长什么样」漏进一个声称与游戏无关的外壳，是另一种错。
+ *   ⇒ 要换就改这个常量、升一次外壳版本（票 32 裁决 6 已经给了那条路）。
+ * ⚠️ 它**不解决**「最远那层没画满」：那件事由装配期拦下（见 [[票 50]]），
+ *   底色只是让「透过去」变成一个**选过的**颜色。
+ */
+export const BACKDROP = "#000000";
+
 export type Vec = { x: number; y: number };
 export type Size = { w: number; h: number };
 export type Box = { x: number; y: number; w: number; h: number };
