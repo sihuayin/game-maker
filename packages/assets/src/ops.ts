@@ -17,6 +17,7 @@ import { buildAssetPack, type GenerateImage } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
+import { decodePNG } from "./png.js";
 import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, styleBrief } from "./prompt.js";
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
@@ -468,16 +469,79 @@ const walk = (dir: string, base = ""): string[] => fs.readdirSync(dir, { withFil
   .flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name), `${base}${d.name}/`) : [`${base}${d.name}`]));
 
 // ── inspect：包里有什么 ─────────────────────────────────────────────────────
+/**
+ * 交付态到底把色板用成了什么样 —— **确定性、可扫**（票 15 发现，票 39 定它是**观察**）。
+ *
+ * ⚠️ **它是观察，不是判据**（票 39）。读法定了「`palette` 是**绘制词汇**」之后，
+ *   「某个色没人用」「重音色占比低」都**不是缺陷** —— 词汇表里的词不必每句都用上，
+ *   而一个黄昏世界的最暗色占大头可能正是对的。所以这里**只报数**，不打分、不阻断。
+ *   ⚠️ 这也是为什么它不该留在 `out/`（gitignore）里当一次性脚本 —— 人眼判
+ *   「像不像同一个视觉世界」时，手上多这组数比没有强。
+ */
+function paletteUsage(packDir: string, m: AssetPackManifest) {
+  const hex = (r: number, g: number, b: number) =>
+    "#" + [r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("");
+  const perColor = m.palette.values.map((c) => ({ color: c, pixels: 0, assets: [] as string[] }));
+  const atlasCache = new Map<string, ReturnType<typeof decodePNG>>();
+  const perAsset: { id: string; usedColors: number; opacityPixels: number; top: { color: string; share: number }[] }[] = [];
+
+  for (const a of m.assets) {
+    const atlas = m.atlases.find((x) => x.id === a.atlasId);
+    if (!atlas) continue;
+    const aj = JSON.parse(fs.readFileSync(path.join(packDir, atlas.meta), "utf8")) as
+      { frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }> };
+    let img = atlasCache.get(atlas.id);
+    if (!img) { img = decodePNG(fs.readFileSync(path.join(packDir, atlas.image))); atlasCache.set(atlas.id, img); }
+    const count = new Array(m.palette.values.length).fill(0);
+    let opaque = 0;
+    for (const f of a.frames) {
+      const fr = aj.frames[f.name];
+      if (!fr) continue;
+      for (let y = 0; y < fr.frame.h; y++) for (let x = 0; x < fr.frame.w; x++) {
+        const o = ((fr.frame.y + y) * img.width + fr.frame.x + x) * 4;
+        if (img.data[o + 3] === 0) continue;
+        opaque++;
+        const i = m.palette.values.indexOf(hex(img.data[o]!, img.data[o + 1]!, img.data[o + 2]!));
+        if (i >= 0) { count[i]++; perColor[i]!.pixels++; }
+      }
+    }
+    const used = count.filter((c) => c > 0).length;
+    for (const [i, c] of count.entries()) if (c > 0) perColor[i]!.assets.push(a.id);
+    perAsset.push({
+      id: a.id, usedColors: used, opacityPixels: opaque,
+      top: count.map((c, i) => ({ color: m.palette.values[i]!, share: opaque === 0 ? 0 : c / opaque }))
+        .sort((x, y) => y.share - x.share).slice(0, 3).filter((x) => x.share > 0),
+    });
+  }
+  const total = perColor.reduce((n, c) => n + c.pixels, 0);
+  return {
+    perAsset,
+    perColor: perColor.map((c) => ({ color: c.color, assets: c.assets.length, share: total === 0 ? 0 : c.pixels / total })),
+    totalPixels: total,
+  };
+}
+
 export function inspectPack(opts: { packDir: string; outRoot?: string }): CommandResult {
   const root = opts.outRoot ?? path.dirname(path.resolve(opts.packDir));
   const parsed = parseAssetPack(JSON.parse(fs.readFileSync(path.join(opts.packDir, "manifest.json"), "utf8")));
   if (!parsed.ok) throw new CommandError("invalid", `manifest 不过 schema：${parsed.errors.slice(0, 6).join("；")}`);
   const m = parsed.value;
+  // ⚠️ 扫交付态图集要**解 PNG** —— 这是 `inspect` 唯一的重活，而它是诊断命令，值。
+  const usage = paletteUsage(opts.packDir, m);
+  const byId = new Map(usage.perAsset.map((u) => [u.id, u]));
+
   const lines = [`${m.id} v${m.version} · ${m.provenance.mode}`, `${m.assets.length} 个资源 · ${m.atlases.length} 张图集`];
   for (const a of m.assets) {
     const anim = a.animations?.length ? ` · 动画 ${a.animations.map((x) => `${x.name}(${x.frames.length})`).join(" ")}` : "";
-    lines.push(`  ${a.id} · ${a.kind} · ${a.size.w}×${a.size.h} · ${a.origin}/${a.paletteBinding} · ${a.frames.length} 帧${anim}`);
+    const u = byId.get(a.id);
+    const uses = u ? ` · 用色 ${u.usedColors}/${m.palette.values.length}` : "";
+    lines.push(`  ${a.id} · ${a.kind} · ${a.size.w}×${a.size.h} · ${a.origin}/${a.paletteBinding} · ${a.frames.length} 帧${anim}${uses}`);
   }
+  // ⚠️ 这一块是**观察**不是判据（票 39）—— 不打分、不阻断，只是把人眼判「像不像同一个世界」时要看的事实摆出来
+  lines.push(`色板 ${m.palette.values.length} 色 · 交付态实际用到的像素分布（**观察，不是判据**）：`);
+  for (const c of usage.perColor)
+    lines.push(`  ${c.color} · ${c.assets}/${m.assets.length} 个资源用到 · 占全部不透明像素 ${(100 * c.share).toFixed(1)}%`);
+
   return {
     command: "inspect", summary: lines,
     data: {
@@ -485,6 +549,7 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
       assets: m.assets.map((a) => ({ id: a.id, kind: a.kind, size: a.size, origin: a.origin,
         paletteBinding: a.paletteBinding, frames: a.frames.length,
         animations: (a.animations ?? []).map((x) => ({ name: x.name, frames: x.frames.length, fps: x.fps ?? null, loop: x.loop })) })),
+      paletteUsage: usage,
     },
     artifacts: [{ path: rel(root, opts.packDir), kind: "asset-pack" }],
   };
