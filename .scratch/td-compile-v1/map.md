@@ -104,6 +104,13 @@ Effort: td-compile-v1
   **插槽 id 全部改名后结果逐字段相同**（策略确实与关卡无关）。
   ⚠️ 它推翻了我写在票面上的两处：「先升级赢 3/20」是记串了旧数字（真跑正好相反），
   「文档里那张五波曲线」**根本不存在**（有的是一段判据记录）。⇒ 换尺子时要同时改三处，票里列了。
+- [「HUD 在屏幕空间内」那条检查的缝在哪](issues/03-screen-space-seam.md)：
+  缝开在 **contracts**，而共享的不只是那条判断 —— **「有哪些 HUD 项」也共享**
+  （每个玩法一个 `hudScreenBoxes(config, manifest) → {where, at, box}[]`，配一个共用的
+  `auditScreenSpace(viewport, items)`；算**第五族**、硬失败）。
+  ⚠️ 选它是因为**量出来一个洞**：塔防的 `hud` 有五个成员，`fitViewport` 只覆盖三个 ——
+  **图标与读数摆到屏幕外，今天没有任何东西会检查**，而两份名单可以各漏各的。
+  ⚠️ 代价比票面估的大：两种玩法的**纯层**也要改成从 `hudScreenBoxes` 取盒子。
 
 ## Not yet specified
 
