@@ -205,10 +205,68 @@ export function imageNegativePrompt(): string {
  *     里面的 "nested panel frames" 会让它画一张带边框的面板而不是一个物体。
  *     所以这里只取 identity / material / constraints，把 camera 换成"正交、无透视"的一句。
  */
-export function imagePrompt(spec: AssetSpec, style: StyleSpec, animName?: string): string {
-  return spec.kind === "animation"
-    ? animationSheetPrompt(spec, style, animName)
-    : singleObjectPrompt(spec, style);
+/** 这次画的是**哪一个东西** —— 一段动画，或者分层背景的某一层。 */
+export type ImagePromptTarget = {
+  anim?: string;
+  layer?: { name: string; index: number; total: number; tileX: boolean };
+};
+
+export function imagePrompt(spec: AssetSpec, style: StyleSpec, target: ImagePromptTarget = {}): string {
+  if (spec.kind === "animation") return animationSheetPrompt(spec, style, target.anim);
+  // ⚠️ 分层背景走**独立模板**（票 43）。不能在单物体那份上打补丁：那一份的头一条是
+  //   「物体占满整个画面」，而一层背景的头一条恰恰是「**没东西的地方留空**」——
+  //   同一份提示词里写两条互相打架的规矩，模型只会执行一条（动画那一支已经吃过一次这个亏）。
+  if (spec.kind === "background" && spec.layers && target.layer) return backgroundLayerPrompt(spec, style, target.layer);
+  return singleObjectPrompt(spec, style);
+}
+
+/**
+ * 分层背景的**一层**（票 43）。
+ *
+ * 要交代三件事，缺一条都会画坏：
+ *   ① **画的是哪一层**（从远到近第几层、叫什么）—— 否则模型画的是整张场景
+ *   ② **这一层没有东西的地方留空**（= 抠底色）—— 否则它会把背景填满，层就叠不出层次
+ *   ③ 可平铺的层**左右要接得上** —— 否则每 480px 一道硬缝
+ *
+ * ⚠️ 生图路线在这里有一样**天然的好处**：它本来就要抠底色（`keyBackground`），
+ *   而抠背景是**全局比色**——所以「没东西的地方」抠完就是**透明**的，
+ *   与「每层画满整块画布、靠透明叠出层次」那条契约**天然对得上**，不用额外做什么。
+ */
+function backgroundLayerPrompt(
+  spec: Extract<AssetSpec, { kind: "background" }>, style: StyleSpec,
+  layer: { name: string; index: number; total: number; tileX: boolean },
+): string {
+  const bg = keyColorFor(style.palette);
+  const edge = layer.tileX
+    ? `⚠️ 这一层在**横向上可以平铺**（游戏里会把它左右重复铺满整条街），
+   所以**左边缘与右边缘必须接得上** —— 接缝处不要有突然的断裂、也不要明显的重复标记。`
+    : `这一层**不平铺**（只画这一次），左右边缘不必接缝。`;
+  return `画一张游戏**横版卷轴场景的其中一层**。画布长宽比必须精确是 ${spec.size.w} : ${spec.size.h}。
+
+⚠️⚠️ 最重要的一条，请先读它：**这一层没有东西的地方，必须是纯色 ${bg}**。
+   不要拿白、灰、渐变、天空色或地面色去填 —— 就是纯色 ${bg}，把空白处整块填满。
+   管线会把 ${bg} 抠成**透明**，那一块就"透过去"露出它后面的那一层。
+   ⚠️ 反过来：**这一层里真正画出来的东西**上，一个 ${bg} 的像素都不许出现。
+
+这是这个世界的一个多层场景里，从远到近的**第 ${layer.index + 1} / ${layer.total} 层**，
+这一层叫 **${layer.name}**。
+
+这一层要画的东西：${spec.description}（${spec.role}）
+${layer.index === 0 ? "⚠️ 它是最远的一层 —— 它后面没有别的东西了，该有东西的地方要**画满**。" : ""}
+${edge}
+
+画出来的东西**只用**下面这些颜色（空白的 ${bg} 是唯一例外）：
+${style.palette.join("  ")}
+
+这个世界的视觉语法：
+identity: ${JSON.stringify(style.identity)}
+material: ${JSON.stringify(style.material)}
+
+画法：硬边色块、边缘干净利落、不要抗锯齿、不要柔边、不要渐变、不要写实照片质感、不要景深。
+**平视、正交投影、不要透视** —— 它是横版卷轴的一层，不是一张插画。
+
+再强调一次：**没东西的地方**是纯色 ${bg}（会被抠成透明），
+而**画出来的东西**上不要出现 ${bg}。`;
 }
 
 /** 单帧资源：就一件道具，像贴图那样单独摆着。 */

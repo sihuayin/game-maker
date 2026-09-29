@@ -4,7 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { parseAssetPack, type AssetSpec, type AssetRecipe, type DrawList, type StyleSpec } from "@game-maker/contracts";
-import { buildAssetPack, nextPackVersion, verifyPack, type DrawListGenerator } from "../src/index.js";
+import { decodePNG } from "../src/png.js";
+import {
+  buildAssetPack, keyColorFor, nextPackVersion, verifyPack,
+  type DrawListGenerator, type GenerateImage, type RasterImage,
+} from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const RECIPE: AssetRecipe = JSON.parse(readFileSync(ROOT + "fixtures/recipes/shift-change.json", "utf8"));
@@ -237,5 +241,156 @@ describe("分层背景与九宫格：两条从配方到交付态的连线（票 
     expect(atlas.frames["hud"].scale9Borders).toEqual(want);
 
     expect(verifyPack({ packDir }).data.ok).toBe(true);
+  });
+});
+
+/**
+ * 票 43：**生图路线支持分层背景**。
+ *
+ * ⚠️ 这条路以前**根本走不通**（票 40 撞到的）：生图支对非 animation 只出**一张图**，
+ *   而分层背景的 `plan` 有 N 项 ⇒ `results[i]` 越界成 `undefined`，
+ *   一路带到 `buildAtlas` 才炸成一个**说不清是哪里错的** TypeError。
+ */
+describe("生图路线的分层背景：一层一次调用（票 43）", () => {
+  const LAYERS = [
+    { name: "sky", parallax: 0 },
+    { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+    { name: "ground", parallax: 1, tileable: { x: true, y: false } },
+  ];
+  const recipe = (): AssetRecipe => ({
+    // ⚠️ 去掉 `shift-change.json` 带的 `referenceImage`：它的相对路径是相对**那个配方自己**的目录，
+    //   而这里 `recipeDir` 传的是仓库根；再说本用例要的是「不喂风格参考图」这条最朴素的形态。
+    ...RECIPE, referenceImage: undefined,
+    assets: [{
+      spec: {
+        kind: "background", id: "station", role: "backdrop", description: "黄昏站台，三层",
+        styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 96, h: 64 },
+        dependencies: [], required: true, layers: LAYERS,
+      },
+      source: { kind: "image", background: { tolerance: 0 } },
+    }],
+  });
+
+  const px = (hex: string): [number, number, number] =>
+    [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+  /** 一张「中间有东西、四周是抠底色」的图 —— 与真生图模型的产出同构。 */
+  const layerImage = (w: number, h: number, fill: string): RasterImage => {
+    const data = Buffer.alloc(w * h * 4);
+    const k = px(keyColorFor(STYLE.palette)), f = px(fill);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const o = (y * w + x) * 4;
+      const inner = x >= w * 0.25 && x < w * 0.75 && y >= h * 0.25 && y < h * 0.75;
+      const c = inner ? f : k;
+      data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+    }
+    return { width: w, height: h, data };
+  };
+
+  const call = (n: number) => {
+    const prompts: string[] = [];
+    const gen: GenerateImage = async (req) => {
+      prompts.push(req.prompt);
+      return {
+        image: layerImage(req.size.w, req.size.h, STYLE.palette[n]!),
+        call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
+      };
+    };
+    return { prompts, gen };
+  };
+
+  it("三层 ⇒ **三次调用**，一层一张原图，帧名 `<资源 id>.<层名>`", async () => {
+    const { prompts, gen } = call(1);
+    const { manifest, packDir, audit } = await buildAssetPack({
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    });
+    expect(audit).toEqual([]);
+    expect(prompts, "一层一次调用 —— 不是一次出一张").toHaveLength(3);
+    for (const name of ["sky", "wall", "ground"])
+      expect(existsSync(path.join(packDir, `authoring/generated/station.${name}.png`)), name).toBe(true);
+    expect(manifest.assets[0]!.frames.map((f) => f.name)).toEqual(["station.sky", "station.wall", "station.ground"]);
+    expect(verifyPack({ packDir }).data.ok).toBe(true);
+  });
+
+  it("提示词说得清「画的是哪一层」与「没东西的地方留空」，且**不**照搬单物体那份", async () => {
+    const { prompts, gen } = call(1);
+    await buildAssetPack({ recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH });
+    const key = keyColorFor(STYLE.palette);
+
+    prompts.forEach((p, i) => {
+      expect(p, `第 ${i + 1} 次要说清画的是哪一层`).toMatch(new RegExp(`第 ${i + 1} / 3 层`));
+      expect(p).toContain(LAYERS[i]!.name);
+      expect(p, "没东西的地方 = 抠底色，会被抠成透明").toContain(key);
+      expect(p).toMatch(/透明/);
+      // ⚠️ 两条互相打架的规矩会让模型只执行一条（动画那一支吃过这个亏）——
+      //   单物体那份的头一条是「物体占满整个画面」，分层背景恰恰**不能**那样。
+      expect(p, "分层背景不能照搬「占满整个画面」").not.toMatch(/占满整个画面/);
+    });
+    expect(prompts[1], "可平铺的层要交代左右接得上").toMatch(/接得上/);
+    expect(prompts[0], "不平铺的层不必接缝").toMatch(/不平铺/);
+  });
+
+  it("**每一层**的原图都声明成创作态 —— 不是一个资源只记第一张", async () => {
+    const { gen } = call(1);
+    const { manifest } = await buildAssetPack({
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    });
+    const refs = manifest.assets[0]!.authoring.map((a) => a.ref).sort();
+    expect(refs).toEqual([
+      "authoring/generated/station.ground.png",
+      "authoring/generated/station.sky.png",
+      "authoring/generated/station.wall.png",
+    ]);
+  });
+});
+
+/**
+ * ⚠️ **分层背景不许裁框**（票 43 施工时抓到的）。
+ *
+ * 导入通道的默认行为是「抠底 → **裁到内容的包围盒** → 拉到 `spec.size`」——
+ * 对**一件道具**这是对的（裁紧、归一化，位置本来无意义）。
+ * 但对**一层背景**它是**毁掉构成**：层里只画了上半部分，裁完再拉满整张画布，
+ * 那一层就变成铺满 —— 层与层之间的空间关系没有了。
+ *
+ * ⇒ 背景必须 `trim: false`：保住整张画布的构成，只把抠底留下的**透明**留下。
+ */
+describe("分层背景：构成必须保住（票 43）", () => {
+  const recipe = (): AssetRecipe => ({
+    ...RECIPE, referenceImage: undefined,
+    assets: [{
+      spec: {
+        kind: "background", id: "sky", role: "backdrop", description: "只有上半有东西",
+        styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 64, h: 48 },
+        dependencies: [], required: true, layers: [{ name: "sky", parallax: 0 }],
+      },
+      source: { kind: "image", background: { tolerance: 0 } },
+    }],
+  });
+  /** 内容**只占上半**，下半是抠底色 —— 构成要是被拉满，下半的透明就没了。 */
+  const upperHalfOnly = (w: number, h: number): RasterImage => {
+    const data = Buffer.alloc(w * h * 4);
+    const k = [255, 0, 255], f = [90, 106, 138];
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const o = (y * w + x) * 4;
+      const c = y < h / 2 ? f : k;
+      data[o] = c[0]!; data[o + 1] = c[1]!; data[o + 2] = c[2]!; data[o + 3] = 255;
+    }
+    return { width: w, height: h, data };
+  };
+
+  it("下半没有东西 ⇒ 交付态那一半必须是**透明**的，不是被拉满", async () => {
+    const gen: GenerateImage = async (req) => ({
+      image: upperHalfOnly(req.size.w, req.size.h),
+      call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
+    });
+    const { packDir } = await buildAssetPack({
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    });
+    const atlas = JSON.parse(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.json"), "utf8"));
+    const img = decodePNG(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.png")));
+    const fr = atlas.frames["sky.sky"].frame as { x: number; y: number; w: number; h: number };
+    const alphaAt = (px: number, py: number) => img.data[((fr.y + py) * img.width + fr.x + px) * 4 + 3]!;
+
+    expect(alphaAt(fr.w >> 1, 1), "上半有东西 ⇒ 不透明").toBe(255);
+    expect(alphaAt(fr.w >> 1, fr.h - 2), "下半没东西 ⇒ **透明**（构成保住了）").toBe(0);
   });
 });

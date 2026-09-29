@@ -16,7 +16,7 @@ import { buildAtlas } from "./atlas.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
-import { framePlan, imageNegativePrompt, imagePrompt } from "./prompt.js";
+import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import type { ImageGenCall, ImageRequest } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
 import { rasterize } from "./raster.js";
@@ -73,6 +73,11 @@ export type BuildPackResult = {
   /** spec ↔ 产物的对账结果（`auditAssetSpec`）。**有内容不等于失败** —— 交调用方决定。 */
   audit: string[];
 };
+
+/** `#rrggbb` → `[r,g,b]`。⚠️ 色板落盘前已规范化成小写，这里不做兼容性猜测。 */
+const hexToRgb = (hex: string): [number, number, number] => [
+  parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16),
+];
 
 const sha256 = (b: Buffer) => "sha256:" + createHash("sha256").update(b).digest("hex");
 const jstr = (o: unknown) => JSON.stringify(o, null, 2) + "\n";
@@ -190,26 +195,31 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       const reference = src.reference
         ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
         : undefined;
-      // ⚠️ **一个动画一次调用**，不是一个资源一次。实测把 14 帧塞进一次调用，模型只给回来 1 个角色。
-      // ⚠️ **分层背景在这条路上还不成立**（票 40 撞到的）：下面这一支对非 animation 只出
-      //   **一张图**，而 `plan` 对三层背景有 3 项 —— `results[i]` 会越界成 `undefined`，
-      //   一路带到 `buildAtlas` 才炸成一个**说不清是哪里错**的 TypeError。
-      //   与其让它那样死，不如在这里说清楚：显式拒绝，并指向那张要把它做出来的票。
-      if (spec.kind === "background" && spec.layers)
-        throw new Error(
-          `资源 "${spec.id}" 是**分层背景**，而生图路线还不支持它 —— ` +
-          `它一个资源一次调用只出一张图，而分层背景一层一张。见票 43。`,
-        );
-      const units: { anim?: string; frames: number; raw: string }[] =
+      // ⚠️ **一个 unit 一次调用**。unit 的划分与 drawlist 路线的 `framePlan` **对称**（票 43）：
+      //   · animation → 一个**动画**一个 unit（实测把 14 帧塞进一次调用，模型只给回来 1 个角色）
+      //   · 分层背景 → **一层**一个 unit（票 40 撞到的那个洞：以前只出一张图，而 plan 有 N 项，
+      //     `results[i]` 越界成 undefined，一路带到 buildAtlas 才炸成一个说不清哪里错的 TypeError）
+      //   · 其余 → 一个资源一个 unit
+      const bgLayers = spec.kind === "background" ? spec.layers : undefined;
+      const units: { anim?: string; layer?: { name: string; index: number; total: number; tileX: boolean }; frames: number; raw: string }[] =
         spec.kind === "animation"
           ? spec.animations.map((a) => ({ anim: a.name, frames: a.frames, raw: `authoring/generated/${spec.id}.${a.name}.png` }))
-          : [{ frames: 1, raw: `authoring/generated/${spec.id}.png` }];
+          : bgLayers
+            ? bgLayers.map((l, i) => ({
+                layer: { name: l.name, index: i, total: bgLayers.length, tileX: l.tileable?.x ?? false },
+                frames: 1,
+                raw: `authoring/generated/${spec.id}.${l.name}.png`,
+              }))
+            : [{ frames: 1, raw: `authoring/generated/${spec.id}.png` }];
 
       // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
       // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
       const batches: RasterImage[][] = [];
       for (const u of units) {
-        const prompt = src.prompt ?? imagePrompt(spec, style, u.anim);
+        const prompt = src.prompt ?? imagePrompt(spec, style, {
+          ...(u.anim === undefined ? {} : { anim: u.anim }),
+          ...(u.layer === undefined ? {} : { layer: u.layer }),
+        });
         const { image, call } = await opts.generateImage({
           prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
           negativePrompt: imageNegativePrompt(),
@@ -241,11 +251,21 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         }
         imageCalls.push({ assetId: spec.id, ...call });
       }
-      const raw = units[0]!.raw;
+      // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43），都要在这里定，不能留给默认：
+      //   ① **按我们告诉模型的颜色抠底**，不四角取样 —— 背景层的角上就是内容本身
+      //      （地面填满下半、墙填满中间那带），四角取样会把内容色当成底色，**整层抠光**。
+      //   ② **不裁框** —— 导入通道默认「裁到内容再拉到 spec.size」，对一件道具是对的
+      //      （裁紧、归一化），对一层背景是**毁掉构成**：层里只画了上半，裁完拉满，
+      //      层与层之间的空间关系就没了。
+      const isBg = spec.kind === "background";
+      const bgOpt = isBg
+        ? { tolerance: src.background?.tolerance ?? 30, colors: [hexToRgb(keyColorFor(palette))] }
+        : src.background;
       const results = batches.flatMap((cells) =>
         importFrames(cells, {
           palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
-          ...(src.background !== undefined ? { background: src.background } : {}),
+          ...(bgOpt !== undefined ? { background: bgOpt } : {}),
+          ...(isBg ? { trim: false } : {}),
           ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
         }),
       );
@@ -254,9 +274,13 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         let k = 0;
         for (const a of spec.animations) for (let i = 0; i < a.frames; i++) stateOf.set(plan[k++]!.name, a.name);
       }
+      // ⚠️ **每一个 unit 的原图都要声明成创作态**，不是一个资源只声明第一张。
+      //   票 43：分层背景**一层一张原图**，只记 `units[0]` 会让 manifest 说
+      //   「这个背景的创作态是 `station.sky.png`」—— 而另外两层同样是它的创作态。
+      //   （文件本来就在包里、也在 `files[]` 里，漏的只是这句**声明**。）
+      for (const u of units)
+        authoring.push({ kind: "bitmap", ref: u.raw, original: units.length > 1 ? `生图 · ${units.length} 次调用` : "生图" });
       plan.forEach((p, i) => {
-        // 创作态落一次就够（多帧时帧名不同，都指向同一批原图）
-        if (i === 0) authoring.push({ kind: "bitmap", ref: raw, original: units.length > 1 ? `生图 · ${units.length} 个动画各一次调用` : "生图" });
         frames.push({ name: p.name, state: stateOf.get(p.name), image: results[i]! });
       });
     } else {

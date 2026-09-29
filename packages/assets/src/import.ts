@@ -29,7 +29,10 @@ const pixel = (img: RasterImage, x: number, y: number): [number, number, number,
  * ⚠️ 这是「够用」而不是「正确」—— 它假定背景是与主体色差明显的近纯色。
  * 背景复杂时（照片、多色场景）人应当自己给透明底的 PNG。
  */
-export function keyBackground(img: RasterImage, { tolerance = 30 }: { tolerance?: number } = {}): {
+export function keyBackground(
+  img: RasterImage,
+  { tolerance = 30, colors }: { tolerance?: number; colors?: readonly [number, number, number][] } = {},
+): {
   image: RasterImage; backgroundColors: [number, number, number][]; keyedPixels: number;
 } {
   // ⚠️ **必须跳过全透明的像素**（2026-09-26 修）。四角取样曾经直接读 RGB，不看 alpha ——
@@ -47,10 +50,17 @@ export function keyBackground(img: RasterImage, { tolerance = 30 }: { tolerance?
     }
     return pixel(img, Math.min(x0, img.width - 1), Math.min(y0, img.height - 1)).slice(0, 3) as [number, number, number];
   };
-  const refs = [
-    opaqueFrom(2, 2, 1, 1), opaqueFrom(img.width - 3, 2, -1, 1),
-    opaqueFrom(2, img.height - 3, 1, -1), opaqueFrom(img.width - 3, img.height - 3, -1, -1),
-  ];
+  // ⚠️ **背景层的底色是「我们知道的那个」，不该靠四角猜**（票 43）。
+  //   四角取样假定「这件东西四周全是底色」—— 对一件道具成立，对**一层背景不成立**：
+  //   地面层填满下半、墙面层填满中间那一横带，它们的**角上就是内容本身**。
+  //   一旦如此，内容色被当成底色 ⇒ **整层被抠光**（不是画得难看，是空的）。
+  //   而生图路线本来就知道那个颜色 —— 提示词里逐字写着它（`keyColorFor`）。
+  const refs: [number, number, number][] = colors && colors.length > 0
+    ? colors.map((c) => [c[0], c[1], c[2]])
+    : [
+        opaqueFrom(2, 2, 1, 1), opaqueFrom(img.width - 3, 2, -1, 1),
+        opaqueFrom(2, img.height - 3, 1, -1), opaqueFrom(img.width - 3, img.height - 3, -1, -1),
+      ];
   const out: RasterImage = { width: img.width, height: img.height, data: Buffer.from(img.data) };
   let keyed = 0;
   for (let i = 0; i < img.width * img.height; i++) {
@@ -168,7 +178,8 @@ export type ImportOptions = {
   /** 世界色板。**导入位图默认量化到它**（票 23 的裁决）。 */
   palette: readonly string[];
   /** 抠背景。给了才抠；不给就假定人已经给了透明底。 */
-  background?: { tolerance?: number };
+  /** 抠底参数。⚠️ `colors` 给了就**按它抠**，不给才四角取样（见 `keyBackground`）。 */
+  background?: { tolerance?: number; colors?: readonly [number, number, number][] };
   /** alpha 二值化阈值，默认 0.5。传 `null` 保留半透明边缘（不推荐，会产出色板外颜色）。 */
   alphaThreshold?: number | null;
   /** 裁到非透明包围盒，默认 true。 */
