@@ -1,0 +1,520 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruins-grocery-tower-defense",
+  "styleRef": "../style-spec.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-floor",
+        "role": "tile",
+        "description": "俯视视角的水泥地面砖，五种砖里最亮的一档，灰绿偏冷的水泥面，带细碎的像素抖动颗粒与浅色刮痕，四周一圈1像素深绿灰描边，无透视，严格正方格。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-walkway",
+        "role": "tile",
+        "description": "俯视视角的走道砖，明显比地面砖暗的水泥通道面，横向排列数条防滑凸条，凸条高光与暗面用阶梯色块表现，四周1像素深绿灰描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-shelf",
+        "role": "tile",
+        "description": "俯视视角的货架砖，深色金属外框内嵌挤在一起的小货箱与罐头，罐头圆顶用像素阶梯圆表现，箱体带锈迹与磨损，整体偏暗，四周1像素深绿灰描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-wall",
+        "role": "tile",
+        "description": "俯视视角的墙砖，铁皮隔断顶面，深褐色，正中一条纵向加强筋，加强筋两侧各一排等距铆钉，表面有锈痕与污渍抖动，四周1像素深绿灰描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-shutter-door",
+        "role": "tile",
+        "description": "俯视视角的卷帘门砖，横向排列的帘片，每条帘片有高光与暗面阶梯，门面横贯一条警示斜纹，斜纹为像素阶梯状，颜色为低饱和暖橙与米黄，四周1像素深绿灰描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "trap-nailgun",
+        "role": "trap",
+        "description": "俯视视角的钉枪台，方形湖绿机壳，一侧圆形米黄弹鼓，另一侧伸出一根短枪管，机壳上有磨损与铆钉细节，整体轮廓清晰带1像素深色描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "trap-shock-floor",
+        "role": "trap",
+        "description": "俯视视角的电击地板，嵌在地里的金属板，中央裂开一道口子，裂缝内可见深色电线与短促电光，金属板表面有划痕与锈斑，四周1像素深绿灰描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "trap-searchlight",
+        "role": "trap",
+        "description": "俯视视角的探照灯，米黄色圆形灯罩中央一块反光镜面，配锈橙色三脚支架，三脚从俯视角度呈放射状短杆，灯罩边缘深色描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "projectile-nail",
+        "role": "projectile",
+        "description": "一枚朝右的短铁钉，铁灰色，钉帽与钉尖用像素阶梯表现，整体细长，带1像素深色描边，无透视。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 9,
+          "h": 5
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "projectile-light-patch",
+        "role": "projectile",
+        "description": "探照灯打出的暖白光斑，一团柔和的圆形光晕，中心偏白暖色向外渐变为米黄直至透明，用像素抖动实现过渡，始终为单帧贴图。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 21,
+          "h": 21
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "fx-shock-ring",
+        "role": "effect",
+        "description": "电击地板放电时在原地炸开的电环，由小到大逐帧扩散，环体为湖绿与暖白电光，边缘像素抖动，扩散到最大时透明度降低。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 45,
+          "h": 45
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "burst",
+            "frames": 3,
+            "fps": 12,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-scavenger",
+        "role": "enemy",
+        "description": "俯视视角的拾荒者，瘦小身形，橄榄绿兜帽顶面，手持一根短铁棍，手臂与腿在行走时交替摆动，每帧用像素色块表现，整体轮廓清晰带深色描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-brute",
+        "role": "enemy",
+        "description": "俯视视角的蛮兵，宽肩壮汉，锈橙色大块肩甲占据大半轮廓，行动缓慢，肩甲上有磨损与铆钉，移动时肩甲与腿部有轻微起伏。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 19,
+          "h": 19
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-mech-dog",
+        "role": "enemy",
+        "description": "俯视视角的机械犬，湖绿色方形机身，前端一块小传感镜头，四角伸出细腿，奔跑时四腿快速交替摆动，机身有轻微上下抖动，整体小巧。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 13,
+          "h": 13
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 14,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "counter",
+        "role": "objective",
+        "description": "俯视视角的要守柜台，横向长方形台面，米黄台面配锈橙包边，台面上摆着收银机、一叠纸盒和一个铁皮罐，各物件有像素阶梯轮廓与深色描边，无透视。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 135,
+          "h": 30
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-status-bar",
+        "role": "hud",
+        "description": "屏幕空间的顶部状态栏，深色金属横条，横向带状，表面有磨损与铆钉，可横向拉伸，四角略圆，用于承载废料与声望等信息。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 480,
+          "h": 24
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-button-base",
+        "role": "hud",
+        "description": "屏幕空间的方形按钮底板，深色金属材质，四角略圆，表面有细微磨损与高光，用于机关按钮与开波按钮，九宫格拉伸保持边角不变形。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-icon-scrap",
+        "role": "icon",
+        "description": "屏幕空间的小图标，一堆废铁，灰绿色金属废料交叠堆叠，高光与暗面用像素阶梯表现，整体轮廓清晰带深色描边，无透视。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-icon-reputation",
+        "role": "icon",
+        "description": "屏幕空间的小图标，一枚带五角星的盾形徽章，暖橙色盾面配米黄五角星，边缘有金属包边与磨损，整体轮廓清晰带深色描边。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-slot-bracket",
+        "role": "hud",
+        "description": "屏幕空间的四角括弧，用于提示插槽可装机关，只画四个角上的短折线，不画成封闭方框，湖绿色线，中间完全镂空，九宫格拉伸保持四角位置。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-shop-floor",
+        "role": "scene",
+        "description": "废墟杂货铺关卡的场景底图，32列×18行、每格15像素的正俯视砖格场地，从远到近依次为整体地面底衬与走道、柜台等静态布景层，不含透视。",
+        "styleId": "style-ref",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "floor",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": true
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ]
+}
