@@ -19,6 +19,7 @@ import {
   type AssetPackManifest, type CommandResult, type ConfigIssue, type GameConfig, type LayerCoverage,
 } from "@game-maker/contracts";
 import { BACKDROP, SHELL_VERSION, VIEWPORT, buildWorld, type Box, type WorldDescription } from "./world.js";
+import { failWith, laySite } from "./layout.js";
 
 // ── 第四族 · 几何可行性 ─────────────────────────────────────────────────────
 //
@@ -109,12 +110,6 @@ export function auditGeometry(world: WorldDescription, coverage?: readonly Layer
   return out;
 }
 
-/** 把一族 issue 拼成一条能读的 error —— 硬失败**一次报全**，别让人跑五遍。 */
-const failWith = (title: string, issues: ConfigIssue[]): never => {
-  const lines = issues.map((i) => `  · ${i.where}: ${i.message}`);
-  throw new CommandError("invalid", `${title}（${issues.length} 条）：\n${lines.join("\n")}`);
-};
-
 export type SiteOptions = {
   /** 资源包目录（**已解开的目录** —— 票 18 Q1：交付形态只出目录，zip 是导出动作不是生成动作）。 */
   packDir: string;
@@ -128,16 +123,6 @@ export type SiteOptions = {
 
 const jstr = (o: unknown) => JSON.stringify(o, null, 2) + "\n";
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
-
-/** 下一个站点版本号 —— **绝不覆盖**（票 18 与票 24 同一条规矩）。 */
-function nextSiteVersion(siteDir: string): number {
-  if (!fs.existsSync(siteDir)) return 1;
-  const ns = fs.readdirSync(siteDir)
-    .map((d) => /^v(\d+)$/.exec(d))
-    .filter((m): m is RegExpExecArray => m !== null)
-    .map((m) => Number(m[1]));
-  return ns.length === 0 ? 1 : Math.max(...ns) + 1;
-}
 
 /**
  * 装配一个站点。**成功返回 `CommandResult`，失败抛 `CommandError`**（票 30 的形状）。
@@ -190,44 +175,19 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);
 
-  // ── 摆目录 ──────────────────────────────────────────────────────────────
-  // 包：**拷进 out 树**（站点因此自带它消费的那个包，整体搬走就能跑）。
-  // ⚠️ 同一个版本**已存在就不动** —— 「绝不覆盖」，而且换包时不会把上一次的产物踩掉。
-  const packDest = path.join(gameDir, "pack", packVersion);
-  const packCopied = !fs.existsSync(packDest);
-  if (packCopied) {
-    fs.mkdirSync(path.dirname(packDest), { recursive: true });
-    fs.cpSync(opts.packDir, packDest, { recursive: true });
-  }
-
-  const siteRoot = path.join(gameDir, "site");
-  fs.mkdirSync(siteRoot, { recursive: true });
-  const n = nextSiteVersion(siteRoot);
-  const siteDir = path.join(siteRoot, `v${n}`);
-
-  fs.mkdirSync(siteDir, { recursive: true });
-  fs.copyFileSync(opts.shellJsPath, path.join(siteDir, "shell.js"));
-  fs.copyFileSync(opts.configPath, path.join(siteDir, "game-config.json"));
-
-  // ⚠️ **经典 script**（不是 module）：票 03 实测 module script 撞 CORS —— 少一个失败模式
-  fs.writeFileSync(path.join(siteDir, "index.html"), `<!doctype html>
-<html lang="zh"><head><meta charset="utf-8"><title>${gameId}</title>
-<style>html,body{margin:0;height:100%;background:#101014;display:grid;place-items:center}</style>
-</head><body><div id="game"></div>
-<script src="./shell.js"></script>
-</body></html>
-`);
-
-  // 站点**自己说明自己是怎么来的**（票 18 / 票 32 裁决 6）：外壳版本 + 消费的包版本。
-  // ⚠️ 这两样是 R6 说的 A/B 之间**唯一**的依赖 —— 有了它，「换包不重建」才成立。
-  fs.writeFileSync(path.join(siteDir, "site.json"), jstr({ shell: SHELL_VERSION, pack: packVersion }));
+  // ── 摆目录（**与塔防共用同一份**，见 `layout.ts`）────────────────────────
+  const laid = laySite({
+    packDir: opts.packDir, outRoot, gameId, packVersion,
+    shellJsPath: opts.shellJsPath, configPath: opts.configPath, configFileName: "game-config.json",
+  });
+  const { siteDir, siteVersion: n, packCopied } = laid;
 
   // ── 报账 ────────────────────────────────────────────────────────────────
   const warnings = all.filter((i) => i.severity === "warning");
   return {
     command: "site",
     summary: [
-      `站点：${rel(outRoot, siteDir)}（${packCopied ? "拷入" : "复用已存在的"}包 ${rel(outRoot, packDest)}）`,
+      `站点：${rel(outRoot, siteDir)}（${packCopied ? "拷入" : "复用已存在的"}包 ${rel(outRoot, laid.packDest)}）`,
       `消费：外壳 v${SHELL_VERSION} · 资源包 ${packVersion}（${manifest.assets.length} 个资源）`,
       `校验：三族 + 第四族（几何）+ 第五族（HUD 屏幕空间）全过${warnings.length ? `；${warnings.length} 条警告` : ""}` +
         (coverageLayers ? "" : " ⚠️（这个包没有 coverage.json，「最远层画满」那条没查 —— 它不是错，老包都不带）"),
@@ -237,7 +197,7 @@ export function assembleSite(opts: SiteOptions): CommandResult {
     ],
     data: {
       gameId, siteVersion: n, shellVersion: SHELL_VERSION, packVersion,
-      packCopied, siteDir: rel(outRoot, siteDir), packDir: rel(outRoot, packDest),
+      packCopied, siteDir: rel(outRoot, siteDir), packDir: rel(outRoot, laid.packDest),
       warnings: warnings.map((i) => `${i.where}: ${i.message}`),
       serveRoot: rel(outRoot, gameDir),
       entry: `${rel(outRoot, siteDir)}/index.html`,

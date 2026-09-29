@@ -1,0 +1,123 @@
+{
+  "frames": {
+    "ui-hud-bar": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 26
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "scale9Borders": {
+        "x": 4,
+        "y": 4,
+        "w": 88,
+        "h": 18
+      }
+    },
+    "ui-btn": {
+      "frame": {
+        "x": 0,
+        "y": 26,
+        "w": 44,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 44,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 22
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "scale9Borders": {
+        "x": 3,
+        "y": 3,
+        "w": 38,
+        "h": 16
+      }
+    },
+    "ui-icon-life": {
+      "frame": {
+        "x": 44,
+        "y": 26,
+        "w": 10,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 10,
+        "h": 10
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "ui-icon-scrap": {
+      "frame": {
+        "x": 54,
+        "y": 26,
+        "w": 10,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 10,
+        "h": 10
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.ui.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 96,
+      "h": 48
+    },
+    "scale": 1
+  }
+}

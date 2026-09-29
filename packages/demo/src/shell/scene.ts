@@ -200,10 +200,14 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
         //   （票 25 定的家），Phaser 零参数自动读。探测走 `Frame.customData` ——
         //   那是 JSONHash 解析器抄进来的**原始每帧 JSON**，不是我们自己记的第二份。
         const s9 = (this.textures.getFrame(p.atlas, p.frame)?.customData as { scale9Borders?: unknown } | undefined)?.scale9Borders;
-        // ⚠️ `nineslice` 这个工厂**只在 WebGL 构建里注册**（票 25 查过 Phaser 源码：`仅 WebGL`）。
-        //   Canvas 回退下它是 `undefined` —— 直接调用就是一个 TypeError，而**壳不许崩**
-        //   （裁决 3 的精神：环境不完美也要起得来，只是要说出来）。
-        const canNine = typeof (this.add as { nineslice?: unknown }).nineslice === "function";
+        // ⚠️ **判据是渲染器，不是「工厂在不在」**（2026-09-29 修）：
+        //   原先判 `typeof this.add.nineslice === "function"`，而 Phaser 在 **Canvas 构建里
+        //   也注册那个工厂** —— 于是判据恒真、走 NineSlice 那条路，而 **Canvas 渲染器画不出
+        //   NineSlice**：对象进了显示列表、几何全对、`visible=true`，**一个像素都不画，也不报错**。
+        //   实测（塔防外壳，同为 Canvas 回退）顶栏整条不见。改判渲染器类型。
+        //   代价说明：WebGL 下仍然是九宫格（拉伸不变形）；Canvas 下退回普通拉伸 ——
+        //   四边会被拉长一点，但**看得见**，而看得见比好看要紧。
+        const canNine = this.game.renderer.type === Phaser.WEBGL;
         if (s9 && !canNine)
           console.warn("[warning] hud.panel: 这个渲染器不支持九宫格（Phaser 的 nineslice 仅 WebGL）—— 面板退回普通拉伸");
         const go = s9 && canNine

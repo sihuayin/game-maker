@@ -229,6 +229,20 @@ drawlist 里没有「实例化另一个资源」这种 op，所以场景组合�
 多关卡 = 多份文件 + 一份索引（索引的形状**尚未设计**）。
 **它的坐标一律是交付态像素，1:1、整数。**
 
+⚠️ **2026-09-29：Game Config 现在是「一族格式」，有两个成员。**
+横版是 `game-config/v1`（顶层七块，见上）；塔防是 [[td-config]]。
+它们是**平级的兄弟格式，不是同一份 schema 的 v1/v2** ——
+判别式要动 `game-config/v1` 的 `.strict()` 字段集，而那会让磁盘上**已经存在的每一份**
+横版关卡（fixtures 里的、`out/*/site/v*/` 里的）当场读不出来。
+那条「一个文件 = 一个关卡」对两者都成立；**玩法由 `format` 串认**，
+`site` 命令与外壳都按它分派（`packages/demo/src/assemble.ts` 是**唯一**的分派处）。
+
+**Td Config（塔防配置）** —— ⚠️ **2026-09-29 新词**
+`format: "td-config/v1"`，[[Game Config]] 的第二个成员。顶层十块 ——
+`world` / `arena` / `scene` / `path` / `core` / `slots` / `towers` / `enemies` / `waves` /
+`economy` / `hud`。与横版共享的**只有**「坐标是整数交付态像素」与「它是一份菜谱」这两条。
+设计文档在 `docs/counter-siege.md`；契约在 `packages/contracts/src/td-config.ts`。
+
 **行为原语（Behavior Primitive）**
 Game Config 能表达的最小行为单位。外壳**写死实现**一组原语，Config 只说
 「哪里有、参数是多少」—— 所以 **Game Config 是一份菜谱，不是一门语言**。
@@ -335,13 +349,28 @@ _Avoid_: 色板摘要、画面占比。
 
 ⚠️ **2026-09-26（票 32）形状落定**：站点 = **三份数据 + 一份共用 bundle** ——
 `index.html` / `shell.js`（[[Runtime Shell]]，**所有站点共用同一份、逐字节相同**）/
-`site.json`（`{shell, pack}`，**它自己说明自己是怎么来的**）/ `game-config.json`。
+`site.json`（`{shell, pack, config}`，**它自己说明自己是怎么来的**）/ 那一份 [[Game Config]]。
 ⚠️ **game-config 必须独立成文件、不可内联进站点专属文件** ——
 否则 R6 的「**换包不重建**」（同一份 game-config 吃两个包、游戏代码一字不动）当场失效。
+
+⚠️ **2026-09-29（加塔防）**：`site.json` 多了 **`config`** 一项 ——
+它是**那份配置在站点目录里的文件名**（`game-config.json` / `td-config.json`）。
+外壳靠它取到配置、再看配置的 `format` 选玩法，**不靠猜文件名**。
+老站点没有这一项，外壳回落到 `game-config.json`。
 
 **Runtime Shell（固定外壳）**
 产物 B 里**唯一**的代码：一组写死的行为原语的实现 + 一层薄渲染。R8 的「永不改变」
 在它是**字面意义**的 —— 仓库构建一次，所有站点拷同一份字节。
+
+⚠️ **2026-09-29：一份外壳带两种玩法**（横版 + 塔防），`SHELL_VERSION` 由 `"1"` 升到 `"2"`。
+**不是两个 bundle**，两条理由：① [[Demo Site]] 那条「所有站点共用同一份、逐字节相同」
+在有第二份 bundle 的那一刻就变成假的；② `site.json` 的 `shell` 字段正是
+「站点与外壳对不上、先怀疑拷错了」的唯一探测手段 —— 两份 bundle 要各自起一个版本号才不失效，
+而那等于把这个字段的意思换掉。
+分派在 `packages/demo/src/shell/entry.ts`：**读 `site.json` 的 `config` → 取配置 → 看它的 `format`**。
+**每一种玩法各有一个纯层**（`src/world.ts` / `src/td/world.ts`）**与一个场景**，
+它们互不知情；共用的只有 `src/draw.ts`（常量 · 「画得出/画不出」的表达 · 图集清单）。
+⚠️ 加一种玩法的代价是**加一个场景 + 一个纯层 + 一行分派**，不是改 [[Game Config]] 的形状。
 ⚠️ 它的中心不是 Phaser，而是**一条纯函数**：`(manifest, game-config) → 场景描述`。
 Phaser 只负责把那份描述画出来，**函数里不许出现 Phaser** —— 那是外壳可测的全部理由。
 ⚠️ **数据坏了（资源解不到）就画占位符并继续**，不是白屏也不是静默跳过：

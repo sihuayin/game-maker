@@ -76,7 +76,12 @@ export * from "./coverage.js";
 export * from "./command.js";
 
 // ── 游戏配置：AI 与手写 runtime 之间唯一的语义接口 ─────────────────────────
+// ⚠️ **两个变体、两个 format 串**（2026-09-29）：`game-config/v1` 是横版，
+// `td-config/v1` 是塔防。它们是**平级的兄弟格式**，不是同一份 schema 的 v1/v2 ——
+// 「一个文件 = 一个关卡」这条本来就允许关卡文件是不同形状，而判别式会让磁盘上
+// 已经存在的每一份横版关卡当场读不出来（那个坑 assetpack 的 v1→v2 踩过一次）。
 export * from "./game-config.js";
+export * from "./td-config.js";
 
 // ── 资源规格（四类）与确定性校验 ──────────────────────────────────────────
 export * from "./asset-spec.js";

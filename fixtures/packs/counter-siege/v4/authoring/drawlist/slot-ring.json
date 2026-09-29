@@ -1,0 +1,169 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "slot-ring",
+  "frame": "slot-ring",
+  "viewBox": [
+    0,
+    0,
+    20,
+    20
+  ],
+  "expectedSize": [
+    20,
+    20
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 1,
+      "y": 1,
+      "w": 5,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 1,
+      "y": 2,
+      "w": 1,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 14,
+      "y": 1,
+      "w": 5,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 18,
+      "y": 2,
+      "w": 1,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 1,
+      "y": 18,
+      "w": 5,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 1,
+      "y": 14,
+      "w": 1,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 14,
+      "y": 18,
+      "w": 5,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 18,
+      "y": 14,
+      "w": 1,
+      "h": 4
+    },
+    {
+      "op": "dither",
+      "x": 1,
+      "y": 1,
+      "w": 5,
+      "h": 1,
+      "colors": [
+        "palette:5",
+        "palette:4"
+      ],
+      "ratio": 0.35,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 14,
+      "y": 1,
+      "w": 5,
+      "h": 1,
+      "colors": [
+        "palette:5",
+        "palette:4"
+      ],
+      "ratio": 0.35,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 1,
+      "y": 18,
+      "w": 5,
+      "h": 1,
+      "colors": [
+        "palette:5",
+        "palette:4"
+      ],
+      "ratio": 0.35,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 14,
+      "y": 18,
+      "w": 5,
+      "h": 1,
+      "colors": [
+        "palette:5",
+        "palette:4"
+      ],
+      "ratio": 0.35,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "opacity": 0.55,
+      "x": 1,
+      "y": 5,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "opacity": 0.55,
+      "x": 18,
+      "y": 5,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "opacity": 0.55,
+      "x": 1,
+      "y": 14,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "opacity": 0.55,
+      "x": 18,
+      "y": 14,
+      "w": 1,
+      "h": 1
+    }
+  ]
+}

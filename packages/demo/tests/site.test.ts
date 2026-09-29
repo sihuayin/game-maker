@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { CommandError } from "@game-maker/contracts";
-import { assembleSite, auditGeometry, buildWorld, type SiteOptions } from "../src/index.js";
+import { assembleSite, auditGeometry, buildWorld, SHELL_VERSION, type SiteOptions } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 /** ⚠️ 真产物：票 40 的包 + 票 33 的配置。**不现造**（票 37 立的规矩）。 */
@@ -32,8 +32,13 @@ describe("装配：三份数据 + 一份共用 bundle", () => {
     const r = assembleSite(h.opts);
     const dir = siteDirOf(h.outRoot);
     expect(fs.readdirSync(dir).sort()).toEqual(["game-config.json", "index.html", "shell.js", "site.json"]);
-    // ⚠️ 站点**自己说明自己是怎么来的**（票 18 / 票 32 裁决 6）—— 外壳版本 + 消费的包版本
-    expect(readJson(path.join(dir, "site.json"))).toEqual({ shell: "1", pack: "v2" });
+    // ⚠️ 站点**自己说明自己是怎么来的**（票 18 / 票 32 裁决 6）——
+    //   外壳版本 + 消费的包版本 + **哪一份配置**（2026-09-29 加：一个外壳带两种玩法，
+    //   外壳读不到这个名字就得靠猜文件名，而那正是下面那条「拷错了」探测要防的东西）。
+    //   ⚠️ 版本号**不写死** —— 外壳一改它就得改（票 32 裁决 6），写死只会让每次改外壳都要来改测试。
+    expect(readJson(path.join(dir, "site.json"))).toEqual({
+      shell: SHELL_VERSION, pack: "v2", config: "game-config.json",
+    });
     expect(fs.readFileSync(path.join(dir, "shell.js"), "utf8")).toBe(fs.readFileSync(h.shellJsPath, "utf8"));
     expect(r.data.siteVersion).toBe(1);
     expect(r.data.serveRoot).toBe("last-train");
@@ -142,7 +147,7 @@ describe("警告：有解释余地的不判死刑", () => {
     (cfg.entities as Record<string, unknown>[])[3]!.at = { x: 0, y: 250 };   // luggage
     fs.writeFileSync(h.cfgPath, JSON.stringify(cfg));
     const r = assembleSite(h.opts);          // ← 不抛
-    expect(r.data.warnings.join("\n")).toMatch(/探出了世界的左边\/上边/);
+    expect((r.data.warnings as string[]).join("\n")).toMatch(/探出了世界的左边\/上边/);
   });
 
   it("正常的 last-train 配置：**一条警告都没有**", () => {

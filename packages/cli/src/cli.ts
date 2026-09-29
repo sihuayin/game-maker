@@ -7,7 +7,7 @@ import {
   CommandError, EXIT, compileGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
-import { assembleSite, VIEWPORT } from "@game-maker/demo";
+import { CONFIG_FILE_NAME, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -15,7 +15,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker derive --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
   game-maker pack   --recipe <清单.json> [--out <目录>] [--concurrency <n>] [--json]
   game-maker compile-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
-  game-maker site   <资源包目录> --config <game-config.json> [--shell <shell.js>] [--out <目录>] [--json]
+  game-maker site   <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
 
@@ -36,6 +36,11 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 `;
 
 type Parsed = { command: string; positionals: string[]; flags: Record<string, string | boolean> };
+
+/** 读一份 JSON，读不到就 `undefined`（**不抛**）—— `site` 要靠它认出配置是哪种玩法。 */
+function readJsonOrUndefined(p: string): unknown {
+  try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return undefined; }
+}
 
 export function parseArgs(argv: readonly string[]): Parsed {
   const positional: string[] = [];
@@ -116,15 +121,16 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
       }
       case "site": {
         const dir = positionals[0]; if (!dir) throw new CommandError("usage", "site 需要一个资源包目录");
-        if (typeof flags.config !== "string") throw new CommandError("usage", "site 需要 --config <game-config.json>");
-        // 外壳 bundle 是仓库的构建产物（`pnpm --filter @game-maker/demo bundle`）。
-        // ⚠️ 默认按**仓库布局**找；独立安装时用 --shell 显式给。
+        if (typeof flags.config !== "string") throw new CommandError("usage", `site 需要 --config <关卡配置>（认得的格式：${KNOWN_FORMATS.join(" · ")}）`);
+        const configPath = path.resolve(flags.config);
+        // ⚠️ **按配置的 `format` 分派**（横版 / 塔防），不是按文件名 ——
+        //   而 `--shell` 仍然可以显式覆盖外壳 bundle（独立安装时按仓库布局找不到它）。
         const shell = typeof flags.shell === "string"
           ? path.resolve(flags.shell)
-          : path.resolve("packages/demo/dist/shell.js");
-        result = assembleSite({
+          : defaultShellPath(detectFormat(readJsonOrUndefined(configPath)) ?? "", process.cwd());
+        result = assembleFromConfig({
           packDir: path.resolve(dir),
-          configPath: path.resolve(flags.config),
+          configPath,
           shellJsPath: shell,
           outRoot,
           ...(typeof flags["game-id"] === "string" ? { gameId: flags["game-id"] } : {}),

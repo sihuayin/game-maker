@@ -9,4 +9,8 @@
   },
   "//": "渲染层与入口：**要** DOM 与 Phaser。它不产出声明文件（产物是 esbuild 打的 dist/shell.js），只做类型检查 —— 于是「纯层无 DOM」这条缝是编译器看着的。",
   "include": ["src/shell"]
+  // 两个玩法的渲染层都在 src/shell/ 下（`shell/` 是横版、`shell/td/` 是塔防）——
+  // 于是这份 include **一行都不用改**，而它是 `pnpm check` 唯一会跑到的类型检查。
+  // ⚠️ 把塔防外壳放到 `src/td/shell/` 会让它**完全不被类型检查**（tsc -b 不跑 shell 配置，
+  //    而 spec 配置有意排除 shell）—— 一个带类型错误的渲染层会一路通过 pnpm check。
 }

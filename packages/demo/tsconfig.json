@@ -5,11 +5,9 @@
     "rootDir": "src"
   },
   "//": "⚠️ **只编译纯层**。`src/shell/` 走 tsconfig.shell.json —— 那条缝就是「纯函数不许碰 DOM」这条纪律的结构化落点（票 44 的判据：纯函数是外壳可测的全部理由）。",
-  "include": [
-    "src/index.ts",
-    "src/world.ts",
-    "src/site.ts"
-  ],
+  "//include": "⚠️ **按目录而不是按文件名列举**（2026-09-29）。原来是显式清单，于是新加一个纯模块时忘了写进来 = 它**静默不被编译、也不被类型检查**（`pnpm check` 跑的是 `tsc -b`，它只看得到列出来的文件）。排除 `src/shell` 才是那条真缝：渲染层要 DOM，走 tsconfig.shell.json。",
+  "include": ["src"],
+  "exclude": ["src/shell"],
   "references": [
     {
       "path": "../contracts"

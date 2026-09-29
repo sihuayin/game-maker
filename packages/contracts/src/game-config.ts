@@ -19,9 +19,9 @@ import { resolvePackRef, type AssetPackManifest } from "./assetpack.js";
 export const GAME_CONFIG_FORMAT = "game-config/v1" as const;
 
 /** 整数坐标。**非负** —— 世界从 (0,0) 起算。 */
-const Coord = z.number().int().nonnegative();
-const Point = z.object({ x: Coord, y: Coord }).strict();
-const Size = z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict();
+export const Coord = z.number().int().nonnegative();
+export const Point = z.object({ x: Coord, y: Coord }).strict();
+export const Size = z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict();
 /**
  * 世界里的一个轴对齐矩形（地形、碰撞盒）。
  *

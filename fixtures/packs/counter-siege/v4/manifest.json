@@ -1,0 +1,964 @@
+{
+  "format": "assetpack/v2",
+  "id": "counter-siege",
+  "version": 4,
+  "createdAt": "2026-09-29T11:56:02.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated",
+    "style": {
+      "origin": "human-in-session",
+      "ref": "authoring/stylespec.json",
+      "stylespecId": "style-ref",
+      "checksum": "sha256:54a98c9d99fc8650862c4437ceedfa7ad67f3c75aeb74f9b775ced5d3f7870dc"
+    }
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 9,
+    "values": [
+      "#7c968e",
+      "#55685f",
+      "#a9b7ac",
+      "#3e3236",
+      "#c3cdc9",
+      "#ead8a6",
+      "#c4694a",
+      "#4ebba4",
+      "#6d8f52"
+    ],
+    "coverage": {
+      "exact": 15,
+      "composited": 6,
+      "quantized": 0,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 24,
+        "h": 152
+      },
+      "frames": 9,
+      "assets": [
+        "enemy-brute",
+        "enemy-drone",
+        "enemy-scavenger",
+        "fx-shock"
+      ],
+      "checksum": "sha256:31e5749fe6dd376f41413517a13b2b2078fa4f4a881ef57bc768f4dc5d8d1cea"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 40,
+        "h": 119
+      },
+      "frames": 13,
+      "assets": [
+        "core-counter",
+        "proj-beam",
+        "proj-nail",
+        "slot-ring",
+        "slot-socket",
+        "tile-door",
+        "tile-floor",
+        "tile-shelf",
+        "tile-walk",
+        "tile-wall",
+        "tower-floodlight",
+        "tower-nailgun",
+        "tower-shock"
+      ],
+      "checksum": "sha256:f96069f9335e0d71729e0fce2c3b68dde8b0860eb35ff60932c352f16427dacf"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 96,
+        "h": 48
+      },
+      "frames": 4,
+      "assets": [
+        "ui-btn",
+        "ui-hud-bar",
+        "ui-icon-life",
+        "ui-icon-scrap"
+      ],
+      "checksum": "sha256:383220591d09c02955bb79dd9d8c3e32eb3934c15bc4a281304647bf3f851461"
+    }
+  ],
+  "assets": [
+    {
+      "id": "tile-floor",
+      "kind": "sprite",
+      "role": "场地砖：店内的水泥地面，俯视",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 15,
+        "h": 15
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tile-floor"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tile-floor.json"
+        }
+      ]
+    },
+    {
+      "id": "tile-walk",
+      "kind": "sprite",
+      "role": "走道砖：敌人走的通道，俯视。**明显比地面暗**",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 15,
+        "h": 15
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tile-walk"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tile-walk.json"
+        }
+      ]
+    },
+    {
+      "id": "tile-shelf",
+      "kind": "sprite",
+      "role": "货架：一排货箱的顶面，俯视",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 15,
+        "h": 15
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tile-shelf"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tile-shelf.json"
+        }
+      ]
+    },
+    {
+      "id": "tile-wall",
+      "kind": "sprite",
+      "role": "店墙：铁皮隔断的顶面，俯视",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 15,
+        "h": 15
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tile-wall"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tile-wall.json"
+        }
+      ]
+    },
+    {
+      "id": "tile-door",
+      "kind": "sprite",
+      "role": "卷帘门：敌人涌进来的入口，俯视",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 15,
+        "h": 15
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tile-door"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tile-door.json"
+        }
+      ]
+    },
+    {
+      "id": "slot-socket",
+      "kind": "sprite",
+      "role": "空插槽：嵌在地板里的方形检修口，正好占一格",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 15,
+        "h": 15
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "slot-socket"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/slot-socket.json"
+        }
+      ]
+    },
+    {
+      "id": "slot-ring",
+      "kind": "sprite",
+      "role": "高亮框：鼠标悬停或选中时套在插槽外面的四角括弧",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "slot-ring"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/slot-ring.json"
+        }
+      ]
+    },
+    {
+      "id": "tower-nailgun",
+      "kind": "sprite",
+      "role": "机关：钉枪台。前期便宜的快速单体攻击",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tower-nailgun"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tower-nailgun.json"
+        }
+      ]
+    },
+    {
+      "id": "tower-shock",
+      "kind": "sprite",
+      "role": "机关：电击地板。范围伤害并减速",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tower-shock"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tower-shock.json"
+        }
+      ]
+    },
+    {
+      "id": "tower-floodlight",
+      "kind": "sprite",
+      "role": "机关：探照灯。射程最远、单发伤害最高的慢速机关",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tower-floodlight"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/tower-floodlight.json"
+        }
+      ]
+    },
+    {
+      "id": "fx-shock",
+      "kind": "animation",
+      "role": "特效：电击地板放电时向外扩散的电环",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "fx-shock.zap1"
+        },
+        {
+          "name": "fx-shock.zap2"
+        },
+        {
+          "name": "fx-shock.zap3"
+        }
+      ],
+      "animations": [
+        {
+          "name": "zap",
+          "frames": [
+            "fx-shock.zap1",
+            "fx-shock.zap2",
+            "fx-shock.zap3"
+          ],
+          "fps": 12,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/fx-shock.zap1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/fx-shock.zap2.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/fx-shock.zap3.json"
+        }
+      ]
+    },
+    {
+      "id": "proj-nail",
+      "kind": "sprite",
+      "role": "抛射物：钉枪台射出的钉子",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 6,
+        "h": 6
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "proj-nail"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/proj-nail.json"
+        }
+      ]
+    },
+    {
+      "id": "proj-beam",
+      "kind": "sprite",
+      "role": "抛射物：探照灯射出的光弹",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 8,
+        "h": 8
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "proj-beam"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/proj-beam.json"
+        }
+      ]
+    },
+    {
+      "id": "enemy-scavenger",
+      "kind": "animation",
+      "role": "敌人：拾荒者。跑得快、血少的前期杂兵",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 14,
+        "h": 14
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-scavenger.walk1"
+        },
+        {
+          "name": "enemy-scavenger.walk2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "walk",
+          "frames": [
+            "enemy-scavenger.walk1",
+            "enemy-scavenger.walk2"
+          ],
+          "fps": 6,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/enemy-scavenger.walk1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/enemy-scavenger.walk2.json"
+        }
+      ]
+    },
+    {
+      "id": "enemy-brute",
+      "kind": "animation",
+      "role": "敌人：蛮兵。走得慢、血厚、有护甲的中期敌人",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-brute.walk1"
+        },
+        {
+          "name": "enemy-brute.walk2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "walk",
+          "frames": [
+            "enemy-brute.walk1",
+            "enemy-brute.walk2"
+          ],
+          "fps": 5,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/enemy-brute.walk1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/enemy-brute.walk2.json"
+        }
+      ]
+    },
+    {
+      "id": "enemy-drone",
+      "kind": "animation",
+      "role": "敌人：机械犬。速度极快、血极薄的后期敌人",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-drone.hover1"
+        },
+        {
+          "name": "enemy-drone.hover2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "hover",
+          "frames": [
+            "enemy-drone.hover1",
+            "enemy-drone.hover2"
+          ],
+          "fps": 8,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/enemy-drone.hover1.json"
+        },
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/enemy-drone.hover2.json"
+        }
+      ]
+    },
+    {
+      "id": "core-counter",
+      "kind": "sprite",
+      "role": "要守的东西：店铺的柜台（俯视台面）",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 40,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "core-counter"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/core-counter.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-hud-bar",
+      "kind": "ui",
+      "role": "界面：顶部状态条的底板，九宫格可拉伸",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 26
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-hud-bar"
+        }
+      ],
+      "scale9Borders": {
+        "x": 4,
+        "y": 4,
+        "w": 88,
+        "h": 18
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-hud-bar.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-btn",
+      "kind": "ui",
+      "role": "界面：机关按钮的底板，九宫格可拉伸",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 44,
+        "h": 22
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-btn"
+        }
+      ],
+      "scale9Borders": {
+        "x": 3,
+        "y": 3,
+        "w": 38,
+        "h": 16
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-btn.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-icon-scrap",
+      "kind": "ui",
+      "role": "界面图标：废料（游戏里的钱）",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 10,
+        "h": 10
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-icon-scrap"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-icon-scrap.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-icon-life",
+      "kind": "ui",
+      "role": "界面图标：店铺声望（游戏里的命）",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 10,
+        "h": 10
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-icon-life"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-icon-life.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/core-counter.json",
+      "bytes": 6679,
+      "checksum": "sha256:cad43d73b63471e72cedea9050e143eda551e13f4e04967d15073ad9d999fc88"
+    },
+    {
+      "path": "authoring/drawlist/enemy-brute.walk1.json",
+      "bytes": 3791,
+      "checksum": "sha256:a2feae8a97c97961d760f18d0f1ef23ab282babcf6cd258c81db1bb1e768281a"
+    },
+    {
+      "path": "authoring/drawlist/enemy-brute.walk2.json",
+      "bytes": 3794,
+      "checksum": "sha256:471d06395f450c15b8392321b21b3585f246681a12bb6a756ca3a3b8c58f31d3"
+    },
+    {
+      "path": "authoring/drawlist/enemy-drone.hover1.json",
+      "bytes": 1808,
+      "checksum": "sha256:b87a90e02af06f5c65a39bac2b3691cb2373bb0e6c5fd97dbf5d03d34751841c"
+    },
+    {
+      "path": "authoring/drawlist/enemy-drone.hover2.json",
+      "bytes": 1808,
+      "checksum": "sha256:712749c87a1cf92cbf886d5dc782baa606111f974074082c492adc85380c52a7"
+    },
+    {
+      "path": "authoring/drawlist/enemy-scavenger.walk1.json",
+      "bytes": 2745,
+      "checksum": "sha256:3e6ec295cf2ed56dcafcf7cb42521196a4456388e4625b2004871bd0247f5516"
+    },
+    {
+      "path": "authoring/drawlist/enemy-scavenger.walk2.json",
+      "bytes": 2745,
+      "checksum": "sha256:cb835721e1768adfa93bc4901f2138de6cd6470d4d20d089168f83383b2617a1"
+    },
+    {
+      "path": "authoring/drawlist/fx-shock.zap1.json",
+      "bytes": 2871,
+      "checksum": "sha256:1b8aefa1b0f8b2bf18c4f6c9678f948247e2c9351d6f1c6ea541343fd07e1510"
+    },
+    {
+      "path": "authoring/drawlist/fx-shock.zap2.json",
+      "bytes": 3081,
+      "checksum": "sha256:a01dbde2ff735a11a0135374482f64b0d2e5bab386e8b4913fcf8488060bcad8"
+    },
+    {
+      "path": "authoring/drawlist/fx-shock.zap3.json",
+      "bytes": 2985,
+      "checksum": "sha256:672aad3d2fc399ecac5c9c1e9e8cbffea27f98221464198973fcecbdc5d7e3a4"
+    },
+    {
+      "path": "authoring/drawlist/proj-beam.json",
+      "bytes": 2162,
+      "checksum": "sha256:fb941832007f157ef1509e956225fe9e7ea572528e35eec75dd3f144624b17e0"
+    },
+    {
+      "path": "authoring/drawlist/proj-nail.json",
+      "bytes": 2016,
+      "checksum": "sha256:55718da916ef48b5adbb217f17777780cdc7a65843c6c77076b4b8673d35a04f"
+    },
+    {
+      "path": "authoring/drawlist/slot-ring.json",
+      "bytes": 2501,
+      "checksum": "sha256:6a0de5f4d227ccde02bfb4f759ee322547ace2be163c091e0a87bf7e13e2eb98"
+    },
+    {
+      "path": "authoring/drawlist/slot-socket.json",
+      "bytes": 4654,
+      "checksum": "sha256:291904eb2b88b1271eab76a0aa6e0a4fe67aae1faf277ce69ff787ae4e133831"
+    },
+    {
+      "path": "authoring/drawlist/tile-door.json",
+      "bytes": 4735,
+      "checksum": "sha256:f32c3a1ee216cf9612ea37c25f3bc875a9a1f3a84e79ee580950210935a0718f"
+    },
+    {
+      "path": "authoring/drawlist/tile-floor.json",
+      "bytes": 3097,
+      "checksum": "sha256:0926d9c4b9936d2435e8231ba1641db930e7ee48385cdb486aaafa1e7c26c645"
+    },
+    {
+      "path": "authoring/drawlist/tile-shelf.json",
+      "bytes": 2670,
+      "checksum": "sha256:71ac79db2ce394ef652526b3907ce0708f129a2761d6d30adab87ffadc033aa0"
+    },
+    {
+      "path": "authoring/drawlist/tile-walk.json",
+      "bytes": 3232,
+      "checksum": "sha256:cd5de70cd7bac6b8007519eda4119799fe1002ad76d9ef036b9b708d59c1712d"
+    },
+    {
+      "path": "authoring/drawlist/tile-wall.json",
+      "bytes": 3195,
+      "checksum": "sha256:f1b65a133f3dff84eaa5468a9b759ddb48d517235166dc28947aa8ecebff41f1"
+    },
+    {
+      "path": "authoring/drawlist/tower-floodlight.json",
+      "bytes": 3632,
+      "checksum": "sha256:cfd589abb85399341973d6dbe2bc8420be798ace4e5de37ed472b43c5755acbd"
+    },
+    {
+      "path": "authoring/drawlist/tower-nailgun.json",
+      "bytes": 3133,
+      "checksum": "sha256:bb81ee6883549bc86770b6914e3d1036ad58f45e921a5c71972533a5ffe8e86a"
+    },
+    {
+      "path": "authoring/drawlist/tower-shock.json",
+      "bytes": 5071,
+      "checksum": "sha256:ff3d44e88076aa0bec53729a8fae42424a5e128b22502c4979569d334de02e56"
+    },
+    {
+      "path": "authoring/drawlist/ui-btn.json",
+      "bytes": 2324,
+      "checksum": "sha256:3c5e880756f2f5ed838659e96d85e4d9c22e6672ee507f28f277c27a6206e58e"
+    },
+    {
+      "path": "authoring/drawlist/ui-hud-bar.json",
+      "bytes": 3225,
+      "checksum": "sha256:e31a24cb696884125f3d2a2568873a2651962535fd9b1eccf66d88dd117ca822"
+    },
+    {
+      "path": "authoring/drawlist/ui-icon-life.json",
+      "bytes": 2809,
+      "checksum": "sha256:b4ce334283fdcae2cff99d05658c007127c57cfc5983961feed0ec799ee34dbe"
+    },
+    {
+      "path": "authoring/drawlist/ui-icon-scrap.json",
+      "bytes": 3160,
+      "checksum": "sha256:dc6a541ba6e4db1e619bb112049cca942f8b9303cec01962b29f57821d0801d1"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 2511,
+      "checksum": "sha256:54a98c9d99fc8650862c4437ceedfa7ad67f3c75aeb74f9b775ced5d3f7870dc"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 105,
+      "checksum": "sha256:b156901475ea42e2a5a61cc44eadfb5ca16f17d72fd6a5b7f5c2451ff124c008"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 3823,
+      "checksum": "sha256:1ae432bcb43d30a9588eac0d48e743ce98b32ab5eb916f2d70ef189c0f632d06"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 822,
+      "checksum": "sha256:31e5749fe6dd376f41413517a13b2b2078fa4f4a881ef57bc768f4dc5d8d1cea"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 5332,
+      "checksum": "sha256:85df87a6fdf0edef0d162f14c425d55d65c8c9b9181da24942431f90a4d440e3"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 1187,
+      "checksum": "sha256:f96069f9335e0d71729e0fce2c3b68dde8b0860eb35ff60932c352f16427dacf"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1963,
+      "checksum": "sha256:d64298c052835bee483b055358bc47687c947a87313f65d7ace8a273812fa383"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 485,
+      "checksum": "sha256:383220591d09c02955bb79dd9d8c3e32eb3934c15bc4a281304647bf3f851461"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 6633,
+      "checksum": "sha256:49b170474e09c31ba2f665e51ea50874e9f740ae15478a6050209dcd84bb348d"
+    }
+  ]
+}

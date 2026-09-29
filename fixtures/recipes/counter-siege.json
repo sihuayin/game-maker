@@ -1,0 +1,492 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "counter-siege",
+  "styleRef": "../style-spec.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-floor",
+        "role": "场地砖：店内的水泥地面，俯视",
+        "description": "一块正方形的店内水泥地面砖，俯视。**浅色的青灰水泥**，砖面有轻微磨损与几粒尘屑，四条边各一条**很细的深色砖缝**。整块砖都要画满、不留透明，四边能与其他地面砖无缝对接。**这是场地里最亮的一档**，用来与走道形成明显对比",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-walk",
+        "role": "走道砖：敌人走的通道，俯视。**明显比地面暗**",
+        "description": "一块正方形的金属走道板，俯视。**深色的旧钢板**（比店内地面暗一大档），板面横向排列着几条**等距的防滑凸条**，凸条之间有点状磨损。**四条边不画任何边框**——要能与其他走道砖无缝连成一条连续的路面。整块画满、不留透明。**这是场地里最暗的一档之一**，敌人走在上面时轮廓要能一眼看清",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-shelf",
+        "role": "货架：一排货箱的顶面，俯视",
+        "description": "一块正方形的俯视货架格：深色金属框里嵌着一排挤在一起的小货箱与罐头，箱盖有米黄与橄榄绿两种，之间露出暗色的缝隙。**整块砖都要画满，不留透明**，四边能与其他货架砖无缝拼接成一条长货架",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-wall",
+        "role": "店墙：铁皮隔断的顶面，俯视",
+        "description": "一块正方形的俯视墙体：深褐色的铁皮隔断顶面，中间一条纵向的加强筋，两侧各一排等距铆钉，表面有锈迹与刮痕。**整块砖都要画满，不留透明**，四边能与其他墙砖无缝拼接",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-door",
+        "role": "卷帘门：敌人涌进来的入口，俯视",
+        "description": "一块正方形的俯视卷帘门：横向排列的金属帘片（五到六条），帘片之间有深色缝隙，两端是深色的导轨，底部有一条警示用的锈橙色斜纹带。**整块画满，不留透明**",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "slot-socket",
+        "role": "空插槽：嵌在地板里的方形检修口，正好占一格",
+        "description": "俯视的一小块方形金属检修口，嵌在地板里，比周围地板略深。四角各一颗螺栓，中央是一块格栅盖板，边缘有磨损。读起来要像「这里可以往上装东西」的空位。**整块画满，不留透明**",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "slot-ring",
+        "role": "高亮框：鼠标悬停或选中时套在插槽外面的四角括弧",
+        "description": "**四条边全部留空，只在四个角各画一个 L 形的短括弧**（每边约 5 像素），线宽 1 像素，暖米黄色，四角对称。这是选中指示，绝对不要画成一个封闭的方框",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tower-nailgun",
+        "role": "机关：钉枪台。前期便宜的快速单体攻击",
+        "description": "从上方俯视的一台小钉枪台：方形湖绿色机壳，左侧一个米黄色弹鼓，右侧伸出一根短短的深色枪管。机壳四角有螺丝，顶面有散热缝。整体是一台架在地上的小机器，不是手持工具",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tower-shock",
+        "role": "机关：电击地板。范围伤害并减速",
+        "description": "俯视的一小块嵌在地里的电击板：金属底板中间裂开一道口子，裂缝里露出几根电线，裂缝周围有一圈短促的菱形电光。电光用暖米黄色，与金属的冷青灰形成对比。它是**铺在地上的一块板**，不是立起来的机器",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tower-floodlight",
+        "role": "机关：探照灯。射程最远、单发伤害最高的慢速机关",
+        "description": "从上方俯视的一盏落地探照灯：米黄色的圆形灯罩朝右，锈橙色的三脚支架，灯罩中央是一块浅色反光镜面。俯视下读起来是一个圆灯头加一圈支脚",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "fx-shock",
+        "role": "特效：电击地板放电时向外扩散的电环",
+        "description": "俯视的扩散电环，三帧由小到大：第 1 帧是一个小的米黄色锯齿环，第 2 帧环变大一倍且更细更暗，第 3 帧环最大最淡、只剩零星几个电火花。环的中心始终是空的（透明），只有环本身",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "zap",
+            "frames": 3,
+            "fps": 12,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "proj-nail",
+        "role": "抛射物：钉枪台射出的钉子",
+        "description": "一枚水平朝右的短铁钉，俯视。尖头在右，钉帽在左，钉帽稍大且颜色更亮，钉身细长偏深。画布很小，只要几块像素就能读出来",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 6,
+          "h": 6
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "proj-beam",
+        "role": "抛射物：探照灯射出的光弹",
+        "description": "一团小小的圆形暖白光斑，中心最亮（浅米白），外圈一圈略暗的米黄，边缘做一圈抖动过渡，读起来像一枚发光的小球",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 8,
+          "h": 8
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-scavenger",
+        "role": "敌人：拾荒者。跑得快、血少的前期杂兵",
+        "description": "**从正上方俯视**的一个瘦小拾荒者，两帧走路：第 1 帧左腿在前，第 2 帧右腿在前。只见兜帽的顶面（橄榄绿）与两只伸出的肩膀，兜帽下缘是暗色阴影，手里拎一根短铁棍。**主体居中、占满整块画布**，俯视图里没有「站在一条线上」这回事，请不要在画布底部留空",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 14,
+          "h": 14
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 2,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-brute",
+        "role": "敌人：蛮兵。走得慢、血厚、有护甲的中期敌人",
+        "description": "**从正上方俯视**的一个宽肩壮汉，两帧走路：第 1 帧左腿在前，第 2 帧右腿在前。腐锈橙色的大块肩甲占了大半，中间露出暗色的头盔顶，两只戴护腕的手垂在身侧，肩上斜挎一根铁管。**主体居中、占满整块画布**，俯视图里没有「站在一条线上」这回事，请不要在画布底部留空",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 2,
+            "fps": 5,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-drone",
+        "role": "敌人：机械犬。速度极快、血极薄的后期敌人",
+        "description": "**从正上方俯视**的一台四足机械犬，两帧跑动：第 1 帧前腿并拢，第 2 帧前后腿张开。湖绿色的方形机身，前端一块小小的暗色传感镜头，四角各伸出一条深色的细腿。**主体居中、占满整块画布**，俯视图里没有「站在一条线上」这回事，请不要在画布底部留空",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "hover",
+            "frames": 2,
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "core-counter",
+        "role": "要守的东西：店铺的柜台（俯视台面）",
+        "description": "**从正上方俯视**的一截店铺柜台台面：横向的长方形米黄色台面，四周一圈锈橙色包边，台面上摆着一台小小的收银机（有按键与一块暗色屏幕）、一叠纸盒、一个铁皮罐。右上角有一盏小小的暖色台灯。这是要守住的东西，读起来要贵重要紧",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 40,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-hud-bar",
+        "role": "界面：顶部状态条的底板，九宫格可拉伸",
+        "description": "一条横向的深色金属面板，用于顶部状态条。四周一圈 1 像素亮边、加一圈更深的描边，面板里侧有一条内嵌的细凹线。面板中央必须完全平坦（纯色加规整的细点阵），不要画任何文字与图案",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 96,
+          "h": 26
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-btn",
+        "role": "界面：机关按钮的底板，九宫格可拉伸",
+        "description": "一块方形按钮底板，深色凹面板，四周一圈亮色高光边、下缘一圈更深的阴影边，读起来是可以按下去的一小块面板。中央必须完全平坦，不要画任何文字与图案",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 44,
+          "h": 22
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 3,
+          "right": 3,
+          "top": 3,
+          "bottom": 3
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-icon-scrap",
+        "role": "界面图标：废料（游戏里的钱）",
+        "description": "一小堆废铁：两三枚叠起来的六角螺栓、一片弯掉的铁皮、一颗小齿轮，冷灰金属色，带深色描边。俯视，居中",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 10,
+          "h": 10
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-icon-life",
+        "role": "界面图标：店铺声望（游戏里的命）",
+        "description": "一枚小小的盾形徽章，米黄色底，中间一颗锈橙色的五角星，四周一圈深色描边与两颗铆钉。居中",
+        "styleId": "counter-siege",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 10,
+          "h": 10
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ]
+}

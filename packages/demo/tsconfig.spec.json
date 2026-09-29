@@ -9,5 +9,7 @@
     "rootDir": ".",
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src/index.ts", "src/world.ts", "src/site.ts", "tests"]
+  "//include": "⚠️ 与 tsconfig.json 同款：按目录列举，排除渲染层（它要 DOM）。",
+  "include": ["src", "tests"],
+  "exclude": ["src/shell"]
 }
