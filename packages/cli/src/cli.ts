@@ -13,7 +13,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 用法：
   game-maker derive --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
-  game-maker pack   --recipe <清单.json> [--out <目录>] [--json]
+  game-maker pack   --recipe <清单.json> [--out <目录>] [--concurrency <n>] [--json]
   game-maker compile-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
   game-maker site   <资源包目录> --config <game-config.json> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
@@ -21,7 +21,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 通用选项：
   --out <目录>   产物根。默认 ./out。**所有回报的路径都相对于它**。
-  --json         输出机器可解析的 JSON（与人类输出是**同一份数据**）
+  --json         输出机器可解析的 JSON（与人类输出是**同一份数据**，与 MCP 同源）
 
 退出码：
   0  成功
@@ -40,7 +40,7 @@ type Parsed = { command: string; positionals: string[]; flags: Record<string, st
 export function parseArgs(argv: readonly string[]): Parsed {
   const positional: string[] = [];
   const flags: Record<string, string | boolean> = {};
-  const takesValue = new Set(["requirement", "style", "out", "recipe", "config", "shell", "game-id", "pack"]);
+  const takesValue = new Set(["requirement", "style", "out", "recipe", "config", "shell", "game-id", "pack", "concurrency"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--help" || a === "-h") { flags.help = true; continue; }
@@ -90,9 +90,15 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
         // 生图凭据：文件（已 gitignore）或环境变量，环境变量优先。没配也能跑 —— 只要清单里没有 image 资源。
         const img = resolveImageTransport({ env: process.env, cwd: process.cwd() });
         for (const w of img.warnings) io.err(`⚠️ ${w}\n`);
+        // 并发上限（票 47）：**按上游分别定**是本来的形状，但一个数就够人用了 ——
+        // 给了就两边都用它；要分开调就用 API。
+        const n = typeof flags.concurrency === "string" ? Number(flags.concurrency) : undefined;
+        if (n !== undefined && (!Number.isInteger(n) || n < 1))
+          throw new CommandError("usage", `--concurrency 必须是 ≥1 的整数（给的是 "${flags.concurrency}"）`);
         result = await packAssets({
           recipePath: path.resolve(flags.recipe), outRoot, transport,
           ...(img.transport ? { imageTransport: img.transport } : {}),
+          ...(n !== undefined ? { concurrency: { text: n, image: n } } : {}),
         });
         break;
       }

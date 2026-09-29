@@ -54,6 +54,11 @@ export type BuildPackOptions = {
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
   /**
+   * 并发上限（票 47）。**按上游分别定** —— 不给就用 `DEFAULT_CONCURRENCY`。
+   * ⚠️ 设成 1 就是旧的串行行为（对照实验用得上）。
+   */
+  concurrency?: { text?: number; image?: number };
+  /**
    * 一次运行的账（票 45）。给了就往包根写一份 `ledger.json`。
    * ⚠️ 传进来的是一个**调用方也持有的数组** —— 文本那一路的调用由**生成器**直接记进来
    *   （`createDrawListGenerator({onCall})`），生图那一路由本函数追加。
@@ -90,6 +95,47 @@ export type BuildPackResult = {
 const hexToRgb = (hex: string): [number, number, number] => [
   parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16),
 ];
+
+/**
+ * 并发上限的**默认值**（票 47）。⚠️ **按上游分别定** —— 限流是**上游**的属性，不是一个全局数。
+ *
+ * · **文本**（DeepSeek via 代理想）：上游的限额**查不到**，所以取一个保守值，
+ *   并且它只是**客户端**的并发数（真正的限额在代理那一侧，超了就是 HTTP 429/500）。
+ * · **生图**：票 34 实测千问那条是 **RPS 5 / 并发 5**；OpenAI 那一支没查到，
+ *   但一次调用就是一笔钱，取更保守的值。
+ *
+ * ⚠️ 两个都可以用 `BuildPackOptions.concurrency` 覆盖 —— 数字是**实测挑出来的**，
+ *   不是定律（见票 47 的 Answer 里那张串行/并行对照表）。
+ */
+export const DEFAULT_CONCURRENCY = { text: 4, image: 3 } as const;
+
+/**
+ * 一个最简单的**信号量**：最多放 `limit` 个进去，其余的排队。
+ * ⚠️ 排队是 FIFO —— 不这样做的话，晚提交的任务可能先跑，而**顺序在调上游时是有意义的**
+ *   （同一批调用打在同一个上游上，先来先服务才是上游期待的样子）。
+ */
+function semaphore(limit: number, stop: { error: unknown }) {
+  let active = 0;
+  const waiting: (() => void)[] = [];
+  return async function gate<T>(fn: () => Promise<T>): Promise<T> {
+    if (stop.error) throw stop.error;
+    if (active >= limit) await new Promise<void>((resolve) => waiting.push(resolve));
+    active += 1;
+    try {
+      // ⚠️ **排到队之后再查一次** —— 排队期间可能已经有一次调用失败了。
+      //   这一句就是「失败之后不再花钱」的落点：在途的那几笔拦不住（钱已经出去了），
+      //   但**还没发出去的**必须拦住。票 19 Q2 的另一半是「已经花掉的要报出来」（票 46）。
+      if (stop.error) throw stop.error;
+      return await fn();
+    } catch (e) {
+      // ⚠️ **必须记在 `catch` 里，不能记在外层**：`finally` 会**先唤醒下一个排队者**，
+      //   而那时外层的 catch 还没跑 —— 于是一个「还没失败」的世界把它又放了一笔出去。
+      //   实测差的正好是一笔（上限 2、8 个资源，发出去了 3 笔）。
+      stop.error ??= e;
+      throw e;
+    } finally { active -= 1; waiting.shift()?.(); }
+  };
+}
 
 const sha256 = (b: Buffer) => "sha256:" + createHash("sha256").update(b).digest("hex");
 const jstr = (o: unknown) => JSON.stringify(o, null, 2) + "\n";
@@ -168,187 +214,205 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   fs.mkdirSync(path.join(packDir, "authoring", "generated"), { recursive: true });
 
   type Built = { spec: AssetSpec; origin: "generated" | "imported"; paletteBinding: "exact" | "composited" | "quantized"; frames: { name: string; state?: string; image: RasterImage }[]; animations?: { name: string; frames: string[]; fps?: number; loop: boolean }[]; authoring: { kind: "drawlist" | "bitmap"; ref: string; original?: string }[] };
-  const built: Built[] = [];
   /** 生图调用的账 —— 一次调用就是一笔钱，逐条记下来交调用方报出来。 */
   const imageCalls: ({ assetId: string } & ImageGenCall)[] = [];
 
-  for (const [idx, entry] of recipe.assets.entries()) {
-    const spec = entry.spec;
-    opts.onProgress?.(idx, recipe.assets.length, spec.id);
-    const plan = framePlan(spec);
-    const frames: Built["frames"] = [];
-    const authoring: Built["authoring"] = [];
-    let origin: Built["origin"] = "generated";
-    let binding: Built["paletteBinding"] = "exact";
+  // ⚠️ **并发跑**（票 47）：资源之间**没有任何数据依赖** —— 每一次调用只吃自己的
+  //   `spec` + StyleSpec，`dependencies` 那条线**从来没有过消费者**（本节末尾有交代）。
+  //   串行纯属浪费：实测 9 个资源串行 43.7s，而墙钟本可以贴着最慢的那一个走。
+  //
+  // ⚠️ **两个闸门而不是一个**：限流是**上游**的属性。文本与生图是两个不同的上游
+  //   （票 34：千问 RPS 5 / 并发 5；文本那侧查不到，取保守值），一个全局数会把
+  //   「生图只能同时 3 个」错加到文本头上，或者反过来。
+  // ⚠️ **失败即止**：串行时「第 5 个失败」只浪费掉前 4 个；并发之后若不管，
+  //   `Promise.all` 虽然立刻拒绝，但**其余 8 个已经排进闸门了**，它们会照样发出去 ——
+  //   钱在「已经知道失败了」之后继续烧。这个共享的失败信号就是那道闸。
+  const stop: { error: unknown } = { error: null };
+  const textGate = semaphore(opts.concurrency?.text ?? DEFAULT_CONCURRENCY.text, stop);
+  const imageGate = semaphore(opts.concurrency?.image ?? DEFAULT_CONCURRENCY.image, stop);
+  const built: Built[] = new Array<Built>(recipe.assets.length);
 
-    if (entry.source.kind === "drawlist") {
-      const drawlists = await generate(spec, style);
-      if (drawlists.length !== plan.length)
-        throw new Error(`资源 "${spec.id}"：清单说要有 ${plan.length} 帧，生成器给了 ${drawlists.length} 帧`);
-      plan.forEach((p, i) => {
-        const dl = drawlists[i]!;
-        const dest = `authoring/drawlist/${p.name}.json`;
-        // 落盘时**以清单给的名字为准**：生成器可能没写 `frame`，或写得跟清单不一致
-        fs.writeFileSync(path.join(packDir, dest), jstr({ ...dl, id: spec.id, frame: p.name.split(".").slice(1).join(".") || p.name }));
-        authoring.push({ kind: "drawlist", ref: dest });
-        frames.push({ name: p.name, state: p.anim ?? undefined, image: rasterize(dl, { palette }) });
-      });
-      // 票 36：对 drawlist 资源，绑定关系是**解析期静态**的 —— 不需要渲染后再扫
-      binding = drawlists.some((d) => paletteBindingOf(d.ops) === "composited") ? "composited" : "exact";
-    } else if (entry.source.kind === "image") {
-      const src = entry.source;
-      if (!opts.generateImage)
-        throw new Error(`资源 "${spec.id}" 是 source.kind="image"，但调用方没给 generateImage —— 这是**调用方的 bug**，不静默跳过`);
-      origin = "generated";
-      // 生图产物**同样过那条重建管线**（抠背景 → 裁框 → 降采样 → 二值化 → 量化），
-      // 所以它与导入通道在结构上是同一种东西：都是「原生位图」这一创作态。
-      binding = "quantized";
-      // 世界的风格参考图（配方级）。给了就内联进每一次生图请求 —— 让模型**看着那个世界**画，
-      // 而不是听一个文字转述（实测后者会走样成一张场景插画）。
-      const styleReference = recipe.referenceImage
-        ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, recipe.referenceImage)))
-        : undefined;
-      const reference = src.reference
-        ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
-        : undefined;
-      // ⚠️ **一个 unit 一次调用**。unit 的划分与 drawlist 路线的 `framePlan` **对称**（票 43）：
-      //   · animation → 一个**动画**一个 unit（实测把 14 帧塞进一次调用，模型只给回来 1 个角色）
-      //   · 分层背景 → **一层**一个 unit（票 40 撞到的那个洞：以前只出一张图，而 plan 有 N 项，
-      //     `results[i]` 越界成 undefined，一路带到 buildAtlas 才炸成一个说不清哪里错的 TypeError）
-      //   · 其余 → 一个资源一个 unit
-      const bgLayers = spec.kind === "background" ? spec.layers : undefined;
-      const units: { anim?: string; layer?: { name: string; index: number; total: number; tileX: boolean }; frames: number; raw: string }[] =
-        spec.kind === "animation"
-          ? spec.animations.map((a) => ({ anim: a.name, frames: a.frames, raw: `authoring/generated/${spec.id}.${a.name}.png` }))
-          : bgLayers
-            ? bgLayers.map((l, i) => ({
-                layer: { name: l.name, index: i, total: bgLayers.length, tileX: l.tileable?.x ?? false },
-                frames: 1,
-                raw: `authoring/generated/${spec.id}.${l.name}.png`,
-              }))
-            : [{ frames: 1, raw: `authoring/generated/${spec.id}.png` }];
+  await Promise.all(recipe.assets.map(async (entry, idx) => {
+      const spec = entry.spec;
+      opts.onProgress?.(idx, recipe.assets.length, spec.id);
+      const plan = framePlan(spec);
+      const frames: Built["frames"] = [];
+      const authoring: Built["authoring"] = [];
+      let origin: Built["origin"] = "generated";
+      let binding: Built["paletteBinding"] = "exact";
 
-      // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
-      // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
-      const batches: RasterImage[][] = [];
-      for (const u of units) {
-        const prompt = src.prompt ?? imagePrompt(spec, style, {
-          ...(u.anim === undefined ? {} : { anim: u.anim }),
-          ...(u.layer === undefined ? {} : { layer: u.layer }),
+      if (entry.source.kind === "drawlist") {
+        // ⚠️ `async () =>` 不是多余的：`DrawListGenerator` 的返回是 `DrawList[] | Promise<DrawList[]>`，
+      //   直接包一层会让闸门的泛型吃进那个**联合**（于是 await 完还剩一个 Promise）。
+      const drawlists = await textGate(async () => generate(spec, style));
+        if (drawlists.length !== plan.length)
+          throw new Error(`资源 "${spec.id}"：清单说要有 ${plan.length} 帧，生成器给了 ${drawlists.length} 帧`);
+        plan.forEach((p, i) => {
+          const dl = drawlists[i]!;
+          const dest = `authoring/drawlist/${p.name}.json`;
+          // 落盘时**以清单给的名字为准**：生成器可能没写 `frame`，或写得跟清单不一致
+          fs.writeFileSync(path.join(packDir, dest), jstr({ ...dl, id: spec.id, frame: p.name.split(".").slice(1).join(".") || p.name }));
+          authoring.push({ kind: "drawlist", ref: dest });
+          frames.push({ name: p.name, state: p.anim ?? undefined, image: rasterize(dl, { palette }) });
         });
-        const { image, call } = await opts.generateImage({
-          prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
-          negativePrompt: imageNegativePrompt(),
-          ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
-        });
-        // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
-        fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));
-        fs.writeFileSync(path.join(packDir, u.raw.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
-        const cells: RasterImage[] = [];
-        batches.push(cells);
-        if (u.frames === 1) { cells.push(image); }
-        else {
-          // ⚠️ **按墨迹间隙分块**，不等分 —— 实测模型不按格子排版（见 sheet.ts 的文件头）。
-          // ⚠️ 分块看的是 alpha，所以要先**抠一份**出来当探针；原图（纯 RGB）每一列都有"墨"。
-          if (!src.background)
-            throw new Error(
-              `资源 "${spec.id}" 的动画 "${u.anim}" 是多帧，但 source 没给 \`background\` —— ` +
-              "分块靠的是抠掉背景之后的 alpha，不抠就切不开（实测会把一整排 4 个角色判成 1 块）。",
-            );
-          const probe = keyBackground(image, src.background).image;
-          const seg = segmentRowCells(image, probe);
-          if (seg.cells.length !== u.frames)
-            throw new Error(
-              `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
-              "生图模型的帧数不可信（实测要 6 给 5）。要么重出这张图，要么把 spec 的帧数改成它真能画出来的数量 —— " +
-              "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。",
-            );
-          cells.push(...seg.cells);
+        // 票 36：对 drawlist 资源，绑定关系是**解析期静态**的 —— 不需要渲染后再扫
+        binding = drawlists.some((d) => paletteBindingOf(d.ops) === "composited") ? "composited" : "exact";
+      } else if (entry.source.kind === "image") {
+        const src = entry.source;
+        if (!opts.generateImage)
+          throw new Error(`资源 "${spec.id}" 是 source.kind="image"，但调用方没给 generateImage —— 这是**调用方的 bug**，不静默跳过`);
+        origin = "generated";
+        // 生图产物**同样过那条重建管线**（抠背景 → 裁框 → 降采样 → 二值化 → 量化），
+        // 所以它与导入通道在结构上是同一种东西：都是「原生位图」这一创作态。
+        binding = "quantized";
+        // 世界的风格参考图（配方级）。给了就内联进每一次生图请求 —— 让模型**看着那个世界**画，
+        // 而不是听一个文字转述（实测后者会走样成一张场景插画）。
+        const styleReference = recipe.referenceImage
+          ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, recipe.referenceImage)))
+          : undefined;
+        const reference = src.reference
+          ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
+          : undefined;
+        // ⚠️ **一个 unit 一次调用**。unit 的划分与 drawlist 路线的 `framePlan` **对称**（票 43）：
+        //   · animation → 一个**动画**一个 unit（实测把 14 帧塞进一次调用，模型只给回来 1 个角色）
+        //   · 分层背景 → **一层**一个 unit（票 40 撞到的那个洞：以前只出一张图，而 plan 有 N 项，
+        //     `results[i]` 越界成 undefined，一路带到 buildAtlas 才炸成一个说不清哪里错的 TypeError）
+        //   · 其余 → 一个资源一个 unit
+        const bgLayers = spec.kind === "background" ? spec.layers : undefined;
+        const units: { anim?: string; layer?: { name: string; index: number; total: number; tileX: boolean }; frames: number; raw: string }[] =
+          spec.kind === "animation"
+            ? spec.animations.map((a) => ({ anim: a.name, frames: a.frames, raw: `authoring/generated/${spec.id}.${a.name}.png` }))
+            : bgLayers
+              ? bgLayers.map((l, i) => ({
+                  layer: { name: l.name, index: i, total: bgLayers.length, tileX: l.tileable?.x ?? false },
+                  frames: 1,
+                  raw: `authoring/generated/${spec.id}.${l.name}.png`,
+                }))
+              : [{ frames: 1, raw: `authoring/generated/${spec.id}.png` }];
+
+        // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
+        // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
+        const batches: RasterImage[][] = [];
+        for (const u of units) {
+          const prompt = src.prompt ?? imagePrompt(spec, style, {
+            ...(u.anim === undefined ? {} : { anim: u.anim }),
+            ...(u.layer === undefined ? {} : { layer: u.layer }),
+          });
+          // ⚠️ 过**生图**那道闸 —— 一次调用就是一笔钱，别把它和文本调用共用一个上限
+          const { image, call } = await imageGate(() => opts.generateImage!({
+            prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
+            negativePrompt: imageNegativePrompt(),
+            ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
+          }));
+          // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
+          fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));
+          fs.writeFileSync(path.join(packDir, u.raw.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
+          const cells: RasterImage[] = [];
+          batches.push(cells);
+          if (u.frames === 1) { cells.push(image); }
+          else {
+            // ⚠️ **按墨迹间隙分块**，不等分 —— 实测模型不按格子排版（见 sheet.ts 的文件头）。
+            // ⚠️ 分块看的是 alpha，所以要先**抠一份**出来当探针；原图（纯 RGB）每一列都有"墨"。
+            if (!src.background)
+              throw new Error(
+                `资源 "${spec.id}" 的动画 "${u.anim}" 是多帧，但 source 没给 \`background\` —— ` +
+                "分块靠的是抠掉背景之后的 alpha，不抠就切不开（实测会把一整排 4 个角色判成 1 块）。",
+              );
+            const probe = keyBackground(image, src.background).image;
+            const seg = segmentRowCells(image, probe);
+            if (seg.cells.length !== u.frames)
+              throw new Error(
+                `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
+                "生图模型的帧数不可信（实测要 6 给 5）。要么重出这张图，要么把 spec 的帧数改成它真能画出来的数量 —— " +
+                "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。",
+              );
+            cells.push(...seg.cells);
+          }
+          imageCalls.push({ assetId: spec.id, ...call });
+          opts.ledger?.push({
+            step: "image", target: spec.id, upstream: call.protocol, ms: call.ms, attempts: call.attempts,
+            requestedSize: call.requestedSize,
+            ...(call.model !== undefined ? { model: call.model } : {}),
+            ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
+            ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
+            ...(call.usage !== undefined ? { usage: call.usage } : {}),
+          });
         }
-        imageCalls.push({ assetId: spec.id, ...call });
-        opts.ledger?.push({
-          step: "image", target: spec.id, upstream: call.protocol, ms: call.ms, attempts: call.attempts,
-          requestedSize: call.requestedSize,
-          ...(call.model !== undefined ? { model: call.model } : {}),
-          ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
-          ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
-          ...(call.usage !== undefined ? { usage: call.usage } : {}),
+        // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43），都要在这里定，不能留给默认：
+        //   ① **按我们告诉模型的颜色抠底**，不四角取样 —— 背景层的角上就是内容本身
+        //      （地面填满下半、墙填满中间那带），四角取样会把内容色当成底色，**整层抠光**。
+        //   ② **不裁框** —— 导入通道默认「裁到内容再拉到 spec.size」，对一件道具是对的
+        //      （裁紧、归一化），对一层背景是**毁掉构成**：层里只画了上半，裁完拉满，
+        //      层与层之间的空间关系就没了。
+        const isBg = spec.kind === "background";
+        const bgOpt = isBg
+          ? { tolerance: src.background?.tolerance ?? 30, colors: [hexToRgb(keyColorFor(palette))] }
+          : src.background;
+        const results = batches.flatMap((cells) =>
+          importFrames(cells, {
+            palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
+            ...(bgOpt !== undefined ? { background: bgOpt } : {}),
+            ...(isBg ? { trim: false } : {}),
+            ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
+          }),
+        );
+        const stateOf = new Map<string, string>();
+        if (spec.kind === "animation") {
+          let k = 0;
+          for (const a of spec.animations) for (let i = 0; i < a.frames; i++) stateOf.set(plan[k++]!.name, a.name);
+        }
+        // ⚠️ **每一个 unit 的原图都要声明成创作态**，不是一个资源只声明第一张。
+        //   票 43：分层背景**一层一张原图**，只记 `units[0]` 会让 manifest 说
+        //   「这个背景的创作态是 `station.sky.png`」—— 而另外两层同样是它的创作态。
+        //   （文件本来就在包里、也在 `files[]` 里，漏的只是这句**声明**。）
+        for (const u of units)
+          authoring.push({ kind: "bitmap", ref: u.raw, original: units.length > 1 ? `生图 · ${units.length} 次调用` : "生图" });
+        plan.forEach((p, i) => {
+          frames.push({ name: p.name, state: stateOf.get(p.name), image: results[i]! });
+        });
+      } else {
+        // ⚠️ 先把 source 取出来再进闭包 —— 闭包里会丢掉判别式的收窄
+        const src = entry.source;
+        origin = "imported";
+        binding = "quantized";   // 票 23 的裁决：导入位图默认量化到世界色板
+        // ⚠️ 相对**配方文件**解析（`BuildPackOptions.recipeDir`），不是相对 cwd —— 见那个字段的注释
+        const srcPath = path.resolve(opts.recipeDir, src.ref);
+        const img = decodePNG(fs.readFileSync(srcPath));
+        const names = src.sheet?.names ?? [spec.id];
+        const crops = src.sheet ? sliceGrid(img, src.sheet) : [img];
+        if (crops.length !== names.length) throw new Error(`资源 "${spec.id}"：网格切出 ${crops.length} 帧，清单给了 ${names.length} 个名字`);
+        const animOf = new Map<string, string>();
+        for (const a of src.sheet?.animations ?? []) for (const n of a.frames) animOf.set(n, a.name);
+        // ⚠️ 全部帧**一次过** `importFrames`：它让各帧共用同一个裁框。
+        // 逐帧各裁各的会让同一角色在帧间改变位置**与缩放**（`tw/th` 是从裁完的图推的），
+        // 而且会让逐资源声明的 `spec.anchor` 每帧落在角色身上不同的位置。
+        const imported = importFrames(crops, {
+          palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
+          ...(src.background !== undefined ? { background: src.background } : {}),
+          ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
+        });
+        names.forEach((name, i) => {
+          const r = imported[i]!;
+          const dest = `authoring/imported/${name}${path.extname(srcPath)}`;
+          fs.writeFileSync(path.join(packDir, dest), encodePNG(crops[i]!));
+          // `original` 写**清单里的原样字符串**（即相对配方文件的那个 ref），不写解析后的绝对路径：
+          // 绝对路径会让 manifest 随机器与目录变，而「同一输入两次生成逐字节相同」是 checksum 的前提。
+          authoring.push({ kind: "bitmap", ref: dest, original: rel(src.ref) });
+          frames.push({ name, state: animOf.get(name), image: r });
         });
       }
-      // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43），都要在这里定，不能留给默认：
-      //   ① **按我们告诉模型的颜色抠底**，不四角取样 —— 背景层的角上就是内容本身
-      //      （地面填满下半、墙填满中间那带），四角取样会把内容色当成底色，**整层抠光**。
-      //   ② **不裁框** —— 导入通道默认「裁到内容再拉到 spec.size」，对一件道具是对的
-      //      （裁紧、归一化），对一层背景是**毁掉构成**：层里只画了上半，裁完拉满，
-      //      层与层之间的空间关系就没了。
-      const isBg = spec.kind === "background";
-      const bgOpt = isBg
-        ? { tolerance: src.background?.tolerance ?? 30, colors: [hexToRgb(keyColorFor(palette))] }
-        : src.background;
-      const results = batches.flatMap((cells) =>
-        importFrames(cells, {
-          palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
-          ...(bgOpt !== undefined ? { background: bgOpt } : {}),
-          ...(isBg ? { trim: false } : {}),
-          ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
-        }),
-      );
-      const stateOf = new Map<string, string>();
-      if (spec.kind === "animation") {
-        let k = 0;
-        for (const a of spec.animations) for (let i = 0; i < a.frames; i++) stateOf.set(plan[k++]!.name, a.name);
-      }
-      // ⚠️ **每一个 unit 的原图都要声明成创作态**，不是一个资源只声明第一张。
-      //   票 43：分层背景**一层一张原图**，只记 `units[0]` 会让 manifest 说
-      //   「这个背景的创作态是 `station.sky.png`」—— 而另外两层同样是它的创作态。
-      //   （文件本来就在包里、也在 `files[]` 里，漏的只是这句**声明**。）
-      for (const u of units)
-        authoring.push({ kind: "bitmap", ref: u.raw, original: units.length > 1 ? `生图 · ${units.length} 次调用` : "生图" });
-      plan.forEach((p, i) => {
-        frames.push({ name: p.name, state: stateOf.get(p.name), image: results[i]! });
-      });
-    } else {
-      // ⚠️ 先把 source 取出来再进闭包 —— 闭包里会丢掉判别式的收窄
-      const src = entry.source;
-      origin = "imported";
-      binding = "quantized";   // 票 23 的裁决：导入位图默认量化到世界色板
-      // ⚠️ 相对**配方文件**解析（`BuildPackOptions.recipeDir`），不是相对 cwd —— 见那个字段的注释
-      const srcPath = path.resolve(opts.recipeDir, src.ref);
-      const img = decodePNG(fs.readFileSync(srcPath));
-      const names = src.sheet?.names ?? [spec.id];
-      const crops = src.sheet ? sliceGrid(img, src.sheet) : [img];
-      if (crops.length !== names.length) throw new Error(`资源 "${spec.id}"：网格切出 ${crops.length} 帧，清单给了 ${names.length} 个名字`);
-      const animOf = new Map<string, string>();
-      for (const a of src.sheet?.animations ?? []) for (const n of a.frames) animOf.set(n, a.name);
-      // ⚠️ 全部帧**一次过** `importFrames`：它让各帧共用同一个裁框。
-      // 逐帧各裁各的会让同一角色在帧间改变位置**与缩放**（`tw/th` 是从裁完的图推的），
-      // 而且会让逐资源声明的 `spec.anchor` 每帧落在角色身上不同的位置。
-      const imported = importFrames(crops, {
-        palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
-        ...(src.background !== undefined ? { background: src.background } : {}),
-        ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
-      });
-      names.forEach((name, i) => {
-        const r = imported[i]!;
-        const dest = `authoring/imported/${name}${path.extname(srcPath)}`;
-        fs.writeFileSync(path.join(packDir, dest), encodePNG(crops[i]!));
-        // `original` 写**清单里的原样字符串**（即相对配方文件的那个 ref），不写解析后的绝对路径：
-        // 绝对路径会让 manifest 随机器与目录变，而「同一输入两次生成逐字节相同」是 checksum 的前提。
-        authoring.push({ kind: "bitmap", ref: dest, original: rel(src.ref) });
-        frames.push({ name, state: animOf.get(name), image: r });
-      });
-    }
 
-    const animations = spec.kind === "animation"
-      ? spec.animations.map((a) => ({
-          name: a.name,
-          frames: frames.filter((f) => f.state === a.name).map((f) => f.name),
-          ...(a.fps !== undefined ? { fps: a.fps } : {}),
-          loop: a.loop,
-        }))
-      : undefined;
-    built.push({ spec, origin, paletteBinding: binding, frames, ...(animations ? { animations } : {}), authoring });
-  }
+      const animations = spec.kind === "animation"
+        ? spec.animations.map((a) => ({
+            name: a.name,
+            frames: frames.filter((f) => f.state === a.name).map((f) => f.name),
+            ...(a.fps !== undefined ? { fps: a.fps } : {}),
+            loop: a.loop,
+          }))
+        : undefined;
+      // 按下标落位 —— `Promise.all` 的完成顺序是乱的，而 manifest 里的资源顺序必须稳定。
+      built[idx] = { spec, origin, paletteBinding: binding, frames, ...(animations ? { animations } : {}), authoring };
+  }));
 
   // ── 按 kind 各打一份图集（票 24：四类的最优打包参数不同）──────────────────
   const ATLAS_NAME: Record<string, string> = { sprite: "sprites", animation: "animations", background: "backgrounds", ui: "ui" };

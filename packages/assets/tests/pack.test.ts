@@ -118,7 +118,7 @@ describe("导入通道端到端（真实素材）", () => {
       ...RECIPE,
       assets: [{
         spec: { kind: "background", id: "shop_interior", role: "scene-backdrop", description: "商店内景", styleId: "style-ref",
-          anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, dependencies: [], required: true },
+          anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, required: true },
         source: { kind: "import", ref: "fixtures/reference/test.png", background: { tolerance: 30 } },
       }],
     };
@@ -147,7 +147,7 @@ describe("⚠️ 纯导入的包（2026-09-25 抓到的两个 bug）", () => {
       ...RECIPE,
       assets: [{
         spec: { kind: "sprite", id: "imported-crate", role: "obstacle", description: "从位图导入的木箱", styleId: "style-ref",
-          anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true },
+          anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true },
         source: { kind: "import", ref: "art.png", background: { tolerance: 30 } },
       }],
     };
@@ -192,7 +192,7 @@ describe("分层背景与九宫格：两条从配方到交付态的连线（票 
       { spec: {
           kind: "background", id: "station", role: "backdrop", description: "黄昏站台，三层",
           styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 },
-          dependencies: [], required: true,
+          required: true,
           layers: [
             { name: "sky", parallax: 0 },
             { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
@@ -202,7 +202,7 @@ describe("分层背景与九宫格：两条从配方到交付态的连线（票 
       { spec: {
           kind: "ui", id: "hud", role: "hud-panel", description: "HUD 面板",
           styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 },
-          dependencies: [], required: true,
+          required: true,
           ninePatch: { left: 4, right: 4, top: 4, bottom: 4 },
         }, source: { kind: "drawlist" } },
     ],
@@ -265,7 +265,7 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
       spec: {
         kind: "background", id: "station", role: "backdrop", description: "黄昏站台，三层",
         styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 96, h: 64 },
-        dependencies: [], required: true, layers: LAYERS,
+        required: true, layers: LAYERS,
       },
       source: { kind: "image", background: { tolerance: 0 } },
     }],
@@ -360,7 +360,7 @@ describe("分层背景：构成必须保住（票 43）", () => {
       spec: {
         kind: "background", id: "sky", role: "backdrop", description: "只有上半有东西",
         styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 64, h: 48 },
-        dependencies: [], required: true, layers: [{ name: "sky", parallax: 0 }],
+        required: true, layers: [{ name: "sky", parallax: 0 }],
       },
       source: { kind: "image", background: { tolerance: 0 } },
     }],
@@ -392,5 +392,76 @@ describe("分层背景：构成必须保住（票 43）", () => {
 
     expect(alphaAt(fr.w >> 1, 1), "上半有东西 ⇒ 不透明").toBe(255);
     expect(alphaAt(fr.w >> 1, fr.h - 2), "下半没东西 ⇒ **透明**（构成保住了）").toBe(0);
+  });
+});
+
+/**
+ * 票 47：**并发跑，且上限真的管用**。
+ *
+ * ⚠️ 这条测试值得存在，是因为我第一次实现时**闸门根本没接上**（选项没转发到构建器），
+ *   而当时的「实测」四个并发档位跑出来几乎一样快 —— 看起来像「并发到一定程度就够了」，
+ *   其实是**每一档都在用同一个默认值**。一条能证明「上限真的改变行为」的断言，就是那时候缺的。
+ */
+describe("并发：上限按上游分别定，而且真的管用（票 47）", () => {
+  const many = (n: number): AssetRecipe => ({
+    ...RECIPE, referenceImage: undefined,
+    assets: Array.from({ length: n }, (_, i) => ({
+      spec: { kind: "sprite", id: `s${i}`, role: "道具", description: "一个方块。", styleId: "style-ref",
+        anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true },
+      source: { kind: "drawlist" },
+    })),
+  });
+  /** 记下「同时在跑的调用数」的峰值 —— 那就是并发是否被限住的直接证据。 */
+  const peakOf = () => {
+    let active = 0, peak = 0;
+    const gen: DrawListGenerator = async (spec) => {
+      active += 1; peak = Math.max(peak, active);
+      await new Promise((r) => setTimeout(r, 8));
+      active -= 1;
+      return stubDrawLists(spec);
+    };
+    return { gen, peak: () => peak };
+  };
+
+  it("上限 2 ⇒ 同时在跑的调用**从不超过 2**（而且确实 > 1，是真的在并发）", async () => {
+    const { gen, peak } = peakOf();
+    await buildAssetPack({ recipe: many(8), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: gen, concurrency: { text: 2 }, sourceDateEpoch: EPOCH });
+    expect(peak()).toBeLessThanOrEqual(2);
+    expect(peak(), "要是 1 就等于没并发").toBeGreaterThan(1);
+  });
+
+  it("上限 1 ⇒ **退化成串行**（对照实验用的就是这一档）", async () => {
+    const { gen, peak } = peakOf();
+    await buildAssetPack({ recipe: many(5), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: gen, concurrency: { text: 1 }, sourceDateEpoch: EPOCH });
+    expect(peak()).toBe(1);
+  });
+
+  it("⚠️ **一个失败之后不再放新的调用出去** —— 钱不在「已经知道失败了」之后继续烧（票 47 第 3 条）", async () => {
+    // 串行时「第 5 个失败」只浪费前 4 个；并发之后若不管，`Promise.all` 虽然立刻拒绝，
+    // 但**其余都已经排进闸门了**，会照样发出去。这里钉的就是那道闸。
+    let calls = 0;
+    const gen: DrawListGenerator = async (spec) => {
+      calls += 1;
+      if (spec.id === "s0") throw new Error("第一个就挂了");
+      await new Promise((r) => setTimeout(r, 5));
+      return stubDrawLists(spec);
+    };
+    await expect(buildAssetPack({ recipe: many(8), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: gen, concurrency: { text: 2 }, sourceDateEpoch: EPOCH })).rejects.toThrow(/第一个就挂了/);
+    // 在途的拦不住（钱已经出去了），但**没发出去的**必须拦住
+    expect(calls, "8 个资源不该全发出去").toBeLessThanOrEqual(2);
+  });
+
+  it("⚠️ 资源**落位按下标** —— 并发完成顺序是乱的，而 manifest 的顺序必须稳定", async () => {
+    // 让第 0 个资源**最慢**：并发跑的话它最后完成；若靠完成顺序 push，manifest 就会倒过来。
+    const gen: DrawListGenerator = async (spec) => {
+      await new Promise((r) => setTimeout(r, spec.id === "s0" ? 25 : 1));
+      return stubDrawLists(spec);
+    };
+    const { manifest } = await buildAssetPack({ recipe: many(4), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: gen, concurrency: { text: 4 }, sourceDateEpoch: EPOCH });
+    expect(manifest.assets.map((a) => a.id)).toEqual(["s0", "s1", "s2", "s3"]);
   });
 });

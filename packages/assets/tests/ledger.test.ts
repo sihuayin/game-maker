@@ -13,10 +13,10 @@ const RECIPE = {
   format: "asset-recipe/v1", id: "ledger-probe", styleRef: "stylespec.json",
   assets: [
     { spec: { kind: "sprite", id: "crate", role: "箱子", description: "一个木箱。", styleId: "flat-pixel-side-scroller",
-        anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true },
+        anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true },
       source: { kind: "drawlist" } },
     { spec: { kind: "background", id: "sky", role: "天空", description: "黄昏的天。", styleId: "flat-pixel-side-scroller",
-        anchor: { x: 0, y: 0 }, size: { w: 480, h: 270 }, dependencies: [], required: true,
+        anchor: { x: 0, y: 0 }, size: { w: 480, h: 270 }, required: true,
         layers: [{ name: "sky", parallax: 0 }] },
       source: { kind: "image", background: { tolerance: 40 } } },
   ],
@@ -91,10 +91,12 @@ describe("账：跟着包走的收据（票 45）", () => {
     await build(d, { usage: true, fails: 1 });    // 第一次文本调用失败一次、第二次成功
     const ledger = JSON.parse(fs.readFileSync(path.join(d, "out", "ledger-probe", "pack", "v1", "ledger.json"), "utf8"));
     const calls = ledger.calls as { step: string; attempts: number; ms: number }[];
-    // 这份清单两个资源：一个 drawlist、一个生图 —— 三类调用各记各的
-    expect(calls.map((c) => c.step)).toEqual(["drawlist", "image"]);
-    expect(calls[0]!.attempts, "重试过的那个要 > 1").toBe(2);
-    expect(calls[1]!.attempts).toBe(1);
+    // 这份清单两个资源：一个 drawlist、一个生图 —— 两类调用各记各的
+    // ⚠️ **顺序不按清单走**：票 47 之后资源是**并发**生成的，`calls[]` 记的是**完成顺序**。
+    //   这是真的（它们确实同时在跑），所以断言要按**内容**而不是按位置。
+    expect([...calls.map((c) => c.step)].sort()).toEqual(["drawlist", "image"]);
+    expect(calls.find((c) => c.step === "drawlist")!.attempts, "重试过的那个要 > 1").toBe(2);
+    expect(calls.find((c) => c.step === "image")!.attempts).toBe(1);
     expect(summarizeCalls(calls as never)).toEqual({
       derive: { calls: 0, attempts: 0 },
       drawlist: { calls: 1, attempts: 2 },

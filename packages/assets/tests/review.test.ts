@@ -15,7 +15,7 @@ afterAll(() => { for (const d of dirs) rmSync(d, { recursive: true, force: true 
 
 const SPECK: AssetSpec = {
   kind: "sprite", id: "crate", role: "obstacle", description: "木箱", styleId: "s",
-  anchor: { x: 0, y: 0 }, size: { w: 8, h: 8 }, dependencies: [], required: true,
+  anchor: { x: 0, y: 0 }, size: { w: 8, h: 8 }, required: true,
 };
 const stub = (): never => ([{
   format: "drawlist+curve/v1", id: "crate", frame: "crate",

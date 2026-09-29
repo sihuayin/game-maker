@@ -140,15 +140,6 @@ export const AssetRecipe = z.object({
     ids.add(e.spec.id);
   }
 
-  // dependencies **只用于生成顺序，不用于组合**（票 05）—— 所以它引用的必须是清单里真有资源，
-  // 且不能自引用。跨出清单的依赖无处兑现。
-  r.assets.forEach((e, i) => {
-    for (const d of e.spec.dependencies) {
-      if (d === e.spec.id) issue(["assets", i, "spec", "dependencies"], `资源 "${e.spec.id}" 依赖它自己`);
-      else if (!ids.has(d)) issue(["assets", i, "spec", "dependencies"], `资源 "${e.spec.id}" 依赖了清单里没有的 "${d}"`);
-    }
-  });
-
   r.assets.forEach((e, i) => {
     const { spec, source } = e;
     const at = (m: string) => issue(["assets", i], m);

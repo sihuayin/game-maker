@@ -21,8 +21,6 @@ const COMMON = {
   anchor: Anchor,
   /** 交付态的目标尺寸（像素）。 */
   size: z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict(),
-  /** 只用于**生成顺序**，不用于组合（票 05）。 */
-  dependencies: z.array(z.string()).default([]),
   required: z.boolean().default(true),
 };
 

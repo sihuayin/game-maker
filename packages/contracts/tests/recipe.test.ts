@@ -45,13 +45,7 @@ describe("反例 —— 清单的自洽性", () => {
     expect(errors((() => { const r = clone(); r.assets.push(structuredClone(r.assets[0]!)); return r; })())).toMatch(/id 重复/);
   });
 
-  it("依赖了清单里没有的资源被拒（依赖跨出清单就无处兑现）", () => {
-    expect(errors((() => { const r = clone(); r.assets[0]!.spec.dependencies = ["ghost"]; return r; })())).toMatch(/清单里没有/);
-  });
 
-  it("依赖自己也被拒", () => {
-    expect(errors((() => { const r = clone(); r.assets[0]!.spec.dependencies = [r.assets[0]!.spec.id]; return r; })())).toMatch(/依赖它自己/);
-  });
 
   it("版本号写错被拒", () => {
     expect(errors((() => { const r = clone() as unknown as { format: string }; r.format = "asset-recipe/v2"; return r; })())).toContain("format");

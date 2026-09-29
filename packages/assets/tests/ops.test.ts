@@ -19,7 +19,7 @@ const STYLE = {
 const RECIPE = {
   format: "asset-recipe/v1", id: "no-fallback", styleRef: "stylespec.json",
   assets: [{ spec: { kind: "sprite", id: "crate", role: "箱子", description: "一个木箱。", styleId: "style-ref",
-    anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true },
+    anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true },
     source: { kind: "drawlist" } }],
 };
 /** 一份足够过 `DrawListSchema` 的单帧回应 —— 生成器会自己补 id / viewBox / expectedSize。 */

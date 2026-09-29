@@ -19,7 +19,6 @@
           "w": 32,
           "h": 48
         },
-        "dependencies": [],
         "required": true,
         "animations": [
           {
@@ -65,7 +64,6 @@
           "w": 64,
           "h": 16
         },
-        "dependencies": [],
         "required": true
       },
       "source": {
@@ -90,7 +88,6 @@
           "w": 48,
           "h": 48
         },
-        "dependencies": [],
         "required": true
       },
       "source": {
@@ -115,7 +112,6 @@
           "w": 64,
           "h": 24
         },
-        "dependencies": [],
         "required": true
       },
       "source": {
@@ -140,7 +136,6 @@
           "w": 16,
           "h": 16
         },
-        "dependencies": [],
         "required": true
       },
       "source": {
@@ -165,7 +160,6 @@
           "w": 14,
           "h": 22
         },
-        "dependencies": [],
         "required": true
       },
       "source": {
@@ -190,7 +184,6 @@
           "w": 320,
           "h": 180
         },
-        "dependencies": [],
         "required": true
       },
       "source": {
@@ -216,7 +209,6 @@
           "w": 96,
           "h": 48
         },
-        "dependencies": [],
         "required": true
       },
       "source": {

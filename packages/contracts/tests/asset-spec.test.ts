@@ -14,7 +14,7 @@ const fixture = (n: string): DrawList => JSON.parse(readFileSync(FIXTURE_DIR + n
 const PLAYER: AssetSpec = {
   kind: "animation", id: "player", role: "protagonist", description: "玩家角色",
   styleId: "style-ref", anchor: { x: 0.5, y: 0.92 }, size: { w: 24, h: 32 },
-  dependencies: [], required: true,
+  required: true,
   animations: [
     { name: "idle", frames: 1, fps: 1, loop: true },
     { name: "walk", frames: 4, fps: 8, loop: true },
@@ -25,20 +25,20 @@ const PLAYER: AssetSpec = {
 const PLATFORM: AssetSpec = {
   kind: "sprite", id: "platform", role: "ground-tile", description: "地面平台",
   styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 64, h: 16 },
-  dependencies: [], required: true,
+  required: true,
 };
 /** 人工导入的场景尺度背景（票 23 那条通道）。 */
 const INTERIOR: AssetSpec = {
   kind: "background", id: "shop_interior", role: "scene-backdrop", description: "商店内景",
   styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 1218, h: 685 },
-  dependencies: [], required: true,
+  required: true,
   layers: [{ name: "wall", parallax: 0.2 }, { name: "counter", parallax: 1 }],
 };
 /** 一个真正**屏幕空间**的面板（带九宫格）。 */
 const PANEL: AssetSpec = {
   kind: "ui", id: "hud_panel", role: "panel", description: "HUD 面板",
   styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 },
-  dependencies: [], required: true,
+  required: true,
   ninePatch: { left: 4, right: 4, top: 4, bottom: 4 },
 };
 
@@ -123,7 +123,7 @@ describe("auditAssetSpec —— 分层背景（票 42）", () => {
   const STATION: AssetSpec = {
     kind: "background", id: "station", role: "backdrop", description: "黄昏站台，三层",
     styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 },
-    dependencies: [], required: true,
+    required: true,
     layers: [
       { name: "sky", parallax: 0 },
       { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },

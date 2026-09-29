@@ -11,7 +11,7 @@ const STYLE: StyleSpec = {
 
 const PLAYER: AssetSpec = {
   kind: "animation", id: "player", role: "protagonist", description: "玩家角色", styleId: "s-ref",
-  anchor: { x: 0.5, y: 0.92 }, size: { w: 24, h: 32 }, dependencies: [], required: true,
+  anchor: { x: 0.5, y: 0.92 }, size: { w: 24, h: 32 }, required: true,
   animations: [{ name: "idle", frames: 1, loop: true }, { name: "walk", frames: 2, loop: true }],
 };
 
@@ -176,7 +176,7 @@ describe("framePlan：帧名只此一份（票 40）", () => {
   it("分层背景：一层一帧，帧名 `<资源 id>.<层名>`，且带上层名给提示词用", () => {
     const bg: AssetSpec = {
       kind: "background", id: "station", role: "backdrop", description: "站台", styleId: "s-ref",
-      anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, dependencies: [], required: true,
+      anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, required: true,
       layers: [{ name: "sky", parallax: 0 }, { name: "wall", parallax: 0.5, tileable: { x: true, y: false } }],
     };
     const plan = framePlan(bg);
@@ -188,7 +188,7 @@ describe("framePlan：帧名只此一份（票 40）", () => {
   it("单帧资源：帧名就是资源 id", () => {
     const s: AssetSpec = {
       kind: "sprite", id: "crate", role: "prop", description: "货箱", styleId: "s-ref",
-      anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, dependencies: [], required: true,
+      anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true,
     };
     expect(framePlan(s).map((p) => p.name)).toEqual(["crate"]);
   });
@@ -196,7 +196,7 @@ describe("framePlan：帧名只此一份（票 40）", () => {
   it("提示词要为分层背景说「一次给全部层」，且说清每层都画满整块画布", () => {
     const bg: AssetSpec = {
       kind: "background", id: "station", role: "backdrop", description: "黄昏站台", styleId: "s-ref",
-      anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, dependencies: [], required: true,
+      anchor: { x: 0, y: 0 }, size: { w: 320, h: 180 }, required: true,
       layers: [{ name: "sky", parallax: 0 }, { name: "ground", parallax: 1, tileable: { x: true, y: false } }],
     };
     const p = renderPrompt(bg, STYLE);
@@ -208,7 +208,7 @@ describe("framePlan：帧名只此一份（票 40）", () => {
   it("提示词要为九宫格说清「四边原样、中央被拉伸」", () => {
     const ui: AssetSpec = {
       kind: "ui", id: "hud-panel", role: "hud", description: "HUD 面板", styleId: "s-ref",
-      anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 }, dependencies: [], required: true,
+      anchor: { x: 0, y: 0 }, size: { w: 48, h: 32 }, required: true,
       ninePatch: { left: 4, right: 4, top: 4, bottom: 4 },
     };
     const p = renderPrompt(ui, STYLE);
@@ -224,7 +224,7 @@ describe("framePlan：帧名只此一份（票 40）", () => {
 describe("锚点要进提示词（票 40）", () => {
   const crate: AssetSpec = {
     kind: "sprite", id: "crate", role: "prop", description: "货箱", styleId: "s-ref",
-    anchor: { x: 0.5, y: 0.8 }, size: { w: 40, h: 40 }, dependencies: [], required: true,
+    anchor: { x: 0.5, y: 0.8 }, size: { w: 40, h: 40 }, required: true,
   };
   it("把归一化锚点换算成画布上的行与列说清楚", () => {
     const p = renderPrompt(crate, STYLE);

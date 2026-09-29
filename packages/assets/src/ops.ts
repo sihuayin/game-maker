@@ -14,6 +14,7 @@ import {
   type AssetPackManifest, type LedgerCall, type LedgerUsage, type StyleSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences } from "./generate.js";
+import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { buildAssetPack, type GenerateImage } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
@@ -51,7 +52,6 @@ export async function deriveRecipe(opts: DeriveOptions): Promise<CommandResult> 
 ⚠️ **同一个东西的多个动作是「一个资源、多个动画」，不是多个资源** ——
 玩家角色的 idle/run/jump 应当是**一个**资源，带三个 animation；
 「不同的资源」指的是**不同的东西**（玩家 / 货箱 / 罐头 / 背景）。
-dependencies 只用于生成顺序，绝大多数清单不需要它。
 
 # 需求
 ${requirement}
@@ -63,7 +63,7 @@ ${styleBrief(style)}
 {"format":"asset-recipe/v1","id":"<slug>","styleRef":"${rel(opts.outRoot, opts.stylePath)}","assets":[
  {"spec":{"kind":"sprite|animation|background|ui","id":"<slug>","role":"...","description":"...",
    "styleId":"${style.id}","anchor":{"x":0..1,"y":0..1},"size":{"w":int,"h":int},
-   "dependencies":[],"required":true,
+   "required":true,
    "animations":[{"name":"...","frames":int,"fps":num,"loop":bool}]},
   "source":{"kind":"drawlist"}}]}
 
@@ -73,7 +73,7 @@ ${styleBrief(style)}
 3. \`background\` 是场景尺度；\`ui\` 是**屏幕空间**（世界里的招牌是 sprite，不是 ui）。
 4. \`animations[].frames\` 是**帧数**（整数），不是帧名。
 
-每个 spec 只许有这些键：kind / id / role / description / styleId / anchor / size / dependencies / required。
+每个 spec 只许有这些键：kind / id / role / description / styleId / anchor / size / required。
 按类可以另加，且**形状必须逐字如下**：
   animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
   background → "layers":[{"name":"sky","parallax":0.3},
@@ -379,6 +379,11 @@ export type PackOptions = {
   imageTransport?: ImageTransport;
   fetchImpl?: typeof fetch;
   onProgress?: (done: number, total: number, assetId: string) => void;
+  /**
+   * 并发上限（票 47）。**按上游分别定** —— 限流是上游的属性。
+   * 不给就用 `DEFAULT_CONCURRENCY`；设 1 就是旧的串行行为。
+   */
+  concurrency?: { text?: number; image?: number };
 };
 
 /**
@@ -437,6 +442,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
         ? { generateImage: imageGeneratorFor(opts.imageTransport, opts.fetchImpl) }
         : {}),
       ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
+      ...(opts.concurrency ? { concurrency: opts.concurrency } : {}),
     });
   } catch (e) {
     // ⚠️ 生成失败**就是**「上游不可达」（3），不是「失败」（1）。
