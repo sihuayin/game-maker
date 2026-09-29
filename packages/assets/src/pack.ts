@@ -332,7 +332,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           opts.ledger?.push({
             step: "image", target: spec.id, upstream: call.protocol, ms: call.ms, attempts: call.attempts,
             requestedSize: call.requestedSize,
-            ...(call.model !== undefined ? { model: call.model } : {}),
+            ...(call.requestedModel !== undefined ? { requestedModel: call.requestedModel } : {}),
             ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
             ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
             ...(call.usage !== undefined ? { usage: call.usage } : {}),

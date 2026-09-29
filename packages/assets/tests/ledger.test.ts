@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseLedger, summarizeCalls } from "@game-maker/contracts";
-import { encodePNG, packAssets, verifyPack, type RasterImage } from "../src/index.js";
+import { CommandError, encodePNG, packAssets, verifyPack, type RasterImage } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const STYLE = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/style-spec.halt-dusk.json"), "utf8"));
@@ -149,5 +149,97 @@ describe("账：跟着包走的收据（票 45）", () => {
     fs.writeFileSync(p, JSON.stringify(l));
     // ⚠️ 改了文件 checksum 就不符了 —— 那条会先报；把两条都看成「包坏了」即可
     expect(() => verifyPack({ packDir: path.join(d, "out", "ledger-probe", "pack", "v1") })).toThrow(/checksum|对不上/);
+  });
+});
+
+/**
+ * 票 46：**失败也要报账**。
+ *
+ * ⚠️ 包没产出来 ⇒ 没有 `ledger.json` 可写，而**花了钱是事实**。
+ *   所以账跟着**异常**走（不是塞回 `CommandResult` —— 那会换掉票 30 立的那条规矩）。
+ */
+describe("失败也要报账（票 46）", () => {
+  /** 第 `failAt` 个资源开始失败 —— 而**前面那几个已经花掉了**。 */
+  const upTo = (failAt: number): typeof fetch => {
+    let n = 0;
+    return (async () => {
+      n += 1;
+      if (n > failAt) return new Response("boom", { status: 500 });
+      return new Response(JSON.stringify({
+        model: "deepseek-flash",
+        content: [{ type: "text", text: JSON.stringify({ frames: [{ name: "x", ops: [{ op: "rect", x: 0, y: 0, w: 16, h: 16, fill: "palette:0" }] }] }) }],
+        usage: { input_tokens: 10, output_tokens: 20 },
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }) as unknown as typeof fetch;
+  };
+  /** 全是 drawlist 的清单：5 个资源，好让「前几个已经花掉」这件事有内容。 */
+  const manyRecipe = () => ({
+    format: "asset-recipe/v1", id: "will-fail", styleRef: "stylespec.json",
+    assets: Array.from({ length: 5 }, (_, i) => ({
+      spec: { kind: "sprite", id: `o${i}`, role: "物件", description: "一个方块。", styleId: "flat-pixel-side-scroller",
+        anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true },
+      source: { kind: "drawlist" },
+    })),
+  });
+  const dir = () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), "gm-fail-"));
+    fs.writeFileSync(path.join(d, "stylespec.json"), JSON.stringify(STYLE));
+    fs.writeFileSync(path.join(d, "recipe.json"), JSON.stringify(manyRecipe()));
+    return d;
+  };
+
+  it("中途失败 ⇒ `CommandError` 带上**前面已经花掉的**（条数 · 目标 · 往返次数）", async () => {
+    const d = dir();
+    const e = await packAssets({
+      recipePath: path.join(d, "recipe.json"), outRoot: path.join(d, "out"),
+      transport: { baseUrl: "http://x", apiKey: "k" },
+      fetchImpl: upTo(2),                       // 前两个成功，第三个开始 500
+      concurrency: { text: 1 },                 // 串行 ⇒ 顺序确定，断言才钉得死
+    }).catch((x: unknown) => x);
+
+    expect(e).toBeInstanceOf(CommandError);
+    const err = e as CommandError;
+    expect(err.kind).toBe("upstream");
+    expect(err.ledger, "花掉的账要跟着异常出来").toBeDefined();
+    // 5 个资源：前两个成功、第三个也**记了**（失败的那次调用同样是既成事实），
+    // 而票 47 的「失败即止」让后两个根本没发出去
+    expect(err.ledger!.map((c) => c.target)).toEqual(["o0", "o1", "o2"]);
+    expect(err.ledger!.every((c) => c.step === "drawlist")).toBe(true);
+    expect(err.ledger!.reduce((n, c) => n + c.attempts, 0)).toBeGreaterThanOrEqual(3);
+    expect(err.message).toMatch(/HTTP 500/);
+
+    // ⚠️ **`model` 与 `requestedModel` 是两个事实**（真实跑抓到过这处的谎）：
+    //   上游指向死端口时，账里曾写着 `deepseek-v4-pro` —— 而那几次**根本没到过任何上游**。
+    // 前两个是**成功**的：上游答了，`model` 记的就是它自报的那个
+    const ok = err.ledger![0]! as { model?: string; requestedModel?: string };
+    expect(ok.requestedModel).toBe("deepseek-v4-pro");
+    expect(ok.model, "上游自报的那个 —— 与请求的**不同**（票 01 实测过代理会换）").toBe("deepseek-flash");
+    // 最后一个是**失败**的那一笔：上游根本没应答，所以没有 `model` 可言
+    const failed = err.ledger!.at(-1)! as { model?: string; requestedModel?: string };
+    expect(failed.requestedModel, "我们请求了什么，是知道的").toBe("deepseek-v4-pro");
+    expect(failed.model, "上游没应答 ⇒ 不记「谁服务的」，不拿请求的那个顶替").toBeUndefined();
+  });
+
+  it("⚠️ 失败**不**塞回 `CommandResult` —— 它抛，账跟着异常走（票 30 的纪律照旧）", async () => {
+    const d = dir();
+    const e = await packAssets({
+      recipePath: path.join(d, "recipe.json"), outRoot: path.join(d, "out"),
+      transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: upTo(0), concurrency: { text: 1 },
+    }).catch((x: unknown) => x);
+    // 抛出来的**不是**一个「带错误的结果」——「成功」那个类型里仍然没有假货
+    expect(e).toBeInstanceOf(CommandError);
+    expect(e).not.toHaveProperty("command");
+    expect(e).not.toHaveProperty("data");
+    expect(e).not.toHaveProperty("outcome");
+  });
+
+  it("**一个都没发出去就挂了** ⇒ 账是空的，不假装有（也不编一个 0）", async () => {
+    const d = dir();
+    const e = await packAssets({
+      recipePath: path.join(d, "recipe.json"), outRoot: path.join(d, "out"),
+      transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: upTo(0), concurrency: { text: 1 },
+    }).catch((x: unknown) => x);
+    // 第一个调用就失败 ⇒ 它自己**记了**（那次确实是发出去的），所以是 1 条不是 0 条
+    expect((e as CommandError).ledger!.map((c) => c.target)).toEqual(["o0"]);
   });
 });

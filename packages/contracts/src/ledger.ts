@@ -35,11 +35,15 @@ export const LedgerCall = z.object({
   /** 这一步作用在谁身上：资源 id（生图还会带上 `<id>.<动画|层名>`），或 `recipe` / `game-config`。 */
   target: z.string().min(1),
   /**
-   * 上游**实际**服务的模型名。
+   * 上游**自报**的模型名。
    * ⚠️ **拿不到就缺席，不许编一个** —— `dashscope-mcp` 协议根本没有 `model` 参数
-   * （票 34：模型由服务端定），而代理解析出来的模型名也可能与请求的那个不同（票 01 实测过）。
+   * （票 34：模型由服务端定）；而**上游没应答时更无从谈起**（失败的那一笔）。
+   * ⚠️ 它与 `requestedModel` **是两个事实**，别混：票 01 实测过代理**请求一个、回另一个**
+   *      （请求 `deepseek-v4-pro`，响应里写的是 `deepseek-flash`）。
    */
   model: z.string().min(1).optional(),
+  /** 我们**请求**的那个模型名。与 `model` 并列，**不互相顶替**。 */
+  requestedModel: z.string().min(1).optional(),
   /** 走的是哪条路：文本是 `messages` / `chat-completions`，生图是协议名。 */
   upstream: z.string().min(1).optional(),
   /** 生图请求的尺寸（上游要的就是 `宽*高` 这种字符串）。 */

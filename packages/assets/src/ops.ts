@@ -447,7 +447,14 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
   } catch (e) {
     // ⚠️ 生成失败**就是**「上游不可达」（3），不是「失败」（1）。
     // 拆掉降级链之前这条分支不会发生 —— 上游死活都被兜底吸收，pack 永远成功。
-    if (e instanceof GenerationError || e instanceof ImageGenerationError) throw new CommandError("upstream", e.message);
+    // ⚠️ **失败时账没有别的地方可去**（票 46）：包没产出来，所以没有 `ledger.json` 可写。
+    //   而**已经花掉的那几笔是事实** —— 它们跟着异常走，两个壳各自渲染。
+    //   ⚠️ 这个数组在 `buildAssetPack` **调用之前**就存在了，所以它活过了这次抛出；
+    //   而票 47 的「失败即止」保证它只含**真的发出去过**的调用（没发的不算）。
+    const carried = ledger.length > 0 ? { ledger } : {};
+    if (e instanceof GenerationError || e instanceof ImageGenerationError)
+      throw new CommandError("upstream", e.message, carried);
+    if (e instanceof CommandError) throw new CommandError(e.kind, e.message, carried);
     throw e;
   }
   const m = res.manifest;

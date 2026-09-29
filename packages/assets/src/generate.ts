@@ -183,14 +183,19 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
         const r = await once(spec, style);
         opts.onCall?.({
           step: "drawlist", target: spec.id, upstream: endpoint, ms: Date.now() - t0, attempts: trips,
-          model: r.servedModel ?? model, ...(r.usage ? { usage: r.usage } : {}),
+          requestedModel: model,
+          // ⚠️ 只有**上游说了**才记 `model` —— 上游不说就缺席，不拿请求的那个顶替（它们是两个事实）
+          ...(r.servedModel ? { model: r.servedModel } : {}),
+          ...(r.usage ? { usage: r.usage } : {}),
         });
         return r.frames;
       } catch (e) { last = e; }
     }
     // ⚠️ **失败也要交账** —— 前面那几次往返已经花了（票 19 Q2）。这里只记事实，不记 usage
     //   （拿不到就是拿不到，不编）。
-    opts.onCall?.({ step: "drawlist", target: spec.id, upstream: endpoint, ms: Date.now() - t0, attempts: trips, model });
+    // ⚠️ 失败这一笔**不记 `model`** —— 上游根本没应答，我们无从知道是谁服务的。
+    //   （实测：上游指向死端口时，账里曾写着 `deepseek-v4-pro` —— 那是个**谎**。）
+    opts.onCall?.({ step: "drawlist", target: spec.id, upstream: endpoint, ms: Date.now() - t0, attempts: trips, requestedModel: model });
     throw last instanceof GenerationError
       ? new GenerationError(spec.id, `${attempts} 次都没成功；最后一次：${last.message.replace(`资源 "${spec.id}" 生成失败：`, "")}`)
       : last;

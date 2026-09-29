@@ -7,6 +7,7 @@
 //   `assets` 仍然**原样再导出**，所以两个壳与既有调用方一行都不用改。
 //
 // ⚠️ 它是**纯形状 + 两个小工具**，不含任何业务：退出码语义、失败的载体。
+import type { LedgerCall } from "./ledger.js";
 export type CommandResult = {
   command: string;
   /** 人类可读的几行。CLI 直接打印，MCP 放进 content。 */
@@ -24,8 +25,23 @@ export type CommandResult = {
  */
 export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as const;
 
-/** 失败**不**放进 `CommandResult.outcome` —— 它抛。这样「成功」这个类型里没有假货。 */
+/**
+ * 失败**不**放进 `CommandResult.outcome` —— 它抛。这样「成功」这个类型里没有假货。
+ *
+ * ⚠️ **`ledger`（票 46）**：失败时**已经花掉的那几笔**跟着异常一起走。
+ *   理由很直白 —— 包没产出来，所以没有 `ledger.json` 可写；
+ *   而**花了钱是事实，失败不改变这个事实**（与 R3「诚实是结构性的」同一条纪律）。
+ *
+ * ⚠️ 它**不是 outcome**：`CommandResult` 那条「成功这个类型里没有假货」的纪律照旧。
+ *   **不要为了让账有地方放，就把失败塞回 `CommandResult`** —— 那是用「成功类型里掺假」
+ *   换一处方便，正好换掉了当初立这条规矩要防的东西。
+ */
 export class CommandError extends Error {
-  constructor(readonly kind: keyof typeof EXIT, message: string) { super(message); this.name = "CommandError"; }
+  readonly ledger?: LedgerCall[];
+  constructor(readonly kind: keyof typeof EXIT, message: string, opts: { ledger?: LedgerCall[] } = {}) {
+    super(message);
+    this.name = "CommandError";
+    this.ledger = opts.ledger;
+  }
 }
 export const exitCodeOfError = (e: unknown): number => (e instanceof CommandError ? EXIT[e.kind] : EXIT.failure);

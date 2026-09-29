@@ -149,8 +149,15 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
   } catch (e) {
     const code = exitCodeOfError(e);
     const message = e instanceof Error ? e.message : String(e);
-    if (json) io.out(JSON.stringify({ command, error: message, exitCode: code }, null, 2) + "\n");
-    else io.err(`✗ ${message}\n`);
+    // ⚠️ **失败时已经花掉的那几笔**（票 46）—— 包没产出来，它们没有别的家。
+    const spent = e instanceof CommandError ? e.ledger : undefined;
+    if (json) io.out(JSON.stringify({ command, error: message, exitCode: code, ...(spent?.length ? { ledger: spent } : {}) }, null, 2) + "\n");
+    else {
+      io.err(`✗ ${message}\n`);
+      if (spent?.length)
+        io.err(`\n已经花掉的（${spent.length} 次调用 · ${spent.reduce((n, c) => n + c.attempts, 0)} 次往返）：\n` +
+          spent.map((c) => `  · ${c.step} ${c.target} · ${(c.ms / 1000).toFixed(1)}s · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}\n`).join(""));
+    }
     return code;
   }
 }

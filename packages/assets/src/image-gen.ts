@@ -36,11 +36,11 @@ export type ImageGenCall = {
   /** 上游给图的那个临时 URL 的**主机名**（只记主机，不记带签名的完整 URL）。 */
   sourceHost?: string;
   /**
-   * 上游**实际**服务的模型名。
+   * 我们**请求**的模型名（上游那几家都不在回应里报模型，所以这里只可能是请求的那个）。
    * ⚠️ **拿不到就缺席，不许编一个** —— `dashscope-mcp` 协议**根本没有 `model` 参数**
    *   （票 34：模型由服务端定），这时记一个我们猜测的名字就是把不知道的事说成知道的。
    */
-  model?: string;
+  requestedModel?: string;
   /** 上游自报的用量。⚠️ 没给就缺席 —— **不填 0 冒充「测到了 0」**（票 19 Q4）。 */
   usage?: LedgerUsage;
   ms: number;
@@ -314,7 +314,7 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
           image,
           call: {
             protocol: "gemini", requestedSize: `aspect ${geminiAspect(size)}`, ms: Date.now() - t0, attempts: i,
-            model,
+            requestedModel: model,
           },
         };
       } catch (e) {
@@ -478,7 +478,7 @@ export function createOpenAIGenerator(opts: OpenAIOptions): ImageGenerator {
             protocol: "openai", ms: Date.now() - t0, attempts: i,
             requestedSize: inputs.length > 0 ? `${requestedSize} · edits ${inputs.length} 图` : requestedSize,
             // `gpt-image` 系会把用量带回来 —— 那是**上游给的事实**，不是我们的折算，该记（票 19 Q7 的例外）
-            ...(opts.model ? { model: opts.model } : {}),
+            ...(opts.model ? { requestedModel: opts.model } : {}),
             ...(body.usage
               ? { usage: {
                   ...(body.usage.input_tokens !== undefined ? { inputTokens: body.usage.input_tokens } : {}),
