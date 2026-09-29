@@ -14,7 +14,7 @@
 //      仍然可用（0.7s、干净 JSON）。代理的上游配置一直在变，所以端点是**参数**不是常量。
 //   ③ **关 thinking** —— 开着会吃光输出预算（实测 max_tokens=8000 时 reasoning=8000），
 //      关掉快 18 倍、且真的产出内容；代价是会加 markdown 围栏，所以要剥。
-import { DrawListSchema, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { DrawListSchema, type AssetSpec, type DrawList, type LedgerCall, type LedgerUsage, type StyleSpec } from "@game-maker/contracts";
 import { assetTask, drawListFewShot, drawListOpsSpec, framePlan, paletteLine, styleBrief } from "./prompt.js";
 import type { DrawListGenerator } from "./pack.js";
 
@@ -35,6 +35,12 @@ export type GenerateOptions = {
   fetchImpl?: typeof fetch;
   /** 每次调用前把完整 prompt 交出来（存证 / 复现 / 人看）。 */
   onPrompt?: (prompt: string, spec: AssetSpec) => void;
+  /**
+   * 每一次**调用**的账（票 45）。
+   * ⚠️ **成功与失败都要交** —— 中途失败时那几笔是**既成事实**，而账的意义正在于此
+   *   （票 19 Q2：花了钱是事实，失败不改变这个事实）。
+   */
+  onCall?: (c: LedgerCall) => void;
   /**
    * 最多试几次。默认 **2**。
    *
@@ -85,7 +91,7 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
 
   const attempts = Math.max(1, opts.attempts ?? 2);
 
-  const once = async (spec: AssetSpec, style: StyleSpec): Promise<DrawList[]> => {
+  const once = async (spec: AssetSpec, style: StyleSpec): Promise<{ frames: DrawList[]; usage?: LedgerUsage; servedModel?: string }> => {
     const plan = framePlan(spec);
     const prompt = renderPrompt(spec, style);
     opts.onPrompt?.(prompt, spec);
@@ -93,6 +99,8 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), opts.timeoutMs ?? 180_000);
     let raw: string;
+    let usage: LedgerUsage | undefined;
+    let servedModel: string | undefined;
     try {
       const res = await doFetch(`${opts.baseUrl}${endpoint === "messages" ? "/v1/messages" : "/v1/chat/completions"}`, {
         method: "POST", signal: ctl.signal,
@@ -107,9 +115,27 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
       });
       if (!res.ok) throw new GenerationError(spec.id, `上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
       const body = (await res.json()) as {
+        model?: string;
         choices?: { message?: { content?: string }; finish_reason?: string }[];
         content?: { type: string; text?: string }[];
         stop_reason?: string;
+        // ⚠️ 两种协议的 usage 字段名不同，**都认**。上游没给就整个键缺席（票 19 Q4）。
+        usage?: { input_tokens?: number; output_tokens?: number; prompt_tokens?: number; completion_tokens?: number; total_tokens?: number;
+                  completion_tokens_details?: { reasoning_tokens?: number }; output_tokens_details?: { reasoning_tokens?: number } };
+      };
+      // ⚠️ **上游说它服务的是哪个模型**才算数 —— 票 01 实测过：代理请求一个、回的是另一个
+      //   （`deepseek-v4-pro` 要进去，`model` 字段写的是 `deepseek-flash`）。
+      servedModel = body.model;
+      const u = body.usage;
+      if (u) usage = {
+        ...(u.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
+        ...(u.prompt_tokens !== undefined ? { inputTokens: u.prompt_tokens } : {}),
+        ...(u.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
+        ...(u.completion_tokens !== undefined ? { outputTokens: u.completion_tokens } : {}),
+        ...(u.total_tokens !== undefined ? { totalTokens: u.total_tokens } : {}),
+        ...((u.completion_tokens_details?.reasoning_tokens ?? u.output_tokens_details?.reasoning_tokens) !== undefined
+          ? { reasoningTokens: u.completion_tokens_details?.reasoning_tokens ?? u.output_tokens_details?.reasoning_tokens }
+          : {}),
       };
       // ⚠️ 截断与「模型吐坏 JSON」是**两回事**，但表现一样（JSON 不合法）。
       //   分开报，否则调的人会往错的方向找。
@@ -132,7 +158,7 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
     if (frames.length !== plan.length) throw new GenerationError(spec.id, `清单要 ${plan.length} 帧，模型给了 ${frames.length} 帧`);
 
     const [vw, vh] = [spec.size.w, spec.size.h];
-    return frames.map((f, i) => {
+    const out = frames.map((f, i) => {
       const ops = (f as { ops?: unknown }).ops;
       const candidate = { format: "drawlist+curve/v1", id: spec.id, frame: `${plan[i]!.anim ?? spec.id}${plan[i]!.total > 1 ? plan[i]!.index + 1 : ""}`, viewBox: [0, 0, vw, vh], expectedSize: [vw, vh], ops };
       const r = DrawListSchema.safeParse(candidate);
@@ -142,14 +168,29 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
       }
       return r.data;
     });
+    return { frames: out, ...(usage ? { usage } : {}), ...(servedModel ? { servedModel } : {}) };
   };
 
   return async (spec, style) => {
+    const t0 = Date.now();
     let last: unknown;
+    // ⚠️ **往返次数**要如实记：重试烧掉的额度必须能单独看见，否则失败的归因是错的
+    //   （票 14 §7：有界重试吸收抖动 ≠ 降级；票 19 Q4）。
+    let trips = 0;
     for (let i = 0; i < attempts; i++) {
-      try { return await once(spec, style); }
-      catch (e) { last = e; }
+      trips += 1;
+      try {
+        const r = await once(spec, style);
+        opts.onCall?.({
+          step: "drawlist", target: spec.id, upstream: endpoint, ms: Date.now() - t0, attempts: trips,
+          model: r.servedModel ?? model, ...(r.usage ? { usage: r.usage } : {}),
+        });
+        return r.frames;
+      } catch (e) { last = e; }
     }
+    // ⚠️ **失败也要交账** —— 前面那几次往返已经花了（票 19 Q2）。这里只记事实，不记 usage
+    //   （拿不到就是拿不到，不编）。
+    opts.onCall?.({ step: "drawlist", target: spec.id, upstream: endpoint, ms: Date.now() - t0, attempts: trips, model });
     throw last instanceof GenerationError
       ? new GenerationError(spec.id, `${attempts} 次都没成功；最后一次：${last.message.replace(`资源 "${spec.id}" 生成失败：`, "")}`)
       : last;

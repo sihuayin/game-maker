@@ -11,7 +11,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { ASSET_PACK_FORMAT, derivePackMode, paletteBindingOf, type AssetPackManifest, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import {
+  ASSET_PACK_FORMAT, LEDGER_FORMAT, derivePackMode, paletteBindingOf, summarizeCalls,
+  type AssetPackManifest, type AssetSpec, type DrawList, type Ledger, type LedgerCall, type StyleSpec,
+} from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
@@ -50,6 +53,13 @@ export type BuildPackOptions = {
   generateImage?: GenerateImage;
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
+  /**
+   * 一次运行的账（票 45）。给了就往包根写一份 `ledger.json`。
+   * ⚠️ 传进来的是一个**调用方也持有的数组** —— 文本那一路的调用由**生成器**直接记进来
+   *   （`createDrawListGenerator({onCall})`），生图那一路由本函数追加。
+   *   两边写同一个数组，就不会有「两份账」。
+   */
+  ledger?: LedgerCall[];
   generator?: { name: string; version: string; run?: string };
   /** 逐资源的进度回报（MCP 的 `notifications/progress` 用它，票 30）。 */
   onProgress?: (done: number, total: number, assetId: string) => void;
@@ -72,6 +82,8 @@ export type BuildPackResult = {
   imageCalls: ({ assetId: string } & ImageGenCall)[];
   /** spec ↔ 产物的对账结果（`auditAssetSpec`）。**有内容不等于失败** —— 交调用方决定。 */
   audit: string[];
+  /** 写进包的那份账（票 45）。没传 `ledger` 进来就是 undefined。 */
+  ledger?: Ledger;
 };
 
 /** `#rrggbb` → `[r,g,b]`。⚠️ 色板落盘前已规范化成小写，这里不做兼容性猜测。 */
@@ -134,6 +146,10 @@ export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackR
 }
 
 async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
+  // ⚠️ **墙钟**：人等了多久 —— 与各次调用的 ms 之和**是两个不相加的量**（票 19）。
+  //   串行时恰好相等，并行（票 47）之后就不再相等，而**差正是并行的收益**。
+  const runT0 = Date.now();
+
   const { recipe, style, outDir, generate } = opts;
   const palette = normalizePalette(style.palette);
   const version = nextPackVersion(outDir, recipe.id);
@@ -250,6 +266,14 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           cells.push(...seg.cells);
         }
         imageCalls.push({ assetId: spec.id, ...call });
+        opts.ledger?.push({
+          step: "image", target: spec.id, upstream: call.protocol, ms: call.ms, attempts: call.attempts,
+          requestedSize: call.requestedSize,
+          ...(call.model !== undefined ? { model: call.model } : {}),
+          ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
+          ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
+          ...(call.usage !== undefined ? { usage: call.usage } : {}),
+        });
       }
       // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43），都要在这里定，不能留给默认：
       //   ① **按我们告诉模型的颜色抠底**，不四角取样 —— 背景层的角上就是内容本身
@@ -404,6 +428,23 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
     }),
     files: [],
   };
+  // ── 账：包根的 sidecar `ledger.json`（票 19 / 票 45）───────────────────────
+  //
+  // ⚠️ **写在这里是全部的关键**：`files[]` 是 `walk(packDir)` **穷举**，所以 sidecar 会
+  //   **自动进 files[]**、自动被 `verify` 校验 checksum —— **契约一个字不用改、不用升版**。
+  //   写在 walk 之后的话它就漏在 checksum 覆盖之外了。
+  //
+  // ⚠️ 而且它写在**临时包目录**里（`finalDir` 搬迁之前），所以它跟着包一起搬走。
+  const ledgerDoc: Ledger | undefined = opts.ledger
+    ? {
+        format: LEDGER_FORMAT, packId: recipe.id, packVersion: version,
+        createdAt: new Date((opts.sourceDateEpoch ?? Number(process.env.SOURCE_DATE_EPOCH ?? Math.floor(Date.now() / 1000))) * 1000).toISOString(),
+        run: { wallClockMs: Date.now() - runT0, byStep: summarizeCalls(opts.ledger) },
+        calls: opts.ledger,
+      }
+    : undefined;
+  if (ledgerDoc) fs.writeFileSync(path.join(packDir, "ledger.json"), jstr(ledgerDoc));
+
   // ── files[]：逐文件 checksum（manifest.json 自身除外，自指）──────────────
   const walk = (dir: string, base = ""): string[] => fs.readdirSync(dir, { withFileTypes: true })
     .flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name), `${base}${d.name}/`) : [`${base}${d.name}`]));
@@ -423,5 +464,5 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   // 全部成功才搬过去 —— 这一步之后才对「绝不覆盖」的版本号负责
   fs.mkdirSync(path.dirname(finalDir), { recursive: true });
   fs.renameSync(packDir, finalDir);
-  return { manifest, packDir: finalDir, audit, imageCalls };
+  return { manifest, packDir: finalDir, audit, imageCalls, ...(ledgerDoc ? { ledger: ledgerDoc } : {}) };
 }

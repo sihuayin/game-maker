@@ -19,6 +19,7 @@
 //
 // 有界重试保留（票 14 §7：重试吸收抖动 ≠ 降级），但**只对网络错与 5xx 重试** ——
 // 这一条每次调用都是钱，4xx 重试是白花。
+import type { LedgerUsage } from "@game-maker/contracts";
 import { ImageGenerationError, type ImageProtocol } from "./image-gen-error.js";
 import { decodePNG, encodePNG } from "./png.js";
 import type { RasterImage } from "./image.js";
@@ -34,6 +35,14 @@ export type ImageGenCall = {
   requestId?: string;
   /** 上游给图的那个临时 URL 的**主机名**（只记主机，不记带签名的完整 URL）。 */
   sourceHost?: string;
+  /**
+   * 上游**实际**服务的模型名。
+   * ⚠️ **拿不到就缺席，不许编一个** —— `dashscope-mcp` 协议**根本没有 `model` 参数**
+   *   （票 34：模型由服务端定），这时记一个我们猜测的名字就是把不知道的事说成知道的。
+   */
+  model?: string;
+  /** 上游自报的用量。⚠️ 没给就缺席 —— **不填 0 冒充「测到了 0」**（票 19 Q4）。 */
+  usage?: LedgerUsage;
   ms: number;
   attempts: number;
 };
@@ -305,6 +314,7 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
           image,
           call: {
             protocol: "gemini", requestedSize: `aspect ${geminiAspect(size)}`, ms: Date.now() - t0, attempts: i,
+            model,
           },
         };
       } catch (e) {
@@ -460,12 +470,22 @@ export function createOpenAIGenerator(opts: OpenAIOptions): ImageGenerator {
           });
         } finally { clearTimeout(timer); }
         if (!res.ok) throw new Error(`上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
-        const image = imageFromOpenAI(await res.json());
+        const body = (await res.json()) as { usage?: { input_tokens?: number; output_tokens?: number; total_tokens?: number } };
+        const image = imageFromOpenAI(body);
         return {
           image,
           call: {
             protocol: "openai", ms: Date.now() - t0, attempts: i,
             requestedSize: inputs.length > 0 ? `${requestedSize} · edits ${inputs.length} 图` : requestedSize,
+            // `gpt-image` 系会把用量带回来 —— 那是**上游给的事实**，不是我们的折算，该记（票 19 Q7 的例外）
+            ...(opts.model ? { model: opts.model } : {}),
+            ...(body.usage
+              ? { usage: {
+                  ...(body.usage.input_tokens !== undefined ? { inputTokens: body.usage.input_tokens } : {}),
+                  ...(body.usage.output_tokens !== undefined ? { outputTokens: body.usage.output_tokens } : {}),
+                  ...(body.usage.total_tokens !== undefined ? { totalTokens: body.usage.total_tokens } : {}),
+                } }
+              : {}),
           },
         };
       } catch (e) {

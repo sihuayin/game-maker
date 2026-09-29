@@ -9,8 +9,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, entityBox, FALLBACK_ANCHOR, parseAssetPack, parseGameConfig, parseRecipe,
-  type AssetPackManifest, type StyleSpec,
+  auditGameConfig, entityBox, FALLBACK_ANCHOR, parseAssetPack, parseGameConfig, parseLedger, parseRecipe,
+  summarizeCalls,
+  type AssetPackManifest, type LedgerCall, type LedgerUsage, type StyleSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences } from "./generate.js";
 import { buildAssetPack, type GenerateImage } from "./pack.js";
@@ -86,9 +87,21 @@ ${styleBrief(style)}
   //   实测它真的会偶发不过 schema（第一版没有重试，一次形状违规就让整条命令挂掉）。
   let checked: ReturnType<typeof parseRecipe> | null = null;
   let lastError = "";
+  // ⚠️ `derive` 的账**只进回报，不落盘**（票 19：账跟着「包」走，而「清单」不是包 ——
+  //   R7 两条路都开，清单可以是人直接写的，那时根本没有这一次调用）。
+  let deriveCall: LedgerCall[] = [];
   for (let attempt = 0; attempt < 2; attempt++) {
     let raw: string;
-    try { raw = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl }); }
+    const t0 = Date.now();
+    try {
+      const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl });
+      raw = r.text;
+      deriveCall = [{
+        step: "derive", target: "recipe", upstream: "messages", ms: Date.now() - t0, attempts: 1,
+        ...(r.servedModel !== undefined ? { model: r.servedModel } : {}),
+        ...(r.usage !== undefined ? { usage: r.usage } : {}),
+      }];
+    }
     catch (e) { throw new CommandError("upstream", (e as Error).message); }
     let parsed: unknown;
     try { parsed = JSON.parse(stripFences(raw)); }
@@ -113,13 +126,19 @@ ${styleBrief(style)}
   return {
     command: "derive",
     summary: [`清单已落盘：${rel(opts.outRoot, file)}`, `${checked.value.assets.length} 个资源（${Object.entries(kinds).map(([k, v]) => `${k}×${v}`).join(" · ")}）`],
-    data: { recipeId: checked.value.id, version, assetCount: checked.value.assets.length, kinds },
+    data: { recipeId: checked.value.id, version, assetCount: checked.value.assets.length, kinds, ledger: deriveCall },
     artifacts: [{ path: rel(opts.outRoot, file), kind: "asset-recipe" }],
   };
 }
 
-/** 调一次文本上游（`derive` 用；生成走 `createDrawListGenerator`）。 */
-async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof fetch }): Promise<string> {
+/**
+ * 调一次文本上游（`derive` 用；生成走 `createDrawListGenerator`）。
+ * ⚠️ 返回**不只是文本**：`usage` 与上游自报的模型名都要带出来（票 45）——
+ *   它们是「花了什么」的事实，而这一层过去把它们直接丢了。
+ */
+async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof fetch }):
+Promise<{ text: string; usage?: LedgerUsage; servedModel?: string }> {
+  const t0 = Date.now();
   const doFetch = opts.fetchImpl ?? fetch;
   const res = await doFetch(`${opts.baseUrl}/v1/messages`, {
     method: "POST",
@@ -127,8 +146,21 @@ async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof f
     body: JSON.stringify({ model: "deepseek-v4-pro", max_tokens: 32_000, thinking: { type: "disabled" }, messages: [{ role: "user", content: opts.prompt }] }),
   });
   if (!res.ok) throw new Error(`上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
-  const j = (await res.json()) as { content?: { type: string; text?: string }[] };
-  return (j.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("");
+  const j = (await res.json()) as {
+    model?: string; content?: { type: string; text?: string }[];
+    usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
+  };
+  const u = j.usage;
+  return {
+    text: (j.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
+    ...(j.model ? { servedModel: j.model } : {}),
+    ...(u ? { usage: {
+      ...(u.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
+      ...(u.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
+      ...(u.completion_tokens_details?.reasoning_tokens !== undefined ? { reasoningTokens: u.completion_tokens_details.reasoning_tokens } : {}),
+    } } : {}),
+  };
+  void t0;
 }
 
 function nextVersion(dir: string): number {
@@ -276,7 +308,7 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   let lastError = "";
   for (let attempt = 0; attempt < 2; attempt++) {
     let raw: string;
-    try { raw = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl }); }
+    try { raw = (await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl })).text; }
     catch (e) { throw new CommandError("upstream", (e as Error).message); }
     let parsed: unknown;
     try { parsed = JSON.parse(stripFences(raw)); }
@@ -385,6 +417,10 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       `这份清单里有 source.kind="image" 的资源，但**没配生图凭据** —— ` +
       `写 game-maker.local.json（已 gitignore）或设 GAME_MAKER_IMAGE_* 环境变量。`);
 
+  // ⚠️ 这个数组是**调用方与构建器共用**的：文本那一路由生成器直接记进来
+  //   （`createDrawListGenerator({ onCall })`），生图那一路由 `buildAssetPack` 追加。
+  //   ⚠️ 而它在这里**就存在了**，所以中途失败时已经花掉的那几笔还在 —— 那是票 46 的地基。
+  const ledger: LedgerCall[] = [];
   let res;
   try {
     res = await buildAssetPack({
@@ -393,8 +429,10 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       recipeDir: path.dirname(path.resolve(opts.recipePath)),
       generate: createDrawListGenerator({
         baseUrl: opts.transport.baseUrl, apiKey: opts.transport.apiKey,
+        onCall: (c) => ledger.push(c),
         ...(opts.fetchImpl ? { fetchImpl: opts.fetchImpl } : {}),
       }),
+      ledger,
       ...(opts.imageTransport
         ? { generateImage: imageGeneratorFor(opts.imageTransport, opts.fetchImpl) }
         : {}),
@@ -412,6 +450,18 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
     summary: [`资源包：${rel(opts.outRoot, res.packDir)}（v${m.version}）`,
       `${m.assets.length} 个资源 · ${m.atlases.length} 张图集 · ${m.files.length} 个文件`,
       `来源：${m.provenance.mode}`,
+      // ⚠️ **墙钟与调用耗时之和是两个数**（票 19）—— 串行时恰好相等，并行之后就不再相等。
+      //   两个都报出来，差就是并行的收益。
+      (() => {
+        const s = summarizeCalls(ledger);
+        const calls = ledger.length;
+        if (calls === 0) return "账：无调用";
+        const ms = ledger.reduce((n, c) => n + c.ms, 0);
+        const trips = ledger.reduce((n, c) => n + c.attempts, 0);
+        const wall = res.ledger ? `墙钟 ${(res.ledger.run.wallClockMs / 1000).toFixed(1)}s · ` : "";
+        return `账：${calls} 次调用 · ${trips} 次往返（${trips > calls ? "**有重试**" : "无重试"}）· ` +
+          `${wall}调用耗时合计 ${(ms / 1000).toFixed(1)}s · 见包内 ledger.json`;
+      })(),
       ...(res.imageCalls.length > 0
         ? [`生图：${res.imageCalls.length} 次调用 · ${res.imageCalls.map((c) => c.assetId).join(" ")}`]
         : [])],
@@ -420,6 +470,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       ...(res.imageCalls.length > 0
         ? { imageCalls: res.imageCalls, imageUpstream: describeImageTransport(opts.imageTransport) }
         : {}),
+      ledgerCalls: ledger, ledgerRun: summarizeCalls(ledger),
       assetCount: m.assets.length, fileCount: m.files.length,
       provenanceMode: m.provenance.mode, paletteCoverage: m.palette.coverage,
     },
@@ -449,6 +500,20 @@ export function verifyPack(opts: VerifyOptions): CommandResult {
     const sum = "sha256:" + createHash("sha256").update(buf).digest("hex");
     if (sum !== f.checksum) problems.push(`checksum 不符：${f.path}`);
   }
+  // ⚠️ **账（包里如果有）也要过 schema** —— 它已经在 `files[]` 里，所以上面那段已经验过
+  //   「没被改过」；但 checksum **只证明它没被改**，不证明它**是一份合法的账**。
+  //   ⚠️ **没有不算错** —— 磁盘上已有的包（票 40 那份）不带它，必须照常通过。
+  const ledgerPath = path.join(opts.packDir, "ledger.json");
+  const hasLedger = fs.existsSync(ledgerPath);
+  let ledgerRun: ReturnType<typeof summarizeCalls> | null = null;
+  if (hasLedger) {
+    const l = parseLedger(JSON.parse(fs.readFileSync(ledgerPath, "utf8")));
+    if (!l.ok) problems.push(...l.errors.map((e) => `ledger.json 不过 schema：${e}`));
+    else if (l.value.packId !== m.id || l.value.packVersion !== m.version)
+      problems.push(`账与包对不上：ledger.json 说自己是 "${l.value.packId}" v${l.value.packVersion}，而 manifest 是 "${m.id}" v${m.version}`);
+    else ledgerRun = l.value.run.byStep;
+  }
+
   const onDisk = walk(opts.packDir).filter((p) => p !== "manifest.json").sort();
   const declared = m.files.map((f) => f.path);
   for (const p of onDisk) if (!declared.includes(p)) problems.push(`files[] 没记录的文件：${p}`);
@@ -459,7 +524,10 @@ export function verifyPack(opts: VerifyOptions): CommandResult {
   return {
     command: "verify",
     summary: [`✅ ${rel(root, opts.packDir)} 通过：${m.files.length} 个文件的 checksum 全部对得上`,
-      `来源：${m.provenance.mode}`],
+      `来源：${m.provenance.mode}`,
+      ...(ledgerRun
+        ? [`账：${ledgerRun.drawlist.calls + ledgerRun.image.calls + ledgerRun.derive.calls} 次调用被记在包内 ledger.json 里`]
+        : ["账：这个包没有 ledger.json（**不是错** —— 票 45 之前产的包都没有）"])],
     data: { packId: m.id, version: m.version, ok: true, problems: [], provenanceMode: m.provenance.mode },
     artifacts: [],
   };
