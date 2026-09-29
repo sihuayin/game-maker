@@ -4,16 +4,17 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
+  CommandError, EXIT, compileGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
-import { assembleSite } from "@game-maker/demo";
+import { assembleSite, VIEWPORT } from "@game-maker/demo";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 用法：
   game-maker derive --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
   game-maker pack   --recipe <清单.json> [--out <目录>] [--json]
+  game-maker compile-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
   game-maker site   <资源包目录> --config <game-config.json> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
@@ -39,7 +40,7 @@ type Parsed = { command: string; positionals: string[]; flags: Record<string, st
 export function parseArgs(argv: readonly string[]): Parsed {
   const positional: string[] = [];
   const flags: Record<string, string | boolean> = {};
-  const takesValue = new Set(["requirement", "style", "out", "recipe", "config", "shell", "game-id"]);
+  const takesValue = new Set(["requirement", "style", "out", "recipe", "config", "shell", "game-id", "pack"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--help" || a === "-h") { flags.help = true; continue; }
@@ -92,6 +93,18 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
         result = await packAssets({
           recipePath: path.resolve(flags.recipe), outRoot, transport,
           ...(img.transport ? { imageTransport: img.transport } : {}),
+        });
+        break;
+      }
+      case "compile-game": {
+        if (typeof flags.requirement !== "string" || typeof flags.pack !== "string")
+          throw new CommandError("usage", "compile-game 需要 --requirement 与 --pack");
+        result = await compileGame({
+          requirementPath: path.resolve(flags.requirement),
+          packDir: path.resolve(flags.pack),
+          outRoot, transport,
+          // 视口传外壳**那一份**常量 —— 不让这个数在仓里出现第二个值
+          viewport: VIEWPORT,
         });
         break;
       }

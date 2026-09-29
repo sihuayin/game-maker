@@ -7,10 +7,10 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  CommandError, deriveRecipe, exitCodeOfError, inspectPack, packAssets, verifyPack,
+  CommandError, compileGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
-import { assembleSite } from "@game-maker/demo";
+import { assembleSite, VIEWPORT } from "@game-maker/demo";
 
 const PROTOCOL_VERSION = "2025-06-18";
 
@@ -66,6 +66,24 @@ const TOOLS = [
       "何时用：**在写游戏配置之前** —— 你需要知道有哪些资源、它们的动画叫什么名字，才能写出能解析的引用。\n" +
       "它不校验 checksum（那是 verify_asset_pack 的事）。",
     inputSchema: { type: "object", properties: { packDir: { type: "string", description: "资源包目录" } }, required: ["packDir"] },
+  },
+  {
+    name: "compile_game",
+    description:
+      "从一段需求文本 + 一个资源包编译出一份 game-config（game-config/v1），落盘到 <out>/<id>/game-configs/v<N>.json。\n" +
+      "**两阶段的第一步** —— 编完先让人过目，再用 assemble_site 装配。绝不覆盖，每次写新的 v<N>。\n" +
+      "何时用：用户给了需求文本，且已经有一个资源包（配置必须只引用包里真实存在的资源与动画）。\n" +
+      "⚠️ 配置**照常落盘**，但校验不过时回报里会逐条列出 —— 那是给人改的依据。\n" +
+      "会失败的情况：上游不可达；两次都吐不出合法 JSON；编译结果不过 schema。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        requirementPath: { type: "string", description: "需求文本的路径（markdown 或纯文本）" },
+        packDir: { type: "string", description: "资源包目录 —— 它既是模型要看的资源清单，也是校验的依据" },
+        outDir: { type: "string", description: "产物根目录，默认 ./out。回报的路径都相对于它" },
+      },
+      required: ["requirementPath", "packDir"],
+    },
   },
   {
     name: "assemble_site",
@@ -140,6 +158,15 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             break;
           case "verify_asset_pack":
             result = verifyPack({ packDir: String(args.packDir) });
+            break;
+          case "compile_game":
+            tick(0.2, "正在编译游戏配置…");
+            result = await compileGame({
+              requirementPath: String(args.requirementPath), packDir: String(args.packDir),
+              outRoot: String(args.outDir ?? "out"),
+              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              viewport: VIEWPORT,
+            });
             break;
           case "assemble_site":
             result = assembleSite({

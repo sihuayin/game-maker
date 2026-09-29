@@ -8,7 +8,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { parseAssetPack, parseRecipe, type AssetPackManifest, type StyleSpec } from "@game-maker/contracts";
+import {
+  auditGameConfig, entityBox, FALLBACK_ANCHOR, parseAssetPack, parseGameConfig, parseRecipe,
+  type AssetPackManifest, type StyleSpec,
+} from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences } from "./generate.js";
 import { buildAssetPack, type GenerateImage } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
@@ -131,6 +134,209 @@ function nextVersion(dir: string): number {
   if (!fs.existsSync(dir)) return 1;
   const vs = fs.readdirSync(dir).map((d) => /^v(\d+)\.json$/.exec(d)).filter((m): m is RegExpExecArray => m !== null).map((m) => Number(m[1]));
   return vs.length === 0 ? 1 : Math.max(...vs) + 1;
+}
+
+// ── compile-game：需求 + 资源包 → game-config ────────────────────────────────
+//
+// 与 `derive → pack` 完全同构（票 09 裁决 2）：**一次 LLM 调用编译 → 先落盘成文件 →
+// 人过目 → 再装配**。产物 B 的那条链从此**首尾闭合**：需求 → 配置 →（票 33）站点。
+//
+// ⚠️ **输入用的是「资源包的 manifest」而不是 `asset-recipe/v1` 配方。**
+//   两者是同一个清单的两种状态，而 manifest 是**实现态**、也正是 config 必须解析通过的那一份。
+//   用配方会让「模型看到的」与「校验依据的」成为两份 —— 那正是本仓库反复吃的亏。
+
+/** 外壳视口。⚠️ 与票 32 裁决 1 的外壳常量同值；调用方可以显式传（CLI 传的就是外壳那一份）。 */
+export const DEFAULT_VIEWPORT = { w: 480, h: 270 } as const;
+
+/**
+ * 给模型看的**形状骨架**。⚠️ **它必须是能过 schema 的** —— 导出它是为了让测试能直接断言这件事。
+ *
+ * 票 40 抓到过三条「**提示词教模型写一个会被自己拒收的形状**」（`tileable` 少一个轴、
+ * 锚点没进提示词、帧数两份实现）。这里的等价风险是：教模型把 `at` 当左上角、
+ * 或者把 HUD 摆到屏幕外。**示例错了，模型就会错，而且是以一种「看起来没问题」的方式错。**
+ */
+export const gameConfigExample = {
+  format: "game-config/v1",
+  world: { size: { w: 1440, h: 270 } },
+  scene: { background: { asset: "<背景资源的 id>" } },
+  player: {
+    asset: "<玩家资源的 id>",
+    anims: { idle: "<idle 动画名>", run: "<run 动画名>", jump: "<jump 动画名>" },
+    at: { x: 40, y: 250 },
+  },
+  terrain: [{ x: 0, y: 250, w: 1440, h: 20 }],
+  entities: [
+    { id: "pickup-1", kind: "pickup", at: { x: 300, y: 250 }, asset: "<可拾取资源的 id>" },
+    { id: "block-1", kind: "solid", at: { x: 500, y: 250 }, asset: "<静态障碍资源的 id>" },
+    { id: "mover", kind: "hazard", at: { x: 800, y: 250 }, asset: "<危险物资源的 id>", anim: "<动画名>",
+      motion: { kind: "cycle", axis: "x", distance: 200, periodMs: 4000 } },
+    { id: "gate", kind: "goal", at: { x: 1400, y: 250 }, asset: "<终点资源的 id>", anim: "<动画名>" },
+  ],
+  hud: {
+    panel: { asset: "<ui 面板资源的 id>", at: { x: 8, y: 262 }, size: { w: 72, h: 32 } },
+    pip: { asset: "<ui 标记资源的 id>", at: { x: 12, y: 250 }, step: { x: 20, y: 0 } },
+  },
+  objective: { kind: "collect-then-reach", gate: "gate" },
+} as const;
+
+/** 把资源包渲染成模型能读的一张清单：id / 种类 / 尺寸 / **锚点落点** / 动画名 / 背景层。 */
+function resourceBrief(manifest: AssetPackManifest): string {
+  const lines: string[] = [];
+  for (const a of manifest.assets) {
+    const anims = a.animations ?? [];
+    const animText = anims.length === 0
+      ? "（无动画，引用时不必给 anim）"
+      : anims.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ");
+    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · 锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · 动画：${animText}`);
+    if (a.layers && a.layers.length > 0)
+      lines.push(`    背景层（远→近）：${a.layers.map((l) => `${l.name}(parallax ${l.parallax}${l.tileable?.x ? " 可平铺" : ""})`).join(" · ")}`);
+  }
+  return lines.join("\n");
+}
+
+/** 把「锚点」翻译成人能照着摆的一句话 —— 这一条是模型最容易搞错的地方。 */
+const anchorHint = (a: { x: number; y: number }): string =>
+  a.y === 1 && a.x > 0 ? "底边中心（**站在地面线上的东西写 at.y = 地面线的 y**）"
+    : a.y === 1 && a.x === 0 ? "左下角"
+      : a.x === 0 && a.y === 0 ? "左上角"
+        : `{x:${a.x}, y:${a.y}}（归一化锚点，\`at\` 是它落在的那个点）`;
+
+export type CompileGameOptions = {
+  requirementPath: string;
+  /** 资源包目录 —— 它**就是**模型要看的资源清单，也是校验的依据。 */
+  packDir: string;
+  outRoot: string;
+  transport?: Transport;
+  fetchImpl?: typeof fetch;
+  /** 外壳视口。默认 480×270（与票 32 的常量同值）。 */
+  viewport?: { w: number; h: number };
+};
+
+/**
+ * 需求 + 资源包 → 一份 game-config，落盘到 `<out>/<id>/game-configs/v<N>.json`。
+ *
+ * ⚠️ **先校验、后落盘**。与别的操作不同，这一条的产物是**给机器吃的**：
+ *   一份「看起来像那么回事、其实引用解不到」的配置，比没有配置更坏 ——
+ *   它会在很久之后的装配那一步才炸，而且炸得像包有问题。
+ *   ⚠️ 但它**照常落盘**（只是同时报出来）：票 09 裁决 2 说「人过目」，
+ *   而人过目的前提是**他看得到哪儿不对** —— 不落盘的话他连看的东西都没有。
+ */
+export async function compileGame(opts: CompileGameOptions): Promise<CommandResult> {
+  const requirement = fs.readFileSync(opts.requirementPath, "utf8");
+  const manifestPath = path.join(opts.packDir, "manifest.json");
+  if (!fs.existsSync(manifestPath)) throw new CommandError("usage", `不是资源包（没有 manifest.json）：${opts.packDir}`);
+  const mp = parseAssetPack(JSON.parse(fs.readFileSync(manifestPath, "utf8")));
+  if (!mp.ok) throw new CommandError("invalid", `资源包不过 schema：${mp.errors.slice(0, 4).join("；")}`);
+  const manifest = mp.value;
+  if (!opts.transport) throw new CommandError("upstream", "编译需要文本上游；它现在不可达（配置是文件，人可以直接写一份）");
+
+  const vp = opts.viewport ?? DEFAULT_VIEWPORT;
+  const prompt = `你是游戏关卡设计师。根据下面的**需求**与**资源包清单**，产出一份 game-config（game-config/v1）。
+
+只输出 JSON 本体，不要 markdown 围栏，不要解释。
+
+# 铁律（**每条都会被校验器检查，违反直接拒收**）
+
+1. 顶层**只有**这八个键：format / world / scene / player / terrain / entities / hud / objective。多一个就拒。
+2. \`format\` 恒为 \`"game-config/v1"\`。坐标一律**非负整数** —— \`x: 10.5\` 会静默糊掉像素网格，直接拒。
+3. ⚠️ **\`at\` 是「资源锚点落在的那个点」，不是左上角。** 本包的锚点含义见下面每条清单。
+   最要命的一条：**底边中心的资源（角色、道具、危险物），站在地面线上的写法是 \`at.y = 地面线的 y\`**，
+   **不是** \`地面线 − 高\`。写成后者，整个世界的道具都会浮在半空。
+4. \`world.size.h\` **必须等于视口高 ${vp.h}**（这个游戏单屏高，只横向滚动；视口是 ${vp.w}×${vp.h}）。
+   \`world.size.w\` 自己定（横向滚多远）。
+5. \`kind\` ∈ \`solid\` / \`pickup\` / \`hazard\` / \`goal\` / \`decor\`。
+   **看得见的静态碰撞体（行李堆、台阶）写 \`solid\` 实体**；\`terrain\` 只放**看不见的**碰撞
+   （地面线、关卡边界、隐形墙）。
+6. \`objective\` **不带数量**：\`{"kind":"collect-then-reach","gate":"<某个 goal 实体的 id>"}\`。
+   要捡几件由 \`kind:"pickup"\` 的实体条数**派生** —— 多写一个数就拒。
+7. \`gate\` 必须指向一个**真的存在**且 \`kind:"goal"\` 的实体；实体 id **不得重复**；**至少要有 1 个 pickup**。
+8. ⚠️ **\`hud\` 的坐标是屏幕空间（≤ ${vp.w}×${vp.h}），不是世界空间。**
+   世界可以宽 1440，但屏幕只有 ${vp.w} 宽 —— HUD 写到 x > ${vp.w - 72} 就跑出屏幕了，直接拒。
+9. \`anim\` 只在资源有**多个**动画时才需要，且必须是清单里**真实存在**的动画名。
+   ⚠️ **只许用下面清单里的 id 与动画名** —— 清单里没有的一律拒收。
+
+# 需求
+${requirement}
+
+# 资源包清单（**只许用这里面的东西**）
+${resourceBrief(manifest)}
+
+# 锚点的意思（照这个摆）
+${[...new Set(manifest.assets.map((a) => `${a.kind}：${anchorHint(a.anchor)}`))].join(" · ")}
+
+# 形状（**逐字照抄这个骨架**；\`<…>\` 是占位符，换成清单里真实的 id 与动画名）
+${JSON.stringify(gameConfigExample, null, 2)}
+
+⚠️ 骨架里的**位置只是示意**（都摆在地面线上）—— 按需求把东西铺开，并让关卡真的可通关：
+玩家能跳的高度是有限的，台阶别高过它。`;
+
+  // 有界重试，与 derive 同一条道理：编译是**重采样**，不是修复循环（不把错误喂回去）
+  let checked: ReturnType<typeof parseGameConfig> | null = null;
+  let lastError = "";
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let raw: string;
+    try { raw = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl }); }
+    catch (e) { throw new CommandError("upstream", (e as Error).message); }
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripFences(raw)); }
+    catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
+    const r = parseGameConfig(parsed);
+    if (r.ok) { checked = r; break; }
+    lastError = `编译出来的配置不过 schema：${r.errors.slice(0, 4).join("；")}`;
+  }
+  if (!checked?.ok) throw new CommandError("invalid", lastError);
+
+  const config = checked.value;
+
+  // ── 落盘**之前**先校验：产物是给机器吃的，坏配置比没配置更坏 ──────────────
+  //
+  // ⚠️ 这里跑的是 `site` 要跑的同一批校验（减去第四族 —— 那条是**包**的性质，
+  //   与模型写的配置无关：可平铺的层对任何世界宽都盖得住，不平铺的层只有 parallax = 0 才行，
+  //   两条都不看 config）。
+  const issues: string[] = [];
+  for (const i of auditGameConfig(config, manifest))
+    issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+
+  // HUD 的**屏幕空间**边界：校验器看不到视口（那是外壳的常量），所以在这一票里补上。
+  // ⚠️ 模型最容易犯的错就是拿世界坐标写 HUD —— 摆到屏幕外，而契约层的校验放它过去。
+  const pipSize = manifest.assets.find((a) => a.id === config.hud.pip.asset)?.size ?? { w: 1, h: 1 };
+  const panelBox = entityBox(config.hud.panel.at, config.hud.panel.size,
+    manifest.assets.find((a) => a.id === config.hud.panel.asset)?.anchor ?? FALLBACK_ANCHOR);
+  const hudBoxes: [string, { x: number; y: number; w: number; h: number }][] = [["hud.panel", panelBox]];
+  const pickups = config.entities.filter((e) => e.kind === "pickup").length;
+  for (let i = 0; i < pickups; i++) {
+    const at = { x: config.hud.pip.at.x + i * config.hud.pip.step.x, y: config.hud.pip.at.y + i * config.hud.pip.step.y };
+    hudBoxes.push([`hud.pip[${i}]`, entityBox(at, pipSize,
+      manifest.assets.find((a) => a.id === config.hud.pip.asset)?.anchor ?? FALLBACK_ANCHOR)]);
+  }
+  for (const [where, b] of hudBoxes)
+    if (b.x < 0 || b.y < 0 || b.x + b.w > vp.w || b.y + b.h > vp.h)
+      issues.push(`❌ ${where}: HUD 活在**屏幕空间**，必须落在视口 ${vp.w}×${vp.h} 内；而它的盒子是 (${b.x},${b.y}) ${b.w}×${b.h}`);
+
+  const dir = path.join(opts.outRoot, manifest.id, "game-configs");
+  fs.mkdirSync(dir, { recursive: true });
+  const version = nextVersion(dir);
+  const file = path.join(dir, `v${version}.json`);
+  fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+
+  const bad = issues.filter((i) => i.startsWith("❌"));
+  return {
+    command: "compile-game",
+    summary: [
+      `配置已落盘：${rel(opts.outRoot, file)}（v${version}）`,
+      `${config.entities.length} 个实体 · ${pickups} 个拾取物 · 世界 ${config.world.size.w}×${config.world.size.h}`,
+      bad.length === 0
+        ? `✅ 校验全过${issues.length ? `（${issues.length} 条警告）` : ""} —— 下一步：game-maker site ${rel(opts.outRoot, opts.packDir)} --config ${rel(opts.outRoot, file)}`
+        : `❌ **这份配置过不了校验**（${bad.length} 条）—— 改完再 \`site\`：`,
+      ...(bad.length ? issues : []),
+    ],
+    data: {
+      gameId: manifest.id, version, configPath: rel(opts.outRoot, file),
+      entityCount: config.entities.length, pickupCount: pickups,
+      worldSize: config.world.size, issues, ok: bad.length === 0,
+    },
+    artifacts: [{ path: rel(opts.outRoot, file), kind: "game-config" }],
+  };
 }
 
 // ── pack：清单 → 资源包 ─────────────────────────────────────────────────────

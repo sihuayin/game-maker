@@ -9,8 +9,8 @@
 //   得到一份「全是占位符」的描述，而不是一个异常。这正是对冲票 03 那条实测：
 //   **Phaser 的 loader 静默返回空且不报错** —— 不主动查，坏数据是不显形的。
 import {
-  parseAssetPack, parseGameConfig, resolvePackRef,
-  type AssetPackManifest, type GameConfig, type PaletteColor,
+  entityBox, parseAssetPack, parseGameConfig, resolvePackRef, FALLBACK_ANCHOR,
+  type AssetPackManifest, type GameConfig,
 } from "@game-maker/contracts";
 
 /** 视口 = **外壳常量**（票 32 裁决 1）。于是 1 交付像素 = 1 屏幕像素字面成立。 */
@@ -117,8 +117,7 @@ export type WorldDescription = {
 
 /** 未知资源时的占位尺寸。可见即可 —— 它的岗位是「让坏了显形」，不是好看。 */
 const FALLBACK_SIZE: Size = { w: 32, h: 32 };
-/** 未知资源的兜底锚点。世界里的东西**绝大多数**是「底边中心」（票 40 的真包：`{x:.5,y:1}`）。 */
-const FALLBACK_ANCHOR: Vec = { x: 0.5, y: 1 };
+
 
 const isVec = (v: unknown): v is Vec =>
   typeof v === "object" && v !== null &&
@@ -149,14 +148,12 @@ function anchorOf(manifest: AssetPackManifest | null, assetId: string): Vec {
   return isVec(a) ? { x: a.x, y: a.y } : FALLBACK_ANCHOR;
 }
 
-/** 由「锚点落点 + 尺寸 + 锚点」推出盒子（左上角）—— 全文件里**唯一**一处这么算的地方。 */
-function boxAt(at: Vec, size: Size, anchor: Vec): Box {
-  return {
-    x: Math.round(at.x - anchor.x * size.w),
-    y: Math.round(at.y - anchor.y * size.h),
-    w: size.w, h: size.h,
-  };
-}
+/**
+ * ⚠️ **盒子不在这里算** —— 用的是 `@game-maker/contracts` 的 `entityBox`。
+ *   同一个公式曾经在三个地方各写一份（契约的校验器、这里的纯层、还有一份在票 48 之前），
+ *   而「校验过的盒子」与「画出来的盒子」差一点点，正是**静默**糊掉像素的那种错。
+ */
+const boxAt = entityBox;
 
 /**
  * 把一个引用解成「画得出来 / 画不出来」。

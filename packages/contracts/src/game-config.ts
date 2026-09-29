@@ -83,7 +83,24 @@ export const DEFAULT_PLAYER_MOVE = { speed: 90, jumpVelocity: 330, gravity: 900 
  * 资源解不到时算盒子用的兜底锚点。**与外壳（票 44）是同一个值** ——
  * 世界里的东西绝大多数是「底边中心」（票 40 的真包：`{x:.5,y:1}`）。
  */
-const FALLBACK_ANCHOR = { x: 0.5, y: 1 } as const;
+export const FALLBACK_ANCHOR = { x: 0.5, y: 1 } as const;
+
+/**
+ * 由「**锚点落点** + 尺寸 + 锚点」推出盒子（左上角）。**全仓只此一处算这个。**
+ *
+ * ⚠️ `at` 是**锚点落在哪**，不是左上角（票 48）。四件事共用它：
+ *   校验器（`auditGameConfig`）· 外壳的纯层（`packages/demo` 的 `world.ts`）·
+ *   `compile-game` 的 HUD 自检 · 站点装配。
+ *   ⚠️ 交付态坐标是整数，盒子也**取整** —— 不取整的话「校验过的盒子」与
+ *   「画出来的位置」会差半像素，而那正是**静默**糊掉像素网格的那一类。
+ */
+export const entityBox = (
+  at: { x: number; y: number }, size: { w: number; h: number }, anchor: { x: number; y: number },
+) => ({
+  x: Math.round(at.x - anchor.x * size.w),
+  y: Math.round(at.y - anchor.y * size.h),
+  w: size.w, h: size.h,
+});
 
 export const PlayerMove = z.object({
   /** 水平速度（像素/秒）。 */
@@ -270,11 +287,8 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
    *   逐帧锚点归渲染（外壳那边由 Phaser 自己逐帧 `setOrigin`）。
    *   ⚠️ 盒子取整（与外壳 `boxAt` 同一个公式）—— 交付态坐标是整数，盒子也该是。
    */
-  const boxOf = (at: { x: number; y: number }, size: { w: number; h: number } | null, assetId?: string) => {
-    const s = size ?? { w: 1, h: 1 };
-    const a = anchorOf(assetId);
-    return { x: Math.round(at.x - a.x * s.w), y: Math.round(at.y - a.y * s.h), w: s.w, h: s.h };
-  };
+  const boxOf = (at: { x: number; y: number }, size: { w: number; h: number } | null, assetId?: string) =>
+    entityBox(at, size ?? { w: 1, h: 1 }, anchorOf(assetId));
 
   const inWorld = (where: string, b: { x: number; y: number; w: number; h: number }) => {
     if (b.x + b.w > W || b.y + b.h > H)

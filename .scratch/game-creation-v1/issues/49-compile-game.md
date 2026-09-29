@@ -1,9 +1,16 @@
 # 49. `compile-game` —— 需求 + 资源清单 → game-config（与 `derive` 对称）
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: —
 Map: ../map.md
+> ✅ **2026-09-29 已决议** —— 见文末 Answer。**拿真模型跑通了整条链**：
+> 需求 → 一次 LLM 调用 → game-config →（票 33）站点 → 浏览器，零错误，**一次就过**。
+> ⚠️ 两条判定见 §4：坏配置**照常落盘但明确标出来**（人过目得先有东西可看）；
+> **第四族不在这里跑**（它是包的性质，不是配置的性质 —— 可证明）。
+> ⚠️ 顺带修了一处真问题：**盒子公式曾经有两份实现**（contracts 的 `boxOf` 与 demo 的 `boxAt`），
+> 已收成 contracts 的 `entityBox`，三处共用。
+
 
 > 由[票 33](33-runtime-assembly.md) 毕业。⚠️ 它**不是**票 33 的射程 —— 票 32 把 33 收窄成
 > 「构建期：`(包, game-config, out根) → site/v<N>/`」，而**票 09 §5 点名 `compile-game`
@@ -49,3 +56,111 @@ Map: ../map.md
 ### 不归本票
 
 - **装配** —— [票 33](33-runtime-assembly.md) 已 resolved。
+
+---
+
+## Answer
+
+**结论：`compile-game` 落地了，而且**拿真模型跑通了整条链**。**
+需求 → **一次 LLM 调用** → game-config → 站点 → **浏览器里跑起来**，零错误。
+全套 **342/342** 绿 · `pnpm check` 绿 · `compile-game` **11 条**测试。
+
+**产物 B 的那条链从此首尾闭合**：一段需求进去，一个打开即玩的站点出来。
+
+### 1. 真跑了一遍（票面：「最好拿真跑一遍来证明」）
+
+```
+node packages/cli/dist/cli.mjs compile-game \
+  --requirement inputs/last-train/PROMPT.md \
+  --pack fixtures/packs/last-train/v2 --out out
+```
+
+→ `out/last-train/game-configs/v1.json`（v1）· 7 个实体 · 3 个拾取物 · 世界 1440×270
+→ **✅ 校验全过**（三族 + HUD 屏幕空间），**一次就过**，没有重试。
+
+然后拿**它**去装配 + 开浏览器：
+
+```
+node packages/cli/dist/cli.mjs site fixtures/packs/last-train/v2 \
+  --config out/last-train/game-configs/v1.json --out out
+```
+
+→ `site/v3` · 画布 1 · **页内 0 异常 · 控制台 0 报错** · 截图 `out/__probe/shot-compiled.png`。
+
+⚠️ **模型把最要命的那条做对了**：所有东西都写 `at.y = 250`（**站在地面线上**），
+而不是 `250 − 高`。它甚至自己推出「第二件失物应该摆在行李堆**顶上**」（`y: 210`）——
+这正是票 48 定死的锚点语义。HUD 也写了屏幕空间的 `x: 8`，不是世界坐标的 `x: 1000`。
+
+### 2. 输入用**资源包的 manifest**，不用配方
+
+票面写的是「需求 + 资源清单」。清单有两种状态：`asset-recipe/v1`（配方）与 **manifest（实现态）**。
+选了 manifest —— 因为它是 config **必须解析通过**的那一份。
+用配方会让「模型看到的」与「校验依据的」成为两份东西，而那正是本仓库反复吃的亏。
+
+### 3. 提示词是这票的真活，而且**示例是可断言的**
+
+票 40 抓到过三条「**提示词教模型写一个会被自己拒收的形状**」。这里有三条同等风险的新规则，
+全部写进了铁律：
+
+- ⚠️ **`at` 是锚点落点**，底边中心的资源「站在地面线上」写 `at.y = 地面线的 y`（**不是** `− 高`）
+- ⚠️ **`hud` 是屏幕空间**（≤ 480×270），不是世界空间（世界可以宽 1440）
+- ⚠️ `world.size.h` **必须等于视口高**
+
+⭐ **示例是一个带类型的导出**（`gameConfigExample`），所以测试能**直接断言它过 schema**：
+
+```
+it("gameConfigExample 是一份合法的 game-config —— 示例错了，模型就会以「看起来没问题」的方式错")
+```
+
+并另有一条断言「示例里的 HUD 不能示范拿世界坐标写 HUD」。**示例不再靠人眼看它对不对。**
+
+### 4. 两条我判的（票面留的问题）
+
+**① 坏配置**照常落盘**，但明确标出来。** 票 09 裁决 2 说「先落盘、**人过目**、再装配」——
+而人过目的前提是**他看得到哪儿不对**。不落盘的话他连看的东西都没有。
+所以：校验结果逐条进 `summary`（`❌ where: 怎么了`）与 `data.issues`，`data.ok` 给机器判。
+
+**② 第四族（几何）不在这一票跑。** 它**是包的性质，不是配置的性质**，可以证明：
+可平铺的层无论世界多宽都盖得住（`(W−V)(1−p) ≥ 0`）；不平铺的层只要 `parallax = 0`，
+对**任何** `W` 都盖得住。⇒ 模型写的 config **没法**造成第四族失败，跑它等于在检查包 ——
+而那件事 `site` 已经做了。
+**但第五族（HUD 屏幕空间）跑了** —— 它**确实**取决于 config（模型最容易犯的错），
+而契约层的校验看不到视口。用的就是外壳那个 `entityBox` + 调用方传进来的视口。
+
+### 5. 顺带修的一处真问题：盒子公式曾经有**两份实现**
+
+`packages/contracts` 的 `boxOf` 与 `packages/demo` 的 `boxAt` 是**同一个公式的两份拷贝** ——
+票 48 的整个结论是「只此一处算盒子」，但我当时只在 `auditGameConfig` 内部统一了。
+已收成 contracts 导出的 **`entityBox`**，校验器 / 外壳纯层 / `compile-game` 三处共用。
+⚠️ 这个公式一旦有两份，「校验过的盒子」与「画出来的盒子」就会差一点点 ——
+而那正是**静默**糊掉像素网格的那类错。
+
+### 6. 对外面
+
+- CLI `game-maker compile-game --requirement <需求.md> --pack <资源包目录>`
+- MCP `compile_game`（**工具面五个 → 六个**；钉住数量的那条测试已改）
+- 两个壳都把**外壳那一份** `VIEWPORT` 传给 core —— 这个常量在仓里只有一个值。
+
+### 7. 产物 B 的完整链（现在全都在了）
+
+```
+需求.md ──derive──▶ 资源清单 ──pack──▶ 资源包 ─┐
+                  │                            ├─ site ─▶ site/v<N>/ ─▶ 打开即玩
+                  └──compile-game──▶ game-config ┘
+```
+
+⚠️ 两条路都开（R7 的口径）：**配置也可以人手写**（`fixtures/game-configs/last-train.json`
+就是人写的那一份，票 33 产），`compile-game` 是**推导**那条路。
+有意思的是两份都合法，但**不一样** —— 手写那份的三件失物都摆在地面线上，
+编译那份把第二件摆到了行李堆顶上。
+
+### 8. 完成条件逐条
+
+| 票面要求 | 状态 |
+|---|---|
+| `compileGame()` 落在 `packages/assets` | ✅ 与 `deriveRecipe` 同类同处 |
+| 输入带资源清单（id 与动画名是真的） | ✅ 用包 manifest（理由见 §2） |
+| 输出 `out/<id>/game-configs/v<N>.json`，绝不覆盖 | ✅ |
+| 落盘前跑校验 | ✅ 三族 + HUD 屏幕空间；第四族不跑（§4） |
+| CLI + MCP 对外面 | ✅ 六个工具 |
+| ⚠️ 提示词里的示例逐字可过校验 | ✅ **有测试盯着**（§3） |
