@@ -1,0 +1,31 @@
+// 一次操作的**对外回报形状** —— 两个壳（CLI / MCP）与所有 core 操作共用的那一份。
+//
+// ⚠️ **2026-09-29 从 `packages/assets` 搬到这里**（票 33）。理由：`site` 装配住在
+//   `@game-maker/demo`，而依赖图里 **demo 只能依赖 contracts**（R6：A 与 B 可独立交付）——
+//   拿不到这一份，demo 就只能自己再写一个「长得差不多」的回报形状，
+//   而那正是本仓库反复吃的那个亏（两边各写一份必然漂移）。
+//   `assets` 仍然**原样再导出**，所以两个壳与既有调用方一行都不用改。
+//
+// ⚠️ 它是**纯形状 + 两个小工具**，不含任何业务：退出码语义、失败的载体。
+export type CommandResult = {
+  command: string;
+  /** 人类可读的几行。CLI 直接打印，MCP 放进 content。 */
+  summary: string[];
+  /** 机器可读的载荷。**路径一律相对 `outRoot`**（票 30：绝对路径会把「产物在哪儿」与「这台机器上的哪里」绑死）。 */
+  data: Record<string, unknown>;
+  /** 产物（相对 `outRoot` 的路径 + 种类）。 */
+  artifacts: { path: string; kind: string }[];
+};
+
+/**
+ * 退出码语义。
+ * ⚠️ **2026-09-25 起 `upstream`(3) 变得可达了** —— 降级链拆掉之后，上游死活不再被兜底吸收，
+ * 生成失败就是失败。此前 `pack` 永远不会返回 3（死活都出包，只是产物难看）。
+ */
+export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as const;
+
+/** 失败**不**放进 `CommandResult.outcome` —— 它抛。这样「成功」这个类型里没有假货。 */
+export class CommandError extends Error {
+  constructor(readonly kind: keyof typeof EXIT, message: string) { super(message); this.name = "CommandError"; }
+}
+export const exitCodeOfError = (e: unknown): number => (e instanceof CommandError ? EXIT[e.kind] : EXIT.failure);

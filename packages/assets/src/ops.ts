@@ -16,29 +16,10 @@ import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, styleBrief } from "./prompt.js";
 
-export type CommandResult = {
-  command: string;
-  /** 人类可读的几行。CLI 直接打印，MCP 放进 content。 */
-  summary: string[];
-  /** 机器可读的载荷。路径一律相对 `outRoot`。 */
-  data: Record<string, unknown>;
-  /** 产物（相对 `outRoot` 的路径 + 种类）。 */
-  artifacts: { path: string; kind: string }[];
-};
-
-/**
- * 退出码语义。
- * ⚠️ **2026-09-25 起 `upstream`(3) 变得可达了** —— 降级链拆掉之后，上游死活不再被兜底吸收，
- * 生成失败就是失败。此前 `pack` 永远不会返回 3（死活都出包，只是产物难看）。
- */
-export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as const;
-
-/** 失败**不**放进 `CommandResult.outcome` —— 它抛。这样「成功」这个类型里没有假货。 */
-export class CommandError extends Error {
-  constructor(readonly kind: keyof typeof EXIT, message: string) { super(message); this.name = "CommandError"; }
-}
-export const exitCodeOfError = (e: unknown): number => (e instanceof CommandError ? EXIT[e.kind] : EXIT.failure);
-
+// ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
+//   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
+import { CommandError, EXIT, type CommandResult } from "@game-maker/contracts";
+export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
 

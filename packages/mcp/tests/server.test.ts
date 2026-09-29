@@ -35,10 +35,13 @@ describe("MCP 协议面", () => {
     expect(await drive([{ jsonrpc: "2.0", method: "notifications/initialized" }])).toEqual([]);
   });
 
-  it("工具面是四个，且每个的 description 都写了「何时用」与「会失败的情况」", async () => {
+  it("工具面是五个，且每个的 description 都写了「何时用」与「会失败的情况」", async () => {
+    // ⚠️ 票 30 落地时是**四个**；票 33 落 `site` 装配，**加了第五个**（`assemble_site`）——
+    //   它是 R6 那条「一个资源包 + 一份配置 → 打开即玩」的入口。
     const [r] = await drive([{ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }]);
     const tools = r.result.tools;
-    expect(tools.map((t: { name: string }) => t.name)).toEqual(["derive_recipe", "build_asset_pack", "verify_asset_pack", "inspect_asset_pack"]);
+    expect(tools.map((t: { name: string }) => t.name)).toEqual(
+      ["derive_recipe", "build_asset_pack", "verify_asset_pack", "inspect_asset_pack", "assemble_site"]);
     for (const t of tools) {
       expect(t.description, t.name).toMatch(/何时用/);
       expect(t.inputSchema.type).toBe("object");

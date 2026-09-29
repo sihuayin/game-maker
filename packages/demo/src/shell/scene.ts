@@ -190,7 +190,7 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
     }
 
     private addHud(): void {
-      const p = world.hud.panel;
+      const p = world.hud.panel.draw;
       if (p.missing) { this.addPlaceholder(p, DEPTH_HUD, 0); }
       else {
         // ⚠️ 九宫格：边界值由**图集 JSON 的每帧 `scale9Borders`** 带进来

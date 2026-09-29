@@ -90,9 +90,14 @@ export type PlayerDesc = {
 };
 
 export type HudDesc = {
-  panel: Drawn;
+  /**
+   * HUD 的摆放。⚠️ **盒子一并给出来**（与 `BackgroundLayer` 同款）——
+   *   HUD 是**屏幕空间**的，装配期要拿这个盒子对**视口**（不是 `world.size`）校验，
+   *   而那两处必须用**同一个盒子**，否则「校验过的」与「画出来的」又是两份。
+   */
+  panel: { draw: Drawn; box: Box };
   /** 一个拾取物一个槽 —— 槽位数 = `pickupCount`（**同一个数**，票 09 裁决 8）。 */
-  pips: { draw: Drawn; at: Vec }[];
+  pips: { draw: Drawn; at: Vec; box: Box }[];
 };
 
 export type WorldDescription = {
@@ -231,7 +236,8 @@ export function buildWorld(
     return {
       shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { ...VIEWPORT },
       atlases: [], issues,
-      background: [], terrain: [], entities: [], hud: { panel: hudFallback("没有资源包"), pips: [] },
+      background: [], terrain: [], entities: [],
+      hud: { panel: { draw: hudFallback("没有资源包"), box: { x: 0, y: 0, w: VIEWPORT.w, h: VIEWPORT.h } }, pips: [] },
       player: fallbackPlayer(issues), objective: { gate: "", pickupCount: 0 },
     };
   }
@@ -239,7 +245,8 @@ export function buildWorld(
     return {
       shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { ...VIEWPORT },
       atlases, issues,
-      background: [], terrain: [], entities: [], hud: { panel: hudFallback("没有 game-config"), pips: [] },
+      background: [], terrain: [], entities: [],
+      hud: { panel: { draw: hudFallback("没有 game-config"), box: { x: 0, y: 0, w: VIEWPORT.w, h: VIEWPORT.h } }, pips: [] },
       player: fallbackPlayer(issues), objective: { gate: "", pickupCount: 0 },
     };
   }
@@ -340,11 +347,15 @@ export function buildWorld(
   const panelSize = cfg.hud.panel.size;
   const hudPanel = resolveDraw(pack, cfg.hud.panel.at, { asset: cfg.hud.panel.asset },
     issues, "hud.panel", cfg.hud.panel.asset, panelSize);
-  const pips = Array.from({ length: pickups }, (_, i) => ({
-    draw: resolveDraw(pack, { x: cfg.hud.pip.at.x + i * cfg.hud.pip.step.x, y: cfg.hud.pip.at.y + i * cfg.hud.pip.step.y },
-      { asset: cfg.hud.pip.asset }, issues, `hud.pip[${i}]`, cfg.hud.pip.asset),
-    at: { x: cfg.hud.pip.at.x + i * cfg.hud.pip.step.x, y: cfg.hud.pip.at.y + i * cfg.hud.pip.step.y },
-  }));
+  const pipSize = assetSize(pack, cfg.hud.pip.asset) ?? FALLBACK_SIZE;
+  const pipAnchor = anchorOf(pack, cfg.hud.pip.asset);
+  const pips = Array.from({ length: pickups }, (_, i) => {
+    const at = { x: cfg.hud.pip.at.x + i * cfg.hud.pip.step.x, y: cfg.hud.pip.at.y + i * cfg.hud.pip.step.y };
+    return {
+      draw: resolveDraw(pack, at, { asset: cfg.hud.pip.asset }, issues, `hud.pip[${i}]`, cfg.hud.pip.asset),
+      at, box: boxAt(at, pipSize, pipAnchor),
+    };
+  });
 
   // 终点实体在不在 —— 校验期已挡过，这里只再确认一次（坏数据要显形）
   if (!cfg.entities.some((e) => e.id === cfg.objective.gate && e.kind === "goal"))
@@ -353,7 +364,7 @@ export function buildWorld(
   return {
     shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { w: W, h: H }, atlases, issues,
     background, terrain, entities, player,
-    hud: { panel: hudPanel, pips },
+    hud: { panel: { draw: hudPanel, box: boxAt(cfg.hud.panel.at, panelSize, anchorOf(pack, cfg.hud.panel.asset)) }, pips },
     objective: { gate: cfg.objective.gate, pickupCount: pickups },
   };
 }

@@ -7,12 +7,14 @@ import {
   CommandError, EXIT, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
+import { assembleSite } from "@game-maker/demo";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 用法：
   game-maker derive --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
   game-maker pack   --recipe <清单.json> [--out <目录>] [--json]
+  game-maker site   <资源包目录> --config <game-config.json> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
 
@@ -25,6 +27,9 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   1  失败   2  参数错   3  上游不可达   4  产物/清单不合法
   ⚠️ 3 在 2026-09-25 之前从 pack 里返回不出来（上游死活都被降级链兜住、照样出包）。
 
+⚠️ 打开站点时 **HTTP server 的根必须是 <out>/<gameId>/**（pack/ 与 site/ 的父目录）——
+   根指到 site 里面会 404，而 Phaser 的 loader **静默失败**。
+
 环境变量：
   ANTHROPIC_BASE_URL · ANTHROPIC_AUTH_TOKEN   文本上游（生成与推导要用）
 `;
@@ -34,7 +39,7 @@ type Parsed = { command: string; positionals: string[]; flags: Record<string, st
 export function parseArgs(argv: readonly string[]): Parsed {
   const positional: string[] = [];
   const flags: Record<string, string | boolean> = {};
-  const takesValue = new Set(["requirement", "style", "out", "recipe"]);
+  const takesValue = new Set(["requirement", "style", "out", "recipe", "config", "shell", "game-id"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a === "--help" || a === "-h") { flags.help = true; continue; }
@@ -87,6 +92,23 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
         result = await packAssets({
           recipePath: path.resolve(flags.recipe), outRoot, transport,
           ...(img.transport ? { imageTransport: img.transport } : {}),
+        });
+        break;
+      }
+      case "site": {
+        const dir = positionals[0]; if (!dir) throw new CommandError("usage", "site 需要一个资源包目录");
+        if (typeof flags.config !== "string") throw new CommandError("usage", "site 需要 --config <game-config.json>");
+        // 外壳 bundle 是仓库的构建产物（`pnpm --filter @game-maker/demo bundle`）。
+        // ⚠️ 默认按**仓库布局**找；独立安装时用 --shell 显式给。
+        const shell = typeof flags.shell === "string"
+          ? path.resolve(flags.shell)
+          : path.resolve("packages/demo/dist/shell.js");
+        result = assembleSite({
+          packDir: path.resolve(dir),
+          configPath: path.resolve(flags.config),
+          shellJsPath: shell,
+          outRoot,
+          ...(typeof flags["game-id"] === "string" ? { gameId: flags["game-id"] } : {}),
         });
         break;
       }

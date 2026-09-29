@@ -68,6 +68,9 @@ export * from "./geometry.js";
 // ── 交付态：资源包自描述 ──────────────────────────────────────────────────
 export * from "./assetpack.js";
 
+// ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────
+export * from "./command.js";
+
 // ── 游戏配置：AI 与手写 runtime 之间唯一的语义接口 ─────────────────────────
 export * from "./game-config.js";
 

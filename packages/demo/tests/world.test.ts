@@ -16,10 +16,10 @@ const EMPTY = read("../fixtures/empty-world.json");
  * ⚠️ 它的数字是按**锚点语义**写的 —— `at` 是「**锚点落在哪**」，不是左上角：
  *   角色的锚点是 `{x:.5,y:.95}`（脚），道具是 `{x:.5,y:1}`（底边中心），
  *   HUD 面板是 `{x:0,y:1}`（左下角）。所以「站在地面线上」= `at.y = 地面 y`。
- * ⚠️ **真事变例归票 33**（它依赖外壳的视口与玩家尺寸）；这份存在的理由是
- *   **让外壳今天就能端到端冒烟**，票 33 要么采纳它、要么替换它。
+ * ⚠️ **它就是票 31 要的那份「last-train 的 fixture game-config」**（票 33 产）。
+ *   `fixtures/` 现在是**唯一来源** —— 外壳测试、站点装配、端到端冒烟读的都是它。
  */
-const BASE = read("../fixtures/last-train.world.json");
+const BASE = read("../../../fixtures/game-configs/last-train.json");
 /** 每个用例都从**深拷**一份改 —— 反例才有意义（`structuredClone` 免得串味）。 */
 const valid = (over: Record<string, unknown> = {}) => ({ ...structuredClone(BASE), ...over });
 
@@ -38,7 +38,7 @@ describe("零数据：起得来（票 32 裁决 3）", () => {
     expect(w.worldSize).toEqual(VIEWPORT);
     expect(w.atlases).toEqual([]);
     expect(w.player.draw.missing).toBe(true);
-    expect(w.hud.panel.missing).toBe(true);
+    expect(w.hud.panel.draw.missing).toBe(true);
     expect(w.issues.length, "坏数据必须留下痕迹").toBeGreaterThan(0);
     expect(w.shellVersion).toBe(SHELL_VERSION);
   });
@@ -67,7 +67,7 @@ describe("空场景最小数据集：数据全错也不白屏", () => {
       ...w.background.map((l) => l.box),
       w.player.box,
       ...(w.player.draw.missing ? [boxOf(w.player.draw)] : []),
-      ...(w.hud.panel.missing ? [boxOf(w.hud.panel)] : []),
+      ...(w.hud.panel.draw.missing ? [boxOf(w.hud.panel.draw)] : []),
     ];
     expect(boxes.length).toBeGreaterThan(0);
     for (const b of boxes) expect(inViewport(b), `占位符跑到画布外了：${JSON.stringify(b)}`).toBe(true);
@@ -129,7 +129,7 @@ describe("正常数据：last-train 装配正确", () => {
     expect(w.objective.pickupCount).toBe(3);
     expect(w.hud.pips).toHaveLength(3);
     expect(w.hud.pips.map((p) => p.at.x)).toEqual([12, 32, 52]);   // step.x = 20
-    if (!w.hud.panel.missing) expect({ w: w.hud.panel.w, h: w.hud.panel.h }).toEqual({ w: 72, h: 32 });
+    expect(w.hud.panel.box).toEqual({ x: 8, y: 230, w: 72, h: 32 });   // 锚点 {x:0,y:1} ⇒ 底边压在 262
   });
 
   it("地形与终点：盒子原样搬运，`gate` 指向真的 goal 实体", () => {

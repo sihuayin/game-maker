@@ -10,6 +10,7 @@ import {
   CommandError, deriveRecipe, exitCodeOfError, inspectPack, packAssets, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
+import { assembleSite } from "@game-maker/demo";
 
 const PROTOCOL_VERSION = "2025-06-18";
 
@@ -66,6 +67,26 @@ const TOOLS = [
       "它不校验 checksum（那是 verify_asset_pack 的事）。",
     inputSchema: { type: "object", properties: { packDir: { type: "string", description: "资源包目录" } }, required: ["packDir"] },
   },
+  {
+    name: "assemble_site",
+    description:
+      "把一个资源包 + 一份 game-config 装配成一个**静态可托管的站点目录**（产物 B），落盘到 <out>/<gameId>/site/v<N>/。\n" +
+      "站点 = 三份数据 + 一份共用 bundle（index.html / shell.js / site.json / game-config.json），绝不覆盖，每次写新的 v<N>。\n" +
+      "何时用：已经有了一个校验通过的游戏配置，想把它跑起来。\n" +
+      "**起服务时 HTTP server 的根必须是 <out>/<gameId>/**（pack/ 与 site/ 的父目录）—— 根指到 site 里面会 404，而 Phaser 静默失败。\n" +
+      "会失败的情况：包或配置不过 schema、**装配期校验不过**（引用/自洽/可通关/几何/HUD 屏幕空间），这些都**硬失败**、不产出站点。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        packDir: { type: "string", description: "资源包目录（含 manifest.json 的那种目录）" },
+        configPath: { type: "string", description: "game-config JSON 的路径" },
+        shellPath: { type: "string", description: "外壳 bundle 的路径，默认 packages/demo/dist/shell.js" },
+        outDir: { type: "string", description: "产物根目录，默认 ./out。回报的路径都相对于它" },
+        gameId: { type: "string", description: "站点目录名，默认取资源包自己的 id" },
+      },
+      required: ["packDir", "configPath"],
+    },
+  },
 ] as const;
 
 type Rpc = { jsonrpc: "2.0"; id?: number | string; method: string; params?: Record<string, unknown> };
@@ -119,6 +140,14 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             break;
           case "verify_asset_pack":
             result = verifyPack({ packDir: String(args.packDir) });
+            break;
+          case "assemble_site":
+            result = assembleSite({
+              packDir: String(args.packDir), configPath: String(args.configPath),
+              shellJsPath: String(args.shellPath ?? "packages/demo/dist/shell.js"),
+              outRoot: String(args.outDir ?? "out"),
+              ...(args.gameId === undefined ? {} : { gameId: String(args.gameId) }),
+            });
             break;
           case "inspect_asset_pack":
             result = inspectPack({ packDir: String(args.packDir) });

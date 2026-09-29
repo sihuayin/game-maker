@@ -7,7 +7,8 @@
   "//": "⚠️ **只编译纯层**。`src/shell/` 走 tsconfig.shell.json —— 那条缝就是「纯函数不许碰 DOM」这条纪律的结构化落点（票 44 的判据：纯函数是外壳可测的全部理由）。",
   "include": [
     "src/index.ts",
-    "src/world.ts"
+    "src/world.ts",
+    "src/site.ts"
   ],
   "references": [
     {
