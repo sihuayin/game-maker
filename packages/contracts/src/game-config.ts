@@ -79,6 +79,12 @@ export const Entity = z.object({
  */
 export const DEFAULT_PLAYER_MOVE = { speed: 90, jumpVelocity: 330, gravity: 900 } as const;
 
+/**
+ * 资源解不到时算盒子用的兜底锚点。**与外壳（票 44）是同一个值** ——
+ * 世界里的东西绝大多数是「底边中心」（票 40 的真包：`{x:.5,y:1}`）。
+ */
+const FALLBACK_ANCHOR = { x: 0.5, y: 1 } as const;
+
 export const PlayerMove = z.object({
   /** 水平速度（像素/秒）。 */
   speed: z.number().positive(),
@@ -248,27 +254,46 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
 
   // ── 自洽族（硬失败）────────────────────────────────────────────────────
   const { w: W, h: H } = config.world.size;
-  const inWorld = (where: string, box: { x: number; y: number }, w = 1, h = 1) => {
-    if (box.x + w > W || box.y + h > H) err(where, `落在世界之外（世界 ${W}×${H}，这里是 (${box.x},${box.y}) ${w}×${h}）`);
-  };
-  for (const [i, t] of config.terrain.entries()) inWorld(`terrain[${i}]`, t, t.w, t.h);
-  for (const e of config.entities) {
-    const s = e.body ?? sizeOf(e.asset);
-    inWorld(`entity "${e.id}"`, e.at, s?.w ?? 1, s?.h ?? 1);
-  }
-  inWorld("player.at", config.player.at, 1, 1);
-  inWorld("hud.panel", config.hud.panel.at, config.hud.panel.size.w, config.hud.panel.size.h);
 
-  // 出生点不能卡在墙里 —— 点在某个 solid 的体内就是硬失败。
-  const solids = config.entities.filter((e) => e.kind === "solid");
-  const inside = (p: { x: number; y: number }, e: GameEntity) => {
-    const s = e.body ?? sizeOf(e.asset);
-    if (!s) return false;
-    // 实体的 `at` 是**锚点**位置；这里只做「点是否落在以 at 为左上角的盒内」这个近似 ——
-    // 精确判据要读资源的 anchor，而那是**产物的属性**，装配期拿得到但这一层不该依赖它。
-    return p.x >= e.at.x && p.x <= e.at.x + s.w && p.y >= e.at.y && p.y <= e.at.y + s.h;
+  /** 资源级锚点（manifest 上那一份）。取不到就用兜底 —— 与外壳（票 44）同款。 */
+  const anchorOf = (assetId: string | undefined) =>
+    (assetId ? manifest.assets.find((a) => a.id === assetId)?.anchor : undefined) ?? FALLBACK_ANCHOR;
+
+  /**
+   * 一个东西在世界上**占的那个盒子**（左上角 + 宽高）。**全函数只此一处算盒子。**
+   *
+   * ⚠️ **`at` 是「资源锚点落在哪」，不是左上角**（票 48）。这条由**包**定死：
+   *   角色的锚点是**脚**（`{x:.5,y:.95}`）、世界里的道具是**底边中心**（`{x:.5,y:1}`）、
+   *   HUD 面板是**左下角**（`{x:0,y:1}`）。所以站在地面线上的东西写 `at.y = 地面 y`，
+   *   而它的盒子是**从 `at` 往上长**的 —— 不是从 `at` 往下。
+   *   ⚠️ 用**资源级**锚点（不是图集里逐帧那一份）：这是**占位/碰撞盒**，要的是稳定；
+   *   逐帧锚点归渲染（外壳那边由 Phaser 自己逐帧 `setOrigin`）。
+   *   ⚠️ 盒子取整（与外壳 `boxAt` 同一个公式）—— 交付态坐标是整数，盒子也该是。
+   */
+  const boxOf = (at: { x: number; y: number }, size: { w: number; h: number } | null, assetId?: string) => {
+    const s = size ?? { w: 1, h: 1 };
+    const a = anchorOf(assetId);
+    return { x: Math.round(at.x - a.x * s.w), y: Math.round(at.y - a.y * s.h), w: s.w, h: s.h };
   };
-  for (const e of solids) if (inside(config.player.at, e)) err("player.at", `出生点卡在 solid "${e.id}" 里`);
+
+  const inWorld = (where: string, b: { x: number; y: number; w: number; h: number }) => {
+    if (b.x + b.w > W || b.y + b.h > H)
+      err(where, `落在世界之外（世界 ${W}×${H}；这个盒子是 (${b.x},${b.y}) ${b.w}×${b.h}）`);
+  };
+  for (const [i, t] of config.terrain.entries()) inWorld(`terrain[${i}]`, t);
+  for (const e of config.entities) inWorld(`entity "${e.id}"`, boxOf(e.at, e.body ?? sizeOf(e.asset), e.asset));
+  inWorld("player.at", boxOf(config.player.at, sizeOf(config.player.asset), config.player.asset));
+  inWorld("hud.panel", boxOf(config.hud.panel.at, config.hud.panel.size, config.hud.panel.asset));
+
+  // 出生点不能卡在墙里 —— 点在某个 solid 的**盒子**里就是硬失败。
+  const solids = config.entities.filter((e) => e.kind === "solid");
+  const inside = (p: { x: number; y: number }, box: { x: number; y: number; w: number; h: number }) =>
+    p.x >= box.x && p.x <= box.x + box.w && p.y >= box.y && p.y <= box.y + box.h;
+  for (const e of solids) {
+    const s = e.body ?? sizeOf(e.asset);
+    if (!s) continue;   // 资源都解不到，谈不上「卡在里面」
+    if (inside(config.player.at, boxOf(e.at, s, e.asset))) err("player.at", `出生点卡在 solid "${e.id}" 里`);
+  }
 
   // ── 可通关族（**警告**）─────────────────────────────────────────────────
   const move = playerMoveOf(config);
@@ -279,7 +304,10 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
   for (const e of solids) {
     const s = e.body ?? sizeOf(e.asset);
     if (!s) continue;
-    const step = groundY - e.at.y;
+    // ⚠️ 台阶高 = 地面线 − **盒子的底边**（不是 `at.y`）。锚点在底边时两者相同，
+    //   锚点在别处时只有盒子这一种读法是对的（票 48：这里以前读的是 `at.y`）。
+    const box = boxOf(e.at, s, e.asset);
+    const step = groundY - (box.y + box.h);
     if (step > apex)
       warn(`entity "${e.id}"`, `台阶高 ${step}px，而最大跳跃高度只有 ${apex.toFixed(1)}px（${move.jumpVelocity}²/(2×${move.gravity})）—— 可能上不去。若这是有意的（该绕路走），忽略本条`);
   }

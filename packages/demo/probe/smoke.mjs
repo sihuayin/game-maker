@@ -53,10 +53,12 @@ setTimeout(function(){document.documentElement.setAttribute('data-probe',JSON.st
 
 function chrome(url, { budget = 9000, shot } = {}) {
   const shotArgs = shot ? [`--screenshot=${shot}`, '--window-size=1000,600'] : [];
+  // ⚠️ **必须带 timeout** —— 实测 `--screenshot` 偶发把无头 Chrome 挂死（有一回挂了 11 小时，
+  //   还占着端口，把后面每一次探针都堵住）。宁可在这里响亮地失败，也不要静静吊死。
   const out = execSync(
     `"${CHROME}" --headless=new --disable-gpu --no-sandbox --virtual-time-budget=${budget} ` +
     `--enable-logging=stderr --v=0 ${shotArgs.join(' ')} --dump-dom "${url}" 2>&1`,
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 120_000 },
   );
   const raw = (out.match(/data-probe="([^"]*)"/) || [])[1];
   const probe = raw ? JSON.parse(raw.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')) : null;
@@ -89,6 +91,8 @@ const ok = (b) => (b ? '✅' : '❌');
 const results = {};
 
 const srv = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: SITE_ROOT, stdio: 'ignore' });
+srv.on('error', (e) => { console.error(`起不了 http server：${e.message}`); process.exit(1); });
+srv.on('exit', (c) => { if (c !== null && c !== 0) console.error(`⚠️ http server 退出了（码 ${c}）—— 端口 ${PORT} 可能被上一次没杀干净的探针占着；\n   查：lsof -nP -iTCP:${PORT} -sTCP:LISTEN`); });
 await new Promise((r) => setTimeout(r, 1200));
 
 const scenarios = [

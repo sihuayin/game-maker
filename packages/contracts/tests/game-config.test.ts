@@ -32,10 +32,10 @@ const base = (over: Partial<GameConfig> = {}): GameConfig => ({
     { id: "signal", kind: "goal", at: { x: 1400, y: 230 }, asset: "signal-endlight", anim: "red" },
   ],
   hud: {
-    // ⚠️ `at` 是**左上角**（与 terrain 的 Rect、实体的 `body` 同一套），不是下边缘。
-    //   世界高 270、面板高 32：`262` 是「底边留 8px」被写成了 `at.y`，于是面板跨 262..294
-    //   —— 落在世界之外。底边留 8px 的正确写法是 `270 - 32 - 8 = 230`。
-    panel: { asset: "hud-lost-slots", at: { x: 8, y: 230 }, size: { w: 72, h: 32 } },
+    // ⚠️ `at` 是**锚点落点**，不是左上角（票 48）。面板的锚点是 `{x:0, y:1}`（左下角），
+    //   所以 `y = 262` 就是「底边离世界底 8px」—— 盒子是 230..262，**本来就对**。
+    //   票 41 曾按左上角近似把它改成 230，那是**修错了地方**（盒子算错，不是夹具写错）。
+    panel: { asset: "hud-lost-slots", at: { x: 8, y: 262 }, size: { w: 72, h: 32 } },
     pip: { asset: "hud-pip", at: { x: 12, y: 250 }, step: { x: 20, y: 0 } },
   },
   objective: { kind: "collect-then-reach", gate: "signal" },
@@ -139,7 +139,9 @@ describe("引用族（硬失败）", () => {
 describe("自洽族（硬失败）", () => {
   it("出生点卡在 solid 里 → 报出来", () => {
     const c = base();
-    c.player = { ...c.player, at: { x: 510, y: 220 } };   // 落在 luggage 的盒内
+    // ⚠️ luggage 的锚点是 `{x:.5,y:1}`、尺寸 40×40，`at = (500,210)`
+    //   ⇒ 盒子是 **(480,170) 40×40**，不是 (500,210)。
+    c.player = { ...c.player, at: { x: 500, y: 190 } };
     expect(errs(c).map((i) => i.message).join()).toMatch(/出生点卡在 solid "luggage" 里/);
   });
 
@@ -147,6 +149,37 @@ describe("自洽族（硬失败）", () => {
     const c = base();
     c.entities[0] = { ...c.entities[0]!, at: { x: 5000, y: 240 } };
     expect(errs(c).map((i) => i.message).join()).toMatch(/落在世界之外/);
+  });
+
+  it("**`at` 是锚点落点，不是左上角** —— 站在地面线上的东西不许被判越界（票 48）", () => {
+    // 世界高 270、地面线 250。底边锚点（`{x:.5,y:1}`）的东西写 `at.y = 250` 就是「站在地上」。
+    // ⚠️ 这条以前会挂：越界检查把 `at` 当左上角，算成 `250 + 40 = 290 > 270` —— **凭空多算一个 h**。
+    const c = base();
+    for (const id of ["luggage", "carriage", "signal"]) {
+      const e = c.entities.find((x) => x.id === id)!;
+      e.at = { x: e.at.x, y: 250 };
+    }
+    expect(errs(c).map(line).join()).toBe("");
+    expect(warns(c).map(line).join()).toBe("");
+  });
+
+  it("盒子的**底边**才是判据 —— 真越界必须被报", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, at: { x: 300, y: 280 } };   // 盒底 280 > 世界底 270
+    expect(errs(c).map(line).join()).toMatch(/entity "suitcase-1".*世界之外/);
+  });
+
+  it("**锚点决定盒子从哪边长** —— 换个 `at`，判决跟着盒子走（这条是锚点语义的守门人）", () => {
+    // ⚠️ 没有这一条，这个 bug 可以一直悄悄活着：**没有一条测试问过「盒子是从哪儿算的」**。
+    // `hud-lost-slots` 锚点 `{x:0,y:1}`（左下角）、尺寸 72×32：
+    //   `at = (8,262)` ⇒ 盒子 (8, 230, 72, 32)，底边正好压在 262（离世界底 8px）✅
+    const ok = base();
+    ok.hud = { ...ok.hud, panel: { ...ok.hud.panel, at: { x: 8, y: 262 } } };
+    expect(errs(ok)).toEqual([]);
+    // 同一个 `at`，把面板再往下推 9px ⇒ 底边 271 > 270，真的出去了 ❌
+    const bad = base();
+    bad.hud = { ...bad.hud, panel: { ...bad.hud.panel, at: { x: 8, y: 271 } } };
+    expect(errs(bad).map(line).join()).toMatch(/hud\.panel.*世界之外/);
   });
 
   it("HUD 面板自己也要落在世界内", () => {
