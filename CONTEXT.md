@@ -243,6 +243,16 @@ drawlist 里没有「实例化另一个资源」这种 op，所以场景组合�
 `economy` / `hud`。与横版共享的**只有**「坐标是整数交付态像素」与「它是一份菜谱」这两条。
 设计文档在 `docs/counter-siege.md`；契约在 `packages/contracts/src/td-config.ts`。
 
+**砖（Tile）** —— ⚠️ **2026-09-29 新词**（塔防那张图，
+[票 07](.scratch/td-compile-v1/issues/07-arena-tile-size.md)）
+[[Td Config]] 的 `arena.tiles` 引用的那种资源 —— **场地是一格一格拼出来的，不是一张整幅的画**。
+⚠️ 它有三条**构造上可判**的性质，缺一条都判为错：① 尺寸**精确等于** `arena.cell`；
+② 锚点在**正中**；③ 是 `sprite` 或 `animation`（不是 `background`）。
+理由：外壳按「格心 + 锚点」摆精灵 —— 比 cell 大就**盖住邻居**、比 cell 小就**留缝、透出外壳底色**、
+锚点偏了整张地图**偏半格**。三条都不会是设计，且**三条都不会自己报错**。
+⚠️ 它是[[观察 / 判据|判据]]里的**引用族**（与「`hud.panel` 必须是 `ui` 类」同款：
+引用的那个东西的**性质**符不符合这里的要求）。
+
 **行为原语（Behavior Primitive）**
 Game Config 能表达的最小行为单位。外壳**写死实现**一组原语，Config 只说
 「哪里有、参数是多少」—— 所以 **Game Config 是一份菜谱，不是一门语言**。
