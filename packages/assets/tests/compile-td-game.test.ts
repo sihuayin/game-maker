@@ -98,11 +98,36 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
 
   it("⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）", async () => {
     const d = tmp();
-    const e = await run(d, "这不是 JSON").catch((x: unknown) => x);
+    const e = await run(d, "这不是 JSON", { attempts: 2 }).catch((x: unknown) => x);
     const ledger = (e as CommandError).ledger;
     expect(ledger, "失败也要把账带出来").toBeDefined();
     expect(ledger![0]!.step).toBe("compile-td-game");
-    expect(ledger![0]!.attempts).toBe(2);       // 两次都试过了
+    expect(ledger![0]!.attempts).toBe(2);       // 两次都试过了（次数是显式给的，不钉默认值）
+  });
+
+  it("⚠️ **校验不过也重采样** —— 真跑量下来「一次就过」只有 ~1/4，而重采样不是修复循环", async () => {
+    // ⚠️ **不把错误喂回去**（那会是修复循环，R2 判过它出局）—— 只是**重采样**同一份提示词。
+    const d = tmp();
+    const bad = structuredClone(GOOD);
+    bad.arena.rows[8] = "#" + ".".repeat(12) + bad.arena.rows[8].slice(13);   // 走道画偏一格
+    let n = 0;
+    const flaky = (async () => new Response(
+      JSON.stringify({ content: [{ type: "text", text: JSON.stringify(n++ === 0 ? bad : GOOD) }] }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    )) as unknown as typeof fetch;
+    const r = await run(d, GOOD, { fetchImpl: flaky });
+    expect(r.data.ok, "第二次过了").toBe(true);
+    expect((r.data.ledger as { attempts: number }[])[0]!.attempts).toBe(2);
+  });
+
+  it("⚠️ 重采样**全失败**也照常落盘最后那一份（人过目的前提是他看得到哪儿不对）", async () => {
+    const d = tmp();
+    const bad = structuredClone(GOOD);
+    bad.arena.rows[8] = "#" + ".".repeat(12) + bad.arena.rows[8].slice(13);
+    const r = await run(d, bad);
+    expect(r.data.ok).toBe(false);
+    expect(fs.existsSync(path.join(d, "out", "counter-siege", "td-configs", "v1.json"))).toBe(true);
+    expect((r.data.ledger as { attempts: number }[])[0]!.attempts).toBe(3);   // 默认三次都试了
   });
 
   it("回报里给出下一步（而「能通关吗」判在 `site` —— 票 11）", async () => {

@@ -25,7 +25,7 @@ import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, recipeShapeSp
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, gameHudScreenItems, parseTdConfig, tdHudScreenItems, type CommandResult } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, gameHudScreenItems, parseTdConfig, tdHudScreenItems, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -505,6 +505,11 @@ export type CompileTdGameOptions = {
   hudLineHeight?: number;
   /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]]。 */
   timeoutMs?: number;
+  /**
+   * 最多试几次。默认 **3**（不是 2 —— **校验不过也重采样**，而真跑量下来一次就过的概率只有 ~1/4）。
+   * ⚠️ 每一次都是**一笔上游调用**，调小它就是省钱。
+   */
+  attempts?: number;
 };
 
 /**
@@ -529,44 +534,58 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
   const vp = opts.viewport ?? DEFAULT_VIEWPORT;
   const prompt = tdConfigPrompt(requirement, tdResourceBrief(manifest), tdConfigExample);
 
-  let checked: ReturnType<typeof parseTdConfig> | null = null;
-  let lastError = "";
-  // ⚠️ 编译是**重采样**，不是修复循环（不把错误喂回去）—— 与 `compileGame` 同一个道理
+  // ⚠️ **校验（三族 + 屏幕空间）**抽成一个内部函数 —— 循环里要用它决定**要不要重采样**。
+  const auditOf = (c: TdConfig): string[] => {
+    const out: string[] = [];
+    for (const i of auditTdConfig(c, manifest))
+      out.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+    for (const i of auditScreenSpace(vp, tdHudScreenItems(c, manifest, { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })))
+      out.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+    return out;
+  };
+
+  // ⚠️ **重采样，不是修复循环**（不把错误喂回去 —— R2 把「自我修复闭环」整体判过出局）。
+  //   而它要重采样的**不只有 schema 失败**：真跑量下来，模型产出的关卡**过不了校验**才是常态
+  //   （8 次里 1 次过；失败几乎全在「路径坐标 vs 地图上画成走道的格」那一族）。
+  //   ⇒ **硬失败也重采样**。⚠️ 每一次都是**一笔上游调用**，所以次数是参数（默认 3）。
   //
   // ⚠️ **账要累计往返次数，不能在每次循环里覆盖成一个**：一次失败的重采样**是花掉的钱**，
   //   而「重试烧掉的额度要能单独看见，否则失败的归因是错的」（`CONTEXT.md` 的「调用 / 往返」）。
   //   （⚠️ `derive` 与 `compileGame` 那边是覆盖式的 —— 那是它们的旧账，本票不顺手改。）
+  const attempts = opts.attempts ?? 3;
+  let picked: TdConfig | null = null;      // 过了校验的那一份
+  let fallback: TdConfig | null = null;    // 最后一份过了 schema 的（校验可能不过）
+  let issues: string[] = [];
+  let lastError = "";
   let trips = 0; let ledger: LedgerCall[] = [];
   const t0 = Date.now();
   try {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      let raw: string;
+    for (let attempt = 0; attempt < attempts; attempt++) {
       trips += 1;
       const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) });
-      raw = r.text;
       // ⚠️ **落账**（票 06 的 Q4）：这一笔花了什么，得有地方记着。
       ledger = [{ step: "compile-td-game", target: "td-config", upstream: "messages", ms: Date.now() - t0, attempts: trips,
         ...(r.servedModel !== undefined ? { model: r.servedModel } : {}), ...(r.usage !== undefined ? { usage: r.usage } : {}) }];
       let parsed: unknown;
-      try { parsed = JSON.parse(stripFences(raw)); }
+      try { parsed = JSON.parse(stripFences(r.text)); }
       catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
       const p = parseTdConfig(parsed);
-      if (p.ok) { checked = p; break; }
-      lastError = `编译出来的关卡不过 schema：${p.errors.slice(0, 4).join("；")}`;
+      if (!p.ok) { lastError = `编译出来的关卡不过 schema：${p.errors.slice(0, 4).join("；")}`; continue; }
+      const got = auditOf(p.value);
+      fallback = p.value; issues = got;
+      if (!got.some((i) => i.startsWith("❌"))) { picked = p.value; break; }
+      lastError = `编译出来的关卡过不了校验（${got.filter((i) => i.startsWith("❌")).length} 条）：` +
+        got.find((i) => i.startsWith("❌"))!.replace(/^❌ /, "");
     }
   } catch (e) {
-    // ⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）——
-    //   包没产出来，它们没有别的家。
+    // ⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）—— 包没产出来，它们没有别的家。
     throw new CommandError("upstream", (e as Error).message, { ledger });
   }
-  if (!checked?.ok) throw new CommandError("invalid", lastError, { ledger });
-  const config = checked.value;
-
-  const issues: string[] = [];
-  for (const i of auditTdConfig(config, manifest))
-    issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
-  for (const i of auditScreenSpace(vp, tdHudScreenItems(config, manifest, { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })))
-    issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+  // ⚠️ **一次都没过 schema** —— 那才是真的没东西可落盘。
+  if (!fallback) throw new CommandError("invalid", lastError, { ledger });
+  // ⚠️ **不过校验也照常落盘**（票 06/09 那条裁决）：**人过目的前提是他看得到哪儿不对**。
+  //   重采样全失败了也一样 —— 落**最后那一份**，并把问题报出来。
+  const config = picked ?? fallback;
 
   const dir = path.join(opts.outRoot, manifest.id, "td-configs");
   fs.mkdirSync(dir, { recursive: true });
