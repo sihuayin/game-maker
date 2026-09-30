@@ -47,6 +47,33 @@ export const AnimatedSpec = z.object({
 }).strict();
 
 /** 场景尺度。与 `sprite` 的分野是**尺寸级别与镜头关系**，不是画法。 */
+/**
+ * **配方里的**一层：与交付清单那份（`Layer`）同形，**多一样只有作者知道的东西 —— 这一层画什么**。
+ *
+ * ⚠️ **为什么另开一个形状，而不是给 `Layer` 加个字段**（2026-09-30 · 票 02）：
+ *   `Layer` 是 `assetpack`（**交付清单**）与这里**共用**的，而 `pack` 会把 `spec.layers`
+ *   **原样拷进 manifest** ⇒ 加在那份上，**作者的散文会进交付清单**（而壳子从不读它）。
+ *   这个分岔在清单里**早就有先例**：`role` 进、`description` 不进。
+ *
+ * ⚠️ 而**不用升 `assetpack/v2 → v3`**：清单那份 `Layer` **一个字没动**，
+ *   磁盘上已有的包照旧解析得过（升版的判据见 `assetpack.ts` 的文件头）。
+ */
+export const LayerSpec = Layer.extend({
+  /**
+   * **这一层画什么。**缺省 = 回落到 `spec.description`（整张场景那份）。
+   *
+   * ⚠️ 不给它的时候，**每一层的提示词里写的都是整张场景** —— 模板那一行原样插 `spec.description`，
+   *   而「整张场景」描述不了「这一层该画哪一段」。这是票 02 要补的那处缝。
+   *
+   * ⚠️ **别跟模板里最远那一支对着写**。模板对最远层另说一套
+   *   （「这一层就是天空……整块画布从头到尾都要是画出来的颜色」），而那段是
+   *   **票 51 四次真跑**量出来的（原禁色清单里那句「天空色」字面上就是「别画天空」）。
+   *   ⚠️ 实测两版都跑过（只写正面 / 再补一句「更近的那几层不要画」），**结果一样** ——
+   *   所以这不是一条硬规矩，是**别去跟一段量出来的话对着写**。
+   */
+  description: z.string().min(1).optional(),
+});
+
 export const BackgroundSpec = z.object({
   kind: z.literal("background"), ...COMMON,
   /**
@@ -59,7 +86,7 @@ export const BackgroundSpec = z.object({
    * ⚠️ **2026-09-26（票 42）**：`tileable` 从**资源级下沉到层**。资源级那个表达不了
    *   「天空不平铺、墙和地平铺」—— 而三层背景里这恰恰是常态，且它当时零消费者。
    */
-  layers: z.array(Layer).optional(),
+  layers: z.array(LayerSpec).optional(),
 }).strict();
 
 /**

@@ -104,9 +104,14 @@ export function framePlan(spec: AssetSpec): FramePlanEntry[] {
 /** 把一段 prompt 要的资源描述出来 —— 生成器的任务块。 */
 export function assetTask(spec: AssetSpec, style: StyleSpec): string {
   const plan = framePlan(spec);
+  // 判别式收窄：`layers` 只有背景有，而 `plan.map` 那个回调是跨四类共用的
+  const bgLayers = spec.kind === "background" ? spec.layers : undefined;
   const lines = plan.map((p, i) =>
     p.layer !== null
-      ? `  第 ${i + 1} 帧（层名 ${p.layer}）：从远到近的第 ${p.index + 1}/${p.total} 层`
+      // ⚠️ **这一层自己那句也带上**（票 02）—— 与生图那条路**读同一个字段**。
+      //   一个字段在一条路上被采纳、在另一条上被默默忽略，是「一个决定两个住址」的另一种写法。
+      ? `  第 ${i + 1} 帧（层名 ${p.layer}）：从远到近的第 ${p.index + 1}/${p.total} 层` +
+        `${bgLayers?.[p.index]?.description ? ` —— ${bgLayers[p.index]!.description}` : ""}`
       : `  第 ${i + 1} 帧：${p.anim === null ? "唯一的一帧" : `${p.anim} 动作的第 ${p.index + 1}/${p.total} 帧`}`);
   const heads = headCount(spec.size.h);
   const shape = spec.kind === "animation"
@@ -247,6 +252,11 @@ function backgroundLayerPrompt(
   //   ⚠️ 所以这里是**另一段文字**，不是「通用那段 + 一句覆盖」——
   //   自相矛盾的提示词模型只执行一条（第三次实验就是这么失败的，动画那一支也吃过一次）。
   const isFarthest = layer.index === 0;
+  // ⚠️ **这一层自己的描述**（2026-09-30 · 票 02）：给了就用它，没给才回落到整张场景那份。
+  //   ⚠️ 而**回落到整张场景时才带上 `role`**：`role` 写的是**整张背景**是什么
+  //   （「三层视差背景：远天、候车室外墙、站台地面与铁轨」）—— 把它接在一层的描述后面，
+  //   等于又把整张场景塞了回来，而那正是这一票在修的东西。
+  const own = spec.layers?.[layer.index]?.description;
   const keyRule = isFarthest
     ? `⚠️⚠️ 最重要的一条，请先读它：**这一层就是「天空」** —— **天空本身就是你要画的东西**，
    不是「没有东西的地方」。整块画布从头到尾都要是画出来的颜色：天要**铺满到每一条边、每一个角**。
@@ -268,7 +278,7 @@ ${keyRule}
 这是这个世界的一个多层场景里，从远到近的**第 ${layer.index + 1} / ${layer.total} 层**，
 这一层叫 **${layer.name}**。
 
-这一层要画的东西：${spec.description}（${spec.role}）
+这一层要画的东西：${own ?? `${spec.description}（${spec.role}）`}
 ${isFarthest ? "⚠️ 它后面**没有别的东西**了 —— 没有画到的地方，玩家看到的就是一片底色。" : ""}
 ${edge}
 

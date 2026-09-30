@@ -93,6 +93,11 @@ export type BuildPackResult = {
 };
 
 /** `#rrggbb` → `[r,g,b]`。⚠️ 色板落盘前已规范化成小写，这里不做兼容性猜测。 */
+/** 配方那侧的一层 → 交付清单那侧的一层。⚠️ **`description` 剥在这里**（票 02）。 */
+const toPackLayer = (l: { name: string; parallax: number; tileable?: { x: boolean; y: boolean } }) => ({
+  name: l.name, parallax: l.parallax, ...(l.tileable ? { tileable: l.tileable } : {}),
+});
+
 const hexToRgb = (hex: string): [number, number, number] => [
   parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16),
 ];
@@ -511,7 +516,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       anchor: b.spec.anchor,
       // 分层背景的层表 —— 它是「资源固有性质」里**唯一**读不到于图集 JSON 的那一条
       // （TexturePacker 没有视差这个概念），壳子只读 manifest，所以必须落在这里。
-      ...(b.spec.kind === "background" && b.spec.layers ? { layers: b.spec.layers } : {}),
+      // ⚠️ **`description` 就剥在这一步**（票 02）：那是**作者**写的东西（「这一层画什么」），
+      //   壳子从不读它，而它已经住在 `authoring/` 里了 ⇒ 不进交付清单。
+      //   与 `role` 进、`description` 不进 是**同一个分工**。
+      ...(b.spec.kind === "background" && b.spec.layers ? { layers: b.spec.layers.map(toPackLayer) } : {}),
       atlasId: atlasIdOf.get(b.spec.id)!,
       // 帧只有名字（票 26：`state` 已降格为单帧动画，不是帧的属性）
       frames: b.frames.map((f) => ({ name: f.name })),

@@ -66,7 +66,8 @@
         "layers": [
           {
             "name": "sky",
-            "parallax": 0
+            "parallax": 0,
+            "description": "整幅黄昏天空：橙红色落日压在山脊剪影后面。天空铺满整块画布"
           },
           {
             "name": "wall",
@@ -74,7 +75,8 @@
             "tileable": {
               "x": true,
               "y": false
-            }
+            },
+            "description": "候车室的外墙带：一排窗户、挂画与壁灯，横向平铺"
           },
           {
             "name": "ground",
@@ -82,7 +84,8 @@
             "tileable": {
               "x": true,
               "y": false
-            }
+            },
+            "description": "站台地面与下方的一小段铁轨，横向平铺"
           }
         ]
       },

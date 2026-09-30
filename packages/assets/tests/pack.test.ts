@@ -373,6 +373,56 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
     expect(prompts[0], "不平铺的层不必接缝").toMatch(/不平铺/);
   });
 
+  const recipeWithLayers = (layers: unknown[]): AssetRecipe => {
+    const r = recipe();
+    return { ...r, assets: r.assets.map((a) => ({ ...a, spec: { ...a.spec, layers } as never })) };
+  };
+
+  it("⚠️ **逐层描述**：每一层用自己的那一句，**缺省才回落**到整张场景（票 02）", async () => {
+    // ⚠️ 实测：不给逐层描述时，**每一层的提示词里写的都是整张场景**，而模型的默认解释是
+    //   「**从这一层往前**」⇒ 最远那层把整张场景画了一遍，最近那层恰好全对。
+    const { prompts, gen } = call(1);
+    await buildAssetPack({
+      recipe: recipeWithLayers([
+        { name: "sky", parallax: 0, description: "整幅黄昏天空，铺满整块画布" },
+        { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },   // 没给 ⇒ 回落
+        { name: "ground", parallax: 1, tileable: { x: true, y: false }, description: "站台地面与铁轨那一条" },
+      ]),
+      style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    });
+    expect(prompts[0]).toContain("整幅黄昏天空，铺满整块画布");
+    expect(prompts[2]).toContain("站台地面与铁轨那一条");
+    // ⚠️ 给了自己那句的层，**不许**再出现整张场景那句 —— 那正是这一票在修的东西
+    expect(prompts[0]).not.toContain("黄昏站台，三层");
+    expect(prompts[2]).not.toContain("黄昏站台，三层");
+    // ⚠️ 没给自己的那层照旧回落，**而且带上 `role`**（回落时它是同一句描述的一部分）
+    expect(prompts[1]).toContain("黄昏站台，三层");
+    expect(prompts[1]).toContain("backdrop");
+  });
+
+  it("⚠️ **作者的散文不进交付清单** —— `layers[].description` 剥在拷进 manifest 那一步（票 02）", async () => {
+    // ⚠️ `Layer` 是**配方与清单共用**的定义，而这一条钉的是它们**在哪儿分岔**：
+    //   `role` 进、`description` 不进（清单里早就是这个分工）。
+    const gen = call(1).gen;
+    const { manifest, audit } = await buildAssetPack({
+      recipe: recipeWithLayers([
+        { name: "sky", parallax: 0, description: "整幅黄昏天空" },
+        { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
+        { name: "ground", parallax: 1, tileable: { x: true, y: false } },
+      ]),
+      style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    });
+    const layers = manifest.assets[0]!.layers!;
+    expect(layers.map((l) => l.name)).toEqual(["sky", "wall", "ground"]);
+    for (const l of layers) expect(l, "交付清单里不该有 description").not.toHaveProperty("description");
+    // ⚠️ 而壳子真要的东西一样都不许少
+    expect(layers[1]!.parallax).toBe(0.5);
+    expect(layers[1]!.tileable).toEqual({ x: true, y: false });
+    // ⚠️ 而**两边形状不同不许把对账绊倒** —— `auditAssetSpec` 是**逐字段**比的
+    //   （name / parallax / tileable），不是整对象比。这一条钉住那个前提。
+    expect(audit).toEqual([]);
+  });
+
   it("⚠️ **最远那层不许再说「别拿天空色去填」**（票 51：那句话字面上就是「别画天空」）", async () => {
     // 票 51 量了四次：把「画满」说硬（70.3%）、改成「天空就是内容」（66.9%）**全都没用**，
     // 而**只拆掉那句禁色** ⇒ **100%**。所以这条钉的不是措辞好不好听，是**那个矛盾在不在了**。

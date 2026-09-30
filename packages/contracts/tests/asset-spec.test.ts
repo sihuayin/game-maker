@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  AssetSpecSchema, auditAssetSpec, boundsOfOps, checkSize, parseDrawList,
+  AssetSpecSchema, Layer, auditAssetSpec, boundsOfOps, checkSize, parseDrawList,
   type AssetPackEntry, type AssetSpec, type DrawList,
 } from "../src/index.js";
 
@@ -82,6 +82,24 @@ describe("按类的硬要求", () => {
       layers: [{ name: "sky", parallax: 0 },
                { name: "ground", parallax: 1, tileable: { x: true, y: false } }],
     }).success).toBe(true);
+  });
+
+  it("⚠️ 层可以带**自己那一句**描述 —— 而它属于**配方**，不属于交付清单（票 02）", () => {
+    // ⚠️ 这一条钉的是**两边的分岔**：`LayerSpec`（配方）比 `Layer`（清单）多一个可选的 `description`。
+    //   实测不给它的时候，**每一层的提示词里写的都是整张场景**，而模型的默认解释是
+    //   「从这一层往前」⇒ 最远那层把整张场景画了一遍。
+    //   ⚠️ 而它**不能**加在共用的那份上：`pack` 会把 `spec.layers` 原样拷进 manifest，
+    //   于是作者的散文会进**交付清单**（壳子从不读它）。清单里早有这个分工：`role` 进、`description` 不进。
+    expect(AssetSpecSchema.safeParse({
+      ...INTERIOR,
+      layers: [{ name: "sky", parallax: 0, description: "整幅黄昏天空，铺满整块画布" },
+               { name: "ground", parallax: 1 }],
+    }).success).toBe(true);
+    // ⚠️ 清单那份**不认**这个键（它 `.strict()`）—— 读者的两种形状必须真的不同
+    expect(Layer.safeParse({ name: "sky", parallax: 0, description: "…" }).success).toBe(false);
+    expect(Layer.safeParse({ name: "sky", parallax: 0 }).success).toBe(true);
+    // 空串不算「有描述」
+    expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ name: "sky", parallax: 0, description: "" }] }).success).toBe(false);
   });
 
   it("资源级的 tileable 已删除 —— 它表达不了「天空不平铺、地平铺」（票 42）", () => {
