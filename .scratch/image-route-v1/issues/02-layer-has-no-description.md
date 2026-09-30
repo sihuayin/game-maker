@@ -1,8 +1,8 @@
 # 02. 分层背景的**每一层没有自己的描述** —— 于是每一层的提示词里都写着整张场景
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber（2026-09-30 认领 · 同日解出）
 Blocked by: —
 Map: ../map.md
 > **由 code-review 的规格轴抓到**，而它在**两个模型**上都复现过：

@@ -1,8 +1,8 @@
 # 03. 抠图底色**从来没对上过** —— 声明色抠不掉，而它让覆盖率门禁失明
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber（2026-09-30 认领 · 同日解出）
 Blocked by: —
 Map: ../map.md
 > **由票 02 的实验顺带抓出来的**，而它比票 02 更靠底层：**在它修好之前，票 02 修得再对，
