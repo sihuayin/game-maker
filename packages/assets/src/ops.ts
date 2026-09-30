@@ -13,7 +13,7 @@ import {
   summarizeCalls,
   type AssetPackManifest, type LedgerCall, type LedgerUsage, type StyleSpec,
 } from "@game-maker/contracts";
-import { createDrawListGenerator, GenerationError, stripFences } from "./generate.js";
+import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
 import { buildAssetPack, type GenerateImage } from "./pack.js";
@@ -21,17 +21,22 @@ import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerat
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
-import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, styleBrief } from "./prompt.js";
+import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, recipeShapeSpec, styleBrief } from "./prompt.js";
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, type CommandResult } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, gameHudScreenItems, type CommandResult } from "@game-maker/contracts";
 export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
 
 // ── derive：需求 + StyleSpec → 资源清单 ──────────────────────────────────────
-export type DeriveOptions = { requirementPath: string; stylePath: string; outRoot: string; transport?: Transport; fetchImpl?: typeof fetch };
+export type DeriveOptions = {
+  requirementPath: string; stylePath: string; outRoot: string;
+  transport?: Transport; fetchImpl?: typeof fetch;
+  /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
+  timeoutMs?: number;
+};
 
 /**
  * 推导一份资源清单。**两阶段的第一阶段**（票 28）—— 清单落盘，人过目，再 `pack`。
@@ -74,15 +79,7 @@ ${styleBrief(style)}
 3. \`background\` 是场景尺度；\`ui\` 是**屏幕空间**（世界里的招牌是 sprite，不是 ui）。
 4. \`animations[].frames\` 是**帧数**（整数），不是帧名。
 
-每个 spec 只许有这些键：kind / id / role / description / styleId / anchor / size / required。
-按类可以另加，且**形状必须逐字如下**：
-  animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
-  background → "layers":[{"name":"sky","parallax":0.3},
-                         {"name":"ground","parallax":1,"tileable":{"x":true,"y":false}}]
-               ← **数组**，每项是对象，**从远到近**排序；层名会拼成帧名 \`<资源 id>.<层名>\`
-               ← 不平铺的层**别写 tileable**（三层里通常只有墙与地平铺，天空不平铺）
-  ui         → "ninePatch":{"left":4,"right":4,"top":4,"bottom":4}
-**多余一个键、或形状不对，就会被拒收。**`;
+${recipeShapeSpec()}`;
 
   // ⚠️ 有界重试，与生成器同一条道理：推导是**重采样**，不是修复循环（不把错误喂回去）。
   //   实测它真的会偶发不过 schema（第一版没有重试，一次形状违规就让整条命令挂掉）。
@@ -95,7 +92,7 @@ ${styleBrief(style)}
     let raw: string;
     const t0 = Date.now();
     try {
-      const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl });
+      const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) });
       raw = r.text;
       deriveCall = [{
         step: "derive", target: "recipe", upstream: "messages", ms: Date.now() - t0, attempts: 1,
@@ -137,15 +134,35 @@ ${styleBrief(style)}
  * ⚠️ 返回**不只是文本**：`usage` 与上游自报的模型名都要带出来（票 45）——
  *   它们是「花了什么」的事实，而这一层过去把它们直接丢了。
  */
-async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof fetch }):
+async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof fetch; timeoutMs?: number }):
 Promise<{ text: string; usage?: LedgerUsage; servedModel?: string }> {
-  const t0 = Date.now();
+  // ⚠️ **没配凭据要在**这里**拦住**，不能让它落到 fetch 上去失败。
+  //   两个壳（CLI 一处 + MCP 三处）永远传一个**定义了、但 `baseUrl` 可能是空串**的对象，
+  //   所以 `ops` 里那些 `if (!opts.transport)` 恒不触发 —— 用户看到的是一个原始 fetch 报错，
+  //   而不是这句话。（票 06 量到的：那句好话站错了地方。）
+  if (opts.baseUrl === "" || opts.apiKey === "")
+    throw new Error(
+      "文本上游没配：ANTHROPIC_BASE_URL 与 ANTHROPIC_AUTH_TOKEN **两个都要给**。" +
+      "⚠️ 但这一步的产物是文件 —— 资源清单与关卡配置都可以由人直接写一份。");
+
   const doFetch = opts.fetchImpl ?? fetch;
-  const res = await doFetch(`${opts.baseUrl}/v1/messages`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-api-key": opts.apiKey, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: "deepseek-v4-pro", max_tokens: 32_000, thinking: { type: "disabled" }, messages: [{ role: "user", content: opts.prompt }] }),
-  });
+  // ⚠️ 超时**做成参数**：否则「上游不响应」这条路径在测试里就要真等 180 秒，而那等于测不了。
+  const timeoutMs = opts.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  let res: Response;
+  try {
+    res = await doFetch(`${opts.baseUrl}/v1/messages`, {
+      method: "POST",
+      signal: ctl.signal,
+      headers: { "content-type": "application/json", "x-api-key": opts.apiKey, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: "deepseek-v4-pro", max_tokens: 32_000, thinking: { type: "disabled" }, messages: [{ role: "user", content: opts.prompt }] }),
+    });
+  } catch (e) {
+    // ⚠️ 中止与「连不上」是**两件事**，而 fetch 都抛 AbortError/TypeError —— 分开报，否则人查错方向
+    if (ctl.signal.aborted) throw new Error(`上游 ${Math.round(timeoutMs / 1000)} 秒没回应，已中止（超时）`);
+    throw e;
+  } finally { clearTimeout(timer); }
   if (!res.ok) throw new Error(`上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
   const j = (await res.json()) as {
     model?: string; content?: { type: string; text?: string }[];
@@ -161,7 +178,6 @@ Promise<{ text: string; usage?: LedgerUsage; servedModel?: string }> {
       ...(u.completion_tokens_details?.reasoning_tokens !== undefined ? { reasoningTokens: u.completion_tokens_details.reasoning_tokens } : {}),
     } } : {}),
   };
-  void t0;
 }
 
 function nextVersion(dir: string): number {
@@ -244,6 +260,10 @@ export type CompileGameOptions = {
   fetchImpl?: typeof fetch;
   /** 外壳视口。默认 480×270（与票 32 的常量同值）。 */
   viewport?: { w: number; h: number };
+  /** 外壳画 HUD 文字的行高（票 09）。默认 [[DEFAULT_HUD_LINE_HEIGHT]] —— ⚠️ 外壳那一份由壳传进来。 */
+  hudLineHeight?: number;
+  /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
+  timeoutMs?: number;
 };
 
 /**
@@ -309,7 +329,7 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   let lastError = "";
   for (let attempt = 0; attempt < 2; attempt++) {
     let raw: string;
-    try { raw = (await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl })).text; }
+    try { raw = (await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) })).text; }
     catch (e) { throw new CommandError("upstream", (e as Error).message); }
     let parsed: unknown;
     try { parsed = JSON.parse(stripFences(raw)); }
@@ -331,21 +351,15 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   for (const i of auditGameConfig(config, manifest))
     issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
 
-  // HUD 的**屏幕空间**边界：校验器看不到视口（那是外壳的常量），所以在这一票里补上。
-  // ⚠️ 模型最容易犯的错就是拿世界坐标写 HUD —— 摆到屏幕外，而契约层的校验放它过去。
-  const pipSize = manifest.assets.find((a) => a.id === config.hud.pip.asset)?.size ?? { w: 1, h: 1 };
-  const panelBox = entityBox(config.hud.panel.at, config.hud.panel.size,
-    manifest.assets.find((a) => a.id === config.hud.panel.asset)?.anchor ?? FALLBACK_ANCHOR);
-  const hudBoxes: [string, { x: number; y: number; w: number; h: number }][] = [["hud.panel", panelBox]];
-  const pickups = config.entities.filter((e) => e.kind === "pickup").length;
-  for (let i = 0; i < pickups; i++) {
-    const at = { x: config.hud.pip.at.x + i * config.hud.pip.step.x, y: config.hud.pip.at.y + i * config.hud.pip.step.y };
-    hudBoxes.push([`hud.pip[${i}]`, entityBox(at, pipSize,
-      manifest.assets.find((a) => a.id === config.hud.pip.asset)?.anchor ?? FALLBACK_ANCHOR)]);
+  // HUD 的**屏幕空间**边界 —— ⚠️ **共用一份**（`auditScreenSpace`），
+  // 不再在这里自己写一遍（票 03：判断那两行两个副本一模一样，差的是措辞与输出形状）。
+  // ⚠️ 而「**有哪些 HUD 项**」也只此一份（`gameHudScreenItems`）——
+  // 两份名单可以**各漏各的**，票 03 量到塔防那边就漏了两个成员。
+  {
+    const screen = auditScreenSpace(vp, gameHudScreenItems(config, manifest,
+      { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT }));
+    for (const i of screen) issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
   }
-  for (const [where, b] of hudBoxes)
-    if (b.x < 0 || b.y < 0 || b.x + b.w > vp.w || b.y + b.h > vp.h)
-      issues.push(`❌ ${where}: HUD 活在**屏幕空间**，必须落在视口 ${vp.w}×${vp.h} 内；而它的盒子是 (${b.x},${b.y}) ${b.w}×${b.h}`);
 
   const dir = path.join(opts.outRoot, manifest.id, "game-configs");
   fs.mkdirSync(dir, { recursive: true });
@@ -353,6 +367,7 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   const file = path.join(dir, `v${version}.json`);
   fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
 
+  const pickups = config.entities.filter((e) => e.kind === "pickup").length;
   const bad = issues.filter((i) => i.startsWith("❌"));
   return {
     command: "compile-game",

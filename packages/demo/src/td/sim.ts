@@ -277,33 +277,64 @@ export function advance(
 // ⚠️ 它**不是作弊码**，是**一个玩家**：它产出的 `TdAction[]` 与鼠标点出来的一模一样，
 //   走的也是同一个 `advance()`。于是「这份配置打得赢吗」变成一条**可以在 vitest 里断言的事**
 //   （见 `tests/td-sim.test.ts`），而截图退回到证明渲染没坏。
-/** 建造顺序：贴着走道的那几个插槽先来。⚠️ 插槽 id 由关卡给，这里只写顺序。 */
-export const AUTO_PLAN: readonly (readonly [string, string])[] = [
-  ["s3", "nailgun"], ["s6", "shock"], ["s4", "nailgun"], ["s7", "floodlight"],
-  ["s1", "nailgun"], ["s5", "shock"], ["s2", "floodlight"], ["s8", "nailgun"], ["s9", "shock"],
-];
+/**
+ * 参考玩家的建造顺序：**沿路径先后铺开** —— 按「插槽最靠近路径的哪个弧长位置」从入口排到柜台。
+ *
+ * ⚠️ **它必须与关卡无关**：只看几何，**不引用任何插槽的 id**、也不看有多少个插槽。
+ *   否则它只能跑它自己那一关，而那正是它要取代的东西（票 02）。
+ *
+ * ⚠️ 为什么是这一条而不是另外两条（票 02 各量过）：
+ *   · 「**离折线最近**」在真关卡上**退化** —— 9 个插槽里 8 个到折线的距离都是 **15.0**
+ *     （正好贴着走道边），这条判据挑不出区别；
+ *   · 「**按覆盖弧长最长**」得先回答「用哪一级射程算」—— 而那个数说不清，
+ *     且两级会挑出**完全不同**的顺序。
+ */
+const ORDER_CACHE = new WeakMap<TdWorldDescription, string[]>();
+function slotOrder(world: TdWorldDescription): string[] {
+  const hit = ORDER_CACHE.get(world);
+  if (hit) return hit;
+  const arcAt = (slot: { at: Vec }) => {
+    let best = Infinity, at = 0;
+    for (let d = 0; d <= world.path.total; d += 1) {
+      const p = pathPointAt(world.path, d);
+      const dd = Math.hypot(p.x - slot.at.x, p.y - slot.at.y);
+      if (dd < best) { best = dd; at = d; }
+    }
+    return at;
+  };
+  const order = [...world.slots].sort((a, b) => arcAt(a) - arcAt(b)).map((s) => s.id);
+  ORDER_CACHE.set(world, order);
+  return order;
+}
 
-/** 参考玩家这一步想做什么。**只读状态，不改。** */
+/**
+ * **参考玩家**这一步想做什么。**只读状态，不改。**
+ *
+ * ⚠️ 它是[[参考玩家]] —— **可通关性的下界，不是难度计**：它赢了只说明这一关不是坏的。
+ *   三条策略都是票 02 量出来的：
+ *   ① **升级优先**（先把已有的升满再铺新的）：同关同顺序下 **20/20 零漏** vs 铺开优先 14/20 漏 4；
+ *   ② **沿路径先后铺开**（见 `slotOrder`）；
+ *   ③ **选型循环关卡提供的种类** —— 按定义与关卡无关，而且会把每一种机关都用上
+ *     （「最便宜」那条永远只建一种，等于让另外两种**根本没被验过**）。
+ *   ⚠️ **它必须确定**：同一份关卡两次跑要给同一串动作（`td-sim.test.ts` 有一条断言钉着它）。
+ */
 export function autoPlay(state: TdState, world: TdWorldDescription): TdAction[] {
   if (state.phase === "won" || state.phase === "lost") return [];
-  // 1) 按计划把能建的建了
-  // ⚠️ **一波正在打的时候照样建** —— 真实玩家就是在打的中间补机关的，
-  //   而第一版把它挡在 `phase === "build"` 里，参考玩家因此比人弱一大截，
-  //   调出来的「平衡」调的是那个假玩家的平衡。
-  for (const [slotId, towerId] of AUTO_PLAN) {
-    if (!world.slots.some((s) => s.id === slotId)) continue;
-    if (state.towers.some((t) => t.slotId === slotId)) continue;
-    const spec = world.towers.find((t) => t.id === towerId);
-    if (!spec || state.scrap < spec.cost) continue;
-    return [{ kind: "build", slotId, towerId }];
-  }
-  // 2) 都建完了就升级
+  // ① 升级优先
   const plain = state.towers.find((t) => t.level === 0);
   if (plain) {
     const spec = world.towers.find((t) => t.id === plain.towerId);
     if (spec && state.scrap >= spec.upgradeCost) return [{ kind: "upgrade", slotId: plain.slotId }];
   }
-  // 3) 没别的可做的、而且**当前不在打**，就开下一波
+  // ② 沿路径先后铺开（⚠️ 一波正在打的时候**照样建** —— 真人就是在打的中间补机关的）
+  for (const slotId of slotOrder(world)) {
+    if (state.towers.some((t) => t.slotId === slotId)) continue;
+    // ③ 循环现有种类
+    const spec = world.towers[state.towers.length % world.towers.length];
+    if (!spec || state.scrap < spec.cost) continue;
+    return [{ kind: "build", slotId, towerId: spec.id }];
+  }
+  // ④ 没别的可做的、而且**当前不在打**，就开下一波
   if (state.phase !== "build") return [];
   return [{ kind: "start-wave" }];
 }

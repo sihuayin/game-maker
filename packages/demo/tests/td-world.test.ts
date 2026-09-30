@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { auditScreenSpace, tdHudScreenItems } from "@game-maker/contracts";
 import { buildTdWorld, pathPointAt, type TdWorldDescription } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
@@ -117,5 +118,41 @@ describe("buildTdWorld：**零数据也必须起得来**（与横版同一条纪
     expect(errs.join("\n")).toMatch(/tower "nailgun": __没有__：包里没有资源 "__没有__"/);
     expect(w.towers[0]!.draw.missing).toBe(true);       // 画不出来 → 占位符
     expect(w.arena.tiles).toHaveLength(576);            // 其余照画，游戏继续
+  });
+});
+
+describe("HUD 的盒子：**校验过的**与**外壳要画的**必须是同一个（票 03）", () => {
+  const items = () => tdHudScreenItems(config(), manifest(), { lineHeight: 10 });
+  const boxOf = (where: string) => items().find((i) => i.where === where)!.box;
+
+  it("panel / start / 每个按钮 —— 与 `tdHudScreenItems` 给的盒子**逐字段相同**", () => {
+    // ⚠️ 这一条钉的是票 03 定下的那条不变量。纯层要是自己再算一遍，
+    //   「校验过的」与「画出来的」就成了两份描述 —— 那是票 48 记下的亏。
+    const w = build();
+    expect(w.hud.panel.box).toEqual(boxOf("hud.panel"));
+    expect(w.hud.start.box).toEqual(boxOf("hud.start"));
+    for (const b of w.hud.buttons) expect(b.box).toEqual(boxOf(`hud.buttons["${b.towerId}"]`));
+  });
+
+  it("⚠️ 塔防的 `hud` **五个成员一个都不漏** —— 票 03 量到原先只覆盖了三个", () => {
+    // 漏掉的正是 `hud.icons` 与 `hud.readout`：那两项原先**没有任何东西**在看。
+    expect(items().map((i) => i.where).sort()).toEqual([
+      "hud.buttons[\"floodlight\"]", "hud.buttons[\"nailgun\"]", "hud.buttons[\"shock\"]",
+      "hud.icons.life", "hud.icons.scrap", "hud.panel", "hud.readout", "hud.start",
+    ].sort());
+  });
+
+  it("`hud.readout` 是**唯一没有盒子**的那一项 —— 纯文字，只有高度算得出来", () => {
+    const r = items().find((i) => i.where === "hud.readout")!;
+    expect(r.box).toBeUndefined();
+    // 三行 ⇒ 起点 + 两倍行距 + 一行行高
+    expect(r.height).toBe(2 * config().hud.readout.step.y + 10);
+  });
+
+  it("而**没有盒子的那一项**也会被屏幕空间那条检查看到（不是悄悄跳过）", () => {
+    // 把读数摆到视口外 —— 只查盒子的话它会溜过去，而它是**起点 + 高度**那一条
+    const out = auditScreenSpace({ w: 480, h: 270 }, [{ where: "hud.readout", at: { x: 10, y: 268 }, height: 28 }]);
+    expect(out).toHaveLength(1);
+    expect(out[0]!.message).toMatch(/纯文字/);
   });
 });

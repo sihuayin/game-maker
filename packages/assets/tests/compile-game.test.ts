@@ -124,4 +124,32 @@ describe("失败的路", () => {
     const e = await run(d, GOOD, { packDir: d }).catch((x: unknown) => x);
     expect((e as CommandError).kind).toBe("usage");
   });
+
+  /**
+   * ⚠️ 上面那条测的是**库调用方不传 transport** —— 而**生产里永远不会那样**：
+   *   两个壳（CLI 一处 + MCP 三处）永远传一个**定义了、但 `baseUrl` 可能是空串**的对象。
+   *   所以那条「配置是文件，人可以直接写一份」的话，**需要它的人摸不到**（票 06 量到的）。
+   *   这一条测的是**真会发生的那条路**。
+   */
+  it("凭据是空串（生产里真会发生的那条路）→ upstream，且说得出要哪两个环境变量", async () => {
+    const d = tmp();
+    const e = await run(d, GOOD, { transport: { baseUrl: "", apiKey: "" } }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("upstream");
+    expect((e as CommandError).message).toMatch(/ANTHROPIC_BASE_URL/);
+    expect((e as CommandError).message).toMatch(/ANTHROPIC_AUTH_TOKEN/);
+  });
+
+  it("上游不响应 → 超时 → upstream（⚠️ 超时值**可注入**，否则这条路径测不了）", async () => {
+    const d = tmp();
+    // 一个**尊重 signal** 的假 fetch：不主动返回，等被中止
+    const hang = ((_url: unknown, init?: { signal?: AbortSignal }) =>
+      new Promise((_res, rej) => {
+        init?.signal?.addEventListener("abort", () => rej(new Error("aborted")));
+      })) as unknown as typeof fetch;
+    const e = await run(d, GOOD, { fetchImpl: hang, timeoutMs: 30 }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("upstream");
+    expect((e as CommandError).message).toMatch(/超时|没回应/);
+  });
 });

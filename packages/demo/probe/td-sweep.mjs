@@ -12,7 +12,7 @@
 //   留着一份复制品的唯一理由是：这个脚本要能解释它自己量出来的数。
 import fs from "node:fs";
 const { buildTdWorld, pathPointAt } = await import("../dist/td/world.js");
-const { createSim, advance, FIXED_DT_MS, simSnapshot } = await import("../dist/td/sim.js");
+const { createSim, advance, autoPlay, FIXED_DT_MS, simSnapshot } = await import("../dist/td/sim.js");
 
 import path from "node:path";
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../../..");
@@ -36,33 +36,15 @@ function mutate(cfg, dim, k) {
   return c;
 }
 
+/**
+ * ⚠️ 这里原本有一份**参考玩家的复制品**（票 04 留的，因为那时真玩家还没有几何策略）。
+ *   现在真的那个已经在 `sim.ts` 里了 —— 复制品**已经删掉**，改成 import 真的 `autoPlay`。
+ *   留着两份的唯一后果是：它们会漂，而「扫描量出来的刻度」会与「真跑用的玩家」不是同一个人。
+ */
 function play(w) {
-  const nearestArc = (slot) => {
-    let best = Infinity, at = 0;
-    for (let d = 0; d <= w.path.total; d += 1) {
-      const p = pathPointAt(w.path, d);
-      const dd = Math.hypot(p.x - slot.at.x, p.y - slot.at.y);
-      if (dd < best) { best = dd; at = d; }
-    }
-    return at;
-  };
-  const order = [...w.slots].sort((a, b) => nearestArc(a) - nearestArc(b)).map((s) => s.id);
   let s = createSim(w);
-  const built = new Set();
   for (let i = 0; i < 900 * 62; i++) {
-    const acts = [];
-    if (s.phase === "build" || s.phase === "wave") {
-      const plain = s.towers.find((t) => t.level === 0);
-      const us = plain && w.towers.find((t) => t.id === plain.towerId);
-      if (plain && us && s.scrap >= us.upgradeCost) acts.push({ kind: "upgrade", slotId: plain.slotId });
-      else {
-        const next = order.find((id) => !built.has(id));
-        const spec = next && w.towers[s.towers.length % w.towers.length];
-        if (next && spec && s.scrap >= spec.cost) { acts.push({ kind: "build", slotId: next, towerId: spec.id }); built.add(next); }
-      }
-      if (!acts.length && s.phase === "build") acts.push({ kind: "start-wave" });
-    }
-    s = advance(s, FIXED_DT_MS, acts, w);
+    s = advance(s, FIXED_DT_MS, autoPlay(s, w), w);
     if (s.phase === "won" || s.phase === "lost") break;
   }
   return simSnapshot(s);

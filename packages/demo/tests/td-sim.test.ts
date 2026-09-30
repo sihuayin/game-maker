@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  AUTO_PLAN, FIXED_DT_MS, MAX_FRAME_MS, advance, autoPlay, createSim, enemyPos, simSnapshot,
+  FIXED_DT_MS, MAX_FRAME_MS, advance, autoPlay, createSim, enemyPos, simSnapshot,
   buildTdWorld, type TdAction, type TdState, type TdWorldDescription,
 } from "../src/index.js";
 
@@ -205,13 +205,29 @@ describe("参考玩家（`?auto=1` 与 vitest 用的是**同一个人**）", () 
     }
     const snap = simSnapshot(s);
     expect(snap.phase).toBe("won");
-    expect(snap.leaked as number).toBeLessThan(10);             // 赢得不勉强
-    expect(snap.built as number).toBeGreaterThanOrEqual(AUTO_PLAN.length - 1);
+    // ⚠️ 实测：**漏 1、声望 19/20**（旧尺子：漏 6、12/20）。
+    //   留一点余量而不是钉 0 —— 这一关的数值将来一动，0 就会变成一条**与玩家无关的**假红。
+    expect(snap.leaked as number).toBeLessThanOrEqual(2);
+    expect(snap.built as number).toBe(w.slots.length);          // 每个插槽都用上了
   });
 
-  it("播放顺序里的插槽 id 全都在关卡里（写错一个 id 就是**静默少建一座塔**）", () => {
-    const ids = new Set(world().slots.map((s) => s.id));
-    for (const [slotId] of AUTO_PLAN) expect(ids.has(slotId)).toBe(true);
+  it("⚠️ **与关卡无关**：把插槽 id 全部改名，结果**逐字段相同**（票 02 的确定性断言）", () => {
+    // 这一条替掉了原先那条「播放顺序里的插槽 id 全都在关卡里」——
+    // 那条测的是一张**写死的插槽表**，而那张表已经不存在了。
+    // 真正要钉住的是：**玩家只看几何，不引用任何插槽 id**。改名不该改变任何东西。
+    const run = (w: ReturnType<typeof world>) => {
+      let s = createSim(w);
+      for (let i = 0; i < 400_000 / FIXED_DT_MS && s.phase !== "won" && s.phase !== "lost"; i++) {
+        s = advance(s, FIXED_DT_MS, autoPlay(s, w), w);
+      }
+      return simSnapshot(s);
+    };
+    const w1 = world();
+    const w2 = world((c) => {
+      (c as { slots: { id: string }[] }).slots = (c as { slots: { id: string }[] }).slots
+        .map((s, i) => ({ ...s, id: `slot-${String.fromCharCode(97 + i)}` }));
+    });
+    expect(JSON.stringify(run(w2))).toBe(JSON.stringify(run(w1)));
   });
 
   it("结束之后不再产动作（赢了/输了都不该继续点）", () => {

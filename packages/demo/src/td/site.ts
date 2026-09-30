@@ -6,11 +6,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, auditTdConfig, parseAssetPack, parseTdConfig, TD_CONFIG_FORMAT,
+  CommandError, auditScreenSpace, auditTdConfig, parseAssetPack, parseTdConfig, tdHudScreenItems, TD_CONFIG_FORMAT,
   type AssetPackManifest, type CommandResult, type ConfigIssue, type TdConfig,
 } from "@game-maker/contracts";
 import { buildTdWorld, type TdWorldDescription } from "./world.js";
 import { failWith, laySite } from "../layout.js";
+import { HUD_LINE_HEIGHT, VIEWPORT } from "../draw.js";
 import type { Box } from "../draw.js";
 
 /**
@@ -49,18 +50,6 @@ export function auditTdGeometry(world: TdWorldDescription): ConfigIssue[] {
   if (world.path.total <= 0) err("path", `折线总长是 ${world.path.total} —— 敌人一出生就到柜台了`);
   for (const s of world.slots) inWorld(`slot "${s.id}"`, s.box);
   inWorld("core", world.core.box);
-
-  // ── HUD：**屏幕空间**的，尺子是视口不是世界 ──────────────────────────────
-  // ⚠️ 与横版同一条：摆到看不见的地方**几乎不可能是设计**（它没有「另一条路」这回事），
-  //   而它是精确可算的 —— 所以是**硬失败**。
-  const fitViewport = (where: string, b: Box) => {
-    if (b.x < 0 || b.y < 0 || b.x + b.w > V.w || b.y + b.h > V.h)
-      err(where, `HUD 活在**屏幕空间**，必须整个落在视口 ${V.w}×${V.h} 内；` +
-        `而它的盒子是 (${b.x},${b.y}) ${b.w}×${b.h}。⚠️ 尺子是**视口**不是 world.size`);
-  };
-  fitViewport("hud.panel", world.hud.panel.box);
-  fitViewport("hud.start", world.hud.start.box);
-  for (const b of world.hud.buttons) fitViewport(`hud.buttons["${b.towerId}"]`, b.box);
 
   return out;
 }
@@ -112,7 +101,10 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   // ⚠️ 场景描述**只构建一次**：几何族校验的那份，就是下面写进 warning 汇总、以及
   //   外壳将要画的那一份。构建两次 = 给了它们漂移的机会，而漂移是静默的。
   const world = buildTdWorld(manifest, config, { packBase: `../../pack/${packVersion}/` });
-  const all = [...auditTdConfig(config, manifest), ...auditTdGeometry(world)];
+  // ⚠️ **第五族与几何族分开、且与横版共用一份**（票 03）——
+  //   塔防的 `hud` 有**五个**成员，而原先的几何族只覆盖了三个（票 03 量到的那个洞）。
+  const screenIssues = auditScreenSpace(VIEWPORT, tdHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
+  const all = [...auditTdConfig(config, manifest), ...screenIssues, ...auditTdGeometry(world)];
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);
 

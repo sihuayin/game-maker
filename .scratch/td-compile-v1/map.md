@@ -228,3 +228,30 @@ Effort: td-compile-v1
   并**重跑** `probe/td-sweep.mjs`（票 02 · 04）。
 - `probe/td-sweep.mjs` 里那份**复制品玩家**要删掉、改成 import 真的 `autoPlay`（票 04 里写着这条警告）。
 - 新写的 `compileTdGame` **要落账**（票 06）。
+
+---
+
+### ⚠️ 2026-09-30 施工时显形的一处欠账（**地图没覆盖的缝**）
+
+施工做到 `compile-td-game` 时撞上了它。`Destination` 第 3 件验收写着「参考玩家跑得完」，
+而那需要**模拟器** —— 它住在 `demo`（`src/td/sim.ts`）。可是：
+
+| 要的东西 | 住在哪 |
+|---|---|
+| 调 LLM 产配置（`callText` 是**私有**函数） | `packages/assets` |
+| 校验（`auditTdConfig` · `auditScreenSpace`） | `packages/contracts` ✓ |
+| **跑参考玩家判「通不通」** | `packages/demo` |
+
+而依赖图（`scripts/check-deps.mjs` 的 `ALLOWED`）写死 **`assets → contracts` 且 `demo → contracts`** ——
+**没有一个包同时够得着这三样**。⇒ 三条路：
+
+- **(a) 在 CLI 里合**：`compileTdGame`（assets）产配置 + 校验，CLI 再调 demo 的参考玩家跑一遍。
+  ⚠️ 代价：`compile-td-game` 就不再是**一个** op 的完整回报，而是 CLI 里两步的合成；
+  MCP 那条路（本图 Out of scope）将来要复用，得自己再合一次。
+- **(b) 把参考玩家搬进 contracts**。⚠️ 它不是一个小工具 —— 它是整个塔防模拟
+  （`createSim` / `advance` / `stepOnce`），而契约层是「纯形状 + 小工具」。
+- **(c) 让 `assets` 依赖 `demo`**。⚠️ **直接违反 R6**（A 与 B 可独立交付），`check-deps.mjs` 会红。
+
+⚠️ **本图的十张票答完了每一个「玩法」问题**（参考玩家要多强 · 它跑哪一关 · 判据与观察的界线），
+但**这一条是「包边界」问题**，而它只在你真去写那个 op 时才显形。
+⇒ 这是要在**新开一张图**（或在这张图上补一张票）时先回答的。

@@ -14,11 +14,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, auditGameConfig, parseAssetPack, parseCoverage, parseGameConfig,
+  CommandError, auditGameConfig, auditScreenSpace, gameHudScreenItems, parseAssetPack, parseCoverage, parseGameConfig,
   FILLED,
   type AssetPackManifest, type CommandResult, type ConfigIssue, type GameConfig, type LayerCoverage,
 } from "@game-maker/contracts";
-import { BACKDROP, SHELL_VERSION, VIEWPORT, buildWorld, type Box, type WorldDescription } from "./world.js";
+import { BACKDROP, HUD_LINE_HEIGHT, SHELL_VERSION, VIEWPORT, buildWorld, type Box, type WorldDescription } from "./world.js";
 import { failWith, laySite } from "./layout.js";
 
 // ── 第四族 · 几何可行性 ─────────────────────────────────────────────────────
@@ -76,21 +76,6 @@ export function auditGeometry(world: WorldDescription, coverage?: readonly Layer
         `而它后面没有别的层 —— 透过去就是外壳的底色（${BACKDROP}）。` +
         `⚠️ 其余层的留白是设计；**只有最远这层必须满**（票 50）`);
   }
-
-  // ── HUD：**屏幕空间**的，尺子是视口不是世界 ──────────────────────────────
-  //
-  // ⚠️ 世界宽 1440、视口宽 480 —— 一个摆在 x:1000 的 HUD **过得了世界校验、却在屏幕外**。
-  //   硬失败：HUD 摆到看不见的地方**几乎不可能是设计**（它没有「另一条路」这回事，
-  //   与「越不过这块台阶可能是设计」正相反），而它又是**精确可算**的。
-  //   —— 这一条与本票其它几何检查的「上界报警告」纪律不同，是**有意**的。
-  const fitViewport = (where: string, b: Box) => {
-    if (b.x < 0 || b.y < 0 || b.x + b.w > V.w || b.y + b.h > V.h)
-      err(where, `HUD 活在**屏幕空间**，必须整个落在视口 ${V.w}×${V.h} 内；` +
-        `而它的盒子是 (${b.x},${b.y}) ${b.w}×${b.h}。⚠️ 尺子是**视口**不是 world.size —— ` +
-        `世界宽 ${W.w} 而屏幕只有 ${V.w}，对世界校验会放它过去`);
-  };
-  fitViewport("hud.panel", world.hud.panel.box);
-  world.hud.pips.forEach((p, i) => fitViewport(`hud.pip[${i}]`, p.box));
 
   // ── 近端边：盒子的左边 / 上边探出世界（**警告**，不是硬失败）──────────────
   //
@@ -171,7 +156,10 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   const geometryIssues = auditGeometry(buildWorld(manifest, config, {
     packBase: `../../pack/${packVersion}/`,
   }), coverageLayers);
-  const all = [...audit, ...geometryIssues];
+  // ⚠️ **第五族（HUD 屏幕空间）与它分开、而且共用一份**（票 03）——
+  //   「有哪些 HUD 项」只有一份名单，compile 与 site 读的是同一个（票 03 量到两份会各漏各的）。
+  const screenIssues = auditScreenSpace(VIEWPORT, gameHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
+  const all = [...audit, ...screenIssues, ...geometryIssues];
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);
 

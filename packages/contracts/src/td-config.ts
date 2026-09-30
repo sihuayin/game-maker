@@ -392,7 +392,20 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   // ── 引用族（硬失败）──────────────────────────────────────────────────────
   ref("scene.slot", { asset: config.scene.slot.asset }, ["sprite"]);
   ref("scene.slotActive", { asset: config.scene.slotActive.asset }, ["sprite"]);
-  for (const [ch, r] of Object.entries(config.arena.tiles)) ref(`arena.tiles["${ch}"]`, r, ["sprite", "animation"]);
+  for (const [ch, r] of Object.entries(config.arena.tiles)) {
+    if (!ref(`arena.tiles["${ch}"]`, r, ["sprite", "animation"])) continue;
+    // ⚠️ **砖的尺寸与锚点**（票 07）：上面那条只要求引用解得开 —— 于是**一张声明成 sprite 的
+    //   480×270 大图照样解得开**。而外壳按「格心 + 锚点」摆精灵，576 格会各画一张大图叠在一起，
+    //   **没有任何东西会报错**。三个真包的砖都是 `cell×cell`、锚点正中 ⇒ 这条判据不误伤任何真产物。
+    const a = assetOf(r.asset)!;
+    if (a.size.w !== config.arena.cell || a.size.h !== config.arena.cell)
+      err(`arena.tiles["${ch}"]`, `砖 "${r.asset}" 是 ${a.size.w}×${a.size.h}，而格子是 ${config.arena.cell}×${config.arena.cell} —— ` +
+        `比格子大就会**盖住邻居**（每一格都画一张），比格子小就会**留缝、透出外壳底色**。` +
+        `砖的尺寸必须**正好等于** arena.cell`);
+    if (a.anchor.x !== 0.5 || a.anchor.y !== 0.5)
+      err(`arena.tiles["${ch}"]`, `砖 "${r.asset}" 的锚点是 {x:${a.anchor.x}, y:${a.anchor.y}}，而外壳按「**格心 + 锚点**」摆精灵 ` +
+        `⇒ 锚点不正中，整张地图会**偏半格**，而没有任何东西会报错。砖的锚点必须是 {x:0.5, y:0.5}`);
+  }
   ref("core", { asset: config.core.asset }, ["sprite"]);
   for (const t of config.towers) {
     ref(`tower "${t.id}"`, { asset: t.asset, ...(t.anim ? { anim: t.anim } : {}) }, ["sprite", "animation"]);
@@ -481,6 +494,19 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
         `（走道半宽 ${cell / 2} + 插槽半宽 ${Math.max(slotSize.w, slotSize.h) / 2}）—— ` +
         `机关压在敌人走的路上，读起来像站在路中间`);
   }
+
+  // ⚠️ **每种机关的 L1 至少要有一个插槽够得着走道**（票 10）：否则那座塔在这一关里
+  //   **建了永远不开火** —— 而「一种塔在这关里是死的」不可能是设计。实测：模型编译出来的那一关，
+  //   电击地板 L1（射程 40）在**任何一个插槽上都够不着**。
+  //   ⚠️ **只看 L1** —— 那是你第一次把它建出来的状态。看每一级太紧：编译那关 L1 是 0% 但 L2 有 29%，
+  //   按「每一级都要」会拒掉一个「升级之后就能用」的关卡，而那是**可能的设计**。
+  if (config.slots.length > 0)
+    for (const t of config.towers) {
+      const range = t.levels[0].range;
+      if (!config.slots.some((s) => tdDistanceToPath(pts, s.at).distance <= range))
+        err(`tower "${t.id}"`, `L1 射程 ${range} 在**任何一个插槽上都够不着走道** —— 这座机关在这一关里是**死的**` +
+          `（建了永远不开火）。要么把 L1 射程放大到够得着最近的那个插槽，要么把它从这一关的机关表里去掉`);
+    }
 
   // 柜台与 HUD 落在世界里 / 视口里
   const coreA = assetOf(config.core.asset);

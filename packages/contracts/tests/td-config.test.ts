@@ -25,8 +25,11 @@ const valid = (): TdConfig => {
   if (!r.ok) throw new Error(`fixture 关卡不过 schema：${r.errors.join("；")}`);
   return r.value;
 };
-const errorsOf = (c: TdConfig) =>
-  auditTdConfig(c, manifestOf()).filter((i) => i.severity === "error").map((i) => `${i.where}: ${i.message}`);
+const errorsOf = (c: TdConfig, tweakManifest?: (m: AssetPackManifest) => void) => {
+  const m = manifestOf();
+  tweakManifest?.(m);
+  return auditTdConfig(c, m).filter((i) => i.severity === "error").map((i) => `${i.where}: ${i.message}`);
+};
 const warningsOf = (c: TdConfig) =>
   auditTdConfig(c, manifestOf()).filter((i) => i.severity === "warning").map((i) => `${i.where}: ${i.message}`);
 
@@ -147,6 +150,35 @@ describe("td-config/v1：三族校验（真包 + 真关卡）", () => {
     const c = structuredClone(valid());
     c.arena.walkChar = "%";
     expect(errorsOf(c).join("\n")).toMatch(/走道字符 "%" 不在 arena.tiles 里/);
+  });
+
+  // ⚠️ 下面两条由票 07 顶出来。判据的实据是：**两个真包的砖都是 15×15、锚点正中** ⇒ 不误伤任何真产物。
+  it("引用族：**砖的尺寸必须正好等于 `arena.cell`**（一张 40×32 的柜台当走道砖 → 拒）", () => {
+    const c = structuredClone(valid());
+    c.arena.tiles[":"] = { asset: "core-counter" };          // 40×32，而 cell 是 15
+    expect(errorsOf(c).join("\n")).toMatch(/砖的尺寸必须\*\*正好等于\*\* arena\.cell/);
+  });
+
+  it("引用族：**砖的锚点必须正中**（锚点偏了整张地图偏半格，而不报错）", () => {
+    const c = structuredClone(valid());
+    expect(errorsOf(c, (m) => {
+      m.assets.find((a) => a.id === "tile-wall")!.anchor = { x: 0, y: 0 };
+    }).join("\n")).toMatch(/砖的锚点必须是 \{x:0\.5, y:0\.5\}/);
+  });
+
+  // ⚠️ 这条由票 10 顶出来，而它的实据是一次真跑：模型编译的那一关，电击地板 L1（射程 40）
+  //   在**任何一个插槽上都够不着**（覆盖 0%）—— 那座塔建了永远不开火。
+  it("自洽族：**每种机关的 L1 至少要有一个插槽够得着走道**（否则那座塔是死的）", () => {
+    const c = structuredClone(valid());
+    c.towers[1]!.levels[0].range = 5;                        // 而最近的插槽离走道 15px
+    expect(errorsOf(c).join("\n")).toMatch(/任何一个插槽上都够不着走道/);
+  });
+
+  it("⚠️ **只看 L1**：L1 够得着就放行，哪怕 L2 够不着（L1 才是「你第一次把它建出来」的那个状态）", () => {
+    const c = structuredClone(valid());
+    c.towers[1]!.levels[0].range = 52;                       // L1 够得着
+    c.towers[1]!.levels[1].range = 5;                        // L2 反而够不着 —— 不看它
+    expect(errorsOf(c)).toEqual([]);
   });
 
   it("可通关族：伤害与护甲**写反了量级** → 警告（不是硬失败：下限 1 保证还打得动）", () => {

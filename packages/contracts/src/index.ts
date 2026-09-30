@@ -83,6 +83,9 @@ export * from "./command.js";
 export * from "./game-config.js";
 export * from "./td-config.js";
 
+// ── 屏幕空间：两种玩法共用的那条判据与各自的 HUD 项清单（票 03 · 09）────
+export * from "./screen-space.js";
+
 // ── 资源规格（四类）与确定性校验 ──────────────────────────────────────────
 export * from "./asset-spec.js";
 export * from "./audit.js";

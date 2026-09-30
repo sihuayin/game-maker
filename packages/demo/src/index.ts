@@ -7,7 +7,7 @@ export { assembleSite, auditGeometry, type SiteOptions } from "./site.js";
 export { assembleFromConfig, detectFormat, defaultShellPath, CONFIG_FILE_NAME, KNOWN_FORMATS, type AssembleOptions } from "./assemble.js";
 export { assembleTdSite, auditTdGeometry, type TdSiteOptions } from "./td/site.js";
 export { buildTdWorld, pathPointAt, type TdWorldDescription, type TdTowerDesc, type TdEnemyDesc, type TdWaveDesc, type TdTile, type TdHudButton } from "./td/world.js";
-export { createSim, advance, autoPlay, simSnapshot, enemyPos, FIXED_DT_MS, MAX_FRAME_MS, AUTO_PLAN, type TdState, type TdAction, type SimEnemy, type SimTower } from "./td/sim.js";
+export { createSim, advance, autoPlay, simSnapshot, enemyPos, FIXED_DT_MS, MAX_FRAME_MS, type TdState, type TdAction, type SimEnemy, type SimTower } from "./td/sim.js";
 export {
   buildWorld, formatIssue, SHELL_VERSION, VIEWPORT,
   type AtlasToLoad, type BackgroundLayer, type Box, type Draw, type Drawn, type EntityDesc,
@@ -16,5 +16,5 @@ export {
 // ⚠️ `draw.ts` 那几样也一并露出来 —— 塔防与横版共用它们，两个壳（CLI / MCP）
 //   与外壳都要拿得到**同一份**，而不是各写一个「差不多」的。
 export {
-  BACKDROP, FALLBACK_ANCHOR, anchorOf, assetSize, atlasList, boxAt, boxToXYWH, resolveDraw, type ShellBase,
+  BACKDROP, FALLBACK_ANCHOR, HUD_LINE_HEIGHT, anchorOf, assetSize, atlasList, boxAt, boxToXYWH, resolveDraw, type ShellBase,
 } from "./draw.js";

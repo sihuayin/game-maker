@@ -6,12 +6,12 @@
 //   · 盒子由 `entityBox` + 资源级锚点算（**全仓只此一处算盒子**）；
 //   · 凡是**几何**（弧长、拐角朝向、格子换算）都在这里算完，外壳**不做几何**。
 import {
-  anchorOf, assetSize, atlasList, boxAt, formatIssue, FALLBACK_SIZE,
+  anchorOf, assetSize, atlasList, boxAt, formatIssue, FALLBACK_SIZE, HUD_LINE_HEIGHT,
   resolveDraw, SHELL_VERSION, VIEWPORT,
   type AtlasToLoad, type Box, type Drawn, type Issue, type ShellBase, type Size, type Vec,
 } from "../draw.js";
 import {
-  parseAssetPack, parseTdConfig, tdPathLength,
+  parseAssetPack, parseTdConfig, tdHudScreenItems, tdPathLength,
   type AssetPackManifest, type TdConfig,
 } from "@game-maker/contracts";
 
@@ -251,12 +251,19 @@ export function buildTdWorld(
   });
 
   // ── HUD 按钮：**条数 = 机关种类数**（派生，不重复声明）────────────────────
+  // ⚠️ **HUD 的盒子从 `tdHudScreenItems` 取，不在这里再算一遍**（票 03）——
+  //   那几个盒子正是**屏幕空间那条检查看过的同一个盒子**。各算一份就是「校验过的」与
+  //   「外壳要画的」两份描述，而那正是这个仓库反复吃过的亏（票 48）。
+  const hudItems = tdHudScreenItems(cfg, pack, { lineHeight: HUD_LINE_HEIGHT });
+  /** ⚠️ 构造上必然有：`tdHudScreenItems` 给这些项都填了 `box`（**只有 `hud.readout` 是纯文字**）。 */
+  const hudBox = (where: string) => hudItems.find((i) => i.where === where)!.box!;
+
   const buttonSize = cfg.hud.buttons.size;
   const buttons: TdHudButton[] = cfg.towers.map((t, i) => {
     const at = { x: cfg.hud.buttons.at.x + i * cfg.hud.buttons.step.x, y: cfg.hud.buttons.at.y + i * cfg.hud.buttons.step.y };
     return {
       draw: resolveDraw(pack, at, { asset: cfg.hud.buttons.asset }, issues, `hud.buttons[${i}]`, cfg.hud.buttons.asset, buttonSize),
-      at, box: boxAt(at, buttonSize, anchorOf(pack, cfg.hud.buttons.asset)), towerId: t.id,
+      at, box: hudBox(`hud.buttons["${t.id}"]`), towerId: t.id,
     };
   });
 
@@ -266,12 +273,12 @@ export function buildTdWorld(
   const hud = {
     panel: {
       draw: resolveDraw(pack, cfg.hud.panel.at, { asset: cfg.hud.panel.asset }, issues, "hud.panel", cfg.hud.panel.asset, panelSize),
-      box: boxAt(cfg.hud.panel.at, panelSize, anchorOf(pack, cfg.hud.panel.asset)),
+      box: hudBox("hud.panel"),
     },
     buttons,
     start: {
       draw: resolveDraw(pack, startAt, { asset: cfg.hud.start.asset }, issues, "hud.start", cfg.hud.start.asset, startSize),
-      at: startAt, box: boxAt(startAt, startSize, anchorOf(pack, cfg.hud.start.asset)),
+      at: startAt, box: hudBox("hud.start"),
     },
     readout: { at: { ...cfg.hud.readout.at }, step: { ...cfg.hud.readout.step } },
     icons: {

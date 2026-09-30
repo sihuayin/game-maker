@@ -14,17 +14,17 @@
 //   下面把这些名字**原样再导出**，所以既有的调用方（`index.ts` / 测试 / 外壳）一行不用改。
 import {
   anchorOf, assetSize, atlasList, boxAt, boxToXYWH, buildBackground, formatIssue, FALLBACK_ANCHOR,
-  FALLBACK_SIZE, SHELL_VERSION, VIEWPORT, resolveDraw,
+  FALLBACK_SIZE, HUD_LINE_HEIGHT, SHELL_VERSION, VIEWPORT, resolveDraw,
   type AtlasToLoad, type BackgroundLayer, type Box, type Drawn, type Issue, type Missing,
   type ShellBase, type Size, type Vec,
 } from "./draw.js";
 import {
-  DEFAULT_PLAYER_MOVE, parseAssetPack, parseGameConfig, resolvePackRef,
+  DEFAULT_PLAYER_MOVE, gameHudScreenItems, parseAssetPack, parseGameConfig, resolvePackRef,
   type AssetPackManifest, type GameConfig,
 } from "@game-maker/contracts";
 
 export {
-  BACKDROP, FALLBACK_ANCHOR, SHELL_VERSION, VIEWPORT, anchorOf, assetSize, atlasList, boxAt, boxToXYWH,
+  BACKDROP, FALLBACK_ANCHOR, HUD_LINE_HEIGHT, SHELL_VERSION, VIEWPORT, anchorOf, assetSize, atlasList, boxAt, boxToXYWH,
   formatIssue, resolveDraw,
   type AtlasToLoad, type BackgroundLayer, type Box, type Draw, type Drawn, type Issue, type Missing,
   type ShellBase, type Size, type Vec,
@@ -170,13 +170,17 @@ export function buildWorld(
   const panelSize = cfg.hud.panel.size;
   const hudPanel = resolveDraw(pack, cfg.hud.panel.at, { asset: cfg.hud.panel.asset },
     issues, "hud.panel", cfg.hud.panel.asset, panelSize);
-  const pipSize = assetSize(pack, cfg.hud.pip.asset) ?? FALLBACK_SIZE;
-  const pipAnchor = anchorOf(pack, cfg.hud.pip.asset);
+  // ⚠️ **HUD 的盒子从 `gameHudScreenItems` 取，不在这里再算一遍**（票 03）——
+  //   那两个盒子正是**屏幕空间那条检查看过的同一个盒子**（与塔防那条同款）。
+  const hudItems = gameHudScreenItems(cfg, pack, { lineHeight: HUD_LINE_HEIGHT });
+  /** ⚠️ 构造上必然有：`gameHudScreenItems` 给每一项都填了 `box`（横版没有纯文字的 HUD 项）。 */
+  const hudBox = (where: string) => hudItems.find((i) => i.where === where)!.box!;
+
   const pips = Array.from({ length: pickups }, (_, i) => {
     const at = { x: cfg.hud.pip.at.x + i * cfg.hud.pip.step.x, y: cfg.hud.pip.at.y + i * cfg.hud.pip.step.y };
     return {
       draw: resolveDraw(pack, at, { asset: cfg.hud.pip.asset }, issues, `hud.pip[${i}]`, cfg.hud.pip.asset),
-      at, box: boxAt(at, pipSize, pipAnchor),
+      at, box: hudBox(`hud.pip[${i}]`),
     };
   });
 
@@ -186,7 +190,7 @@ export function buildWorld(
   return {
     shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { w: W, h: H }, atlases, issues,
     background, terrain, entities, player,
-    hud: { panel: { draw: hudPanel, box: boxAt(cfg.hud.panel.at, panelSize, anchorOf(pack, cfg.hud.panel.asset)) }, pips },
+    hud: { panel: { draw: hudPanel, box: hudBox("hud.panel") }, pips },
     objective: { gate: cfg.objective.gate, pickupCount: pickups },
   };
 }

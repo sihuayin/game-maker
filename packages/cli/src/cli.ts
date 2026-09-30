@@ -7,7 +7,7 @@ import {
   CommandError, EXIT, compileGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
-import { CONFIG_FILE_NAME, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
+import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -114,8 +114,9 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
           requirementPath: path.resolve(flags.requirement),
           packDir: path.resolve(flags.pack),
           outRoot, transport,
-          // 视口传外壳**那一份**常量 —— 不让这个数在仓里出现第二个值
+          // 视口与行高都传外壳**那一份**常量 —— 不让这两个数在仓里出现第二个值
           viewport: VIEWPORT,
+          hudLineHeight: HUD_LINE_HEIGHT,
         });
         break;
       }
