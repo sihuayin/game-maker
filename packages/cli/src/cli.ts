@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, compileGame, compileTdGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
+  CommandError, EXIT, compileGame, compileTdGame, deriveRecipe, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
@@ -185,8 +185,8 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
         io.err(`\n⚠️ **已经付过钱的那几张原图留着**（连同那时逐字发出去的提示词）：${kept}\n` +
           `   想复用：把那些资源的 source 改成 {"kind":"import","ref":"…"} 指过去 —— **生图 0 次**。\n`);
       if (spent?.length)
-        io.err(`\n已经花掉的（${spent.length} 次调用 · ${spent.reduce((n, c) => n + c.attempts, 0)} 次往返）：\n` +
-          spent.map((c) => `  · ${c.step} ${c.target} · ${(c.ms / 1000).toFixed(1)}s · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}\n`).join(""));
+        // ⚠️ 渲染**共用** `formatSpentCalls` —— 两个壳的输出必须一字不差（别在这里再写一份）
+        io.err(`\n${formatSpentCalls(spent)}\n`);
     }
     return code;
   }

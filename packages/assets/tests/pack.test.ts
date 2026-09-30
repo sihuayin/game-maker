@@ -549,8 +549,10 @@ describe("并发：上限按上游分别定，而且真的管用（票 47）", (
   });
 
   it("⚠️ **一个失败之后不再放新的调用出去** —— 钱不在「已经知道失败了」之后继续烧（票 47 第 3 条）", async () => {
-    // 串行时「第 5 个失败」只浪费前 4 个；并发之后若不管，`Promise.all` 虽然立刻拒绝，
-    // 但**其余都已经排进闸门了**，会照样发出去。这里钉的就是那道闸。
+    // 串行时「第 5 个失败」只浪费前 4 个；并发之后若不管，**其余那些排进闸门的会照样发出去**。
+    // ⚠️ 拦它们的是**闸门自己**（它记着第一个错、之后一律拒），**不是**外层的 Promise ——
+    //   外层从 2026-09-30 起是 `allSettled`（票 05：等「在飞的」收尾），它不会「立刻拒绝」任何东西。
+    //   这里钉的就是那道闸。
     let calls = 0;
     const gen: DrawListGenerator = async (spec) => {
       calls += 1;
@@ -654,6 +656,29 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
     const d = tmp();
     for (let i = 0; i < 2; i++) await fail(d, failingGen(2).gen);
     expect(readdirSync(path.join(d, "salvage")).filter((x) => x.startsWith("failed-"))).toHaveLength(1);
+  });
+
+  it("⚠️ 失败时**等「在飞的」收尾**（票 05）—— 那几笔已经付过钱，不等就是把已经买的图扔掉", async () => {
+    // ⚠️ 不等的话还有第二个后果：失败那条 `renameSync` 先生效，而**还在飞的**那笔随后
+    //   往**旧路径**写 ⇒ ENOTDIR，且那笔的产物永远进不了失败现场。
+    const d = tmp();
+    const gen: GenerateImage = async (req) => {
+      if (req.size.w === 8) throw new Error("抖一下");            // 这一笔立刻挂
+      await new Promise((r) => setTimeout(r, 60));                 // 另一笔慢，但在飞
+      return { image: flat(req.size.w, req.size.h), call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 } };
+    };
+    const r = twoSprites();
+    (r.assets[0]!.spec as { size: { w: number; h: number } }).size = { w: 8, h: 8 };    // 快的挂
+    (r.assets[1]!.spec as { size: { w: number; h: number } }).size = { w: 16, h: 16 };  // 慢的成
+    const e = await buildAssetPack({
+      recipe: r, style: STYLE, outDir: d, recipeDir: ROOT,
+      generate: stub, generateImage: gen, concurrency: { image: 2 }, sourceDateEpoch: EPOCH,
+    }).then(() => { throw new Error("本该失败"); }, (x: unknown) => x as Error & { failureDir?: string });
+
+    // ⚠️ **等了**：慢的那一笔的产物进了失败现场
+    expect(existsSync(path.join(e.failureDir!, "authoring/generated/b.png")), "在飞的那笔被扔了").toBe(true);
+    // ⚠️ 而**没有留下垃圾**：工作目录已经改名走了，`out/<id>/` 底下不该再有 `.building-*`
+    expect(readdirSync(path.join(d, "salvage")).filter((x) => x.startsWith(".building-"))).toEqual([]);
   });
 
   it("⚠️ **一笔都没成功就挂掉 ⇒ 不留空目录**（原来那条 rmSync 怕的正是这个）", async () => {

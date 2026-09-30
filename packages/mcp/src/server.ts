@@ -7,7 +7,7 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  CommandError, compileGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, verifyPack,
+  CommandError, compileGame, deriveRecipe, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, VIEWPORT } from "@game-maker/demo";
@@ -194,8 +194,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
         //   包没产出来，它们没有别的家；而花了钱是事实。
         const spent = e instanceof CommandError ? e.ledger : undefined;
         const tail = spent?.length
-          ? `\n\n已经花掉的（${spent.length} 次调用 · ${spent.reduce((n, c) => n + c.attempts, 0)} 次往返）：\n` +
-            spent.map((c) => `  · ${c.step} ${c.target} · ${(c.ms / 1000).toFixed(1)}s · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}`).join("\n")
+          ? `\n\n${formatSpentCalls(spent)}`
           : "";
         return reply(id, {
           content: [{ type: "text", text: `✗ ${message}${tail}` }],

@@ -43,6 +43,21 @@ export type DeriveOptions = {
  *
  * ⚠️ 清单**绝不覆盖**：每次推导写一个新的 `v<N>`（与资源包同一条规矩）。
  */
+/**
+ * **「已经花掉的」那一段** —— 两个壳（CLI 与 MCP）**共用这一处**。
+ *
+ * ⚠️ **别在两个壳里各写一遍**：它们的输出**必须一字不差**（人看 CLI、agent 看 MCP），
+ *   而两份拷贝会漂 —— 2026-09-30 就给「`ms` 缺席」那句「还没回来」**同时往两份里贴过**，
+ *   贴的时候还得记得两边都改（code-review 抓到的正是这个）。
+ *
+ * ⚠️ `ms` 缺席要印成**「还没回来」**，不许印 `0.0s`：那是**没测到**，不是「花了 0 秒」。
+ */
+export function formatSpentCalls(calls: readonly LedgerCall[]): string {
+  const trips = calls.reduce((n, c) => n + c.attempts, 0);
+  return `已经花掉的（${calls.length} 次调用 · ${trips} 次往返）：\n` +
+    calls.map((c) => `  · ${c.step} ${c.target} · ${c.ms === undefined ? "**还没回来**" : (c.ms / 1000).toFixed(1) + "s"} · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}`).join("\n");
+}
+
 export async function deriveRecipe(opts: DeriveOptions): Promise<CommandResult> {
   const requirement = fs.readFileSync(opts.requirementPath, "utf8");
   const style = JSON.parse(fs.readFileSync(opts.stylePath, "utf8")) as StyleSpec;
@@ -736,7 +751,8 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
         const s = summarizeCalls(ledger);
         const calls = ledger.length;
         if (calls === 0) return "账：无调用";
-        const ms = ledger.reduce((n, c) => n + c.ms, 0);
+        // ⚠️ `?? 0` 在这里是**跳过**（`ms` 缺席 = 还没回来），不是「把没测到的当 0」
+        const ms = ledger.reduce((n, c) => n + (c.ms ?? 0), 0);
         const trips = ledger.reduce((n, c) => n + c.attempts, 0);
         const wall = res.ledger ? `墙钟 ${(res.ledger.run.wallClockMs / 1000).toFixed(1)}s · ` : "";
         return `账：${calls} 次调用 · ${trips} 次往返（${trips > calls ? "**有重试**" : "无重试"}）· ` +

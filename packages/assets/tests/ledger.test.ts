@@ -117,7 +117,10 @@ describe("账：跟着包走的收据（票 45）", () => {
     const d = tmp();
     await build(d);
     const ledger = JSON.parse(fs.readFileSync(path.join(d, "out", "ledger-probe", "pack", "v1", "ledger.json"), "utf8"));
-    expect(ledger.calls[0].model, "票 01：代理请求一个、回的是另一个").toBe("deepseek-flash");
+    // ⚠️ **按步找，不按下标找** —— 账里多了一条**生图**的（票 05：发出即记），
+    //   它比 drawlist 那条先入账 ⇒ `calls[0]` 不再是它。顺序**不是**契约，步才是。
+    const drawlist = ledger.calls.find((c: { step: string }) => c.step === "drawlist");
+    expect(drawlist.model, "票 01：代理请求一个、回的是另一个").toBe("deepseek-flash");
   });
 
   it("⚠️ **墙钟与调用耗时之和是两个不相加的量** —— 两个都记", async () => {

@@ -58,8 +58,15 @@ export const LedgerCall = z.object({
   requestId: z.string().min(1).optional(),
   /** 上游给图的那个临时 URL 的**主机名**（只记主机，不记带签名的完整 URL）。 */
   sourceHost: z.string().min(1).optional(),
-  /** 这一次调用花了多久（毫秒）。⚠️ **与 `run.wallClockMs` 不可相加**（见下）。 */
-  ms: z.number().int().nonnegative(),
+  /**
+   * 这一次调用花了多久（毫秒）。⚠️ **与 `run.wallClockMs` 不可相加**（见下）。
+   *
+   * ⚠️ **可选：缺席 = 这笔「发出去了、还没回来」**（2026-09-30 · 票 05）。
+   *   失败那一刻账上要记**真实发出去了几笔**，而不是「回来了几笔」——
+   *   真跑里 GPT 那一次一笔都没回来，于是账上空的、CLI 连那一行都不印，而钱确实花了。
+   *   ⚠️ **不许写 0 冒充「测到了 0」**（票 19 Q4）—— 拿不到就是拿不到。
+   */
+  ms: z.number().int().nonnegative().optional(),
   /**
    * 这一次**调用**里往返了几次 HTTP。
    * ⚠️ 有界重试吸收的是**抖动**，不是降级（票 14 §7）——
@@ -92,6 +99,12 @@ export const Ledger = z.object({
     //   而新账也不会因为「多了一个键」被自己的 schema 拒。加值不再需要动格式版本。
     byStep: z.record(LedgerStep, CallCount),
   }).strict(),
+  /**
+   * ⚠️ **顺序不是契约**：它是**入账序**，而**生图那一路**的入账发生在**发出**那一刻
+   *   （票 05）—— 并发下那就是「开始的先后」；**文本那一路照旧在调用回来之后**记（生成器自己
+   *   就在那一步交账，而且它失败也会交一笔）。两条混在一起时，别指望任何「自然的」顺序。
+   *   要按步找就**按 `step` 找**，别按下标。
+   */
   calls: z.array(LedgerCall),
 }).strict();
 

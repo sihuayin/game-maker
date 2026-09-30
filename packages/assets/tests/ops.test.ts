@@ -7,6 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { CommandError, EXIT, packAssets } from "../src/index.js";
+import { encodePNG } from "../src/png.js";
 
 const STYLE = {
   id: "style-ref",
@@ -106,5 +107,70 @@ describe("⚠️ 失败现场：一次失败就是几笔**已经付过钱**的�
     // ⚠️ 它是失败现场不是包：不占版本号、也不在 `pack/` 底下
     expect(fs.existsSync(path.join(OUT2, "keepsake", "pack", "v1"))).toBe(false);
     expect(path.dirname(kept!)).toBe(path.join(OUT2, "keepsake"));
+  });
+});
+
+describe("⚠️ 失败时报的是**真实发出的笔数**，不是「回来的那些」（票 05）", () => {
+  // ⚠️ 由来：2026-09-30 两次真跑里，GPT 那一次**一笔都没回来**，于是 CLI 连
+  //   「已经花掉的（N 次调用 · M 次往返）」那一行都没印 —— 而钱**确实花了**。
+  //   机制：生图那一路是**调用回来之后**才 push 的（`pack.ts`），并发在飞的那几笔既没落账也没落盘。
+  const D3 = fs.mkdtempSync(path.join(os.tmpdir(), "gm-ops-ledger-"));
+  fs.writeFileSync(path.join(D3, "stylespec.json"), JSON.stringify(STYLE));
+  const IMG = { protocol: "openai" as const, baseUrl: "http://x/v1", apiKey: "k", model: "m" };
+  /** 两份**生图**资源 —— 生图那一路才只有「回来的」才落账。 */
+  const TWO_IMG = { ...RECIPE, id: "img-ledger", assets: ["aa", "bb"].map((id) => ({
+    spec: { kind: "sprite", id, role: id, description: `${id} 的东西`, styleId: "style-ref",
+      anchor: { x: 0.5, y: 0.5 }, size: { w: 16, h: 16 }, required: true },
+    source: { kind: "image", background: { tolerance: 0 } },
+  })) };
+  const recipePath = path.join(D3, "recipe.json");
+  fs.writeFileSync(recipePath, JSON.stringify(TWO_IMG));
+  /** 一张最小合法的 PNG（base64）—— 生图那条上游回的就是 b64。 */
+  const PNG = encodePNG({ width: 4, height: 4, data: Buffer.alloc(4 * 4 * 4, 0xff) }).toString("base64");
+
+  /** 四份**生图**资源 —— 用它量「闸门拒掉的那几笔有没有混进账」。 */
+  const FOUR_IMG = { ...TWO_IMG, id: "img-four", assets: ["a", "b", "c", "d"].map((id) => ({
+    spec: { ...TWO_IMG.assets[0]!.spec, id }, source: TWO_IMG.assets[0]!.source })) };
+  const fourPath = path.join(D3, "four.json");
+  fs.writeFileSync(fourPath, JSON.stringify(FOUR_IMG));
+
+  it("⚠️ 闸门**拒掉的**那几笔**没发出去** ⇒ 不许记进账（判据：报出来的 === 真实发出的）", async () => {
+    // ⚠️ 这是 code-review 量出来的真缺陷：push 若放在**闸门外**，那几笔排队等着、
+    //   还没发出去的调用也会进账 —— 实测 4 个资源、并发 1、第一个就挂 ⇒
+    //   上游只收到 **1** 笔，账上却写了 **4** 笔。
+    let http = 0;
+    const upstream = (async () => { http += 1; throw new Error("抖一下"); }) as typeof fetch;
+    const e = await packAssets({
+      recipePath: fourPath, outRoot: path.join(D3, "out4"), transport: { baseUrl: "http://x", apiKey: "k" },
+      imageTransport: IMG, fetchImpl: upstream, concurrency: { text: 1, image: 1 },
+    }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    // 4 个资源，只有**第 1 个**被放行过 ⇒ 账上就该只有 1 笔
+    expect((e as CommandError).ledger?.length, "把没发出去的那几笔也记了").toBe(1);
+    // ⚠️ 而上游侧收到的是**那 1 笔的 3 次往返**（生成器自己重试）—— 与「几笔调用」是两个数
+    expect(http, "上游侧只收到第 1 个资源的那几次重试").toBeGreaterThanOrEqual(1);
+    expect(http, "后面三个资源一次都没发出去").toBeLessThan(4);
+  });
+
+  it("第 2 笔挂掉 ⇒ 账上**恰好 2 笔**（第 1 笔回来的 + 第 2 笔发出去的）", async () => {
+    let sent = 0;
+    const upstream = (async () => {
+      if (++sent === 2) throw new Error("抖一下");
+      return new Response(JSON.stringify({ data: [{ b64_json: PNG }] }),
+        { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    const e = await packAssets({
+      recipePath, outRoot: path.join(D3, "out"), transport: { baseUrl: "http://x", apiKey: "k" },
+      imageTransport: IMG, fetchImpl: upstream, concurrency: { text: 1, image: 1 },
+    }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    const calls = (e as CommandError).ledger ?? [];
+    // ⚠️ **发出几笔就该记几笔** —— 不是「回来几笔记几笔」
+    expect(sent, "上游侧确实发出去两笔").toBe(2);
+    expect(calls.length, "账上只记了回来的那一笔").toBe(2);
+    // ⚠️ 而**没回来的那一笔**：`ms` **缺席**，不是编一个 0（票 19 否过「不填 0 冒充测到了 0」）
+    const unreturned = calls.filter((c) => c.ms === undefined);
+    expect(unreturned).toHaveLength(1);
+    expect(unreturned[0]!.target).toBe("bb");
   });
 });

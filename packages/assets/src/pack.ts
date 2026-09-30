@@ -276,14 +276,19 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   //   （票 34：千问 RPS 5 / 并发 5；文本那侧查不到，取保守值），一个全局数会把
   //   「生图只能同时 3 个」错加到文本头上，或者反过来。
   // ⚠️ **失败即止**：串行时「第 5 个失败」只浪费掉前 4 个；并发之后若不管，
-  //   `Promise.all` 虽然立刻拒绝，但**其余 8 个已经排进闸门了**，它们会照样发出去 ——
+  //   `allSettled` 会等它们跑完，但**它们早就排进闸门了**，它们会照样发出去 ——
   //   钱在「已经知道失败了」之后继续烧。这个共享的失败信号就是那道闸。
   const stop: { error: unknown } = { error: null };
   const textGate = semaphore(opts.concurrency?.text ?? DEFAULT_CONCURRENCY.text, stop);
   const imageGate = semaphore(opts.concurrency?.image ?? DEFAULT_CONCURRENCY.image, stop);
   const built: Built[] = new Array<Built>(recipe.assets.length);
 
-  await Promise.all(recipe.assets.map(async (entry, idx) => {
+  // ⚠️ **失败不立刻抛**（2026-09-30 · 票 05）：并发在飞的**已经付过钱** —— 等它们收尾，
+  //   多救几张原图进失败现场，账也更准（发出即记那一条让「花了几笔」成为事实）。
+  //   ⚠️ 不等还有第二个后果：失败那条 `renameSync` 先生效，还在飞的那笔随后往**旧路径**写
+  //   ⇒ 报错，而它的产物永远进不了现场；工作目录那时若是空的，**连现场都不留**（整笔白花）。
+  //   ⚠️ 等的上界是**现成的调用超时**（240–300s），不新拍一个数。
+  const settled = await Promise.allSettled(recipe.assets.map(async (entry, idx) => {
       const spec = entry.spec;
       opts.onProgress?.(idx, recipe.assets.length, spec.id);
       const plan = framePlan(spec);
@@ -350,11 +355,41 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             ...(u.layer === undefined ? {} : { layer: u.layer }),
           });
           // ⚠️ 过**生图**那道闸 —— 一次调用就是一笔钱，别把它和文本调用共用一个上限
-          const { image, call } = await imageGate(() => opts.generateImage!({
-            prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
-            negativePrompt: imageNegativePrompt(),
-            ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
-          }));
+          // ⚠️ **发出即记**（2026-09-30 · 票 05）：这一笔**已经花出去了** —— 它回不回来是另一回事。
+          //   先记一笔「已发出」（`ms` 缺席），回来时再把 `ms` / `attempts` / `usage` 补上；
+          //   补不上就让它**缺席** —— 不许写 0 冒充「测到了 0」（票 19 Q4）。
+          //   ⚠️ `upstream` 也**先不写** —— 与 `ms` 同一条纪律：拿不到就缺席（协议要到调用方
+          //   构造生成器时才知道，`buildAssetPack` 手里没有）。回来时一起补上。
+          //
+          //   ⚠️⚠️ **记在闸门「里面」，不是外面**：那道闸会**拒掉还没发出去的**排队调用
+          //   （票 47「失败即止」），而**那几笔一分钱没花** —— 记在外面就会**多报**。
+          //   （实测：4 个资源、并发 1、第一个就挂 ⇒ 上游只收到 **1** 笔，账上却写了 **4** 笔。
+          //   那直接违反票 05 的判据：报出来的笔数 **===** 真实发出的笔数。）
+          let rec: LedgerCall | undefined;
+          const { image, call } = await imageGate(() => {
+            rec = { step: "image", target: spec.id, attempts: 1 };
+            opts.ledger?.push(rec);
+            return opts.generateImage!({
+              prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
+              negativePrompt: imageNegativePrompt(),
+              ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
+            });
+          });
+          // 回来了：把这一笔**补成事实**（同一个对象 —— 账里仍是**一笔**，不是两笔）
+          // ⚠️ **紧跟着 await 做**，别挪到后面去：落盘与「分块」那两段都会抛，
+          //   一笔**已经回来了**的调用若卡在它们后面，就会一直停在 `ms` 缺席 ——
+          //   而两个壳会把它印成「**还没回来**」，那是**假话**（账里那句定义：缺席 = 发出去了、还没回来）。
+          // ⚠️ 走到这里 = 闸门**放行过**它 ⇒ `rec` 必然已经写上（闸门只做两件事：放行、或拒）
+          // ⚠️ `satisfies` 不是装饰：`Object.assign` 会**丢掉对象字面量的多余属性检查**
+          //   （把键名写错不再报错）。这一句把它找回来。
+          if (rec) Object.assign(rec, {
+            upstream: call.protocol, ms: call.ms, attempts: call.attempts,
+            ...(call.requestedSize !== undefined ? { requestedSize: call.requestedSize } : {}),
+            ...(call.requestedModel !== undefined ? { requestedModel: call.requestedModel } : {}),
+            ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
+            ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
+            ...(call.usage !== undefined ? { usage: call.usage } : {}),
+          } satisfies Omit<LedgerCall, "step" | "target">);
           // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
           fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));
           fs.writeFileSync(path.join(packDir, u.raw.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
@@ -380,14 +415,6 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             cells.push(...seg.cells);
           }
           imageCalls.push({ assetId: spec.id, ...call });
-          opts.ledger?.push({
-            step: "image", target: spec.id, upstream: call.protocol, ms: call.ms, attempts: call.attempts,
-            requestedSize: call.requestedSize,
-            ...(call.requestedModel !== undefined ? { requestedModel: call.requestedModel } : {}),
-            ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
-            ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
-            ...(call.usage !== undefined ? { usage: call.usage } : {}),
-          });
         }
         // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43），都要在这里定，不能留给默认：
         //   ① **按我们告诉模型的颜色抠底**，不四角取样 —— 背景层的角上就是内容本身
@@ -492,9 +519,12 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             loop: a.loop,
           }))
         : undefined;
-      // 按下标落位 —— `Promise.all` 的完成顺序是乱的，而 manifest 里的资源顺序必须稳定。
+      // 按下标落位 —— 并发下**完成顺序是乱的**，而 manifest 里的资源顺序必须稳定。
       built[idx] = { spec, origin, paletteBinding: binding, frames, ...(animations ? { animations } : {}), authoring };
   }));
+  // ⚠️ 逐条看过再抛**第一条**失败 —— 取**清单顺序**，与「谁先挂」无关（并发下那个不可复现）
+  const firstFailure = settled.find((r): r is PromiseRejectedResult => r.status === "rejected");
+  if (firstFailure) throw firstFailure.reason;
 
   // ── 按 kind 各打一份图集（票 24：四类的最优打包参数不同）──────────────────
   const ATLAS_NAME: Record<string, string> = { sprite: "sprites", animation: "animations", background: "backgrounds", ui: "ui" };
@@ -584,6 +614,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   //   写在 walk 之后的话它就漏在 checksum 覆盖之外了。
   //
   // ⚠️ 而且它写在**临时包目录**里（`finalDir` 搬迁之前），所以它跟着包一起搬走。
+  // ⚠️ **包内这份账与「异常上那份」是同一份数组，但读的时刻不同**（票 05）——
+  //   包内这份**只在成功时才写**，而失败时根本走不到这里 ⇒ 它天然只含**回来的**调用。
+  //   ⚠️ 而这一点从 2026-09-30 起是**构造保证**、不再是碰巧：每一条「已发出」都**记在闸门里面**
+  //   （没被放行的一分钱没花、也就不记），而每一条记下的都会在同一个 unit 里被 `Object.assign` 补成事实。
+  //   ⇒ 能走到这一行，就说明**每一条都被补过**。
   const ledgerDoc: Ledger | undefined = opts.ledger
     ? {
         format: LEDGER_FORMAT, packId: recipe.id, packVersion: version,
@@ -627,3 +662,4 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   fs.renameSync(packDir, finalDir);
   return { manifest, packDir: finalDir, audit, imageCalls, ...(ledgerDoc ? { ledger: ledgerDoc } : {}) };
 }
+
