@@ -274,9 +274,9 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
   const px = (hex: string): [number, number, number] =>
     [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
   /** 一张「中间有东西、四周是抠底色」的图 —— 与真生图模型的产出同构。 */
-  const layerImage = (w: number, h: number, fill: string): RasterImage => {
+  const layerImage = (w: number, h: number, fill: string, border?: string): RasterImage => {
     const data = Buffer.alloc(w * h * 4);
-    const k = px(keyColorFor(STYLE.palette)), f = px(fill);
+    const k = px(border ?? keyColorFor(STYLE.palette)), f = px(fill);
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const o = (y * w + x) * 4;
       const inner = x >= w * 0.25 && x < w * 0.75 && y >= h * 0.25 && y < h * 0.75;
@@ -309,6 +309,50 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
       expect(existsSync(path.join(packDir, `authoring/generated/station.${name}.png`)), name).toBe(true);
     expect(manifest.assets[0]!.frames.map((f) => f.name)).toEqual(["station.sky", "station.wall", "station.ground"]);
     expect(verifyPack({ packDir }).data.ok).toBe(true);
+  });
+
+  /** 把底色挪开 70 —— 模拟「模型画了另一个相近的颜色」（实测差 129–248）。 */
+  const drifted = () => {
+    const k = px(keyColorFor(STYLE.palette));
+    return `#${[Math.max(0, k[0] - 70), Math.min(255, k[1] + 70), k[2]].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+  };
+  /** 与 `call` 同款，但**底色画偏了**（`which` 指定哪几层偏）。 */
+  const callDrifted = (which: (name: string) => boolean) => {
+    const gen: GenerateImage = async (req) => ({
+      image: layerImage(req.size.w, req.size.h, STYLE.palette[1]!,
+        which(req.prompt.includes("sky") ? "sky" : req.prompt.includes("wall") ? "wall" : "ground") ? drifted() : undefined),
+      call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
+    });
+    return gen;
+  };
+
+  it("⚠️ **底色没抠到 ⇒ 硬失败**（票 03）—— 抠不掉的那层会一个洞都没有，把后面全挡住", async () => {
+    // ⚠️ 依据是实测：模型给的底色可以离声明色 **129–248**，而容差只有 40 ⇒ 一个像素都抠不掉。
+    //   后果不只是「该透明的地方留着底色」—— 这一层的不透明率会**恒为 1**，
+    //   于是「最远层必须画满」那条门禁**反而通过**（抠不掉的东西全是不透明的）。
+    const gen = callDrifted((name) => name !== "sky");
+    const e = await buildAssetPack({
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    }).catch((x: unknown) => x as Error);
+    expect(e).toBeInstanceOf(Error);
+    // 只报**第一条**（wall 在 ground 前面）—— 一次说清一个
+    expect((e as Error).message).toMatch(/底色\*\*一个像素都没抠到\*\*/);
+    expect((e as Error).message).toMatch(/station\.wall/);
+    expect((e as Error).message).toMatch(/把后面那几层整个挡住/);
+    // ⚠️ 而它**明确不许**被修成「按四角取样兜底」—— 那条路会毁掉最远层
+    expect((e as Error).message).toMatch(/别改成「按四角取样兜底」/);
+  });
+
+  it("⚠️ **最远那层底色偏了不报错** —— 它本来就该是满的，抠得少是它对", async () => {
+    // 这一条钉的是「只查非最远层」那条边界。实测：四角取样会把最远层抠掉 **48–50%**
+    // （它的角上就是内容本身）—— 所以「一律兜底」是错的修法。
+    const gen = callDrifted((name) => name === "sky");
+    const { audit } = await buildAssetPack({
+      recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT,
+      generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+    });
+    expect(audit).toEqual([]);
   });
 
   it("提示词说得清「画的是哪一层」与「没东西的地方留空」，且**不**照搬单物体那份", async () => {

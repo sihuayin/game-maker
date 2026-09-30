@@ -349,14 +349,45 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         const bgOpt = isBg
           ? { tolerance: src.background?.tolerance ?? 30, colors: [hexToRgb(keyColorFor(palette))] }
           : src.background;
-        const results = batches.flatMap((cells) =>
-          importFrames(cells, {
+        // 背景层**声明**的那个底色（有就是有、没有就没有 —— 单物件走的是四角取样那条）
+        const declaredColors = bgOpt && "colors" in bgOpt ? bgOpt.colors : undefined;
+        const results = batches.flatMap((cells, u) => {
+          // ⚠️ **背景层的底色必须真的被抠掉**（2026-09-30 · 票 03）——
+          //   抠不掉的后果不只是「该透明的地方留着底色」：这一层的**不透明率会恒为 1**，
+          //   于是它**把后面那几层整个挡住**，而「最远层必须画满」那条门禁**反而通过**
+          //   （抠不掉的东西全是不透明的 ⇒ 每一层看起来都是满的）。那是「错得安静」的正品。
+          //
+          //   ⚠️ **只查「不是最远」的那几层**。最远那层**本来就该是满的**，抠得少是它对；
+          //   而实测里**四角取样会把最远层抠掉 48–50%**（它的角上就是内容本身）。
+          //   这也是为什么这一条不能写成「一律按四角取样兜底」。
+          //
+          //   ⚠️ **判据为什么是「0」而不是某个百分比**：磁盘上 15 张真包的背景层实测下来，
+          //   抠掉 0 的只有 3 张（Gemini 那一包的三层），而**其次最低的一档是 38.3%** ——
+          //   0 不是「少」，是「那个颜色根本不在这张图里」。
+          const layer = units[u]?.layer;
+          if (isBg && layer && layer.index > 0 && declaredColors && bgOpt) {
+            const declared = keyBackground(cells[0]!, { tolerance: bgOpt.tolerance, colors: declaredColors });
+            if (declared.keyedPixels === 0) {
+              const corners = keyBackground(cells[0]!, { tolerance: bgOpt.tolerance }).backgroundColors;
+              throw new Error(
+                `背景层 "${spec.id}.${layer.name}" 的底色**一个像素都没抠到** —— 声明的是 ` +
+                `[${declaredColors[0]!.join(", ")}]（容差 ${bgOpt.tolerance}），而画面里取样到的是 ` +
+                `${corners.map((c) => `[${c.join(", ")}]`).join(" / ")}。\n` +
+                `⚠️ 多半是**模型画了另一个相近的颜色**（实测差 129–248）。抠不掉的后果不只是` +
+                `「该透明的地方留着底色」—— 这一层会**一个洞都没有**，把后面那几层整个挡住，` +
+                `而「最远层必须画满」那条门禁**反而会通过**。\n` +
+                `⇒ 要么重出这一层，要么把 source.background 改成它真画的那个颜色。` +
+                `（⚠️ 别改成「按四角取样兜底」—— 实测那会把**最远**那层抠掉一半，` +
+                `因为最远层的角上就是内容。）`);
+            }
+          }
+          return importFrames(cells, {
             palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
             ...(bgOpt !== undefined ? { background: bgOpt } : {}),
             ...(isBg ? { trim: false } : {}),
             ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
-          }),
-        );
+          });
+        });
         const stateOf = new Map<string, string>();
         if (spec.kind === "animation") {
           let k = 0;
