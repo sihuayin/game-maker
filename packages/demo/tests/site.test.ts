@@ -175,7 +175,7 @@ describe("输入不对时给的是**用法错**（2），不是产物不合法�
  *   因为**墙本来就只占中间那带、上面留给天**。⇒「所有层都必须满」会拒掉它。
  *   而 `out/last-train-image/pack/v2` 的 `sky`（**最远那层**）只有 **68%** —— 那才是洞。
  */
-describe("最远的那一层必须画满（票 50）", () => {
+describe("背景的两条：最远层**必须满**、其余层**不许满**（票 50 + 2026-09-30）", () => {
   // ⚠️ 第一个参数是 **manifest**、第二个才是 config —— 我在这儿写反过一次（传了两份 config），
   //   于是 `buildWorld` 拿到一个过不了 schema 的「包」，产出**空背景**，检查**永远不触发**，
   //   而「画满 ⇒ 通过」那条会**假通过**。测试里最容易骗过自己的就是这种：
@@ -203,6 +203,40 @@ describe("最远的那一层必须画满（票 50）", () => {
     expect(e[0]!.message).toMatch(/最远的那一层没画满/);
     expect(e[0]!.message).toMatch(/68\.2%/);
     expect(e[0]!.message).toMatch(/只有最远这层必须满/);
+  });
+
+  it("⚠️ **其余层一个透光的地方都没有 ⇒ 硬失败** —— 它把后面全挡住，背景等于只有一层", () => {
+    // ⚠️ 这一条是补的另半边：上面那条只查了一个方向，于是留下一个**正好反过来**的洞。
+    //   而它有两种成因，**两种都会让「最远层画满」那条假通过**：
+    //     · 抠图底色没抠掉（模型画的不是提示词里那个纯色 ⇒ `keyBackground` 一个像素都删不掉）；
+    //     · 每层都把整张场景画了一遍（每层的提示词里塞的都是整张场景的描述 —— 那处缝在契约里）。
+    //   ⚠️ 界凭什么不是拍的一个数：17 个包 · 126 张生图原图 · 两个上游实测，
+    //   **抠掉 0 像素的只有 3 张**，其次最低的一档是 **3.5%**，而真包的近层按设计停在 14%/42%。
+    const issues = auditGeometry(world(), [
+      layer(FARTHEST, 1), layer("bg-dusk-halt.wall", 1), layer("bg-dusk-halt.ground", 1),
+    ]);
+    const e = issues.filter((i) => i.severity === "error");
+    expect(e.map((i) => i.where)).toEqual(["scene.background[1]", "scene.background[2]"]);
+    expect(e[0]!.message).toMatch(/一个透光的地方都没有/);
+    expect(e[0]!.message).toMatch(/抠图底色没抠掉/);
+    expect(e[0]!.message).toMatch(/每层都画了整张场景/);
+    // ⚠️ 这条要的是「**别满**」，不是「要满」—— 说反了就会把真包的 14% 也拒掉
+    expect(e[0]!.message).toMatch(/别满/);
+    // ⚠️ 而**旧那条在这份数据上一条都不响** —— 这正是那个洞：抠图失败会让每层看起来都是满的。
+    expect(e.map((i) => i.message).join("\n")).not.toMatch(/最远的那一层没画满/);
+  });
+
+  it("⚠️ 近层**差一点点**不满（0.998）⇒ 放行 —— 界是 `FILLED`，不是「比 1 小就算」", () => {
+    const issues = auditGeometry(world(), [
+      layer(FARTHEST, 1), layer("bg-dusk-halt.wall", 0.998), layer("bg-dusk-halt.ground", 0.14),
+    ]);
+    expect(issues.filter((i) => i.severity === "error")).toEqual([]);
+  });
+
+  it("⚠️ **只有一层**的背景：那条「不许满」不适用（没有后面可挡）", () => {
+    // 判据只对 `background[1..]` 生效 —— 单层背景里那一层既是最远、也是唯一。
+    const issues = auditGeometry(world(), [layer(FARTHEST, 1)]);
+    expect(issues.filter((i) => i.severity === "error")).toEqual([]);
   });
 
   it("⚠️ **没有 coverage.json 就不查** —— 老包都不带它，那不是错", () => {
