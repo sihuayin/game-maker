@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { parseAssetPack, type AssetSpec, type AssetRecipe, type DrawList, type StyleSpec } from "@game-maker/contracts";
-import { decodePNG } from "../src/png.js";
+import { decodePNG, encodePNG } from "../src/png.js";
 import {
   buildAssetPack, keyColorFor, nextPackVersion, verifyPack,
   type DrawListGenerator, type GenerateImage, type RasterImage,
@@ -573,5 +573,93 @@ describe("并发：上限按上游分别定，而且真的管用（票 47）", (
     const { manifest } = await buildAssetPack({ recipe: many(4), style: STYLE, outDir: tmp(), recipeDir: ROOT,
       generate: gen, concurrency: { text: 4 }, sourceDateEpoch: EPOCH });
     expect(manifest.assets.map((a) => a.id)).toEqual(["s0", "s1", "s2", "s3"]);
+  });
+});
+
+describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () => {
+  // ⚠️ 这一条的由来：`pack` 写进 `.building-<pid>-<版本>` 工作目录、成功后改名过去，
+  //   而**原图与逐字提示词是一张一落的**（每次调用回来就写）⇒ 失败那一刻，
+  //   已经付过钱的创作态**就躺在磁盘上**，然后被失败分支的 `rmSync` **主动删掉**。
+  //   实测两次：GPT 6 笔 · 约 19 分钟、Gemini 4 笔 · 约 9.5 分钟，产物为零。
+  /** 两份单帧 sprite —— 一次生图调用一个 unit，「第几个失败」因此是确定的。 */
+  const twoSprites = (): AssetRecipe => ({
+    ...RECIPE, id: "salvage", referenceImage: undefined,
+    assets: ["a", "b"].map((id) => ({
+      spec: { kind: "sprite" as const, id, role: `${id} 的角色`, description: `${id} 那个东西`,
+        styleId: "style-ref", anchor: { x: 0.5, y: 0.5 }, size: { w: 16, h: 16 }, required: true },
+      source: { kind: "image" as const, background: { tolerance: 0 } },
+    })),
+  });
+  /** 一张纯色图 —— 这里不关心内容，只关心「它被写下去过」。⚠️ 自己造，别去够别处的夹具。 */
+  const flat = (w: number, h: number): RasterImage => {
+    const data = Buffer.alloc(w * h * 4);
+    for (let i = 0; i < w * h; i++) { data[i * 4] = 0x44; data[i * 4 + 1] = 0x55; data[i * 4 + 2] = 0x66; data[i * 4 + 3] = 255; }
+    return { width: w, height: h, data };
+  };
+  /** 第 `failAt` 次调用抛，其余照常返回一张图。⚠️ 调用方要把它配上 `concurrency: {image: 1}`（顺序才是确定的）。 */
+  const failingGen = (failAt: number) => {
+    const ok: { image: RasterImage; prompt: string }[] = [];
+    const gen: GenerateImage = async (req) => {
+      if (ok.length + 1 === failAt) throw new Error("抖一下");
+      const image = flat(req.size.w, req.size.h);
+      ok.push({ image, prompt: req.prompt });
+      return { image, call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 } };
+    };
+    return { gen, ok };
+  };
+  /** ⚠️ 用 `.then(成功, 失败)` 而不是 `.catch` —— 只 `.catch` 的话返回类型是**联合**，
+   *  TS 就没法在断言里收窄 `failureDir`（那是 `pack.test.ts` 里第一次见的那种收窄）。 */
+  const fail = (outDir: string, gen: GenerateImage): Promise<Error & { failureDir?: string }> =>
+    buildAssetPack({
+      recipe: twoSprites(), style: STYLE, outDir, recipeDir: ROOT,
+      generate: stub, generateImage: gen, concurrency: { image: 1 }, sourceDateEpoch: EPOCH,
+    }).then(() => { throw new Error("本该失败，却出包了"); },
+      (x: unknown) => x as Error & { failureDir?: string });
+
+  it("⚠️ 第 2 个资源挂掉 ⇒ 第 1 个的**原图与逐字提示词原样还在**（判据一）", async () => {
+    const d = tmp();
+    const { gen, ok } = failingGen(2);
+    const e = await fail(d, gen);
+    expect(e.failureDir, "失败现场没留下来").toBeDefined();
+    const dir = e.failureDir!;
+    expect(path.basename(dir)).toMatch(/^failed-/);
+    // ⚠️ **逐字节**：与那一刻写下去的那份比，不是「差不多」
+    expect(readFileSync(path.join(dir, "authoring/generated/a.png")).equals(encodePNG(ok[0]!.image))).toBe(true);
+    expect(readFileSync(path.join(dir, "authoring/generated/a.prompt.txt"), "utf8")).toBe(ok[0]!.prompt + "\n");
+    // 而**没成功的那一个不许有** —— 现场是「付过钱的那些」，不是「清单上的那些」
+    expect(existsSync(path.join(dir, "authoring/generated/b.png"))).toBe(false);
+    // ⚠️ 它是**失败现场不是包**：不占版本号（「失败不消耗版本号」照旧成立）
+    expect(existsSync(path.join(d, "salvage", "pack", "v1"))).toBe(false);
+    expect(nextPackVersion(d, "salvage")).toBe(1);
+  });
+
+  it("⚠️ **拿那份现场拼一份 `import` 配方出得了包**（判据二）—— 生图 0 次", async () => {
+    const d = tmp();
+    const { gen } = failingGen(2);
+    const e = await fail(d, gen);
+    // 人拿到那份现场之后该做的事：把它当 `import` 的来源，重出一份包。
+    // ⚠️ `ref` 相对**配方文件**解析 ⇒ 把 `recipeDir` 指到现场那一层，路径就是它里面那个。
+    const kept = { ...twoSprites(), id: "salvaged" };
+    const r = await buildAssetPack({
+      recipe: { ...kept, assets: [{ spec: kept.assets[0]!.spec,
+        source: { kind: "import", ref: "authoring/generated/a.png", background: { tolerance: 0 } } }] },
+      style: STYLE, outDir: tmp(), recipeDir: e.failureDir!,
+      generate: stub, sourceDateEpoch: EPOCH,          // ⚠️ 没有 generateImage ⇒ 一次生图调用都不会发
+    });
+    expect(r.audit).toEqual([]);
+    expect(verifyPack({ packDir: r.packDir }).data.ok).toBe(true);
+  });
+
+  it("⚠️ **同一份配方只留最近一份** —— 失败两次不堆成一部失败史", async () => {
+    const d = tmp();
+    for (let i = 0; i < 2; i++) await fail(d, failingGen(2).gen);
+    expect(readdirSync(path.join(d, "salvage")).filter((x) => x.startsWith("failed-"))).toHaveLength(1);
+  });
+
+  it("⚠️ **一笔都没成功就挂掉 ⇒ 不留空目录**（原来那条 rmSync 怕的正是这个）", async () => {
+    const d = tmp();
+    const e = await fail(d, failingGen(1).gen);
+    expect(e.failureDir).toBeUndefined();
+    expect(readdirSync(path.join(d, "salvage")).filter((x) => x.startsWith("failed-") || x.startsWith(".building-"))).toEqual([]);
   });
 });

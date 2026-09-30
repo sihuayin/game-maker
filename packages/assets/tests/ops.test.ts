@@ -44,6 +44,13 @@ describe("⚠️ 没有兜底：上游不可达就是失败（2026-09-25 拆掉�
     expect(fs.existsSync(path.join(OUT, "no-fallback", "pack", "v1"))).toBe(false);
   });
 
+  it("⚠️ 而**一笔都没成功**时也不留空现场（票 01）", () => {
+    // 保住创作态与「不堆积」是同一件事的两面：**有东西才留**。
+    // 这一条钉住空的那一半 —— 一次调用都没成，那里一个文件都没有，留着只是垃圾。
+    expect(fs.existsSync(path.join(OUT, "no-fallback", "failed-"))).toBe(false);
+    expect(fs.readdirSync(path.join(OUT, "no-fallback")).filter((x) => x.startsWith("failed-") || x.startsWith(".building-"))).toEqual([]);
+  });
+
   it("上游正常 → 出包（stub fetch，不碰真网络）；失败一次后重试成功也不算降级", async () => {
     let n = 0;
     const flaky = (async () => {
@@ -62,5 +69,42 @@ describe("⚠️ 没有兜底：上游不可达就是失败（2026-09-25 拆掉�
     expect(r).not.toHaveProperty("degradations");
     expect(r.data).not.toHaveProperty("degraded");
     expect(r.data).not.toHaveProperty("transportUsed");
+  });
+});
+
+describe("⚠️ 失败现场：一次失败就是几笔**已经付过钱**的调用（票 01）", () => {
+  // ⚠️ 由来：`pack` 写进 `.building-<pid>-<版本>`、成功后改名过去，而产物是**一个一个落的**
+  //   ⇒ 失败那一刻，已经付过钱的东西就躺在磁盘上 —— 原来那一次 `rmSync` 把它全删了。
+  //   实测两次：GPT 6 笔 · 约 19 分钟、Gemini 4 笔 · 约 9.5 分钟，产物为零。
+  const D2 = fs.mkdtempSync(path.join(os.tmpdir(), "gm-ops-keep-"));
+  const OUT2 = path.join(D2, "out");
+  /** 两份资源 ⇒ 第一份成功时它的产物就落进工作目录了，第二份挂掉。 */
+  const TWO = { ...RECIPE, id: "keepsake", assets: [RECIPE.assets[0]!,
+    { ...RECIPE.assets[0]!, spec: { ...RECIPE.assets[0]!.spec, id: "crate2" } }] };
+  const recipePath = path.join(D2, "recipe.json");
+  fs.writeFileSync(recipePath, JSON.stringify(TWO));
+  // ⚠️ `styleRef` 相对**配方文件**解析 ⇒ 风格规格得跟着配方走
+  fs.writeFileSync(path.join(D2, "stylespec.json"), JSON.stringify(STYLE));
+
+  it("上游第二次挂掉 ⇒ `CommandError` 上带着**失败现场的路径**，里面躺着第一份的产物", async () => {
+    let n = 0;
+    const flaky = (async () => {
+      if (++n === 1) return new Response(JSON.stringify({ content: [{ type: "text", text: JSON.stringify(GOOD) }] }),
+        { status: 200, headers: { "content-type": "application/json" } });
+      throw new Error("抖一下");
+    }) as typeof fetch;
+    const e = await packAssets({
+      recipePath, outRoot: OUT2, transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: flaky,
+      concurrency: { text: 1, image: 1 },     // ⚠️ 串行 ⇒ 「第一个成功」才是确定的
+    }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    const kept = (e as CommandError).failureDir;
+    expect(kept, "失败现场没搬进 CommandError").toBeDefined();
+    // ⚠️ 里面是**真的付过钱的那一份** —— 而**不是**清单上的全部
+    expect(fs.existsSync(path.join(kept!, "authoring/drawlist/crate.json"))).toBe(true);
+    expect(fs.existsSync(path.join(kept!, "authoring/drawlist/crate2.json"))).toBe(false);
+    // ⚠️ 它是失败现场不是包：不占版本号、也不在 `pack/` 底下
+    expect(fs.existsSync(path.join(OUT2, "keepsake", "pack", "v1"))).toBe(false);
+    expect(path.dirname(kept!)).toBe(path.join(OUT2, "keepsake"));
   });
 });

@@ -1,4 +1,6 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { EXIT, exitCodeOfError, CommandError } from "@game-maker/assets";
@@ -81,5 +83,56 @@ describe.skipIf(!hasPack)("对真实包的三个操作", () => {
     b[at] = b[at]! ^ 0xff;
     writeFileSync(target, b);
     expect((await runC(["verify", dir])).code).toBe(EXIT.invalid);
+  });
+});
+
+describe("⚠️ 失败现场：CLI 要把它说给人（票 01）", () => {
+  // ⚠️ 生图那条路一次失败就是几笔**已经付过钱**的调用，而原图与逐字提示词在失败那一刻
+  //   就在磁盘上（一个一个落的）—— 现在改名留下，这里钉住**它真的被说出来了**。
+  //
+  // 造一份「第一件（import）已经落盘、第二件（drawlist）的上游挂掉」的配方：
+  //   import 那一支**没有 await**，所以它的文件先落 ✓ 不必起桩服务器。
+  const D = mkdtempSync(path.join(tmpdir(), "gm-cli-keep-"));
+  const STYLE = JSON.parse(readFileSync(ROOT + ".scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json", "utf8"));
+  writeFileSync(path.join(D, "stylespec.json"), JSON.stringify(STYLE));
+  copyFileSync(ROOT + "fixtures/reference/test.png", path.join(D, "src.png"));
+  const spec = (id: string) => ({ kind: "sprite", id, role: id, description: `${id} 的东西`,
+    styleId: "style-ref", anchor: { x: 0.5, y: 0.5 }, size: { w: 16, h: 16 }, required: true });
+  const recipePath = path.join(D, "recipe.json");
+  writeFileSync(recipePath, JSON.stringify({ format: "asset-recipe/v1", id: "cli-keep",
+    styleRef: "stylespec.json",
+    assets: [{ spec: spec("first"), source: { kind: "import", ref: "src.png" } },
+             { spec: spec("second"), source: { kind: "drawlist" } }] }));
+
+  const withDeadUpstream = async (argv: string[]) => {
+    const old = { u: process.env.ANTHROPIC_BASE_URL, k: process.env.ANTHROPIC_AUTH_TOKEN };
+    process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:9";   // 死端口 ⇒ 上游不可达（3）
+    process.env.ANTHROPIC_AUTH_TOKEN = "x";
+    try { return await runC(argv); }
+    finally {
+      if (old.u === undefined) delete process.env.ANTHROPIC_BASE_URL; else process.env.ANTHROPIC_BASE_URL = old.u;
+      if (old.k === undefined) delete process.env.ANTHROPIC_AUTH_TOKEN; else process.env.ANTHROPIC_AUTH_TOKEN = old.k;
+    }
+  };
+
+  it("人看的那一行：说清**在哪**、以及**怎么复用**", async () => {
+    const { code, io } = await withDeadUpstream(["pack", "--recipe", recipePath, "--out", path.join(D, "out")]);
+    expect(code).toBe(EXIT.upstream);
+    const text = io.errors.join("");
+    expect(text).toMatch(/已经付过钱的那几张原图留着/);
+    expect(text).toMatch(/failed-/);
+    expect(text).toMatch(/import/);           // 「怎么复用」那一句也得在
+    // ⚠️ 现场**真的在那儿**，不是只有一句好话
+    const dir = /原图留着（[^）]*）：(\S+)/.exec(text.replace(/\*\*/g, ""))?.[1];
+    expect(dir, "那一行里没给出路径").toBeDefined();
+    expect(existsSync(path.join(dir!, "authoring/imported"))).toBe(true);
+  });
+
+  it("机器看的那一份：`--json` 里带着 `failureDir`（与账同一处）", async () => {
+    const { io } = await withDeadUpstream(["pack", "--recipe", recipePath, "--out", path.join(D, "out2"), "--json"]);
+    const doc = JSON.parse(io.lines.join("")) as { exitCode: number; failureDir?: string; ledger?: unknown[] };
+    expect(doc.exitCode).toBe(EXIT.upstream);
+    expect(doc.failureDir).toMatch(/failed-/);
+    expect(doc.ledger, "账也要在（票 46）").toBeDefined();
   });
 });

@@ -38,10 +38,23 @@ export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as 
  */
 export class CommandError extends Error {
   readonly ledger?: LedgerCall[];
-  constructor(readonly kind: keyof typeof EXIT, message: string, opts: { ledger?: LedgerCall[] } = {}) {
+  /**
+   * **失败现场留在哪**（2026-09-30 · 票 01）。
+   *
+   * ⚠️ 只有 `pack` 会带它：生图那条路一次失败就是几笔**已经付过钱**的调用，
+   *   而原图与逐字提示词在失败那一刻**就在磁盘上**（一张一落）。以前那是一次 `rmSync` 删掉的，
+   *   现在改名留下 —— 这个字段把它说给调用方，`--json` 也带得出来。
+   * ⚠️ 它是**失败现场**，不是包：不占版本号、`verify` / `inspect` 都不认它。
+   */
+  readonly failureDir?: string;
+  constructor(
+    readonly kind: keyof typeof EXIT, message: string,
+    opts: { ledger?: LedgerCall[]; failureDir?: string } = {},
+  ) {
     super(message);
     this.name = "CommandError";
     this.ledger = opts.ledger;
+    this.failureDir = opts.failureDir;
   }
 }
 export const exitCodeOfError = (e: unknown): number => (e instanceof CommandError ? EXIT[e.kind] : EXIT.failure);

@@ -174,9 +174,16 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
     const message = e instanceof Error ? e.message : String(e);
     // ⚠️ **失败时已经花掉的那几笔**（票 46）—— 包没产出来，它们没有别的家。
     const spent = e instanceof CommandError ? e.ledger : undefined;
-    if (json) io.out(JSON.stringify({ command, error: message, exitCode: code, ...(spent?.length ? { ledger: spent } : {}) }, null, 2) + "\n");
+    // ⚠️ **失败现场**（票 01）：生图那条路一次失败就是几笔已经付过钱的调用，
+    //   而原图与逐字提示词在失败那一刻就在磁盘上 —— 现在**改名留下**，这里把它说给人。
+    const kept = e instanceof CommandError ? e.failureDir : undefined;
+    if (json) io.out(JSON.stringify({ command, error: message, exitCode: code,
+      ...(spent?.length ? { ledger: spent } : {}), ...(kept ? { failureDir: kept } : {}) }, null, 2) + "\n");
     else {
       io.err(`✗ ${message}\n`);
+      if (kept)
+        io.err(`\n⚠️ **已经付过钱的那几张原图留着**（连同那时逐字发出去的提示词）：${kept}\n` +
+          `   想复用：把那些资源的 source 改成 {"kind":"import","ref":"…"} 指过去 —— **生图 0 次**。\n`);
       if (spent?.length)
         io.err(`\n已经花掉的（${spent.length} 次调用 · ${spent.reduce((n, c) => n + c.attempts, 0)} 次往返）：\n` +
           spent.map((c) => `  · ${c.step} ${c.target} · ${(c.ms / 1000).toFixed(1)}s · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}\n`).join(""));

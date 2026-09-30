@@ -16,7 +16,7 @@ import {
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
-import { buildAssetPack, type GenerateImage } from "./pack.js";
+import { buildAssetPack, type FailureSite, type GenerateImage } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
@@ -712,7 +712,13 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
     //   而**已经花掉的那几笔是事实** —— 它们跟着异常走，两个壳各自渲染。
     //   ⚠️ 这个数组在 `buildAssetPack` **调用之前**就存在了，所以它活过了这次抛出；
     //   而票 47 的「失败即止」保证它只含**真的发出去过**的调用（没发的不算）。
-    const carried = ledger.length > 0 ? { ledger } : {};
+    // ⚠️ **失败现场**（票 01）：`buildAssetPack` 已经把工作目录改名留下了，
+    //   路径挂在异常上 —— 与账**同一处**搬进 `CommandError`（两个壳各自渲染）。
+    const failureDir = (e as FailureSite).failureDir;
+    const carried = {
+      ...(ledger.length > 0 ? { ledger } : {}),
+      ...(failureDir !== undefined ? { failureDir } : {}),
+    };
     if (e instanceof GenerationError || e instanceof ImageGenerationError)
       throw new CommandError("upstream", e.message, carried);
     if (e instanceof CommandError) throw new CommandError(e.kind, e.message, carried);

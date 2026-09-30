@@ -185,14 +185,59 @@ function scale9Of(spec: AssetSpec): { x: number; y: number; w: number; h: number
   return { x: left, y: top, w: spec.size.w - left - right, h: spec.size.h - top - bottom };
 }
 
+/** 失败时把现场留在哪 —— 挂在那条异常上，`packAssets` 会把它搬进 `CommandError`。 */
+export type FailureSite = { failureDir?: string };
+
+/**
+ * **失败现场**：把工作目录**改名**留下，而不是删掉（2026-09-30 · 票 01）。
+ *
+ * ⚠️ 原图与逐字提示词是**一张一落**的（见下面 `u.raw` 那两行）—— 失败那一刻，
+ *   **已经付过钱的创作态就躺在工作目录里**。原来这里是 `rmSync`（为了不堆积），
+ *   于是「一次网络抖动」把几笔真金白银的调用变成零：实测两次，
+ *   GPT 6 笔 · 约 19 分钟、Gemini 4 笔 · 约 9.5 分钟，**产物为零**。
+ *
+ * ⚠️ **为什么改名、不留 `.building-*`**：那个名字带 pid、又是**点开头的隐藏目录**
+ *   （`ls` 里直接消失）—— 正是这个仓库最防的那种「错得安静」。`failed-<时间戳>` 认得出是哪一次。
+ *   ⚠️ 它**是失败现场不是包** ⇒ 不占「绝不覆盖」的版本号（「失败不消耗版本号」照旧成立），
+ *   也不会被 `verify` / `inspect` 误认成包（那两个命令要显式传目录）。
+ *
+ * ⚠️ **同一份配方只留最近一次**：它的语义是「给你**上一份**失败现场」，不是「给你一部失败史」。
+ *   （原来那条 `rmSync` 就是怕堆积 —— 那条担心仍然成立，只是答案从「全删」换成「只留一份」。）
+ */
+/** 这棵目录树里有**任何一个文件**吗（全是空目录也算空）。 */
+function hasAnyFile(dir: string): boolean {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true }))
+    if (e.isDirectory() ? hasAnyFile(path.join(dir, e.name)) : true) return true;
+  return false;
+}
+
+function keepFailureSite(opts: BuildPackOptions): string | undefined {
+  const gameDir = path.join(opts.outDir, opts.recipe.id);
+  if (!fs.existsSync(gameDir)) return undefined;
+  // 按**前缀**找那份工作目录（不重算版本号 —— 那是 `buildInto` 开头算的，重算多一个可能对不上的数）
+  const prefix = `.building-${process.pid}-`;
+  const scratch = fs.readdirSync(gameDir).find((d) => d.startsWith(prefix));
+  if (scratch === undefined) return undefined;
+  const scratchDir = path.join(gameDir, scratch);
+  // ⚠️ **空的现场没什么可保的**：一笔调用都还没成功就挂掉时，那棵树里一个文件都没有
+  //   —— 留下来只是垃圾（原来那条 `rmSync` 怕的正是这个）。这一条把「不堆积」
+  //   与「保住创作态」同时做到：**有东西才留，而且只留最近一份**。
+  if (!hasAnyFile(scratchDir)) { fs.rmSync(scratchDir, { recursive: true, force: true }); return undefined; }
+  for (const d of fs.readdirSync(gameDir))
+    if (d.startsWith("failed-")) fs.rmSync(path.join(gameDir, d), { recursive: true, force: true });
+  const dest = path.join(gameDir, `failed-${new Date().toISOString().replace(/[:.]/g, "-")}`);
+  fs.renameSync(scratchDir, dest);
+  return dest;
+}
+
 export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackResult> {
   try {
     return await buildInto(opts);
   } catch (e) {
-    // ⚠️ 失败时把工作目录清掉：否则 `.building-*` 会在 out/ 里越积越多。
+    // ⚠️ **失败不删**（票 01）—— 留下的那份里是已经付过钱的原图与逐字提示词。
     //   （「失败不消耗版本号」是另一半 —— 见 buildInto 末尾那一步改名。）
-    const scratch = path.join(opts.outDir, opts.recipe.id, `.building-${process.pid}-${nextPackVersion(opts.outDir, opts.recipe.id)}`);
-    fs.rmSync(scratch, { recursive: true, force: true });
+    const failureDir = keepFailureSite(opts);
+    if (failureDir !== undefined) (e as FailureSite).failureDir = failureDir;
     throw e;
   }
 }
