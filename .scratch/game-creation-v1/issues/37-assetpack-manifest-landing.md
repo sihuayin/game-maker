@@ -22,7 +22,7 @@ Map: ../map.md
 
 草案的出处与实测证据（已通过 manifest 解析 + 9 条反例全部被拒）：
 
-- [`../experiments/asset-pack-draft/schema.mjs`](../experiments/asset-pack-draft/schema.mjs)
+- `../experiments/asset-pack-draft/schema.mjs`
 - [`../experiments/asset-pack-draft/validate.mjs`](../experiments/asset-pack-draft/validate.mjs)
 - [`../experiments/asset-pack-draft/build.mjs`](../experiments/asset-pack-draft/build.mjs) —— 真实产出一个包
 

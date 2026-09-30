@@ -130,14 +130,14 @@ LLM 推导做不到逐字节幂等，硬求它只会得到一个假的承诺。�
 | 尺寸是否协调 | 角色 32×48、地砖 64×16、道具 16×16、背景 960×540 | 角色 32×48、地砖 64×16、道具 16×16 / 14×22、背景 640×360 |
 | 招牌 | sprite ✅ | sprite ✅（**票 27 的裁决进了 prompt 就生效**） |
 
-清单实例已固化为 [`fixtures/recipes/shift-change.json`](../../fixtures/recipes/shift-change.json)。
+清单实例已固化为 [`fixtures/recipes/shift-change.json`](../../../fixtures/recipes/shift-change.json)。
 
 ### 7. 🔴 两次推导暴露的两件事
 
 **① 模型的默认动作是「把角色的每个动作拆成一个资源」，而这正好打掉了帧间一致性。**
 第 1 次它产出 `player-idle` / `player-run` / `player-jump` **三个资源**，还用 `dependencies`
 把后两个挂到第一个上 —— 像是在用「生成顺序」补「它们属于同一个东西」，而票 05 明说依赖
-**只用于生成顺序**。[票 22](../animated-player/README.md) 实测过：多状态**必须一次调用生成**
+**只用于生成顺序**。[票 22](../experiments/animated-player/README.md) 实测过：多状态**必须一次调用生成**
 才能保证是同一个角色；拆成三个资源就是三次独立调用，正是那个失败模式。
 
 把这条写成 prompt 规则之后，第 2 次自己就收成了一个资源、三个动画。

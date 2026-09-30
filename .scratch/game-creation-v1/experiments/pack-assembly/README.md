@@ -5,7 +5,7 @@ pnpm build && node build-pack.mjs    # 清单 + StyleSpec → out/shift-change-a
 node verify.mjs                      # 确定性 + 可消费性
 ```
 
-输入是**真实推导出来的**清单 [`fixtures/recipes/shift-change.json`](../../../fixtures/recipes/shift-change.json)
+输入是**真实推导出来的**清单 [`fixtures/recipes/shift-change.json`](../../../../fixtures/recipes/shift-change.json)
 （见 [`../recipe-derivation/`](../recipe-derivation/)），风格是**真实产出**的 StyleSpec。
 
 ## ⚠️ 桩生成器
