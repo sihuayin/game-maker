@@ -20,6 +20,14 @@ export type ReferenceRun = {
   wave: number;
   lives: number;
   leaked: number;
+  /**
+   * 整局杀掉了几个敌人。
+   * ⚠️ **它一度被当成「没有消费者的投机泛化」砍掉过** —— 而砍掉之后才发现，
+   *   「一个敌人都没杀掉」正是「刻度写反」最干净的那条判据（票 13 在量的那个）。
+   *   ⇒ **「没有消费者」是一个时刻的判断，不是一条性质**：字段与判据是成对出现的，
+   *     而判据还没定下来的时候，字段看起来就是多余的。
+   */
+  killed: number;
   /** 跑完用掉的游戏时间（毫秒）—— 「跑到上限还没结束」那条要说它。 */
   ms: number;
 };
@@ -34,7 +42,7 @@ export function playReference(world: TdWorldDescription, opts: { maxMs?: number 
   for (let i = 0; i < maxMs / FIXED_DT_MS && s.phase !== "won" && s.phase !== "lost"; i++) {
     s = advance(s, FIXED_DT_MS, autoPlay(s, world), world);
   }
-  return { phase: s.phase, wave: s.wave, lives: s.lives, leaked: s.leaked, ms: s.ms };
+  return { phase: s.phase, wave: s.wave, lives: s.lives, leaked: s.leaked, killed: s.killed, ms: s.ms };
 }
 
 /**
