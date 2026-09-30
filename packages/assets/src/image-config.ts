@@ -26,7 +26,7 @@ export const IMAGE_ENV = {
 
 /**
  * 上游说的是哪种话。**不是可有可无的分类** —— 2026-09-25 实测：krill 那样"长得像 OpenAI
- * 但什么都不实现"的中转真实存在，而 DashScope 的 `TextGenerateImage` 是个 **MCP 端点**
+ * 但什么都不实现"的中转真实存在，而 DashScope 的 `TextImageGenerator` 是个 **MCP 端点**
  * （要 `initialize` → `tools/list` → `tools/call`），与 REST 完全两回事。
  * 所以它必须显式声明，不能靠 `baseUrl` 猜。 */
 export const IMAGE_PROTOCOLS = ["openai", "minimax", "dashscope-mcp", "gemini"] as const;

@@ -21,7 +21,7 @@ import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
 import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
-import type { ImageGenCall, ImageRequest } from "./image-gen.js";
+import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
 import { rasterize } from "./raster.js";
 
@@ -29,7 +29,9 @@ import { rasterize } from "./raster.js";
 export type DrawListGenerator = (spec: AssetSpec, style: StyleSpec) => DrawList[] | Promise<DrawList[]>;
 
 /** 生图端口。**由调用方提供实现**（本模块只调）。一个资源一次调用、出一张原图。 */
-export type GenerateImage = (req: ImageRequest) => Promise<{ image: RasterImage; call: ImageGenCall }>;
+// ⚠️ 生图端口**只有一份定义**，在 `image-gen.ts`（它才是那个客户端的家）——
+//   这里只是**用**它。曾经这里抄过一份同形的（`GenerateImage`），而两份同形的类型会漂，
+//   漂的那一天就是「这里多一个参数、那里没跟上」（2026-09-30 票 06 差一点就是）。
 
 export type BuildPackOptions = {
   recipe: { id: string; styleRef: string; referenceImage?: string; assets: readonly { spec: AssetSpec; source: AssetSourceLike }[] };
@@ -51,7 +53,7 @@ export type BuildPackOptions = {
   recipeDir: string;
   generate: DrawListGenerator;
   /** 清单里有 `kind: "image"` 的资源时必填，否则**开跑前**就失败（不静默跳过）。 */
-  generateImage?: GenerateImage;
+  generateImage?: ImageGenerator;
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
   /**
@@ -356,8 +358,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           });
           // ⚠️ 过**生图**那道闸 —— 一次调用就是一笔钱，别把它和文本调用共用一个上限
           // ⚠️ **发出即记**（2026-09-30 · 票 05）：这一笔**已经花出去了** —— 它回不回来是另一回事。
-          //   先记一笔「已发出」（`ms` 缺席），回来时再把 `ms` / `attempts` / `usage` 补上；
-          //   补不上就让它**缺席** —— 不许写 0 冒充「测到了 0」（票 19 Q4）。
+          //   先记一笔「已发出」（`ms` 缺席）。之后有**两条**收尾的路，都会把它补成事实：
+          //     · **回来了**（成功）—— `ms` / `attempts` / `usage` 一并补上；
+          //     · **失败了**（生成器内部重试完仍失败）—— 补上「烧了几轮、多久」（票 06）。
+          //   ⚠️ 只有**两条都没走到**时才留着缺席（进程被杀），而那时**不许写 0 冒充「测到了 0」**（票 19 Q4）。
           //   ⚠️ `upstream` 也**先不写** —— 与 `ms` 同一条纪律：拿不到就缺席（协议要到调用方
           //   构造生成器时才知道，`buildAssetPack` 手里没有）。回来时一起补上。
           //
@@ -373,6 +377,12 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
               prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
               negativePrompt: imageNegativePrompt(),
               ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
+            }, {
+              // ⚠️ **失败也要交账**（2026-09-30 · 票 06）：这一笔**烧掉了几趟往返**是事实，
+              //   而失败那条路上，生成器内部的重试此前**没有任何人记** —— 账上只剩一个「发出时的 1」。
+              //   仓库的纪律：「重试烧掉的额度要能单独看见，**否则失败的归因是错的**」。
+              //   ⚠️ 只补 `ms` / `attempts`：`model` / `usage` / `requestId` 拿不到就**缺席**，不编。
+              onFailure: (f) => { if (rec) Object.assign(rec, f); },
             });
           });
           // 回来了：把这一笔**补成事实**（同一个对象 —— 账里仍是**一笔**，不是两笔）

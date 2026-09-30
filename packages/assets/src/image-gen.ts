@@ -1,6 +1,6 @@
 // 生图客户端 —— **只实现实测过的那种协议**。
 //
-// 2026-09-25 实测的往返（DashScope 百炼的 `TextGenerateImage` MCP 端点）：
+// 2026-09-25 实测的往返（DashScope 百炼的 `TextImageGenerator` MCP 端点）：
 //
 //   POST {baseUrl}                          Authorization: Bearer sk-…
 //   {"jsonrpc":"2.0","id":N,"method":"initialize",…}   → BaiLianMcpServer 2024-11-05，**无状态**
@@ -19,7 +19,7 @@
 //
 // 有界重试保留（票 14 §7：重试吸收抖动 ≠ 降级），但**只对网络错与 5xx 重试** ——
 // 这一条每次调用都是钱，4xx 重试是白花。
-import type { LedgerUsage } from "@game-maker/contracts";
+import type { LedgerCall, LedgerUsage } from "@game-maker/contracts";
 import { ImageGenerationError, type ImageProtocol } from "./image-gen-error.js";
 import { decodePNG, encodePNG } from "./png.js";
 import type { RasterImage } from "./image.js";
@@ -67,7 +67,22 @@ export type ImageRequest = {
    */
   styleReference?: RasterImage;
 };
-export type ImageGenerator = (req: ImageRequest) => Promise<{ image: RasterImage; call: ImageGenCall }>;
+/**
+ * 一次调用**失败**时的交账（2026-09-30 · 票 06）。
+ *
+ * ⚠️ **上游没应答** ⇒ 这里只有「**烧了几趟、等了多久**」两件事实。`model` / `usage` / `requestId`
+ *   一律**缺席** —— 拿不到就缺席、不编（那条「记一个我们没听到的模型名」的谎，`generate.ts` 那边记过一次）。
+ *
+ * ⚠️ **为什么要有这个口子**：生成器**自己**会重试（下面那 `attempts` 趟），而成功那条路
+ *   只把 `attempts` 放进返回值 ⇒ **失败时烧掉的往返没人记**，账上只剩一个「发出时的 1」。
+ *   而仓库的纪律是「重试烧掉的额度要能单独看见，**否则失败的归因是错的**」。
+ *   ⚠️ 文本那条一直报（`generate.ts` 在抛出前补记一笔）—— 这个口子让两条路一致。
+ */
+export type ImageCallFailure = Pick<LedgerCall, "ms" | "attempts" | "upstream" | "requestedModel">;
+/** 调用的**收尾**口子。成功那条把事实放在返回值里，所以这里只有失败的。 */
+export type ImageCallReporter = { onFailure?: (f: ImageCallFailure) => void };
+
+export type ImageGenerator = (req: ImageRequest, report?: ImageCallReporter) => Promise<{ image: RasterImage; call: ImageGenCall }>;
 
 export type DashScopeOptions = {
   /** 完整端点 URL（这个协议下 `baseUrl` 就是端点，不再拼路径）。 */
@@ -145,11 +160,13 @@ export function createDashScopeMcpGenerator(opts: DashScopeOptions): ImageGenera
   let nextId = 1;
   const attempts = opts.attempts ?? 2;
 
-  return async ({ prompt, size, negativePrompt }) => {
+  return async ({ prompt, size, negativePrompt }, { onFailure } = {}) => {
     const t0 = Date.now();
     const requestedSize = requestSize(size);
     let lastErr: unknown;
+    let trips = 0;                       // ⚠️ **发起过几轮**（一轮里有几趟 HTTP，看协议）—— 与文本那条同名同义（票 06）
     for (let i = 1; i <= attempts; i++) {
+      trips += 1;
       try {
         if (!initialized) {
           await rpc(opts, {
@@ -193,6 +210,10 @@ export function createDashScopeMcpGenerator(opts: DashScopeOptions): ImageGenera
         if (i >= attempts || !retriable) break;
       }
     }
+    // ⚠️ `upstream` 与 `requestedModel` 也报 —— 它们是**知道的事**（与成功那条账一字不差）。
+    //   ⚠️ 而 `model`（上游自报的那个）**不报** —— 它根本没应答，记了就是**谎**。
+    //   ⚠️ dashscope 这条**没有** `requestedModel`：那个协议根本没有 `model` 参数（票 34）。
+    onFailure?.({ upstream: "dashscope-mcp", ms: Date.now() - t0, attempts: trips });
     throw new ImageGenerationError(`生图失败（${attempts} 次内）：${(lastErr as Error)?.message ?? String(lastErr)}`);
   };
 }
@@ -275,7 +296,7 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
   const attempts = opts.attempts ?? 4;   // 见 GeminiOptions.attempts 的注释：实测 8% 的秒拒率
   const model = opts.model ?? "gemini-2.5-flash-image";
 
-  return async ({ prompt, size, negativePrompt, reference, styleReference }) => {
+  return async ({ prompt, size, negativePrompt, reference, styleReference }, { onFailure } = {}) => {
     const t0 = Date.now();
     const doFetch = opts.fetchImpl ?? fetch;
     const url = `${opts.baseUrl.replace(/\/+$/, "")}/models/${model}:generateContent`;
@@ -295,7 +316,9 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
     };
 
     let lastErr: unknown;
+    let trips = 0;                       // ⚠️ **发起过几轮**（一轮里有几趟 HTTP，看协议）—— 与文本那条同名同义（票 06）
     for (let i = 1; i <= attempts; i++) {
+      trips += 1;
       try {
         const ac = new AbortController();
         const timer = setTimeout(() => ac.abort(), opts.timeoutMs ?? 240_000);
@@ -325,6 +348,7 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
         if (i >= attempts || !/HTTP 5\d\d|fetch failed|aborted|network|ECONN|429|NO_IMAGE/i.test(msg)) break;
       }
     }
+    onFailure?.({ upstream: "gemini", ms: Date.now() - t0, attempts: trips, requestedModel: model });
     throw new ImageGenerationError(`Gemini 生图失败（${attempts} 次内）：${(lastErr as Error)?.message ?? String(lastErr)}`);
   };
 }
@@ -433,7 +457,7 @@ export function createOpenAIGenerator(opts: OpenAIOptions): ImageGenerator {
   const attempts = opts.attempts ?? 3;
   const base = opts.baseUrl.replace(/\/+$/, "");
 
-  return async ({ prompt, size, negativePrompt, reference, styleReference }) => {
+  return async ({ prompt, size, negativePrompt, reference, styleReference }, { onFailure } = {}) => {
     const t0 = Date.now();
     const doFetch = opts.fetchImpl ?? fetch;
     const requestedSize = openaiSize(size);
@@ -456,7 +480,9 @@ export function createOpenAIGenerator(opts: OpenAIOptions): ImageGenerator {
         };
 
     let lastErr: unknown;
+    let trips = 0;                       // ⚠️ **发起过几轮**（一轮里有几趟 HTTP，看协议）—— 与文本那条同名同义（票 06）
     for (let i = 1; i <= attempts; i++) {
+      trips += 1;
       try {
         const ac = new AbortController();
         const timer = setTimeout(() => ac.abort(), opts.timeoutMs ?? 300_000);
@@ -494,6 +520,8 @@ export function createOpenAIGenerator(opts: OpenAIOptions): ImageGenerator {
         if (i >= attempts || !/HTTP 5\d\d|fetch failed|aborted|network|ECONN|429/i.test(msg)) break;
       }
     }
+    onFailure?.({ upstream: "openai", ms: Date.now() - t0, attempts: trips,
+      ...(opts.model ? { requestedModel: opts.model } : {}) });
     throw new ImageGenerationError(`OpenAI 形态生图失败（${attempts} 次内）：${(lastErr as Error)?.message ?? String(lastErr)}`);
   };
 }

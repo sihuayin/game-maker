@@ -1,7 +1,7 @@
 # 06. 失败的**生图**调用不报重试 —— 账上的「往返」于是是错的
 
 Type: grilling
-Status: open
+Status: resolved
 Owner: —
 Blocked by: —
 Map: ../map.md
@@ -52,4 +52,54 @@ Map: ../map.md
 
 ## Answer
 
-（未决）
+**✅ 2026-09-30 已决议并实现：走 (a) —— 给生图生成器开一个「失败交账」的口子。**
+
+### 做法
+
+`ImageGenerator` 多一个可选的第二个参数（`{ onFailure?: (f: ImageCallFailure) => void }`），
+三个生成器各自数 `trips`、在**最终抛出之前**报一笔；`pack.ts` 把它**补进那条已经记下的
+「已发出」记录**（**同一个对象** ⇒ 账里仍是一笔）。
+
+⚠️ 载荷**不是手挑两个字段**，而是从契约里 `Pick` 出来的：
+
+```ts
+export type ImageCallFailure = Pick<LedgerCall, "ms" | "attempts" | "upstream" | "requestedModel">;
+```
+
+—— 这样**键名由契约管着**（写错就编不过），而两个写点（成功那条 / 失败那条）用的是**同一个形状**。
+⚠️ `upstream` 与 `requestedModel` **要报**：它们是**知道的事**（与成功那条账一字不差，
+`ledger.test.ts` 早就为文本那条钉过「我们请求了什么，是知道的」）。
+⚠️ 而 `model`（**上游自报**的那个）**不报** —— 它根本没应答，记了就是**谎**（那条谎文本那边记过一次）。
+
+### Q2 的判据：先红后绿，而且**分得清**「真发了几趟」与「配置的上限」
+
+- 第一版：桩让每一趟都抛 5xx ⇒ `trips === attempts === 3` ⇒ **把实现里的 `trips` 换成
+  `attempts` 它照样绿** —— 而那正是这条判据要抓的那个多报（审查量出来的）。
+- 改成：**第 1 趟抛可重试的 5xx、第 2 趟抛不可重试的 400** ⇒ 循环当场 break ⇒ `trips === 2`，
+  而**上限是 3** ⇒ 账上必须是 **2**（不是 3、也不是发出时的 1）。
+  变异检验：把 `attempts: trips` 换成 `attempts` ⇒ **这条用例红** ✓。
+
+### ⚠️ 三条已知、**没修**的（都记在这里，免得下一个人以为是漏了）
+
+1. **循环之前的抛不会交账**：`geminiAspect` / `encodePNG` / `openaiSize` / `multipartBody`
+   都在重试循环**之前**跑；它们若抛，`onFailure` 不会响 ⇒ 那条记录停在「发出时的 1」+ `ms` 缺席
+   ⇒ 两个壳会印「还没回来」，而那一笔**根本没发出去**。
+   ⚠️ 今天**够不到**（这些函数对合法输入不抛），但它是同一个「账说谎」的家族。
+2. **`attempts: 0` 会违反契约**：`opts.attempts === 0` 时循环不跑 ⇒ 钩子写 `attempts: 0`，
+   而 `ledger.ts` 要求**正整数**。今天够不到（`ops.ts` 不传 `attempts`）。
+3. **只有 `openai` 那条协议有用例**：三个生成器是**对称**改的，但测试只覆盖了一条。
+
+### 审查改掉的（两轴）
+
+- 载荷改成 `Pick<LedgerCall, …>`（上面那条）—— 消掉「同一个记录两处写、两种写法」；
+- **`GenerateImage` 与 `ImageGenerator` 是同形的两份定义**（`pack.ts` 抄了一份）⇒ 只留一份，
+  家安在 `image-gen.ts`（那个客户端的家），`pack.ts` 只**用**它（改名时它当场自指，正好证明这两份该合一）；
+- 三处**名不副实**的注释：`pack.ts` 那段「补不上就缺席」的叙述（现在有**两条**收尾的路）、
+  `trips` 那句把「轮」说成「趟」（dashscope 一轮里是 `initialize` + `tools/call`）；
+- `satisfies` 那条规矩**我自己两行之后就破了**（新写点的 `Object.assign` 没写）—— 改用 `Pick` 之后
+  载荷本身就带类型，那个字面量不再存在。
+
+### 产物
+
+- `packages/assets/src/image-gen.ts`（钩子 + 三个失败出口）· `packages/assets/src/pack.ts`（接上）
+- `packages/assets/tests/ops.test.ts`（判据 + 变异验过）

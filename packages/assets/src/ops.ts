@@ -16,8 +16,8 @@ import {
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
-import { buildAssetPack, type FailureSite, type GenerateImage } from "./pack.js";
-import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError } from "./image-gen.js";
+import { buildAssetPack, type FailureSite } from "./pack.js";
+import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError, type ImageGenerator } from "./image-gen.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
@@ -667,7 +667,7 @@ export type PackOptions = {
  * 剩下的显式抛「没实现」，而不是猜一个形状发出去（krill 那种「长得像 OpenAI 但什么都不实现」
  * 的中转真实存在，猜形状的代价是花着钱拿到一个 200/0 字节）。
  */
-function imageGeneratorFor(t: ImageTransport, fetchImpl?: typeof fetch): GenerateImage {
+function imageGeneratorFor(t: ImageTransport, fetchImpl?: typeof fetch): ImageGenerator {
   // ⚠️ 有代理就必须自己走 —— Node 原生 fetch **不认 HTTPS_PROXY**（实测），
   // 而 api.openai.com / Google 这类上游在境内直连不通。不接这一句的后果是
   // 一个不含任何线索的「fetch failed」。

@@ -7,7 +7,7 @@ import { parseAssetPack, type AssetSpec, type AssetRecipe, type DrawList, type S
 import { decodePNG, encodePNG } from "../src/png.js";
 import {
   buildAssetPack, keyColorFor, nextPackVersion, verifyPack,
-  type DrawListGenerator, type GenerateImage, type RasterImage,
+  type DrawListGenerator, type ImageGenerator, type RasterImage,
 } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -288,7 +288,7 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
 
   const call = (n: number) => {
     const prompts: string[] = [];
-    const gen: GenerateImage = async (req) => {
+    const gen: ImageGenerator = async (req) => {
       prompts.push(req.prompt);
       return {
         image: layerImage(req.size.w, req.size.h, STYLE.palette[n]!),
@@ -318,7 +318,7 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
   };
   /** 与 `call` 同款，但**底色画偏了**（`which` 指定哪几层偏）。 */
   const callDrifted = (which: (name: string) => boolean) => {
-    const gen: GenerateImage = async (req) => ({
+    const gen: ImageGenerator = async (req) => ({
       image: layerImage(req.size.w, req.size.h, STYLE.palette[1]!,
         which(req.prompt.includes("sky") ? "sky" : req.prompt.includes("wall") ? "wall" : "ground") ? drifted() : undefined),
       call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
@@ -488,7 +488,7 @@ describe("分层背景：构成必须保住（票 43）", () => {
   };
 
   it("下半没有东西 ⇒ 交付态那一半必须是**透明**的，不是被拉满", async () => {
-    const gen: GenerateImage = async (req) => ({
+    const gen: ImageGenerator = async (req) => ({
       image: upperHalfOnly(req.size.w, req.size.h),
       call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
     });
@@ -601,7 +601,7 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
   /** 第 `failAt` 次调用抛，其余照常返回一张图。⚠️ 调用方要把它配上 `concurrency: {image: 1}`（顺序才是确定的）。 */
   const failingGen = (failAt: number) => {
     const ok: { image: RasterImage; prompt: string }[] = [];
-    const gen: GenerateImage = async (req) => {
+    const gen: ImageGenerator = async (req) => {
       if (ok.length + 1 === failAt) throw new Error("抖一下");
       const image = flat(req.size.w, req.size.h);
       ok.push({ image, prompt: req.prompt });
@@ -611,7 +611,7 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
   };
   /** ⚠️ 用 `.then(成功, 失败)` 而不是 `.catch` —— 只 `.catch` 的话返回类型是**联合**，
    *  TS 就没法在断言里收窄 `failureDir`（那是 `pack.test.ts` 里第一次见的那种收窄）。 */
-  const fail = (outDir: string, gen: GenerateImage): Promise<Error & { failureDir?: string }> =>
+  const fail = (outDir: string, gen: ImageGenerator): Promise<Error & { failureDir?: string }> =>
     buildAssetPack({
       recipe: twoSprites(), style: STYLE, outDir, recipeDir: ROOT,
       generate: stub, generateImage: gen, concurrency: { image: 1 }, sourceDateEpoch: EPOCH,
@@ -662,7 +662,7 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
     // ⚠️ 不等的话还有第二个后果：失败那条 `renameSync` 先生效，而**还在飞的**那笔随后
     //   往**旧路径**写 ⇒ ENOTDIR，且那笔的产物永远进不了失败现场。
     const d = tmp();
-    const gen: GenerateImage = async (req) => {
+    const gen: ImageGenerator = async (req) => {
       if (req.size.w === 8) throw new Error("抖一下");            // 这一笔立刻挂
       await new Promise((r) => setTimeout(r, 60));                 // 另一笔慢，但在飞
       return { image: flat(req.size.w, req.size.h), call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 } };

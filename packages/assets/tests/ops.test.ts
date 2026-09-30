@@ -134,6 +134,33 @@ describe("⚠️ 失败时报的是**真实发出的笔数**，不是「回来�
   const fourPath = path.join(D3, "four.json");
   fs.writeFileSync(fourPath, JSON.stringify(FOUR_IMG));
 
+  it("⚠️ 一笔**发了 2 趟**然后失败 ⇒ 账上那笔的 `attempts` 是 **2**（既不是上限 3，也不是发出时的 1）", async () => {
+    // ⚠️ 由来：第三次真跑的账头写着「3 次往返」，而报错自己写着「（**3 次内**）」——
+    //   那一笔在一个 unit 里重试了 3 趟，账上却记 1。机制：`call`（含 `attempts`）
+    //   **只在成功那条路上构造** ⇒ 失败时什么也不报。
+    //   而仓库的纪律是「重试烧掉的额度要能单独看见，**否则失败的归因是错的**」。
+    // ⚠️ **第 2 趟抛一个不可重试的错** ⇒ 循环当场 break ⇒ `trips === 2`。
+    //   而配置的上限是 3 —— **2 ≠ 3**，这条用例才分得清「真的发了几趟」与「配置的上限」。
+    //   （第一版让每一趟都抛 5xx ⇒ `trips === attempts === 3`，把实现里的 `trips` 换成
+    //    `attempts` 它**照样绿** —— 那正是这条判据要抓的那个多报。）
+    let http = 0;
+    const upstream = (async () => {
+      http += 1;
+      throw new Error(http === 1 ? "HTTP 503 抖一下" : "HTTP 400 形状不对");   // 第二个**不可重试**
+    }) as typeof fetch;
+    const e = await packAssets({
+      recipePath, outRoot: path.join(D3, "out6"), transport: { baseUrl: "http://x", apiKey: "k" },
+      imageTransport: IMG, fetchImpl: upstream, concurrency: { text: 1, image: 1 },
+    }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    const calls = (e as CommandError).ledger ?? [];
+    expect(calls, "账上该有那一笔").toHaveLength(1);
+    // ⚠️ 上游侧真的发了 **2** 趟（第一趟 5xx 可重试、第二趟 400 当场放弃），
+    //   而**账上要写得下这个 2** —— 不是配置的上限 3，也不是发出时的 1。
+    expect(http, "上游侧发出去的是 2 趟").toBe(2);
+    expect(calls[0]!.attempts, "账上没写对真发出去的趟数").toBe(2);
+  });
+
   it("⚠️ 闸门**拒掉的**那几笔**没发出去** ⇒ 不许记进账（判据：报出来的 === 真实发出的）", async () => {
     // ⚠️ 这是 code-review 量出来的真缺陷：push 若放在**闸门外**，那几笔排队等着、
     //   还没发出去的调用也会进账 —— 实测 4 个资源、并发 1、第一个就挂 ⇒
@@ -168,9 +195,11 @@ describe("⚠️ 失败时报的是**真实发出的笔数**，不是「回来�
     // ⚠️ **发出几笔就该记几笔** —— 不是「回来几笔记几笔」
     expect(sent, "上游侧确实发出去两笔").toBe(2);
     expect(calls.length, "账上只记了回来的那一笔").toBe(2);
-    // ⚠️ 而**没回来的那一笔**：`ms` **缺席**，不是编一个 0（票 19 否过「不填 0 冒充测到了 0」）
-    const unreturned = calls.filter((c) => c.ms === undefined);
-    expect(unreturned).toHaveLength(1);
-    expect(unreturned[0]!.target).toBe("bb");
+    // ⚠️ 票 06 之后，**失败的那一笔也带着事实**：它 settle 过（以失败的方式）——
+    //   所以 `ms` 不再缺席，「还没回来」只留给**真的还没收尾**的那些。
+    const failed = calls.find((c) => c.target === "bb");
+    expect(failed?.ms, "失败的那笔该带着它烧掉的时间").toBeDefined();
+    expect(failed?.attempts, "而它重试了几趟也要写得下").toBeGreaterThanOrEqual(1);
+    expect(calls.filter((c) => c.ms === undefined), "没有哪一笔还悬着").toEqual([]);
   });
 });
