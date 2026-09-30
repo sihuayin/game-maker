@@ -222,8 +222,16 @@ export const TdConfigSchema = z.object({
    *   （`arena.tiles.walk`），而它的宽度就是 `arena.cell`。
    *   把它们再声明一遍就等于给了它们一个能与场地对不上的机会，
    *   而「走道画在哪、敌人就走哪」这件事由 `auditTdConfig` 当场钉死。
+   *
+   * ⚠️ **2026-09-30 起它在 schema 里是可选的**（票 12）：**模型不写它** ——
+   *   编译那一步从场地派生完再写进去（`tdResolveConfig`），所以**产物里它恒在**、
+   *   下游（外壳 / 手写关卡 / 校验）**一无所知**。
+   *   理由是一次实测（20 次真调用）：模型写的路径与它自己画的地图**对不上**，
+   *   而那占了失败原因的绝大多数 ⇒ 那一族失败被做成了**结构上不可能**。
+   *   ⚠️ 而**手写的关卡照旧可以自己声明**（人比模型靠谱），那条校验仍然守着「路径与地图对不上」；
+   *   缺席时 `auditTdConfig` **派生一份再校验**（所以「校验看不到路径」这件事不会发生）。
    */
-  path: z.object({ points: z.array(Point).min(2) }).strict(),
+  path: z.object({ points: z.array(Point).min(2) }).strict().optional(),
   /**
    * 要守的东西（柜台）。
    *
@@ -308,11 +316,14 @@ export function tdDistanceToPath(
   return best;
 }
 
+/** 场地上的一格（列、行）。⚠️ **别处那几个同形的内联类型就是它** —— 别各写各的。 */
+export type TdWalkCell = { c: number; r: number };
+
 /**
  * 像素坐标落在哪一格。**全仓只此一处做这个换算** —— 构建期的「敌人走过的每一格」
  * 与纯层的「这块砖画在哪」必须用同一个映射，否则校验过的与画出来的会差一格。
  */
-export const tdCellOf = (p: { x: number; y: number }, cell: number): { c: number; r: number } => ({
+export const tdCellOf = (p: { x: number; y: number }, cell: number): TdWalkCell => ({
   c: Math.floor(p.x / cell), r: Math.floor(p.y / cell),
 });
 
@@ -322,7 +333,7 @@ export const tdCellOf = (p: { x: number; y: number }, cell: number): { c: number
  * ⚠️ 轴对齐这一条（自洽族）在这里是**前提**：斜段按 1 像素步进采样会漏格。
  *   校验的顺序是先判轴对齐、再用它 —— 两者是同一条规则的两半。
  */
-export function tdPathCells(points: readonly { x: number; y: number }[], cell: number): { c: number; r: number }[] {
+export function tdPathCells(points: readonly { x: number; y: number }[], cell: number): TdWalkCell[] {
   const out: { c: number; r: number }[] = [];
   const seen = new Set<string>();
   const push = (p: { x: number; y: number }) => {
@@ -423,15 +434,22 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   // ── 自洽族（硬失败）──────────────────────────────────────────────────────
   const { w: W, h: H } = config.world.size;
   const { cell } = config.arena;
-  const pts = config.path.points;
+  // ⚠️ `path` 是**可选**的（票 12）：缺席时**派生**一份来校验 ——
+  //   于是「校验器看不到路径」这件事不会发生（而那正是「校验说没问题、外壳却崩了」的样子）。
+  //   ⚠️ 走的是**同一个** `tdResolveConfig`（默认那条：写了就尊重）—— 校验器自己再实现一遍，
+  //   「要不要派生」就有了两个住址，而两份实现会漂。
+  const resolvedPath = tdResolveConfig(config);
+  if (!resolvedPath.ok) err("arena", `从场地派生不出路径：${resolvedPath.error}`);
+  const pts = resolvedPath.ok ? resolvedPath.value.path?.points ?? [] : [];
 
   const inWorld = (where: string, b: { x: number; y: number; w: number; h: number }) => {
     if (b.x < 0 || b.y < 0 || b.x + b.w > W || b.y + b.h > H)
       err(where, `落在世界之外（世界 ${W}×${H}；这个盒子是 (${b.x},${b.y}) ${b.w}×${b.h}）`);
   };
 
-  // 路径：轴对齐 + 不许有零长度段
-  for (const [i, p] of pts.entries()) {
+  // 路径：轴对齐 + 不许有零长度段。
+  // ⚠️ 只查**配置里真写了**的那一份 —— 派生的那份按构造就是轴对齐、无重合（`tdDerivePath` 只留转折点）。
+  for (const [i, p] of (config.path?.points ?? []).entries()) {
     if (p.x > W || p.y > H) err(`path.points[${i}]`, `落在世界之外（世界 ${W}×${H}）`);
   }
   for (let i = 1; i < pts.length; i++) {
@@ -480,6 +498,10 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
     }
   }
 
+  // ⚠️ **路径缺席且派生不出来时，下面那几条「够不够得着走道」都无从谈起** ——
+  //   照旧跑的话它们会拿 `Number.POSITIVE_INFINITY` 去比，报出一串**误导**的错
+  //   （塔的射程明明没问题，却被告知够不着走道）。上面那条「派生不出路径」已经把话说清了。
+  const hasPath = pts.length >= 2;
   const slotA = assetOf(config.scene.slot.asset);
   const slotSize = slotA ? slotA.size : { w: 16, h: 16 };
   const slotAnchor = slotA?.anchor ?? FALLBACK_ANCHOR;
@@ -488,6 +510,7 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   const clearance = cell / 2 + Math.max(slotSize.w, slotSize.h) / 2;
   for (const [i, s] of config.slots.entries()) {
     inWorld(`slot "${s.id}"`, slotBoxes[i]!.box);
+    if (!hasPath) continue;
     const { distance } = tdDistanceToPath(pts, s.at);
     if (distance < clearance)
       err(`slot "${s.id}"`, `离走道只有 ${distance.toFixed(1)}px，而避让要求 ≥ ${clearance.toFixed(1)}px ` +
@@ -500,7 +523,7 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   //   电击地板 L1（射程 40）在**任何一个插槽上都够不着**。
   //   ⚠️ **只看 L1** —— 那是你第一次把它建出来的状态。看每一级太紧：编译那关 L1 是 0% 但 L2 有 29%，
   //   按「每一级都要」会拒掉一个「升级之后就能用」的关卡，而那是**可能的设计**。
-  if (config.slots.length > 0)
+  if (hasPath && config.slots.length > 0)
     for (const t of config.towers) {
       const range = t.levels[0].range;
       if (!config.slots.some((s) => tdDistanceToPath(pts, s.at).distance <= range))
@@ -509,9 +532,12 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
     }
 
   // 柜台与 HUD 落在世界里 / 视口里
+  // ⚠️ **`coreAt` 是派生的，而派生的那份可能根本没有**（路径缺席 + 走道画得不合法）。
+  //   这里原来写着 `pts[pts.length - 1]!` —— 那个 `!` 是**假的**：空数组会给出 `undefined`，
+  //   而 `entityBox(undefined)` 当场抛 ⇒ **校验器把一个「说得出哪儿不对」的失败变成了崩溃**。
   const coreA = assetOf(config.core.asset);
-  const coreAt = pts[pts.length - 1]!;
-  if (coreA) inWorld("core", entityBox(coreAt, coreA.size, coreA.anchor));
+  const coreAt = pts[pts.length - 1];
+  if (coreA && coreAt) inWorld("core", entityBox(coreAt, coreA.size, coreA.anchor));
   const hudPanel = assetOf(config.hud.panel.asset);
   if (hudPanel) inWorld("hud.panel", entityBox(config.hud.panel.at, config.hud.panel.size, hudPanel.anchor));
 
@@ -537,7 +563,7 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   );
   const firstWaveStart = 0;   // 第一波随时可开 —— 上界按「从 0 开始一直打」算
   void firstWaveStart;
-  if (dpsBound * 1 > 0 && totalHp > 0) {
+  if (hasPath && dpsBound * 1 > 0 && totalHp > 0) {
     // 敌人总「在场时间」的上界：全部 wave 的 duration 之和 + 走完全程的时间
     const walkMs = (tdPathLength(pts) / Math.min(...config.enemies.map((e) => e.speed))) * 1000;
     const spawnMs = config.waves.reduce((n, w) => n + tdWaveDurationMs(w), 0);
@@ -556,4 +582,131 @@ export function parseTdConfig(input: unknown): { ok: true; value: TdConfig } | {
   const r = TdConfigSchema.safeParse(input);
   if (r.success) return { ok: true, value: r.data };
   return { ok: false, errors: r.error.issues.map((i) => `${i.path.join(".") || "<根>"}: ${i.message}`) };
+}
+
+// ── 走道 → 折线：**派生**（票 12）──────────────────────────────────────────
+//
+// ⚠️ **为什么路径由代码派生，而不是模型声明**（票 12 的 Q1）：实测模型产出的关卡里，
+//   失败**几乎全在同一族** —— 「`path.points` 的坐标」与「地图上画成 `:` 的格」**对不上**。
+//   而那条路是**结构上可以被消灭的**：走道只有一条，顺序唯一 ⇒ 派生出来的路**就是**画的那条。
+// ⚠️ **它推翻了票 02 的 Q3**（那条否决的前提是「走道可以有多个合法顺序」，而它不成立）。
+// ⚠️ 而 `path` **仍是契约里的一等公民**：产物里它还在，下游一无所知；
+//   **手写的关卡照旧可以自己声明路径** ✓ —— 而那正是 `tdResolveConfig` 有两种模式的原因：
+//   装配与校验**尊重**写下的那一份，**编译一律从地图派生**（`{ fromMap: true }`），
+//   所以「模型写的路径与地图对不上」在编译那条路上**根本无从发生**。
+
+/**
+ * 把场地上的走道格**从入口端到柜台端排好序**。
+ *
+ * ⚠️ **它是派生路径与「走道不许分叉」那条校验共用的同一份**（一个决定只能住在一个地方）——
+ *   两份实现会漂，而漂的表现是「校验说没问题、派生出另一条路」。
+ */
+export function tdWalkway(
+  config: TdConfig,
+): { ok: true; cells: TdWalkCell[] } | { ok: false; error: string } {
+  const { rows, walkChar } = config.arena;
+  const cols = rows[0]?.length ?? 0;
+  const at = (c: number, r: number): string =>
+    r < 0 || r >= rows.length || c < 0 || c >= cols ? "" : ([...rows[r]!][c] ?? "");
+  const isWalk = (c: number, r: number) => at(c, r) === walkChar;
+
+  const walk: TdWalkCell[] = [];
+  const doors: TdWalkCell[] = [];
+  for (const [r, row] of rows.entries())
+    for (const [c, ch] of [...row].entries()) {
+      if (ch === walkChar) walk.push({ c, r });
+      else if (ch === "+") doors.push({ c, r });
+    }
+  if (walk.length === 0) return { ok: false, error: `地图上一格走道（"${walkChar}"）都没有` };
+  if (doors.length === 0) return { ok: false, error: `地图上没有入口（"+"）—— 派生不出起点` };
+  if (doors.length > 1) return { ok: false, error: `地图上有 ${doors.length} 个入口（"+"）—— 只能有一个，否则不知道敌人从哪进` };
+
+  const deg = (p: TdWalkCell) =>
+    [[0, -1], [0, 1], [-1, 0], [1, 0]].filter(([dc, dr]) => isWalk(p.c + dc!, p.r + dr!)).length;
+
+  // ⚠️ **走道必须是一条简单路径**：连通、不分叉、不绕圈。
+  //   否则「派生出来的那条路」就只是算法挑的一条，而不是**画的那条**（票 02 担心的正是这个）。
+  const leaves = walk.filter((p) => deg(p) === 1);
+  const branched = walk.filter((p) => deg(p) > 2);
+  if (branched.length > 0)
+    return { ok: false, error: `走道在格 (${branched[0]!.c},${branched[0]!.r}) 处分了叉（有 ${deg(branched[0]!)} 条出口）—— ` +
+      `走道必须是**一条**一折再折的路，否则「敌人走哪条」就没有唯一答案` };
+  if (leaves.length !== 2)
+    return { ok: false, error: `走道有 ${leaves.length} 个端头（度数 1 的格），而一条简单路径应当**正好两个**` +
+      `${leaves.length === 0
+        ? "（一个都没有 ⇒ 它绕成了一个圈）"
+        // ⚠️ **要点名是哪几格** —— 说得清才有得改（与「分了叉」那条同一个理由）。
+        : `：${leaves.slice(0, 4).map((p) => `(${p.c},${p.r})`).join(" ")}${leaves.length > 4 ? " …" : ""}`}` };
+
+  // 起点 = 紧挨着入口那一头
+  const start = leaves.find((l) => doors.some((d) => Math.abs(d.c - l.c) + Math.abs(d.r - l.r) === 1));
+  if (!start) return { ok: false, error: `两个端头都不挨着入口（"+"）—— 敌人从门口进不到走道上` };
+
+  const ordered: TdWalkCell[] = [start];
+  const seen = new Set([`${start.c},${start.r}`]);
+  for (;;) {
+    const cur = ordered[ordered.length - 1]!;
+    const next = [[0, -1], [0, 1], [-1, 0], [1, 0]]
+      .map(([dc, dr]) => ({ c: cur.c + dc!, r: cur.r + dr! }))
+      .find((p) => isWalk(p.c, p.r) && !seen.has(`${p.c},${p.r}`));
+    if (!next) break;
+    ordered.push(next);
+    seen.add(`${next.c},${next.r}`);
+  }
+  if (ordered.length !== walk.length) {
+    // ⚠️ **要点名是哪一格** —— 这条失败取代了「路径穿过的格不是走道砖」那一族，
+    //   而那一族是**说得出格号**的（`arena.rows[8][12]`）。说得清才有得改。
+    const stuck = walk.find((p) => !seen.has(`${p.c},${p.r}`))!;
+    return { ok: false, error: `走道断了：从入口那头只走得到 ${ordered.length} 格，而地图上画了 ${walk.length} 格` +
+      `（头一格走不到的是 (${stuck.c},${stuck.r}) —— 它与入口那头不连通）` };
+  }
+  return { ok: true, cells: ordered };
+}
+
+/**
+ * **把配置补全**：`path` 缺席就派生一份填上。
+ *
+ * ⚠️ **「要不要派生」这件事只有这一处** —— 三个消费方（`compileTdGame` · `assembleTdSite` ·
+ *   `auditTdConfig`）都调它。各自写一遍的后果是：一个派生了、另一个没有，
+ *   而**产物里到底有没有路径**就成了谜（它真的谜过一次：校验器自己又实现了一遍）。
+ *
+ * ⚠️ `opts.fromMap` = **不看它写没写，一律从地图派生**（**编译那一步**用这个）。
+ *   它才是票 12 那句「那一族失败**结构上不可能**」真正落地的地方：
+ *   只要还「尊重」模型写的 `path`，「模型写了一份与地图对不上的路径」这条失败就**还在**
+ *   —— 而它是 20 次真调用里失败原因的绝大多数。**手写关卡与装配走默认那条**（写了就尊重）。
+ */
+export function tdResolveConfig(
+  config: TdConfig,
+  opts: { fromMap?: boolean } = {},
+): { ok: true; value: TdConfig } | { ok: false; error: string } {
+  if (config.path && !opts.fromMap) return { ok: true, value: config };
+  const d = tdDerivePath(config);
+  if (!d.ok) return d;
+  return { ok: true, value: { ...config, path: { points: d.points } } };
+}
+
+/**
+ * 从场地**派生**那条折线（单元格中心，只留**转折点**）。
+ *
+ * ⚠️ **终点就是走道的另一端 —— 那**就是柜台**（所以 `core` 不需要再声明一个位置：它是派生的）。
+ *   票 12 的 Q3 原写的是「`core` 加一个显式 `at`」，而写到这里看清楚了**那个字段会是多余的**：
+ *   柜台的位置**已经被「走道从门口通到柜台」那条规则完全决定了**（`+` 是入口 ⇒ 另一端就是柜台），
+ *   再加一个 `at` 等于把一个**只能是派生值**的数交给模型去写错 ——
+ *   而票 12 整张票就是在删这种字段。⇒ **已就地更正票 12。**
+ */
+export function tdDerivePath(
+  config: TdConfig,
+): { ok: true; points: { x: number; y: number }[] } | { ok: false; error: string } {
+  const w = tdWalkway(config);
+  if (!w.ok) return w;
+  const { cell } = config.arena;
+  const centre = (p: TdWalkCell) => ({ x: p.c * cell + Math.floor(cell / 2), y: p.r * cell + Math.floor(cell / 2) });
+  const pts: { x: number; y: number }[] = [];
+  for (const [i, p] of w.cells.entries()) {
+    const prev = w.cells[i - 1], next = w.cells[i + 1];
+    const turn = i === 0 || next === undefined ||
+      (prev!.c !== p.c) !== (next.c !== p.c);   // 横竖变了 = 一个转折
+    if (turn) pts.push(centre(p));
+  }
+  return { ok: true, points: pts };
 }

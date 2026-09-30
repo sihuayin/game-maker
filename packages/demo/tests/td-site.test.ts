@@ -118,16 +118,15 @@ describe("塔防站点的装配：**校验不过 = 硬失败，不产出站点**
     expect((caught as CommandError).kind).toBe("usage");
   });
 
-  it("⚠️ **可通关族**：数值刻度整个写反、一开局就被抢空 ⇒ 硬失败，且**一个目录都没写**", () => {
+  it("⚠️ **可通关族**：数值刻度整个写反、**一个敌人都没杀掉** ⇒ 硬失败，且**一个目录都没写**", () => {
     // 票 11 定的那一步就住在**这里**（与几何族同处）—— 那一步需要模拟器，而它住在 demo。
     const h = harness((c) => {
       const cfg = c as unknown as { enemies: { hp: number }[]; economy: { lives: number } };
-      cfg.enemies.forEach((e) => { e.hp *= 20; });
-      cfg.economy.lives = 1;
+      cfg.enemies.forEach((e) => { e.hp *= 20; });      // 打得动、打不死 ⇒ killed === 0
     });
     const e = fails(h);
     expect(e.kind).toBe("invalid");
-    expect(e.message).toMatch(/第一波就被抢空了/);
+    expect(e.message).toMatch(/一个敌人都没杀掉/);
     // ⚠️ 硬失败那条要把**方向**说出来 —— 而那句话是**量出来的**
     expect(e.message).toMatch(/宁可把敌人写弱、把塔写便宜/);
     expect(fs.existsSync(path.join(h.outRoot, "counter-siege", "site"))).toBe(false);
@@ -194,6 +193,25 @@ describe("**一个入口，两种玩法**：`site` 按 config 的 format 分派"
     let caught: unknown;
     try { assembleFromConfig(h.opts); } catch (e) { caught = e; }
     expect((caught as CommandError).message).toMatch(/不认识的配置格式 "shooter-config\/v1"/);
+  });
+
+  it("⚠️ 磁盘上那份**没有 `path`**（模型交出来的原文）→ 站点里发出去的必须是**补全过的那份**", () => {
+    // ⚠️ 这条是 code-review 抓出来的**真 bug**：`laySite` 原来**原样拷** `opts.configPath`，
+    //   于是**校验用的是补全后的、外壳拿到的是没补全的** —— 外壳按 `path.points` 走，
+    //   空路径让 `pathPointAt` 当场给出 NaN，而**六族校验全过**。
+    //   正是票 12 要堵的那种「错得安静」：屏幕上什么也没有，命令行里全是绿灯。
+    const h = harness((c) => { delete c.path; });
+    const r = assembleTdSite(h.opts);
+    const shipped = readJson(path.join(siteDirOf(h.outRoot), "td-config.json"));
+    const pts = (shipped.path as { points: { x: number; y: number }[] } | undefined)?.points ?? [];
+    expect(pts.length, "发出去的那份里没有 path ⇒ 外壳会拿到空路径").toBeGreaterThanOrEqual(2);
+    // 而且它**只落在走道格上**（派生的那份按构造就是）
+    const a = shipped.arena as { rows: string[]; cell: number; walkChar: string };
+    for (const p of pts) {
+      const ch = [...a.rows[Math.floor(p.y / a.cell)]!][Math.floor(p.x / a.cell)]!;
+      expect(ch, `路径点 (${p.x},${p.y}) 落在格 "${ch}" 上`).toBe(a.walkChar);
+    }
+    expect(r.data.genre).toBe("tower-defense");
   });
 
   it("塔防那一路走通（分派之后与直接调装配器是同一件事）", () => {

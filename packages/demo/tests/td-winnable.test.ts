@@ -33,17 +33,29 @@ describe("参考玩家跑一遍：**这一关通不通**（票 11 定的那一�
     expect(JSON.stringify(playReference(w))).toBe(JSON.stringify(playReference(w)));
   });
 
-  it("**判据**：退化 = **一波都没打完**。⚠️ 要构造出来得把声望压到 1 —— 见下面那条「可达性」的发现", () => {
-    const w = world((c) => {
-      (c as { enemies: { hp: number }[] }).enemies.forEach((e) => { e.hp *= 20; });
-      (c as { economy: { lives: number } }).economy.lives = 1;
-    });
+  it("**判据**：退化 = **一个敌人都没杀掉**（票 13）—— 与声望、与第几波**都无关**", () => {
+    // ⚠️ 血量 ×20 打得动但打不死 ⇒ `killed === 0`。**不需要动声望** ——
+    //   那正是它比「一波都没打完」好的地方：后者要求第一波漏 ≥ 声望那么多只，而第一波只有 6 只。
+    const w = world((c) => { (c as { enemies: { hp: number }[] }).enemies.forEach((e) => { e.hp *= 20; }); });
     const run = playReference(w);
     expect(run.phase).toBe("lost");
-    expect(run.wave).toBe(0);                                   // 一波都没打完
-    expect(errs(w).map((i) => i.message).join("\n")).toMatch(/第一波就被抢空了/);
-    // ⚠️ 硬失败那条要把「方向」说出来 —— 它是**量出来的**，不是口味
-    expect(errs(w).map((i) => i.message).join("\n")).toMatch(/宁可把敌人写弱、把塔写便宜/);
+    expect(run.killed).toBe(0);
+    const t = errs(w).map((i) => i.message).join("\n");
+    expect(t).toMatch(/一个敌人都没杀掉/);
+    // ⚠️ 硬失败那条要把**两种成因**都点出来（实测表里两种都有：血量 ×20 是前者、废料 0 是后者）
+    expect(t).toMatch(/打不动/);
+    expect(t).toMatch(/根本没建出塔/);
+    // ⚠️ 而那句方向是**量出来的**，不是口味
+    expect(t).toMatch(/宁可把敌人写弱、把塔写便宜/);
+  });
+
+  it("⚠️ **只杀得动、但杀不完**（血量 ×2）⇒ **不拒**，只报警告 —— 那可能就是「难而公平」", () => {
+    const w = world((c) => { (c as { enemies: { hp: number }[] }).enemies.forEach((e) => { e.hp *= 2; }); });
+    const run = playReference(w);
+    expect(run.phase).toBe("lost");
+    expect(run.killed).toBeGreaterThan(0);                      // 杀得动
+    expect(errs(w)).toEqual([]);                                // ⇒ 够不上判据
+    expect(warns(w)).toHaveLength(1);
   });
 
   it("⚠️ 输在**中途**不是硬失败，是**警告** + 诊断 —— 「人打得赢、它打不赢」的关卡可能是好关卡", () => {
@@ -66,7 +78,9 @@ describe("参考玩家跑一遍：**这一关通不通**（票 11 定的那一�
 });
 
 describe("两条诊断：**每一条都必须带着它的尺子**（票 10）", () => {
-  const heavy = () => world((c) => { (c as { enemies: { hp: number }[] }).enemies.forEach((e) => { e.hp *= 20; }); });
+  // ⚠️ 取材要挑**够不上判据**的那一档：血量 ×20 会 `killed === 0` ⇒ 硬失败、没有诊断。
+  //   血量 ×2 是「杀得动 7 个、但还是输了」（实测表里的那一行）⇒ 只报警告 + 两条诊断。
+  const heavy = () => world((c) => { (c as { enemies: { hp: number }[] }).enemies.forEach((e) => { e.hp *= 2; }); });
 
   it("覆盖那条带尺子 —— 换个射程当尺子这个数会变，所以它只能是诊断", () => {
     const t = warns(heavy()).map((i) => i.message).join("\n");

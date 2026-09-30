@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, auditScreenSpace, auditTdConfig, parseAssetPack, parseTdConfig, tdHudScreenItems, TD_CONFIG_FORMAT,
+  CommandError, auditScreenSpace, auditTdConfig, parseAssetPack, parseTdConfig, tdHudScreenItems, tdResolveConfig, TD_CONFIG_FORMAT,
   type AssetPackManifest, type CommandResult, type ConfigIssue, type TdConfig,
 } from "@game-maker/contracts";
 import { buildTdWorld, type TdWorldDescription } from "./world.js";
@@ -92,7 +92,11 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   if (!cp.ok) throw new CommandError("invalid", `td-config 不过 schema：\n${cp.errors.slice(0, 6).map((e) => "  · " + e).join("\n")}`);
 
   const manifest: AssetPackManifest = mp.value;
-  const config: TdConfig = cp.value;
+  // ⚠️ **装配前也补全**（票 12）：`path` 缺席就从场地派生 —— 与 `compileTdGame` 走同一处
+  //   （`tdResolveConfig`）。两边各写一遍的后果是「产物里到底有没有路径」成了谜。
+  const resolved = tdResolveConfig(cp.value);
+  if (!resolved.ok) throw new CommandError("invalid", `从场地派生不出路径：${resolved.error}`);
+  const config: TdConfig = resolved.value;
   const gameId = opts.gameId ?? manifest.id;
   const packVersion = `v${manifest.version}`;
   const outRoot = path.resolve(opts.outRoot);
@@ -116,7 +120,9 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   // ── 摆目录（**与横版共用同一份**）───────────────────────────────────────
   const laid = laySite({
     packDir: opts.packDir, outRoot, gameId, packVersion,
-    shellJsPath: opts.shellJsPath, configPath: opts.configPath, configFileName: "td-config.json",
+    // ⚠️ 传**补全过的 `config`**（不是 `opts.configPath`）—— 磁盘上那份可能没有 `path`，
+    //   而外壳按 `path.points` 走。见 `layout.ts` 的 `config` 那一行。
+    shellJsPath: opts.shellJsPath, config, configFileName: "td-config.json",
   });
 
   const warnings = all.filter((i) => i.severity === "warning");

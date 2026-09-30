@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { parseTdConfig } from "@game-maker/contracts";
+import { parseTdConfig, tdDerivePath, type TdConfig } from "@game-maker/contracts";
 import { CommandError, compileTdGame, tdConfigExample } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
@@ -37,16 +37,22 @@ describe("⚠️ 提示词里的骨架**必须自己先过 schema**", () => {
 
   it("骨架里那张地图**行长正好 32、行数正好 18** —— 那是它最值钱的一段", () => {
     // ⚠️ 逐字给出「一行多长、五个字符怎么摆」比任何文字描述都准；写错一个字符就白给。
-    const rows = (tdConfigExample as { arena: { rows: string[]; cell: number; walkChar: string } }).arena;
+    const rows = (tdConfigExample as unknown as { arena: { rows: string[]; cell: number; walkChar: string } }).arena;
     expect(rows.rows).toHaveLength(18);
     expect([...new Set(rows.rows.map((r) => r.length))]).toEqual([32]);
     expect(rows.cell).toBe(15);
   });
 
-  it("骨架的**路径落在走道格上** —— 示例自己就不能示范「走道画在哪、敌人走别处」", () => {
-    const a = (tdConfigExample as { arena: { rows: string[]; cell: number; walkChar: string } }).arena;
-    const pts = (tdConfigExample as { path: { points: { x: number; y: number }[] } }).path.points;
-    for (const p of pts) {
+  it("骨架的走道**自己就是一条单线、派得出路径** —— 示例不能示范「分叉」或「走道画歪」", () => {
+    // ⚠️ 票 12 之后这张地图多了一条要满足的性质：走道必须是**一条一折再折的单线**
+    //   （否则派生不出唯一的那条路）。示例错了，模型就会以「看起来没问题」的方式错 ——
+    //   第 5 行最左那五个走道格原本把 `(6,4)` 顶成一个 T 字口，就是这么被抓出来的。
+    const a = (tdConfigExample as unknown as { arena: { rows: string[]; cell: number; walkChar: string } }).arena;
+    const d = tdDerivePath(tdConfigExample as unknown as TdConfig);
+    expect(d.ok, d.ok ? "" : d.error).toBe(true);
+    if (!d.ok) return;
+    expect(d.points.length).toBeGreaterThanOrEqual(2);
+    for (const p of d.points) {
       const ch = [...a.rows[Math.floor(p.y / a.cell)]!][Math.floor(p.x / a.cell)]!;
       expect(ch, `路径点 (${p.x},${p.y}) 落在格 "${ch}" 上`).toBe(a.walkChar);
     }
@@ -64,7 +70,44 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
     expect(r.data.version).toBe(1);
     // ⚠️ 断言的是**内容相同**，不是**字节相同** —— `parseTdConfig` 会按 schema 的键序重建对象，
     //   所以逐字节比对会被键序绊倒，而那与「落盘的就是上游给的那一份」是两件事。
-    expect(JSON.parse(fs.readFileSync(file, "utf8"))).toEqual(GOOD);
+    // ⚠️ **除 `path` 那一块**（票 12）：路径**一律**由编译那一步从地图派生（`{ fromMap: true }`），
+    //   上游写没写它都**不看** —— 所以那句话现在的准确形式是「除 `path` 外逐字段相同」。
+    const written = JSON.parse(fs.readFileSync(file, "utf8")) as { path: unknown };
+    expect({ ...written, path: null }).toEqual({ ...GOOD, path: null });
+    const derived = tdDerivePath(GOOD as TdConfig);
+    expect(derived.ok, derived.ok ? "" : derived.error).toBe(true);
+    if (derived.ok) expect(written.path).toEqual({ points: derived.points });
+  });
+
+  it("⚠️ **上游不写 `path`**（票 12：模型本来就不写它）→ 落盘的那一份里路径是**派生的**", async () => {
+    // ⚠️ 这是这条链上最大的那个缺口被补上的地方：产物**看起来没变**（`path.points` 还在），
+    //   而**写它的不再是模型** —— 「路径与地图对不上」于是结构上不可能。
+    const d = tmp();
+    const draft = structuredClone(GOOD) as Record<string, unknown>;
+    delete draft.path;
+    const r = await run(d, draft);
+    expect(r.data.ok, r.summary.join("\n")).toBe(true);
+    const written = JSON.parse(fs.readFileSync(path.join(d, "out", "counter-siege", "td-configs", "v1.json"), "utf8"));
+    expect(written.path.points.length).toBeGreaterThanOrEqual(2);
+    // 派生的那一份**只落在走道格上**（把地图画对，路径就是对的）
+    const a = written.arena as { rows: string[]; cell: number; walkChar: string };
+    for (const p of written.path.points as { x: number; y: number }[]) {
+      const ch = [...a.rows[Math.floor(p.y / a.cell)]!][Math.floor(p.x / a.cell)]!;
+      expect(ch, `路径点 (${p.x},${p.y}) 落在格 "${ch}" 上`).toBe(a.walkChar);
+    }
+  });
+
+  it("⚠️ **走道画得派生不出路径** → 不崩、不落一份坏关卡，而是有一条说得清的硬失败", async () => {
+    // ⚠️ 这条是写测试时抓出来的**真 bug**：`coreAt` 取 `pts[pts.length - 1]!`，
+    //   而路径派生不出来时 `pts` 是空的 ⇒ `entityBox(undefined)` **抛** ——
+    //   校验器把「说得出哪儿不对的失败」变成了崩溃。
+    const d = tmp();
+    const draft = structuredClone(GOOD) as Record<string, unknown>;
+    delete draft.path;
+    (draft.arena as { rows: string[] }).rows[7] = ":" + (draft.arena as { rows: string[] }).rows[7]!.slice(1);
+    const r = await run(d, draft);
+    expect(r.data.ok).toBe(false);
+    expect(r.summary.join("\n")).toMatch(/派生不出路径/);
   });
 
   it("**绝不覆盖**：再编译一次就是 v2，v1 原样还在", async () => {
@@ -149,15 +192,33 @@ describe("⚠️ 坏关卡**照常落盘**（票 06/09 的裁决：人过目的�
     expect(r.summary.join("\n")).toMatch(/包里没有资源/);
   });
 
-  it("**走道画偏了**（路径穿过的格不是走道砖）→ ok=false，且消息说得出是**哪一格**", async () => {
-    // 这是真跑里最常出现的那一类：模型画的走道与它自己的路径对不上。
+  it("**走道画偏了**（地图上那条走道与门口连不成一条）→ ok=false，且消息说得出是**哪一格**", async () => {
+    // 这是真跑里最常出现的那一类：模型画的地图有问题。
+    // ⚠️ 票 12 之后它在**编译这条路上**不从「路径穿过的格不是走道砖」响了 ——
+    //   路径是**从地图算出来**的，它**没机会**与地图对不上。现在响的是**派生**那一条，
+    //   而这里断言的是：**它同样说得出格号**（说得清才有得改）。
     const d = tmp();
     const bad = structuredClone(GOOD);
     bad.arena.rows[8] = "#" + ".".repeat(12) + bad.arena.rows[8].slice(13);
     const r = await run(d, bad);
     expect(r.data.ok).toBe(false);
-    expect(r.summary.join("\n")).toMatch(/走道画在哪，敌人就该走哪/);
-    expect(r.summary.join("\n")).toMatch(/arena\.rows\[8\]/);
+    expect(r.summary.join("\n")).toMatch(/端头|走道断了/);
+    expect(r.summary.join("\n")).toMatch(/\(\d+,\d+\)/);
+  });
+
+  it("⚠️ **上游写了 `path` 也不看它** —— 一律从地图派生，那一族失败才真的「结构上不可能」", async () => {
+    // ⚠️ 这条是**补上的一处缺口**：只写一句「请不要写 path」是不够的（票 12 量过，
+    //   「把话说硬」的上限很低）。只要还「尊重」模型写的路径，模型写一份与地图对不上的，
+    //   这条失败就原封不动地回来了 —— 而它是 20 次真调用里失败原因的绝大多数。
+    const d = tmp();
+    const bogus = structuredClone(GOOD);
+    bogus.path.points[1] = { x: 999, y: 999 };            // 与它自己的地图毫无关系的一条路
+    const r = await run(d, bogus);
+    expect(r.data.ok, r.summary.join("\n")).toBe(true);   // ⇒ 被无视，不是被拒
+    const written = JSON.parse(fs.readFileSync(path.join(d, "out", "counter-siege", "td-configs", "v1.json"), "utf8"));
+    const good = tdDerivePath(GOOD as TdConfig);
+    expect(good.ok).toBe(true);
+    if (good.ok) expect(written.path).toEqual({ points: good.points });
   });
 });
 

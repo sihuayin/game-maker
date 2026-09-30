@@ -3,8 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  auditTdConfig, parseAssetPack, parseTdConfig, tdDistanceToPath, tdPathCells, tdPathLength,
-  waveCount, towerButtonCount, tdTotalEnemyHp, tdWaveDurationMs,
+  auditTdConfig, parseAssetPack, parseTdConfig, tdDerivePath, tdDistanceToPath, tdPathCells,
+  tdPathLength, tdResolveConfig, waveCount, towerButtonCount, tdTotalEnemyHp, tdWaveDurationMs,
   type AssetPackManifest, type TdConfig,
 } from "../src/index.js";
 
@@ -117,13 +117,13 @@ describe("td-config/v1：三族校验（真包 + 真关卡）", () => {
 
   it("自洽族：**斜着的一段路**必须拒 —— 任意角度会毁掉像素网格", () => {
     const c = structuredClone(valid());
-    c.path.points[1] = { x: c.path.points[1]!.x, y: c.path.points[1]!.y + 3 };
+    c.path!.points[1] = { x: c.path!.points[1]!.x, y: c.path!.points[1]!.y + 3 };
     expect(errorsOf(c).join("\n")).toMatch(/不轴对齐/);
   });
 
   it("自洽族：**零长度段**必须拒 —— 归一化方向是 (0,0) → NaN 的精灵坐标，而不报错", () => {
     const c = structuredClone(valid());
-    c.path.points[1] = { ...c.path.points[0]! };
+    c.path!.points[1] = { ...c.path!.points[0]! };
     expect(errorsOf(c).join("\n")).toMatch(/完全重合/);
   });
 
@@ -186,6 +186,100 @@ describe("td-config/v1：三族校验（真包 + 真关卡）", () => {
     for (const t of c.towers) for (const l of t.levels) l.damage = 1;
     for (const e of c.enemies) e.armor = 5;
     expect(warningsOf(c).join("\n")).toMatch(/数值刻度多半写反了量级/);
+  });
+});
+
+describe("td-config/v1：**路径从走道派生**（票 12 —— 那一族失败被做成结构上不可能）", () => {
+  // ⚠️ **为什么这一族要整块删掉**：20 次真调用里单次过 ≈ 25%，而失败**几乎全在同一族** ——
+  //   模型写下的 `path.points` 与它自己画成 `:` 的那张地图**对不上**。
+  //   写得更硬（0/4 → 1/4）与换更大的模型（代理忽略模型名）都够不着它 ⇒ 换掉**谁写它**。
+  /** 真关卡**删掉 `path` 那一块** —— 模型交出来的就是没有它的那一份。 */
+  const noPath = (): TdConfig => {
+    const c = structuredClone(valid());
+    delete c.path;
+    return c;
+  };
+  /** 把某一行的某一格改成别的字符（原地改，别的都不动）。 */
+  const put = (c: TdConfig, r: number, col: number, ch: string) => {
+    c.arena.rows[r] = c.arena.rows[r]!.slice(0, col) + ch + c.arena.rows[r]!.slice(col + 1);
+  };
+  const doors = (c: TdConfig) =>
+    c.arena.rows.flatMap((row, r) => [...row].map((ch, col) => ({ ch, col, r }))).filter((x) => x.ch === "+");
+
+  it("schema 收得下**没有 `path`** 的关卡 —— 模型本来就不写它", () => {
+    expect(parseTdConfig(noPath()).ok).toBe(true);
+  });
+
+  it("`tdResolveConfig` 把它**填回去**，而且**只补这一块**（别处逐字未动）", () => {
+    const r = tdResolveConfig(noPath());
+    expect(r.ok, r.ok ? "" : r.error).toBe(true);
+    if (!r.ok) return;
+    // ⚠️ 断言「除了 path 之外一字不差」—— 补全**只许**补这一块，多补一处就是另一件事了。
+    expect({ ...r.value, path: null }).toEqual({ ...valid(), path: null });
+    expect(parseTdConfig(r.value).ok).toBe(true);
+  });
+
+  it("派生的路径：**只落在走道格上**、**轴对齐**、起点**紧挨着门口**那一格", () => {
+    const c = noPath();
+    const d = tdDerivePath(c);
+    expect(d.ok, d.ok ? "" : d.error).toBe(true);
+    if (!d.ok) return;
+    expect(d.points.length).toBeGreaterThanOrEqual(2);
+    for (const p of d.points) {
+      const ch = [...c.arena.rows[Math.floor(p.y / c.arena.cell)]!][Math.floor(p.x / c.arena.cell)]!;
+      expect(ch, `路径点 (${p.x},${p.y}) 落在格 "${ch}" 上`).toBe(c.arena.walkChar);
+    }
+    for (let i = 1; i < d.points.length; i++) {
+      const a = d.points[i - 1]!, b = d.points[i]!;
+      expect(a.x === b.x || a.y === b.y, `第 ${i} 段不轴对齐`).toBe(true);
+    }
+    // ⚠️ 起点必须是**紧挨着 `+` 的那一格**的中心 —— 敌人从门口进，第一步就踩在路径上。
+    const door = doors(c)[0]!;
+    const half = Math.floor(c.arena.cell / 2);
+    const start = d.points[0]!;
+    expect(Math.abs(start.x - (door.col * c.arena.cell + half)) +
+      Math.abs(start.y - (door.r * c.arena.cell + half))).toBe(c.arena.cell);
+  });
+
+  it("⚠️ **走道分了叉** → 拒 —— 那时「敌人走哪条」就没有唯一答案", () => {
+    // 票 02 当年正是拿这条理由否掉了「用算法找路」；票 12 证明它的**前提没了**（单线 ⇒ 顺序唯一）。
+    const c = noPath();
+    put(c, 7, 12, ":");                       // 长走道上方再开一格 ⇒ `(12,8)` 成了 T 字口
+    expect(errorsOf(c).join("\n")).toMatch(/分了叉/);
+  });
+
+  it("⚠️ **两个入口** → 拒 —— 不然不知道敌人从哪一头进", () => {
+    const c = noPath();
+    put(c, 16, 30, "+");
+    expect(errorsOf(c).join("\n")).toMatch(/个入口/);
+  });
+
+  it("⚠️ **端头都不挨着入口** → 拒 —— 敌人从门口走不到走道上", () => {
+    const c = noPath();
+    put(c, 4, 31, ".");                       // 把原来的门口封上（走道还在，入口没了）
+    put(c, 16, 2, "+");                       // 远处另开一个 —— 它不挨着任何一个端头
+    expect(errorsOf(c).join("\n")).toMatch(/都不挨着入口/);
+  });
+
+  it("⚠️ **走道断了**（还有一块连不上）→ 拒，且说得出走了几格、画了几格", () => {
+    const c = noPath();
+    c.arena.rows[2] = "::" + c.arena.rows[2]!.slice(2);   // 左上角另开一个 2×2 的环
+    c.arena.rows[3] = "::" + c.arena.rows[3]!.slice(2);
+    expect(errorsOf(c).join("\n")).toMatch(/走道断了：从入口那头只走得到 \d+ 格/);
+  });
+
+  it("⚠️ **走道绕成一个圈**（一个端头都没有）→ 拒 —— 起点无从谈起", () => {
+    const c = noPath();
+    c.arena.rows = c.arena.rows.map((_, r) => (r === 2 || r === 3 ? "##::" + "#".repeat(28) : "#".repeat(32)));
+    put(c, 2, 0, "+");                        // 只留门口那个 `+`，走道是一个 2×2 的环
+    expect(errorsOf(c).join("\n")).toMatch(/绕成了一个圈/);
+  });
+
+  it("⚠️ 手写的路径**照旧被校验** —— 缺席才派生，写了就按写的查", () => {
+    const c = structuredClone(valid());
+    c.path!.points[1] = { ...c.path!.points[1]!, y: c.path!.points[1]!.y + 3 };
+    expect(parseTdConfig(c).ok).toBe(true);   // schema 这一层收得下
+    expect(errorsOf(c).join("\n")).toMatch(/不轴对齐/);
   });
 });
 

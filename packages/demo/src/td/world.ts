@@ -171,7 +171,11 @@ export function buildTdWorld(
   }
 
   // ── 折线：弧长在**这里**算完 ────────────────────────────────────────────
-  const points = cfg.path.points.map((p) => ({ x: p.x, y: p.y }));
+  // ⚠️ `path` 是**可选**的（票 12：模型不写它、由编译那一步派生填上）。
+  //   **这里只「容忍它缺席」，不兜底** —— 空路径会让 `pathPointAt` 越界抛（它取 `points[i-1]`）。
+  //   兜底的责任在**两个消费方**身上：`compileTdGame` 与 `assembleTdSite` 都先走
+  //   `tdResolveConfig`，补不出路径就**在那里**报错，而不是带着一条空路径一路走到这里。
+  const points = (cfg.path?.points ?? []).map((p) => ({ x: p.x, y: p.y }));
   const cum = [0];
   for (let i = 1; i < points.length; i++)
     cum.push(cum[i - 1]! + Math.hypot(points[i]!.x - points[i - 1]!.x, points[i]!.y - points[i - 1]!.y));

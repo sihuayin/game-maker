@@ -166,7 +166,7 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   // ── 摆目录（**与塔防共用同一份**，见 `layout.ts`）────────────────────────
   const laid = laySite({
     packDir: opts.packDir, outRoot, gameId, packVersion,
-    shellJsPath: opts.shellJsPath, configPath: opts.configPath, configFileName: "game-config.json",
+    shellJsPath: opts.shellJsPath, config, configFileName: "game-config.json",
   });
   const { siteDir, siteVersion: n, packCopied } = laid;
 

@@ -21,8 +21,15 @@ export type LayoutOptions = {
   packVersion: string;
   /** 外壳 bundle。**所有站点共用同一份字节**（R8 的字面意义）。 */
   shellJsPath: string;
-  /** 已经过完校验、要原样拷进站点的那份配置。 */
-  configPath: string;
+  /**
+   * **已经过完校验的那份配置对象**（不是路径）。
+   *
+   * ⚠️ 2026-09-30 从「原样拷 `configPath`」改成「写这个对象」—— 因为**校验过的那份
+   *   与磁盘上那份可以不是一份**：塔防的 `path` 由装配那一步**派生补全**，而磁盘上那份
+   *   （模型交出来的）没有它。原样拷的后果是**校验用补全后的、外壳拿到没补全的** ——
+   *   `pathPointAt` 当场给出 NaN，而**校验说全过**（那正是票 12 要堵的那种「错得安静」）。
+   */
+  config: unknown;
   /** 它在站点目录里叫什么（`game-config.json` / `td-config.json`）。 */
   configFileName: string;
 };
@@ -76,7 +83,7 @@ export function laySite(opts: LayoutOptions): LaidSite {
   fs.mkdirSync(siteDir, { recursive: true });
 
   fs.copyFileSync(opts.shellJsPath, path.join(siteDir, "shell.js"));
-  fs.copyFileSync(opts.configPath, path.join(siteDir, opts.configFileName));
+  fs.writeFileSync(path.join(siteDir, opts.configFileName), jstr(opts.config));
 
   // ⚠️ **经典 script**（不是 module）：票 03 实测 module script 撞 CORS —— 少一个失败模式
   fs.writeFileSync(path.join(siteDir, "index.html"), `<!doctype html>

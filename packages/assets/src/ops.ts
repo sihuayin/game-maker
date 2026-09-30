@@ -25,7 +25,7 @@ import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, recipeShapeSp
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, gameHudScreenItems, parseTdConfig, tdHudScreenItems, type CommandResult, type TdConfig } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -398,6 +398,11 @@ ${JSON.stringify(gameConfigExample, null, 2)}
  * ⚠️ 资源 id 一律写**占位符**，否则示例会把某一关的 id 焊进提示词。
  * ⚠️ 而它里面那张 **18 行 × 32 字符的地图是这一段最值钱的部分** ——
  *   逐字给出「一行多长、五个字符怎么摆、走道怎么连成一条」，比任何文字描述都准。
+ * ⚠️ **它里面没有 `path` 那一块**（票 12）：路径由工具从地图派生，模型不写它。
+ *   这也正是这个骨架必须**照实**的原因 —— 示例里留一块不该写的东西，模型就会照写。
+ * ⚠️ 而那张地图的走道**必须自己就是一条单线**（票 12 的「走道不许分叉」）——
+ *   示例错了，模型就会以「看起来没问题」的方式错（票 40 的教训）。第 5 行原本
+ *   在最左端还留了五个走道格，于是 `(6,4)` 成了一个 T 字口 ⇒ **已收回去**。
  *   （⚠️ 它是**行格式的演示**，不是一张可以拿来用的地图 —— 提示词里明说了这条。）
  */
 export const tdConfigExample = {
@@ -416,7 +421,7 @@ export const tdConfigExample = {
       "################################",
       "#..............................#",
       "#..==========================..#",
-      "#::::::::::::::::::::::::::::::+",
+      "#.....:::::::::::::::::::::::::+",
       "#.....:........................#",
       "#.....:........................#",
       "#.....:.======================.#",
@@ -433,7 +438,7 @@ export const tdConfigExample = {
     ],
   },
   scene: { slot: { asset: "<插槽的 id>" }, slotActive: { asset: "<高亮框的 id>" } },
-  path: { points: [{ x: 457, y: 67 }, { x: 97, y: 67 }, { x: 97, y: 187 }, { x: 37, y: 187 }] },
+  // ⚠️ **没有 `path` 这一块** —— 路径由工具从你画的地图**派生**（票 12），你不用写它。
   core: { asset: "<柜台的 id>" },
   slots: [
     { id: "s1", at: { x: 187, y: 112 } }, { id: "s2", at: { x: 277, y: 112 } },
@@ -545,8 +550,9 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
   };
 
   // ⚠️ **重采样，不是修复循环**（不把错误喂回去 —— R2 把「自我修复闭环」整体判过出局）。
-  //   而它要重采样的**不只有 schema 失败**：真跑量下来，模型产出的关卡**过不了校验**才是常态
-  //   （8 次里 1 次过；失败几乎全在「路径坐标 vs 地图上画成走道的格」那一族）。
+  //   而它要重采样的**不只有 schema 失败**：真跑量下来（20 次上游调用），模型一次就产出
+  //   可用关卡的只有 **~1/4**，失败几乎全在「路径坐标 vs 地图上画成走道的格」那一族
+  //   （那一族已由 `fromMap` 删掉；数字见 `docs/td-requirement.md` 与票 12）。
   //   ⇒ **硬失败也重采样**。⚠️ 每一次都是**一笔上游调用**，所以次数是参数（默认 3）。
   //
   // ⚠️ **账要累计往返次数，不能在每次循环里覆盖成一个**：一次失败的重采样**是花掉的钱**，
@@ -571,9 +577,23 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
       catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
       const p = parseTdConfig(parsed);
       if (!p.ok) { lastError = `编译出来的关卡不过 schema：${p.errors.slice(0, 4).join("；")}`; continue; }
-      const got = auditOf(p.value);
-      fallback = p.value; issues = got;
-      if (!got.some((i) => i.startsWith("❌"))) { picked = p.value; break; }
+      // ⚠️ **补全**：模型**不写** `path.points`（票 12）—— 从它画的那张地图**派生**出来填上。
+      //   于是产物里路径还在、下游一无所知，而「路径与地图对不上」那一族失败**结构上不可能**。
+      //   ⚠️ `fromMap` 才是那句「结构上不可能」的**全部**分量：它**不看模型写没写**、一律派生。
+      //   只写一句「请不要写 path」是不够的（票 12 量过：「把话说硬」上限很低）——
+      //   模型真写了、而这份代码又尊重它，那一族失败就原封不动地回来了。
+      const resolved = tdResolveConfig(p.value, { fromMap: true });
+      // ⚠️ **派生不出来也是「坏关卡」的一种，照常落盘**（与校验不过**同一条**裁决 —— 票 06/09：
+      //   人过目的前提是他看得到哪儿不对）。落盘的是**没有 `path` 的那一份** ——
+      //   它就是模型交出来的原文（而它**过得了 schema**），`site` 会在那里再说一遍同一句话。
+      //   ⚠️ 原来这里写的是 `continue` ⇒ 三次重采样全撞上它时**抛异常、一个字节都不落** ——
+      //   于是**模型的产出连同一笔已经花掉的调用一起丢了**，而它的失败其实说得清。
+      const got = resolved.ok
+        ? auditOf(resolved.value)
+        : [`❌ arena: 从场地派生不出路径：${resolved.error}`];
+      fallback = resolved.ok ? resolved.value : p.value;
+      issues = got;
+      if (resolved.ok && !got.some((i) => i.startsWith("❌"))) { picked = resolved.value; break; }
       lastError = `编译出来的关卡过不了校验（${got.filter((i) => i.startsWith("❌")).length} 条）：` +
         got.find((i) => i.startsWith("❌"))!.replace(/^❌ /, "");
     }
