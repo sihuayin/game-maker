@@ -16,7 +16,7 @@ const CONFIG = path.join(ROOT, "fixtures/td-configs/counter-siege.json");
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, unknown>;
 
 /** 每个用例一个临时 out 根 —— 装配器会往里写目录，测试之间不能串味。 */
-function harness(over: (c: Record<string, never>) => void = () => {}) {
+function harness(over: (c: Record<string, unknown>) => void = () => {}) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "gm-td-"));
   const outRoot = path.join(tmp, "out");
   const shellJsPath = path.join(tmp, "shell.js");

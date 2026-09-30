@@ -264,7 +264,7 @@ describe("⚠️ 多帧必须共用裁框（2026-09-25 修）", () => {
   });
 
   it("共用裁框：同一个头两帧画成同样的宽度", () => {
-    const [a, b] = importFrames([keyed, narrower], opt) as [RasterImage, RasterImage];
+    const [a, b] = importFrames([keyed, narrower], opt) as unknown as [RasterImage, RasterImage];
     expect(headWidth(a)).toEqual(headWidth(b));      // 实测两帧都是 22
     // 比例保住了，不代表内容相同 —— 窄掉的那条边是真没了
     expect(a.data.equals(b.data)).toBe(false);

@@ -10,7 +10,7 @@ const CONFIG = path.join(ROOT, "fixtures/td-configs/counter-siege.json");
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, "utf8"));
 
 /** 真包 + 真关卡，按需改一处（与 `td-world.test.ts` 同款）。 */
-const world = (over: (c: Record<string, never>) => void = () => {}): TdWorldDescription => {
+const world = (over: (c: Record<string, unknown>) => void = () => {}): TdWorldDescription => {
   const c = readJson(CONFIG);
   over(c);
   return buildTdWorld(readJson(path.join(PACK, "manifest.json")), c, { packBase: "" });

@@ -12,7 +12,7 @@ const PACK = path.join(ROOT, "fixtures/packs/counter-siege/v4");
 const CONFIG = path.join(ROOT, "fixtures/td-configs/counter-siege.json");
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, "utf8"));
 
-const world = (over: (c: Record<string, never>) => void = () => {}): TdWorldDescription => {
+const world = (over: (c: Record<string, unknown>) => void = () => {}): TdWorldDescription => {
   const c = readJson(CONFIG);
   over(c);
   return buildTdWorld(readJson(path.join(PACK, "manifest.json")), c, { packBase: "../../pack/v4/" });

@@ -35,7 +35,8 @@ const gen = (f: typeof fetch) => createDashScopeMcpGenerator({ baseUrl: "https:/
 
 describe("requestSize —— 长宽比不是可选的", () => {
   it("保持长宽比（管线会把结果两方向独立拉伸到 spec.size）", () => {
-    for (const [w, h] of [[16, 16], [32, 48], [64, 16], [96, 24], [14, 22], [320, 180], [48, 48]]) {
+    const cases: [number, number][] = [[16, 16], [32, 48], [64, 16], [96, 24], [14, 22], [320, 180], [48, 48]];
+    for (const [w, h] of cases) {
       const [a, b] = requestSize({ w, h }).split("*").map(Number) as [number, number];
       const skew = (a / b) / (w / h);
       expect(a % 16, `${w}x${h} 的长边不是 16 的倍数`).toBe(0);
