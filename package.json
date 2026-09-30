@@ -8,7 +8,8 @@
     "build": "tsc -b && pnpm -r --if-present bundle",
     "clean": "tsc -b --clean",
     "check:deps": "node scripts/check-deps.mjs",
-    "check": "pnpm check:deps && pnpm build",
+    "check:links": "node scripts/check-links.mjs",
+    "check": "pnpm check:deps && pnpm check:links && pnpm build",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -b && pnpm -r --if-present typecheck"
   },

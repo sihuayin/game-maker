@@ -1,7 +1,7 @@
 # 从参考图产出一份 StyleSpec
 
-> 这份文件是[票 39](../../.scratch/game-creation-v1/issues/39-palette-role.md) 的产物。
-> 它存在的理由很直白：**这件事每个世界都要重做一次**（[R11](../../.scratch/game-creation-v1/map.md)），
+> 这份文件是[票 39](../.scratch/game-creation-v1/issues/39-palette-role.md) 的产物。
+> 它存在的理由很直白：**这件事每个世界都要重做一次**（[R11](../.scratch/game-creation-v1/map.md)），
 > 而在它之前，「该对模型说什么」**只活在一个实验脚本里**
 > （`.scratch/game-creation-v1/experiments/stylespec-extraction/prompt.mjs`）——
 > 换一张参考图的人没有任何地方可查。被依赖的东西必须有承载它的地方。
@@ -11,7 +11,7 @@
 **一次交互，不是一次管线调用。** R11 把它定成「**人在 Claude Code 会话里让模型看图、
 产出 StyleSpec JSON、存成文件**」，管线**只消费那个文件**（`derive` 的 `--style`）。
 
-这条分工不是将就：它是[票 35](../../.scratch/game-creation-v1/issues/35-bitmap-provenance.md)
+这条分工不是将就：它是[票 35](../.scratch/game-creation-v1/issues/35-bitmap-provenance.md)
 查清条款之后**唯一**既合规又能用的路，而且它有一个额外的好处 ——
 **那份文件是人过目过的**，管线拿到的是一个已经被人看过的输入。
 
