@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseRecipe, type AssetRecipe as Recipe, type AssetSpec } from "../src/index.js";
@@ -127,6 +127,26 @@ describe("导入源 —— 与规格的一致性", () => {
     e.source = { kind: "import", ref: "fixtures/reference/test.png", background: { tolerance: 30 } } as never;
     const p = parseRecipe(r);
     expect(p.ok, p.ok ? "" : p.errors.join(" / ")).toBe(true);
+  });
+});
+
+describe("**入库的每一份配方都要过 schema** —— 它们是真产物，不是示例", () => {
+  // ⚠️ **这条是补的**：`fixtures/recipes/` 里 8 份配方，此前只有 `shift-change.json` 被解析过。
+  //   于是「改了一份入库的配方」可以**悄无声息地**把它改坏 —— 2026-09-30 给
+  //   `last-train-image.json` 的三层加 `layers[].description` 时正是这个处境
+  //   （那次是对的，但**没有任何东西能证明它对**）。
+  //   与 `td-configs` / `packs` 那两份 fixture 同一条规矩：**磁盘上真有的，要有东西守着**。
+  const files = readdirSync(RECIPE_DIR).filter((f) => f.endsWith(".json")).sort();
+
+  it("一份都不少（至少 8 份）—— 少了说明有人搬走了真产物", () => {
+    expect(files.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it("逐份解析，全过", () => {
+    for (const f of files) {
+      const r = parseRecipe(JSON.parse(readFileSync(RECIPE_DIR + f, "utf8")));
+      expect(r.ok, `${f} 不过 schema：${r.ok ? "" : r.errors.slice(0, 3).join("；")}`).toBe(true);
+    }
   });
 });
 
