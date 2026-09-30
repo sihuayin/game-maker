@@ -8,8 +8,7 @@
 //
 // ⚠️⚠️ **它里面那份玩家是「票 02 那个决定的复现版」，不是出货的那一个。**
 //   票 02 定了把参考玩家换成几何 + 升级优先，而**那个换还没实现**（wayfinder 是 plan, don't do）。
-//   ⇒ **换落地的那一天，把下面 `play()` 里那份复制品删掉、改成 import 真的 `autoPlay`。**
-//   留着一份复制品的唯一理由是：这个脚本要能解释它自己量出来的数。
+//   ✅ **2026-09-30：那个换已经落地，复制品也已删掉** —— 现在 import 的是真的 `autoPlay`。
 import fs from "node:fs";
 const { buildTdWorld, pathPointAt } = await import("../dist/td/world.js");
 const { createSim, advance, autoPlay, FIXED_DT_MS, simSnapshot } = await import("../dist/td/sim.js");

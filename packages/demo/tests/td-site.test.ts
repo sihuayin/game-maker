@@ -58,6 +58,18 @@ describe("塔防站点的装配：三份数据 + 一份共用 bundle", () => {
     expect(assembleTdSite(h.opts).data.packCopied).toBe(false);
   });
 
+  it("⚠️ 输在**中途**只报警告 —— 「人打得赢、它打不赢」的关卡可能是好关卡", () => {
+    const h = harness((c) => {
+      const cfg = c as unknown as { enemies: { hp: number }[] };
+      cfg.enemies.forEach((e) => { e.hp *= 5; });        // 实测：这一档输在第 3 波
+    });
+    const r = assembleTdSite(h.opts);                     // ← **不抛**
+    const w = (r.data.warnings as string[]).join("\n");
+    expect(w).toMatch(/没能打完/);
+    expect(w).toMatch(/覆盖 \d+%/);                       // 诊断①，带尺子
+    expect(w).toMatch(/波次血量/);                         // 诊断②
+  });
+
   it("**校验全过时零警告** —— 真关卡不该带着噪音交付", () => {
     const h = harness();
     expect(assembleTdSite(h.opts).data.warnings).toEqual([]);
@@ -104,6 +116,21 @@ describe("塔防站点的装配：**校验不过 = 硬失败，不产出站点**
     let caught: unknown;
     try { assembleTdSite({ ...h.opts, configPath: path.join(h.tmp, "没有这个文件.json") }); } catch (e) { caught = e; }
     expect((caught as CommandError).kind).toBe("usage");
+  });
+
+  it("⚠️ **可通关族**：数值刻度整个写反、一开局就被抢空 ⇒ 硬失败，且**一个目录都没写**", () => {
+    // 票 11 定的那一步就住在**这里**（与几何族同处）—— 那一步需要模拟器，而它住在 demo。
+    const h = harness((c) => {
+      const cfg = c as unknown as { enemies: { hp: number }[]; economy: { lives: number } };
+      cfg.enemies.forEach((e) => { e.hp *= 20; });
+      cfg.economy.lives = 1;
+    });
+    const e = fails(h);
+    expect(e.kind).toBe("invalid");
+    expect(e.message).toMatch(/第一波就被抢空了/);
+    // ⚠️ 硬失败那条要把**方向**说出来 —— 而那句话是**量出来的**
+    expect(e.message).toMatch(/宁可把敌人写弱、把塔写便宜/);
+    expect(fs.existsSync(path.join(h.outRoot, "counter-siege", "site"))).toBe(false);
   });
 
   it("坏消息**一次报全**（别让人改一条跑一次）", () => {

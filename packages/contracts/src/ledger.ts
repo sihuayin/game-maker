@@ -16,7 +16,13 @@ import { z } from "zod";
 export const LEDGER_FORMAT = "assetpack-ledger/v1" as const;
 
 /** 一次运行里有哪几类调用。**封闭判别联合** —— 加一类就是加一个枚举值。 */
-export const LedgerStep = z.enum(["derive", "drawlist", "image"]);
+export const LedgerStep = z.enum([
+  "derive",
+  "drawlist",
+  "image",
+  // ⚠️ 与 `derive` 同一条规矩：**它是一次上游调用，就得记**（票 06 的 Q4）。
+  "compile-td-game",
+]);
 
 /**
  * 上游自报的用量。⚠️ **上游没给就整个键缺席 —— 不许填 0 冒充「测到了 0」**
@@ -32,7 +38,7 @@ export const LedgerUsage = z.object({
 /** 一次调用的账。 */
 export const LedgerCall = z.object({
   step: LedgerStep,
-  /** 这一步作用在谁身上：资源 id（生图还会带上 `<id>.<动画|层名>`），或 `recipe` / `game-config`。 */
+  /** 这一步作用在谁身上：资源 id（生图还会带上 `<id>.<动画|层名>`），或 `recipe` / `game-config` / `td-config`。 */
   target: z.string().min(1),
   /**
    * 上游**自报**的模型名。
@@ -81,7 +87,10 @@ export const Ledger = z.object({
      * 而**差正是并行的收益**。只记一个会让这件事变成无法回答的问题。
      */
     wallClockMs: z.number().int().nonnegative(),
-    byStep: z.object({ derive: CallCount, drawlist: CallCount, image: CallCount }).strict(),
+    // ⚠️ **只记发生过的步**（`z.record` 不要求键齐全）——
+    //   加一个 `LedgerStep` 值时，**磁盘上已有的账照常通过**（缺的键不算错），
+    //   而新账也不会因为「多了一个键」被自己的 schema 拒。加值不再需要动格式版本。
+    byStep: z.record(LedgerStep, CallCount),
   }).strict(),
   calls: z.array(LedgerCall),
 }).strict();
@@ -105,8 +114,13 @@ export function parseLedger(input: unknown): { ok: true; value: Ledger } | { ok:
  * ⚠️ 别在别处再算一遍 —— 票 24 的 `derivePackMode` 是同一个教训。
  */
 export function summarizeCalls(calls: readonly LedgerCall[]) {
-  const empty = () => ({ calls: 0, attempts: 0 });
-  const out = { derive: empty(), drawlist: empty(), image: empty() };
-  for (const c of calls) { out[c.step].calls += 1; out[c.step].attempts += c.attempts; }
+  // ⚠️ **只记发生过的步** —— 与 schema 的 `partialRecord` 一条心。
+  //   零调用的步不写出来，而不是写一个 `{calls: 0}`：后者会让「这个包跑过生图吗」
+  //   这个问题的答案取决于**枚举里有没有那个值**，而不是取决于这一趟真发生了什么。
+  const out: Partial<Record<z.infer<typeof LedgerStep>, { calls: number; attempts: number }>> = {};
+  for (const c of calls) {
+    const e = (out[c.step] ??= { calls: 0, attempts: 0 });
+    e.calls += 1; e.attempts += c.attempts;
+  }
   return out;
 }

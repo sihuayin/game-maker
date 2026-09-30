@@ -66,7 +66,7 @@
 它赢了只说明这一关**不是坏的**；它赢不了仍可能是**难而公平**的关卡。
 「这一关有多难」是**观察**，不进判据。它的策略、以及「它必须与关卡无关」这条，
 见 `packages/demo/src/td/sim.ts` 里 `autoPlay` 的注释与
-[td-compile-v1 的票 02](.scratch/td-compile-v1/issues/02-reference-player-strategy.md)。
+[td-compile-v1 的票 02](../.scratch/td-compile-v1/issues/02-reference-player-strategy.md)。
 
 ## 怎么跑
 

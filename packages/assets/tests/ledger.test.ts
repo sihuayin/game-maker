@@ -97,8 +97,10 @@ describe("账：跟着包走的收据（票 45）", () => {
     expect([...calls.map((c) => c.step)].sort()).toEqual(["drawlist", "image"]);
     expect(calls.find((c) => c.step === "drawlist")!.attempts, "重试过的那个要 > 1").toBe(2);
     expect(calls.find((c) => c.step === "image")!.attempts).toBe(1);
+    // ⚠️ **只记发生过的步** —— 这一趟没有 `derive`，所以键里就没有它。
+    //   写一个 `derive: {calls: 0}` 会让「这个包跑过推导吗」的答案取决于**枚举里有没有那个值**，
+    //   而不是取决于这一趟真发生了什么。加一个 `LedgerStep` 值时也不必再动格式版本。
     expect(summarizeCalls(calls as never)).toEqual({
-      derive: { calls: 0, attempts: 0 },
       drawlist: { calls: 1, attempts: 2 },
       image: { calls: 1, attempts: 1 },
     });

@@ -1,7 +1,7 @@
 // **塔防的站点装配器** —— 与横版那份是**兄弟**，共用 `layout.ts` 的落盘逻辑。
 //
 // ⚠️ 分工与横版一字不差：**校验 → 摆目录 → 写数据 → 报账**，这里不写一行游戏逻辑。
-//   几何族跑在 `buildTdWorld` 的**产物**上，不是另算一遍 —— 于是「校验过的」与
+//   第四/六族跑在 `buildTdWorld` 的**产物**上，不是另算一遍 —— 于是「校验过的」与
 //   「外壳要画的」是同一份描述，不可能漂移（票 33 那条不变量）。
 import fs from "node:fs";
 import path from "node:path";
@@ -10,6 +10,7 @@ import {
   type AssetPackManifest, type CommandResult, type ConfigIssue, type TdConfig,
 } from "@game-maker/contracts";
 import { buildTdWorld, type TdWorldDescription } from "./world.js";
+import { auditWinnable, playReference } from "./winnable.js";
 import { failWith, laySite } from "../layout.js";
 import { HUD_LINE_HEIGHT, VIEWPORT } from "../draw.js";
 import type { Box } from "../draw.js";
@@ -97,14 +98,18 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   const outRoot = path.resolve(opts.outRoot);
   const gameDir = path.join(outRoot, gameId);
 
-  // ── 校验：三族（契约层）+ 几何族 ────────────────────────────────────────
+  // ── 校验：三族（契约层）+ 第四族（几何）+ 第五族（屏幕空间）+ 第六族（可通关）──
   // ⚠️ 场景描述**只构建一次**：几何族校验的那份，就是下面写进 warning 汇总、以及
   //   外壳将要画的那一份。构建两次 = 给了它们漂移的机会，而漂移是静默的。
   const world = buildTdWorld(manifest, config, { packBase: `../../pack/${packVersion}/` });
   // ⚠️ **第五族与几何族分开、且与横版共用一份**（票 03）——
   //   塔防的 `hud` 有**五个**成员，而原先的几何族只覆盖了三个（票 03 量到的那个洞）。
   const screenIssues = auditScreenSpace(VIEWPORT, tdHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
-  const all = [...auditTdConfig(config, manifest), ...screenIssues, ...auditTdGeometry(world)];
+  // ⚠️ **「这一关通不通」也判在这里**（票 11）：那一步需要**模拟器**，而它住在 demo ——
+  //   与**几何族**是同一个处境（同样够不着 `contracts`），所以落在同一处。
+  //   `compileGame` 自己的注释写着这条分工：「这里跑的是 `site` 要跑的同一批校验（**减去第四族**）」。
+  const winnable = auditWinnable(playReference(world), world);
+  const all = [...auditTdConfig(config, manifest), ...screenIssues, ...auditTdGeometry(world), ...winnable];
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);
 
@@ -122,7 +127,7 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
       `玩法：塔防（${TD_CONFIG_FORMAT}）· ${config.waves.length} 波 · ${config.towers.length} 种机关 · ` +
         `${config.enemies.length} 种敌人 · ${config.slots.length} 个插槽`,
       `消费：外壳 v${world.shellVersion} · 资源包 ${packVersion}（${manifest.assets.length} 个资源）`,
-      `校验：三族 + 几何族全过${warnings.length ? `；${warnings.length} 条警告` : ""}`,
+      `校验：三族（契约层）+ 第四族（几何）+ 第五族（HUD 屏幕空间）+ 第六族（**可通关**：参考玩家跑一遍）全过${warnings.length ? `；${warnings.length} 条警告` : ""}`,
       ...warnings.map((i) => `  ⚠️ ${i.where}: ${i.message}`),
       `⚠️ 起服务时 **HTTP server 的根必须是 ${rel(outRoot, gameDir)}/** —— ` +
         `打开 /site/v${laid.siteVersion}/index.html（根指到 site 里面会 404，而 Phaser 静默失败）`,

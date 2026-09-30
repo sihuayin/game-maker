@@ -21,11 +21,11 @@ import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerat
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
-import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, recipeShapeSpec, styleBrief } from "./prompt.js";
+import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, recipeShapeSpec, styleBrief, tdConfigPrompt } from "./prompt.js";
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, gameHudScreenItems, type CommandResult } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, gameHudScreenItems, parseTdConfig, tdHudScreenItems, type CommandResult } from "@game-maker/contracts";
 export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -388,6 +388,212 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   };
 }
 
+// ── 塔防关卡编译（施工单第 1 条）──────────────────────────────────────────────
+
+/**
+ * 给模型看的**塔防关卡骨架**。
+ *
+ * ⚠️ **它必须是能过 `parseTdConfig` 的** —— 导出它是为了让测试能直接断言这件事
+ *   （与 `gameConfigExample` 同一条规矩：**示例错了，模型就会以「看起来没问题」的方式错**）。
+ * ⚠️ 资源 id 一律写**占位符**，否则示例会把某一关的 id 焊进提示词。
+ * ⚠️ 而它里面那张 **18 行 × 32 字符的地图是这一段最值钱的部分** ——
+ *   逐字给出「一行多长、五个字符怎么摆、走道怎么连成一条」，比任何文字描述都准。
+ *   （⚠️ 它是**行格式的演示**，不是一张可以拿来用的地图 —— 提示词里明说了这条。）
+ */
+export const tdConfigExample = {
+  format: "td-config/v1",
+  world: { size: { w: 480, h: 270 } },
+  arena: {
+    cell: 15,
+    walkChar: ":",
+    tiles: {
+      "#": { asset: "<墙砖的 id>" }, ".": { asset: "<地面砖的 id>" },
+      "=": { asset: "<货架砖的 id>" }, ":": { asset: "<走道砖的 id>" },
+      "+": { asset: "<卷帘门的 id>" },
+    },
+    rows: [
+      "################################",
+      "################################",
+      "#..............................#",
+      "#..==========================..#",
+      "#::::::::::::::::::::::::::::::+",
+      "#.....:........................#",
+      "#.....:........................#",
+      "#.....:.======================.#",
+      "#.....:........................#",
+      "#.....:........................#",
+      "#.....:........................#",
+      "#.....:........................#",
+      "#::::::........................#",
+      "#..............................#",
+      "#..............................#",
+      "#..==========================..#",
+      "#..............................#",
+      "#..............................#",
+    ],
+  },
+  scene: { slot: { asset: "<插槽的 id>" }, slotActive: { asset: "<高亮框的 id>" } },
+  path: { points: [{ x: 457, y: 67 }, { x: 97, y: 67 }, { x: 97, y: 187 }, { x: 37, y: 187 }] },
+  core: { asset: "<柜台的 id>" },
+  slots: [
+    { id: "s1", at: { x: 187, y: 112 } }, { id: "s2", at: { x: 277, y: 112 } },
+    { id: "s3", at: { x: 157, y: 202 } }, { id: "s4", at: { x: 262, y: 202 } },
+  ],
+  towers: [
+    { id: "<机关 id>", name: "<显示名>", asset: "<机关的 id>", attack: "single", targeting: "first",
+      cost: 40, upgradeCost: 60,
+      levels: [{ range: 56, damage: 5, fireMs: 480 }, { range: 68, damage: 9, fireMs: 380 }],
+      projectile: { asset: "<抛射物的 id>", speed: 220 } },
+    { id: "<范围机关的 id>", name: "<显示名>", asset: "<范围机关的 id>", attack: "aoe", targeting: "first",
+      cost: 60, upgradeCost: 90,
+      levels: [
+        { range: 40, damage: 3, fireMs: 900, slow: { factor: 0.6, ms: 1200 } },
+        { range: 52, damage: 5, fireMs: 800, slow: { factor: 0.45, ms: 1600 } },
+      ],
+      fx: { asset: "<放电特效的 id>", anim: "<动画名>" } },
+  ],
+  enemies: [
+    { id: "<敌人 id>", name: "<显示名>", asset: "<敌人的 id>", anim: "<动画名>",
+      hp: 20, speed: 40, bounty: 6, armor: 0, leakCost: 1 },
+  ],
+  waves: [
+    { groups: [{ enemy: "<敌人 id>", count: 6, gapMs: 800, delayMs: 0 }] },
+    { groups: [{ enemy: "<敌人 id>", count: 8, gapMs: 700, delayMs: 0 }] },
+    { groups: [{ enemy: "<敌人 id>", count: 10, gapMs: 700, delayMs: 0 }] },
+    { groups: [{ enemy: "<敌人 id>", count: 12, gapMs: 600, delayMs: 0 }] },
+    { groups: [{ enemy: "<敌人 id>", count: 14, gapMs: 600, delayMs: 0 }] },
+  ],
+  economy: { startScrap: 120, lives: 20, waveBonus: 35 },
+  hud: {
+    panel: { asset: "<顶栏的 id>", at: { x: 0, y: 0 }, size: { w: 480, h: 30 } },
+    readout: { at: { x: 22, y: 5 }, step: { x: 0, y: 10 } },
+    icons: {
+      scrap: { asset: "<废料图标的 id>", at: { x: 8, y: 6 } },
+      life: { asset: "<声望图标的 id>", at: { x: 8, y: 16 } },
+    },
+    buttons: { asset: "<按钮底板的 id>", at: { x: 300, y: 4 }, size: { w: 44, h: 22 }, step: { x: 48, y: 0 } },
+    start: { asset: "<按钮底板的 id>", at: { x: 444, y: 4 }, size: { w: 28, h: 22 } },
+  },
+} as const;
+
+/**
+ * 资源包清单 —— `resourceBrief` 的塔防版。
+ *
+ * ⚠️ 带上 `role`（模型靠它认出「**哪个是砖**」）、**锚点**与**尺寸**。
+ *   ⚠️ 锚点那一项是补上的：第一版只写了 kind/size/role/animation，把锚点**悄悄丢了** ——
+ *   而那正是「两份实现必然漂」的样子（横版那份是带锚点的）。
+ *   塔防这边尤其不能丢：**砖的锚点必须正中**（票 07），而模型得看得到它才能照做。
+ */
+function tdResourceBrief(m: AssetPackManifest): string {
+  return m.assets.map((a) => {
+    const anim = a.animations?.length ? `动画：${a.animations.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ")}` : "（无动画）";
+    const layers = a.layers?.length ? ` · 背景层（远→近）：${a.layers.map((l) => l.name).join(" → ")}` : "";
+    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · 锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${a.role} · ${anim}${layers}`;
+  }).join("\n");
+}
+
+export type CompileTdGameOptions = {
+  requirementPath: string;
+  /** 资源包目录 —— 它**就是**模型要看的资源清单，也是校验的依据。 */
+  packDir: string;
+  outRoot: string;
+  transport?: Transport;
+  fetchImpl?: typeof fetch;
+  /** 外壳视口。默认 480×270。 */
+  viewport?: { w: number; h: number };
+  /** 外壳画 HUD 文字的行高（票 09）。默认 [[DEFAULT_HUD_LINE_HEIGHT]]。 */
+  hudLineHeight?: number;
+  /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]]。 */
+  timeoutMs?: number;
+};
+
+/**
+ * 需求 + 资源包 → 一份 td-config，落盘到 `<out>/<id>/td-configs/v<N>.json`。
+ *
+ * ⚠️ **它跑的是「三族（契约层）+ 屏幕空间」**，与 `compileGame` 同一个口径 ——
+ *   **几何族与「这一关通不通」跑不了**：那两族要的是世界描述与模拟器，而它们住在 `demo`
+ *   （`assets → contracts` 是依赖图上写死的）。⇒ 那两族落在 `site`（票 11 定的）。
+ *
+ * ⚠️ **不过校验也照常落盘**（票 06/09 那条裁决）：**「人过目」的前提是他看得到哪儿不对**；
+ *   不落盘他连看的东西都没有。退出码仍由回报里的 `ok` 决定。
+ */
+export async function compileTdGame(opts: CompileTdGameOptions): Promise<CommandResult> {
+  const requirement = fs.readFileSync(opts.requirementPath, "utf8");
+  const manifestPath = path.join(opts.packDir, "manifest.json");
+  if (!fs.existsSync(manifestPath)) throw new CommandError("usage", `不是资源包（没有 manifest.json）：${opts.packDir}`);
+  const mp = parseAssetPack(JSON.parse(fs.readFileSync(manifestPath, "utf8")));
+  if (!mp.ok) throw new CommandError("invalid", `资源包不过 schema：${mp.errors.slice(0, 4).join("；")}`);
+  const manifest = mp.value;
+  if (!opts.transport) throw new CommandError("upstream", "编译需要文本上游；它现在不可达（配置是文件，人可以直接写一份）");
+
+  const vp = opts.viewport ?? DEFAULT_VIEWPORT;
+  const prompt = tdConfigPrompt(requirement, tdResourceBrief(manifest), tdConfigExample);
+
+  let checked: ReturnType<typeof parseTdConfig> | null = null;
+  let lastError = "";
+  // ⚠️ 编译是**重采样**，不是修复循环（不把错误喂回去）—— 与 `compileGame` 同一个道理
+  //
+  // ⚠️ **账要累计往返次数，不能在每次循环里覆盖成一个**：一次失败的重采样**是花掉的钱**，
+  //   而「重试烧掉的额度要能单独看见，否则失败的归因是错的」（`CONTEXT.md` 的「调用 / 往返」）。
+  //   （⚠️ `derive` 与 `compileGame` 那边是覆盖式的 —— 那是它们的旧账，本票不顺手改。）
+  let trips = 0; let ledger: LedgerCall[] = [];
+  const t0 = Date.now();
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let raw: string;
+      trips += 1;
+      const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) });
+      raw = r.text;
+      // ⚠️ **落账**（票 06 的 Q4）：这一笔花了什么，得有地方记着。
+      ledger = [{ step: "compile-td-game", target: "td-config", upstream: "messages", ms: Date.now() - t0, attempts: trips,
+        ...(r.servedModel !== undefined ? { model: r.servedModel } : {}), ...(r.usage !== undefined ? { usage: r.usage } : {}) }];
+      let parsed: unknown;
+      try { parsed = JSON.parse(stripFences(raw)); }
+      catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
+      const p = parseTdConfig(parsed);
+      if (p.ok) { checked = p; break; }
+      lastError = `编译出来的关卡不过 schema：${p.errors.slice(0, 4).join("；")}`;
+    }
+  } catch (e) {
+    // ⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）——
+    //   包没产出来，它们没有别的家。
+    throw new CommandError("upstream", (e as Error).message, { ledger });
+  }
+  if (!checked?.ok) throw new CommandError("invalid", lastError, { ledger });
+  const config = checked.value;
+
+  const issues: string[] = [];
+  for (const i of auditTdConfig(config, manifest))
+    issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+  for (const i of auditScreenSpace(vp, tdHudScreenItems(config, manifest, { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })))
+    issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+
+  const dir = path.join(opts.outRoot, manifest.id, "td-configs");
+  fs.mkdirSync(dir, { recursive: true });
+  const version = nextVersion(dir);
+  const file = path.join(dir, `v${version}.json`);
+  fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+
+  const bad = issues.filter((i) => i.startsWith("❌"));
+  return {
+    command: "compile-td-game",
+    summary: [
+      `关卡已落盘：${rel(opts.outRoot, file)}（v${version}）`,
+      `${config.waves.length} 波 · ${config.towers.length} 种机关 · ${config.enemies.length} 种敌人 · ${config.slots.length} 个插槽`,
+      ...(bad.length === 0
+        ? ["✅ 校验全过（三族 + 屏幕空间）—— 下一步：game-maker site …（几何族与「这一关通不通」判在那一步）"]
+        : [`❌ **这份关卡过不了校验**（${bad.length} 条）—— 改完再 \`site\`：`, ...bad.map((b) => `  ${b}`)]),
+    ],
+    data: {
+      gameId: manifest.id, version, configPath: rel(opts.outRoot, file),
+      waveCount: config.waves.length, towerCount: config.towers.length,
+      slotCount: config.slots.length, issues, ok: bad.length === 0,
+      ledger,
+    },
+    artifacts: [{ path: rel(opts.outRoot, file), kind: "td-config" }],
+  };
+}
+
 // ── pack：清单 → 资源包 ─────────────────────────────────────────────────────
 export type PackOptions = {
   recipePath: string; outRoot: string; transport: Transport;
@@ -555,7 +761,7 @@ export function verifyPack(opts: VerifyOptions): CommandResult {
     summary: [`✅ ${rel(root, opts.packDir)} 通过：${m.files.length} 个文件的 checksum 全部对得上`,
       `来源：${m.provenance.mode}`,
       ...(ledgerRun
-        ? [`账：${ledgerRun.drawlist.calls + ledgerRun.image.calls + ledgerRun.derive.calls} 次调用被记在包内 ledger.json 里`]
+        ? [`账：${Object.values(ledgerRun).reduce((n, v) => n + (v?.calls ?? 0), 0)} 次调用被记在包内 ledger.json 里`]
         : ["账：这个包没有 ledger.json（**不是错** —— 票 45 之前产的包都没有）"])],
     data: { packId: m.id, version: m.version, ok: true, problems: [], provenanceMode: m.provenance.mode },
     artifacts: [],

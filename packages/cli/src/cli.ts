@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, compileGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
+  CommandError, EXIT, compileGame, compileTdGame, deriveRecipe, exitCodeOfError, inspectPack, packAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
@@ -15,6 +15,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker derive --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
   game-maker pack   --recipe <清单.json> [--out <目录>] [--concurrency <n>] [--json]
   game-maker compile-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
+  game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
   game-maker site   <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
@@ -111,6 +112,21 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO): Promise
         if (typeof flags.requirement !== "string" || typeof flags.pack !== "string")
           throw new CommandError("usage", "compile-game 需要 --requirement 与 --pack");
         result = await compileGame({
+          requirementPath: path.resolve(flags.requirement),
+          packDir: path.resolve(flags.pack),
+          outRoot, transport,
+          // 视口与行高都传外壳**那一份**常量 —— 不让这两个数在仓里出现第二个值
+          viewport: VIEWPORT,
+          hudLineHeight: HUD_LINE_HEIGHT,
+        });
+        break;
+      }
+      case "compile-td-game": {
+        // ⚠️ 与 `compile-game` **分开的子命令**，不合成一个按 format 分派的口子 ——
+        //   那是本图的 Out of scope（两条链的提示词、校验族、产物路径都不一样）。
+        if (typeof flags.requirement !== "string" || typeof flags.pack !== "string")
+          throw new CommandError("usage", "compile-td-game 需要 --requirement 与 --pack");
+        result = await compileTdGame({
           requirementPath: path.resolve(flags.requirement),
           packDir: path.resolve(flags.pack),
           outRoot, transport,

@@ -7,6 +7,7 @@ export { assembleSite, auditGeometry, type SiteOptions } from "./site.js";
 export { assembleFromConfig, detectFormat, defaultShellPath, CONFIG_FILE_NAME, KNOWN_FORMATS, type AssembleOptions } from "./assemble.js";
 export { assembleTdSite, auditTdGeometry, type TdSiteOptions } from "./td/site.js";
 export { buildTdWorld, pathPointAt, type TdWorldDescription, type TdTowerDesc, type TdEnemyDesc, type TdWaveDesc, type TdTile, type TdHudButton } from "./td/world.js";
+export { playReference, auditWinnable, type ReferenceRun } from "./td/winnable.js";
 export { createSim, advance, autoPlay, simSnapshot, enemyPos, FIXED_DT_MS, MAX_FRAME_MS, type TdState, type TdAction, type SimEnemy, type SimTower } from "./td/sim.js";
 export {
   buildWorld, formatIssue, SHELL_VERSION, VIEWPORT,
