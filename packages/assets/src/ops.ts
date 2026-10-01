@@ -11,7 +11,7 @@ import { createHash } from "node:crypto";
 import {
   auditGameConfig, entityBox, FALLBACK_ANCHOR, parseAssetPack, parseGameConfig, parseLedger, parseRecipe,
   summarizeCalls,
-  type AssetPackManifest, type LedgerCall, type LedgerUsage, type StyleSpec,
+  type AssetPackManifest, type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
@@ -102,28 +102,28 @@ ${recipeShapeSpec()}`;
   let lastError = "";
   // ⚠️ `derive` 的账**只进回报，不落盘**（票 19：账跟着「包」走，而「清单」不是包 ——
   //   R7 两条路都开，清单可以是人直接写的，那时根本没有这一次调用）。
-  let deriveCall: LedgerCall[] = [];
+  //
+  // ⚠️ 这里以前每一轮**覆盖写**账、且 `attempts` 恒为 1（票 28）—— 于是「重试过几次」与
+  //   「每次为什么重来」在账上**完全不可见**。现在交给 `spentCall`：一格，随往返累加。
+  const call = spentCall("derive", "recipe");
   for (let attempt = 0; attempt < 2; attempt++) {
-    let raw: string;
-    const t0 = Date.now();
-    try {
-      const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) });
-      raw = r.text;
-      deriveCall = [{
-        step: "derive", target: "recipe", upstream: "messages", ms: Date.now() - t0, attempts: 1,
-        ...(r.servedModel !== undefined ? { model: r.servedModel } : {}),
-        ...(r.usage !== undefined ? { usage: r.usage } : {}),
-      }];
-    }
-    catch (e) { throw new CommandError("upstream", (e as Error).message); }
-    let parsed: unknown;
-    try { parsed = JSON.parse(stripFences(raw)); }
-    catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
-    const r = parseRecipe(parsed);
-    if (r.ok) { checked = r; break; }
-    lastError = `推导出来的清单不过 schema：${r.errors.slice(0, 4).join("；")}`;
+    const once = await onceThrough({
+      transport: opts.transport, prompt, what: "推导出来的清单", parse: parseRecipe,
+      ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+      ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
+    });
+    call.trip(once.kind === "ok" ? { spent: once.spent }
+      : once.kind === "not-sent" ? {}
+      : once.kind === "upstream" ? { failure: once.failure }
+      : { failure: once.failure, spent: once.spent });
+    // ⚠️ 没发出去与发出去挂了是**两件事**：前者账上不该有这一笔（票 46 只记真的发出去的）。
+    if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
+    if (once.kind === "upstream") throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
+    if (once.kind === "bad") { lastError = once.detail; continue; }
+    checked = once.result;
+    break;
   }
-  if (!checked?.ok) throw new CommandError("invalid", lastError);
+  if (!checked?.ok) throw new CommandError("invalid", lastError, ledgerCarrying(call.record()));
 
   const dir = path.join(opts.outRoot, checked.value.id, "recipes");
   fs.mkdirSync(dir, { recursive: true });
@@ -139,7 +139,7 @@ ${recipeShapeSpec()}`;
   return {
     command: "derive",
     summary: [`清单已落盘：${rel(opts.outRoot, file)}`, `${checked.value.assets.length} 个资源（${Object.entries(kinds).map(([k, v]) => `${k}×${v}`).join(" · ")}）`],
-    data: { recipeId: checked.value.id, version, assetCount: checked.value.assets.length, kinds, ledger: deriveCall },
+    data: { recipeId: checked.value.id, version, assetCount: checked.value.assets.length, kinds, ledger: asLedger(call.record()) },
     artifacts: [{ path: rel(opts.outRoot, file), kind: "asset-recipe" }],
   };
 }
@@ -149,8 +149,28 @@ ${recipeShapeSpec()}`;
  * ⚠️ 返回**不只是文本**：`usage` 与上游自报的模型名都要带出来（票 45）——
  *   它们是「花了什么」的事实，而这一层过去把它们直接丢了。
  */
+/**
+ * `callText` 失败**带着病因**（票 27 的 Q4(ii)，票 28 落地）。
+ *
+ * ⚠️ **为什么要一个类型而不是靠 message 认**：账上要写得出「**为什么**重来」，
+ *   而按错误信息做字符串匹配去认病因，正是本仓库反复吃亏的那件事
+ *   （票 06 量过：「那句好话站错了地方」也是同一种病）。
+ *
+ * ⚠️ 只有两档：`timeout`（我们自己中止的）与 `http`（**上游没给一个可用的应答** ——
+ *   非 2xx、body 不是 JSON、连不上）。闭集里没有第三档，别现编。
+ *
+ * ⚠️ **「没配凭据」故意**不走这里 —— 那个错在**请求上路之前**就抛了（见下面 `callText` 的守卫），
+ *   而账只记**真的发出去过**的往返（票 46）。它在 `onceThrough` 里落成 `"not-sent"`。
+ */
+export class UpstreamCallError extends Error {
+  constructor(readonly failure: Extract<CallFailure, "http" | "timeout">, message: string) {
+    super(message);
+    this.name = "UpstreamCallError";
+  }
+}
+
 async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof fetch; timeoutMs?: number }):
-Promise<{ text: string; usage?: LedgerUsage; servedModel?: string }> {
+Promise<{ text: string; usage?: LedgerUsage; servedModel?: string; stopReason?: string }> {
   // ⚠️ **没配凭据要在**这里**拦住**，不能让它落到 fetch 上去失败。
   //   两个壳（CLI 一处 + MCP 三处）永远传一个**定义了、但 `baseUrl` 可能是空串**的对象，
   //   所以 `ops` 里那些 `if (!opts.transport)` 恒不触发 —— 用户看到的是一个原始 fetch 报错，
@@ -175,18 +195,21 @@ Promise<{ text: string; usage?: LedgerUsage; servedModel?: string }> {
     });
   } catch (e) {
     // ⚠️ 中止与「连不上」是**两件事**，而 fetch 都抛 AbortError/TypeError —— 分开报，否则人查错方向
-    if (ctl.signal.aborted) throw new Error(`上游 ${Math.round(timeoutMs / 1000)} 秒没回应，已中止（超时）`);
-    throw e;
+    if (ctl.signal.aborted) throw new UpstreamCallError("timeout", `上游 ${Math.round(timeoutMs / 1000)} 秒没回应，已中止（超时）`);
+    throw new UpstreamCallError("http", e instanceof Error ? e.message : String(e));
   } finally { clearTimeout(timer); }
-  if (!res.ok) throw new Error(`上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
+  if (!res.ok) throw new UpstreamCallError("http", `上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
   const j = (await res.json()) as {
-    model?: string; content?: { type: string; text?: string }[];
+    model?: string; content?: { type: string; text?: string }[]; stop_reason?: string;
     usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
   };
   const u = j.usage;
   return {
     text: (j.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
     ...(j.model ? { servedModel: j.model } : {}),
+    // ⚠️ `stop_reason` 要交出来（票 28）：以前这一层只顾着取文本，于是**截断**
+    //   在三个调用点上一律表现为「不是合法 JSON」—— 一个**假病因**，而它会把人引去查模型。
+    ...(j.stop_reason ? { stopReason: j.stop_reason } : {}),
     ...(u ? { usage: {
       ...(u.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
       ...(u.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
@@ -194,6 +217,111 @@ Promise<{ text: string; usage?: LedgerUsage; servedModel?: string }> {
     } } : {}),
   };
 }
+
+/** 上游自报的、跟着这一笔走的东西。⚠️ 单独一个类型：它俩总是**成对**出现，不该在路上散成两个参数。 */
+type Spent = Pick<LedgerCall, "model" | "usage">;
+
+/**
+ * 一次**往返**的结果。
+ *
+ * ⚠️ `"not-sent"` 是**故意**分开的一档：那是**我们这边**没把请求发出去（没配凭据），
+ *   不是上游的错 —— 而账上**也不该有这一笔**（票 46：只记真的发出去的）。
+ */
+type Once<T> =
+  | { kind: "ok"; result: { ok: true; value: T }; spent: Spent }
+  | { kind: "bad"; failure: CallFailure; detail: string; spent: Spent }
+  | { kind: "upstream"; failure: CallFailure; error: Error }
+  | { kind: "not-sent"; error: Error };
+
+/**
+ * **发一趟、拿回来、解析** —— 文本那三处（`derive` / `compile-game` / `compile-td-game`）
+ * 共用的那一段。⚠️ 以前它是**抄三遍**的，而三遍里各自对「失败」的处理还都不一样。
+ *
+ * ⚠️ **只管一次往返**：`attempts` 的累加与 `failures` 的追加是调用方的事（见 `spentCall`）——
+ *   因为账的一格是**一次调用**，不是一次往返（`CONTEXT.md` 的「调用 / 往返」）。
+ *
+ * ⚠️ **失败是返回值，不是抛**（除了上游那一档）：调用方得先把这一趟记进账，再决定重采样还是收工。
+ *   抛出去的话账就漏了 —— 而「花了钱是事实，失败不改变这个事实」（票 46）。
+ */
+async function onceThrough<T>(o: {
+  transport: Transport; prompt: string; fetchImpl?: typeof fetch; timeoutMs?: number;
+  /** 出 schema 问题时那句话里的主语：「推导出来的清单」/「编译出来的配置」/「编译出来的关卡」。 */
+  what: string;
+  parse: (input: unknown) => { ok: true; value: T } | { ok: false; errors: string[] };
+}): Promise<Once<T>> {
+  let r: Awaited<ReturnType<typeof callText>>;
+  try {
+    r = await callText({ ...o.transport, prompt: o.prompt,
+      ...(o.fetchImpl !== undefined ? { fetchImpl: o.fetchImpl } : {}),
+      ...(o.timeoutMs !== undefined ? { timeoutMs: o.timeoutMs } : {}) });
+  } catch (e) {
+    const err = e as Error;
+    return e instanceof UpstreamCallError
+      ? { kind: "upstream", failure: e.failure, error: err }
+      : { kind: "not-sent", error: err };
+  }
+  // ⚠️ 上游自报的模型名与用量要带出来 —— 它们是「花了什么」的事实（票 45），而这一层以前把它们丢了。
+  const spent: Spent = {
+    ...(r.servedModel !== undefined ? { model: r.servedModel } : {}),
+    ...(r.usage !== undefined ? { usage: r.usage } : {}),
+  };
+  // ⚠️ **截断只用来「解释失败」，不拿它推翻一次成功。** 先解析、再校验，两关都过了就是成功；
+  //   只有没过时才回头看 `stop_reason`。反过来的话，一份**完整**的产出会因为 `stop_reason`
+  //   被判失败、丢掉重来（多花一次钱），而被截断的产出又会被报成「模型吐了坏数据」（查错方向）。
+  const truncated = r.stopReason === "max_tokens";
+  let parsed: unknown;
+  try { parsed = JSON.parse(stripFences(r.text)); }
+  catch (e) {
+    return truncated
+      ? { kind: "bad", failure: "truncated", detail: "输出撞上了 max_tokens 被截断（不是模型吐了坏数据）", spent }
+      : { kind: "bad", failure: "invalid-json", detail: `上游返回的不是合法 JSON：${(e as Error).message}`, spent };
+  }
+  const p = o.parse(parsed);
+  if (!p.ok)
+    return truncated
+      ? { kind: "bad", failure: "truncated", spent,
+          detail: `输出撞上了 max_tokens 被截断，而且也没过 schema：${p.errors.slice(0, 4).join("；")}` }
+      : { kind: "bad", failure: "schema", spent,
+          detail: `${o.what}不过 schema：${p.errors.slice(0, 4).join("；")}` };
+  return { kind: "ok", result: p, spent };
+}
+
+/**
+ * 一次**调用**的账：随往返累加，**最后一次性交出去**。
+ *
+ * ⚠️ **一格 = 一次调用，不是一次往返**（`CONTEXT.md` 的「调用 / 往返」：`attempts` 记的是
+ *   「这一次调用里往返了几次」）。⇒ 重采样**不新开一格**，而是在同一格里把 `attempts` 加上去、
+ *   把每次没成的原因追加进 `failures`。两个都留着，账才同时回答得了「重试烧了多少」
+ *   **和**「每次为什么重来」—— 只留前者的旧账，把那四种病因混成了同一个分母。
+ */
+function spentCall(step: LedgerStep, target: string) {
+  const t0 = Date.now();
+  const failures: CallFailure[] = [];
+  let trips = 0;
+  let spent: Spent = {};
+  return {
+    trip(o: { failure?: CallFailure; spent?: Spent } = {}) {
+      trips += 1;
+      if (o.failure !== undefined) failures.push(o.failure);
+      // ⚠️ 只有**成功**那一趟带 `spent`，而一趟调用里至多成功一次（成了就 break）
+      //   ⇒ 后面失败的那些**盖不掉**它。
+      if (o.spent !== undefined) spent = { ...spent, ...o.spent };
+    },
+    /** ⚠️ **一次都没发出去就返回 `null`** —— 账不记没上路的往返（票 46）。 */
+    record(): LedgerCall | null {
+      if (trips === 0) return null;
+      return {
+        step, target, upstream: "messages", ms: Date.now() - t0, attempts: trips,
+        ...(failures.length === 0 ? {} : { failures }), ...spent,
+      };
+    },
+  };
+}
+
+/** `data.ledger` 要的是数组 —— 一次都没发出去就是空数组（与 `pack` 那边的口径一致）。 */
+const asLedger = (r: LedgerCall | null): LedgerCall[] => (r === null ? [] : [r]);
+/** 把这一次调用的账装进 `CommandError`；没发出去就**不带**（票 46：只记真的发出去的）。 */
+const ledgerCarrying = (r: LedgerCall | null): { ledger?: LedgerCall[] } => (r === null ? {} : { ledger: [r] });
 
 function nextVersion(dir: string): number {
   if (!fs.existsSync(dir)) return 1;
@@ -342,18 +470,28 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   // 有界重试，与 derive 同一条道理：编译是**重采样**，不是修复循环（不把错误喂回去）
   let checked: ReturnType<typeof parseGameConfig> | null = null;
   let lastError = "";
+  //
+  // ⚠️ **票 28 之前这里一分账都不交** —— 而根因是 `LedgerStep` 枚举里**根本没有 `compile-game`**
+  //   这个值：一次上游调用**没地方记**（枚举已补上）。而 `site` 那条链上它是**唯一**会调上游的
+  //   `compile-*`，于是在账上是隐形的。
+  const call = spentCall("compile-game", "game-config");
   for (let attempt = 0; attempt < 2; attempt++) {
-    let raw: string;
-    try { raw = (await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) })).text; }
-    catch (e) { throw new CommandError("upstream", (e as Error).message); }
-    let parsed: unknown;
-    try { parsed = JSON.parse(stripFences(raw)); }
-    catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
-    const r = parseGameConfig(parsed);
-    if (r.ok) { checked = r; break; }
-    lastError = `编译出来的配置不过 schema：${r.errors.slice(0, 4).join("；")}`;
+    const once = await onceThrough({
+      transport: opts.transport, prompt, what: "编译出来的配置", parse: parseGameConfig,
+      ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+      ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
+    });
+    call.trip(once.kind === "ok" ? { spent: once.spent }
+      : once.kind === "not-sent" ? {}
+      : once.kind === "upstream" ? { failure: once.failure }
+      : { failure: once.failure, spent: once.spent });
+    if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
+    if (once.kind === "upstream") throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
+    if (once.kind === "bad") { lastError = once.detail; continue; }
+    checked = once.result;
+    break;
   }
-  if (!checked?.ok) throw new CommandError("invalid", lastError);
+  if (!checked?.ok) throw new CommandError("invalid", lastError, ledgerCarrying(call.record()));
 
   const config = checked.value;
 
@@ -397,7 +535,7 @@ ${JSON.stringify(gameConfigExample, null, 2)}
     data: {
       gameId: manifest.id, version, configPath: rel(opts.outRoot, file),
       entityCount: config.entities.length, pickupCount: pickups,
-      worldSize: config.world.size, issues, ok: bad.length === 0,
+      worldSize: config.world.size, issues, ok: bad.length === 0, ledger: asLedger(call.record()),
     },
     artifacts: [{ path: rel(opts.outRoot, file), kind: "game-config" }],
   };
@@ -570,28 +708,35 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
   //   （那一族已由 `fromMap` 删掉；数字见 `docs/td-requirement.md` 与票 12）。
   //   ⇒ **硬失败也重采样**。⚠️ 每一次都是**一笔上游调用**，所以次数是参数（默认 3）。
   //
-  // ⚠️ **账要累计往返次数，不能在每次循环里覆盖成一个**：一次失败的重采样**是花掉的钱**，
-  //   而「重试烧掉的额度要能单独看见，否则失败的归因是错的」（`CONTEXT.md` 的「调用 / 往返」）。
-  //   （⚠️ `derive` 与 `compileGame` 那边是覆盖式的 —— 那是它们的旧账，本票不顺手改。）
+  //
+  // ⚠️ **一格 = 一次调用**（`CONTEXT.md` 的「调用 / 往返」）。这里**以前每一轮把那唯一一格
+  //   覆盖写**、只把往返次数堆在 `attempts` 上 —— 于是账上只留得下**最后一次**为什么失败，
+  //   而「发了 3 次、前两次被截断、第三次坏 schema」与「一次就坏 schema」长得一模一样。
+  //   现在由 `spentCall` 累加：`attempts` 照旧（重试烧了多少），`failures` 把每次的原因留下。
   const attempts = opts.attempts ?? 3;
   let picked: TdConfig | null = null;      // 过了校验的那一份
   let fallback: TdConfig | null = null;    // 最后一份过了 schema 的（校验可能不过）
   let issues: string[] = [];
   let lastError = "";
-  let trips = 0; let ledger: LedgerCall[] = [];
-  const t0 = Date.now();
+  const call = spentCall("compile-td-game", "td-config");
   try {
     for (let attempt = 0; attempt < attempts; attempt++) {
-      trips += 1;
-      const r = await callText({ ...opts.transport, prompt, fetchImpl: opts.fetchImpl, ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}) });
-      // ⚠️ **落账**（票 06 的 Q4）：这一笔花了什么，得有地方记着。
-      ledger = [{ step: "compile-td-game", target: "td-config", upstream: "messages", ms: Date.now() - t0, attempts: trips,
-        ...(r.servedModel !== undefined ? { model: r.servedModel } : {}), ...(r.usage !== undefined ? { usage: r.usage } : {}) }];
-      let parsed: unknown;
-      try { parsed = JSON.parse(stripFences(r.text)); }
-      catch (e) { lastError = `上游返回的不是合法 JSON：${(e as Error).message}`; continue; }
-      const p = parseTdConfig(parsed);
-      if (!p.ok) { lastError = `编译出来的关卡不过 schema：${p.errors.slice(0, 4).join("；")}`; continue; }
+      const once = await onceThrough({
+        transport: opts.transport, prompt, what: "编译出来的关卡", parse: parseTdConfig,
+        ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+        ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
+      });
+      call.trip(once.kind === "ok" ? { spent: once.spent }
+        : once.kind === "not-sent" ? {}
+        : once.kind === "upstream" ? { failure: once.failure }
+        : { failure: once.failure, spent: once.spent });
+      if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
+      if (once.kind === "upstream") throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
+      // ⚠️ **`bad` 记的是「这一趟上游没交出可用的东西」**；而下面「过不了校验」是**这一份关卡**
+      //   的问题、不是上游的问题 —— 那一趟的 `failures` 上**不留东西**。要分开，
+      //   否则「上游不稳」会被「模型设计得差」冒充成同一个数（这正是票 27 要病因的原因）。
+      if (once.kind === "bad") { lastError = once.detail; continue; }
+      const p = once.result;
       // ⚠️ **补全**：模型**不写** `path.points`（票 12）—— 从它画的那张地图**派生**出来填上。
       //   于是产物里路径还在、下游一无所知，而「路径与地图对不上」那一族失败**结构上不可能**。
       //   ⚠️ `fromMap` 才是那句「结构上不可能」的**全部**分量：它**不看模型写没写**、一律派生。
@@ -614,10 +759,12 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
     }
   } catch (e) {
     // ⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）—— 包没产出来，它们没有别的家。
-    throw new CommandError("upstream", (e as Error).message, { ledger });
+    // ⚠️ `onceThrough` 自己产出的 `CommandError` 已经带着账了，**原样放行**，别再包一层。
+    if (e instanceof CommandError) throw e;
+    throw new CommandError("upstream", (e as Error).message, ledgerCarrying(call.record()));
   }
   // ⚠️ **一次都没过 schema** —— 那才是真的没东西可落盘。
-  if (!fallback) throw new CommandError("invalid", lastError, { ledger });
+  if (!fallback) throw new CommandError("invalid", lastError, ledgerCarrying(call.record()));
   // ⚠️ **不过校验也照常落盘**（票 06/09 那条裁决）：**人过目的前提是他看得到哪儿不对**。
   //   重采样全失败了也一样 —— 落**最后那一份**，并把问题报出来。
   const config = picked ?? fallback;
@@ -642,7 +789,7 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
       gameId: manifest.id, version, configPath: rel(opts.outRoot, file),
       waveCount: config.waves.length, towerCount: config.towers.length,
       slotCount: config.slots.length, issues, ok: bad.length === 0,
-      ledger,
+      ledger: asLedger(call.record()),
     },
     artifacts: [{ path: rel(opts.outRoot, file), kind: "td-config" }],
   };

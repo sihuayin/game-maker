@@ -1,0 +1,178 @@
+{
+  "label": "04-tool-choice-r4",
+  "ms": 6993,
+  "status": 200,
+  "ok": true,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 183,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1280,
+    "output_tokens": 1476,
+    "service_tier": "standard"
+  },
+  "textLen": 0,
+  "textHead": "",
+  "toolUse": [
+    {
+      "name": "emit_visual_world",
+      "input": {
+        "schemaVersion": "1.0",
+        "identity": {
+          "styleName": "Flat Vector Pixel Halt at Dusk",
+          "keywords": [
+            "flat vector",
+            "pixel art",
+            "minimalist",
+            "silhouette-driven",
+            "limited palette",
+            "dusk",
+            "side-scroller"
+          ],
+          "description": "A minimalist flat-vector/pixel hybrid illustration of a station master standing on a platform track at dusk. Clean unfilled shapes, no outlines, heavily abstracted flat color regions, geometric architecture rendered as simple rectangles, triangles and trapezoids, with a restrained warm-cool dusk palette."
+        },
+        "rendering": {
+          "style": "flat vector pixel art, low-detail poster illustration",
+          "shading": "flat unshaded fills with minimal single-tone ambient occlusion, no gradients except subtle banded sky",
+          "outline": "none, shapes separated by color contrast only",
+          "texture": "clean flat planes, sparse pixel grain on track gravel",
+          "pixelDensity": 1,
+          "antialiasing": false,
+          "dithering": "none"
+        },
+        "camera": {
+          "mode": "side",
+          "projection": "orthographic",
+          "angle": 0,
+          "elevation": 0,
+          "perspective": "flat side-on view, no vanishing point, layered flat planes for sky, station wall, and track foreground"
+        },
+        "palette": {
+          "primary": [
+            "#6b4a2f",
+            "#8a5a3b",
+            "#c98a5c"
+          ],
+          "secondary": [
+            "#3b2a20",
+            "#2a2a3a",
+            "#4a4a6a"
+          ],
+          "accent": [
+            "#e8b04b",
+            "#f5d07a",
+            "#2c3e5c"
+          ],
+          "background": [
+            "#2d4a63",
+            "#3f6480",
+            "#d9a26a"
+          ],
+          "shadow": [
+            "#1e1a18",
+            "#2b2119",
+            "#453022"
+          ],
+          "highlight": [
+            "#f2d9a8",
+            "#fdf0d0",
+            "#cfd6e0"
+          ]
+        },
+        "materials": {
+          "plaster wall": {
+            "appearance": "matte flat mid-brown plane with faint darker banding",
+            "color": [
+              "#8a5a3b",
+              "#6b4a2f"
+            ],
+            "texture": "fine pixel grain, uniform"
+          },
+          "framed poster": {
+            "appearance": "lighter ochre panel with orange and dark navy mountain silhouettes inside a thin brown frame",
+            "color": [
+              "#d9a26a",
+              "#e8b04b",
+              "#2c3e5c"
+            ],
+            "texture": "flat blocks, crisp edges"
+          },
+          "rail steel": {
+            "appearance": "dark charcoal rails over grey gravel ballast",
+            "color": [
+              "#3b3b42",
+              "#7d7d85"
+            ],
+            "texture": "regular repeating pixel pattern"
+          },
+          "uniform cloth": {
+            "appearance": "dark navy jacket with mustard band and flat gold buttons",
+            "color": [
+              "#2c3e5c",
+              "#1e2b3f",
+              "#e8b04b"
+            ],
+            "texture": "flat with hard-edged shading blocks"
+          },
+          "wood bench": {
+            "appearance": "simple horizontal brown slats on brown legs",
+            "color": [
+              "#6b4a2f",
+              "#8a5a3b"
+            ],
+            "texture": "flat rectangles, no grain detail"
+          }
+        },
+        "character": {
+          "silhouette": "short compact blocky figure, wide flat cap brim, rectangular torso, stubby legs",
+          "proportions": "roughly 3 heads tall, chunky square head, thick limbs, no neck taper",
+          "faceAbstraction": "two black square eyes and a small black grid mouth on a pale white face, no other features",
+          "poseLanguage": "static neutral front-facing stance, arms straight down at sides, feet together",
+          "clothing": "dark navy uniform jacket with lighter navy shoulder blocks, mustard-yellow chest band with two gold buttons, dark navy cap with gold band and tiny square badge"
+        },
+        "environment": {
+          "architecture": "long flat brown station wall running horizontally, shallow dark triangle roof peak at left, thin tan trim strip along the top edge",
+          "terrain": "grey platform band in front of the wall, then a stone-textured track bed, dark rails further forward",
+          "props": "framed mountain poster on the wall, wooden bench, hanging small golden framed sign, three small square windows (blue, orange, brown), a round lamp on a thin pole, low sun disc rising above the wall on the right"
+        },
+        "animation": {
+          "timing": "ambient idle, very slow",
+          "frameStyle": "limited keyframes, pixel-locked 12fps",
+          "poseExaggeration": "minimal, near-static character with 2-3 pixel bob or blink only"
+        },
+        "readability": {
+          "silhouette": "character reads clearly against the mid-brown wall via dark navy versus warm brown contrast",
+          "contrast": "strong value separation between dark character, warm mid wall, and cool blue sky",
+          "gameplayScale": "designed for small on-screen scale, character occupies under one fifth of frame height"
+        },
+        "composition": {
+          "background": "banded dusk sky, deep navy at the top fading to lighter blue",
+          "midground": "brown station facade with poster, bench, hanging sign, windows, lamp and low sun",
+          "foreground": "grey platform strip and stone-textured track with rails",
+          "density": "sparse, wide empty areas of flat color",
+          "characterScale": "small, centered slightly below middle, roughly one sixth of frame height",
+          "objectScale": "props sized in flat side view at consistent scale with the wall"
+        },
+        "lighting": {
+          "direction": "ambient frontal, no strong directional source",
+          "softness": "hard-edged flat light, no soft falloff",
+          "contrast": "low-to-medium, mostly local color contrast",
+          "mood": "quiet, still, twilight calm"
+        },
+        "references": {
+          "styleImages": [
+            "fixtures/reference/halt-dusk.png"
+          ],
+          "characterImages": [],
+          "materialImages": []
+        },
+        "confidence": 0.68
+      }
+    }
+  ]
+}

@@ -16,6 +16,9 @@ Effort: game-maker-v2
 > ⚠️ 本图**把执行带进来**（R5）：票解出来的决定**当场实现**，与前三张图的实际做法一致。
 > ⚠️ **2026-10-01（晚）—— `docs/v2/00-overview.md` 与 `02-implementation-plan.md` 已由人补写**（本图的票 01 因此关掉）。⚠️ 但**它们不是从本图的 R 表推出来的**：**5 处与 R 正面冲突 · 2 处 doc 自己先站了队 · 3 条本图完全没有**。完整的对账表在 [票 01 的 Answer](issues/01-write-v2-docs.md) —— **动手前先读它**。
 > ⇒ ✅ **当日裁定（Q18）：R 表是决策记录，`docs/v2` 是它的表达层 —— 冲突时改 doc，改 R 表必须重新开票**（见 R17）。`00` / `02` 已按此改完（13 处），`03` 加了头部指引（正文留作史料）。
+>
+> ⚠️ **2026-10-01（晚）：票 27 与票 28 已接连关掉。** 票 27 按 R17 改写了 **R16**（七发探针量出 `tool_choice` 首发 80%），
+> 派生的票 28 当场施工完 —— 于是 **08/09/10 的阻塞从 `27` 换成了 `28`，而 `28` 也关了**：那三张票现在只等彼此的依赖。
 
 ## Destination
 
@@ -72,7 +75,7 @@ Style Image + Game Intent
 | **R13** | 修复**由判据驱动**，第一阶段**只做资源级重生成**；全链重跑**不做**（Q15a） |
 | **R14** | `CharacterDNA` **落盘成契约**（进 `run/v<N>/`）；**`Material DNA` 等真有消费者再说**（Q16①） |
 | **R15** | 原图进 `VisualWorldSpec.references.styleImages`，**只存引用**（路径），二进制不进 JSON；那份 `provenance.json` **并进去**（Q16③） |
-| **R16** | 严格 JSON 沿用「纯文本 + 剥围栏 + 固定次数重采样」，**同时**开一张 `prototype` 票去量代理的结构化输出/视觉输入（Q17） |
+| **R16** | ⚠️ **2026-10-01 改写（票 27，R17：那就是那张重开票）**。V2 **新**调用（票 08/09/10 + QA 三张）走 **`tool_choice: {type:"tool", name}` 强制工具调用**，**入参必须过 Zod 才算成功** —— `stop_reason === "tool_use"` **不是**成功信号（票 27 第 1 发：工具被调、`input={}`、1135 token 打水漂）。原三件套里**只有「固定次数重采样」保留**，次数定 **3**（1 首 + 2 重）⚠️ **是地板不是调优结果**；「纯文本」被工具调用取代；**「剥围栏」作废**（工具路径 7 发里一次都没出现过围栏）。⚠️ **`strict: true` 与 `output_config.format` 都不可依赖** —— 代理**收下并静默忽略**不认识的参数（票 27 第 7 发实证：HTTP 200、回来一段散文）⇒ 形状**只由我们自己的 Zod 保证**。⚠️ **旧路径不动**（`assets` 的 drawlist / derive / compile-* 沿用纯文本 + 剥围栏 + 重采样），文件头标「旧协议」。**那张 prototype 票 = 票 25，已跑完**。|
 | **R17** | **元规则**（Q18）：**R 表是决策记录，`docs/v2` 是它的表达层。冲突时默认 doc 写错**；要改 R 表**必须重新开票**，不能由文档覆盖。⚠️ 否则 wayfinder 的意义消失 |
 | **R18** | **多参考图**（Q19）：**契约层进**（`styleReferences: {path, role}[]` ——「一图一角色」是合理方向），但**第一阶段 `maxItems === 1`**；N 图的权重融合与冲突解决**没有任何实测**，实现延后并开票（见票 26） |
 
@@ -82,6 +85,26 @@ Style Image + Game Intent
 
 ### 已经量到的（别重新量）
 
+- ⚠️ **代理会收下并静默忽略它不认识的参数**（票 27 第 7 发）：`output_config: {format:{type:"json_schema"}}`
+  换回 **HTTP 200 + 一整段散文**；`strict: true` 也是 200 + 工具被调。
+  ⇒ **「HTTP 200 被接受」不构成任何参数被实现的证据。** 这条对 V2 全链有效。
+- ⚠️ **`stop_reason === "tool_use"` 不是成功信号**（票 27 第 1 发）：七发里有一发
+  `blocks=[tool_use]`、`stop=tool_use`、烧掉 **1135 输出 token**，而 **`input = {}`** ——
+  代理把工具入参丢了。**唯一的成功判据是入参过 Zod。**
+- **强制 `tool_choice` 的真实首发成功率 = 80%（4/5）**，输入 1463 token / 输出 1135~1660 token，
+  单发 6~9s；14 键的 `VisualWorldSpec` **一次吐得完**（票 27 第 1~5 发）。
+  ⚠️ 这是**当时那个代理**的数，票 25 记的「代理一直在变」对它同样成立。
+
+- ⚠️ **V2 的新契约必须用 `zod/v4` 写**（票 28 落地时量出来的约束）：`toolInputSchema` 只能转
+  **v4** 的 schema —— `zod/v4` 的 `toJSONSchema` 对 v3 的 `ZodObject` 直接崩
+  （它连 `_zod` 都没有）。**旧契约（`StyleSpec` / drawlist / assetpack / …）继续用 `zod`**，
+  两边**不许互相嵌套**。⇒ 已播给票 02/03/04/05/06。另：**封口用 `z.strictObject`**
+  （`io: "input"` 下普通 `z.object` 不产出 `additionalProperties: false`）。
+- ⚠️ **`LedgerStep` 里的值就是「一次上游调用有没有地方记」**（票 28）：`compile-game` 一直是「不交账」的
+  —— 根因不是谁忘了写一行，是**枚举里根本没有那个值**。加值的代价是零（`byStep` 是 `z.record`）。
+- ⚠️ **账的一格 = 一次调用，不是一次往返**（`CONTEXT.md` 的「调用 / 往返」）——
+  `attempts` 记往返次数，`failures[]` 记**每一次**没成的原因。⚠️ 票 28 的第一版把格子改成按往返记，
+  被 code review 判成硬违规（文档化的 `attempts > calls` 探测器当场失效），已改回。
 - ⚠️ `03 §2/§6/§25` 让复用 `packages/runtime` 与 `packages/site` —— **这两个包不存在**。
   实际是 `contracts / assets / demo / cli / mcp`（`03 §2` 那段「优先复用」的清单有一半是空的）。
 - **原图已经参与生图**（`03 §15` 要求的这件事**已经做完**）：`packages/assets/src/pack.ts:328-329`
@@ -105,6 +128,9 @@ Style Image + Game Intent
 
 <!-- 索引：一行一张已关的票，够判断相关性即可，细节 zoom 进票 -->
 
+- [V2 结构化调用的底座](issues/28-structured-call-substrate.md)：`contracts` 里落了 **`parseToolUse`**（**过 Zod 才是成功**；截断只解释失败、不许推翻成功）· **`toolInputSchema`**（只吃 `zod/v4` 的 schema）· **`forcedTool`**；账加了 **`failures: CallFailure[]`**（7 个值的闭集）。⚠️ **两处当场更正**：**`compileGame` 不交账的根因是 `LedgerStep` 里没有 `compile-game` 这个值**；票面那条「`zod/v4` 子路径就能转」**对 v3 的 schema 不成立** ⇒ **V2 新契约一律用 `zod/v4` 写**（零新依赖，已播给票 02–06）。⚠️ 第一版把 `LedgerCall` 从「一次调用」改成了「一次往返」，与 `CONTEXT.md` 的术语表冲突（`attempts > calls` 探测器失效），被 review 判硬违规后改回：**一格 = 一次调用**，`attempts` 累加 + `failures` 留原因。
+
+- [严格 JSON 改用 `tool_choice` 吗 —— R16 要不要改](issues/27-json-via-tool-choice.md)：**改**。七发探针量出 **首发 80%（4/5）**，且失败长什么样：**`stop_reason=tool_use` + `input={}`** —— 代理**静默丢入参**，不是模型不听话，也不是坏 JSON ⇒ **`tool_use` 不是成功信号，入参必须过 Zod**。代理还会**收下并静默忽略**不认识的参数（`output_config.format` 换回一段散文）⇒ **`strict` / 结构化输出都不可依赖，「HTTP 200」什么都不证明**。⇒ **R16 改写**：V2 新调用走强制 `tool_choice` + Zod 判据 + **3 次重采样**（地板值），**「剥围栏」作废**（7 发里一次都没用上）；**旧路径不动**，文件头标「旧协议」（Q2）。**底座**（`contracts` 的 schema/解析器 + 账的 `failure` 闭集）派生[票 28](issues/28-structured-call-substrate.md)，08/09/10 已改挂它。
 - [代理到底支不支持结构化输出 / 视觉输入？](issues/25-prototype-structured-output.md)：**三发全 200** —— ① 合成图判别**通过**（真值自造：3 个圆、左红中绿右蓝**全对** ⇒ 模型**真看见**，排除了「收得下图块、看不见图」那个已知失败模式）② 真参考图 + 11 块 JSON：**一次吐完 · 2129 字符 · `JSON.parse` 通过 · 无围栏 · `stop=end_turn`**，且描述具体到了「公告板」③ `tools`+`tool_choice` **支持**（`stop_reason=tool_use`）。⚠️ **每项 n=1** —— 验的是「能不能」不是「成功率」；票 01 的「1/3」是**另一个端点**上的率，本探针既没复现也没推翻。⚠️ `servedModel=deepseek-flash`≠请求的 `deepseek-v4-pro`（代理换模型**又发生一次**）。⇒ 派生[票 27](issues/27-json-via-tool-choice.md)（R16 要改吗）。
 - [依赖守卫要先表态：`ALLOWED` 图加新包](issues/07-deps-allowlist.md)：包集定为 **9 个**（既有 5 + `vision`/`game-design`/`qa`/`pipeline`），**一次建完 4 个骨架 + 一次接线**。⚠️ 那个守卫是**双向**的（图里没有的包报错 · 图里有而目录没有**也**报错）⇒ 图与 `packages/` 必须时刻同步。三条变异验过它**会红**。⚠️ 一并更正：「根 `references` 漏包会静默」**实测不成立**（`tsc -b` 传递构建兜住了）。
 - [补写 `docs/v2/00-overview.md` 与 `docs/v2/02-implementation-plan.md`](issues/01-write-v2-docs.md)：文档**由人补写完成**，但它们**不是从 R 表推出来的** —— 对账出 **5 处与 R 正面冲突 · 2 处 doc 先站了队 · 3 条本图完全没有 · 4 条笔误级**。**Q18 裁定：R 表赢，docs 改**（`00`/`02` 改 13 处，`03` 加头部指引）。⚠️ 顺带更正了 R11 的包数（**我算错了**：是 9 个不是 7 个）—— 而所有者答的「7 包结构」也对不上，**票 07 落地前必须先定**。

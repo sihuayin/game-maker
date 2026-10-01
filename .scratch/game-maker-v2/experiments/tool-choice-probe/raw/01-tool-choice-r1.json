@@ -1,0 +1,27 @@
+{
+  "label": "01-tool-choice-r1",
+  "ms": 5801,
+  "status": 200,
+  "ok": true,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 1463,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1135,
+    "service_tier": "standard"
+  },
+  "textLen": 0,
+  "textHead": "",
+  "toolUse": [
+    {
+      "name": "emit_visual_world",
+      "input": {}
+    }
+  ]
+}

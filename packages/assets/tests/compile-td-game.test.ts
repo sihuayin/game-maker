@@ -126,9 +126,13 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
     expect(ledger[0]!.target).toBe("td-config");
   });
 
-  it("⚠️ **重试在账里看得见**（`attempts` 是**累计往返**，不是每次覆盖成 1）", async () => {
-    // ⚠️ `CONTEXT.md` 的「调用 / 往返」写着：**重试烧掉的额度要能单独看见，否则失败的归因是错的**。
-    //   第一版在循环里覆盖成一个 —— 于是「第一次吐了坏 JSON」这件事在账里**根本不显形**。
+  it("⚠️ **重试在账里看得见，而且看得见「为什么」**（票 28：`attempts` 累计 + `failures` 留原因）", async () => {
+    // ⚠️ `CONTEXT.md` 的「调用 / 往返」写着：**重试烧掉的额度要能单独看见，否则失败的归因是错的**
+    //   ——`attempts > calls` 就是那个探测器。第一版在循环里覆盖成一个（`attempts` 恒为 1），
+    //   于是「第一次吐了坏 JSON」这件事在账里**根本不显形**。
+    //   ⚠️ 票 28 补的是**另一半**：**一格还是「一次调用」**（所以重采样不新开一格），
+    //   但每一次没成的原因追加进 `failures` —— 只留最后一次的话，
+    //   「发了 3 次、前两次截断、第三次坏 schema」与「一次就坏 schema」在账上长得一模一样。
     const d = tmp();
     let n = 0;
     const flaky = (async () =>
@@ -136,7 +140,10 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
         { status: 200, headers: { "content-type": "application/json" } })) as unknown as typeof fetch;
     const r = await run(d, GOOD, { fetchImpl: flaky });
     expect(r.data.ok).toBe(true);
-    expect((r.data.ledger as { attempts: number }[])[0]!.attempts).toBe(2);
+    const ledger = r.data.ledger as { attempts: number; failures?: string[] }[];
+    expect(ledger, "一格 = 一次调用，不是一次往返").toHaveLength(1);
+    expect(ledger[0]!.attempts, "两次往返").toBe(2);
+    expect(ledger[0]!.failures, "第一趟为什么没成，账上写得出").toEqual(["invalid-json"]);
   });
 
   it("⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）", async () => {
@@ -144,8 +151,9 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
     const e = await run(d, "这不是 JSON", { attempts: 2 }).catch((x: unknown) => x);
     const ledger = (e as CommandError).ledger;
     expect(ledger, "失败也要把账带出来").toBeDefined();
+    expect(ledger).toHaveLength(1);
     expect(ledger![0]!.step).toBe("compile-td-game");
-    expect(ledger![0]!.attempts).toBe(2);       // 两次都试过了（次数是显式给的，不钉默认值）
+    expect(ledger![0]!.attempts, "两次都试过了（次数是显式给的，不钉默认值）").toBe(2);
   });
 
   it("⚠️ **校验不过也重采样** —— 真跑量下来「一次就过」只有 ~1/4，而重采样不是修复循环", async () => {
@@ -160,7 +168,13 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
     )) as unknown as typeof fetch;
     const r = await run(d, GOOD, { fetchImpl: flaky });
     expect(r.data.ok, "第二次过了").toBe(true);
-    expect((r.data.ledger as { attempts: number }[])[0]!.attempts).toBe(2);
+    const ledger = r.data.ledger as { attempts: number; failures?: string[] }[];
+    expect(ledger).toHaveLength(1);
+    expect(ledger[0]!.attempts).toBe(2);
+    // ⚠️ **`failures` 缺席** —— 那两次上游调用**都是成功的**（都拿到了合 schema 的关卡），
+    //   出问题的是**那一份配置**。把「上游不稳」与「模型设计得差」记成同一个数，
+    //   正是票 27 要 `failures` 防的事。
+    expect(ledger[0]!.failures).toBeUndefined();
   });
 
   it("⚠️ 重采样**全失败**也照常落盘最后那一份（人过目的前提是他看得到哪儿不对）", async () => {
@@ -170,7 +184,11 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
     const r = await run(d, bad);
     expect(r.data.ok).toBe(false);
     expect(fs.existsSync(path.join(d, "out", "counter-siege", "td-configs", "v1.json"))).toBe(true);
-    expect((r.data.ledger as { attempts: number }[])[0]!.attempts).toBe(3);   // 默认三次都试了
+    const ledger = r.data.ledger as { attempts: number; failures?: string[] }[];
+    expect(ledger, "一格 = 一次调用").toHaveLength(1);
+    expect(ledger[0]!.attempts, "默认三次都试了").toBe(3);
+    // ⚠️ 三次的上游调用**都成功**（都是合法 JSON、都过 schema），所以 `failures` 缺席。
+    expect(ledger[0]!.failures).toBeUndefined();
   });
 
   it("回报里给出下一步（而「能通关吗」判在 `site` —— 票 11）", async () => {

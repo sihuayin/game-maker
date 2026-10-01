@@ -3,7 +3,7 @@
 Type: grilling
 Status: open
 Owner: —
-Blocked by: 03, 07, 27
+Blocked by: 03, 07, 28
 Map: ../map.md
 > ⚠️ **包骨架已在[票 07](07-deps-allowlist.md) 里建好并接线**（`check-deps.mjs` 的 `ALLOWED` + 根 `tsconfig.json` 的 `references`）——
 > 这一票**只写代码**，不要再建包、也不要再动那两处接线。
@@ -44,8 +44,16 @@ V2 把这件事**劈成两半**：先「需求 → `GameIntentSpec`」，再「`
 
 ### 4. 严格 JSON
 
-同票 08 §3、票 25：这一票**沿用** R16 定的三件套（纯文本 + 剥围栏 + 固定次数重采样），
-把重采样次数与失败行为（退出码 4）**写死**。
+⚠️ **2026-10-01 就地更正**：原写「沿用 R16 的三件套（纯文本 + 剥围栏 + 固定次数重采样）」——
+**R16 已被[票 27](27-json-via-tool-choice.md) 改写**（R17：那就是那张重开票）。
+
+**现在的协议是 R16（新）**：走 `tool_choice: {type:"tool", name}` **强制工具调用**，
+且**入参必须过 Zod 才算成功** —— `stop_reason === "tool_use"` **不是**成功信号
+（票 27 第 1 发实测：工具被调、`input={}`、1135 token 打水漂）。
+**重采样 3 次**（1 首 + 2 重），**「剥围栏」作废**。失败行为（退出码 4）本票仍然写死。
+
+⚠️ **底座在[票 28](28-structured-call-substrate.md)**（`contracts` 里的 tool schema/解析器 +
+账的 `failure` 闭集）—— 本票**只写调用方**，别再实现一遍。
 
 ## Answer
 

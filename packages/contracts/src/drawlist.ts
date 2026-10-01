@@ -11,6 +11,10 @@
 // 关键性质：**不含任何不透明字符串**。曲线是数值控制点列而不是 SVG 的 `d`，
 // 所以包围盒、用色、尺寸都能在**不渲染**的前提下算出来。
 import { z } from "zod";
+// ⚠️ 错误格式化器**搬去 `zod-issues.ts` 了**（票 28）—— 本文件是画图，不该兼当 Zod 错误桥。
+//   这里只**原样再导出**，免得既有调用方一行都要改（与 `ops.ts` 再导出 `CommandError` 同款）。
+export { formatIssues, parseWith, type IssueLike } from "./zod-issues.js";
+import { formatIssues } from "./zod-issues.js";
 
 /** 颜色的唯一合法形式：`palette:<下标>` 指向 `StyleSpec.palette` 的有序数组。
  *  **硬编码色值不是「不推荐」，而是根本无法通过 schema** —— 这是「颜色 ∈ 色板」的落点。 */
@@ -128,26 +132,6 @@ export function paletteColor(ref: string, palette: readonly string[]): string | 
   return Number.isInteger(i) && i >= 0 ? palette[i] : undefined;
 }
 
-/**
- * 把 Zod 的错误摊平成 `ops[1].cy: 期望 number` 这种可定位的字符串。
- *
- * 为什么需要它：R2 之后确定性校验是唯一留下的质量控制，而**校验的价值取决于报错能不能定位** ——
- * 「某个 op 有问题」在 20 个 op 的产物上等于没说。
- */
-export function formatIssues(error: z.ZodError): string[] {
-  const flat = (issues: z.ZodIssue[]): z.ZodIssue[] =>
-    issues.flatMap((i) => ("unionErrors" in i && Array.isArray(i.unionErrors)
-      ? i.unionErrors.flatMap((u) => flat(u.issues))
-      : "issues" in i && Array.isArray(i.issues) ? flat(i.issues as z.ZodIssue[]) : [i]));
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const i of flat(error.issues)) {
-    const path = i.path.reduce<string>((acc, p) => (typeof p === "number" ? `${acc}[${p}]` : acc ? `${acc}.${p}` : String(p)), "");
-    const line = `${path || "<根>"}: ${i.message}`;
-    if (!seen.has(line)) { seen.add(line); out.push(line); }
-  }
-  return out;
-}
 
 /** `DrawListSchema.safeParse` + 摊平报错，一次调用拿到「能不能用」和「哪里不能用」。 */
 export function parseDrawList(input: unknown): { ok: true; value: DrawList } | { ok: false; errors: string[] } {

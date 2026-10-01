@@ -1,8 +1,8 @@
 # 27. 严格 JSON 改用 `tool_choice` 吗 —— **R16 要不要改**
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: —
 Map: ../map.md
 > 由[票 25](25-prototype-structured-output.md) 的**第三发**派生。
@@ -49,4 +49,72 @@ Map: ../map.md
 
 ## Answer
 
-（待解）
+**✅ 2026-10-01 已解（HITL：与人两轮问答 + **七发探针**）。**
+探针完整记录在 [`experiments/tool-choice-probe/`](../experiments/tool-choice-probe/README.md)，原始响应在 `raw/`。
+
+### 裁决：**(a) —— 改用 `tool_choice`，R16 改写**
+
+| # | 问题 | 裁决 |
+|---|---|---|
+| Q1 | 先花 5 发量率，还是认下 n=1 | **量** —— 实测 **7 发**（顺带打了 `strict` / `output_config.format` 各一发） |
+| Q2 | 这句话管到哪些调用点 | **(i) 只约束 V2 新调用**（08/09/10 + QA），旧 `assets` 路径**协议**原样 |
+| Q3 | 代码落哪儿 | **(ii)** 纯 schema/解析器进 `contracts`；I/O 各包自理 |
+| Q4 | 账记到多细 | **(ii)** 加闭集 `failure`，并改成**可追踪、不可覆盖** |
+| **Q5** | **R16 改成什么** | **(a)** —— 见下 |
+| Q6 | 重采样次数 | **3 次**（1 首 + 2 重），⚠️ **是地板不是调优结果** |
+| Q7 | 那 1/5 的 `input={}` 要不要复现 | **不复现** —— 交给票 08 的账（免费，且在真实负载上） |
+
+### 七发探针量到了什么
+
+| # | 做法 | 结果 |
+|---|---|---|
+| 1~5 | 真参考图 `halt-dusk.png` + **`VisualWorldSpec` 全 14 键**的 tool schema + 强制 `tool_choice`，真实提示词，`max_tokens=8000` | **4/5 成功**。五发全 200 · `blocks=[tool_use]` · `stop=tool_use` · 6~9s · 输出 **1135~1660 token**。⚠️ **输入 1463 token** —— 原图 + schema 的真实代价 |
+| 6 | `strict: true`（小 schema，合法 strict 形状） | 200 · 工具被调 · input 合 schema。⚠️ **只证明「被接受」，不证明「被实现」** |
+| 7 | `output_config: {format:{type:"json_schema",…}}` | 200 · **回来的是一整段散文**（968 字符，`stop=max_tokens`）—— 参数被**收下并静默忽略** |
+
+**第 1 发是这七发里最要紧的一发：**
+
+```
+stop_reason = "tool_use"    blocks = [tool_use]    output_tokens = 1135
+toolUse[0].input = {}        ← 空对象
+```
+
+上游烧了 1135 个输出 token，回来的 `input` 是**空的**。它**不是**「模型不听话」
+（那样不会有 `tool_use` 块），也**不是**「模型吐了坏 JSON」（那样 `input` 不会是合法对象）。
+它是**代理把工具入参丢了** —— 一种**静默的数据丢失**，而 `stop_reason` / 块类型 / HTTP 码**三项看起来全部正常**。
+
+⇒ **`stop_reason === "tool_use"` 不是成功信号。** 唯一的成功判据是**入参过 Zod**。
+
+### 连带量到的三条
+
+- **六发工具响应全是 `blocks=[tool_use]`、`textLen=0`** ⇒ **「剥围栏」七发里一次都没用上**
+  （票 25 的 ② 也没用上）—— 现在 **0/7**。
+- **`no-tool-use` 出现 0 次** —— (a) 担心的那个死因（代理不认工具）在这七发里**没有证据**；
+  (c) 要防的是一个还没出现过的东西。
+- **`servedModel` 仍是 `deepseek-flash`**（请求的是 `deepseek-v4-pro`）—— 代理换模型**又一次**成立。
+- ⚠️ **HTTP 200 什么都没证明**：第 7 发说明代理**收下并静默忽略**它不认识的参数 ⇒
+  「被接受」**不构成**任何参数被实现的证据。第 6 发那个 `strict`「被接受」因此**几乎肯定也是被忽略**。
+
+### R16（新字面，R17：这就是那张重开票）
+
+> **R16**：V2 **新**调用（票 08/09/10 + QA 三张）拿严格 JSON，走
+> **`tool_choice: {type:"tool", name}` 强制工具调用**，且**入参必须过 Zod 才算成功** ——
+> `stop_reason === "tool_use"` **不是**成功信号（票 27 第 1 发：工具被调、`input={}`，1135 token 打水漂）。
+> 三件套里**只有「固定次数重采样」保留**，而且它是**承重的不是保险**（首发 80% ⇒ 重试两次 99%+），
+> 次数定 **3**（1 首 + 2 重），**地板不是调优结果**；「纯文本」被工具调用取代；**「剥围栏」作废**。
+> ⚠️ **`strict: true` 与 `output_config.format` 都不可依赖** —— 代理会**收下并静默忽略**不认识的参数
+> （票 27 第 7 发实证）⇒ 形状**只由我们自己的 Zod 保证**。
+> ⚠️ **旧路径不动**（`assets` 的 drawlist / derive / compile-* 沿用纯文本 + 剥围栏 + 重采样），
+> 文件头标「旧协议」；要不要翻它们，等 V2 新链的账说话。
+
+### 没有量到的
+
+- **`input={}` 是系统性的还是偶发的** —— n=1 的失败，分不出来。**不复现**（Q7）：
+  票 08 的账会在**真实负载**上给出同一个数，且免费。
+- **`max_tokens` 的真天花板** —— 五发最大 1660 token 都没撞上限 ⇒ 14 键的 `VisualWorldSpec`
+  实测在 **1100~1700 输出 token** 量级。票 25 记的「天花板没量到」现在有了一个**下界**。
+
+### 派生
+
+- **[票 28](28-structured-call-substrate.md)** —— Q3(ii) + Q4(ii) 要落成代码，是 08/09/10 的**硬前置**。
+  08/09/10 的 `Blocked by` 已从 `27` 改挂 `28`。

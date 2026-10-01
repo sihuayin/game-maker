@@ -6,6 +6,9 @@ Owner: —
 Blocked by: —
 Map: ../map.md
 > 依据 **R3**（Q3b/Q13）。`03 §9-12` 的那些 `similarity` 数值**一个都不进判据**。
+> ⚠️ **2026-10-01（票 28）：本票造的是 V2 契约 —— 请用 `import { z } from "zod/v4"` 写**（不是 `from "zod"`）。
+> 理由与代价见[票 28 的 Answer](28-structured-call-substrate.md)：`toolInputSchema` 只能转 v4 的 schema，而 v3/v4 的 schema **不许互相嵌套**。
+> 另：**封口用 `z.strictObject`** —— 普通的 `z.object` 不产出 `additionalProperties: false`。
 
 ## Question
 

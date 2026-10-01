@@ -68,6 +68,13 @@ export * from "./geometry.js";
 // ── 交付态：资源包自描述 ──────────────────────────────────────────────────
 export * from "./assetpack.js";
 
+// ── Zod 错误 → 人可读（**只此一份**，v3 与 v4 都吃；票 28 起住这儿）─────────
+export * from "./zod-issues.js";
+
+// ── V2 的结构化调用底座：失败闭集 + 工具入参的取与验（票 27 / 28）──────────
+// ⚠️ **纯的**：没有 fetch。I/O 那一半各包自理 —— 结构上新包够不着彼此（R11）。
+export * from "./structured-call.js";
+
 // ── 一次资源生成「花了什么」的账（跟着包走的收据）──────────────────────────
 export * from "./ledger.js";
 export * from "./coverage.js";

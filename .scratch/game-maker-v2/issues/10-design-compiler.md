@@ -3,7 +3,7 @@
 Type: grilling
 Status: open
 Owner: —
-Blocked by: 03, 07, 09, 27
+Blocked by: 03, 07, 09, 28
 Map: ../map.md
 > ⚠️ **包骨架已在[票 07](07-deps-allowlist.md) 里建好并接线**（`check-deps.mjs` 的 `ALLOWED` + 根 `tsconfig.json` 的 `references`）——
 > 这一票**只写代码**，不要再建包、也不要再动那两处接线。

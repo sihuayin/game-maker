@@ -12,6 +12,7 @@
 //
 // ⚠️ **它是「观察」那一侧的东西**（票 39 立的界）：不阻断、不打分，只是把花了什么记下来。
 import { z } from "zod";
+import { CallFailure } from "./structured-call.js";
 
 export const LEDGER_FORMAT = "assetpack-ledger/v1" as const;
 
@@ -22,6 +23,11 @@ export const LedgerStep = z.enum([
   "image",
   // ⚠️ 与 `derive` 同一条规矩：**它是一次上游调用，就得记**（票 06 的 Q4）。
   "compile-td-game",
+  // ⚠️ **2026-10-01 补上**（票 28）：`compile-game` 一直**不在这个枚举里** ——
+  //   而这就是它「不交账」的**真正原因**，不是谁忘了写一行。一次上游调用没地方记，
+  //   于是横版那条链上**唯一**会调上游的 `compile-*` 在账上是隐形的。
+  //   加值的代价是零：`byStep` 是 `z.record`（缺键不算错），磁盘上已有的账照常通过。
+  "compile-game",
 ]);
 
 /**
@@ -35,7 +41,11 @@ export const LedgerUsage = z.object({
   totalTokens: z.number().int().nonnegative().optional(),
 }).strict();
 
-/** 一次调用的账。 */
+/**
+ * 一次**调用**的账。
+ * ⚠️ **一格 = 一次调用，不是一次往返** —— `attempts` 才是往返（`CONTEXT.md`「调用 / 往返」）。
+ *   重采样时**不新开一格**，而是在同一格里累加 `attempts`、把每次没成的原因追加进 `failures`。
+ */
 export const LedgerCall = z.object({
   step: LedgerStep,
   /** 这一步作用在谁身上：资源 id（生图还会带上 `<id>.<动画|层名>`），或 `recipe` / `game-config` / `td-config`。 */
@@ -73,12 +83,24 @@ export const LedgerCall = z.object({
    * 重试烧掉的额度要能单独看见，否则失败的归因是错的。
    */
   attempts: z.number().int().positive(),
+  /**
+   * **这场调用里，没能用上的那些往返各自的原因**，按发生顺序。⚠️ **闭集**，见 `CallFailure`。
+   *
+   * ⚠️ **一个数组，不是一格** —— 因为账的一格是**一次调用**（`CONTEXT.md` 的「调用 / 往返」：
+   *   `attempts` 记的是这一次调用里往返了几次）。一格只留得下**最后一次**病因时，
+   *   「发了 3 次、前两次被截断、第三次坏 schema」与「一次就坏 schema」在账上**一模一样**。
+   *   ⚠️ 最典型的一档恰恰是**没被看见就过去了**的那种：上游把入参丢了（`empty-input`）、
+   *   重采样救回来了 —— 只记「最后失败的那次」时它**一次都不会出现**。
+   *
+   * ⚠️ **缺席 == 一次都没失败**（首发就成），与 `usage` 一条心：不许拿占位值冒充「测到了」。
+   */
+  failures: z.array(CallFailure).min(1).optional(),
   usage: LedgerUsage.optional(),
 }).strict();
 
 const CallCount = z.object({
   calls: z.number().int().nonnegative(),
-  /** 往返总数。⚠️ `> calls` 就是「重试过」的证据。 */
+  /** 往返总数。⚠️ `> calls` 就是「重试过」的证据（`CONTEXT.md`「调用 / 往返」那条纪律的落点）。 */
   attempts: z.number().int().nonnegative(),
 }).strict();
 

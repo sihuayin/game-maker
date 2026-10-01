@@ -1,0 +1,22 @@
+{
+  "label": "07-output-config-format",
+  "ms": 3228,
+  "status": 200,
+  "ok": true,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "text"
+  ],
+  "stopReason": "max_tokens",
+  "usage": {
+    "input_tokens": 15,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 500,
+    "service_tier": "standard"
+  },
+  "textLen": 968,
+  "textHead": "我无法直接生成像素画图片，但我可以为你提供一份**详细的像素画设计描述/脚本**，你可以交给 AI 绘图工具（如 Midjourney、DALL·E、Stable Diffusion）或像素画师来制作。\n\n---\n\n## 画面描述：黄昏山间列车小站（像素画风格）\n\n**整体氛围：**\n黄昏时分，暖橙与紫蓝交织的天空，一座偏僻的山间列车小站静谧地坐落在群山之间。\n\n---\n\n### 画面元素分解\n\n| 区域 | 内容 |\n|------|------|\n| **天空** | 渐变黄昏色：顶部深紫蓝 → 中部橙红 → 地平线金黄，点缀几朵像素云 |\n| **远山** | 2~3层剪影山脉，深蓝紫色",
+  "toolUse": []
+}

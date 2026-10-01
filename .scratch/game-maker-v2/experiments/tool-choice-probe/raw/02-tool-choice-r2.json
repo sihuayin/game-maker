@@ -1,0 +1,180 @@
+{
+  "label": "02-tool-choice-r2",
+  "ms": 6589,
+  "status": 200,
+  "ok": true,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 183,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1280,
+    "output_tokens": 1402,
+    "service_tier": "standard"
+  },
+  "textLen": 0,
+  "textHead": "",
+  "toolUse": [
+    {
+      "name": "emit_visual_world",
+      "input": {
+        "schemaVersion": "1.0",
+        "identity": {
+          "styleName": "Flat Pixel Minimalism",
+          "keywords": [
+            "flat",
+            "minimal",
+            "geometric",
+            "pixel",
+            "muted",
+            "dusk"
+          ],
+          "description": "极简扁平风格像素场景，所有形体由矩形与三角拼接，无描边、无渐变，色块边界干净利落。画面呈现黄昏时分的空旷月台，人物以正面平视姿态居中站立，背景由大块色域构成。"
+        },
+        "rendering": {
+          "style": "flat pixel art, geometric abstraction",
+          "shading": "flat solid fills, no gradients",
+          "outline": "none",
+          "pixelDensity": 8,
+          "texture": "smooth solid blocks with occasional 1px detail",
+          "dithering": "none",
+          "antialiasing": false
+        },
+        "camera": {
+          "mode": "side",
+          "projection": "orthographic",
+          "perspective": "flat side-scroller view, no vanishing point",
+          "angle": 0,
+          "elevation": 0
+        },
+        "palette": {
+          "primary": [
+            "#5c3a1e",
+            "#78512e",
+            "#4a2f18"
+          ],
+          "secondary": [
+            "#d9a066",
+            "#c98f5a",
+            "#a9713f"
+          ],
+          "accent": [
+            "#e8b64c",
+            "#f2c96b",
+            "#3b4a63"
+          ],
+          "background": [
+            "#8a9598",
+            "#2e3648",
+            "#1f2635"
+          ],
+          "shadow": [
+            "#3a2513",
+            "#243041",
+            "#5f6a70"
+          ],
+          "highlight": [
+            "#f4e2c0",
+            "#ffffff",
+            "#e5d7bb"
+          ]
+        },
+        "materials": {
+          "woodPanel": {
+            "appearance": "哑光木质墙板，大面积纯色面",
+            "color": [
+              "#5c3a1e",
+              "#78512e",
+              "#4a2f18"
+            ],
+            "texture": "flat, no grain"
+          },
+          "concrete": {
+            "appearance": "月台与地面灰蓝色混凝土块",
+            "color": [
+              "#8a9598",
+              "#6f7a80",
+              "#5f6a70"
+            ],
+            "texture": "flat matte"
+          },
+          "sharpMetal": {
+            "appearance": "蒸汽机车车头蓝色金属与黑色烟囱",
+            "color": [
+              "#3b4a63",
+              "#161b26",
+              "#2e3648"
+            ],
+            "texture": "flat solid"
+          },
+          "duskSky": {
+            "appearance": "黄昏天幕的深蓝渐层块面",
+            "color": [
+              "#1f2635",
+              "#2e3648"
+            ],
+            "texture": "flat bands"
+          },
+          "lightsource": {
+            "appearance": "路边小灯的自发光黄色球体",
+            "color": [
+              "#e8b64c",
+              "#f2c96b"
+            ],
+            "texture": "flat glow"
+          }
+        },
+        "character": {
+          "silhouette": "方正小体块人形，头部为矩形，身体为长方形，双腿为两个短矩形",
+          "proportions": "chibi 比例，约 3 头身，头宽接近肩宽",
+          "faceAbstraction": "面部仅用两个方形眼点和一条短线嘴，无鼻子细节",
+          "clothing": "深蓝色制服外套，深色长裤，头戴带金色帽徽的深色制服帽，手戴浅色手套",
+          "poseLanguage": "正面直立站姿，双臂垂于身体两侧，双脚并拢，静态等待姿态"
+        },
+        "environment": {
+          "terrain": "平坦月台地面，前方为水平铁轨与沙石带",
+          "architecture": "单层木质站房立面，左侧墙上一幅梯形表现的山景画框，右侧挂有一张黄色画框与三块方形标牌，墙边一条木质长椅",
+          "props": "黑色蒸汽机车车头带三角烟囱，右上方一轮黄色落日，右侧一根立式小路灯，地面虚线枕木",
+          "textureDensity": "极低，所有表面为纯色块"
+        },
+        "animation": {
+          "timing": "极缓慢循环，大量静止帧",
+          "frameStyle": "2-4 帧循环，块状位移",
+          "poseExaggeration": "无夸张，保持方正静止的呼吸感",
+          "description": "小灯球在 2 帧间亮度切换形成微弱闪烁，人物极轻微上下浮动 1px，其余画面完全静止"
+        },
+        "composition": {
+          "background": "深蓝天幕与远处山头，落日位于右上方",
+          "midground": "木质站房立面，含画框、标牌、长椅与门",
+          "foreground": "人物居中所站月台地面与下方铁轨带",
+          "characterScale": "人物高度约占画面高度的四分之一，处于中景偏下",
+          "objectScale": "画框与长椅按人物比例放大，形成纪念碑式体量",
+          "density": "疏朗，大面积留白与纯色块"
+        },
+        "lighting": {
+          "direction": "来自右上方的落日方向光",
+          "contrast": "低到中等对比，无硬投影",
+          "softness": "硬边色块，无软化衰减",
+          "mood": "黄昏的安静与孤寂感"
+        },
+        "readability": {
+          "silhouette": "人物与路灯均以清晰方块轮廓从深棕墙面上分离",
+          "contrast": "主体靠深蓝与浅色面板的明度差读出",
+          "gameplayScale": "适用于横版像素场景，角色可辨识距离约 1 屏"
+        },
+        "references": {
+          "styleImages": [
+            "fixtures/reference/halt-dusk.png"
+          ],
+          "characterImages": [],
+          "materialImages": []
+        },
+        "confidence": 0.86
+      }
+    }
+  ]
+}

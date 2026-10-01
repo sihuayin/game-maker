@@ -6,6 +6,9 @@ Owner: —
 Blocked by: —
 Map: ../map.md
 > 依据 **R14**（Q16①）。母版机制**已经在跑**，缺的是契约。
+> ⚠️ **2026-10-01（票 28）：本票造的是 V2 契约 —— 请用 `import { z } from "zod/v4"` 写**（不是 `from "zod"`）。
+> 理由与代价见[票 28 的 Answer](28-structured-call-substrate.md)：`toolInputSchema` 只能转 v4 的 schema，而 v3/v4 的 schema **不许互相嵌套**。
+> 另：**封口用 `z.strictObject`** —— 普通的 `z.object` 不产出 `additionalProperties: false`。
 
 ## Question
 
