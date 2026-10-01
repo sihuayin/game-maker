@@ -103,6 +103,19 @@ importers:
         specifier: 'catalog:'
         version: 3.2.7(@types/node@22.20.4)
 
+  packages/game-design:
+    dependencies:
+      '@game-maker/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.4
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.7(@types/node@22.20.4)
+
   packages/mcp:
     dependencies:
       '@game-maker/assets':
@@ -114,6 +127,57 @@ importers:
       '@game-maker/demo':
         specifier: workspace:*
         version: link:../demo
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.4
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.7(@types/node@22.20.4)
+
+  packages/pipeline:
+    dependencies:
+      '@game-maker/assets':
+        specifier: workspace:*
+        version: link:../assets
+      '@game-maker/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@game-maker/game-design':
+        specifier: workspace:*
+        version: link:../game-design
+      '@game-maker/qa':
+        specifier: workspace:*
+        version: link:../qa
+      '@game-maker/vision':
+        specifier: workspace:*
+        version: link:../vision
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.4
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.7(@types/node@22.20.4)
+
+  packages/qa:
+    dependencies:
+      '@game-maker/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.4
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.7(@types/node@22.20.4)
+
+  packages/vision:
+    dependencies:
+      '@game-maker/contracts':
+        specifier: workspace:*
+        version: link:../contracts
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

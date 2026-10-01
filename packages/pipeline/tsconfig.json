@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../contracts"
+    },
+    {
+      "path": "../assets"
+    },
+    {
+      "path": "../vision"
+    },
+    {
+      "path": "../game-design"
+    },
+    {
+      "path": "../qa"
+    }
+  ]
+}

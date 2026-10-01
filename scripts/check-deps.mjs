@@ -17,8 +17,17 @@ const ALLOWED = {
   "@game-maker/contracts": [],
   "@game-maker/assets": ["@game-maker/contracts"],
   "@game-maker/demo": ["@game-maker/contracts"],
-  "@game-maker/cli": ["@game-maker/contracts", "@game-maker/assets", "@game-maker/demo"],
-  "@game-maker/mcp": ["@game-maker/contracts", "@game-maker/assets", "@game-maker/demo"],
+  // V2 的四个新包（票 07）。⚠️ 它们**彼此不依赖、只依赖 contracts** ——
+  // 于是「禁止跨层」在图上是**结构性**的，不靠约定（map 的 R11）。
+  "@game-maker/vision": ["@game-maker/contracts"],
+  "@game-maker/game-design": ["@game-maker/contracts"],
+  "@game-maker/qa": ["@game-maker/contracts"],
+  "@game-maker/pipeline": [
+    "@game-maker/contracts", "@game-maker/assets",
+    "@game-maker/vision", "@game-maker/game-design", "@game-maker/qa",
+  ],
+  "@game-maker/cli": ["@game-maker/contracts", "@game-maker/assets", "@game-maker/demo", "@game-maker/pipeline"],
+  "@game-maker/mcp": ["@game-maker/contracts", "@game-maker/assets", "@game-maker/demo", "@game-maker/pipeline"],
 };
 
 const siblings = new Set(fs.readdirSync(PKGS).map((d) => {

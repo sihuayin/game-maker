@@ -1,0 +1,23 @@
+{
+  "name": "@game-maker/game-design",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "意图理解与设计编译：GameIntentSpec · GameDesignSpec。",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@game-maker/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.spec.json"
+  }
+}
