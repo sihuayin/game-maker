@@ -3,11 +3,18 @@
 Type: grilling
 Status: open
 Owner: —
-Blocked by: 02, 07, 24, 25
+Blocked by: 02, 07, 24, 25, 27
 Map: ../map.md
 > ⚠️ **包骨架已在[票 07](07-deps-allowlist.md) 里建好并接线**（`check-deps.mjs` 的 `ALLOWED` + 根 `tsconfig.json` 的 `references`）——
 > 这一票**只写代码**，不要再建包、也不要再动那两处接线。
 > `docs/v2/03-claude-code.md` §6/§7。这是整条链的**最前端**，也是**今天完全没有**的一段。
+
+> **⚠️ 2026-10-01 就地更新：票面 §1 与 §3 的两大未知已被[票 25](25-prototype-structured-output.md) 答掉。**
+> **§1「谁来当 Vision LLM」** ⇒ **既有的文本上游**（`/v1/messages` + base64 图块），
+> 而 `review.ts:90-93` 的 `reviewPack` **已经在这么发**（⚠️ 但它库里有、CLI/MCP 里零命中，得先给入口）。
+> **§3「模型的实际限制」** ⇒ 已实测：合成图判别**通过**（真看见）· 11 块 JSON **一次吐完、无围栏**。
+> ⚠️ 两项都是 **n=1** —— 是「能不能」，不是「成功率」。
+> **⇒ 本票剩下的只有 §4（原图登记）与 §5（`confidence`），外加「按哪套协议要 JSON」—— 那归[票 27](27-json-via-tool-choice.md)。**
 
 ## Question
 

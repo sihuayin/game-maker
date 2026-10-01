@@ -1,8 +1,8 @@
 # 25. 代理到底支不支持结构化输出 / 视觉输入？—— 真发一次，量出来
 
 Type: prototype
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: —
 Map: ../map.md
 > 依据 **R16**（Q17）+ `packages/assets/src/generate.ts:11` 那条实测。
@@ -51,3 +51,48 @@ Map: ../map.md
 ## Answer
 
 （待解）
+
+---
+
+## Answer
+
+**✅ 2026-10-01 已跑（三发，按人指定的上限压到 2~3）。完整记录在
+[`experiments/proxy-probe/README.md`](../experiments/proxy-probe/README.md)，原始响应在 `raw/`。**
+
+### 三个结论
+
+| # | 问题 | 答案 |
+|---|---|---|
+| ① | 模型**真看见**吗 | ✅ **真看见**。合成图（白底 3 圆，左红/中绿/右蓝，**真值是我造的**）⇒ 答 `"3 个；左=红色 中=绿色 右=蓝色"`，**全对** |
+| ② | 真图 + 一次能吐多少 | ✅ 2129 字符 · **11 键全齐** · `JSON.parse` 通过 · **无 markdown 围栏** · `stop=end_turn` |
+| ③ | `tools` + `tool_choice` 认不认 | ✅ **认**。`blocks=[tool_use]` · `stop_reason=tool_use` · input 是合法对象 |
+
+三发全 **HTTP 200**（956 / 3404 / 1115 ms）。
+
+⚠️ **① 是最要紧的一发** —— 它排除了那个**已知的失败模式**：这条路此前正好经历过
+「**收得下图块、模型看不见图**」（`../../game-creation-v1/map.md:193-200`）。
+合成图的真值是我自己画的，所以答对**不可能是碰运气**。
+
+⚠️ **② 说的是那张图，不是在编**：`description` = *"a solitary figure in a train station…"*、
+`foreground` = *"Train tracks"*、`background` = *"Station wall, bulletin board"* —— 对得上「黄昏山间列车小站」。
+
+### ⚠️ 三条必须一起读的保留
+
+1. **每项 n = 1。** 回答的是「**能不能**」，**不是「成功率」**。
+   票 01 的「1/3」是一个**率**、且在**另一个端点**（`/v1/chat/completions`）上量的 ——
+   本探针**既没复现它、也没推翻它**。要率得另开一次测量（多花请求）。
+2. **`servedModel` = `deepseek-flash`**，而我们请求的是 `deepseek-v4-pro` ——
+   代理换模型**又发生了一次**（旧图已记过）。⇒ 账上 `requestedModel` / `model` 分开记这条纪律**今天仍成立**。
+3. **② 的 2129 字符是在 4000 `max_tokens` 下、点名只要那 11 个键拿到的** ——
+   真的 `VisualWorldSpec` 可能更大。**天花板没量到。**
+
+### 对下游的影响
+
+- **票 08 的第一段不用新接上游**：复用 `/v1/messages` + base64 图块（照 `review.ts:90-93` 抄）。
+  ⇒ 票 08 的 §1「谁来当 Vision LLM」与 §3「模型的实测限制」**这两问已被本票答掉**，票面已就地更新。
+- ⚠️ ③ 让「严格 JSON」多了一条**比纯文本强**的路，而 **R16 定的是「沿用三件套」** ——
+  **改 R 表必须重新开票**（R17）⇒ 派生[票 27](27-json-via-tool-choice.md)，并把 `25` 从 08/09/10 的阻塞里划掉。
+
+### 产物
+
+- `experiments/proxy-probe/run.mjs` · `raw/{01,02,03}-*.json` · `README.md`

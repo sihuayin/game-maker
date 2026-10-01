@@ -1,0 +1,20 @@
+{
+  "label": "01-synthetic-count",
+  "ms": 956,
+  "status": 200,
+  "ok": true,
+  "servedModel": "deepseek-flash",
+  "blockTypes": [
+    "text"
+  ],
+  "stopReason": "end_turn",
+  "usage": {
+    "input_tokens": 245,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 15,
+    "service_tier": "standard"
+  },
+  "text": "3 个；左=红色 中=绿色 右=蓝色",
+  "toolUse": []
+}
