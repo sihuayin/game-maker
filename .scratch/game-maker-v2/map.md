@@ -34,6 +34,19 @@ Effort: game-maker-v2
 > ⚠️ **本图此前漏报了 08**：写「前沿是 03/04/05/06 四张」时把 08 漏在外面（29/30 另起一段提到了）。
 > ⇒ **前沿以扫描为准，不以本节的叙述为准。**
 > ✅ **前沿现在是 04 / 05 / 06 / 08 / 09 / 11 / 29 / 30 八张**（按号取就是 04）。
+>
+> ⚠️ **2026-10-02（第二 session）：票 04 已关** —— `CharacterDNA` 落地
+> （`packages/contracts/src/character-dna.ts`，v4），并顺手把**「母版」立成配方里的一等公民**
+> （`AssetRecipe.authoring[]` —— **结构性**地不进交付包：`pack` 只迭代 `assets`，够不着它）。
+> ⚠️ **它反转了 `03 §16` 的箭头**：`Master → DNA → Animations` 改读成 **`DNA → 母版 → 动画`**。
+> 原顺序要么让 DNA **反推**母版（权威倒挂），要么**鸡生蛋** ——
+> 画母版需要一段描述这个角色的提示词，而那正是 DNA 要产出的东西。
+> ⚠️ **代价是票 13 的半个票面当场作废**（它的标题就是 `母版 → DNA → 动画`，§2 问「第一环谁产」）——
+> 已重写，并把 DNA 那一环拆成**新票 31 `character-dna-gen`**（住 `packages/game-design/`）。
+> ⚠️ **另一处返工也是本票自己撞出来的**：R2/R4 两次把 `AssetDependency` **整块**推给票 11，
+> 而那块里的 `masterAsset` **正是**「资产 → 母版」的边 ⇒ 推走它，`authoring[]` 会是一张
+> **没有任何东西指向它**的表。第 5 轮专为此开了一问，判**只补这一条边**。
+> ✅ **前沿现在是 05 / 06 / 08 / 09 / 11 / 29 / 30 / 31 八张**（按号取就是 05）。
 
 ## Destination
 
@@ -155,6 +168,8 @@ Style Image + Game Intent
 
 - [`GameIntentSpec` + `GameDesignSpec` 落地](issues/03-contract-intent-and-design.md)：**三层里两层落地、第三层判死**。`packages/contracts/src/game-intent.ts` + `game-design.ts`（v4），外加新立的 **`vocabulary.ts`**（机制/能力的封闭词表，**三份契约的公共依赖**，票 05 必须采纳同一份）。⚠️ **18 条裁决**，四条最要紧：① **门 = 具名消费者**（① 提示词按名插值 ② 判据 ③ 映射进下游契约；`JSON.stringify(spec)` 整份兜底**不算读**）；② 两层 **13 处重名是故意的** —— 它是 Intent QA 集合差**存在的前提**，且**意图层的自由文本不许因此被砍**；③ 设计层**加** `mechanics[]`（封闭枚举，一次拿到「覆盖度」与「R12 拒绝」**两个**判据）；④ **不加 `fromIntent` 回指**，靠 **id 延续**（回指是只能被复述、不能被校验的字段）。⚠️ **当场量到的四条事实**：① **`game-config/v1` 的真本事比票面假设的小得多** —— `EntityKind = solid|pickup|hazard|goal|decor`、`Motion{cycle}`、`PlayerMove{speed,jumpVelocity,gravity}`（**单跳**）、`Objective{collect-then-reach}` ⇒ **`double-jump`/`attack`/`health`/`enemy-ai` 外壳全做不了**，而它们正是用户最常要的 —— **R12 的拒绝第一次有真事可拒，且在生图之前、且免费**（封闭枚举填不出来，不用另写判据）；② **`GameIntentSpec` 是契约不由本票裁量**（§14 的 QA 输入明写它，而 `qa` 只依赖 `contracts` ⇒ 结构决定的，不是选择）；③ **`confidence` 被否掉的唯一理由不是「像分数」，是「够不着人」**（R9 只有一个检查点且在**清单处**）—— 同一理由当场决定 `ambiguity` **只能**挂在那个检查点上，否则同样出局；④ **我自己第一轮漏了 §3 的六个字段**（只过了 §4）⇒ 「逐字段过门」本身需要一个判据，否则会静默地只过一半。⚠️ **砍掉的**：`confidence` · `interactions` · `interactionModel` · `assetRequirements` · `visualRequirements` · `schemaVersion`（→ `format: z.literal`）；`runtimeRequirements` **改成封闭能力集**。⚠️ **判据**：**40 条新测试 · 套件 627/627**（此前 587）· `tsc -b` 干净 · `check:deps` / `check:links` 绿；**三条变异验过会红**（拿掉封口 → 4 红 · 把 `double-jump` 塞进词表 → 3 红 · 把 `id` 改成可选 → 1 红）。⚠️ 第一次跑第三条变异时**变异脚本的 sed 没匹配上**（漏了 `z.array(` 外壳）而全绿 —— 那是**脚本**的假阴性，不是判据的。⚠️ **播下六张票**：`05` 采纳词表 · `09` **不许按外壳能力过滤 `mechanics`** · `10` ① 档欠条 + id 延续 + R12 在填 `mechanics` 那一刻撞上 · `15` `run/v<N>/` 九项清单 · **`16` `ambiguity` 的存亡押在它身上** · `19` 集合差的键已定 + 文本相等的噪声要它自己写下来。
 
+- [`CharacterDNA` 落盘成契约 —— 它是「跨资产同一份」，不是一次调用的中间量](issues/04-contract-character-dna.md)：**DNA 落地（`character-dna.ts`，v4），并把「母版」立成配方里的一等公民**。⚠️ **主消费者是 R13 的资源级重生成** —— 没有一份一字不变的角色描述，**修复会静默地换掉主角**；而**跨资产一致性不是它的功劳**（那个由原图内联进每一次生图承担，算进来是重复记账）。⚠️ **三层的关系定死成「世界 = 类 · DNA = 个体 · 资产 = 一次渲染」**，且 `VWS.character` 的五个字段**一个都不许机械复制进 DNA**（否则就是票 09 删 `GameSpec` 的那条理由）。⚠️ 20 条裁决里最要紧的四条：① 砍 **`bodyProportions`** —— 它不是零消费者，是**更糟的一种：`headCount(size.h)` 的可派生副本**（票 22 实测：自由文本的比例指令模型**不执行**）；② `palette` → **`PaletteRef[]`**（自由 hex 会**静默失效** —— 下游 `quantize` 把它量化掉）；③ **全部必填、没有 optional** —— 非人形写 `"none"` / `[]`，因为可选字段会让「**确实没有脸**」与「**模型忘了填**」在文件里长得一模一样，而重生成时前者该维持、后者会被自由发挥；④ `equipment` + `accessories` **合并成 `gear`**（两者之间是**假**边界，消费者是同一段提示词）。⚠️ **母版**：`AssetRecipe.authoring[]` 是**独立数组不是判别式** —— 判别式要让 `pack` / `audit` / atlas / coverage **每一个**消费者记得过滤，漏一个就是静默交付；独立数组把它做成**结构性**的。母版**不复用 `AssetSpec`**、**不收 `styleId`**（那个字段**源码零读取**），但带**画布** `size` —— 与资产的**缩放目标** `size` **同名不同义**。⚠️ **量到的**：`AssetSpec.styleId` 全仓库**源码零读取**（`recipe.styleRef` 路径那一半才是活的）⇒ 「照 `styleRef`/`styleId` 的先例」要拆成两半，而 `characterId` **不是**同款仪式字段（多角色时是真信息）；`spec.role` **字面就是身份**（`prompt.ts:360`）⇒ DNA 一进来「角色是谁」会有**三个**来源，所以那一条降格是必须的；`VWS.character` 是**搬运来的**（票 02 合法放过，**不是疏漏**）；`CONTEXT.md` 里**既没有「母版」也没有「DNA」**（已补）。⚠️ **判据**：30 条新测试 · 套件 **657/657**（此前 627）· `tsc -b` / `check:deps` / `check:links` 绿 · **三条变异验过会红** · 另有一条**兼容判据**（`fixtures/recipes/` 一字不改仍合法，四个新键全是 optional）。⚠️ **两处由本票自己的裁决造成的返工**：**票 13 的标题与 §2 一半作废**（箭头反转的直接后果，已重写 + 拆出票 31）；**`authoring[]` 的入边洞**（`AssetDependency` 整块被推走，而 `masterAsset` 正是那条边 —— 第 5 轮专开一问补上）。⚠️ **播下**：`11`（剩三条边 + 拓扑排序）· `12`（三个新键 + **planner 不重复校验**）· `15`（**两条统一校验**）· **新票 `31`**（DNA 的产出）。
+
 ## Not yet specified
 
 <!-- 通往终点的雾：在范围内，但还说不成一张票。前沿推过去时会毕业 -->
@@ -167,6 +182,10 @@ Style Image + Game Intent
 - **生图并发与 `run/v<N>/` 的关系**：并发上限（`pack --concurrency`）与「失败时半成品怎么落」
   在新增了理解层之后会不会变，要等链跑起来才知道。
 - **提示词自动优化**（改良，不挡终点）。
+
+- **`interactable` 与 `npc` 的边界**：票 04 判「`interactables[]` / `resources[]` **默认**无 DNA」，
+  那个「默认」留着一个口子 —— 一台**会说话的**自动售货机到底是哪一类？
+  今天没有消费者（第一阶段没有这种实体），所以说不成票；等真有第一个再定。
 
 ## Out of scope
 

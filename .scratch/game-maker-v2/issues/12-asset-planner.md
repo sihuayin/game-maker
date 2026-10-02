@@ -46,6 +46,17 @@ V2 的资产现在有两个视觉来源：`VisualWorldSpec`（世界语法）与
 今天清单有 schema 校验（重复 id、import/sheet 自洽，`recipe.ts:137-172`）。
 新字段（依赖图、策略）要**加进同一处**，不许在 Planner 里另写一份检查。
 
+> ⚠️ **2026-10-02（[票 04](04-contract-character-dna.md) 已关）：清单多了三样东西，且附带两条纪律。**
+> ① `assets[].spec.characterId`（**可选**）—— 有角色的资产才写，取值**沿用 `GameDesignSpec` 的实体 id**
+>    （不许自己起名：那是第四个事实源）。
+> ② `assets[].spec.masterAsset`（**可选**）—— 指向 `AssetRecipe.authoring[].id`。
+> ③ 顶层 **`characterRef`**（可选，路径，与 `styleRef` 同形）+ 顶层 **`authoring[]`**（创作态母版）。
+> ⚠️ **纪律一：planner 不重复校验 `characterId` 的命中** —— 那是票 15 的 pipeline 统一校验（票 04 Q3）。
+> 两处都做就是 `derivePackMode` 那种漂移。
+> ⚠️ **纪律二：`AssetSpec.description` / `role` 已降格为资产级**（"待机三帧"），
+> **不再表示角色身份** —— 身份归 `CharacterDNA`。票面 §2 问的「两个视觉来源谁说了算」，
+> 现在多了一个答案：**角色身份**那一半归 DNA，**世界语法**那一半归 `VisualWorldSpec`。
+
 ## Answer
 
 （待解）

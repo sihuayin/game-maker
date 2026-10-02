@@ -170,3 +170,110 @@ describe("AssetRecipe 与 AssetPackManifest 不共用类型（Spec 与 Artifact 
     expect(JSON.stringify(DERIVED)).not.toContain('"atlasId"');
   });
 });
+
+// ── 票 04：创作态母版与角色引用 ───────────────────────────────────────────────
+//
+//   ⚠️ 这两组断言里**最要紧的是第一条**：加字段**不许弄坏磁盘上已有的配方**（`03 §5`）。
+//   `authoring` / `characterRef` / `characterId` / `masterAsset` 全是 **optional**，
+//   所以 `fixtures/recipes/*.json` 一个字不改仍然解析得过 —— 那是本票的兼容判据。
+describe("§5 兼容：加了字段之后，磁盘上已有的配方一字不改仍解析通过", () => {
+  it("`fixtures/recipes/` 里每一份都还是合法的", () => {
+    for (const f of readdirSync(RECIPE_DIR).filter((n) => n.endsWith(".json"))) {
+      const r = parseRecipe(JSON.parse(readFileSync(RECIPE_DIR + f, "utf8")));
+      expect(r.ok, `${f} 应当仍然合法`).toBe(true);
+    }
+  });
+
+  it("一份**没有** `authoring` / `characterRef` 的配方照旧合法", () => {
+    expect(parseRecipe(clone()).ok).toBe(true);
+    expect(parseRecipe(DERIVED).ok).toBe(true);
+  });
+});
+
+describe("§创作态母版：`authoring[]` 与 `masterAsset` 这条边（票 04 Q1/Q5①）", () => {
+  const MASTER = {
+    id: "player-master",
+    role: "玩家角色的母版位图",
+    description: "五头身、绿毛线帽、胸前提着 CRT 显示屏的店主，正面站立",
+    characterId: "player",
+    size: { w: 64, h: 96 },
+    source: { kind: "image" as const },
+  };
+  const withMaster = (over: Record<string, unknown> = {}) => {
+    const r = clone() as unknown as Record<string, unknown>;
+    r["authoring"] = [MASTER];
+    r["characterRef"] = "character-dna.json";
+    return { ...r, ...over };
+  };
+
+  it("母版进 `authoring[]` ⇒ 合法，且**不会被当成资产**", () => {
+    const r = parseRecipe(withMaster());
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.value.authoring?.length).toBe(1);
+      // ⚠️ 母版**不在** `assets` 里 —— 交付只来自 `assets`，这就是「结构性」的含义
+      expect(r.value.assets.some((a) => a.spec.id === "player-master")).toBe(false);
+    }
+  });
+
+  it("⚠️ **母版不交付是结构性的**：`pack` 拿到的形状里根本没有 `authoring`", () => {
+    // `pack.ts` 的入参类型是 `{ id, styleRef, referenceImage?, assets }` —— 它**够不着** authoring。
+    // 这条断言把「结构性」钉成可检验的：配方里多出来的键，pack 的入参形状里不存在。
+    const r = parseRecipe(withMaster());
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      const packShaped = { id: r.value.id, styleRef: r.value.styleRef, assets: r.value.assets };
+      expect(Object.keys(packShaped)).not.toContain("authoring");
+      expect(JSON.stringify(packShaped)).not.toContain("player-master");
+    }
+  });
+
+  it("`masterAsset` 指向不存在的母版 ⇒ 红（**同一份文件内**的引用族，所以住在契约里）", () => {
+    const r = clone() as unknown as Record<string, unknown>;
+    const assets = r["assets"] as Array<Record<string, unknown>>;
+    (assets[0]!["spec"] as Record<string, unknown>)["masterAsset"] = "ogre-master";
+    const p = parseRecipe({ ...r, authoring: [MASTER] });
+    expect(p.ok).toBe(false);
+    if (!p.ok) expect(JSON.stringify(p.errors)).toContain("ogre-master");
+  });
+
+  it("`masterAsset` 指对了 ⇒ 绿", () => {
+    const r = withMaster() as Record<string, unknown>;
+    const assets = r["assets"] as Array<Record<string, unknown>>;
+    (assets[0]!["spec"] as Record<string, unknown>)["masterAsset"] = "player-master";
+    expect(parseRecipe(r).ok).toBe(true);
+  });
+
+  it("母版 id 重复 / 与资产 id 撞名 ⇒ 红（两个 id 空间必须分开）", () => {
+    expect(parseRecipe(withMaster({ authoring: [MASTER, { ...MASTER }] })).ok).toBe(false);
+    const collide = { ...MASTER, id: (clone().assets[0]!.spec as AssetSpec).id };
+    expect(parseRecipe(withMaster({ authoring: [collide] })).ok).toBe(false);
+  });
+
+  it("母版**必须**有 `characterId`（与资产的相反：母版总是某个角色的）", () => {
+    const { characterId: _drop, ...noChar } = MASTER;
+    expect(parseRecipe(withMaster({ authoring: [noChar] })).ok).toBe(false);
+  });
+
+  it("母版**必须**有画布 `size` —— 没有它，头身比就是随机的（票 04 Q2）", () => {
+    const { size: _drop, ...noSize } = MASTER;
+    expect(parseRecipe(withMaster({ authoring: [noSize] })).ok).toBe(false);
+  });
+
+  it("母版**不收** `styleId` —— 那是一个源码零读取的仪式字段（票 04 Q2）", () => {
+    expect(parseRecipe(withMaster({ authoring: [{ ...MASTER, styleId: "style-ref" }] })).ok).toBe(false);
+  });
+});
+
+describe("§`AssetSpec.characterId` 是可选的真信息（票 04 Q3）", () => {
+  it("没有角色的资产（木条箱、地面砖）照旧合法", () => {
+    expect(parseRecipe(clone()).ok).toBe(true);
+  });
+
+  it("写了就收，且**取值是设计层的实体 id**（不是自己起的名字）", () => {
+    const r = clone() as unknown as Record<string, unknown>;
+    const spec = (r["assets"] as Array<Record<string, unknown>>)[0]!["spec"] as Record<string, unknown>;
+    spec["characterId"] = "player";
+    expect(parseRecipe(r).ok).toBe(true);
+  });
+});

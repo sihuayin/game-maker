@@ -19,9 +19,27 @@ const COMMON = {
   styleId: z.string(),
   /** 逐资源声明的锚点（票 26：**不能**从 ink 包围盒自动推 —— 那会把 jump 帧的脚钉回地面）。 */
   anchor: Anchor,
-  /** 交付态的目标尺寸（像素）。 */
+  /** 交付态的目标尺寸（像素）。
+   *  ⚠️ 它是 **runtime/delivery size**（缩放目标），**不是画布**（票 04 Q2）。
+   *  画布那一份住在 `AuthoringAsset.size` —— 同名不同义，别混。
+   *  ⚠️ 头身比由**它**推：`headCount(size.h) = clamp(round(h/12), 2, 5)`（`prompt.ts:58-68`，
+   *  票 22 的实测：自由文本的比例指令模型不执行，画布尺寸才是真约束）。 */
   size: z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict(),
   required: z.boolean().default(true),
+
+  /** **这个资产是哪个角色的**（票 04 Q3）。⚠️ **可选** —— 木条箱、地面砖、拾取物不是角色。
+   *  ⚠️ 取值沿用 `GameDesignSpec` 那个实体的 `id`（不许自己起名：那是第四个事实源）。
+   *  ⚠️ 它必须命中 `run/v<N>/character-dna.json` 里的一条 —— **引用族判据**，
+   *  在 **pipeline（票 15）统一校验**，planner **不重复验**（票 04 Q3）。 */
+  characterId: z.string().min(1).optional(),
+
+  /** **这个资产从哪张母版派生**（票 04 Q5①）。指向 `AssetRecipe.authoring[].id`。
+   *  ⚠️ 这是 §6 `AssetDependency` 四条边里**唯一**现在落的一条 —— 另外三条
+   *  （`dependsOn` / `derivedFrom` / `referenceAssets`）与拓扑排序仍归**票 11**。
+   *  它落在这里的理由是**结构性的**：没有它，`authoring[]` 就是一张**没有任何东西指向它**的表，
+   *  而「零消费者的字段不进契约」正是票 04 一直在用的那把尺子。
+   *  ⚠️ 存在的校验在 `recipe.ts` 的 `superRefine` 里（**同一份文件内**的引用族）。 */
+  masterAsset: z.string().min(1).optional(),
 };
 
 /**

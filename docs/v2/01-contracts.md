@@ -330,7 +330,18 @@ interface AssetSource {
 
 # 6. Asset Dependency
 
-每个资产支持：
+⚠️ **[票 04](../../.scratch/game-maker-v2/issues/04-contract-character-dna.md) 的裁决（2026-10-02）**：这四个字段里**只有 `masterAsset` 落了**，
+落点在 **`AssetSpec.masterAsset`**（指向 `AssetRecipe.authoring[].id`，校验在配方的 `superRefine` 里）。
+**其余三个（`dependsOn` / `derivedFrom` / `referenceAssets`）与拓扑排序仍归[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md)。**
+
+⇒ 那条边先落的理由是**结构性的**：没有它，`authoring[]` 就是一张**没有任何东西指向它**的表，
+而「零消费者的字段不进契约」正是票 04 一直在用的那把尺子。
+
+⚠️ **「母版」这个词见 [`CONTEXT.md`](../../CONTEXT.md)**：它是**基因的一张渲染图**，
+`DNA → 母版 → 动画`；`Master → DNA` **禁止**（那会让权威倒挂）。
+母版**不进交付包**，且「不交付」是**结构性**的 —— 它与交付资产在两个不同的数组里。
+
+剩下的（票 11 接手）：每个资产支持
 
 ```ts
 interface AssetDependency {
@@ -364,29 +375,66 @@ player-master
 packages/contracts/src/character-dna.ts
 ```
 
+⚠️ **本节已按[票 04](../../.scratch/game-maker-v2/issues/04-contract-character-dna.md) 的裁决改过**（2026-10-02）。
+**R 表是决策记录，本文件是它的表达层**（R17）—— 冲突时改这里，改 R 表要重新开票。
+
+⚠️ **三层的关系是「世界 = 类 · DNA = 个体 · 资产 = 一次渲染」**：
+
+```text
+VisualWorldSpec.character  ← 「这个世界的角色都矮壮、方头、硬边」（管**所有**角色）
+CharacterDNA               ← 「Odin 本人戴绿毛线帽」（管**一个**角色）
+AssetSpec                  ← 「这个资产画什么」（待机三帧 / 行走六帧）
+```
+
+⇒ 硬约束：**`VWS.character` 的五个字段一个都不许机械复制进 DNA**。
+若两层的同一格可以是同一句话，它们就是**同一件事的粗细两版** —— 那正是票 09 删 `GameSpec` 的理由。
+⇒ 三层里**「这个角色是谁」只有 DNA 一个家**：`AssetSpec.role` / `description` 已降格为**资产级**。
+
+⚠️ **它的主消费者是修复**（R13 的资源级重生成），不是提示词。
+没有一份一字不变的角色描述，重画出来就**不是同一个角色** —— 修复会**静默地换掉主角**。
+⚠️ **跨资源一致性不是它的功劳** —— 那个由世界参考图内联进每一次生图调用承担（`pack.ts:328-329`）。
+
+文件形状（`run/v<N>/character-dna.json`，**单文件装全部角色**）：
+
 ```ts
+export interface CharacterDNAFile {
+  format: "character-dna/v1";       // 判别式。⚠️ 不是裸数组 —— 裸数组没地方放它
+  characters: CharacterDNA[];       // ⚠️ 每条记录**不带** format（一族一次就够）
+}
+
 export interface CharacterDNA {
-  id: string;
+  id: string;              // ⚠️ **沿用 GameDesignSpec 那个实体的 id**，不许自己起名
+  identity: string;        // 「这一个是谁」—— ⚠️ 唯一的具体角色身份来源
 
-  identity: string;
+  silhouette: string;      // 形态语言（**画法**，不是数值比例）
+  face: string;            // 无脸写 "none"
+  clothing: string;        // 一段散文。无服装写 "none"
+  gear: string[];          // 携带物/器械清单。无则 []
 
-  bodyProportions: string;
-
-  silhouette: string;
-
-  face: string;
-
-  clothing: string;
-
-  equipment: string[];
-
-  palette: string[];
-
-  accessories: string[];
-
-  visualConstraints: string[];
+  palette: PaletteRef[];   // ⚠️ `palette:<下标>`，**不是**自由 hex
+  visualConstraints: string[];  // ⚠️ **叠加**在世界约束之上，不是替代
 }
 ```
+
+⚠️ **全部必填，一个 `optional` 都没有**（票 04 Q2）—— 包括非人形角色。
+理由直接来自 R13：DNA 的全部意义是**重生成时一字不变**，
+而一个可选字段会让「**这个角色确实没有脸**」与「**模型忘了填**」在文件里**长得一模一样**。
+⇒ **「没有」也必须被说出来**：`face` / `clothing` 写 `"none"`，`gear` 写 `[]`。
+⚠️ 因此空串（`""`）也不算 —— 否则它会变成第二个隐形缺省。
+
+⚠️ **被砍掉的**（连同理由）：
+
+| 字段 | 为什么砍 |
+|---|---|
+| `bodyProportions` | **可派生**（`headCount(size.h) = clamp(round(h/12),2,5)`，`prompt.ts:58-68`）。它不是「零消费者」，是**更糟的一种：一个会与事实分叉的副本**。票 22 实测：自由文本的比例指令模型**不执行**，真正的约束是画布尺寸 |
+| `equipment` + `accessories` | **合并成 `gear`** —— 两者之间是**假**边界：消费者都是 ①（同一段提示词），差别只在标签 |
+| `palette: string[]` | → **`PaletteRef[]`**。票 02 的裁决 25 判过一模一样的形状：否则这个世界就有了**第二套颜色来源**，而写成自由 hex 会**静默失效**（下游 `quantize.ts` 把它量化掉） |
+
+⚠️ **哪些实体配有 DNA**：`player` + `enemies[]` + `npcs[]`。
+`interactables[]` / `resources[]` **默认没有**（木条箱没有基因）。
+
+⚠️ **`silhouette` / `face` / `clothing` / `gear` 都是 ① 档**（只靠提示词具名插值活着）——
+票 10 / 票 13 写模板时它们必须**具名出现**，没露脸的当场出局。
 
 ---
 

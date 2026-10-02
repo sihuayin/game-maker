@@ -82,6 +82,9 @@ export * from "./visual-world.js";
 export * from "./vocabulary.js";
 export * from "./game-intent.js";
 export * from "./game-design.js";
+// ⚠️ 角色基因（票 04）—— 落 `run/v<N>/character-dna.json`，**不交付**。
+//   它的消费者是 R13 的资源级重生成：没有它，修复会**静默换掉角色**。
+export * from "./character-dna.js";
 
 // ── V2 的结构化调用底座：失败闭集 + 工具入参的取与验（票 27 / 28）──────────
 // ⚠️ **纯的**：没有 fetch。I/O 那一半各包自理 —— 结构上新包够不着彼此（R11）。

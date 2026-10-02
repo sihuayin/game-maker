@@ -459,21 +459,34 @@ Generation Strategy
 
 # 16. Character Master
 
-实现：
+⚠️ **本节的箭头已按[票 04](../../.scratch/game-maker-v2/issues/04-contract-character-dna.md) 反转**（2026-10-02）。
+原文写的是 `Character Master → Character DNA → Animations`，**那个顺序是错的** ——
+它要么读成数据依赖（则 DNA 得**反推**母版，而票 04 明令**禁止** `Master → DNA`），
+要么读成流水线顺序（则**画母版需要一段描述这个角色的提示词，而那正是 DNA 要产出的东西 —— 鸡生蛋**）。
+R17：R 表是决策记录，本文件是它的表达层，所以改这里。
+
+正确顺序：
 
 ```text
-packages/assets/src/character-gen.ts
-```
-
-角色生成必须：
-
-```text
-Character Master
-↓
 Character DNA
+↓
+Character Master
 ↓
 Animations
 ```
+
+**母版是基因的一张渲染图，基因才是权威。**
+
+实现拆成两处（R11：新包彼此不依赖、只依赖 `contracts`）：
+
+```text
+packages/game-design/character-dna.ts   ← VWS + GameDesignSpec 实体 → DNA（**理解层**的最后一步）
+packages/assets/src/character-gen.ts    ← DNA → 母版 → 动画          （**生成层**）
+```
+
+⚠️ **母版可以由人导入，也可以由管线生成**；`AuthoringAsset` 两种都收。
+⚠️ 母版的**画布** `size` 与交付资产的 `size` **不同义**（那边是缩放目标），
+且**母版的宽高比必须与引用它的资产一致** —— 否则同一个角色会有两套比例。
 
 而不是：
 

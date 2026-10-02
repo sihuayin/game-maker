@@ -1,9 +1,16 @@
-# 13. 母版 → DNA → 动画：`character-gen.ts` 与 `character-reference` 策略
+# 13. 母版 → 动画：`character-gen.ts` 与 `character-reference` 策略
+
+> ⚠️ **2026-10-02（[票 04](04-contract-character-dna.md) 已关）：标题与 §2 已按裁决重写。**
+> 原标题是「母版 → **DNA** → 动画」，而票 04 Q4 把顺序定死成 **DNA → 母版 → 动画**
+> （`Master → DNA` **禁止** —— 那是权威倒挂）。⇒ **DNA 的产出**已拆出去，
+> 成为[票 31 `character-dna-gen`](31-character-dna-gen.md)（住 `packages/game-design/`）。
+> **本票只负责：拿到 DNA 之后，怎么把它变成母版、再把母版变成动画。**
+> `docs/v2/03-claude-code.md §16` 的箭头已按 R17 反转。
 
 Type: grilling
 Status: open
 Owner: —
-Blocked by: 04, 11, 07
+Blocked by: 04, 07, 11, 31
 Map: ../map.md
 > `docs/v2/03-claude-code.md` §16。「而不是 idle / run / jump 分别重新设计角色。」
 
@@ -26,15 +33,28 @@ Map: ../map.md
 
 ### 2. 母版**本身**怎么造出来
 
-§16 的链是 `Character Master → Character DNA → Animations`。要答：**第一环谁产？**
-- **(a)** 一次 `image` 调用（用 `VisualWorldSpec` + `CharacterDNA` 当提示词）产出一张母版位图；
+⚠️ **§16 的链已按[票 04](04-contract-character-dna.md) 反转成 `DNA → 母版 → 动画`**
+（`Master → DNA` **禁止**：母版是基因的一张渲染图，基因才是权威）。
+⇒ **第一环（DNA）不归本票**，在[票 31](31-character-dna-gen.md)。本票从 DNA 出发。
+
+要答的是**第二环**：
+
+- **(a)** 一次 `image` 调用（提示词由 `CharacterDNA` + `VisualWorldSpec` 渲染）产出一张母版位图；
 - **(b)** 用 drawlist 画（可 diff、可静态校验，符合「创作态」那一侧的偏好）；
 - **(c)** 母版可有可无 —— 直接从 DNA + 世界语法生成每个动画。
+
+⚠️ **形状已经定了**（票 04）：母版是 `AssetRecipe.authoring[]` 里的一项
+（`{id, role, description, source, characterId, size}`），**不进交付包**（结构性保证），
+资产用 `AssetSpec.masterAsset` 指向它。本票要填的是**`source` 该用哪一种**。
 
 ⚠️ **(a) 有一个链条上的硬约束**：`CONTEXT.md:117-131` 那条「风格一致性可证明」成立于**创作态**
 （色板引用使「颜色 ∈ 色板」构造上恒真），再由创作态**决定性**地传导到交付态。
 **生图产出的母版不经过那层** —— 它的颜色靠 `Palette Binding` 的 `quantized` 或 `unquantized`
 诚实标注（票 36）。要答：母版和它的动画**各自**标成哪一值。
+
+⚠️ **母版的画布 `size`**（票 04 Q2 新加的那一格）：它决定母版自身的头身比
+（`headCount(size.h)`），而动画的头身比由**动画 spec 的** `size` 定。
+⇒ 判据：**母版的宽高比 ⊆ 引用它的资产的宽度比集合**。本票要给出**画布取多大**的规则。
 
 ### 3. `character-reference` 在别的上游上会**静默失效**
 

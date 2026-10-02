@@ -75,6 +75,15 @@ runtimeProfile, gameConfig, qa`。要答：
 > ⚠️ `intent.md` 存**原样字节**（裸文本则写一个 `.md`），**不做规范化** —— 否则复现的不是同一次输入。
 > ⚠️ 票 02 甩过来的「**包内要不要带一份 `VisualWorldSpec`**」**仍挂在本票** —— 票 03 没有回答它。
 
+> ⚠️ **2026-10-02（[票 04](04-contract-character-dna.md) 已关）：两条统一校验落在本票。**
+> ① **引用族**：`AssetSpec.characterId` 必须命中 `run/v<N>/character-dna.json` 里某条的 `id`。
+>    （配方内那条 `masterAsset → authoring[]` 已在契约的 `superRefine` 里，本票**不用**管它。）
+> ② **构造性**：母版的宽高比必须与**每一个**引用它的资产的 `size` 宽高比一致（票 04 Q2/Q4）
+>    —— 否则同一个角色会有两套头身比（票 22 撞过的那类坑）。
+> ⚠️ 两条都**只在 pipeline 做一次** —— planner 明确不重复验（票 04 Q3）。
+> 另：`run/v<N>/` 清单里的 **`character-dna.json`** 早已在票 03 的九项里；
+> 它的产出方是[票 31](31-character-dna-gen.md)（不是票 13 —— 那条链的箭头被反转过）。
+
 ## Answer
 
 （待解）

@@ -45,6 +45,15 @@ R10 定了「策略住清单里、LLM 出初稿、人可改」。这一票把它
 要答：`AssetGenerationStrategy` 是**新字段**还是给今天的 `kind` **改名**？
 ⚠️ 改名会让 8 份配方当场读不出来 ⇒ 这条**几乎只能是新字段**，但要说出来。
 
+> ⚠️ **2026-10-02（[票 04](04-contract-character-dna.md) 已关）：`AssetDependency` 四条边里，`masterAsset` 已经落了。**
+> 落在 **`AssetSpec.masterAsset`**（指向 `AssetRecipe.authoring[].id`），校验在配方的 `superRefine` 里
+> —— 因为那是**同一份文件内**的引用族，契约自己看得见。
+> ⇒ **本票接手剩下三条**：`dependsOn` / `derivedFrom` / `referenceAssets`，**以及拓扑排序**。
+> ⚠️ 还欠一个形状的认识：**`AuthoringAsset`**（`{id, role, description, source, characterId, size}`，
+> 在 `recipe.ts` 里，**不进交付包** —— 它以「独立数组」而非判别式实现，是**结构性**的）。
+> 依赖图若要从母版走到资产，另一头就是它的 `id`。
+> ⚠️ 母版的画布 `size` 与资产的缩放 `size` **同名不同义** —— 别在依赖图里把它们当成一件事。
+
 ## Answer
 
 （待解）

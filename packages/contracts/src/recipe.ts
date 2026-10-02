@@ -107,6 +107,37 @@ export const ImportSource = z.object({
 
 export const AssetSource = z.discriminatedUnion("kind", [DrawlistSource, ImageSource, ImportSource]);
 
+/** **创作态母版** —— 参与生成、**不进交付包**（票 04 Q1/Q2）。
+ *
+ *  ⚠️ **它为什么是独立数组而不是 `AssetSpec` 上的判别式**（票 04 Q1(a)）：
+ *    判别式要让**每一个**消费者（`pack` / `auditAssetSpec` / atlas / coverage / manifest）
+ *    **记得过滤** —— 漏一个就是**静默交付一个不该交付的东西**。
+ *    独立数组把它做成**结构性**的：`pack` 只迭代 `assets`，它**够不着** `authoring`。
+ *    （同一条理由见 R11 把「禁止跨层」做成依赖图上一个结构性事实。）
+ *
+ *  ⚠️ **不复用 `AssetSpec`**（票 04 Q2）：那边必填的 `anchor` / `styleId` 是**交付语义**
+ *    （落点、风格归属），母版不交付 ⇒ 键在、意不在。这里是**只留「生成它需要知道的」**。
+ *  ⚠️ 尤其**不再收 `styleId`** —— 它今天在 `packages/` 里**源码零读取**（只有定义、
+ *    让模型照抄的模板、和键清单三处），而风格已经由配方级的 `styleRef` 供给每一次生图。
+ *    一个只被写、不被读的字段，会让下一个读代码的人以为它是活的（`CONTEXT.md:64-69` 那个病）。
+ *
+ *  ⚠️ **`size` 在这里是「画布」，不是「缩放目标」**（票 04 Q2/Q4）—— 同名不同义，
+ *    有判例（票 03 的 Q2(a)：重名是故意的，层不同）。生成母版要有个画布高度，
+ *    否则它的头身比是**随机的**，而动画的头身比由动画 spec 的 `size` 定
+ *    ⇒ 同一个角色会有**两套比例**，那正是票 22 撞到的坑。
+ *    ⇒ 判据：**母版的宽高比必须与引用它的资产的 `size` 宽高比一致**（构建期报错）。 */
+export const AuthoringAsset = z.object({
+  id: z.string().min(1),
+  role: z.string(),
+  description: z.string(),
+  source: AssetSource,
+  /** ⚠️ **必填**（与 `AssetSpec.characterId` 相反）：母版**总是**某个角色的
+   *  —— 「母版是 DNA 的一张渲染图」（票 04 Q4）。 */
+  characterId: z.string().min(1),
+  /** **画布尺寸**（见上）。 */
+  size: z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict(),
+}).strict();
+
 /** 清单的一项 = **纯意图的规格** + **帧从哪来**。两层在文件里就是分开的。 */
 export const RecipeEntry = z.object({
   spec: AssetSpecSchema,
@@ -130,7 +161,16 @@ export const AssetRecipe = z.object({
    * 给了它但上游不支持时，管线**不报错**（那是能力差异，不是清单错误），只是不起作用。
    */
   referenceImage: InputPath.optional(),
+  /** 角色基因文件（`run/v<N>/character-dna.json`）的位置，**相对于配方文件**（见 `InputPath`）。
+   *  ⚠️ 与 `styleRef` **同形**：配方级一条路径 + 资产级一个 id（`AssetSpec.characterId`）。
+   *  ⚠️ 它与 `styleRef` 有一处**关键不同**：`styleId` 之所以是死的，是因为**一份配方只有一个风格**，
+   *  那个 id 不携带信息；而 `characterId` 在**多角色**时是**真信息**。
+   *  它今天安静（只有一个玩家角色），但它是信息，不是仪式 —— **别当 `styleId` 砍掉**。
+   *  ⚠️ 可选：一份全是道具的配方没有角色。 */
+  characterRef: InputPath.optional(),
   assets: z.array(RecipeEntry).min(1),
+  /** **创作态母版**（票 04）。⚠️ **不交付** —— `pack` 只迭代 `assets`（见 `AuthoringAsset` 的注释）。 */
+  authoring: z.array(AuthoringAsset).optional(),
 }).strict().superRefine((r, ctx) => {
   const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message, path });
 
@@ -139,6 +179,24 @@ export const AssetRecipe = z.object({
     if (ids.has(e.spec.id)) issue(["assets", i, "spec", "id"], `资源 id 重复："${e.spec.id}"`);
     ids.add(e.spec.id);
   }
+
+  // ── 创作态母版（票 04）──
+  // ⚠️ 三条都是**同一份文件内**的引用族判据，所以住在契约里。
+  //   （跨文件的 `characterId → character-dna.json` 归票 15 的 pipeline 统一校验 —— 这里看不见那个文件。）
+  const authoringIds = new Set<string>();
+  for (const [i, a] of (r.authoring ?? []).entries()) {
+    if (authoringIds.has(a.id)) issue(["authoring", i, "id"], `母版 id 重复："${a.id}"`);
+    if (ids.has(a.id)) issue(["authoring", i, "id"], `母版 id "${a.id}" 与某个资产 id 撞了 —— 两个 id 空间必须分开`);
+    authoringIds.add(a.id);
+  }
+  r.assets.forEach((e, i) => {
+    const m = e.spec.masterAsset;
+    if (m === undefined) return;
+    if (!authoringIds.has(m))
+      issue(["assets", i, "spec", "masterAsset"],
+        `资产 "${e.spec.id}" 指着母版 "${m}"，但 authoring[] 里没有它` +
+        (authoringIds.size === 0 ? "（这份配方压根没有 authoring[]）" : ""));
+  });
 
   r.assets.forEach((e, i) => {
     const { spec, source } = e;
@@ -175,6 +233,7 @@ export const AssetRecipe = z.object({
 
 export type AssetRecipe = z.infer<typeof AssetRecipe>;
 export type RecipeEntry = z.infer<typeof RecipeEntry>;
+export type AuthoringAsset = z.infer<typeof AuthoringAsset>;
 export type AssetSource = z.infer<typeof AssetSource>;
 export type ImportSource = z.infer<typeof ImportSource>;
 
