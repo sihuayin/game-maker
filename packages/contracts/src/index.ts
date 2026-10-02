@@ -71,6 +71,18 @@ export * from "./assetpack.js";
 // ── Zod 错误 → 人可读（**只此一份**，v3 与 v4 都吃；票 28 起住这儿）─────────
 export * from "./zod-issues.js";
 
+// ── V2 的**理解层**契约：从参考图到「这个世界长什么样」 ────────────────────
+// ⚠️ 本契约与它后面的 V2 诸契约**一律用 `zod/v4` 写**（票 28 定的边界）；
+//   旧契约（本文件上面那些）继续用 `zod`。两边**不许互相嵌套** —— 镜像的代价见该文件头。
+export * from "./visual-world.js";
+
+// ── V2 的理解层下半：用户要什么 → 设计上是什么（票 03）────────────────────
+// ⚠️ 机制/能力的**封闭词表**单独一层（`vocabulary.ts`）—— 三份契约引它，谁也不拥有它。
+//   票 05（`runtime-profile`）必须采纳同一份，不许再立第二张表。
+export * from "./vocabulary.js";
+export * from "./game-intent.js";
+export * from "./game-design.js";
+
 // ── V2 的结构化调用底座：失败闭集 + 工具入参的取与验（票 27 / 28）──────────
 // ⚠️ **纯的**：没有 fetch。I/O 那一半各包自理 —— 结构上新包够不着彼此（R11）。
 export * from "./structured-call.js";

@@ -52,6 +52,15 @@ R4：只实现 `platformer/v1`。这一票**要产出**那份 profile 的实际�
 `capabilities[]` 到底列哪些（`03 §20` 给了一张：movement · jump · collision · camera ·
 pickup · hazard · goal · parallax）。**逐条对着外壳的实际实现过**，列不出实现的不许写。
 
+> ⚠️ **2026-10-02（[票 03](03-contract-intent-and-design.md) 已关）：词表已经定了，别另立一份。**
+> `packages/contracts/src/vocabulary.ts` 的 `MECHANICS` / `CAPABILITIES` 就是本契约
+> `mechanics` / `capabilities` 的取值域（票 03 Q4(b)：三份契约的**公共依赖**，谁也不拥有它）。
+> ⚠️ **两张表的来源是 `game-config/v1` 的四条构造**（`EntityKind` / `Motion` / `PlayerMove` / `Objective`），
+> 不是许愿单 —— `RuntimeProfile` 是**外壳能力的事实投影**（R12）。
+> 漏了某一项就**改 `vocabulary.ts`**，不要在 `runtime-profile.ts` 里开第二张表。
+> 另：`GameDesignSpec.game.runtimeProfile` 现在是 **`{id, version}` 引用**（票 03 Q5）——
+> 本契约的 `id` / `version` 要与它对得上，否则票 14 的拒绝说不出是哪一代的能力。
+
 ## Answer
 
 （待解）

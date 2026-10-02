@@ -19,6 +19,21 @@ Effort: game-maker-v2
 >
 > ⚠️ **2026-10-01（晚）：票 27 与票 28 已接连关掉。** 票 27 按 R17 改写了 **R16**（七发探针量出 `tool_choice` 首发 80%），
 > 派生的票 28 当场施工完 —— 于是 **08/09/10 的阻塞从 `27` 换成了 `28`，而 `28` 也关了**：那三张票现在只等彼此的依赖。
+>
+> ⚠️ **2026-10-01（晚）：票 02 已关** —— 理解层的**第一份契约**落地（`packages/contracts/src/visual-world.ts`，25 条裁决）。
+> **前沿现在是 03 / 04 / 05 / 06 四张**（02 关掉后它们彼此不阻塞，按号取就是 03）。
+> ⚠️ 它派生了两张新票：**29**（`stylespec.json` 从没被 schema 验过）与 **30**（生图提示词漏了 `constraints`）——
+> 两张都**不被任何票阻塞**，可以随时起。
+> ⚠️ **包内要不要带一份 `VisualWorldSpec` 已甩给票 15**，别再往 `pack.ts` 里补。
+>
+> ⚠️ **2026-10-02：票 03 已关** —— 理解层**两份契约落地**（`game-intent.ts` / `game-design.ts`，
+> 18 条裁决），第三份（`GameCreationState`）**判死不建**（`run/v<N>/` 目录即容器）。
+> 顺带立了 **`vocabulary.ts`**：机制/能力的**封闭词表**，**三份契约的公共依赖** —— 票 05 必须采纳同一份。
+> ⚠️ **它一次解冻三张票**：`09`（意图分析）· `11`（配方扩展）当场不阻塞；
+> 而 **`08` 其实**早就**不阻塞了**（它的五个前置 02/07/24/25/28 全部 resolved）。
+> ⚠️ **本图此前漏报了 08**：写「前沿是 03/04/05/06 四张」时把 08 漏在外面（29/30 另起一段提到了）。
+> ⇒ **前沿以扫描为准，不以本节的叙述为准。**
+> ✅ **前沿现在是 04 / 05 / 06 / 08 / 09 / 11 / 29 / 30 八张**（按号取就是 04）。
 
 ## Destination
 
@@ -74,7 +89,7 @@ Style Image + Game Intent
 | **R12** | `RuntimeProfile` = **外壳能力的事实投影**（与 `shell.js` 同源同算），构建期拿它**拒绝**不支持的 `GameDesignSpec`（Q14a）—— `03 §11` 的「记录 `unsupportedRequirements`」**不采用** |
 | **R13** | 修复**由判据驱动**，第一阶段**只做资源级重生成**；全链重跑**不做**（Q15a） |
 | **R14** | `CharacterDNA` **落盘成契约**（进 `run/v<N>/`）；**`Material DNA` 等真有消费者再说**（Q16①） |
-| **R15** | 原图进 `VisualWorldSpec.references.styleImages`，**只存引用**（路径），二进制不进 JSON；那份 `provenance.json` **并进去**（Q16③） |
+| **R15** | 原图进 `VisualWorldSpec.references.styleImages`，**只存引用**（路径），二进制不进 JSON；那份 `provenance.json` **并进去**（Q16③）。⚠️ **2026-10-01（票 02）：字段名已摊平为 `VisualWorldSpec.styleReferences`**（`references` 那层及其余两项零消费者，出局）——**决策本身不变** |
 | **R16** | ⚠️ **2026-10-01 改写（票 27，R17：那就是那张重开票）**。V2 **新**调用（票 08/09/10 + QA 三张）走 **`tool_choice: {type:"tool", name}` 强制工具调用**，**入参必须过 Zod 才算成功** —— `stop_reason === "tool_use"` **不是**成功信号（票 27 第 1 发：工具被调、`input={}`、1135 token 打水漂）。原三件套里**只有「固定次数重采样」保留**，次数定 **3**（1 首 + 2 重）⚠️ **是地板不是调优结果**；「纯文本」被工具调用取代；**「剥围栏」作废**（工具路径 7 发里一次都没出现过围栏）。⚠️ **`strict: true` 与 `output_config.format` 都不可依赖** —— 代理**收下并静默忽略**不认识的参数（票 27 第 7 发实证：HTTP 200、回来一段散文）⇒ 形状**只由我们自己的 Zod 保证**。⚠️ **旧路径不动**（`assets` 的 drawlist / derive / compile-* 沿用纯文本 + 剥围栏 + 重采样），文件头标「旧协议」。**那张 prototype 票 = 票 25，已跑完**。|
 | **R17** | **元规则**（Q18）：**R 表是决策记录，`docs/v2` 是它的表达层。冲突时默认 doc 写错**；要改 R 表**必须重新开票**，不能由文档覆盖。⚠️ 否则 wayfinder 的意义消失 |
 | **R18** | **多参考图**（Q19）：**契约层进**（`styleReferences: {path, role}[]` ——「一图一角色」是合理方向），但**第一阶段 `maxItems === 1`**；N 图的权重融合与冲突解决**没有任何实测**，实现延后并开票（见票 26） |
@@ -128,6 +143,8 @@ Style Image + Game Intent
 
 <!-- 索引：一行一张已关的票，够判断相关性即可，细节 zoom 进票 -->
 
+- [`VisualWorldSpec` 落地](issues/02-contract-visual-world.md)：**两层叠在一份文档里，不是两个版本** —— 新视图（`styleIdentity` / `camera` / 六桶 / `styleReferences`…）给**代码**读、**是权威**；内嵌的完整 `style: StyleSpec` 子树给**提示词与旧链**读、**不是第二事实源**，两者不一致**不设判据**（同一次调用填出，措辞差异）。⚠️ **25 条裁决**，其中三处改写了 doc 的字面：`schemaVersion`→`format: z.literal`（自由字符串**判别式写不出来**）· `references.styleImages`→摊平的 `styleReferences`（另两项**零消费者**，出局）· 删 `confidence`（**长得像分数**，与 Destination 的「不带分数」正面冲突）与 `rendering`（消费者是「将来会有」）。⚠️ **R6 与 R7 的一次正面冲突当场判了**：**R7 的门只管新字段，不管原样搬运的旧子树** —— `StyleSpec` 里 6 个字段**全仓库零读取**（`camera` 还被 `prompt.ts:217` 写下「故意不读」），但它们在**旧链里也是零读取**，砍掉会当场破坏 §5 兼容。⚠️ **落地时量到五条事实**：① `StyleSpecSchema` **从没解析过任何真实文件**（`ops.ts` 两处裸 cast，`parseWith` **零调用者**）⇒ 派生[票 29](issues/29-stylespec-parse-gate.md)；② `composition.layout` 与 `lighting.ambience` 在 VWS 里**没有家** ⇒ 这条**判了代码投影的死刑**，内嵌只能由模型一次吐全；③ `prompt.ts:217` 的注释与它旁边的代码**从第一天就不一致** —— `constraints` 在生图路上**被静默丢掉** ⇒ 派生[票 30](issues/30-constraints-not-in-image-prompt.md)；④ `zod/v4` 与 v3 **不许嵌套**（`toolInputSchema` 会抛）⇒ 四处 **v4 镜像** + 一条**漂移测试**（比对用**行为**，封口性写成**明示例外**）；⑤ 六桶装 `PaletteRef` 让「同源的两个视图」成为**结构事实**。判据：**587/587** · `tsc -b` 干净 · **包内要不要带 VWS 已甩给[票 15](issues/15-pipeline-create-game.md)**。
+
 - [V2 结构化调用的底座](issues/28-structured-call-substrate.md)：`contracts` 里落了 **`parseToolUse`**（**过 Zod 才是成功**；截断只解释失败、不许推翻成功）· **`toolInputSchema`**（只吃 `zod/v4` 的 schema）· **`forcedTool`**；账加了 **`failures: CallFailure[]`**（7 个值的闭集）。⚠️ **两处当场更正**：**`compileGame` 不交账的根因是 `LedgerStep` 里没有 `compile-game` 这个值**；票面那条「`zod/v4` 子路径就能转」**对 v3 的 schema 不成立** ⇒ **V2 新契约一律用 `zod/v4` 写**（零新依赖，已播给票 02–06）。⚠️ 第一版把 `LedgerCall` 从「一次调用」改成了「一次往返」，与 `CONTEXT.md` 的术语表冲突（`attempts > calls` 探测器失效），被 review 判硬违规后改回：**一格 = 一次调用**，`attempts` 累加 + `failures` 留原因。
 
 - [严格 JSON 改用 `tool_choice` 吗 —— R16 要不要改](issues/27-json-via-tool-choice.md)：**改**。七发探针量出 **首发 80%（4/5）**，且失败长什么样：**`stop_reason=tool_use` + `input={}`** —— 代理**静默丢入参**，不是模型不听话，也不是坏 JSON ⇒ **`tool_use` 不是成功信号，入参必须过 Zod**。代理还会**收下并静默忽略**不认识的参数（`output_config.format` 换回一段散文）⇒ **`strict` / 结构化输出都不可依赖，「HTTP 200」什么都不证明**。⇒ **R16 改写**：V2 新调用走强制 `tool_choice` + Zod 判据 + **3 次重采样**（地板值），**「剥围栏」作废**（7 发里一次都没用上）；**旧路径不动**，文件头标「旧协议」（Q2）。**底座**（`contracts` 的 schema/解析器 + 账的 `failure` 闭集）派生[票 28](issues/28-structured-call-substrate.md)，08/09/10 已改挂它。
@@ -136,6 +153,8 @@ Style Image + Game Intent
 - [补写 `docs/v2/00-overview.md` 与 `docs/v2/02-implementation-plan.md`](issues/01-write-v2-docs.md)：文档**由人补写完成**，但它们**不是从 R 表推出来的** —— 对账出 **5 处与 R 正面冲突 · 2 处 doc 先站了队 · 3 条本图完全没有 · 4 条笔误级**。**Q18 裁定：R 表赢，docs 改**（`00`/`02` 改 13 处，`03` 加头部指引）。⚠️ 顺带更正了 R11 的包数（**我算错了**：是 9 个不是 7 个）—— 而所有者答的「7 包结构」也对不上，**票 07 落地前必须先定**。
 - [这个仓库今天有哪些模型能看图？](issues/24-vision-model-availability.md)：**有 —— 就是既有的文本上游**（`/v1/messages` + base64 图块），而 `review.ts` 的 `reviewPack` **已经在这么发**（库里有、CLI/MCP 里零命中，得先给入口）。⚠️ 四个生图协议**没有一个是视觉**（票面那三条线索方向全反了）；⚠️ 最新实测停在 **2026-09-25**，今天是否还成立本地判不了 ⇒ 票 25 成为票 08 的硬前置。
 
+- [`GameIntentSpec` + `GameDesignSpec` 落地](issues/03-contract-intent-and-design.md)：**三层里两层落地、第三层判死**。`packages/contracts/src/game-intent.ts` + `game-design.ts`（v4），外加新立的 **`vocabulary.ts`**（机制/能力的封闭词表，**三份契约的公共依赖**，票 05 必须采纳同一份）。⚠️ **18 条裁决**，四条最要紧：① **门 = 具名消费者**（① 提示词按名插值 ② 判据 ③ 映射进下游契约；`JSON.stringify(spec)` 整份兜底**不算读**）；② 两层 **13 处重名是故意的** —— 它是 Intent QA 集合差**存在的前提**，且**意图层的自由文本不许因此被砍**；③ 设计层**加** `mechanics[]`（封闭枚举，一次拿到「覆盖度」与「R12 拒绝」**两个**判据）；④ **不加 `fromIntent` 回指**，靠 **id 延续**（回指是只能被复述、不能被校验的字段）。⚠️ **当场量到的四条事实**：① **`game-config/v1` 的真本事比票面假设的小得多** —— `EntityKind = solid|pickup|hazard|goal|decor`、`Motion{cycle}`、`PlayerMove{speed,jumpVelocity,gravity}`（**单跳**）、`Objective{collect-then-reach}` ⇒ **`double-jump`/`attack`/`health`/`enemy-ai` 外壳全做不了**，而它们正是用户最常要的 —— **R12 的拒绝第一次有真事可拒，且在生图之前、且免费**（封闭枚举填不出来，不用另写判据）；② **`GameIntentSpec` 是契约不由本票裁量**（§14 的 QA 输入明写它，而 `qa` 只依赖 `contracts` ⇒ 结构决定的，不是选择）；③ **`confidence` 被否掉的唯一理由不是「像分数」，是「够不着人」**（R9 只有一个检查点且在**清单处**）—— 同一理由当场决定 `ambiguity` **只能**挂在那个检查点上，否则同样出局；④ **我自己第一轮漏了 §3 的六个字段**（只过了 §4）⇒ 「逐字段过门」本身需要一个判据，否则会静默地只过一半。⚠️ **砍掉的**：`confidence` · `interactions` · `interactionModel` · `assetRequirements` · `visualRequirements` · `schemaVersion`（→ `format: z.literal`）；`runtimeRequirements` **改成封闭能力集**。⚠️ **判据**：**40 条新测试 · 套件 627/627**（此前 587）· `tsc -b` 干净 · `check:deps` / `check:links` 绿；**三条变异验过会红**（拿掉封口 → 4 红 · 把 `double-jump` 塞进词表 → 3 红 · 把 `id` 改成可选 → 1 红）。⚠️ 第一次跑第三条变异时**变异脚本的 sed 没匹配上**（漏了 `z.array(` 外壳）而全绿 —— 那是**脚本**的假阴性，不是判据的。⚠️ **播下六张票**：`05` 采纳词表 · `09` **不许按外壳能力过滤 `mechanics`** · `10` ① 档欠条 + id 延续 + R12 在填 `mechanics` 那一刻撞上 · `15` `run/v<N>/` 九项清单 · **`16` `ambiguity` 的存亡押在它身上** · `19` 集合差的键已定 + 文本相等的噪声要它自己写下来。
+
 ## Not yet specified
 
 <!-- 通往终点的雾：在范围内，但还说不成一张票。前沿推过去时会毕业 -->
@@ -143,8 +162,6 @@ Style Image + Game Intent
 - **多关卡索引**：一次 `create` 出一个关卡；**多个关卡怎么索引**（票 09 的老账）—— 本图不碰，等真有第二关。
 - **第二个 `RuntimeProfile` 成员的真形状**：R4 只定了「抽象成族」，没定**怎么加一个成员**。
   塔防是现成的候选，但加它的代价等第一个成员落地才量得出来。
-- **`GameIntentSpec` 里那些自由文本字段的消费者到底是谁**：R7 的门要在票 03 上**逐字段过一遍**，
-  **过不了就砍** —— 这一条现在说不成票，因为它取决于那份契约写出来长什么样。
 - **无参考图时视觉观察怎么报**：`review.ts` 今天喂的是 contact sheet（见上），
   原图进来之后两边怎么比、比不过时说什么，都还没量。
 - **生图并发与 `run/v<N>/` 的关系**：并发上限（`pack --concurrency`）与「失败时半成品怎么落」

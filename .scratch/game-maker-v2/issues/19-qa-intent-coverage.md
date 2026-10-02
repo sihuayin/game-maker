@@ -46,6 +46,17 @@ R3 之后 `score` **没有位置**。要答：`coverage` 那个 `Record<string, 
 要能给出一条**先红后绿**的用例：一份故意漏掉某个实体的 `GameDesignSpec` ⇒ 覆盖度**红**，
 且 `missingRequirements` 里**正好**是那一个。变异检验：把集合差换成「非空即通过」⇒ 用例必须红。
 
+> ⚠️ **2026-10-02（[票 03](03-contract-intent-and-design.md) 已关）：集合差的形状定了 —— 本票 §1 那个三选一已经有答案。**
+> 票 03 Q2(b)/Q3(a) 判：**不加 `fromIntent` 回指**（那是一个只能被复述、不能被校验的字段），
+> 靠 **id 延续** —— 设计层四个桶的 `id` 沿用意图层 `entities[].id`；`mechanics` 两侧都带 `id`。
+> ⇒ **可减的集合**：`entities` 与 `mechanics` 按 **id**；
+>   `coreLoop` / `winConditions` / `loseConditions` / `resources` / `progression` 按**文本相等**。
+> ⚠️ **文本相等是脆的**（设计层把「收集三枚硬币」改写成「搜集三枚硬币」就误报）。
+>   票 03 **明确拒绝**用 id 去掩盖它（给描述性字段发 id＝发一个只会被复述的字段），
+>   而是要求**本票把这条当作判据的已知噪声写下来**。⇒ 这一条是本票 §2 的必答项。
+> ⇒ 现成的负例（一份漏掉 `m-double-jump` 的设计）在
+>   `packages/contracts/tests/game-design.test.ts` 最后一节。
+
 ## Answer
 
 （待解）

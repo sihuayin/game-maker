@@ -114,8 +114,7 @@ VisualWorldSpec
 Prompt 必须要求模型分析：
 
 ```text
-style
-rendering
+styleIdentity
 camera
 composition
 palette
@@ -123,9 +122,14 @@ lighting
 materials
 character
 environment
-animation
-readability
+shapeLanguage
+constraints
+styleReferences
 ```
+
+⚠️ **2026-10-01（票 02）：这张清单已与契约对齐。** 旧稿列的 `rendering` / `animation` / `readability`
+已删掉 —— 它们**零消费者**，按 R7 的门不进契约（理由逐条见票 02 的 Answer）。
+而 `style`（内嵌的那份完整 `StyleSpec` 形）**同样要模型填**，它与上面这些**在同一次调用里产出**。
 
 禁止：
 
@@ -140,7 +144,7 @@ readability
 原始图片路径必须保存在：
 
 ```text
-VisualWorldSpec.references.styleImages
+VisualWorldSpec.styleReferences
 ```
 
 后续 Image Generation 必须重新读取这些图片。

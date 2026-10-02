@@ -8,6 +8,13 @@ Map: ../map.md
 > ⚠️ **包骨架已在[票 07](07-deps-allowlist.md) 里建好并接线**（`check-deps.mjs` 的 `ALLOWED` + 根 `tsconfig.json` 的 `references`）——
 > 这一票**只写代码**，不要再建包、也不要再动那两处接线。
 > `docs/v2/03-claude-code.md` §25 + 依据 **R8**（Q9a）。
+>
+> ⚠️ **2026-10-01（[票 02](02-contract-visual-world.md)，R2-Q5）—— 包内要不要带一份 `VisualWorldSpec`，
+> 归本票，别在 `pack.ts` 里补。** 票 02 只钉了 `run/v<N>/visual-world.json`（doc `02 §Phase19` 已写）；
+> 而包（`pack/v<N>/`）今天只带 `authoring/stylespec.json`（`pack.ts:566`），doc 从头到尾**没说**包内要不要放 VWS。
+> ⇒ 这是「链怎么落盘」的问题，不是「契约长什么样」的问题。⚠️ 包是**自描述、可复跑**的那份 ——
+> 只带 stylespec 的包，重建时**拿不回类型化视图**（`VWS.camera.mode` 这类封闭枚举），
+> 而 `pack.ts:580` 的 `provenance.style` 槽位也只指向 stylespec。这个权衡要在本票里表态。
 
 ## Question
 
@@ -57,6 +64,16 @@ runtimeProfile, gameConfig, qa`。要答：
 - ⚠️ **它返回的是内存对象还是路径？** `CLI 只解析参数、渲染结果`（`README_zh.md`），
   而 §28 要一堆 JSON 文件 —— 两者不冲突，但**谁负责写**要说清（pipeline 写，CLI 只报路径）。
 - 进度与取消：今天 `pack` 有 `--concurrency`、MCP 有 `notifications/progress`。
+
+> ⚠️ **2026-10-02（[票 03](03-contract-intent-and-design.md) 已关）：`run/v<N>/` 的**目录清单**定了** ——
+> 它就是那个被砍掉的 `GameCreationState`（本票 Q3 判**不建**那个契约，目录即容器）。
+> 九项见 `docs/v2/01-contracts.md §13`：`intent.md` · `visual-world.json` · `game-intent.json` ·
+> `game-design.json` · `character-dna.json` · `asset-recipe.json` · `game-config.json` ·
+> `qa-report.json` · `ledger.json`。
+> ⚠️ 除 `asset-recipe.json`（R9 检查点 + R10 策略都落在那里）外**一律机器产出、不许手改** ——
+> 否则「禁止覆盖」的 `v<N>` 会被手工编辑悄悄毁掉。
+> ⚠️ `intent.md` 存**原样字节**（裸文本则写一个 `.md`），**不做规范化** —— 否则复现的不是同一次输入。
+> ⚠️ 票 02 甩过来的「**包内要不要带一份 `VisualWorldSpec`**」**仍挂在本票** —— 票 03 没有回答它。
 
 ## Answer
 

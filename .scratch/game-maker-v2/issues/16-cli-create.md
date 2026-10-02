@@ -45,6 +45,13 @@ R9 + Q10b：在清单处停一次，`--yes` 跳过。要答：
 - `--help` 里能看到它，且 `docs`（`README.md` / `README_zh.md`）同步更新 ——
   ⚠️ `pnpm check:links` 会查相对链接（`scripts/check-links.mjs`）。
 
+> ⚠️ **2026-10-02（[票 03](03-contract-intent-and-design.md) 已关）：`ambiguity` 这个字段的**存亡押在本票上**。**
+> 票 03 Q2 判：`GameIntentSpec.ambiguity` 的**唯一消费者是 R9 的清单检查点**
+> （不是终点那份 QA 报告 —— 一份「你没说清」的报告在生图之后递给人，没有任何一刻能改变结局）。
+> ⇒ 它必须 ① 在检查点的**展示清单**里具名出现 ② `--yes` 跳过时**进日志**。
+> ⚠️ **这两条若不成立，那个字段当场出局** —— 回去把它从 `game-intent.ts` 删掉，
+> 别养成「将来可能会用」的空壳。这是票 03 写进契约文件里的原话，本票是兑现处。
+
 ## Answer
 
 （待解）

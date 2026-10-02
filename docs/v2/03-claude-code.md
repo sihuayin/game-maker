@@ -246,7 +246,7 @@ StyleSpec
 必须：
 
 ```text
-VisualWorldSpec.references.styleImages
+VisualWorldSpec.styleReferences
 ```
 
 保存原始图片引用。

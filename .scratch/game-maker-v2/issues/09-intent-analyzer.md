@@ -55,6 +55,15 @@ V2 把这件事**劈成两半**：先「需求 → `GameIntentSpec`」，再「`
 ⚠️ **底座在[票 28](28-structured-call-substrate.md)**（`contracts` 里的 tool schema/解析器 +
 账的 `failure` 闭集）—— 本票**只写调用方**，别再实现一遍。
 
+> ⚠️ **2026-10-02（[票 03](03-contract-intent-and-design.md) 已关）：`GameIntentSpec` 的形状落定了**
+> （`packages/contracts/src/game-intent.ts`，含文件头的一张「① 档欠条」）。三条会影响本票：
+> ① **`mechanics[].name` 是自由文本，故意的** —— 用户要二段跳就**照实记**，哪怕外壳做不了。
+>    **别「顺手」按外壳能力过滤**：记下来，拒绝是 `compile-design`（票 10）的事。
+>    过滤掉的话，`03 §11` 要防的「偷偷丢掉」就发生了。
+> ② `entities[].type` 是**封闭枚举** `enemy | npc | interactable | resource`，与设计层四个桶一一对应。
+> ③ `title` **可空**（用户真可能不起名）—— 别为了填满而编一个。
+> ⚠️ 另：`run/v<N>/intent.md` 要存**原样字节**（票 03 Q5）；裸文本 vs 文件两种给法仍归本票 §3 答。
+
 ## Answer
 
 （待解）
