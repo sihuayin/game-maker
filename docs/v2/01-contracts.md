@@ -157,7 +157,7 @@ GameIntentSpec  =「用户说的」（可以缺、可以说错、可以说得不
 GameDesignSpec  =「我们做成的」（必须完整、必须可执行）
 ```
 
-重名**不是**冗余：Intent QA（§11）的覆盖度判据**正是拿两层的同名字段相减**。
+重名**不是**冗余：Intent QA（§10）的覆盖度判据**正是拿两层的同名字段相减**。
 若两层各存一份不相干的东西，**没有可以相减的两个集合**，R3 的判据当场蒸发、退回 LLM 打分。
 ⇒ 因此本层的自由文本**不许因为设计层也有就被砍**。
 
@@ -183,7 +183,7 @@ export interface GameIntentSpec {
   camera?: string;
   targetExperience: string;
 
-  coreLoop: string[];                 // ⚠️ 裸串：减集靠「沿用原文」，噪声见 §11
+  coreLoop: string[];                 // ⚠️ 裸串：减集靠「沿用原文」，噪声见 §10
 
   player: { role: string; goals: string[] };
 
@@ -526,70 +526,149 @@ packages/contracts/src/qa.ts
 ```
 
 ```ts
-export interface QAReport {
-  status: "pass" | "fail";
-
-  visual?: VisualQAResult;
-
-  gameplay?: GameplayQAResult;
-
-  intent?: IntentQAResult;
-
-  failures: QAFailure[];
-
-  repairAttempts: number;
+QAReport {
+  format: "qa-report/v1";     // 判别式
+  checked: QAJudgement[];     // 这一次**跑过**哪几条判据
+  failures: QAFailure[];      // 判据的全部结论。**空 = 通过**
+  observations: Observation[]; // 只报，不阻断、不打分
 }
 ```
 
----
+⚠️ **`status` 不是字段** —— 它是 `qaVerdict(report)` 派生的三值
+（`"pass"` / `"fail"` / `"incomplete"`）。
+理由：**可派生的副本不进契约**（[票 04] 砍 `bodyProportions`、[票 05] 砍 `cameraModel` 的同一条），
+而做成字段就是给「观察污染通过与否」留一个**能被写错的位置** ——
+R3 那条底线不该只靠一句注释守。
 
-# 10. Visual QA
+⚠️ **也没有 `repairAttempts`、没有 `createdAt`**：前者描述的是**循环**（修复会让 QA 跑 N+1 次，
+于是 N+1 份报告各自对同一个字段报不同的数），落点归[票 21]；后者由**目录**答了（`run/v<N>/`）。
 
-```ts
-interface VisualQAResult {
-  styleSimilarity: number;
-  paletteSimilarity: number;
-  silhouetteSimilarity: number;
-  compositionSimilarity: number;
-  characterConsistency: number;
-  materialConsistency: number;
-  animationConsistency: number;
-}
-```
+⚠️ **六条判据的名字只住一处**（`QA_JUDGEMENTS`），同时被 `checked` 与 `QAFailure.judgement` 取用 ——
+于是「码的条数 = 判据的条数」**在类型上只有一份**，没有东西可以漂移。取值见 §10。
 
----
-
-# 11. Intent QA
-
-```ts
-interface IntentQAResult {
-  coverage: Record<string, boolean>;
-
-  score: number;
-
-  missingRequirements: string[];
-}
-```
+⚠️ **两个观察来源，每个恰好一条**（`"inspect"` / `"review"`）：一个**忘了写进去**的条目，
+与一个「比过了、没差异」的条目，否则在文件里长得一样。见 §11。
 
 ---
 
-# 12. QA Failure
+# 10. 判据 —— 六条，判据阻断、观察只报（R3）
+
+R3 只收三类：**集合差 · 构造性约束 · 引用族**。门槛是 `CONTEXT.md` 那句
+「**精确可算 + 错了一定不是设计**」—— 说不出后半句的，就是观察。
+
+| `QAJudgement` | 判据 | 今天住在哪 |
+|---|---|---|
+| `palette-binding` | 色板绑定四值自洽（`exact`/`composited`/`quantized`/`unbound`） | `assetpack.ts` · `quantize.ts`（[票 36]） |
+| `constructive-constraint` | `size` 与帧 bounds 一致 · `anchor` ∈ [0,1] · 九宫格只在面板上读 | `pack.ts` · 校验处 |
+| `layer-coverage` | 不平铺的层 ≥ 视口；**最远那层必须 100%** | 装配期（`pack.ts` 已硬失败） |
+| `reference-resolution` | `hud.panel` 必须是 `ui` · 砖的尺寸 == `arena.cell` · 引用解得到（含 `characterId`） | `game-config.ts` · `td-config.ts` |
+| `reachability` | 冒烟：`boot → spawn → goal` 可达 | ⚠️ **怎么跑还没定**（[票 18] §2） |
+| `intent-coverage` | 集合差：意图里每个实体/机制在设计里**有对应项** | `game-intent.ts` × `game-design.ts`（见 §11） |
+
+⚠️ **尺寸那条判据是劈开的**：**config 侧**的关系（砖 == `arena.cell`）归 `reference-resolution`；
+**asset 侧**自身（声明的 `size` 与帧 bounds）归 `constructive-constraint`。
+归错侧，[票 21] 的「判据 → 阶段」映射会指向**错的资源**。
+
+⚠️ **`intent-coverage` 集合差怎么算**：`entities` 与 `mechanics` 按 **id**
+（设计层沿用意图层的 id，**不加 `fromIntent` 回指** —— 那是一个只能被复述、不能被校验的字段）；
+`coreLoop` / `winConditions` / `loseConditions` / `resources` / `progression` 按**文本相等**。
+⚠️ **文本相等是脆的**（设计层把「收集三枚硬币」改写成「搜集三枚硬币」就误报）——
+票 03 **明确拒绝**用 id 去掩盖它（给描述性字段发 id ＝ 发一个只会被复述的字段），
+**要求把这条当作判据的已知噪声写下**。这是上面那个「重名不是冗余」的另一面。
+
+⚠️ **原来的十二个 `QAFailureCode` 出局了六个**（见 §12 的表）——
+`Camera` / `Silhouette` / `Material` / `Animation` / `Scale` 那五个**今天没有判据撑着**，
+留着它们就是留一个「谁来触发」都答不出的枚举值。
+
+## 一次判据跑出来的结果，**只有二态**
 
 ```ts
-type QAFailureCode =
-  | "STYLE_MISMATCH"
-  | "COLOR_MISMATCH"
-  | "CAMERA_MISMATCH"
-  | "SILHOUETTE_MISMATCH"
-  | "CHARACTER_DRIFT"
-  | "MATERIAL_MISMATCH"
-  | "SCALE_MISMATCH"
-  | "TRANSPARENCY_ERROR"
-  | "ANIMATION_ERROR"
-  | "GAMEPLAY_READABILITY_ERROR"
-  | "GAMEPLAY_RUNTIME_ERROR"
-  | "INTENT_MISSING";
+JudgementResult = { ran: true;  findings: QAFinding[] }   // findings 空 = 成功
+                | { ran: false; reason: string }          // 没跑
 ```
+
+⚠️ **「成功 / 失败」是读出来的，不是写出来的**（它是 `findings` 空不空）——
+⇒ 不许在 `ran: true` 那一支里再放一个 `ok: boolean`（**可派生的副本**），
+⇒ 不许把联合做成三个变体。
+⚠️ `ran: false` 的 `reason` **不落盘**：落盘的形式是「不在 `checked` 里」，
+而**为什么**不在今天是**静态**的 —— 链要么走到 QA、要么在到达之前就死了。
+
+## 自白：今天恒真的三件事
+
+1. **六条判据 6/6 全跑** ⇒ `"incomplete"` **今天走不到**。真口子在 [票 18] §2。
+2. **`severity: "warning"` 今天一条都不报** —— 类型允许，报不报是[票 20] §3 的事。
+3. **`checked` 今天恒等于全集，是链的性质、不是类型的要求。**
+
+---
+
+# 11. 观察 —— 只报，不阻断、不打分
+
+```ts
+Observation = { source: "inspect" | "review"; outcome: "ok";          lines: string[] }
+            | { source: "inspect" | "review"; outcome: "unavailable"; reason: string }
+```
+
+⚠️ **只搬人家渲染好的那批话**（`inspect` 的 `summary` / `reviewPack` 的 `observations`），
+**原样搬**：`qa.ts` 不 import 它们中的任何一个、不扫像素、**不重新调用视觉模型**
+（`reviewPack` 要花钱）。**重算 = 第二份真相**，而这两处的**措辞本身就是裁决过的东西**
+（`review.ts:6` 那句「只说差异、不说好坏……不要求打分」）。
+⚠️ 搬 `summary` **不搬 `CommandResult.data`** —— 后者有它自己定型过的形状，
+再嵌一次就是同一份数据定型第二次（`ledger.ts` 拒绝把账塞进 manifest，是同一条理由）。
+
+⚠️ **`outcome` 不许省**：`unavailable` 的意思是「这一条**没拿到**」。
+不表达的话，`reviewPack` 拿不到视觉上游时那一半会**静默地是空的**，而「空」读起来
+正像「比过了，没差异」—— 那是 `ledger.ts` 「缺席 == 一次都没失败」那条纪律的**反面**。
+⇒ 只有**两值**，不是三值：「没试」与「试了没成」的差别**钱已经答了**（账里那一笔）。
+
+⚠️ **`inspect` 里那三行层覆盖要改措辞**：它今天用 ✅/⚠️ 的**判据口吻**打印层覆盖，
+而它是**冲着包去的诊断命令**（不属于 `create`）。改成**只报数、不判**，
+并明说「判决在 QA 那边」。
+
+---
+
+# 12. 失败 —— `QAFinding` 与严重度
+
+```ts
+QAFinding = { target: string; detail: string; severity: "error" | "warning" }
+QAFailure = QAFinding & { judgement: QAJudgement }   // 落盘那一条
+```
+
+⚠️ **内层不带 `judgement`**（它住在哪条判据底下**由键说**）：让内层也带一个，
+就多一个**能被写错的位置**，而那要再写一条判据去拒它。落盘那层的 `judgement`
+是**投影加上去的**，不是手打的。
+
+⚠️ **`target` 复用账的词汇**（`LedgerCall.target`：资源 id / `<id>.<动画|层名>` /
+`recipe` / `game-config` / `td-config`）—— 于是「哪条判据在**谁**身上失败」与
+「哪次调用作用在**谁**身上」是**同一种说法**，[票 21] 的修复循环能拿它对上账。
+⚠️ **不是** `ConfigIssue.where` 那种人话（`entity "x"`）：那个**解析不了**。
+
+⚠️ **同一 `(judgement, target)` 不许重复** —— 重复条目会让同一个资源被派两次。
+
+⚠️ **`severity` 是「精确可算、但不构成判决」的那一档**（`auditGameConfig` 的先例：
+「**精确的硬失败、上界的报警告**」）。**只有 `error` 决定裁决** ——
+`warning` 不阻断，与观察一样不阻断。
+
+## 十二个旧码的去留
+
+| 旧码 | 判 | 现在叫什么 |
+|---|---|---|
+| `COLOR_MISMATCH` | 改名 | `palette-binding` |
+| `TRANSPARENCY_ERROR` | 改名 | `layer-coverage` |
+| `SCALE_MISMATCH` | 并入 | `constructive-constraint`（asset 侧）/ `reference-resolution`（config 侧） |
+| `GAMEPLAY_READABILITY_ERROR` | 改名 | `reference-resolution` |
+| `GAMEPLAY_RUNTIME_ERROR` | 改名 | `reachability` |
+| `INTENT_MISSING` | 留 | `intent-coverage` |
+| `CHARACTER_DRIFT` | 删 | 它真正那条（`characterId` 解得到）已在 `reference-resolution` 里 |
+| `ANIMATION_ERROR` | 删 | 「解得到」在引用族；「像不像」是观察 |
+| `STYLE_MISMATCH` · `SILHOUETTE_MISMATCH` · `MATERIAL_MISMATCH` | 删 | 与 R3 正面冲突；`Material DNA` 本就在 Out of scope |
+| `CAMERA_MISMATCH` | 删 | 「相机不被外壳支持」是真判据，但 R12 在**设计编译**那刻已经拒绝 —— 留码等于把一次拒绝**再说一遍** |
+
+[票 04]: ../../.scratch/game-maker-v2/issues/04-contract-character-dna.md
+[票 05]: ../../.scratch/game-maker-v2/issues/05-contract-runtime-profile.md
+[票 18]: ../../.scratch/game-maker-v2/issues/18-qa-gameplay-judgements.md
+[票 20]: ../../.scratch/game-maker-v2/issues/20-qa-report-assembly.md
+[票 21]: ../../.scratch/game-maker-v2/issues/21-repair-loop.md
+[票 36]: ../../.scratch/game-creation-v1/issues/36-opacity-and-palette-invariant.md
 
 ---
 

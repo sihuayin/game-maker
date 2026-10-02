@@ -115,3 +115,10 @@ export * from "./screen-space.js";
 export * from "./asset-spec.js";
 export * from "./audit.js";
 export * from "./recipe.js";
+
+// ── 三个 QA 跑完之后留下的那一份东西（票 06）──────────────────────────────
+// ⚠️ **判据阻断、观察只报**（R3）—— 落实它的办法不是注释，是**让「通过」那个位置
+//   根本不存在**：`status` 是 `failures` 的纯函数（`qaVerdict`），它**不是字段**。
+// ⚠️ 判据是**六条**，名字只住 `QA_JUDGEMENTS` 一处，同时被 `checked` 与
+//   `QAFailure.judgement` 取用 —— 于是「码的条数 = 判据的条数」在类型上只有一份。
+export * from "./qa.js";

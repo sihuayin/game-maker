@@ -8,6 +8,18 @@ Map: ../map.md
 > ⚠️ **包骨架已在[票 07](07-deps-allowlist.md) 里建好并接线**（`check-deps.mjs` 的 `ALLOWED` + 根 `tsconfig.json` 的 `references`）——
 > 这一票**只写代码**，不要再建包、也不要再动那两处接线。
 > 依据 **R3** + 票 06 定下的形状。这是三个 QA 的**汇合处**。
+>
+> ⚠️ **2026-10-02（[票 06](06-contract-qa.md) 已关）：§1 已经被答掉了，别再重新问。**
+> `packages/contracts/src/qa.ts` 已经落地（v4），`buildQAReport(results, observations)` 是**纯函数**：
+>   · **§1 的答案**：观察是**引用**，而且是**原样搬人家渲染好的那批话**
+>     （`inspect` 的 `summary` / `reviewPack` 的 `observations`）—— `qa.ts` **不 import 它们**、
+>     不扫像素、**不重新调用视觉模型**（`reviewPack` 要花钱）。⚠️ 搬 `summary` **不搬 `CommandResult.data`**
+>     （那是同一份数据定型第二次）。
+>   · **§2 的一半**：`QAFinding.target` 与账（`LedgerCall.target`）**同词汇** —— 票 21 要的归因已经就位。
+>   · **§3**：`severity: "warning"` 这一档**类型允许**，且**只有 `error` 决定裁决**。
+>     ⚠️ 但「**哪一条判据真去报警告**」仍然**完全是本票的事** —— 契约的自白里明写着「今天一条都不报」。
+>   · **§4（退出码）**仍是本票的。
+>   · ⚠️ 装配**不许**顺手去调 `reviewPack`：观察必须**上游算好传进来**。
 
 ## Question
 

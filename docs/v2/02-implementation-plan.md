@@ -566,19 +566,20 @@ packages/qa/visual.ts
 packages/qa/gameplay.ts
 ```
 
-检查：
+⚠️ **按 R3，这一族的判据只有两条**（`01 §10`）：
 
 ```text
-boot
-player spawn
-input
-movement
-collision
-interaction
-pickup
-win
-lose
+引用族          hud.panel 必须是 ui · 砖的尺寸 == arena.cell · 引用解得到
+冒烟可达        boot → spawn → goal
 ```
+
+⚠️ 上面原来那张十项单子（`input` / `movement` / `collision` / `interaction` / `pickup`
+/ `win` / `lose` …）**不采用**：它们要么落在引用族里，要么**要求跑游戏**——
+而「跑游戏」正是 `game-creation-v1` 推掉的那一簇（Playwright / 语义测试动作），
+R3 那一轮没有把它请回来。
+⚠️ **冒烟怎么跑还没定**（[票 18](../../.scratch/game-maker-v2/issues/18-qa-gameplay-judgements.md) §2）：
+塔防那边有一个「参考玩家」式的**纯层**，横版有没有**还没量** ——
+没有的话这一条就判不了，而 `QAReport.checked` **说得出**这件事。
 
 ---
 
@@ -595,14 +596,27 @@ packages/qa/intent.ts
 ```text
 GameIntentSpec
 GameDesignSpec
-Playable Game
 ```
 
-输出：
+输出：**不是一份 `IntentQAResult`，是那条判据的失败**
 
 ```text
-IntentQAResult
+IntentQAResult   ← ⚠️ 不采用：`score` 与「不带分数」正面冲突，`coverage` 那个
+                    Record<string, boolean> 的键也从没定过
 ```
+
+⚠️ 它今天**就是一条判据** —— **集合差**：`GameIntentSpec` 里每个实体/机制在
+`GameDesignSpec` 里有对应项（按 **id** 或**文本相等**），产出的是
+`QAFailure { judgement: "intent-coverage", target, detail, severity }`。
+⚠️ 「文本相等是脆的」那条**已知噪声**由
+[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md) 写下。
+
+---
+
+⚠️ **三个 QA 都汇到同一份东西上**（`01 §9`）：`run/v<N>/qa-report.json`，
+形状是 `{ format, checked, failures, observations }` —— **没有 `status`**（它是
+`qaVerdict()` 派生的三值），判据与观察在类型上分开住。
+汇合处是[票 20](../../.scratch/game-maker-v2/issues/20-qa-report-assembly.md)。
 
 ---
 

@@ -30,10 +30,13 @@ R3 给了 Intent QA 一个**可精确算**的形式：**集合差** ——
 
 ### 2. 缺项的落点
 
-`01-contracts.md` §11 给的是 `IntentQAResult { coverage: Record<string, boolean>;
-score: number; missingRequirements: string[] }`。
-R3 之后 `score` **没有位置**。要答：`coverage` 那个 `Record<string, boolean>` 的**键**是什么
-（意图里的哪一层：实体？机制？核心循环的每一步？）—— 键选错了，覆盖度就是**一个好看但没用的百分比**。
+> ⚠️ **2026-10-02（[票 06](06-contract-qa.md) 已关）：`IntentQAResult` 整个不采用。**
+> `01 §10` 现在的形状是**一条判据** `intent-coverage`，产出的是
+> `QAFinding { target, detail, severity }`（落盘时**投影**带上 `judgement`）。
+> ⇒ 这里要答的变成：**`target` 写什么**（`game-intent.json`？还是那一个实体/机制的 id？）
+> —— 它与账（`LedgerCall.target`）**同词汇**，因为票 21 拿它派活。
+> `coverage` 那个 `Record<string, boolean>`、`missingRequirements`、`score` **都不存在**了。
+> ⚠️ 另外：`warning` 这一档**类型允许**（`severity`），但**哪一条判据真去报**是[票 20](20-qa-report-assembly.md) 的事。
 
 ### 3. 它和 `ambiguity` 的关系
 
