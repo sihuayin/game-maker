@@ -32,7 +32,7 @@ out/<gameId>/
 │   ├── game-intent.json         ← 票 03
 │   ├── game-design.json         ← 票 03
 │   ├── character-dna.json       ← 票 04（可能多个角色 ⇒ 一个目录？）
-│   ├── runtime-profile.json     ← 票 05
+│   ├── runtime-profile.json     ← ⚠️ **票 05 判：不落盘**（见下方注）
 │   └── qa-report.json           ← 票 06
 ├── <清单落在哪？>                ← ⚠️ 今天 recipes/v<N>.json 是与 pack/ 平级的
 ├── pack/v<N>/                   ← 票 12 的产出
@@ -44,6 +44,12 @@ out/<gameId>/
   进 `run/v<N>/` 会**移动一个既有路径** —— 移还是不移？
 - **`gameId` 谁给**：今天 id 由**模型**给出（`README_zh.md`：「id 由模型给出，命令会把确切路径打出来」）。
   一次 `create` 里，id 在**哪一步**才知道？（视觉那一步没有 id。）
+
+> ⚠️ **2026-10-02（[票 05](05-contract-runtime-profile.md) 已关）：上面那张树里的 `runtime-profile.json` 划掉。**
+> Q5 判**不落盘**：`RuntimeProfile` 是**外壳的事实**，不是这一次运行的产物 ——
+> 写进 `run/` 会让它长得像运行的产物，而「禁止覆盖的 `v<N>`」对它的语义也不成立。
+> `01 §13` 那份**定稿的九项**里没有它（就是本草稿之后定的），**那是故意的**。
+> ⚠️ 但 `createGame` 的返回里**仍有** `runtimeProfile`（§4）—— 那是**内存对象**，路径与对象要分开说。
 
 ### 2. 检查点（R9）在 `createGame` 里怎么表达
 

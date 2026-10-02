@@ -6,12 +6,16 @@
 //     §R12 是**结构性**的 —— 设计层填不出一条外壳没有的机制。拒绝不需要谁记得去判：
 //       它填不出来。
 import { describe, expect, it } from "vitest";
-import { GAME_DESIGN_FORMAT, GameDesignSpecSchema, MECHANICS, toolInputSchema } from "../src/index.js";
+import { GAME_DESIGN_FORMAT, GameDesignSpecSchema, MECHANICS, PLATFORMER_V1, toolInputSchema } from "../src/index.js";
+
+/** ⚠️ **身份冻结**（票 05 Q8）：`{id, version}` 只从契约取，**不许在这里写死字面量** ——
+ *  写死两份之后，改一次身份要满仓库找 `"v1"` 那种拼法（它就在这里躺过）。 */
+const REF = { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version };
 
 /** 一份**像样**的设计。注意 `mechanics` 里**没有**意图层那条 `m-double-jump`。 */
 const DESIGN = {
   format: GAME_DESIGN_FORMAT,
-  game: { title: "拾荒者", genre: "platformer", camera: "side-scroll", runtimeProfile: { id: "platformer", version: "v1" } },
+  game: { title: "拾荒者", genre: "platformer", camera: "side-scroll", runtimeProfile: REF },
   coreLoop: ["探索废墟", "收集零件", "抵达终点"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["run", "jump"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿固定路线往复", threat: "接触即伤" }],
@@ -55,7 +59,7 @@ describe("§runtimeProfile 是引用不是裸串（票 03 Q5）", () => {
   it("`{id, version}` 两样都要 —— 单一个名字对不上版本，拒绝时说不出是哪一代的能力", () => {
     expect(parse({ game: { ...DESIGN.game, runtimeProfile: "platformer" } }).success).toBe(false);
     expect(parse({ game: { ...DESIGN.game, runtimeProfile: { id: "platformer" } } }).success).toBe(false);
-    expect(parse({ game: { ...DESIGN.game, runtimeProfile: { id: "platformer", version: "v1" } } }).success).toBe(true);
+    expect(parse({ game: { ...DESIGN.game, runtimeProfile: REF } }).success).toBe(true);
   });
 });
 

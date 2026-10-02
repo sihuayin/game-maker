@@ -41,8 +41,17 @@ HUD 活在**屏幕空间**（上限是**视口**不是 `world.size`）；纯文�
 
 ### 4. 第一阶段只出 `platformer/v1`
 
-R4。要答：`RuntimeProfile` 有**两个成员**（横版 + 塔防）而只有一个是新链的 —— 
+R4。要答：`RuntimeProfile` 有**两个成员**（横版 + 塔防）而只有一个是新链的 ——
 这个不对称在代码里怎么表达，才不会让下一个加玩法的人以为要改 `GameConfig` 的形状。
+
+> ✅ **2026-10-02（[票 05](05-contract-runtime-profile.md) 已关）：这一问已被答掉，不再是开放问题。**
+> ① profile 与 `format` **正交**（Q3(b)）—— `format` 说「这份数据怎么读」，profile 说「这一代外壳会做什么」，
+> 两者**不是**同一根轴上的两个名字，所以加一个 profile 成员**不必**动 `GameConfig` 的形状。
+> ② 族的容器已经在了：`RUNTIME_PROFILES` 注册表 + `resolveRuntimeProfile({id, version})`
+> （`packages/contracts/src/runtime-profile.ts`）。今天**一个成员**，塔防那一代**不进新链**（R4）。
+> ③ 你要做的是**解析引用**：`GameDesignSpec.game.runtimeProfile` 解析不动 ⇒ `undefined` ⇒
+> 那就是「说不出是哪一代的能力」的拒绝素材。
+> ⇒ 本节剩下的只有你自己那道题：**在哪一刻拒绝**（§2），以及两个入口怎么走同一处校验（§1）。
 
 ## Answer
 

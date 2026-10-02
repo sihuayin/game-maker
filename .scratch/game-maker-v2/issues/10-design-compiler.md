@@ -53,6 +53,12 @@ R12 明确**不采用**那条「运行时再说」的路。要答：`GameDesignS
 >    （`vocabulary.ts`）—— 想填 `double-jump` 会**填不出来**。那就是 R12 的拒绝，
 >    而且是**免费**的（不用另写判据），比票 14 早得多也便宜得多（生图的钱还没花）。
 
+> ⚠️ **2026-10-02（[票 05](05-contract-runtime-profile.md) 已关）：`game.camera` / `game.genre` 的取值从哪来。**
+> 票 05 砍掉了 `RuntimeProfile.cameraModel` / `.genre`（它们是**可派生的副本**），
+> 所以本票填这两个自由字符串时，**从 profile 的 `id` 与 `capabilities[]` 现取**
+> （`capabilities.filter(c => c.startsWith("camera:"))` 就是那个取值域）——
+> **别再往 profile 里补字段**，也别在提示词里让模型自由发挥这两个值。
+
 ## Answer
 
 （待解）

@@ -40,6 +40,7 @@
 //                            而两串自然语言求差集得到的**不是判据，是噪声**。
 import { z } from "zod/v4";
 import { CapabilitySchema, MechanicSchema } from "./vocabulary.js";
+import { RuntimeProfileRefSchema } from "./runtime-profile.js";
 
 /** 判别式。⚠️ 票 03 Q4 按票 02 的判例补：`01-contracts.md §4` 今天**连 `schemaVersion`
  *  都没有**，两份契约里只有它是**匿名**的 —— 落盘之后没有任何东西能证明某个 JSON 是哪一族。 */
@@ -65,8 +66,10 @@ export const GameDesignSpecSchema = z.strictObject({
     genre: z.string(),
     camera: z.string(),
     /** ⚠️ **改成一个引用，不是一个裸串**（票 03 Q5）：单一个名字对不上版本，
-     *  拒绝时说不出是哪一代的能力。`id` + `version` 一起才是 `RuntimeProfile` 的身份。 */
-    runtimeProfile: z.strictObject({ id: z.string().min(1), version: z.string().min(1) })
+     *  拒绝时说不出是哪一代的能力。`id` + `version` 一起才是 `RuntimeProfile` 的身份。
+     *  ⚠️ 形状引 `runtime-profile.ts` 的 `RuntimeProfileRefSchema`（票 05 Q8）——
+     *  「身份冻结」的意思就是**只此一处**定义它，不在这里再写一个内联的 strictObject。 */
+    runtimeProfile: RuntimeProfileRefSchema
   }),
 
   /** ② 判据：Intent QA 拿它与意图层的同名数组相减。 */

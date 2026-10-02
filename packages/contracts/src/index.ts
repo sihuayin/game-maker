@@ -81,6 +81,9 @@ export * from "./visual-world.js";
 //   票 05（`runtime-profile`）必须采纳同一份，不许再立第二张表。
 export * from "./vocabulary.js";
 export * from "./game-intent.js";
+// ⚠️ `RuntimeProfile`（票 05）—— **外壳能力的事实投影**（R12），被 `game-design` 引用。
+//   ⚠️ 它**不落盘**（不在 `01 §13` 的九项里），也**不被外壳 import** —— 它是**读侧**的契约。
+export * from "./runtime-profile.js";
 export * from "./game-design.js";
 // ⚠️ 角色基因（票 04）—— 落 `run/v<N>/character-dna.json`，**不交付**。
 //   它的消费者是 R13 的资源级重生成：没有它，修复会**静默换掉角色**。

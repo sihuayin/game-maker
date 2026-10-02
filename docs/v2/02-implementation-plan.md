@@ -65,8 +65,10 @@ visual-world/v1
 game-intent/v1
 game-design/v1
 character-dna/v1
-runtime-profile/v1
 qa/v1
+
+⚠️ `runtime-profile` **没有** `format` 判别式（票 05 Q8）：
+它**不落盘**，`id` + `version` 本身就是身份。
 ```
 
 ---
@@ -491,24 +493,16 @@ referenceAssets
 
 ⚠️ **不是 `packages/runtime/`**（该包**不存在**；实际是 `contracts` / `assets` / `demo` / `cli` / `mcp`）。
 
+✅ **2026-10-02 落地**（[票 05](../../.scratch/game-maker-v2/issues/05-contract-runtime-profile.md)）。
 ⚠️ 按 **R12**，`RuntimeProfile` 是**外壳能力的事实投影**（与 `shell.js` **同源同算**），
 **不是**一份可以独立声明的清单 —— 否则它与外壳构成**两份真相**。
 
-⇒ **落点由[票 05](../../.scratch/game-maker-v2/issues/05-contract-runtime-profile.md) 定**，
-候选三条：从 `contracts` 里既有的闭合枚举**派生** · 手写 + 一条对拍守卫 · 外壳构建时**导出**。
-
-它描述：
-
-```text
-movement
-jump
-collision
-camera
-pickup
-hazard
-goal
-parallax
-```
+⇒ 落地成 **`packages/contracts/src/runtime-profile.ts`**：**四个字段**
+（`id` · `version` · `mechanics[]` · `capabilities[]`），两条表引 `vocabulary.ts`。
+「事实性」由**见证判据**保证（`packages/demo/tests/shell-capability-witness.test.ts`
+逐条读外壳源码、断言那条行为串还在），**不由类型保证** —— 外壳**不 import** 它。
+它的形状、砍掉的六个字段、以及「两个数组今天恰好等于词表全集」的**自白**，
+全部见 [`01-contracts.md §8`](01-contracts.md)。
 
 ---
 
@@ -721,7 +715,7 @@ out/<gameId>/
 │   ├── game-intent.json
 │   ├── game-design.json
 │   ├── character-dna.json
-│   ├── runtime-profile.json
+│   │   （⚠️ **没有** runtime-profile.json —— 票 05 Q5：它不落盘）
 │   └── qa-report.json
 ├── recipes/v<N>.json           ← ⚠️ 清单的落点**沿用今天的路径**；要不要挪进 run/ 由票 15 定
 ├── pack/v<N>/                  ← 交付态目录，永不 zip；自己的计数器
@@ -806,6 +800,8 @@ verify
 ```text
 旧： game-config/v1 · td-config/v1        ← 原样保留，继续用
 新： GameDesignSpec → RuntimeProfile → game-config/v1   ← 新的产出口
+     ⚠️ `→ RuntimeProfile` 读作「**选择**」不读作「派生」—— profile 是外壳的事实（R12），
+       设计层只是 `{id, version}` 引用它。见 `01-contracts.md §8`。
 ```
 
 ⇒ R6 选的「**并存**」已经满足了本节真正要的那件事（**不破坏旧 contract**）。

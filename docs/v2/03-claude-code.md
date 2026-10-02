@@ -559,18 +559,19 @@ GameConfig
 platformer/v1
 ```
 
-能够支持：
+⚠️ **2026-10-02 更正（票 05）**：下面那张「能够支持」的八项单子**已出局** ——
+它既**不全**（漏了外壳真做的 `gravity` 与 `moving-platform`），又是**另一套措辞**
+（`movement`/`pickup`/`goal` 都不是词表里的名字），所以它是一份**独立声明**，
+与外壳构成两份真相（本文件头部已声明本文是**表达层**）。
+
+支持什么**以契约为准**：
 
 ```text
-movement
-jump
-collision
-camera
-pickup
-hazard
-goal
-parallax
+packages/contracts/src/vocabulary.ts   ← 名字的家（MECHANICS / CAPABILITIES）
+packages/contracts/src/runtime-profile.ts ← 「这一代实现了其中哪些」的断言语
 ```
+
+⚠️ `runtime-profile.ts` **不落盘**，也不被外壳 import —— 见 `01-contracts.md §8`。
 
 ---
 
@@ -799,7 +800,7 @@ out/<gameId>/
 ├── game-design.json
 ├── asset-recipe.json
 ├── asset-pack.json
-├── runtime-profile.json
+│   （⚠️ **没有** runtime-profile.json —— 票 05：它不落盘）
 ├── game-config.json
 ├── qa-report.json
 └── playable/

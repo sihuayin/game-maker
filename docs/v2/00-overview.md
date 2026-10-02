@@ -283,6 +283,12 @@ Regenerate
                  Regenerate
 ```
 
+> ⚠️ **图上那根 `Runtime Planner → RuntimeProfile` 的箭头，读作「选择 / 引用」，不读作「派生」**
+> （R12；澄清由[票 01](../../.scratch/game-maker-v2/issues/01-write-v2-docs.md) 的对账表第 7 条点名，
+> [票 05](../../.scratch/game-maker-v2/issues/05-contract-runtime-profile.md) 落地时补上）。
+> `RuntimeProfile` 是**外壳的事实**，不是设计的产物 —— 设计层存的是 `{id, version}` **引用**
+> （`GameDesignSpec.game.runtimeProfile`）。它**不落盘**（`01-contracts.md §13` 的九项里没有它）。
+
 ---
 
 # 4. 架构原则

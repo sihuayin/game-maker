@@ -446,48 +446,76 @@ export interface CharacterDNA {
 packages/contracts/src/runtime-profile.ts
 ```
 
+✅ **2026-10-02 落地**（[票 05](../../.scratch/game-maker-v2/issues/05-contract-runtime-profile.md)）—— 下面是**已实现**的形状，不是设想。
+
 ```ts
-export interface RuntimeProfile {
-  id: string;
-
-  version: string;
-
-  genre: string;
-
-  capabilities: string[];
-
-  inputModel: string;
-
-  cameraModel: string;
-
-  entityTypes: string[];
-
-  mechanics: string[];
-
-  winConditions: string[];
-
-  loseConditions: string[];
-}
+export const RuntimeProfileSchema = RuntimeProfileRefSchema.extend({
+  mechanics: z.array(MechanicSchema),       // ⟸ vocabulary.ts
+  capabilities: z.array(CapabilitySchema)   // ⟸ vocabulary.ts
+});
+// 身份 = id + version。`platformer/v1` 是**拼出来的**（`runtimeProfileRef`），不以字面量存在
+// —— 存两种拼法就是两个事实源。`v` 是**显示**前缀，`version` 里存的是裸号 `"1"`。
+export const RuntimeProfileRefSchema = z.strictObject({
+  id: z.string().min(1).regex(/^[^/]+$/),      // 不许含 `/`：`<id>/v<version>` 要能拼回去
+  version: z.string().min(1).regex(/^[^/]+$/)
+});
 ```
 
-第一阶段：
+**只有四个字段** —— R7 的门是「说不出**具名**消费者的不进契约」：
 
-```text
-platformer/v1
-```
+| 字段 | 谁读它 |
+|---|---|
+| `id` · `version` | `GameDesignSpec.game.runtimeProfile` 那条**引用**；Runtime Compiler 拿它给拒绝**署名** |
+| `mechanics[]` | Runtime Compiler 的差集 `mechanics[].mechanic − profile.mechanics` |
+| `capabilities[]` | Runtime Compiler 的差集 `runtimeRequirements − profile.capabilities` |
 
-⚠️ **本节的 `mechanics` / `capabilities` 必须采纳同一份词表**
-（[票 03](../../.scratch/game-maker-v2/issues/03-contract-intent-and-design.md) Q4(b)，2026-10-02）：
-`packages/contracts/src/vocabulary.ts` 的 `MECHANICS` / `CAPABILITIES`。
+**砍掉的六个，连同死因**（票 05 Q4 / Q7）：
+
+| 砍掉的 | 死因 |
+|---|---|
+| `inputModel` | 零消费者 |
+| `entityTypes[]` | 零消费者 —— `EntityKind` 是**渲染桶**、设计层四个桶是**角色**，两轴不同 |
+| `winConditions[]` · `loseConditions[]` | 设计层同名字段是**自由文本** —— 封闭表减自由文本**是噪声不是判据** |
+| `cameraModel` · `genre` | **可派生的副本**（不是零消费者，是更糟的一种）：取值域就是 `capabilities` 里的 `camera:*`，而 `genre` 的值就是 `id`。同票 04 砍 `bodyProportions` 的理由 |
+
+⇒ `compile-design` 要相机 / 题材的取值，**现从 `id` 与 `capabilities[]` 取**，不要为它另立字段。
+
+## 它凭什么叫「事实投影」
+
+⚠️ **「事实性」由测试保证，不由类型保证**（票 05 Q10 / Q12）。R12 的「同源同算」落地成三件事：
+
+- **同源** —— 两条表都从 `game-config/v1` 的四条构造出发（`EntityKind` · `Motion` · `PlayerMove` · `Objective`）。
+- **转录** —— 真正机器派生的**只有一条**：`EntityKind → MECHANICS`（`vocabulary.test.ts` 的 `ENTITY_KIND_FATE`）。
+  其余是**带行号的转录**（`vocabulary.ts` 的注释里写着它投影的是哪一行）。
+- **见证判据** —— `packages/demo/tests/shell-capability-witness.test.ts` 逐条读外壳源码、断言那条**行为串**还在。
+  ⚠️ 读的是**剥掉注释之后**的源码：第一版读原文，被一句行尾块注释当场骗过（变异实验）。
+
+⚠️ **外壳不 import 本契约** —— 它是**读侧**的。曾经想让「外壳 import 它 + 穷尽分派 ⇒ 漂移是编译错误」，
+量下来立不住：外壳对**实体种类**的穷尽性**已经**由 `scene.ts` 的 switch 对 `EntityKind` 自动取得，
+而 `capabilities` / `mechanics` 是**不可分派的字符串** —— import 进来也无处可 switch。
+
+## 两个数组**今天恰好等于词表全集**
+
+`platformer/v1` 的 `mechanics` ⟺ `MECHANICS`、`capabilities` ⟺ `CAPABILITIES`
+⇒ `game-design.ts` 那两条差集在**第一阶段恒为空**。
+
+⚠️ 这**不是**「一条写坏了的判据」，是**给第二个成员留的位**：今天真正在拒绝的是**封闭枚举本身**
+（想填 `double-jump` 就填不出来，票 10 §3③）—— 免费、且在生图之前。
+⚠️ **词表不是外壳的全集**（它是从 `game-config/v1` 反推的，所以是**横版**的）。分工是：
+**`vocabulary.ts` 是名字的家**（三份契约的公共依赖，谁也不拥有它），
+**`RuntimeProfile` 是「这一代外壳实现了其中哪些」的断言语** —— 第二个成员落地那天，这张断言才开始说话。
+
+⚠️ **本节的 `mechanics` / `capabilities` 必须采纳同一份词表**：`packages/contracts/src/vocabulary.ts`。
 **不许在本契约里再立第二张表** —— 否则就是 `derivePackMode` 那种「写入侧与校验侧各写一份必然漂移」。
 发现漏了某一项就**改那个文件**。
-
-⚠️ 两张表的**方向**也要说清：`RuntimeProfile` 是**外壳能力的事实投影**（R12），
-不是一张许愿单 —— 它该说的只有**外壳真能做的**（今天的来源是 `game-config/v1` 的四条构造：
-`EntityKind` · `Motion` · `PlayerMove` · `Objective`）。
 `double-jump` / `attack` / `health` / `enemy-ai` **不在表里**，而这正是 R12 的拒绝**能在生图之前发生**的原因。
 
----
+## 它**不落盘**
+
+`run/v<N>/` 的九项清单（§13）里**没有**它 —— 它是**外壳的事实**，不是这一次运行的产物。
+`createGame` 的返回里有 `runtimeProfile`（内存对象，见 §25），但**不写文件**；
+设计层存的是 `{id, version}` 那条**引用**，那正是引用该有的样子。
+
 
 # 9. QAReport
 
@@ -590,6 +618,11 @@ run/v<N>/ledger.json          ← 票 28 的 sidecar
 
 pack/v<N>/  ·  site/v<N>/     ← R8（禁止覆盖）
 ```
+
+⚠️ **`RuntimeProfile` 不在上面的清单里，是有意的**（票 05 Q5）：它是**外壳的事实**，
+不是这一次运行的产物 —— 写进 `run/` 会让它长得像运行的产物，而「禁止覆盖的 `v<N>`」
+对它的语义也不成立（外壳换个版本，历史 `run` 里那份不该跟着变）。
+⚠️ 票 15 的**草稿**目录树里曾列过 `runtime-profile.json` —— 那是本文定稿（九项）之前的写法。
 
 ⚠️ 除 `asset-recipe.json`（R9 的检查点、R10 的策略都落在那里）外，
 `run/v<N>/` 里的文件**一律机器产出、不许手改** —— 否则「禁止覆盖」的 `v<N>` 会被手工编辑悄悄毁掉。

@@ -146,7 +146,9 @@ export function parseToolUse<T>(body: unknown, toolName: string, schema: Structu
 //   ⇒ 两条路：给 `contracts` 加一个第三方依赖（`zod-to-json-schema`），或者**新契约用 v4 写**。
 //   选了后者 —— 票 27 的 Q2(i) 本来就定了**只有 V2 新调用**走这套协议，
 //   而 V2 的契约（`visual-world` / `game-intent` / `game-design` / `runtime-profile` / `qa`）
-//   **今天一个都还不存在**（`packages/contracts/src/` 里零命中），所以这不是改存量，是定新增。
+//   **当时一个都还不存在**（零命中），所以那不是改存量，是定新增。
+//   ⚠️ 2026-10-02：写这段话时列的五份已落了四份（`runtime-profile` 是票 05 落的）——
+//     ⚠️ 它**不喂 `toolInputSchema`**：`RuntimeProfile` 是**外壳的事实**，模型从不产出它（票 05 Q10）。
 //   **零新依赖**，且 zod 4 才是这条路的前方 —— 将来整体升 v4 时，这批契约不用再动一次。
 //
 // ⚠️ 于是 `contracts` 里**两套 zod API 并存**，边界是干净的：

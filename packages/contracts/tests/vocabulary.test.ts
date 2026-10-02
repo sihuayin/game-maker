@@ -7,6 +7,10 @@
 //
 //   **§负判据** —— 外壳**做不了**的那些，必须**不在**表里。它们正是用户最常要的，
 //     所以它们是 R12 拒绝的**唯一素材**：少了这个，拒绝逻辑没有东西可拒。
+//
+//   ⚠️ **能力**（`CAPABILITIES`）那一侧的见证不在这里 —— 它住在
+//     `packages/demo/tests/shell-capability-witness.test.ts`：那八条要读外壳的**源码文本**
+//     才验得了（`shell/scene.ts` import 了 Phaser，node 里 import 不动，票 05 Q11）。
 import { describe, expect, it } from "vitest";
 import {
   CAPABILITIES, CapabilitySchema, INTENT_ENTITY_TYPES, IntentEntityTypeSchema,
@@ -14,6 +18,7 @@ import {
 } from "../src/vocabulary.js";
 import { EntityKind } from "../src/game-config.js";
 import { GameDesignSpecSchema } from "../src/game-design.js";
+import { PLATFORMER_V1 } from "../src/runtime-profile.js";
 
 /** 每一种 `EntityKind` 必须在这里有个交代 —— 要么推出一个机制，要么**明写**它没有。
  *  ⚠️ `Record<EntityKind, …>` 是**穷尽的**：`game-config/v1` 加一种 kind，这里当场编译不过。 */
@@ -82,7 +87,7 @@ describe("§桶对齐：意图层的 type 与设计层四个数组一一对应",
     for (const home of Object.values(BUCKET)) expect(shape).toHaveProperty(home);
     // 行为验证：一个缺 id 的敌人项解析不过 —— 若哪天有人把 id 改成可选，`compile-design`
     // 就没法沿用意图层的 id，覆盖度判据**当场失效**（票 03 Q2(b)）。
-    const bare = { format: "game-design/v1", game: { title: "t", genre: "g", camera: "c", runtimeProfile: { id: "platformer", version: "v1" } }, coreLoop: [], player: { id: "p", role: "r", abilities: [], goals: [] }, enemies: [{ behavior: "b", threat: "t" }], npcs: [], interactables: [], resources: [], world: { theme: "", setting: "", structure: "" }, levels: [], progression: { model: "m", description: "d" }, mechanics: [], winConditions: [], loseConditions: [], runtimeRequirements: [] };
+    const bare = { format: "game-design/v1", game: { title: "t", genre: "g", camera: "c", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } }, coreLoop: [], player: { id: "p", role: "r", abilities: [], goals: [] }, enemies: [{ behavior: "b", threat: "t" }], npcs: [], interactables: [], resources: [], world: { theme: "", setting: "", structure: "" }, levels: [], progression: { model: "m", description: "d" }, mechanics: [], winConditions: [], loseConditions: [], runtimeRequirements: [] };
     expect(GameDesignSpecSchema.safeParse(bare).success).toBe(false);
   });
 });
