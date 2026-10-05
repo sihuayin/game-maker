@@ -98,10 +98,27 @@ type AnalyzeReferenceInput = {
    *   image A: palette / image B: character / image C: environment。
    * ⚠️ 但**第一阶段 `maxItems === 1`**（R18）：多图的权重融合与冲突解决
    *   没有任何实测，不许在这一阶段实现。见票 26。
+   * ⚠️ **由调用方注入**（R1-Q2）：模型面向的 schema 把它 `omit` 掉了 ——
+   *   那个路径是**相对于 `visual-world.json`** 的，模型答不出来。
    */
   styleReferences: { path: string; role: string }[];
+  /**
+   * ⚠️ **原始需求文本，必填**（R1-Q1）—— 人肉基线（`docs/stylespec-extraction.md`）说「一定要给」：
+   *   `palette` 的判据是「画不画得出这个世界里的东西」，而**要画的东西有一部分压根不在参考图里**。
+   *   ⚠️ 喂的是文本、**不是** `GameIntentSpec` 的产物 ⇒ vision 与 intent 两步**并列**。
+   */
+  requirementText: string;
+  /** 风格身份（R2-Q2）：参考图 basename 的 slug，由 CLI 生成。提示词递给模型照抄，装配时**强制覆盖**。 */
+  styleId: string;
+  transport: { baseUrl: string; apiKey: string };
+  fetchImpl?: typeof fetch;
+  timeoutMs?: number;
 };
 ```
+
+⚠️ **2026-10-03（票 08）：这一段已按落地形状改过。** 返回值是
+`{ spec: VisualWorldSpec; ledger?: LedgerCall[] }`，失败抛 `AnalyzeReferenceError`
+（自带 `failure: CallFailure` 与 `ledger` —— **三发全败也要把账带出来**）。
 
 输出：
 
@@ -132,6 +149,13 @@ styleReferences
 ⚠️ **2026-10-01（票 02）：这张清单已与契约对齐。** 旧稿列的 `rendering` / `animation` / `readability`
 已删掉 —— 它们**零消费者**，按 R7 的门不进契约（理由逐条见票 02 的 Answer）。
 而 `style`（内嵌的那份完整 `StyleSpec` 形）**同样要模型填**，它与上面这些**在同一次调用里产出**。
+
+⚠️ **2026-10-03（票 08 的 R2-Q5）：还有三件事连 schema 都表达不出来，它们写在**工具声明**里。**
+`toJSONSchema` 会**静默丢掉** `superRefine`，也会把开放对象摊成**没有 `properties` 的空对象**。
+八发真跑实测：两发失败**全部**出在内嵌的 `style` 子树 ——
+一发把 `style.camera` / `composition` / `lighting` 填成了**字符串数组**（schema 里它们看着像"随便填"），
+一发**自造了一个键** `environmentStyle`（键集是封的，但 schema 没说得清有哪 12 个）。
+⇒ 那三件事的原文在 `packages/vision/src/prompts.ts` 的 `TOOL_DESCRIPTION`。
 
 禁止：
 
@@ -223,11 +247,15 @@ confidence
 
 # Phase 4：Game Design Compiler
 
-输入：
+✅ **2026-10-04 落地**（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md)），落点
+`packages/game-design/`（`compile-design.ts` + `build-design.ts` + `prompts.ts`）。
+
+输入（⚠️ **第三样是票 10 加的**，理由：R12 的拒绝要落在**生图之前**，而票 14 看不见意图与 VWS）：
 
 ```text
 GameIntentSpec
 VisualWorldSpec
+RuntimeProfile
 ```
 
 输出：
@@ -240,7 +268,9 @@ GameDesignSpec
 
 ## 4.1 Design Prompt
 
-必须生成：
+必须生成（⚠️ **`asset requirements` / `visual requirements` 已在票 03 被砍** ——
+Asset Planner 的输入是结构化的四个桶，视觉语法已经住在 `VisualWorldSpec`；
+`runtime requirements` **留下但改成封闭能力集**。见 [`01-contracts.md §4`](01-contracts.md)）：
 
 ```text
 player
@@ -251,9 +281,7 @@ world
 levels
 progression
 win/lose
-asset requirements
-visual requirements
-runtime requirements
+runtime requirements（封闭能力集）
 ```
 
 ---

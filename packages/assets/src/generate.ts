@@ -14,20 +14,22 @@
 //      仍然可用（0.7s、干净 JSON）。代理的上游配置一直在变，所以端点是**参数**不是常量。
 //   ③ **关 thinking** —— 开着会吃光输出预算（实测 max_tokens=8000 时 reasoning=8000），
 //      关掉快 18 倍、且真的产出内容；代价是会加 markdown 围栏，所以要剥。
-import { DrawListSchema, type AssetSpec, type DrawList, type LedgerCall, type LedgerUsage, type StyleSpec } from "@game-maker/contracts";
+import { DrawListSchema, UPSTREAM_TIMEOUT_MS, type AssetSpec, type DrawList, type LedgerCall, type LedgerUsage, type StyleSpec } from "@game-maker/contracts";
 import { assetTask, drawListFewShot, drawListOpsSpec, framePlan, paletteLine, styleBrief } from "./prompt.js";
 import type { DrawListGenerator } from "./pack.js";
 
 /**
- * **一次上游文本调用最多等多久**（毫秒）。⚠️ **全仓只有这一个数** ——
- * `callText`（`ops.ts` 的 `derive` / `compile-*`）与 `createDrawListGenerator` 都用它。
+ * **一次上游调用最多等多久**（毫秒）。⚠️ **全仓只有这一个数**。
  *
- * ⚠️ **为什么是 180s**：实测同一上游最长的一笔是 **23.0s**（330 笔 `drawlist` 的账里），
- * 而产出最大的 `callText` 调用（21 个资源的整份清单）是 **10.8s** —— 所以这是观测最大值的 **~8 倍**。
- * 超时**宁可松不可紧**：一个过紧的超时会把一次**本来会成功**的调用变成 `upstream` 错误，
- * 那比没有超时更糟。⚠️ 它是**每次尝试**的超时（`compile`/`derive` 各试 2 次）。
+ * ⚠️ **2026-10-03 起它住在 `@game-maker/contracts`**（票 08 的 R2-Q3）—— 这里是**原样再导出**，
+ * 所以 `assets` 内部与所有既有调用方**一行都不用改**。搬家的理由与先例（票 33）
+ * 写在 `contracts/src/structured-call.ts` 那个定义旁边。
  */
-export const UPSTREAM_TIMEOUT_MS = 180_000;
+// ⚠️ **必须是「先 import 再 export」，不能写成 `export { X } from "…"`** —— 后者是**纯再导出**，
+//   不引入本地绑定，而本文件自己（第 111 行的 `timeoutMs ?? UPSTREAM_TIMEOUT_MS`）还要用它。
+//   （第一版就是这么写的：类型检查看不出来，而运行期那个名字是 undefined，
+//   于是 `setTimeout(fn, undefined)` **立刻触发** ⇒ assets 那边 24 条测试当场变红。）
+export { UPSTREAM_TIMEOUT_MS };
 
 export type GenerateOptions = {
   baseUrl: string;

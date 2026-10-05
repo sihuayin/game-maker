@@ -198,8 +198,6 @@ export interface GameIntentSpec {
   progression?: { type?: string; description?: string };
   challenge?: { type?: string; description?: string };
 
-  resources: string[];                // ⚠️ 裸串；§4 那份 {id,purpose}[] 才是被造出来的东西
-
   winConditions: string[];
   loseConditions: string[];
 
@@ -214,6 +212,13 @@ export interface GameIntentSpec {
 | `confidence: number` | 零消费者 + 长得像分数，与 Destination 的「不带分数」正面冲突。想拿它阈值化也不行：R9 只留了一个人工点且在**清单处**，那时本契约早就过去了 |
 | `interactions: string[]` | 没有独有的活：用户说的「能推箱子」要么是实体（进 `entities[]`）、要么是机制（进 `mechanics[]`）。与 §4 砍 `interactionModel` 对称 |
 | `schemaVersion: string` | → `format: z.literal(...)` |
+| `resources: string[]` | **同层之内**与 `entities[].type = "resource"` 重复：设计层的那个桶**只认** `entities[].type = "resource"`（见 §4 四个桶的注释），于是「两个家 → 下游同一个桶」，模型每次运行都得猜一次（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 Q5）。⚠️ 它与票 03 说的「13 处**跨层**重名」不是一回事 —— 那些是意图层 X ↔ 设计层 X |
+
+⚠️ **契约带一条顶层 gate**（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 R2-Q1）：
+必填字符串为空串 · `coreLoop` / `player.goals` / `mechanics` 为空数组 · `entities` 与 `mechanics` 的 id 重复
+⇒ 这一发**算 `schema` 失败、重采样**。分界线是「**空了就说明这一趟没说出一件事**」进 gate、
+「**空了本身是一句设计陈述**」不进 —— 所以 `winConditions: []` / `loseConditions: []` / `ambiguity: []` /
+**`entities: []`** 都是**合法**的。逐条理由与那张「别往里加」的名单在 `game-intent.ts` 的注释里。
 
 ⚠️ **① 档字段的欠条** —— 门收三种**具名**读取：① 提示词按名字插值 · ② 判据 · ③ 映射进下游契约。
 本层靠 **①** 单独活着的：`subgenre` · `camera` · `targetExperience` · `world.atmosphere` ·
@@ -287,10 +292,27 @@ export interface GameDesignSpec {
 ⚠️ 同批砍掉：`interactionModel: string[]` —— 它与 `player.abilities` + `interactables[].behavior`
 **说的是同一件事**，而那两个在场上。
 
+⚠️ **契约带一条顶层 gate**（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 Q4）：
+必填字符串为空串 · `coreLoop` / `player.abilities` / `player.goals` / `mechanics` / `levels` 为空数组 ·
+**id 跨四桶重复** · **`levels[].entities[]` 解不到** ⇒ 这一发算 `schema` 失败、重采样。
+⚠️ **四个桶本身可以为空**（障碍跑式关卡是真的，与意图层把 `entities: []` 划出去同一条理由）；
+`winConditions` / `loseConditions` 可空；`difficulty` 可缺席。逐条理由在 `game-design.ts` 的注释里。
+
+⚠️ **`game.genre` / `game.camera` / `game.runtimeProfile` 由调用方注入、装配时强制覆盖**
+（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 Q5）：`genre` 取 profile 的 `id`、
+`camera` 取 `VisualWorldSpec.camera.mode` 的字面、`runtimeProfile` 是那一代的 `{id, version}` 引用。
+⚠️ 前两个是**可派生的副本**（同票 04 砍 `bodyProportions` 那种病），留它们的代价与读者写在契约字段的注释里。
+
+⚠️ **这一层是「意图覆盖 + 需求补全」，不是「意图镜像」**（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 R2-Q1）：
+**意图 ⊆ 设计**是**判据**（少了 = R12 的拒绝）；**设计多出意图是允许的**（依据必须在需求语义里）。
+⚠️ 「多出来的有没有依据」**不可机械判定** ⇒ 它不是判据，只是提示词纪律。
+
 ⚠️ **① 档字段的欠条** —— 靠 **① 单独**活着的：`world.theme` · `world.setting` · `world.structure` ·
 `player.role` · `player.abilities` · `enemies[].behavior` · `enemies[].threat` · `npcs[].role` ·
 `npcs[].interaction` · `interactables[].type` · `interactables[].behavior` · `levels[].purpose`。
 ⇒ 同上：票 10 / 票 14 的提示词模板里没**具名**出现就出局。
+⚠️ **票 10 落地时的裁定**（人类）：**本层这 12 个**由票 10 的提示词**逐条点名地生产**，
+而**具名插值**发生在**下游**（票 12 / 票 14）；票 10 真正要具名插值的是**意图层**那 6 个。
 
 ---
 
@@ -570,8 +592,10 @@ R3 只收三类：**集合差 · 构造性约束 · 引用族**。门槛是 `CON
 归错侧，[票 21] 的「判据 → 阶段」映射会指向**错的资源**。
 
 ⚠️ **`intent-coverage` 集合差怎么算**：`entities` 与 `mechanics` 按 **id**
-（设计层沿用意图层的 id，**不加 `fromIntent` 回指** —— 那是一个只能被复述、不能被校验的字段）；
-`coreLoop` / `winConditions` / `loseConditions` / `resources` / `progression` 按**文本相等**。
+（设计层沿用意图层的 id，**不加 `fromIntent` 回指** —— 那是一个只能被复述、不能被校验的字段）。
+⚠️ **资源那一桶的键是 `entities[]` 里 `type === "resource"` 的那些 id**（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 Q5 删掉了顶层的 `resources[]`，
+两个家指向设计层同一个桶）—— 票 19 落地时按这一条写，别再找那个已经不存在的字段；
+`coreLoop` / `winConditions` / `loseConditions` / `progression` 按**文本相等**。
 ⚠️ **文本相等是脆的**（设计层把「收集三枚硬币」改写成「搜集三枚硬币」就误报）——
 票 03 **明确拒绝**用 id 去掩盖它（给描述性字段发 id ＝ 发一个只会被复述的字段），
 **要求把这条当作判据的已知噪声写下**。这是上面那个「重名不是冗余」的另一面。

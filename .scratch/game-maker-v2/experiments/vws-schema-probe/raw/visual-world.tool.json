@@ -1,0 +1,367 @@
+{
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string",
+      "const": "visual-world/v1"
+    },
+    "styleIdentity": {
+      "type": "object",
+      "properties": {
+        "styleName": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "keywords",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "camera": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "side",
+            "top-down",
+            "isometric",
+            "first-person",
+            "other"
+          ]
+        },
+        "projection": {
+          "type": "string"
+        },
+        "angle": {
+          "type": "number"
+        },
+        "elevation": {
+          "type": "number"
+        },
+        "perspective": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "additionalProperties": false
+    },
+    "composition": {
+      "type": "object",
+      "properties": {
+        "foreground": {
+          "type": "string"
+        },
+        "midground": {
+          "type": "string"
+        },
+        "background": {
+          "type": "string"
+        },
+        "objectScale": {
+          "type": "string"
+        },
+        "characterScale": {
+          "type": "string"
+        },
+        "density": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "palette": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^palette:\\d+$"
+          }
+        },
+        "secondary": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^palette:\\d+$"
+          }
+        },
+        "accent": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^palette:\\d+$"
+          }
+        },
+        "background": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^palette:\\d+$"
+          }
+        },
+        "shadow": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^palette:\\d+$"
+          }
+        },
+        "highlight": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^palette:\\d+$"
+          }
+        }
+      },
+      "required": [
+        "primary",
+        "secondary",
+        "accent",
+        "background",
+        "shadow",
+        "highlight"
+      ],
+      "additionalProperties": false
+    },
+    "lighting": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string"
+        },
+        "softness": {
+          "type": "string"
+        },
+        "contrast": {
+          "type": "string"
+        },
+        "mood": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "materials": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "appearance": {
+            "type": "string"
+          },
+          "texture": {
+            "type": "string"
+          },
+          "color": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^palette:\\d+$"
+            }
+          }
+        },
+        "required": [
+          "appearance"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "character": {
+      "type": "object",
+      "properties": {
+        "proportions": {
+          "type": "string"
+        },
+        "silhouette": {
+          "type": "string"
+        },
+        "poseLanguage": {
+          "type": "string"
+        },
+        "clothing": {
+          "type": "string"
+        },
+        "faceAbstraction": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "architecture": {
+          "type": "string"
+        },
+        "terrain": {
+          "type": "string"
+        },
+        "props": {
+          "type": "string"
+        },
+        "textureDensity": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "shapeLanguage": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "styleReferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "identity": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "camera": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "composition": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "palette": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$"
+          }
+        },
+        "lighting": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "shapeLanguage": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "material": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "characterStyle": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "confidence"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "format",
+    "styleIdentity",
+    "camera",
+    "composition",
+    "palette",
+    "lighting",
+    "materials",
+    "character",
+    "environment",
+    "shapeLanguage",
+    "constraints",
+    "styleReferences",
+    "style"
+  ],
+  "additionalProperties": false
+}

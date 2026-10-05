@@ -1,5 +1,19 @@
 # 从参考图产出一份 StyleSpec
 
+> ## ⚠️ 2026-10-03：**这份规程已被代码取代，留作基线。**
+>
+> V2 的 [`packages/vision`](../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md) 现在**机器做**这件事
+> （参考图 + 需求文本 → `VisualWorldSpec`），这份人肉规程不再是管线的一步。
+>
+> **但它没有被扔掉，理由有三个**：
+> 1. **它是「机器要追上什么」的清单** —— 下面那两条实测纠正已经**原文搬进**
+>    `packages/vision/src/prompts.ts`（**选色不排色** · `constraints` 不许写数值面积上限）。
+>    它们不是文风，是量出来的，所以留在那里当参照。
+> 2. **它仍然是人手补一份 `StyleSpec` 的操作规程** —— `derive --style` 那条旧路没变。
+> 3. ⚠️ **它的产物与机器产物的形状不同**：这里产出的是 `StyleSpec`，
+>    机器产出的是 `VisualWorldSpec`（内嵌的那份 `style` 子树才是同一样东西）。
+>    下面的 `confidence` 与 `camera.mode` 那种自由文本，在新契约里**已经有了封闭枚举**。
+
 > 这份文件是[票 39](../.scratch/game-creation-v1/issues/39-palette-role.md) 的产物。
 > 它存在的理由很直白：**这件事每个世界都要重做一次**（[R11](../.scratch/game-creation-v1/map.md)），
 > 而在它之前，「该对模型说什么」**只活在一个实验脚本里**

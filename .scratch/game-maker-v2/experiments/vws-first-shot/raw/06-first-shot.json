@@ -1,0 +1,258 @@
+{
+  "label": "06-first-shot",
+  "ms": 10450,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 154,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1998,
+    "service_tier": "standard"
+  },
+  "ok": false,
+  "failure": "schema",
+  "detail": "工具入参不过契约：style: Unrecognized key: \"environmentStyle\"",
+  "violations": null,
+  "input": {
+    "format": "visual-world/v1",
+    "styleIdentity": {
+      "styleName": "黄昏山间小站 · 极简像素剪影",
+      "keywords": [
+        "flat pixel art",
+        "low-resolution",
+        "minimal silhouette",
+        "limited palette",
+        "hard-edge blocks",
+        "side-scroller",
+        "dusk"
+      ],
+      "description": "低分辨率横版像素风：形体由少量硬边方块与梯形拼合，无渐变、无描边、无纹理噪点；天空与远景以大面积平涂色块分层堆叠，近景靠一条水平色带暗示地面与铁轨。所有元素正交视角（侧视），不做透视收缩，光源单一来自画面上方偏右。"
+    },
+    "camera": {
+      "mode": "side",
+      "projection": "orthographic",
+      "perspective": "flat side-on scrolling layer stack, no vanishing point, no depth foreshortening",
+      "angle": 0,
+      "elevation": 0
+    },
+    "composition": {
+      "background": "天空 + 山脊剪影 + 日头圆盘，占据画面上方三分之一至二分之一，横向不重复",
+      "midground": "候车室外墙带：窗、挂画、路灯所依附的墙面色块",
+      "foreground": "站台地面色带 + 其下的铁轨色带，横向可无缝重复",
+      "characterScale": "角色高度约为画面高度的十分之一到八分之一，立姿居中偏下",
+      "objectScale": "窗口、挂画、路灯等比角色小一档，道具与角色同尺度级别",
+      "density": "低密度，元素之间留大片空白色块，单一地平线切分画面"
+    },
+    "palette": {
+      "primary": [
+        "palette:1",
+        "palette:2",
+        "palette:3"
+      ],
+      "secondary": [
+        "palette:4",
+        "palette:5",
+        "palette:6"
+      ],
+      "accent": [
+        "palette:7",
+        "palette:8"
+      ],
+      "background": [
+        "palette:0",
+        "palette:9"
+      ],
+      "shadow": [
+        "palette:2",
+        "palette:10"
+      ],
+      "highlight": [
+        "palette:8",
+        "palette:11"
+      ]
+    },
+    "lighting": {
+      "direction": "自上而下、略偏右，日头圆盘与绿灯为局部自发光源",
+      "contrast": "中低对比，靠色相差异而非明度差区分层",
+      "softness": "硬边无过渡，无阴影投影",
+      "mood": "黄昏收班、安静、微暖的暮色"
+    },
+    "materials": {
+      "sky_night": {
+        "appearance": "平涂暗色天空带，无云无渐变",
+        "color": [
+          "palette:0"
+        ],
+        "texture": "无纹理"
+      },
+      "wall_warm_brown": {
+        "appearance": "整片暖棕墙面，作候车室外墙与站点结构的基底",
+        "color": [
+          "palette:1",
+          "palette:2"
+        ],
+        "texture": "无纹理，仅同色系深浅两档分件"
+      },
+      "window_pane": {
+        "appearance": "浅蓝白玻璃色块，内嵌远山梯形剪影",
+        "color": [
+          "palette:9",
+          "palette:3"
+        ],
+        "texture": "无纹理"
+      },
+      "sign_amber": {
+        "appearance": "挂画/警示牌/站牌用的高饱和琥珀黄方块",
+        "color": [
+          "palette:8"
+        ],
+        "texture": "无纹理"
+      },
+      "sun_disc": {
+        "appearance": "将落日头，暖黄圆盘边缘带一圈浅色接缝",
+        "color": [
+          "palette:11"
+        ],
+        "texture": "实心无渐变"
+      },
+      "signal_lamp": {
+        "appearance": "信号灯头，红/绿两态切换的高饱和小圆点",
+        "color": [
+          "palette:7",
+          "palette:12"
+        ],
+        "texture": "实心，可发光"
+      },
+      "platform_stone": {
+        "appearance": "站台地面与铁轨的冷灰中性带，含一条浅色路缘",
+        "color": [
+          "palette:5",
+          "palette:4"
+        ],
+        "texture": "仅一条水平浅色分隔线"
+      },
+      "rail_dark": {
+        "appearance": "铁轨与枕木的深色横带",
+        "color": [
+          "palette:10",
+          "palette:6"
+        ],
+        "texture": "低分辨率重复点阵"
+      },
+      "coat_navy": {
+        "appearance": "旅人大衣的深蓝主色，与浅色衬里/围巾对比",
+        "color": [
+          "palette:13"
+        ],
+        "texture": "无纹理"
+      }
+    },
+    "character": {
+      "proportions": "矮胖三段式，头占近半，躯干与腿均为短方块",
+      "silhouette": "方帽 + 宽方肩躯干 + 两条短腿的硬边剪影，背侧带一个凸出的小方块表示行李卷",
+      "faceAbstraction": "面部无五官细节，仅两块深色方块作眼，肤色为浅方块",
+      "clothing": "深蓝大衣覆盖躯干，浅色围巾/衬里一道横色块置于颈部",
+      "poseLanguage": "站：双腿并拢垂直；跑：双腿交替水平错开；跳：整体上移一条腿抬起——三态皆由同一批方块平移实现，不新增曲线"
+    },
+    "environment": {
+      "terrain": "水平分层：天空带 / 山脊剪影带 / 站台地面带 / 铁轨带，全部直线分割",
+      "architecture": "单一外墙平面 + 一个内凹窗口 + 一个屋檐三角；高度差仅为小台阶与行李堆",
+      "props": "路灯（竖杆 + 圆头）、挂画框、站牌、散落的皮箱、信号灯柱",
+      "textureDensity": "极低，无颗粒、无渐变，仅靠色块边界成形"
+    },
+    "shapeLanguage": [
+      "硬边矩形为基本单元",
+      "梯形表示山脊与窗内远山",
+      "圆盘 / 小圆点仅用于日头与灯头",
+      "所有形体正交对齐像素网格",
+      "无描边、无圆角、无抗锯齿",
+      "重复元素以固定间距水平平铺"
+    ],
+    "constraints": [
+      "所有新资产必须保持正交侧视，禁止引入透视或斜角投影",
+      "只使用色板内颜色，禁止渐变、阴影模糊、纹理噪点与描边",
+      "墙面与地面类元素必须能左右无缝重复，天空类元素不可重复",
+      "发光仅允许出现在日头与信号灯，且只能用高饱和暖黄或红灯/绿灯色",
+      "角色与道具必须由矩形/梯形/圆盘的像素块构成，禁止曲线与细节五官",
+      "背景层、中景层、前景层必须以水平色带明确分割，禁止层间重叠模糊",
+      "危险区与失物必须能与站台地面形成明显色相差异，以保证可读性",
+      "高度差只能由一档以内的可跳台阶表现，不得出现连续斜坡"
+    ],
+    "style": {
+      "id": "halt-dusk",
+      "identity": [
+        "flat pixel art",
+        "orthographic side-scroller layers",
+        "hard-edged block construction",
+        "dusk minimalism"
+      ],
+      "characterStyle": [
+        "blocky chibi proportions",
+        "no facial detail",
+        "silhouette-readable",
+        "same palette as environment"
+      ],
+      "environmentStyle": [
+        "horizontally repeating wall and floor bands",
+        "single horizon split",
+        "trapezoid mountains",
+        "no texture"
+      ],
+      "material": [
+        "flat fills",
+        "no gradients",
+        "no outlines",
+        "no noise"
+      ],
+      "lighting": {
+        "model": "not present",
+        "selfLit": [
+          "sun disc",
+          "signal lamp"
+        ],
+        "shadow": "none"
+      },
+      "camera": {
+        "mode": "side",
+        "projection": "orthographic"
+      },
+      "composition": {
+        "layers": 3,
+        "horizon": "single",
+        "density": "sparse"
+      },
+      "palette": [
+        "#2b3350",
+        "#6b4a30",
+        "#3d2a1c",
+        "#8a5c33",
+        "#8f9aa0",
+        "#5c666e",
+        "#4a4f57",
+        "#d94f3d",
+        "#f2b53c",
+        "#cdd6dd",
+        "#2a2e33",
+        "#f7d774",
+        "#4fbf6a",
+        "#243b6b"
+      ],
+      "constraints": [
+        "orthographic side view only",
+        "flat fills only",
+        "no gradients or blur",
+        "seamless horizontal tiling for wall and ground",
+        "glow reserved for sun and signal lamp",
+        "no facial or rounded detail"
+      ],
+      "confidence": 0.82
+    }
+  }
+}

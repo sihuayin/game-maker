@@ -91,7 +91,40 @@ Effort: game-maker-v2
 > —— 落盘形式是「不在 `checked` 里」，而**为什么**不在今天**只可能是静态的**，所以写在契约自白里。
 > 若票 18 把「可达性判不了」变成要逐次记的事，要么加字段、要么拆自白。
 > ✅ **前沿现在是 08 / 09 / 11 / 22 / 29 / 30 / 31 七张**（按号取就是 08）。
+
+> ⚠️ **2026-10-03（第五 session）：票 08 已关** —— **理解层的最前端落地**（`packages/vision`，三份源文件 + 提示词）。
+> ⚠️ **它先纠了一条票面当成「已知」的数**：票 27 那个「首发 80%」量的是**手抄的、票 02 之前的 schema**
+> （与落地契约**只有 5 个键重合**、且顶层没封口 ⇒ 更松、低估难度），而 **`toolInputSchema()` 从没被跑过**。
+> ⇒ 先补了两个探针：一个验转换器（**行** —— 13 键、11 个 `strictObject` 逐个封口、开集没被替它表态、
+> 1000 token、零 `$ref`），一个**真跑 8 发**量率 —— **首发过 Zod `6/8` = 75%**，3 次地板下 ≈98.4%。
+> ⚠️ **最有价值的一条不是率，是失败长在哪儿**：两发失败**全部**出在**内嵌的 `style` 子树**、
+> 新视图零失败（一发把三个开放对象填成了**数组**，一发**自造了键**）⇒ 那正是 R2-Q5 那三句话的来历。
+> ⚠️ 顺带抓到：**`superRefine` 被 `toJSONSchema` 静默丢掉** ⇒「色板不得重色」这类硬约束**模型看不见**，
+> 而 `safeParse` 照旧拒 ⇒ **一次静默的重采样被烧掉，且模型永远学不会**（重采样是重抽，不喂错误）。
+> ⚠️ **本票按 R17 动了 `visual-world.ts` 三处**（越界 `superRefine` + 两句自白）、`ledger.ts` 一处、
+> `03 §6/§7/§14` · `02 §2.1` · `00 §3/§6` · `stylespec-extraction.md` —— **都是要记账的修改，不是重开 R 表**。
+> ✅ **前沿现在仍是 09 / 11 / 22 / 26 / 29 / 30 / 31 七张**（**扫描**确认，与上一行的叙述这次对上了）。
 > ⚠️ 票 06 关掉当场**解冻了 22**（它只等 02 与 06）；而 17/18/19 仍等票 15，20 等 17/18/19，19 还等票 10。
+
+> ⚠️ **2026-10-03：票 09 已关** —— 理解层的**第二发调用**落地
+> （`packages/game-design/src/analyze-intent.ts` + `prompts.ts`；契约 16 键，**无装配步**）。
+> 它连带改了三处契约与四处文档：**顶层 `resources` 出局**（唯一来源 `entities[].type = "resource"`）·
+> **契约加一条结构性空值 gate** · `LedgerStep += "analyze-intent"`。
+> ⚠️ 同一天**票 08 的 Answer §4 第 3 条被标为过时**：传输层失败**进** `failures[]`（以**代码**为准，票 09 的 1-Q3 裁定）。
+> ⚠️ 它还留了三条**造判据时踩到的坑**在「已经量到的」小节里（变异脚本的两口 + 枚举值光靠 `tsc` 守着不够）——**下一个人别重踩**。
+> ✅ **前沿现在是 10 / 11 / 22 / 26 / 29 / 30 / 31 七张**（09 关掉当场**解冻 10**）。
+> ⚠️ 前沿以**扫描**为准，不以本节的叙述为准。
+
+> ⚠️ **2026-10-04：票 10 已关** —— 理解层的**收尾那一发**落地
+> （`packages/game-design/compile-design.ts` + **`build-design.ts`（纯：装配 + 拒绝）** + `prompts.ts`）。
+> **它改了三处契约**（`game-design.ts` 加顶层 gate + 「意图覆盖 + 需求补全」那段裁定 + 两处自白 ·
+> `vocabulary.ts` 新增 `ENTITY_BUCKETS`）**与四处文档**，并**首次给 `RuntimeProfile` 接了线**
+> —— 在此之前那份契约**一根线都没接**（`resolveRuntimeProfile` 只有测试调用）。
+> ✅ **R12 的拒绝第一次真的响了**，而且它**不是失败**：不重采样、不进 `failures[]`、退出码 4。
+> ⚠️ **探针当场证伪了我写在工具说明里的一句话**（「`id` 不许新造」）—— 人类据此把这一层正式定为
+> **「意图覆盖 + 需求补全」**，不是「意图镜像」（裁定原文在票 10 的 Answer §3）。
+> ✅ **前沿现在是 11 / 14 / 19 / 22 / 26 / 29 / 30 / 31 八张**（10 关掉当场**解冻 14 与 19**）。
+> ⚠️ 前沿以**扫描**为准，不以本节的叙述为准。
 
 ## Destination
 
@@ -194,12 +227,60 @@ Style Image + Game Intent
   `ImageSource.reference` 指一张 `player-master.png`；多帧是**一次调用画一行、按墨迹间隙切**
   （`pack.ts:340-342,377` + `sheet.ts`）。缺的是**契约**：`masterAsset`/`derivedFrom`/`CharacterDNA`
   在整个 `packages/` 里**零命中**。
+- **落地契约生成的 tool schema 是能用的**，且**首发过 Zod = 75%（6/8）**（票 08 探针，真图 + 真需求文本）：
+  13 键 / 3956 B / ≈1000 token / 零 `$ref` / 11 个 `strictObject` 节点逐个拿到 `additionalProperties: false` /
+  开集 `materials` 没被替它表态。⚠️ 失败**全是 `schema`**，**两发 100% 出在内嵌的 `style` 子树**（新视图零失败）。
+  ⚠️ 票 27 那个「80%」量的是**手抄的旧形状**（只 5 键重合、顶层没封口）⇒ **别拿它当基线**。
+- ⚠️ **`toJSONSchema` 会把 `superRefine` 静默丢掉**（既不抛也不警告）——
+  ⇒ 契约里**已有**的「色板不得重色」与 `StyleReferencePath` 的三条路径检查，**模型一个都看不见**，
+  而 `safeParse` 照旧会拒 ⇒ **一次静默的重采样被烧掉，且模型永远学不会**（重采样是**重抽**，不喂错误回去）。
+  想让模型知道，只能写进 **`forcedTool` 的 `description`**（票 08 的 R2-Q5）。
+- ⚠️ **`export { X } from "…"` 是纯再导出、不引入本地绑定** —— 同一个文件里还要用 `X` 的话，
+  类型检查**看不出来**，运行期那个名字是 `undefined`。票 08 搬 `UPSTREAM_TIMEOUT_MS` 时第一版就那么写，
+  于是 `setTimeout(fn, undefined)` **立刻触发**，`assets` **24 条测试当场变红**。⇒ 写成 **先 import 再 export**。
+- **`.omit()` 会摘掉 `superRefine`**，而 **`.superRefine()` 保得住 `.omit()`**（zod v4 实测）——
+  所以「契约带一条 gate」+「模型面向的 schema 摘掉一个键」这两件事**必须配对**：
+  gate 的落点只能是**注入后的重校验**，不是模型那一份。
+- ⚠️ **造判据时踩到的第四个坑（票 10 实吃）**：**每一发变异都要瞄准「有判据看着的那句话」** ——
+  第 22 发瞄的是「**不许**挑个近似的」，而判据只锚了旁边那句「整条省掉」⇒ 源码改了、
+  **被测的那句话一个字没动**，于是全绿。修法是**把测试补宽**，不是把变异改软。
+- ⚠️ **新加一条 gate 时，回头查旧的负判据有没有被它兜住**（票 10 实吃）：`game-design.test.ts` 原来用
+  一份**全空**的壳测「缺 id 要拒」，新 gate 生效后那种壳会因为**一堆别的理由**被拒 ⇒
+  **在「id 被改成可选」时照样绿**（假阳性）。已改成「一份**除了那个 id 之外完全合法**的设计」。
+- **票 10 的探针**（`experiments/design-first-shot/`，n=4 —— ⚠️ **与 08/09 刻意不同**：那两发量的是
+  「原始契约 + 最小说明」，本票量的是**出货的那一套**，因为这一步最要紧的两个问题
+  （id 有没有被照抄 · 做不了的机制是省了还是被近似了）**只存在于提示词里**；代价是**纯契约的首发率本票没量**）：
+  输入是一份**真跑出来过**的 VWS（08 探针 `raw/01`）· schema **16 键 / 3452 B**（意图那步 1735 B，翻了近一倍）·
+  **首发过 Zod 4/4（100%）** · 输出 1405–1869 token · **id 延续**：丢失 0/4 · 串桶 0/4 · **发明 1/4** ·
+  **R12 响了**（hostile 臂 2/2 `rejected:intent-mechanic-missing`，normal 臂 2/2 `ok`）·
+  **挑近似值 0/2**（两条 hostile 都整条省掉了「二段跳」）· 服务端自报 `servedModel=deepseek-flash`。
+  ⚠️ 那个「发明」就是 `e-water` —— 它催生了 R2-Q1 的裁定（见 Decisions so far）。
+- ⚠️ **造判据时踩到的三个坑（票 09 实吃，写下来免得重踩）**：
+  ① **变异的目标文件若被测试经包出口（`dist/`）消费，改 `src` 而不 rebuild 就等于没改** ——
+     `game-design` 的测试 import `@game-maker/contracts` ⇒ 走 dist；票 08 没吃到是因为它那条 ledger 变异挑的测试 import 的是 `../src/index.js`。
+  ② **它的孪生兄弟**：收尾那次 `tsc -b` 在**增量**状态下**可能是 no-op** ⇒ dist 里留着某一发**变异版**的 JS。
+     症状是**变异全绿、紧接着 `pnpm test` 红一片**。⇒ rebuild 一律加 **`--force`**。
+  ③ **枚举值光靠 `tsc` 守着不够**：`spentCall("…")` 的字面量对不上 `LedgerStep` 会在编译期报 TS2345，
+     但**变异判据跑的是 vitest、不是 tsc** ⇒「删掉枚举值」那一发**静默通过**（09 第 13 发）。
+     ⇒ 每个枚举值配一条测试（`LedgerStep.options` 里含它），`structured-call.test.ts` 里已按此补到两个。
+- **票 09 的探针**（`experiments/intent-first-shot/`，n=4 —— **量的是原始契约 + 最小说明**，不是出货那份）：
+  模型面向的 schema = 契约本身 **16 键 / 1735 B**（无注入、无 `.omit()`）· **verbose（§27 的正文，104 字）2/2 过 Zod** ·
+  **terse（「做一个废土横版寻宝游戏」）0/2 —— 两发都是 `empty-input`**（`stop=tool_use`、`input={}`、白烧 1074/1082 输出 token，
+  与票 27 第 1 发逐字同形）· 合计首发 **2/4** · 两发成功的 verbose 里那条 gate 的射程表**一处都没踩中**（安静是预期的）·
+  ⚠️ `ambiguity` 全写成**自由句子、一条都不点字段名**，且多条讲的根本不是这份契约的字段
+  ⇒ 这就是 09 判「必须指得出字段名」的直接证据。⚠️ 提示词骨架救不救得了短输入，**没测**（授权用尽）。
 - `scripts/check-deps.mjs:16-22` 的 `ALLOWED` 图里**没有的包名直接报错** ⇒ 新包**必须先改那张图**
   才装得上（票 07）。
 
 ## Decisions so far
 
 <!-- 索引：一行一张已关的票，够判断相关性即可，细节 zoom 进票 -->
+
+- [`compile-design.ts`：`GameIntentSpec` + `VisualWorldSpec` → `GameDesignSpec` 落地](issues/10-design-compiler.md)：理解层的**收尾那一发**，落在 **`packages/game-design/`**（`compile-design.ts` + **`build-design.ts`（纯）** + `prompts.ts`）。⚠️ **20 条裁决**，最要紧的六条：① ⚠️ **输入多了第三样 `RuntimeProfile`**（Q3a）—— 决定性理由是**票 14 的输入里既没有意图也没有 VWS**，所以「用户要的东西做丢了」与「参考图的视角做不出来」这两件事**除了本步没人管得了**，而 R12 要「在生图之前、且免费」地拒 ⇒ **本步就是那个点**（这也首次给那份契约接了线 —— 在此之前 `resolveRuntimeProfile` 只有测试调用）。⚠️ 这改了 `03 §10` / `02 Phase 4` 的输入表（按 R17 记了账）；② **R12 拒三条**，按「今天是否活着」排：**意图→设计的覆盖**（`intent.mechanics[].id ⊆ design.mechanics[].id`，四桶同款按 `type` 落桶 —— **今天唯一活着、且只有本步看得见**的那条，报错**点名用户自己的话**「二段跳」）· **`vws.camera.mode` 对不上 profile 的 `camera:*`**（⚠️ **票 06 删 `CAMERA_MISMATCH` 时把这条兑现押在了本票上**，已兑现）· **两条差集**（`mechanics − profile.mechanics` / `runtimeRequirements − profile.capabilities`，⚠️ **今天恒空**，是给第二个成员留的位）；③ ⚠️ **「拒绝 ≠ 失败」**（Q3c）：拒绝是**一条结论**，所以**不重采样、不进 `failures[]`**（那一发上游调用**成功了**，账照记）、退出码 4、文案走 `rejections` —— 与「模型吐错了 ⇒ 重采样」**结构上分成两个错误类**；④ ⚠️ **「意图覆盖 + 需求补全」，不是「意图镜像」**（R2-Q1，裁定原文在票里）：**意图 ⊆ 设计**是**判据**（少了 = R12 的拒绝），**设计多出意图 = 允许**（那叫**补全**，依据必须在**需求/意图的语义**里）—— 而「多出来的有没有依据」**不可机械判定** ⇒ **它不是判据**，只活提示词纪律（R3 的纪律：判据只收「精确可算 + 错了一定不是设计」）。⚠️ 这条裁定的来历是**探针当场证伪了我写的一句话**（我在工具说明里写了「`id` 不许新造」，第 4 发里模型造了个 `e-water` —— 而它**是对的**，意图层的 `coreLoop` 明写「收集废料与**净水**」而 `entities[]` 里只有废料）⇒ 问题不是模型不听话，是**那句话反了方向**；⑤ **VWS 的四个落点**（Q1，R7 要的「具名读者」）：`world.structure` ← `vws.composition` · `levels[].layout` ← `vws.environment.*` + `composition.background` · 实体做派 ← `vws.environment.props` + `character.*` · **相机拒绝面** ← `vws.camera.mode`；⚠️ 明说不进：`game.genre`（从 profile 的 `id` 取）· `world.theme/setting`（**意图层的话**才是源）· 资产层的一切（票 12 的活）；⑥ **装配步回来了**（与票 09 相反，且那里写清了为什么）：`game.runtimeProfile` / `game.genre` / `game.camera` 是**三个「调用方才知道」的值** —— 模型**照抄**、装配**强制覆盖**（照票 08 让模型照抄 `style.id` 同款）。⚠️ `game.camera` **不许**填成 profile 那条能力名（那样相机那条对照**恒真**、拒绝面当场死掉），而 `CAMERA_MODE_NEEDS` 是一张**显式的表**（`side → camera:side-scroll`，其余 `null`）—— **不许**写成 `some(c => c.startsWith("camera:"))`。⚠️ **契约侧改了三处**：`game-design.ts` 加**顶层 gate**（结构性空值 + **id 跨桶唯一** + **`levels[].entities[]` 解得到**；⚠️ 四个桶**本身可空** —— 障碍跑式关卡是真的 · `levels` 只要 **≥1** 不是恰好 1）+「意图覆盖 + 需求补全」那段裁定 + `game.genre`/`game.camera` 两处「可派生的副本」自白；`vocabulary.ts` **新增 `ENTITY_BUCKETS`**（那个映射此前散在 `vocabulary.test.ts` 里，收上来了）。⚠️ **判据**：**60 条新测试 · 套件 861/861**（此前 801）· `tsc -b --force` 干净 · 两个守卫绿（742 条链接）· **24 发变异全部验过会红**。⚠️ **两处既有 fixture 被新 gate 判死**（`runtime-profile.test.ts` 的全空壳、`game-design.test.ts` 里一个缺 id 的桶）—— 后者是**假阳性**（全空的壳因别的理由被拒，于是「id 改成可选」时照样绿），已改成「除了那个 id 之外完全合法」的设计。⚠️ **播下**：`14`（两条差集的形式是你的，今天恒空 · `levels` ≥1 · `game.camera` 是 `mode` 的字面不是能力名）· `12`（`world.structure`/`levels[].layout` 接着用 · **设计层可以补全**，多出来的实体照样要排资产 · `derive` 的存废归你）· `16`（退出码映射；**拒绝那条文案走 `rejections`** 不是 `failure`）· `19`（id 那一半已在票 10 拒过，你只剩**文本相等**那一半；**反向差集只能是观察**不是判据）· `15`（吃已解析的产物 + 一个 profile ref；`gameId` 仍未定）。
+
+- [`analyze-intent.ts`：自然语言 → `GameIntentSpec` 落地](issues/09-intent-analyzer.md)：理解层的**第二发调用**，落在 **`packages/game-design/`**（**不在** `vision` —— 两个新包彼此不依赖）。⚠️ **17 条裁决**，最要紧的五条：① **`derive` 保留、本票一个字没碰** —— 它的存废与合并归**票 12**（票 12 的票面已自称「接班人」，同一件事不在两个票里各记一次账）；② **缺席要分三种**，票面那一问把它们混成了一件：契约**必填而用户没说** ⇒ 按 §3.2 的 MVP 许可推一个保守值 + **记进 `ambiguity[]`**；契约**可选而用户没说** ⇒ **省略即可、不进 `ambiguity`**（「可以缺」是这一层的合法形状，相机由票 05 从 `RuntimeProfile` 现取）；**模型把必填吐成空串/空数组** ⇒ 那是**模型没干活**，而立一条契约 gate；③ **契约加一条顶层结构性空值 gate**（`game-intent.ts` 的 `.superRefine`）—— 分界线是「**空了就说明这一趟没说出一件事**」进、「**空了本身是一句设计陈述**」不进，所以 `winConditions: []` / `loseConditions: []` / `ambiguity: []` / **`entities: []`** 都合法；⚠️ 人类专门把 **`entities ≥ 1` 从 gate 里划了出去**（障碍跑式关卡是对的），只留 `mechanics ≥ 1`；④ **顶层 `resources[]` 出局**（Q5）—— 它在**同层之内**与 `entities[].type = "resource"` 重复，而设计层那个桶**只认**后者的 id，于是「两个家 → 下游同一个桶」，模型每次运行都得猜一次。⚠️ 它与票 03 说的「13 处**跨层**重名」不是一回事；⑤ **传输层失败照代码进 `failures[]`**（票 08 的 Answer §4 第 3 条因此就地标为**过时**）—— 账里 `failures` 的定义是「每一次没成的往返的原因」，丢掉它等于账上写着 `attempts: 1` 却不说为什么。⚠️ **落地形状**：**没有装配步**（`GameIntentSpec` 没有一个字段是「调用方才知道的」，所以不需要 `build-visual-world.ts` 那样的第二份文件）· 无 `.omit()`、无注入 · `LedgerStep += "analyze-intent"` · 账的 `target = "game-intent"`（**产物名**，不是 id）· `max_tokens = 16_000` · 工具名 `emit_game_intent` · **不做 CLI 入口**。⚠️ **探针 n=4**（原始契约 + 最小说明）：verbose 2/2、**terse 0/2 全灭于 `empty-input`**（代理丢入参，白烧 ~1080 token/发）、合计首发 2/4；⚠️ `ambiguity` 全是不点字段名的自由句子 ⇒ 判据出台。⚠️ **提示词骨架救不救得了短输入没测**（授权用尽）。⚠️ **判据**：**40 条新测试 · 套件 801/801**（此前 761）· `tsc -b --force` 干净 · 两个守卫绿（731 条链接）· **17 发变异全部验过会红**。⚠️ **三条当场量到的坑**：变异若经 `dist/` 消费则「改 src 不 rebuild **等于没改**」· 收尾 `tsc -b` 在增量下**可能是 no-op**（症状：变异全绿、`pnpm test` 却红）⇒ rebuild 一律 **`--force`** · **枚举值光靠 `tsc` 守着不够**（变异跑的是 vitest）⇒ 每个枚举值配一条测试，已补。⚠️ **播下**：`10`（`subgenre`/`camera` 是**可选但 ① 档**，别当成不存在）· `16`（`--intent` 的判别规则**本票定了**：存在路径读文件、否则裸文本；**疑似路径而文件不存在 ⇒ usage 错**；`intent.md` 要**逐字节**，与提示词侧的 `trim()` 分开）· `15`（本步**不写文件**；`gameId` 从哪来还没人定）· `19`（资源那一桶的集合差键**改了**：`entities[]` 里 `type === "resource"` 的那些 id）· `12`（`derive` 由你判）。
+
+- [`packages/vision` + `analyze-reference.ts` 落地](issues/08-vision-analyze-reference.md)：**参考图 + 需求文本 → `VisualWorldSpec`**，整条 V2 链的最前端。⚠️ **16 条裁决**，最要紧的四条：① **输入不止参考图** —— 还要**原始需求文本**（R1-Q1）。判据是「`palette` 是[[绘制词汇]]不是画面分布的摘要」，而**要画的东西有一部分压根不在参考图里**（`halt-dusk.png` 的 provenance 自白「故意不包含牛/拖拉机」）⇒ 喂的是**原始文本、不是 `GameIntentSpec`** ⇒ vision 与 intent 两步**并列**（`00 §6` 那条**严格线性**的链因此重写）；② **`styleReferences` 由调用方注入**（R1-Q2），模型面向的 schema 用 `.omit()` 摘掉它 —— 理由是那条路径**相对于 `visual-world.json`**，模型**答不出来**；分界线由此立起：**「提示词里给得出正确值的才让模型填（`style.id`，裁决 21），给不出的就别问」**；③ **顶层 `superRefine` 做越界 gate**（R1-Q6 / R2-Q4）—— 判据是「**就地 gate 只管「一次调用内部自相矛盾」**」，所以**只查** `palette:N` 越界（六桶 + `materials.*.color`），重色归「教模型」那一侧、空色板归票 17；④ **R2-Q5 那个杠杆**：`forcedTool.description` 是「schema 说不清的东西」**唯一的家**。⚠️ **两处实测把这条决定从理论变成账**：`toJSONSchema` **静默丢掉 `superRefine`**（模型看不见越界与重色），而它把开放对象摊成**没有 `properties` 的空对象**（模型于是把 `style.camera` 填成**数组**）。⚠️ **真探针 8 发**：首发过 Zod **`6/8`（75%）** · 输出 1742–2156 token · 单发 ~10s · 3 次地板下 ≈98.4% —— 而**两发失败 100% 出在内嵌的 `style` 子树**、新视图零失败，过 Zod 的 6 发里 1 发越界。⚠️ **票 27 的 80% 不能搬**：那份 schema 是手抄的、与落地契约**只 5 键重合**、顶层没封口。⚠️ **落地时量到四条**：`.omit()` 会**摘掉** `superRefine`（而 `.superRefine()` 保得住 `.omit()`）⇒ gate 的落点只能是**装配后的重校验**，R1-Q6 与 R2-Q1 因此**必须配对**；**`export { X } from "…"` 是纯再导出**、不引入本地绑定（第一版那么写，`assets` **24 条测试当场变红**）；zod 会把键序归一成契约次序（落盘顺序稳定）；`contracts` 的测试 import `assets` 源码是**越层**。⚠️ 判据：**49 条新测试 · 套件 761/761**（此前 712）· `tsc -b` 干净 · 两个守卫绿 · **13 发变异全部验过会红**。⚠️ **一处先前就有的类型错误仍在**（`contracts/tests/qa.test.ts:48` TS2783，`HEAD` 一字不差）——不是本票的，没顺手改。⚠️ **播下**：`15`（落盘与 `styleId` 生成归它）· `16`（`--style-id` 是覆盖口）· `17`（**越界判据在 VWS 这一侧永不触发**，自白写在契约里）· `09/10/31`（照抄这一步的形状）· `22`（`assets` 够不着 `vision`，读图那段要自己再写一份）· `26`（`role` 今天固定 `"global"`）。
 
 - [`VisualWorldSpec` 落地](issues/02-contract-visual-world.md)：**两层叠在一份文档里，不是两个版本** —— 新视图（`styleIdentity` / `camera` / 六桶 / `styleReferences`…）给**代码**读、**是权威**；内嵌的完整 `style: StyleSpec` 子树给**提示词与旧链**读、**不是第二事实源**，两者不一致**不设判据**（同一次调用填出，措辞差异）。⚠️ **25 条裁决**，其中三处改写了 doc 的字面：`schemaVersion`→`format: z.literal`（自由字符串**判别式写不出来**）· `references.styleImages`→摊平的 `styleReferences`（另两项**零消费者**，出局）· 删 `confidence`（**长得像分数**，与 Destination 的「不带分数」正面冲突）与 `rendering`（消费者是「将来会有」）。⚠️ **R6 与 R7 的一次正面冲突当场判了**：**R7 的门只管新字段，不管原样搬运的旧子树** —— `StyleSpec` 里 6 个字段**全仓库零读取**（`camera` 还被 `prompt.ts:217` 写下「故意不读」），但它们在**旧链里也是零读取**，砍掉会当场破坏 §5 兼容。⚠️ **落地时量到五条事实**：① `StyleSpecSchema` **从没解析过任何真实文件**（`ops.ts` 两处裸 cast，`parseWith` **零调用者**）⇒ 派生[票 29](issues/29-stylespec-parse-gate.md)；② `composition.layout` 与 `lighting.ambience` 在 VWS 里**没有家** ⇒ 这条**判了代码投影的死刑**，内嵌只能由模型一次吐全；③ `prompt.ts:217` 的注释与它旁边的代码**从第一天就不一致** —— `constraints` 在生图路上**被静默丢掉** ⇒ 派生[票 30](issues/30-constraints-not-in-image-prompt.md)；④ `zod/v4` 与 v3 **不许嵌套**（`toolInputSchema` 会抛）⇒ 四处 **v4 镜像** + 一条**漂移测试**（比对用**行为**，封口性写成**明示例外**）；⑤ 六桶装 `PaletteRef` 让「同源的两个视图」成为**结构事实**。判据：**587/587** · `tsc -b` 干净 · **包内要不要带 VWS 已甩给[票 15](issues/15-pipeline-create-game.md)**。
 

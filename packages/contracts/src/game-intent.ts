@@ -74,6 +74,42 @@ export const GameIntentMechanicSchema = z.strictObject({
   name: z.string().min(1)
 });
 
+// ── 顶层 gate：**「模型没做决定」与「用户要的就是这样」不许长得一样**（票 09 的 R2-Q1）────────
+//
+//   本契约的必填字段**没有 `.min(1)`**（`genre: z.string()`、`coreLoop: z.array(z.string())`），
+//   于是 `genre: ""` 与 `coreLoop: []` **完全合法** —— 而它们在文件里与「用户要的就是这样」
+//   **一模一样**。票 04 砍 `bodyProportions`、票 05 砍 `cameraModel` 都是同一种病：
+//   两个不同的东西在文件里长得一样，下一个人分不出来。
+//
+//   **这条 gate 管什么** —— 分界线是「结构性 / 语义性」（人类拍板，票 09 第 2 轮 R2-Q1）：
+//     凡「空了就说明**这一趟没说出一件事**」的 ⇒ 进 gate（这一发算 `schema` 失败、重采样）；
+//     凡「空了**本身是一句设计陈述**」的 ⇒ **不进**。
+//   进：必填字符串非空 · 数组元素非空 · `coreLoop` / `player.goals` / `mechanics` ≥ 1 ·
+//       可选对象出现时不得是空壳 · id 不得重复。
+//   不进（**逐条写下来，免得下一个人往里加**）：
+//     · `winConditions: []` / `loseConditions: []` —— 「不会死 / 没有终点」是真设计
+//       （仓库里就有原话：「没有血量条，也不会死」，`out/__probe-derive/vague.md`）；
+//     · `ambiguity: []` —— 需求说得够全时它就该是空的；
+//     · **`entities: []`** —— 障碍跑式的关卡（只有平台，没有敌人/拾取物/交互物）是**对的**，
+//       横版外壳里地形与终点根本不算实体 ⇒ 空不是「模型没干活」，是设计如此。
+//       ⚠️ 这一格是**人类专门从 gate 里划出去的**（票 09 第 2 轮：与 `mechanics ≥ 1` 二选一），
+//          **别再挪回来** —— 挪回来就是把合法设计判成失败，烧掉一次静默的重采样；
+//     · `title` / `subgenre` / `camera` 缺席 · `progression` / `challenge` 整个缺席。
+//
+//   ⚠️ **它管「有没有做决定」，不管「决定对不对」**：`genre` 填成 `platformer` 而用户其实要塔防，
+//     那是**理解错**，判据碰不到 —— 那是票 19 的 Intent QA。**别把这条 check 当垃圾桶。**
+//
+//   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 会静默丢掉 `superRefine`（票 08 探针实测）。
+//     这正是它该有的样子（它是 gate，不是提示）—— 而「让模型知道有这条规矩」那件事，
+//     由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+//
+//   ⚠️ **它同时也管从磁盘上读回来的 `game-intent.json`**（与 VWS 那条 gate 同理）。
+//     票 09 的探针实测：两发过 Zod 的 verbose 里，这张射程表**一处都没踩中** ⇒
+//     它在正常输入上很安静 —— 安静是预期的，别以为它坏了。
+//
+//   ⚠️ **`.omit()` 会摘掉 `superRefine`**（票 08 实测），而本契约**没有**要摘掉的键
+//     （没有任何「调用方才知道」的字段，票 09 第 1 轮 Q6）⇒ gate 一直跟着模型面向的 schema 走。
+//     但模型**仍然看不见它** —— 丢它的是 `toJSONSchema`，不是 `.omit()`。两件事别混。
 export const GameIntentSpecSchema = z.strictObject({
   format: z.literal(GAME_INTENT_FORMAT),
 
@@ -115,9 +151,6 @@ export const GameIntentSpecSchema = z.strictObject({
     .strictObject({ type: z.string().optional(), description: z.string().optional() })
     .optional(),
 
-  /** ⚠️ **裸串**（Q3(a)）：设计层那份 `{id, purpose}[]` 才是被造出来的东西。 */
-  resources: z.array(z.string()),
-
   winConditions: z.array(z.string()),
   loseConditions: z.array(z.string()),
 
@@ -131,6 +164,61 @@ export const GameIntentSpecSchema = z.strictObject({
    *  ⇒ 因此它必须 ① 在检查点的展示清单里**具名出现** ② `--yes` 跳过时**进日志**。
    *  ⇒ **这两条若不成立，本字段当场出局** —— 别把它养成「将来可能会用」的空壳。 */
   ambiguity: z.array(z.string())
+}).superRefine((v, ctx) => {
+  const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: "custom", path, message });
+  const blank = (s: string | undefined) => (s ?? "").trim() === "";
+  const HINT = " —— ⚠️ 「**用户没说**」要写成 `ambiguity[]` 里**指得出字段名**的一条，**不许**拿空值占位";
+
+  // ① 必填的**字符串**：空了 = 这一趟没说出一件事
+  const strings: [string, string][] = [
+    ["genre", v.genre],
+    ["targetExperience", v.targetExperience],
+    ["player.role", v.player.role],
+    ["world.theme", v.world.theme],
+    ["world.setting", v.world.setting],
+    ["world.atmosphere", v.world.atmosphere]
+  ];
+  for (const [label, s] of strings) if (blank(s)) issue(label.split("."), `\`${label}\` 是空的${HINT}`);
+
+  // ② 数组的**元素**：空串不是「没有这一条」，是一个占位符
+  const arrays: [string, string[]][] = [
+    ["coreLoop", v.coreLoop],
+    ["player.goals", v.player.goals],
+    ["winConditions", v.winConditions],
+    ["loseConditions", v.loseConditions],
+    ["ambiguity", v.ambiguity]
+  ];
+  for (const [label, arr] of arrays)
+    arr.forEach((x, i) => { if (blank(x)) issue([...label.split("."), i], `\`${label}[${i}]\` 是空串${HINT}`); });
+  v.entities.forEach((e, i) => { if (blank(e.role)) issue(["entities", i, "role"], `\`entities[${i}].role\` 是空串${HINT}`); });
+
+  // ③ 「一条都说不出」的数组（⚠️ `entities` **不在**这一档 —— 理由见上面那段）
+  const nonEmpty: [string, number][] = [
+    ["coreLoop", v.coreLoop.length],
+    ["player.goals", v.player.goals.length],
+    ["mechanics", v.mechanics.length]
+  ];
+  for (const [label, n] of nonEmpty)
+    if (n === 0) issue(label.split("."), `\`${label}\` 是空数组 —— 一条都说不出来的需求是**模型没干活**，不是设计如此`);
+
+  // ④ 可选对象**若出现**，不得是空壳（整个省掉合法，`{}` 不合法）
+  for (const label of ["progression", "challenge"] as const) {
+    const o = v[label];
+    if (o !== undefined && blank(o.type) && blank(o.description))
+      issue([label], `\`${label}\` 出现了但 \`type\` 与 \`description\` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种`);
+  }
+
+  // ⑤ id 不得重复：跨阶段的 id 延续靠它，重了就说不出「是哪一个」（与 08 的「色板不得重色」同形）
+  const dupIds = (arr: readonly { id: string }[], where: string) => {
+    const seen = new Set<string>();
+    arr.forEach((x, i) => {
+      if (seen.has(x.id))
+        issue([where, i, "id"], `\`${where}[${i}].id\` 与前面某一条重复（${x.id}）—— 设计层按 **id 延续**（票 03 Q2(b)），重了就对不上是哪一个`);
+      seen.add(x.id);
+    });
+  };
+  dupIds(v.entities, "entities");
+  dupIds(v.mechanics, "mechanics");
 
   // ⚠️ 被砍掉的，连同理由（票 03 的三轮）：
   //   `confidence`   —— 零消费者 + 长得像分数，与 Destination 的「不带分数」正面冲突。
@@ -141,6 +229,12 @@ export const GameIntentSpecSchema = z.strictObject({
   //                     （进 `entities[]`），要么是机制（进 `mechanics[]`）。
   //                     与设计层砍 `interactionModel` 对称。
   //   `schemaVersion` —— → `format: z.literal(...)`。
+  //   `resources`    —— **同层之内**与 `entities[].type === "resource"` 重复（票 09 Q5）。
+  //                    设计层的那个桶**只认** `entities[].type = "resource"`（见 `game-design.ts`
+  //                    四个桶的注释），于是「两个家 → 下游同一个桶」：模型每跑一次就在两个家之间
+  //                    猜一次，猜错就是串桶。⇒ 顶层这份出局，唯一来源是 `entities[]`。
+  //                    ⚠️ 它不是票 03 Q2 说的那「13 处**跨层**重名」之一 —— 那些是
+  //                    意图层 X ↔ 设计层 X（供 Intent QA 减集），这一处是**同层**的两个家。
 });
 
 export type GameIntentSpec = z.infer<typeof GameIntentSpecSchema>;

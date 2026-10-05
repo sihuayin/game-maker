@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z as z3 } from "zod";
 import { z as z4 } from "zod/v4";
 import {
-  CALL_FAILURES, CallFailure, forcedTool, parseLedger, parseToolUse, toolInputSchema,
+  CALL_FAILURES, CallFailure, LedgerStep, UPSTREAM_TIMEOUT_MS, forcedTool, parseLedger, parseToolUse, toolInputSchema,
 } from "../src/index.js";
 
 /** 一份**像 V2 契约那样**的 schema —— 嵌套对象、枚举、可选字段、开集 `Record` 一个不少。 */
@@ -218,5 +218,36 @@ describe("账上的 `failure`：闭集、可缺席、不许现编", () => {
 
   it("`CallFailure` 枚举与 `CALL_FAILURES` 是**同一份**（没有手抄第二遍）", () => {
     expect(CallFailure.options).toEqual([...CALL_FAILURES]);
+  });
+});
+
+describe("票 08 搬进来的那个超时常量与那个新的账目档位", () => {
+  it("`UPSTREAM_TIMEOUT_MS` 现在住这里 —— 因为 `vision` 只许依赖 `contracts`（R2-Q3）", () => {
+    // ⚠️ 搬家的理由不是整洁，是**够不着**：`vision` 够不着 `assets`，而「全仓只有这一个数」
+    //   这条纪律一旦有个包够不着它，就会**静默地**变成「有两个数」。
+    expect(UPSTREAM_TIMEOUT_MS).toBe(180_000);
+  });
+
+  // ⚠️ 「`assets` 那边是原样再导出」这条断言住在 `packages/assets/tests/generate.test.ts` ——
+  //   **不在这里**：`contracts` 的测试去 import `assets` 的源码是**越层**，
+  //   而 `tsconfig.spec.json` 的 `rootDir` 会当场把它抓出来（第一版就是那么写的，13 条 TS6059）。
+  it('`LedgerStep` 认得 `"analyze-reference"` —— 枚举里没有那个值，账上就是**隐形**的', () => {
+    // ⚠️ 与 `compile-game` 同一条教训：那次它「不交账」的真正原因不是谁忘了写一行，
+    //   是**枚举里根本没有那个值**。理解层的第一个调用不该再犯一次。
+    expect(LedgerStep.options).toContain("analyze-reference");
+  });
+
+  // ⚠️ **每加一次调用就加一条**（票 09 补理解层第二发）。这一条看着同义反复，但它守着一件事：
+  //   枚举值被谁删掉时**测试会红** —— 否则只有 `tsc` 拦得住（`spentCall("…")` 的字面量对不上
+  //   `LedgerStep` 会在编译期报 TS2345），而**变异判据跑的是 vitest、不是 tsc** ⇒
+  //   「删掉枚举值」这一发在变异里会静默通过（票 09 实吃了一口，见 `experiments/intent-mutations/`）。
+  it('`LedgerStep` 认得 `"analyze-intent"` —— 理解层的第二发同理', () => {
+    expect(LedgerStep.options).toContain("analyze-intent");
+  });
+
+  it('`LedgerStep` 认得 `"compile-design"` —— 理解层的收尾那一发同理', () => {
+    // ⚠️ 每加一次调用就加一条（票 09 立的规矩）：枚举值光靠 `tsc` 守着不够，
+    //   因为变异判据跑的是 vitest、不是 tsc。
+    expect(LedgerStep.options).toContain("compile-design");
   });
 });

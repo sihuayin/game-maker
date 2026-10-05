@@ -78,14 +78,18 @@ describe("§注册表与解析（R4 的「成族」· 票 05 Q9）", () => {
   });
 
   it("`GameDesignSpec` 里那份**引用**解析得动（设计层与运行档对得上）", () => {
+    // ⚠️ 这份 fixture 必须**过得了 `game-design.ts` 的 gate**（票 10 加的那条）——
+    //   第一版是一副全空的壳（`world: {"","",""}`、`levels: []`、`mechanics: []`），
+    //   而「层内可算的空」正是那条 gate 拦的东西。这里填成一份**最小但完整**的设计。
     const design = {
       format: GAME_DESIGN_FORMAT,
-      game: { title: "t", genre: "g", camera: "c", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } },
-      coreLoop: [], player: { id: "p", role: "r", abilities: [], goals: [] },
+      game: { title: "t", genre: "platformer", camera: "side", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } },
+      coreLoop: ["走"], player: { id: "p", role: "r", abilities: ["run"], goals: ["走到头"] },
       enemies: [], npcs: [], interactables: [], resources: [],
-      world: { theme: "", setting: "", structure: "" }, levels: [],
+      world: { theme: "t", setting: "s", structure: "st" },
+      levels: [{ id: "l-1", purpose: "p", layout: "左到右", entities: [] }],
       progression: { model: "m", description: "d" },
-      mechanics: [], winConditions: [], loseConditions: [], runtimeRequirements: []
+      mechanics: [{ id: "m-run", mechanic: "run" }], winConditions: [], loseConditions: [], runtimeRequirements: []
     };
     const parsed = GameDesignSpecSchema.safeParse(design);
     expect(parsed.success).toBe(true);

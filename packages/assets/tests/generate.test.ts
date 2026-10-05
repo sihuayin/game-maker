@@ -236,3 +236,27 @@ describe("锚点要进提示词（票 40）", () => {
     expect(renderPrompt(PLAYER, STYLE)).toMatch(/腾空的帧例外/);
   });
 });
+
+describe("超时常量搬进了 `contracts`（票 08 的 R2-Q3）", () => {
+  it("⚠️ `assets` 这里是**原样再导出** —— 既有调用方一行都不用改（票 33 的先例）", async () => {
+    // 搬家的理由不是整洁，是**够不着**：`vision` 只许依赖 `contracts`（R11 / `check-deps.mjs`），
+    // 而「全仓只有这一个数」这条纪律一旦有个包够不着它，就会**静默地**变成「有两个数」。
+    const { UPSTREAM_TIMEOUT_MS } = await import("@game-maker/contracts");
+    const assets = await import("../src/generate.js");
+    expect(assets.UPSTREAM_TIMEOUT_MS).toBe(UPSTREAM_TIMEOUT_MS);
+    expect(assets.UPSTREAM_TIMEOUT_MS).toBe(180_000);
+  });
+
+  it("⚠️ 而它必须是**先 import 再 export** —— 纯再导出不引入本地绑定，`generate.ts` 自己还在用它", async () => {
+    // 第一版写成了 `export { X } from "…"`：类型检查看不出来，而运行期那个名字是 `undefined`，
+    // 于是 `setTimeout(fn, undefined)` **立刻触发** ⇒ 本文件 12 条测试当场变红。
+    // 这一条判据就是拿「真的发一次请求」来钉住它 —— 超时没被立刻触发，才会走到回应。
+    const seen: RequestInit[] = [];
+    const g = gen((async (_u: string, init: RequestInit) => {
+      seen.push(init);
+      return { ok: true, status: 200, json: async () => okBody(3), text: async () => "" } as unknown as Response;
+    }) as unknown as typeof fetch);
+    await g(PLAYER, STYLE);   // 请求真的发出去了 ⇒ 超时**没有**被立刻触发
+    expect(seen).toHaveLength(1);
+  });
+});

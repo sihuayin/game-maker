@@ -98,8 +98,12 @@ describe("§四项引用族都要 id（票 03 Q3(a)）", () => {
       : bucket === "npcs" ? { role: "r", interaction: "i" }
       : bucket === "interactables" ? { type: "t", behavior: "b" }
       : { purpose: "p" };
-    expect(parse({ [bucket]: [{ id: "x", ...item }] }).success, `${bucket} 带 id`).toBe(true);
-    expect(parse({ [bucket]: [item] }).success, `${bucket} 缺 id`).toBe(false);
+    // ⚠️ 桶的 id 与 `levels[].entities` 现在**连着**了（票 10 加的那条引用族 gate）——
+    //   所以改桶就得同时改关卡的引用，否则红的是「悬空引用」而不是这一条。
+    const withRef = (items: unknown[]) =>
+      parse({ [bucket]: items, levels: [{ ...DESIGN.levels[0], entities: (items as { id: string }[]).map((i) => i.id) }] });
+    expect(withRef([{ id: "x", ...item }]).success, `${bucket} 带 id`).toBe(true);
+    expect(withRef([item]).success, `${bucket} 缺 id`).toBe(false);
   });
 });
 

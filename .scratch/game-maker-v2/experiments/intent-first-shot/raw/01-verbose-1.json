@@ -1,0 +1,157 @@
+{
+  "label": "01-verbose-1",
+  "tag": "verbose-1",
+  "ms": 5776,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 247,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 640,
+    "output_tokens": 991,
+    "service_tier": "standard"
+  },
+  "ok": true,
+  "failure": null,
+  "detail": null,
+  "emptiness": [],
+  "resourceShape": {
+    "byType": {
+      "npc": 1,
+      "interactable": 3,
+      "resource": 1,
+      "enemy": 2
+    },
+    "hasResourceEntity": true,
+    "ambiguity": [
+      "未明确玩家是否可攻击敌人，还是仅能躲避",
+      "未明确资源的具体用途（如回血、升级或开门）",
+      "未明确最终目标的具体形式与撤离方式",
+      "未明确关卡数量与地图是否分段"
+    ]
+  },
+  "input": {
+    "format": "game-intent/v1",
+    "genre": "横版动作冒险",
+    "subgenre": "废土探索寻宝平台跳跃",
+    "targetExperience": "在荒凉废墟中谨慎探索、紧张躲避敌人，并通过不断拾荒积累资源获得成长感的末世求生冒险体验。",
+    "coreLoop": [
+      "横版移动与跳跃穿越废弃城市地形",
+      "探索区域寻找宝箱与散布的资源点",
+      "拾取资源，积累物资与补给",
+      "躲避或对抗游荡的敌人与危险陷阱",
+      "利用资源解锁新区域或强化自身能力",
+      "抵达最终目标区域，取得核心宝物并撤离"
+    ],
+    "player": {
+      "role": "废土拾荒者",
+      "goals": [
+        "在废弃城市中探索并生存下来",
+        "搜集资源与宝箱中的宝物",
+        "躲避或击败敌人与危险",
+        "抵达并完成最终目标，带回核心宝物"
+      ]
+    },
+    "world": {
+      "theme": "末世废土生存",
+      "setting": "被灾难摧毁的废弃城市，断裂的高楼、生锈的车辆、坍塌的地铁与辐射荒原层层相连",
+      "atmosphere": "荒凉、破败、压抑而孤寂，伴随偶发危险带来的紧张感"
+    },
+    "mechanics": [
+      {
+        "id": "side-scroll-move",
+        "name": "横版移动"
+      },
+      {
+        "id": "jump",
+        "name": "跳跃"
+      },
+      {
+        "id": "chest-loot",
+        "name": "宝箱开启与开箱奖励"
+      },
+      {
+        "id": "resource-gather",
+        "name": "资源拾取与物资积累"
+      },
+      {
+        "id": "enemy-avoid",
+        "name": "敌人巡逻与躲避"
+      },
+      {
+        "id": "hazard-damage",
+        "name": "危险陷阱与伤害"
+      },
+      {
+        "id": "final-objective",
+        "name": "最终目标关卡与宝物取得"
+      }
+    ],
+    "entities": [
+      {
+        "id": "scavenger",
+        "type": "npc",
+        "role": "玩家控制的拾荒者"
+      },
+      {
+        "id": "loot-chest",
+        "type": "interactable",
+        "role": "可开启的宝箱，内含宝物与稀有资源"
+      },
+      {
+        "id": "scrap-pile",
+        "type": "resource",
+        "role": "可拾取的废料、食物、药品等基础资源"
+      },
+      {
+        "id": "raider",
+        "type": "enemy",
+        "role": "巡逻的废土掠夺者，会追击玩家"
+      },
+      {
+        "id": "mutant-beast",
+        "type": "enemy",
+        "role": "游荡的变异生物，区域性强敌"
+      },
+      {
+        "id": "hazard-zone",
+        "type": "interactable",
+        "role": "辐射区、尖刺或坍塌地面等危险地形"
+      },
+      {
+        "id": "final-relic",
+        "type": "interactable",
+        "role": "最终目标核心宝物，取得后通关"
+      }
+    ],
+    "winConditions": [
+      "抵达最终目标区域并取得核心宝物",
+      "带着核心宝物成功撤离"
+    ],
+    "loseConditions": [
+      "生命值耗尽",
+      "被敌人击杀或陷入致命危险陷阱"
+    ],
+    "progression": {
+      "type": "线性关卡分段推进",
+      "description": "沿废弃城市从外围废墟逐步深入到核心遗迹，随进度敌人与危险增强，资源用于补给与能力强化，最终抵达并夺取核心宝物。"
+    },
+    "challenge": {
+      "type": "探索与生存压力",
+      "description": "在有限生命与资源下穿越危险地形、躲避或对抗敌人，并在深入区域时承受越来越强的威胁。"
+    },
+    "camera": "横版横向卷轴跟随视角",
+    "ambiguity": [
+      "未明确玩家是否可攻击敌人，还是仅能躲避",
+      "未明确资源的具体用途（如回血、升级或开门）",
+      "未明确最终目标的具体形式与撤离方式",
+      "未明确关卡数量与地图是否分段"
+    ]
+  }
+}

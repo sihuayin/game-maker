@@ -1,0 +1,154 @@
+{
+  "label": "02-normal",
+  "tag": "normal",
+  "ms": 9075,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 134,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3323,
+    "output_tokens": 1598,
+    "service_tier": "standard"
+  },
+  "ok": true,
+  "failure": null,
+  "detail": null,
+  "inspect": {
+    "invented": [],
+    "lost": [],
+    "wrongBucket": [],
+    "dropped": [],
+    "approximated": [],
+    "mechanics": [
+      "m-run:run",
+      "m-jump:jump",
+      "m-collect:collect-pickup"
+    ],
+    "knownEnum": 8
+  },
+  "assembled": "ok",
+  "input": {
+    "format": "game-design/v1",
+    "game": {
+      "title": "拾荒者",
+      "genre": "platformer",
+      "camera": "side",
+      "runtimeProfile": {
+        "id": "platformer",
+        "version": "1"
+      }
+    },
+    "coreLoop": [
+      "在废弃都市的平坦平台带上左右移动（m-run），跨过竖直台阶边的断口",
+      "跳过平台之间的空隙与铁路信号旁的缺口（m-jump），一路向上爬升",
+      "拾取散落的废料与净水（m-collect），攒够资源去开格栅门",
+      "沿铁轨带与更暗的平台基座带向右推进，抵达被沙暴吞噬前的安全区终点"
+    ],
+    "player": {
+      "id": "p-scavenger",
+      "role": "拾荒者 —— 一个在天黑前必须找到归宿的方块人，粗壮短腿、方头、只有几个深色像素点当五官",
+      "abilities": [
+        "左右移动：沿平台顶面水平奔跑，速度恒定，无加速无惯性",
+        "跳跃：单段垂直起跳，起跳高度固定，用来跨过平台竖直台阶边的落差",
+        "拾取：与废料、净水等方块物件接触即收进背包，不占用手部动作",
+        "开启终端：站在终端前消耗已收集的废料，点亮信号灯并打开前方格栅门"
+      ],
+      "goals": [
+        "在天黑前抵达地图最右端的安全区",
+        "凑齐开门所需的废料与维持体力的净水",
+        "不被游荡的变异体拖住脚步"
+      ]
+    },
+    "enemies": [
+      {
+        "id": "e-mutant",
+        "behavior": "在平台带上左右往返游荡，方向固定、速度恒定，走到平台边缘就折返，不做任何转向追踪",
+        "threat": "水平接触即被判定为压力来源，被撞到会打断行进、损失时间与净水；跳跃可以完全从它头顶越过"
+      }
+    ],
+    "npcs": [],
+    "interactables": [
+      {
+        "id": "e-terminal",
+        "type": "资源门终端 —— 嵌在长墙条內凹矩形面板里的老式控制台",
+        "behavior": "玩家带着足够废料接触它时消耗资源，信号灯由暗红转亮，前方格栅门升起，作为通往下一段的门闸；资源不足时不响应，只闪一下红光"
+      }
+    ],
+    "resources": [
+      {
+        "id": "e-scrap",
+        "purpose": "开启 e-terminal 的唯一货币，攒够固定数量才能让格栅门升起"
+      }
+    ],
+    "world": {
+      "theme": "后启示录废土 · 被沙暴侵蚀的废弃都市；荒凉、孤寂，偶有暗红天光",
+      "setting": "极简平面矢量像素风：纯色矩形块拼接，无描边无渐变，靠硬边色块与横向色带切分空间；天空是闷黄到暗红的三段平滑色带，山脊与建筑为无细节剪影，太阳是一枚被钉在画面上缘附近的低垂圆盘；角色为粗壮低分辨率的方块人",
+      "structure": "画面分三段横向色带：最上与最下是天空色带，夹着一条很长的单层墙面条带，墙上有内凹的矩形面板、一根细灯柱与一块悬挂方板。可玩空间从下往上分三层——平坦的平台顶面带（主行走层）、其上的铁轨带（同一水平面延伸至画面右侧的窄条）、再往上是更暗的平台基座带；层与层之间只有竖直台阶边，用来跳。所有道具都是轴对齐矩形，尺寸按角色尺度定；排布稀疏，大片空白纯色场之间横向间隔很远。"
+    },
+    "levels": [
+      {
+        "id": "l-01",
+        "purpose": "开场：教玩家移动、跳跃与拾取，用一段没有压力的长平台把荒凉感摆出来",
+        "layout": "从最左端一片空旷平地起步，向右一条笔直的平坦平台顶面带，中途一段竖直台阶边需要跳一次；平台上沿路散布几枚废料。全段没有敌人，也没有门——走到底只是换到下一段的更暗区域。",
+        "entities": [
+          "e-scrap"
+        ]
+      },
+      {
+        "id": "l-02",
+        "purpose": "引入威胁与门闸：在变异体的游荡区间里收集废料，再用废料开启终端开门",
+        "layout": "延续同一条平台带向右，先经过一段有变异体来回游荡的开阔地，玩家需在它折返的间隙里拾取废料；再往右是细灯柱与三块小墙板构成的地标，尽头是嵌在墙条内凹面板里的终端；接触终端消耗废料后格栅门升起，露出通往安全区的一段上升台阶。",
+        "entities": [
+          "e-mutant",
+          "e-scrap",
+          "e-terminal"
+        ]
+      }
+    ],
+    "progression": {
+      "model": "线性关卡推进 + 资源门闸",
+      "description": "整体是一条从左到右、逐段抬升的线性路线，没有回到旧区域的回路。进阶由两种东西把住关口：一是竖直台阶边构成的跳跃门槛，二是终端门——只有攒够废料才能让格栅门升起进入下一段。守卫强度不靠数值成长，而靠空间被逐步收紧。"
+    },
+    "difficulty": {
+      "model": "静态分段式难度：威胁密度随向右推进递增",
+      "description": "第一段完全无威胁，只做移动与拾取的引入；第二段加入一只横穿游荡的变异体并首次出现资源门闸，玩家必须在游荡间隙里规划拾取与开门。全程无随机要素、无刷怪，难度只由敌我间距、平台断口宽度与所需废料数量三件事决定。"
+    },
+    "mechanics": [
+      {
+        "id": "m-run",
+        "mechanic": "run"
+      },
+      {
+        "id": "m-jump",
+        "mechanic": "jump"
+      },
+      {
+        "id": "m-collect",
+        "mechanic": "collect-pickup"
+      }
+    ],
+    "winConditions": [
+      "在天黑前抵达地图最右端的安全区"
+    ],
+    "loseConditions": [
+      "被游荡的变异体撞到，打断行进并损失净水；净水耗尽即失败",
+      "天黑计时归零时仍未抵达安全区"
+    ],
+    "runtimeRequirements": [
+      "input:keyboard",
+      "camera:side-scroll",
+      "camera:parallax",
+      "collision:aabb",
+      "objective:collect-then-reach",
+      "hud:screen-space",
+      "coord:delivery-pixels"
+    ]
+  }
+}

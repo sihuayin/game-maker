@@ -1,0 +1,26 @@
+{
+  "label": "03-terse-1",
+  "tag": "terse-1",
+  "ms": 6785,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 185,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 640,
+    "output_tokens": 1074,
+    "service_tier": "standard"
+  },
+  "ok": false,
+  "failure": "empty-input",
+  "detail": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。",
+  "emptiness": null,
+  "resourceShape": null,
+  "input": {}
+}

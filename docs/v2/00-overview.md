@@ -215,6 +215,10 @@ Regenerate
 
 # 3. V2 总体架构
 
+> ⚠️ **2026-10-03（[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md) 的 R1-Q1）：
+> 图中 `Game Intent` 那一支**同时**喂给 `Visual Understanding`。**
+> 它的输入是 **Style Reference + 一份原始需求文本**，不是只有参考图 —— 理由见 §6。
+
 ```text
                          User
                           │
@@ -380,11 +384,9 @@ Demo：
 # 6. 第一阶段完整 Pipeline
 
 ```text
-Image
+Style Image + Game Intent          ← ⚠️ 两个**并列**的输入（票 08 的 R1-Q1）
 ↓
-VisualWorldSpec
-↓
-GameIntentSpec
+VisualWorldSpec  +  GameIntentSpec ← ⚠️ 两步**并列**：都吃上面那两样，vision 不等 intent
 ↓
 GameDesignSpec
 ↓
@@ -511,3 +513,11 @@ V2 第一阶段完成必须满足：
 | `03 §11` 的「记录 `unsupportedRequirements`」 | **不采用**：`RuntimeProfile` 是外壳能力的**事实投影**，构建期**拒绝**（R12） |
 | `03 §7/§16` 的 Material DNA | **延后**，等真有消费者（R14） |
 | `03 §2/§6/§25` 让复用 `packages/runtime` 与 `packages/site` | 这两个包**不存在**；实际是 `contracts` / `assets` / `demo` / `cli` / `mcp` |
+| `03 §14` 把 Vision 的输入写成「`StyleReference`」单数一样 | 还要一份**原始需求文本** —— vision 与 intent 两步**并列**（[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md) 的 R1-Q1） |
+| `03 §7` 那张十项清单 | **以落地契约为准**；`Rendering` / `Animation` / `Readability` 零消费者、**不问**（票 08 的 R1-Q4） |
+| `03 §6` / `02 §2.1` 的 Vision 输入与 `AnalyzeReferenceInput` | 已按落地形状重写；另有**三件事 schema 表达不出来**，写在工具声明里（票 08 的 R2-Q5） |
+| `03 §9` 那张「至少识别」清单里的 `resources` | **出局**：降成 `entities[].type = "resource"`（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 Q5）；契约另加一条**结构性空值 gate**（该票的 R2-Q1） |
+| `03 §10` / `§19` 的编译器输入表 | `compile-design` **多一个 `RuntimeProfile` 输入** —— R12 的拒绝必须发生在**生图之前**，而票 14 看不见意图与 VWS（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 Q3a） |
+
+> ⚠️ 上表最后五行**不是 R 表改的，是票解出来的决定**（三行来自[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md)、一行来自[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md)、一行来自[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md)）。
+> 本文件的规矩同样适用：**票的决定是决策记录，`docs/` 是它的表达层** —— 冲突时改文档。

@@ -1,0 +1,266 @@
+{
+  "label": "01-first-shot",
+  "ms": 10293,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 2202,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1866,
+    "service_tier": "standard"
+  },
+  "ok": true,
+  "failure": null,
+  "detail": null,
+  "violations": {
+    "paletteLen": 16,
+    "dupes": [],
+    "refs": 32,
+    "oob": [],
+    "bucketsEmpty": false,
+    "oobTexts": []
+  },
+  "input": {
+    "format": "visual-world/v1",
+    "styleIdentity": {
+      "styleName": "halftone dusk platformer",
+      "keywords": [
+        "flat vector pixel",
+        "hard-edged silhouettes",
+        "limited ramp",
+        "horizontal banding",
+        "matte gradient sky",
+        "chunky 8-bit proportions",
+        "poster-flat layering"
+      ],
+      "description": "极简平面矢量像素风：纯色矩形区块拼接、无描边无渐变，靠硬边色块与横向色带切分空间；天空用三段平滑色带做黄昏渐变，山脊与建筑为无细节剪影；角色为粗壮低分辨率的方块人，五官仅由几个深色像素点构成；所有体积感来自有限的明度阶梯而非光影渲染。"
+    },
+    "camera": {
+      "mode": "side",
+      "projection": "orthographic",
+      "perspective": "flat side-scroller view, no vanishing point, parallel bands stacked vertically",
+      "angle": 0,
+      "elevation": 0
+    },
+    "composition": {
+      "background": "sky bands with dark ridge silhouette and a low sun disc pinned near the top edge",
+      "midground": "long repeating wall strip with rectangular feature panels, one lamp post",
+      "foreground": "flat platform floor band, then a rail band, then darker platform base band",
+      "characterScale": "small, roughly one tenth of frame height, centered on the platform band",
+      "objectScale": "props are axis-aligned rectangles, sized to character scale",
+      "density": "sparse; large empty flat color fields, features spaced far apart horizontally"
+    },
+    "palette": {
+      "primary": [
+        "palette:6",
+        "palette:7",
+        "palette:11"
+      ],
+      "secondary": [
+        "palette:2",
+        "palette:3",
+        "palette:9"
+      ],
+      "accent": [
+        "palette:5",
+        "palette:10",
+        "palette:12"
+      ],
+      "background": [
+        "palette:1",
+        "palette:4",
+        "palette:8"
+      ],
+      "shadow": [
+        "palette:13",
+        "palette:14"
+      ],
+      "highlight": [
+        "palette:0",
+        "palette:15"
+      ]
+    },
+    "lighting": {
+      "direction": "flat frontal, sun implied at upper right horizon",
+      "contrast": "low to medium; only two or three value steps per material",
+      "softness": "hard edges with banded sky gradient as the sole soft transition",
+      "mood": "quiet dusk, warm horizon against cool dark upper sky"
+    },
+    "materials": {
+      "sky": {
+        "appearance": "flat matte color bands, zero texture",
+        "color": [
+          "palette:1",
+          "palette:4",
+          "palette:8"
+        ],
+        "texture": "none"
+      },
+      "wall": {
+        "appearance": "matte mid-brown plaster, unshaded except for band edges",
+        "color": [
+          "palette:7",
+          "palette:6"
+        ],
+        "texture": "none"
+      },
+      "ground": {
+        "appearance": "flat grey slab with a darker base band below",
+        "color": [
+          "palette:9",
+          "palette:13"
+        ],
+        "texture": "none"
+      },
+      "rail": {
+        "appearance": "dark repeating horizontal dashes over a darker strip",
+        "color": [
+          "palette:13",
+          "palette:14"
+        ],
+        "texture": "regular repeating dashes"
+      },
+      "wood": {
+        "appearance": "soft tan blocky furniture and luggage",
+        "color": [
+          "palette:3",
+          "palette:5"
+        ],
+        "texture": "none"
+      },
+      "metal": {
+        "appearance": "uniform deep navy garment and equipment surfaces",
+        "color": [
+          "palette:11",
+          "palette:2"
+        ],
+        "texture": "none"
+      },
+      "emissive": {
+        "appearance": "flat glowing disc and framed panels, no blur halo",
+        "color": [
+          "palette:5",
+          "palette:10",
+          "palette:12"
+        ],
+        "texture": "none"
+      }
+    },
+    "character": {
+      "proportions": "stubby, wide torso, oversized square head, short legs",
+      "silhouette": "boxy hat brim, tall rectangle body, small rectangular limbs",
+      "faceAbstraction": "two dark square eyes and one mouth pixel, no other features",
+      "clothing": "long dark navy coat with lighter belt band, square hat, small pale hands",
+      "poseLanguage": "upright neutral idle; run and jump read only through leg and body offset"
+    },
+    "environment": {
+      "architecture": "single long horizontal wall strip with inset rectangular panels; flat roof line silhouette",
+      "terrain": "perfectly flat platform top, vertical step edges for jumps",
+      "props": "rectangular picture frame, hanging square panel, three small wall plates, thin lamp post with disc head, bench, luggage stack, railway signal",
+      "textureDensity": "very low; each prop is one or two flat shapes"
+    },
+    "shapeLanguage": [
+      "axis-aligned rectangles",
+      "flat trapezoid and triangle ridge silhouettes",
+      "circles only as sun disc, lamp head, signal lamp",
+      "no rounded corners except discs",
+      "strictly horizontal banding",
+      "one-pixel dash rhythm for rails"
+    ],
+    "constraints": [
+      "所有形状必须为轴对齐矩形、三角形或圆形，禁止圆角与自由曲线",
+      "禁止描边、渐变、阴影投射与任何体积渲染：面与面之间只用硬边直接相接",
+      "天空必须用不超过四段的横向色带表现黄昏，而不是连续渐变",
+      "山脊、建筑、角色一律为纯色剪影，禁止内部纹理与细线细节",
+      "角色只能用一套粗方块图元，五官仅限眼与嘴的像素点",
+      "远景层可平滑卷动，墙面与地面层必须以固定周期重复拼接",
+      "发光物（日头、窗、挂画、信号灯、路灯）只允许用高饱和平涂色块表示，不得加光晕或模糊",
+      "行李、木箱、长凳等可站立道具必须做成一到两个色块构成的方盒，且顶部为水平面以承载跳跃落点",
+      "信号灯必须在红与绿之间整体换色，且颜色需取自强调色组",
+      "HUD 面板为墙面同色系的实心矩形，槽位为空/亮两态，不得使用新色"
+    ],
+    "style": {
+      "id": "halt-dusk",
+      "identity": [
+        "flat vector pixel",
+        "hard-edged color blocking",
+        "banded dusk sky",
+        "silhouette landmark",
+        "limited warm-on-cool palette",
+        "side-scroller platformer strip"
+      ],
+      "confidence": 0.86,
+      "palette": [
+        "#f2c14e",
+        "#2d3f63",
+        "#1d2739",
+        "#e8a95c",
+        "#3c5a8a",
+        "#e9c05a",
+        "#8a5a34",
+        "#6b4526",
+        "#26314d",
+        "#8f8f96",
+        "#f5f0d8",
+        "#1b2540",
+        "#d97a2b",
+        "#3a3038",
+        "#141b2b",
+        "#c9be6a"
+      ],
+      "characterStyle": [
+        "stubby square proportions",
+        "navy coat block",
+        "square hat brim",
+        "pixel eyes and mouth",
+        "no outline"
+      ],
+      "environment": [
+        "long repeating wall panel",
+        "flat platform slab",
+        "dash-rhythm rail band",
+        "ridge and sun skyline"
+      ],
+      "material": [
+        "matte flat fills",
+        "no specular",
+        "no texture maps",
+        "one value step per material"
+      ],
+      "lighting": {
+        "mode": "flat",
+        "sun": "upper right, implied only by warm horizon color",
+        "halo": "none"
+      },
+      "camera": {
+        "mode": "side",
+        "projection": "orthographic",
+        "scroll": "horizontal parallax"
+      },
+      "composition": {
+        "bands": 3,
+        "layout": "sky / wall / platform+rail",
+        "horizon": "upper third"
+      },
+      "constraints": [
+        "no gradients except sky bands",
+        "no outlines",
+        "no rounded geometry",
+        "repeating midground strip",
+        "non-repeating sky"
+      ],
+      "shapeLanguage": [
+        "rectangle",
+        "triangle",
+        "disc"
+      ]
+    }
+  }
+}

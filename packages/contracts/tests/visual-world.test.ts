@@ -156,7 +156,11 @@ describe("VisualWorldSpecSchema 本身的形状", () => {
     constraints: [],
     styleReferences: [],
     style: {
-      id: "probe", identity: ["a"], camera: {}, composition: {}, palette: ["#112233"],
+      // ⚠️ **2026-10-03（票 08）色板从 1 个色加到 4 个**：本文件下面有两处用 `palette:1` / `palette:3`
+      //   来考「引用的**形式**」（是 `palette:<下标>`，不是 hex），而票 08 加的越界 gate 现在会
+      //   把「色板只有 1 个色、却引用 `palette:3`」判成**悬空引用**。考形式的那两条**不该**顺手考范围，
+      //   所以这里把 fixture 补成自洽的 —— **断言一个字没动**。
+      id: "probe", identity: ["a"], camera: {}, composition: {}, palette: ["#112233", "#445566", "#778899", "#aabbcc"],
       lighting: {}, shapeLanguage: [], material: [], environment: [], characterStyle: [], constraints: [], confidence: 0.9,
     },
   };

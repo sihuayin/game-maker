@@ -13,7 +13,7 @@
 //     才验得了（`shell/scene.ts` import 了 Phaser，node 里 import 不动，票 05 Q11）。
 import { describe, expect, it } from "vitest";
 import {
-  CAPABILITIES, CapabilitySchema, INTENT_ENTITY_TYPES, IntentEntityTypeSchema,
+  CAPABILITIES, CapabilitySchema, ENTITY_BUCKETS, INTENT_ENTITY_TYPES, IntentEntityTypeSchema,
   MECHANICS, MechanicSchema,
 } from "../src/vocabulary.js";
 import { EntityKind } from "../src/game-config.js";
@@ -71,23 +71,36 @@ describe("§形状：两份词表本身", () => {
 });
 
 describe("§桶对齐：意图层的 type 与设计层四个数组一一对应", () => {
-  /** 桶名映射。⚠️ 它是**全的**（每个 type 有家）且**单的**（没有两个 type 挤一个家）。 */
-  const BUCKET: Record<(typeof INTENT_ENTITY_TYPES)[number], string> = {
-    enemy: "enemies", npc: "npcs", interactable: "interactables", resource: "resources"
-  };
-
+  /** ⚠️ 映射**只有一份**，住 `vocabulary.ts`（票 10 把它从这张测试里收上去了）——
+   *  在测试里再抄一份，就是「写入侧与校验侧各写一份必然漂移」那条老病。 */
   it("映射是全的、单的 —— 每个 type 恰好一个家", () => {
-    const homes = INTENT_ENTITY_TYPES.map((t) => BUCKET[t]);
+    const homes = INTENT_ENTITY_TYPES.map((t) => ENTITY_BUCKETS[t]);
     expect(homes.length).toBe(INTENT_ENTITY_TYPES.length);
     expect(new Set(homes).size).toBe(homes.length);
   });
 
   it("四个桶在设计层都真的存在，且每一项都要求 `id`（id 是集合差的键）", () => {
     const shape = GameDesignSpecSchema.shape as Record<string, unknown>;
-    for (const home of Object.values(BUCKET)) expect(shape).toHaveProperty(home);
-    // 行为验证：一个缺 id 的敌人项解析不过 —— 若哪天有人把 id 改成可选，`compile-design`
-    // 就没法沿用意图层的 id，覆盖度判据**当场失效**（票 03 Q2(b)）。
-    const bare = { format: "game-design/v1", game: { title: "t", genre: "g", camera: "c", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } }, coreLoop: [], player: { id: "p", role: "r", abilities: [], goals: [] }, enemies: [{ behavior: "b", threat: "t" }], npcs: [], interactables: [], resources: [], world: { theme: "", setting: "", structure: "" }, levels: [], progression: { model: "m", description: "d" }, mechanics: [], winConditions: [], loseConditions: [], runtimeRequirements: [] };
-    expect(GameDesignSpecSchema.safeParse(bare).success).toBe(false);
+    for (const home of Object.values(ENTITY_BUCKETS)) expect(shape).toHaveProperty(home);
+
+    // ⚠️ 行为验证：一份**除了「那个敌人缺 id」之外完全合法**的设计必须不过。
+    //   ⚠️ 这份 fixture 第一版是**全空的壳**（`coreLoop: []`、`world: {"","",""}`、`levels: []`）——
+    //   票 10 给本契约加了 gate 之后，那种壳会因为**一堆别的理由**被拒，
+    //   于是这条断言在「`id` 被改成可选」时**照样绿**（假阳性）。
+    //   若哪天有人把 id 改可选，`compile-design` 就没法沿用意图层的 id，覆盖度判据**当场失效**。
+    const legal = {
+      format: "game-design/v1",
+      game: { title: "t", genre: "platformer", camera: "side", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } },
+      coreLoop: ["走"],
+      player: { id: "p", role: "r", abilities: ["run"], goals: ["到头"] },
+      npcs: [], interactables: [], resources: [],
+      world: { theme: "t", setting: "s", structure: "st" },
+      levels: [{ id: "l-1", purpose: "p", layout: "左到右", entities: [] }],
+      progression: { model: "m", description: "d" },
+      mechanics: [{ id: "m-run", mechanic: "run" }],
+      winConditions: [], loseConditions: [], runtimeRequirements: []
+    };
+    expect(GameDesignSpecSchema.safeParse({ ...legal, enemies: [{ id: "e", behavior: "b", threat: "t" }] }).success, "带 id 应当过").toBe(true);
+    expect(GameDesignSpecSchema.safeParse({ ...legal, enemies: [{ behavior: "b", threat: "t" }] }).success, "缺 id 应当不过").toBe(false);
   });
 });

@@ -190,12 +190,20 @@ analyze-reference.ts
 要求：
 
 ```text
-Style Reference Image
+Style Reference Image + Requirement Text
 ↓
 Vision LLM
 ↓
 VisualWorldSpec
 ```
+
+⚠️ **2026-10-03（[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md) 的 R1-Q1）：
+输入**不止**参考图，还要一份**原始需求文本**。**
+`palette` 是[[绘制词汇]]、**不是画面分布的摘要** —— 它的判据是「画不画得出这个世界里的东西」，
+而**要画的东西有一部分压根不在参考图里**（`fixtures/reference/halt-dusk.png` 的 provenance 白纸黑字：
+它「故意不包含牛/拖拉机/谷仓」，而 Destination 验收第 2 条要考的正是这个）。
+⇒ 喂的是**原始需求文本**、**不是** `GameIntentSpec` 的产物 —— 于是 vision 与 intent 两步**并列**，
+`GameIntentSpec` 之后才轮到它。见 `00-overview.md` §3 / §6。
 
 模型输出必须严格符合 Contract。
 
@@ -205,33 +213,29 @@ VisualWorldSpec
 
 # 7. Vision Prompt
 
-必须要求模型分析：
+必须要求模型分析的清单**以落地契约为准**（[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md) 的 R1-Q4）：
 
 ```text
-Rendering
-Camera
-Composition
-Palette
-Lighting
-Materials
-Character
-Environment
-Animation
-Readability
+styleIdentity · camera · composition · palette · lighting · materials
+character · environment · shapeLanguage · constraints · styleReferences
+（外加内嵌的 style —— 一份完整的 StyleSpec 形，它同样由模型填）
 ```
 
-特别注意：
+⚠️ **本节旧稿列过 `Rendering` / `Animation` / `Readability`，它们已被删掉**：
+按 R7 的门（**说不出「谁读它」的字段不进契约**）那三项**零消费者** ——
+`rendering` 里唯一拟人化的那部分由 `prompt.ts` 一句硬编码承担，而像素风真正的约束是
+`shapeLanguage` / `materials.texture` / `lighting` 这些**有家**的字段。
+理由逐条见[票 02 的 Answer](../../.scratch/game-maker-v2/issues/02-contract-visual-world.md)。
 
-```text
-pixel density
-outline
-shading
-dithering
-texture density
-character proportions
-object scale
-camera angle
-```
+⚠️ 「特别注意」那八项**不是消失了，是各有各的家**：
+`object scale → composition.objectScale` · `texture density → environment.textureDensity` ·
+`character proportions → character.proportions` · `camera angle → camera.angle` ·
+`outline → style.shapeLanguage` · `shading → lighting / materials.appearance` ·
+`dithering → materials.texture`。**`pixel density` 没有家**，所以不问（别把它硬塞进某处的自由文本）。
+
+⚠️ 而**三件 schema 表达不出来的事**写在**工具声明**里（票 08 的 R2-Q5）——
+`toJSONSchema` 会静默丢掉 `superRefine`，也会把开放对象摊成没有 `properties` 的空对象。
+具体是那三件，见 `packages/vision/src/prompts.ts` 的 `TOOL_DESCRIPTION`。
 
 ---
 
@@ -254,6 +258,17 @@ VisualWorldSpec.styleReferences
 ---
 
 # 9. Game Intent
+
+> ⚠️ **2026-10-03 已落地**（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md)）。
+> **以 `packages/contracts/src/game-intent.ts` 为准**，它 16 个键。与本文的出入有三处：
+> ① 下面那张「至少识别」清单里的 **`resources` 已出局** —— 它降成 `entities[].type = "resource"`
+> （票 09 的 Q5：两个家指向设计层同一个桶）；
+> ② `confidence` 不存在（票 03 已砍），所以「缺项」只能写进 `ambiguity[]`；
+> ③ 契约带一条**顶层 gate**：空串 / 空数组（`coreLoop`·`player.goals`·`mechanics`）/ id 重复
+> ⇒ 这一发算 `schema` 失败、重采样（票 09 的 R2-Q1）。
+>
+> ⚠️ 落点在 `packages/game-design/src/analyze-intent.ts`（**不在** `vision` —— 两个新包彼此不依赖），
+> 而**没有装配步**：没有任何「调用方才知道」的字段要注回去。
 
 实现：
 
@@ -292,6 +307,15 @@ lose
 ---
 
 # 10. Game Design
+
+> ⚠️ **2026-10-04 已落地**（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md)）。与本文的出入有一条**要紧**的：
+> **输入多了第三样 —— `RuntimeProfile`**（票 10 的 Q3a）。理由：R12 要「**在生图之前、且免费**」地拒绝，
+> 而**票 14 的输入里既没有意图也没有 `VisualWorldSpec`**（见 §19）⇒「用户要的东西做丢了」与
+> 「参考图的视角外壳承载不了」这两件事，**除了 `compile-design` 没人管得了**。
+> ⇒ 于是 R12 的拒绝**落在这一步**，且它**不是失败**：那一发上游调用是**成功的**（账照记、`failures[]` 不留痕），
+> 只是这份设计**做不出来**（不重采样）。⚠️ 票 06 删 `CAMERA_MISMATCH` 时把这条兑现押在了本票上。
+> ⚠️ 另：本层的 gate、两个注入值、以及「**意图覆盖 + 需求补全，不是意图镜像**」那条方向规则，
+> 见 [`01-contracts.md §4`](01-contracts.md)。
 
 实现：
 

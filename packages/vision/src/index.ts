@@ -1,10 +1,11 @@
-// ⚠️ **骨架，尚未实现。**
+// 视觉理解：**风格参考图 → `VisualWorldSpec`**（票 08）。
 //
-// 这一包要做的事在
-// `../../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md`
-// —— 那才是有消费者的地方；这里空空如也**是有意的**。
+// 落点与决定：`../../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md`
+// 与地图的 `R15` / `R16` / `R16`。
 //
-// 它现在存在的唯一理由：让 `scripts/check-deps.mjs` 与根 `tsconfig.json` 能**先表态**
-// （见票 07 的 Answer —— 那个守卫是**双向**的，图和 `packages/` 必须时刻同步），
-// 从而下游那张票写代码时不必再碰构建管线。
-export {};
+// ⚠️ 本包**只依赖 `contracts`**（R11 / `scripts/check-deps.mjs`）—— 所以 I/O 是自己写的，
+//   而 `packages/assets` 的 `prompt.ts` / `review.ts` 够不着（那是**反方向**的那一半：它们把
+//   `StyleSpec` 转成生成提示词，本包把参考图转成 `VisualWorldSpec`）。
+export * from "./prompts.js";
+export * from "./build-visual-world.js";
+export * from "./analyze-reference.js";

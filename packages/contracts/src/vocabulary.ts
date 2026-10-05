@@ -98,4 +98,17 @@ export type Capability = z.infer<typeof CapabilitySchema>;
 export const INTENT_ENTITY_TYPES = ["enemy", "npc", "interactable", "resource"] as const;
 
 export const IntentEntityTypeSchema = z.enum(INTENT_ENTITY_TYPES);
+
+/** **意图层的 `type` → 设计层的那个桶**（票 03 Q3 的「一一对应」落地成一个名字关系）。
+ *  ⚠️ 住在这里是**故意的**：它是**名字**的关系，而这里就是名字的家（文件头）。
+ *  在别处再写一份，就是「写入侧与校验侧各写一份必然漂移」那条老病
+ *  （它此前散在 `vocabulary.test.ts` 的穷尽断言里，票 10 收上来）。
+ *  ⚠️ `compile-design`（票 10）拿它判**意图的每个实体在设计里有没有对家** ——
+ *  那是 R12 今天真正活着的那条拒绝。 */
+export const ENTITY_BUCKETS: Record<IntentEntityType, "enemies" | "npcs" | "interactables" | "resources"> = {
+  enemy: "enemies",
+  npc: "npcs",
+  interactable: "interactables",
+  resource: "resources"
+};
 export type IntentEntityType = z.infer<typeof IntentEntityTypeSchema>;

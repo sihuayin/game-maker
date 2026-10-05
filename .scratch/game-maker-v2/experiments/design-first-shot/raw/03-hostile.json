@@ -1,0 +1,163 @@
+{
+  "label": "03-hostile",
+  "tag": "hostile",
+  "ms": 9360,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 1549,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1920,
+    "output_tokens": 1671,
+    "service_tier": "standard"
+  },
+  "ok": true,
+  "failure": null,
+  "detail": null,
+  "inspect": {
+    "invented": [],
+    "lost": [],
+    "wrongBucket": [],
+    "dropped": [
+      "m-double-jump"
+    ],
+    "approximated": [],
+    "mechanics": [
+      "m-run:run",
+      "m-jump:jump",
+      "m-collect:collect-pickup"
+    ],
+    "knownEnum": 8
+  },
+  "assembled": "rejected:intent-mechanic-missing",
+  "input": {
+    "format": "game-design/v1",
+    "game": {
+      "title": "拾荒者",
+      "genre": "platformer",
+      "camera": "side",
+      "runtimeProfile": {
+        "id": "platformer",
+        "version": "1"
+      }
+    },
+    "coreLoop": [
+      "在废土平台的平顶与竖直角壁之间左右奔跑、跳跃，向画面右侧推进。",
+      "沿途拾取散落的废料与净水，把它们记入本区域的储量。",
+      "在终端前消耗废料储量把封死的门打开，继续向右深入。",
+      "在暗红天光彻底熄灭前抵达区域尽头废弃安全区的入口。"
+    ],
+    "player": {
+      "id": "player-scavenger",
+      "role": "拾荒者：粗壮低分辨率的方块人，宽躯干、超大方形头、短腿，戴一顶方檐帽，在天黑前赶路。",
+      "abilities": [
+        "左右移动：在平台平顶带与更暗的基座带之间水平推进，步幅小、速度稳。",
+        "跳跃：越过高出平台顶面的竖直角壁与低矮障碍，落回平顶。",
+        "收集：贴近废料与净水时把它们拾起，计入本区域的资源储量。",
+        "消耗资源开门：站到终端前把积攒的废料投进去，门板退开让出通路。"
+      ],
+      "goals": [
+        "在天黑前抵达区域尽头的废弃安全区入口。",
+        "为开门攒够废料，不至于被门挡在半路。"
+      ]
+    },
+    "enemies": [
+      {
+        "id": "e-mutant",
+        "behavior": "在平台平顶的一段固定区间内左右游荡，走到边界就折返，不追出这段区间。",
+        "threat": "与拾荒者接触即造成伤害，把玩家从平顶上逼退、拖慢赶路节奏；它不主动接近，是横在路上的一段会动的障碍。"
+      }
+    ],
+    "npcs": [],
+    "interactables": [
+      {
+        "id": "e-terminal",
+        "type": "资源闸门终端：嵌在长墙带矩形面板中的一块扁平机箱，薄灯柱与之并置。",
+        "behavior": "靠近交互时扣除本区域积攒的废料；储量够则门板退开、通路放行，储量不够则终端保持熄灭、门不动。"
+      }
+    ],
+    "resources": [
+      {
+        "id": "e-scrap",
+        "purpose": "拾取后计入本区域废料储量，是终端开门的唯一消耗品；储量不足就过不去门。"
+      }
+    ],
+    "world": {
+      "theme": "后启示录废土：荒凉、孤寂，偶有暗红天光；极简平面矢量像素风，纯色矩形区块拼接，无描边无渐变，体积感只来自有限的明度阶梯。",
+      "setting": "被沙暴侵蚀的废弃都市——一条很长的横向墙体带，墙上有内嵌的矩形面板、挂着的方形板、三块小墙板和一盏细灯柱；屋顶线是平的剪影，平台上偶有长凳、行李堆与铁路信号。",
+      "structure": "横向分三层色带：上方是三条平滑色带的黄昏天空（顶部压着暗红天光、山脊剪影与紧贴顶边的低日盘），中景是带矩形特征面板的长墙带，下方是平顶平台地面带，平台顶面绝对水平、靠竖直的台阶边缘制造跳跃高差，最下再压一层更暗的基座带。前景/中景/背景互不遮挡地平平叠放，道具都是轴对齐矩形、按角色尺度定尺寸，横向间距拉得很大，大片空的纯色域留白，相机只做横向卷动。"
+    },
+    "levels": [
+      {
+        "id": "level-01-dusk-run",
+        "purpose": "开场段：教会左右移动、跳跃与拾取废料，让玩家在无威胁的空平台上先熟悉手感与横向推进。",
+        "layout": "从最左侧一段长而空的平顶平台起步，向右只有低矮的竖直台阶落差，需要一次次跳上跳下；沿途稀疏散着几堆废料，天光由暗红缓缓压暗，最后落在一个略高的平台上收尾。",
+        "entities": [
+          "e-scrap"
+        ]
+      },
+      {
+        "id": "level-02-mutant-stretch",
+        "purpose": "引入唯一的威胁：变异体在平台段上横挡，玩家必须在赶路与绕行之间取舍，同时不能漏掉废料。",
+        "layout": "承接上一关的高度，平台顶面继续向右延伸；中段横着变异体游荡的一段区间，玩家要跳过头顶或从下方台壁绕开；这一段废料被刻意摆得离变异体的活动带很近，逼玩家冒险去捡。",
+        "entities": [
+          "e-mutant",
+          "e-scrap"
+        ]
+      },
+      {
+        "id": "level-03-terminal-gate",
+        "purpose": "结算段：把前面攒下的废料换成通路，验证「收集—开门—抵达」这条循环闭合。",
+        "layout": "平台在一堵嵌了矩形面板的长墙前收窄，墙上挂着一块方形面板、三块小墙板和一盏细灯柱；终端就在墙脚，门前散着最后一小堆废料，门开之后平台把玩家送到区域尽头废弃安全区的入口。",
+        "entities": [
+          "e-terminal",
+          "e-scrap",
+          "e-mutant"
+        ]
+      }
+    ],
+    "progression": {
+      "model": "线性关卡推进：区域即关卡，逐段向右。",
+      "description": "每关由「一段跑跳平台 + 一段威胁 + 一个终端门」构成；废料储量不带过关，只在当前区域花掉，所以每关都要重新收集；开门后进入下一区域，天光一段比一段暗，越往后越接近天黑。"
+    },
+    "difficulty": {
+      "model": "固定难度曲线，靠空间与数量自然加压。",
+      "description": "难度只由三件事抬高：平台间的竖直落差变大、变异体横挡的区间变长、废料被摆得离威胁更近。不改数值、不加新敌人，节奏让玩家自己跑快跑慢。"
+    },
+    "mechanics": [
+      {
+        "id": "m-run",
+        "mechanic": "run"
+      },
+      {
+        "id": "m-jump",
+        "mechanic": "jump"
+      },
+      {
+        "id": "m-collect",
+        "mechanic": "collect-pickup"
+      }
+    ],
+    "winConditions": [
+      "在天黑前抵达区域尽头废弃安全区的入口。",
+      "第三关的终端被废料打开、玩家越过门后的平台终点。"
+    ],
+    "loseConditions": [
+      "与游荡的变异体接触而受伤。"
+    ],
+    "runtimeRequirements": [
+      "input:keyboard",
+      "camera:side-scroll",
+      "collision:aabb",
+      "objective:collect-then-reach",
+      "hud:screen-space",
+      "coord:delivery-pixels"
+    ]
+  }
+}

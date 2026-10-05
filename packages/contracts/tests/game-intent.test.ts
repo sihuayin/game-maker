@@ -24,7 +24,6 @@ const INTENT = {
   entities: [{ id: "e-drone", type: "enemy", role: "沿固定路线巡逻的无人机" }],
   progression: { type: "linear", description: "三关" },
   challenge: { type: "timing", description: "跳跃时机" },
-  resources: ["零件"],
   winConditions: ["收集三枚零件并抵达终点"],
   loseConditions: ["生命归零"],
   ambiguity: ["没说共几关"]

@@ -1,0 +1,177 @@
+{
+  "label": "04-hostile",
+  "tag": "hostile",
+  "ms": 10714,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 141,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3328,
+    "output_tokens": 1869,
+    "service_tier": "standard"
+  },
+  "ok": true,
+  "failure": null,
+  "detail": null,
+  "inspect": {
+    "invented": [
+      "e-water"
+    ],
+    "lost": [],
+    "wrongBucket": [],
+    "dropped": [
+      "m-double-jump"
+    ],
+    "approximated": [],
+    "mechanics": [
+      "m-run:run",
+      "m-jump:jump",
+      "m-collect:collect-pickup"
+    ],
+    "knownEnum": 8
+  },
+  "assembled": "rejected:intent-mechanic-missing",
+  "input": {
+    "format": "game-design/v1",
+    "game": {
+      "title": "拾荒者",
+      "genre": "platformer",
+      "camera": "side",
+      "runtimeProfile": {
+        "id": "platformer",
+        "version": "1"
+      }
+    },
+    "coreLoop": [
+      "在废弃都市的水平平台带上向左或向右奔跑，用跳跃跨越台阶与断口，一路向上推进。",
+      "沿途拾取散落的废料与净水，把它们当作开门与续命的筹码。",
+      "躲开游荡的变异体，在暗红天光彻底压下来之前抵达区域终点的安全区。"
+    ],
+    "player": {
+      "id": "p-scavenger",
+      "role": "拾荒者：一个背着破布包的方块小人，在沙暴侵蚀的废城里逐层向上搜集废料与净水，目标是在天黑前活着进入安全区。",
+      "abilities": [
+        "左右奔跑：沿平台水平移动，速度恒定，遇墙停止。",
+        "跳跃：起跳越过台阶边缘与沟壑，跳跃高度固定，用于跨越垂直落差。",
+        "二段跳：空中可再跳一次，用来够到高处悬挂的方形平台板与跨越长断口。",
+        "拾取：碰到废料与净水即收入背包，无需按键。",
+        "终端交互：站在终端前消耗背包里的资源，开启通往上一层的门。",
+        "受击后退：被变异体碰到会损失净水并被弹开一段距离。"
+      ],
+      "goals": [
+        "在天黑前抵达每一段的区域终点。",
+        "攒够废料与净水，换取终端开门的资格。",
+        "尽量少受伤，保住抵达安全区所需的净水。"
+      ]
+    },
+    "enemies": [
+      {
+        "id": "e-mutant",
+        "behavior": "在一条固定水平平台带上来回游荡，走到带子两端就折返，不追逐玩家、不跳跃、不掉落。",
+        "threat": "接触即造成伤害：扣掉一份净水并把玩家弹开一段距离，弹开方向可能把玩家推下平台。"
+      }
+    ],
+    "npcs": [],
+    "interactables": [
+      {
+        "id": "e-terminal",
+        "type": "资源门终端",
+        "behavior": "嵌在墙体矩形面板里的终端；玩家站到它面前时，若背包里的废料数量达到门槛，就消耗废料并让它身后的门板滑开，露出通往上一层的缺口；废料不够则门板不动，玩家可以折返继续搜集后再来。"
+      }
+    ],
+    "resources": [
+      {
+        "id": "e-scrap",
+        "purpose": "废料：终端开门的唯一筹码，每开一扇门消耗固定数量；不参与生命，只参与通行资格。"
+      },
+      {
+        "id": "e-water",
+        "purpose": "净水：玩家的耐久筹码，被变异体撞击时扣一份，归零则本次拾荒失败；也是抵达安全区时结算的生存凭证。"
+      }
+    ],
+    "world": {
+      "theme": "后启示录废土：极简平面矢量像素风，纯色矩形区块拼接，无描边无渐变，硬边色块与横向色带切分空间，所有体积感来自有限的明度阶梯。",
+      "setting": "被沙暴侵蚀的废弃都市：一条横贯全屏的长墙带、平屋顶剪影、低垂的暗红日盘与山脊剪影，稀疏的方形道具按角色尺度摆放，大片空白的平色场。",
+      "structure": "自上而下分四层：最上是三段平滑色带的黄昏天空，压着暗色山脊剪影与贴顶边的低日盘；其下是中景的长重复墙带，墙上嵌着规整的矩形面板与稀疏散布的画框、方形挂板、三块小墙板与一根圆盘头灯柱；再下是角色实际站立的平坦平台面色带（前景），带长椅、行李堆与铁路信号等横向道具；最底是更暗的平台基座带，用竖直台阶边缘形成跳跃落差。整条流程从左向右推进，每过一道终端门就爬升一段高度，越往上天色越暗。"
+    },
+    "levels": [
+      {
+        "id": "l-01-wall-run",
+        "purpose": "教学段：在墙带下学会跑、跳与拾取，并第一次撞见变异体的威胁。",
+        "layout": "从最左侧的平屋顶剪影下起跑，平台面几乎是一条直线，只有两三处单人高的竖直台阶需要跳跃；中段一段长直带上有一只e-mutant来回游荡，玩家必须跳起越过它；带子上方稀疏散布若干e-scrap与e-water，末尾是一段长断口，必须用二段跳跨越后才能落到终点平台。",
+        "entities": [
+          "e-scrap",
+          "e-water",
+          "e-mutant"
+        ]
+      },
+      {
+        "id": "l-02-terminal-gate",
+        "purpose": "资源换通行：把搜集来的废料交给终端，换开一扇通往上一层的门。",
+        "layout": "起点平台较短，随即进入墙带下的搜集走廊，走廊上散布e-scrap与e-water，中途仍有一只e-mutant巡逻把守；走廊尽头立着e-terminal，其后的门板是唯一的继续通路；门开之后是一串高度递增的竖直台阶，需要连续跳跃与一次二段跳爬上去。",
+        "entities": [
+          "e-scrap",
+          "e-water",
+          "e-mutant",
+          "e-terminal"
+        ]
+      },
+      {
+        "id": "l-03-last-light",
+        "purpose": "收束段：在天色彻底压暗前，用最后一段连续跳跃抵达安全区。",
+        "layout": "全程是一条持续向上折返的阶梯平台带，落点之间间距拉大，必须依赖二段跳；带上有两只e-mutant分守上下两段，e-water放在它们身后作为冒险的回报；最后一段长断口之后就是贴着日盘剪影的安全区终点平台。",
+        "entities": [
+          "e-scrap",
+          "e-water",
+          "e-mutant",
+          "e-terminal"
+        ]
+      }
+    ],
+    "progression": {
+      "model": "线性关卡推进（lineer stage progression）",
+      "description": "三段关卡从左到右、由低到高串联：每段的终点平台就是下一段的起点，段与段之间由终端门把关。难度靠三样东西递进：落点间距变大（越来越依赖二段跳）、平台带变窄变高、变异体的数量从一只增加到两只且巡逻区正好压在必经路线上。玩家本身不获得新能力，成长体现在背包里攒下的废料与净水上。"
+    },
+    "difficulty": {
+      "model": "资源压力递增（resource pressure）",
+      "description": "难度不通过数值成长而是通过资源稀缺与地形收紧来提升：第一段几乎不消耗，第二段开始必须为终端攒够废料，第三段则要在两只变异体的夹缝里保住净水才能活着抵达安全区。受伤不致死但会消耗净水，净水归零即失败，因此容错由净水袋的厚度决定。"
+    },
+    "mechanics": [
+      {
+        "id": "m-run",
+        "mechanic": "run"
+      },
+      {
+        "id": "m-jump",
+        "mechanic": "jump"
+      },
+      {
+        "id": "m-collect",
+        "mechanic": "collect-pickup"
+      }
+    ],
+    "winConditions": [
+      "在天亮变暗之前抵达第三段终点的安全区平台。",
+      "背包中至少保留一份净水到达安全区。"
+    ],
+    "loseConditions": [
+      "净水被变异体撞击消耗至零。",
+      "掉出平台带下缘的基座带、无法再回到可通行平台。"
+    ],
+    "runtimeRequirements": [
+      "input:keyboard",
+      "camera:side-scroll",
+      "collision:aabb",
+      "objective:collect-then-reach",
+      "hud:screen-space",
+      "coord:delivery-pixels"
+    ]
+  }
+}

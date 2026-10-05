@@ -116,6 +116,28 @@ export const StyleSpecShape = z.strictObject({
 });
 
 // ── 新契约 ────────────────────────────────────────────────────────────────────────────────
+//
+// ⚠️ **一条顶层的 `superRefine`：所有 `palette:N` 的落点必须落在 `style.palette` 之内**（票 08 的 R1-Q6 / R2-Q4）。
+//
+//   **它管什么**：六桶**与** `materials.*.color` —— 一个世界只有一个颜色来源，
+//     所以「引用越界」在这两处是**同一条**违规，一条 check 管完。
+//   **为什么只提前管这一条**：判据是 **「就地 gate 只管「一次调用内部自相矛盾」」** ——
+//     模型自己写下一份 9 个色的 `style.palette`、又引用 `palette:9`，那是**自己跟自己打架**。
+//     票 08 的八发真探针实测：过 Zod 的 6 发里有 **1 发**正是这个（`highlight` + 三个 `materials.*.color`）。
+//     ⚠️ 而「色板为空」那种**不是**自相矛盾、是**世界的一种性质** ⇒ 不在这里管，
+//     它归票 17 的判据。**别把这条 check 当垃圾桶往里加。**
+//
+// ⚠️ **这条 check 模型看不见。** `toJSONSchema` 会把 `superRefine` **静默丢掉**（票 08 探针实测），
+//   所以它**只在我们这边响**。这正是它**该有的样子**（它是 gate，不是提示），
+//   但**模型不知道有这条规矩** ⇒ 由 `vision` 在工具 `description` 里补一句（票 08 的 R2-Q5）。
+//
+// ⚠️ **一个必须点名的连带后果：这条 check 同时也管从磁盘上读回来的 `visual-world.json`。**
+//   它不只在 vision 那一次调用里响 —— 一份**人手写的**、引用越界的文档，解析时就会被拒。
+//   我们认为这是对的（票 02 裁决 12 本来就把「palette 越界」定成**判据**，而 R3 说判据在构建期阻断），
+//   但要**说清楚**：它让[[观察 / 判据|判据]]里那条「palette 越界」**在 VWS 这一侧**
+//   **永远不再触发** —— config / drawlist 那一侧的那条还在，别以为它坏了。
+//   照票 05 的先例（「那两条差集**恒为空是预期的**」，契约里自带这句自白），写在这里免得下一个人找。
+//
 
 /** 六桶的**名字**。⚠️ 这是 schema 的键集，不是取值域 —— 取值域永远是 `style.palette` 那份有序数组。 */
 export const PALETTE_BUCKETS = ["primary", "secondary", "accent", "background", "shadow", "highlight"] as const;
@@ -239,7 +261,28 @@ export const VisualWorldSpecSchema = z.strictObject({
   // ⚠️ `style.id` 由**调用方注入**（第 21 条裁决，R4-Q1）：提示词把 `<styleId>` 递给模型让它照抄
   //   （先例见 `ops.ts:86`），解析后由 pipeline **强制覆盖** —— `id` 是**身份不是观察**，
   //   让模型看一张图即兴编，同一张图两次会跑出两个 `stylespecId`，而那个字段的用途恰恰是指认。
+  // ⚠️ `confidence` **从不做门禁**（票 08 的 R1-Q3）。它是**模型自报**的数、消费者为零，
+  //   而 R3 说自报的数进不了判据。留着它是因为它与 `StyleSpecSchema` **一字不差**
+  //   （漂移测试盯着这一条），而**不是**因为它有用 —— 别拿它当闸门。
   style: StyleSpecShape
+}).superRefine((v, ctx) => {
+  // ⚠️ **只此一处的「越界」定义**。上面文件头写着它管什么、为什么只提前管这一条。
+  const n = v.style.palette.length;
+  const sites: { where: string; path: (string | number)[]; ref: string }[] = [];
+  for (const [bucket, refs] of Object.entries(v.palette))
+    (refs ?? []).forEach((ref, i) => sites.push({ where: `palette.${bucket}[${i}]`, path: ["palette", bucket, i], ref }));
+  for (const [name, mat] of Object.entries(v.materials))
+    (mat?.color ?? []).forEach((ref, i) => sites.push({ where: `materials.${name}.color[${i}]`, path: ["materials", name, "color", i], ref }));
+  for (const { where, path, ref } of sites) {
+    // 形式已由 `PaletteRefShape` 的正则保证是 `palette:<数字>`，所以这里直接取数字。
+    const idx = Number(ref.slice("palette:".length));
+    if (idx >= n)
+      ctx.addIssue({
+        code: "custom", path,
+        message: `${where} 指向 ${ref}，而这份文档的 style.palette 只有 ${n} 个色（合法下标 0..${n - 1}）` +
+          "—— ⚠️ 悬空引用：色板与引用是同一次调用里写出来的，对不上就是**文书自己跟自己矛盾**",
+      });
+  }
 });
 
 export type VisualWorldSpec = z.infer<typeof VisualWorldSpecSchema>;

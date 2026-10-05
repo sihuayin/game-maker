@@ -1,0 +1,147 @@
+{
+  "label": "01-normal",
+  "tag": "normal",
+  "ms": 7532,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "blockTypes": [
+    "tool_use"
+  ],
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 3457,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1405,
+    "service_tier": "standard"
+  },
+  "ok": true,
+  "failure": null,
+  "detail": null,
+  "inspect": {
+    "invented": [],
+    "lost": [],
+    "wrongBucket": [],
+    "dropped": [],
+    "approximated": [],
+    "mechanics": [
+      "m-run:run",
+      "m-jump:jump",
+      "m-collect:collect-pickup"
+    ],
+    "knownEnum": 8
+  },
+  "assembled": "ok",
+  "input": {
+    "format": "game-design/v1",
+    "game": {
+      "title": "拾荒者",
+      "genre": "platformer",
+      "camera": "side",
+      "runtimeProfile": {
+        "id": "platformer",
+        "version": "1"
+      }
+    },
+    "coreLoop": [
+      "在废土平台上左右移动，跨过断裂的台阶与地缝。",
+      "跳过垂直落差与废弃结构，落回平坦的楼层带。",
+      "沿途拾取散落的废料与净水，把背包填到能开门。",
+      "在天光彻底暗下去之前抵达区域终点——安全区的闸门。"
+    ],
+    "player": {
+      "id": "p-scavenger",
+      "role": "拾荒者：一个在沙暴侵蚀的废弃都市里靠翻找废料与净水活下去的流浪者，必须在入夜前抵达安全区。",
+      "abilities": [
+        "左右匀速行走，落地即停，没有加速跑的余力。",
+        "单次跳跃，能跨过一人的缺口或跳上一个垂直台阶。",
+        "接触即拾取废料与净水，无需按键。",
+        "被变异体碰到不会死，但会被顶开并丢掉一部分废料。"
+      ],
+      "goals": [
+        "在天黑前抵达区域终点（安全区闸门）。",
+        "沿途收集足够多的废料与净水，用来开启终端门并支撑到下一个区域。"
+      ]
+    },
+    "enemies": [
+      {
+        "id": "e-mutant",
+        "behavior": "在平台带上来回游荡，走到平台边缘或墙面前就转身，不主动追击、不跳跃。",
+        "threat": "接触造成击退：玩家被顶开、失去少量废料并被短暂打断前进节奏，在垂直台阶边缘被顶开可能掉回下层，浪费时间——而时间就是天黑。"
+      }
+    ],
+    "npcs": [],
+    "interactables": [
+      {
+        "id": "e-terminal",
+        "type": "资源闸门终端",
+        "behavior": "嵌在长墙的矩形面板里；玩家身上废料与净水够数时接触即开闸，不够则不予响应，只回一段暗红光提示。"
+      }
+    ],
+    "resources": [
+      {
+        "id": "e-scrap",
+        "purpose": "散落在平台顶部与台阶边缘的废料，既是终端开门的消耗品，也是被变异体顶开时会掉落的损失品。"
+      }
+    ],
+    "world": {
+      "theme": "后启示录废土：荒凉、孤寂，偶有暗红天光。",
+      "setting": "被沙暴侵蚀的废弃都市——一条不断重复的长墙带、平齐的屋顶剪影线与横贯画面的铁路楼层带。",
+      "structure": "背景为三段平滑色带拼出的黄昏天空，天际线压一道深色山脊剪影，一枚低垂的日盘钉在画面上缘；中景是一条极长的横向墙体带，内嵌矩形面板，仅立一根细灯柱；前景为平台结构——最上层是平直的平台地面带，其下是一条铁路带，再下是更暗的平台基座带，台阶以垂直切边相接，无倾斜面。所有道具均为轴对齐矩形，按角色尺度取大；分布稀疏，大面积纯色空场，特征物沿水平方向拉得很开。"
+    },
+    "levels": [
+      {
+        "id": "l-01",
+        "purpose": "开场教学：让玩家在没有威胁压力的情况下学会移动与跳跃，并第一次意识到「废料是可以捡的」。",
+        "layout": "从左端出发，一整段平坦平台地面带向右延伸，途中两处垂直台阶上下交替；中段出现第一只游荡的变异体，玩家可以选择绕行；其后铺开一段较长的空场，只放三份散落废料，收尾处是一道高出地面一人的台阶，跳上去即到达区域终点。",
+        "entities": [
+          "e-scrap",
+          "e-mutant"
+        ]
+      },
+      {
+        "id": "l-02",
+        "purpose": "把收集变成必要：废料不再是可选收获，而是开门的前提；同时用变异体把「绕行」变成「承担风险」。",
+        "layout": "起始于平台基座带（更暗的下层），需连续两次跳跃上升回到平台地面带；铁路带横贯中段，一只变异体在带上来回游荡巡逻；中后段废料密度提高但都摆在靠近游荡路线的位置；最右端墙面上嵌着终端，集齐足量废料后接触开门，门后即安全区。",
+        "entities": [
+          "e-scrap",
+          "e-mutant",
+          "e-terminal"
+        ]
+      }
+    ],
+    "progression": {
+      "model": "linear-level-sequence",
+      "description": "横向的、不可回头的线性推进：一关一关从左向右走，关卡之间不保留能力升级，只累积「已收集的废料与净水」这一种资源；资源在关卡内被终端消耗掉，用于开启通往下一段的路。推进的度量不是等级，而是天光——每过一关，天空色带整体下压一档，直到最后一关的暗红天光。"
+    },
+    "mechanics": [
+      {
+        "id": "m-run",
+        "mechanic": "run"
+      },
+      {
+        "id": "m-jump",
+        "mechanic": "jump"
+      },
+      {
+        "id": "m-collect",
+        "mechanic": "collect-pickup"
+      }
+    ],
+    "winConditions": [
+      "在天空色带彻底变暗前抵达区域终点——安全区闸门。"
+    ],
+    "loseConditions": [],
+    "runtimeRequirements": [
+      "input:keyboard",
+      "camera:side-scroll",
+      "camera:parallax",
+      "collision:aabb",
+      "objective:collect-then-reach",
+      "hud:screen-space",
+      "coord:delivery-pixels"
+    ]
+  }
+}
