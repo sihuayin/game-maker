@@ -1,0 +1,770 @@
+{
+  "label": "02-plan",
+  "ms": 39207,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 136,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 6656,
+    "output_tokens": 4714,
+    "service_tier": "standard"
+  },
+  "wireOk": false,
+  "wireFailure": "schema",
+  "wireDetail": "工具入参不过契约：assets[6]: Unrecognized key: \"dependsOn\"；assets[13]: Unrecognized key: \"dependsOn\"",
+  "truthOk": null,
+  "truthErrors": null,
+  "inspect": null,
+  "input": {
+    "format": "asset-recipe/v1",
+    "id": "scavenger-wasteland-assets",
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png",
+    "authoring": [
+      {
+        "id": "am-player",
+        "role": "player-character-master",
+        "description": "拾荒者母版：方块人，粗壮宽躯干、过大的方形头、短腿，深藏青长外套配较浅腰带带、方帽檐，小手点位；中性直立站姿。",
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, chunky 8-bit boxy humanoid, oversized square head, stubby wide torso, short legs, long dark navy coat with lighter belt band, square hat with boxy brim, small pale hands, no outlines, no gradients, plain flat background"
+        },
+        "characterId": "player",
+        "size": {
+          "w": 64,
+          "h": 64
+        }
+      },
+      {
+        "id": "am-mutant",
+        "role": "enemy-character-master",
+        "description": "变异体母版：同一套方块人骨架，躯干更宽更矮、头更小、肢体更粗短，整体一团暗色块；中性直立姿态。",
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, chunky 8-bit boxy creature humanoid, wider squatter torso than a human, small square head, thick stubby limbs, uniform dark blocky silhouette, no outlines, no gradients, plain flat background"
+        },
+        "characterId": "e-mutant",
+        "size": {
+          "w": 64,
+          "h": 64
+        }
+      }
+    ],
+    "assets": [
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-dusk-sky",
+          "role": "黄昏天空与天际线",
+          "description": "三段平滑色带拼出的黄昏天空，天际线压一道深色山脊剪影，一枚低垂的日盘钉在画面上缘；不平铺、无纹理。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 480,
+            "h": 270
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "sky",
+              "parallax": 0.15
+            },
+            {
+              "name": "ridge",
+              "parallax": 0.3
+            },
+            {
+              "name": "sun",
+              "parallax": 0.3
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art dusk sky, three smooth matte horizontal color bands for a sunset gradient zero texture, a dark low ridge silhouette along the horizon, one flat glowing sun disc pinned near the top edge with no halo, no gradients beyond the band steps, no outlines, no detail"
+        }
+      },
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-wall-strip",
+          "role": "中景长墙带",
+          "description": "一条极长的横向墙体带，内嵌矩形面板，仅立一根细灯柱；哑光墙色，只有色带边缘分界，水平可平铺。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 480,
+            "h": 160
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "wall",
+              "parallax": 0.6,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, one extremely long horizontal wall strip with inset rectangular panels, single thin lamp post with a disc head, matte mid-brown plaster surface unshaded except at band edges, hard edges, no outlines, seamless horizontally tileable, no detail"
+        }
+      },
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-platform-slabs",
+          "role": "前景平台结构",
+          "description": "最上层平直的平台地面带，其下一条铁路带（深色横杠重复），再下更暗的平台基座带；台阶以垂直切边相接，无倾斜面。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 480,
+            "h": 200
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "floor",
+              "parallax": 1,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            },
+            {
+              "name": "rail",
+              "parallax": 1,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            },
+            {
+              "name": "base",
+              "parallax": 1,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art platform structure bands: a perfectly flat platform top slab band, below it a rail band of dark repeating horizontal dashes over a darker strip, below that a darker platform base band, vertical step edges only, no slanted surfaces, hard-edged, seamless horizontally tileable, no detail"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-scrap",
+          "role": "废料拾取物",
+          "description": "一小块轴对齐的方形废料块，按角色尺度取小，纯色平涂加一格高光边；散布在平台顶部与台阶边缘。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-water",
+          "role": "净水拾取物",
+          "description": "一小只轴对齐的方形净水容器块，带一条浅色液面横带；与废料同为开门消耗品，分布更稀疏。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-terminal",
+          "role": "资源闸门终端",
+          "description": "嵌在长墙矩形面板里的方形终端面板，平涂暗底加两格微亮指示块；废料与净水够数时接触开闸。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 40
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-gate",
+          "role": "安全区闸门",
+          "description": "一道竖直矩形闸门板，由两条平行实心门体块构成，落地即闭合；终端开启后向右滑开。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 48,
+            "h": 96
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        },
+        "dependsOn": [
+          "e-terminal"
+        ]
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-picture-frame",
+          "role": "墙上矩形画框",
+          "description": "一件轴对齐的矩形画框道具，外框内一块纯色空面，无内容细节。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 40
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-hanging-panel",
+          "role": "悬挂方形面板",
+          "description": "一块从墙带上方垂下的方形挂板，硬边纯色块，仅一到两个明度阶梯。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0
+          },
+          "size": {
+            "w": 32,
+            "h": 32
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-wall-plate",
+          "role": "墙面板片",
+          "description": "三片一组的小矩形墙面片，厚度极薄，贴墙平涂，供长墙带重复排布。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 24,
+            "h": 24
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-lamp-post",
+          "role": "细灯柱",
+          "description": "一根极细的竖直灯柱，顶端一枚扁平圆盘头，平涂无光晕；中景长墙带上仅立一根。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 96
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-bench",
+          "role": "长凳",
+          "description": "轴对齐矩形长凳：一块水平座板加两条短支腿，方块家具比例。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 24
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-luggage-stack",
+          "role": "行李堆",
+          "description": "两三个轴对齐方形箱包叠成的软棕方块堆，无把手细节。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 40
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-rail-signal",
+          "role": "铁路信号灯",
+          "description": "细杆顶一枚方形信号箱，箱面一格平涂圆形信号片；立在铁路带上。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 64
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        },
+        "dependsOn": [
+          "p-lamp-post"
+        ]
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-idle",
+          "role": "玩家待机",
+          "description": "拾荒者直立中性待机，双臂垂放、无呼吸起伏，仅一帧重心的极微水平偏移。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "am-player",
+          "animations": [
+            {
+              "name": "idle",
+              "frames": 2,
+              "fps": 4,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art character sprite sheet, 2 frames of upright neutral idle, chunky 8-bit proportions, oversized square head, stubby wide torso, short legs, long dark navy coat with lighter belt band, square hat, small pale hands, no outlines, no gradients, plain flat background",
+          "reference": "master"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-walk",
+          "role": "玩家行走",
+          "description": "左右匀速行走：上身前倾极少，仅靠双腿交替与躯干竖直偏移读出步态，落地即停、无加速跑。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "am-player",
+          "animations": [
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 8,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art character sprite sheet, 4 frames side-view walk cycle, legs alternating only, torso held near upright with slight vertical offset, chunky 8-bit proportions, oversized square head, stubby wide torso, dark navy long coat with lighter belt band, square hat, small pale hands, no outlines, no gradients, plain flat background",
+          "reference": "master"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-jump",
+          "role": "玩家跳跃",
+          "description": "单次跳跃：起跳双腿收拢、上升段躯干略拉伸，下落段双腿分开；只有腿部与躯干偏移变化。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "am-player",
+          "animations": [
+            {
+              "name": "jump",
+              "frames": 3,
+              "fps": 8,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art character sprite sheet, 3 frames side-view jump: crouch launch, rising with legs tucked, falling with legs split, chunky 8-bit proportions, oversized square head, stubby wide torso, dark navy long coat with lighter belt band, square hat, small pale hands, no outlines, no gradients, plain flat background",
+          "reference": "master"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-hurt",
+          "role": "玩家被顶开",
+          "description": "被变异体接触击退：躯干整体后倾并水平后移一档，帽子与外套下摆位移变大，节奏被打断。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "am-player",
+          "animations": [
+            {
+              "name": "knockback",
+              "frames": 3,
+              "fps": 10,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art character sprite sheet, 3 frames side-view knockback recoil: torso tipping backward and shifted horizontally, hat and coat hem offset, off-balance legs, chunky 8-bit proportions, oversized square head, dark navy long coat with lighter belt band, square hat, small pale hands, no outlines, no gradients, plain flat background",
+          "reference": "master"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "mutant-walk",
+          "role": "变异体游荡",
+          "description": "在平台带上来回游荡的粗短方块体：左右小幅交替迈腿，躯干几乎不动，到边缘或墙前原地转身。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "e-mutant",
+          "masterAsset": "am-mutant",
+          "animations": [
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 6,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art creature sprite sheet, 4 frames side-view patrol walk, chunky 8-bit boxy creature with wider squatter torso than a human, small square head, thick stubby limbs alternating, uniform dark blocky silhouette, no outlines, no gradients, plain flat background",
+          "reference": "master"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-hud-panel",
+          "role": "HUD 底板",
+          "description": "屏幕角落的状态底板，纯色平面板带一圈明度边框；会被拉伸到任意尺寸，写九宫格。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 48,
+            "h": 32
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 6,
+            "right": 6,
+            "top": 6,
+            "bottom": 6
+          }
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-scrap-count",
+          "role": "废料计数行",
+          "description": "横排计数行底板：左侧一格方形废料槽，右侧留空供数字；会被拉伸到任意宽度。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 64,
+            "h": 16
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 16,
+            "right": 4,
+            "top": 4,
+            "bottom": 4
+          }
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-water-count",
+          "role": "净水计数行",
+          "description": "横排计数行底板：左侧一格方形净水槽，右侧留空供数字；会被拉伸到任意宽度。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 64,
+            "h": 16
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 16,
+            "right": 4,
+            "top": 4,
+            "bottom": 4
+          }
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-daylight-bar",
+          "role": "天光计时条",
+          "description": "一条水平计时条：底槽加实心填充块，随入夜向右缩短；底槽会被拉伸到任意宽度，填充块按比例裁切。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 128,
+            "h": 12
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 3,
+            "right": 3,
+            "top": 3,
+            "bottom": 3
+          }
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-icon-scrap",
+          "role": "废料图标",
+          "description": "一格方形废料图标，按原尺寸绘制，绝不被拉伸。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-icon-water",
+          "role": "净水图标",
+          "description": "一格方形净水图标，按原尺寸绘制，绝不被拉伸。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-prompt-terminal",
+          "role": "终端交互提示",
+          "description": "终端面板旁的方形提示牌，按原尺寸绘制的一块扁平指示块，不入库拉伸。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 24,
+            "h": 24
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-flash-deny",
+          "role": "开闸失败提示",
+          "description": "屏幕空间的一枚暗红光平闪片，方块状，按原尺寸绘制、只做透明度淡出，不写九宫格。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 32
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      }
+    ]
+  }
+}

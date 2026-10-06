@@ -9,9 +9,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, entityBox, FALLBACK_ANCHOR, parseAssetPack, parseGameConfig, parseLedger, parseRecipe,
-  summarizeCalls,
-  type AssetPackManifest, type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleSpec,
+  auditGameConfig, ConfigToolSchema, entityBox, FALLBACK_ANCHOR, forcedTool, GameDesignSpecSchema,
+  parseAssetPack, parseGameConfig, parseLedger, parseRecipe, parseToolUse, PLATFORMER_V1,
+  RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
+  summarizeCalls, VisualWorldSpecSchema,
+  type AssetPackManifest, type CallFailure, type ConfigIssue, type LedgerCall, type LedgerStep,
+  type LedgerUsage, type StructuredSchema, type StyleSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
@@ -21,7 +24,7 @@ import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerat
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
-import { assetTask, drawListFewShot, drawListOpsSpec, paletteLine, recipeShapeSpec, styleBrief, tdConfigPrompt } from "./prompt.js";
+import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, designBrief, drawListFewShot, drawListOpsSpec, paletteLine, PLAN_TOOL_DESCRIPTION, PLAN_TOOL_NAME, recipeShapeSpec, styleBrief, tdConfigPrompt } from "./prompt.js";
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
@@ -30,19 +33,6 @@ export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-m
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
 
-// ── derive：需求 + StyleSpec → 资源清单 ──────────────────────────────────────
-export type DeriveOptions = {
-  requirementPath: string; stylePath: string; outRoot: string;
-  transport?: Transport; fetchImpl?: typeof fetch;
-  /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
-  timeoutMs?: number;
-};
-
-/**
- * 推导一份资源清单。**两阶段的第一阶段**（票 28）—— 清单落盘，人过目，再 `pack`。
- *
- * ⚠️ 清单**绝不覆盖**：每次推导写一个新的 `v<N>`（与资源包同一条规矩）。
- */
 /**
  * **「已经花掉的」那一段** —— 两个壳（CLI 与 MCP）**共用这一处**。
  *
@@ -58,89 +48,205 @@ export function formatSpentCalls(calls: readonly LedgerCall[]): string {
     calls.map((c) => `  · ${c.step} ${c.target} · ${c.ms === undefined ? "**还没回来**" : (c.ms / 1000).toFixed(1) + "s"} · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}`).join("\n");
 }
 
-export async function deriveRecipe(opts: DeriveOptions): Promise<CommandResult> {
-  const requirement = fs.readFileSync(opts.requirementPath, "utf8");
-  const style = JSON.parse(fs.readFileSync(opts.stylePath, "utf8")) as StyleSpec;
-  if (!opts.transport) throw new CommandError("upstream", "推导需要文本上游；它现在不可达（清单是文件，人可以直接写一份）");
+// ── plan-assets：设计 + 这个世界 → 资源清单（票 12）───────────────────────────
+//
+// ⚠️ **这一道是 `derive` 的接班人，不是它的兄弟**（票 12 的 Q1：(a) 合并 —— 票 09 / 10 / 11 三次
+//   把这一问推给它）。两者产的是**同一种文件**，而这一道是它的**严格超集**：
+//   旧的 `derive` 提示词**明确拒绝**决定策略（「所有资源的 source 都写 drawlist……
+//   那一项由人后续自己填」），而 V2 要求 LLM 决定它（`00 §2.4`）。
+//   ⇒ 于是**写入侧只有这一处**（`derivePackMode` 那条教训：两个入口各写一遍必然漂移）。
+export type PlanAssetsOptions = {
+  /** `game-design.json` —— 理解层的收尾产物（票 10）。 */
+  designPath: string;
+  /** `visual-world.json` —— 票 02 的产物。 */
+  visualWorldPath: string;
+  outRoot: string;
+  transport?: Transport; fetchImpl?: typeof fetch;
+  /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
+  timeoutMs?: number;
+};
 
-  const prompt = `你是游戏资源策划。根据下面的**需求**与**风格规格**，产出一份完整的资源清单。
-⚠️ **所有资源的 source 都写 {"kind":"drawlist"}** —— 你无法知道人工导入的位图放在哪，
-   也无法替人决定哪个资源该花钱调生图模型（source.kind = "image"）。
-那一项由人后续自己填。
+/** 上游自报的模型名与用量（与 `callText` 那条路同款 —— 它们是「花了什么」的事实，票 45）。 */
+function spentOfTool(body: unknown): Spent {
+  const j = body as {
+    model?: string;
+    usage?: { input_tokens?: number; output_tokens?: number; reasoning_tokens?: number };
+  } | null;
+  const u = j?.usage;
+  return {
+    ...(j?.model !== undefined ? { model: j.model } : {}),
+    ...(u === undefined
+      ? {}
+      : {
+          usage: {
+            ...(u.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
+            ...(u.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
+            ...(u.reasoning_tokens !== undefined ? { reasoningTokens: u.reasoning_tokens } : {})
+          }
+        })
+  };
+}
 
-只输出 JSON 本体，不要 markdown 围栏，不要解释。
-清单要完整：需求里点名的每一种资源都列出来，该拆的拆开（两种障碍是两条）。
-⚠️ **同一个东西的多个动作是「一个资源、多个动画」，不是多个资源** ——
-玩家角色的 idle/run/jump 应当是**一个**资源，带三个 animation；
-「不同的资源」指的是**不同的东西**（玩家 / 货箱 / 罐头 / 背景）。
+/**
+ * **一次往返**（**R16 那条协议**：强制工具调用）。⚠️ 它与上面 `onceThrough` 那条**旧协议**的路
+ * **并列**，别把两者混起来：那条走 `callText` + 剥围栏 + `JSON.parse`，这条走 `parseToolUse`。
+ *
+ * ⚠️ **唯一的成功判据是入参过 Zod** —— `stop_reason === "tool_use"` **不是**（票 27 第 1 发实测：
+ *   工具被调、`input = {}`、1135 token 打水漂）。
+ */
+async function onceThroughTool<T>(o: {
+  transport: Transport; body: string; tool: string; schema: StructuredSchema<T>;
+  fetchImpl?: typeof fetch; timeoutMs?: number;
+}): Promise<Once<T>> {
+  const doFetch = o.fetchImpl ?? fetch;
+  const timeoutMs = o.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  let res: Response;
+  try {
+    res = await doFetch(`${o.transport.baseUrl}/v1/messages`, {
+      method: "POST", signal: ctl.signal,
+      headers: { "content-type": "application/json", "x-api-key": o.transport.apiKey, "anthropic-version": "2023-06-01" },
+      body: o.body,
+    });
+  } catch (e) {
+    const kind = ctl.signal.aborted ? ("timeout" as const) : ("http" as const);
+    const msg = ctl.signal.aborted
+      ? `上游 ${Math.round(timeoutMs / 1000)} 秒没回应，已中止（超时）`
+      : (e as Error).message;
+    return { kind: "upstream", failure: kind, error: new UpstreamCallError(kind, msg) };
+  } finally { clearTimeout(timer); }
 
-# 需求
-${requirement}
+  if (!res.ok)
+    return { kind: "upstream", failure: "http", error: new UpstreamCallError("http", `上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`) };
 
-# 风格规格
-${styleBrief(style)}
+  let body: unknown;
+  try { body = await res.json(); }
+  catch (e) { return { kind: "upstream", failure: "http", error: new UpstreamCallError("http", `上游回的不是 JSON：${(e as Error).message}`) }; }
 
-# 清单格式（asset-recipe/v1）
-{"format":"asset-recipe/v1","id":"<slug>","styleRef":"${rel(opts.outRoot, opts.stylePath)}","assets":[
- {"spec":{"kind":"sprite|animation|background|ui","id":"<slug>","role":"...","description":"...",
-   "styleId":"${style.id}","anchor":{"x":0..1,"y":0..1},"size":{"w":int,"h":int},
-   "required":true,
-   "animations":[{"name":"...","frames":int,"fps":num,"loop":bool}]},
-  "source":{"kind":"drawlist"}}]}
+  const spent = spentOfTool(body);
+  const parsed = parseToolUse(body, o.tool, o.schema);
+  // 形式的失败（没调工具 / 入参丢了 / 不合线形状）由 `parseToolUse` 分好类 —— 那一档才是重采样的理由。
+  if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
+  return { kind: "ok", result: { ok: true, value: parsed.value } as const, spent };
+}
 
-四条硬规则（**会被 schema 强制检查，违反直接拒收**）：
-1. \`sprite\` —— **不许出现 \`animations\` 这个键**（它只有一帧）。会动的才是 animation。
-2. \`animation\` —— 必须有 \`animations\`，至少一个。
-3. \`background\` 是场景尺度；\`ui\` 是**屏幕空间**（世界里的招牌是 sprite，不是 ui）。
-4. \`animations[].frames\` 是**帧数**（整数），不是帧名。
+/**
+ * 规划一份资源清单。**两阶段的第一阶段**（票 28）—— 清单落盘，人过目，再 `pack`。
+ *
+ * ⚠️ 清单**绝不覆盖**：每次规划写一个新的 `v<N>`（与资源包同一条规矩）。
+ * ⚠️ **它走 R16**（强制工具调用 + 入参过 Zod + `STRUCTURED_CALL_ATTEMPTS` 次重采样）——
+ *   与 `derive` 当年那条「纯文本 + 剥围栏 + 2 次」的旧路**不是一回事**，别照抄旧的那份。
+ * ⚠️ **入参过线形状不算数**：真正的判据是 `parseRecipe`（v3 那份契约）—— 依赖图 · 母版比例 ·
+ *   九宫格中央区 · 路径字符都住在它里面（`recipe-tool.ts` 的文件头解释了这条分工）。
+ */
+export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult> {
+  const readJson = (p: string, what: string): unknown => {
+    try { return JSON.parse(fs.readFileSync(p, "utf8")); }
+    catch (e) { throw new CommandError("invalid", `${what}读不出来或不是 JSON：${p} —— ${(e as Error).message}`); }
+  };
+  const fmt = (e: { issues: readonly { path: readonly PropertyKey[]; message: string }[] }) =>
+    e.issues.slice(0, 4).map((i) => `${i.path.join(".")}: ${i.message}`).join("；");
 
-${recipeShapeSpec()}`;
+  const d = GameDesignSpecSchema.safeParse(readJson(opts.designPath, "设计"));
+  if (!d.success) throw new CommandError("invalid", `设计不过 schema：${fmt(d.error)}`);
+  const w = VisualWorldSpecSchema.safeParse(readJson(opts.visualWorldPath, "这个世界"));
+  if (!w.success) throw new CommandError("invalid", `这个世界不过 schema：${fmt(w.error)}`);
+  // ⚠️ **查的是两个字段空不空，不是对象在不在** —— 这一条是从 `derive` 那里继承来的教训
+  //   （它的账测试里记着）：只查对象的话，`{baseUrl:"", apiKey:""}` 会**照样发出去**，
+  //   而 fetch 对空 baseUrl 抛的那一枪会被记成 `failure: "http"` ——
+  //   **一个本地配置错被计成上游故障**，于是「上游今天稳不稳」这个数被自己的配置污染了。
+  // ⚠️ 报错里**点名两个环境变量**：这一档以前是 `callText` 替它报的，而那条路现在不走了。
+  if (!opts.transport || opts.transport.baseUrl === "" || opts.transport.apiKey === "")
+    throw new CommandError(
+      "upstream",
+      "规划资源清单需要文本上游：ANTHROPIC_BASE_URL 与 ANTHROPIC_AUTH_TOKEN **两个都要给**。" +
+      "⚠️ 但清单是文件 —— 人可以直接写一份，再 `pack`。");
 
-  // ⚠️ 有界重试，与生成器同一条道理：推导是**重采样**，不是修复循环（不把错误喂回去）。
-  //   实测它真的会偶发不过 schema（第一版没有重试，一次形状违规就让整条命令挂掉）。
+  const design = d.data;
+  const world = w.data;
+  const refs = world.styleReferences;
+  /** ⚠️ 风格与清单**住同一个目录** ⇒ `styleRef` 就是一个普通文件名（与 `derive` 当年的做法一字不差）。 */
+  const STYLE_FILE = "stylespec.json";
+  const REF_FILE = "reference.png";
+
+  const body = JSON.stringify({
+    // ⚠️ 与 `callText` 同源（票 24 的实况：代理**请求一个、回另一个**，`model` 与 `requestedModel` 是两个事实）。
+    model: "deepseek-v4-pro", max_tokens: 16_000, thinking: { type: "disabled" },
+    ...forcedTool(PLAN_TOOL_NAME, PLAN_TOOL_DESCRIPTION, RecipeToolSchema),
+    messages: [{
+      role: "user",
+      content: [{
+        type: "text",
+        text: assetPlanPrompt({
+          design, vws: world,
+          echo: { styleRef: STYLE_FILE, styleId: world.style.id, ...(refs.length > 0 ? { referenceImage: REF_FILE } : {}) }
+        })
+      }]
+    }]
+  });
+
+  // ⚠️ 账**只进回报，不落盘**（票 19：账跟着「包」走，而「清单」不是包 —— 清单可以是人直接写的）。
+  const call = spentCall("plan-assets", "recipe");
   let checked: ReturnType<typeof parseRecipe> | null = null;
   let lastError = "";
-  // ⚠️ `derive` 的账**只进回报，不落盘**（票 19：账跟着「包」走，而「清单」不是包 ——
-  //   R7 两条路都开，清单可以是人直接写的，那时根本没有这一次调用）。
-  //
-  // ⚠️ 这里以前每一轮**覆盖写**账、且 `attempts` 恒为 1（票 28）—— 于是「重试过几次」与
-  //   「每次为什么重来」在账上**完全不可见**。现在交给 `spentCall`：一格，随往返累加。
-  const call = spentCall("derive", "recipe");
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const once = await onceThrough({
-      transport: opts.transport, prompt, what: "推导出来的清单", parse: parseRecipe,
+  for (let attempt = 0; attempt < STRUCTURED_CALL_ATTEMPTS; attempt++) {
+    const once = await onceThroughTool({
+      transport: opts.transport, body, tool: PLAN_TOOL_NAME, schema: RecipeToolSchema,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
       ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
     });
-    call.trip(once.kind === "ok" ? { spent: once.spent }
-      : once.kind === "not-sent" ? {}
-      : once.kind === "upstream" ? { failure: once.failure }
-      : { failure: once.failure, spent: once.spent });
-    // ⚠️ 没发出去与发出去挂了是**两件事**：前者账上不该有这一笔（票 46 只记真的发出去的）。
+    if (once.kind === "upstream") {
+      call.trip({ failure: once.failure });
+      throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
+    }
+    // ⚠️ 「没上路」那一档在**这条路上不该出现**（凭据上面已经查过）—— 留着这一句是为了让类型收窄
+    //   说得出口，而它真出现时按「上游不可达」报（与 `derive` 当年同款）。
     if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
-    if (once.kind === "upstream") throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
-    if (once.kind === "bad") { lastError = once.detail; continue; }
-    checked = once.result;
+    if (once.kind === "bad") {
+      call.trip({ failure: once.failure, spent: once.spent });
+      lastError = once.detail;
+      continue;
+    }
+    const truth = parseRecipe(once.result.value);
+    if (!truth.ok) {
+      call.trip({ failure: "schema", spent: once.spent });
+      lastError = `清单不过契约：${truth.errors.slice(0, 4).join("；")}`;
+      continue;
+    }
+    call.trip({ spent: once.spent });
+    checked = truth;
     break;
   }
   if (!checked?.ok) throw new CommandError("invalid", lastError, ledgerCarrying(call.record()));
 
   const dir = path.join(opts.outRoot, checked.value.id, "recipes");
   fs.mkdirSync(dir, { recursive: true });
-  // StyleSpec 与配方放**同一个目录**，于是 styleRef 就是一个普通文件名 —— 不需要 `..`。
-  // （它是这个项目的输入之一，本来就该跟着配方走。）
-  fs.copyFileSync(opts.stylePath, path.join(dir, "stylespec.json"));
+  // ⚠️ 落盘的风格是**这个世界的 `style` 子树**（R6 说的那个「兼容载体」）—— 它原样就是一份
+  //   `StyleSpec`，所以配方契约与 `pack` 都**一行不用改**。
+  fs.writeFileSync(path.join(dir, STYLE_FILE), JSON.stringify(world.style, null, 2) + "\n");
+  const out: Record<string, unknown> = { ...checked.value, styleRef: STYLE_FILE };
+  if (refs.length > 0) {
+    // ⚠️ 风格参考图**拷进配方目录**（与 stylespec 同款）：`referenceImage` 是**原图参与生图**的唯一入口
+    //   （`03 §15` 要求原图必须参与），而世界那边的路径是**相对 `visual-world.json`** 的。
+    const src = path.resolve(path.dirname(opts.visualWorldPath), refs[0]!.path);
+    try { fs.copyFileSync(src, path.join(dir, REF_FILE)); }
+    catch (e) { throw new CommandError("invalid", `世界指的那张风格参考图读不出来：${src} —— ${(e as Error).message}`); }
+    out["referenceImage"] = REF_FILE;
+  } else {
+    delete out["referenceImage"]; // 世界没给参考图 ⇒ 不留模型瞎写的那个值
+  }
   const version = nextVersion(dir);
   const file = path.join(dir, `v${version}.json`);
-  fs.writeFileSync(file, JSON.stringify({ ...checked.value, styleRef: "stylespec.json" }, null, 2) + "\n");
+  fs.writeFileSync(file, JSON.stringify(out, null, 2) + "\n");
 
   const kinds: Record<string, number> = {};
   for (const a of checked.value.assets) kinds[a.spec.kind] = (kinds[a.spec.kind] ?? 0) + 1;
   return {
-    command: "derive",
+    command: "plan",
     summary: [`清单已落盘：${rel(opts.outRoot, file)}`, `${checked.value.assets.length} 个资源（${Object.entries(kinds).map(([k, v]) => `${k}×${v}`).join(" · ")}）`],
     data: { recipeId: checked.value.id, version, assetCount: checked.value.assets.length, kinds, ledger: asLedger(call.record()) },
-    artifacts: [{ path: rel(opts.outRoot, file), kind: "asset-recipe" }],
+    artifacts: [{ path: rel(opts.outRoot, file), kind: "asset-recipe" }]
   };
 }
 
@@ -394,14 +500,21 @@ const anchorHint = (a: { x: number; y: number }): string =>
       : a.x === 0 && a.y === 0 ? "左上角"
         : `{x:${a.x}, y:${a.y}}（归一化锚点，\`at\` 是它落在的那个点）`;
 
-export type CompileGameOptions = {
-  requirementPath: string;
+export type CompileRuntimeOptions = {
+  /** `run/v<N>/game-design.json` —— 理解层的收尾产物（票 10）。 */
+  designPath: string;
   /** 资源包目录 —— 它**就是**模型要看的资源清单，也是校验的依据。 */
   packDir: string;
   outRoot: string;
+  /**
+   * 编**哪一关**。⚠️ 省略 = 设计层的第一关。
+   *  ⚠️ `CONTEXT.md` 的 [[Game Config]] 钉着「**一个 game-config = 一个关卡**」，
+   *  而「多个关卡怎么索引」**仍是地图上的雾** ⇒ 本票只编一关，**不假装支持多关**。
+   */
+  levelId?: string;
   transport?: Transport;
   fetchImpl?: typeof fetch;
-  /** 外壳视口。默认 480×270（与票 32 的常量同值）。 */
+  /** 外壳视口。默认 480×270（与票 32 的常量同值）。⚠️ **它是外壳的常量，不是数据** —— 由调用方传。 */
   viewport?: { w: number; h: number };
   /** 外壳画 HUD 文字的行高（票 09）。默认 [[DEFAULT_HUD_LINE_HEIGHT]] —— ⚠️ 外壳那一份由壳传进来。 */
   hudLineHeight?: number;
@@ -410,27 +523,84 @@ export type CompileGameOptions = {
 };
 
 /**
- * 需求 + 资源包 → 一份 game-config，落盘到 `<out>/<id>/game-configs/v<N>.json`。
+ * **`RuntimeProfile` ⇒ 出哪一种 config 形状**（票 14 的 Q2：(β) profile 被**读**，用途是**分派**）。
  *
- * ⚠️ **先校验、后落盘**。与别的操作不同，这一条的产物是**给机器吃的**：
- *   一份「看起来像那么回事、其实引用解不到」的配置，比没有配置更坏 ——
- *   它会在很久之后的装配那一步才炸，而且炸得像包有问题。
- *   ⚠️ 但它**照常落盘**（只是同时报出来）：票 09 裁决 2 说「人过目」，
- *   而人过目的前提是**他看得到哪儿不对** —— 不落盘的话他连看的东西都没有。
+ * ⚠️ **今天只有一行、恒等于常数 —— 那是预期的**（同票 05 给 `mechanics`/`capabilities` 那两个
+ *   数组写的自白）：它是**给第二个成员留的位**。第二个成员落地那天，这张表才开始说话，
+ *   而**拒绝**早在 `compile-design`（票 10）就发生了 —— 本步只管「哪一代 ⇒ 哪一种形状」。
  */
-export async function compileGame(opts: CompileGameOptions): Promise<CommandResult> {
-  const requirement = fs.readFileSync(opts.requirementPath, "utf8");
+const CONFIG_SHAPES: Record<string, { format: string; artifactKind: string }> = {
+  platformer: { format: "game-config/v1", artifactKind: "game-config" }
+};
+
+/**
+ * 设计 + 这一代外壳 + 资源包 → 一份 game-config，落盘到 `<out>/<id>/game-configs/v<N>.json`。
+ *
+ * ⚠️ **它是 `compile-game` 的接班人**（票 14 的 Q1：(a) 取代）—— 旧的「需求 + 资源包」那道
+ *   **没有了**：新链的 config 必须**从设计层长出来**（`levels[].layout`、每关的 `entities[]`、
+ *   `world.structure` 都在设计层），而从需求硬猜正是 `compile-td-game` 那条
+ *   「需求没说的，它们只能拿示例填」的老路。⚠️ 塔防那条**一个字不动**（R4）。
+ *
+ * ⚠️ **两类失败要分开**（票 14 的 Q5 裁定，人类原话：「后者不应该默认重采样，否则会把**确定性的
+ *   编译/设计错误**伪装成**模型生成失败**」）：
+ *     · **入参/结构不过**（线形状不过 · v3 契约不过）⇒ 那是**模型没生成好** ⇒ **重采样**，3 次用尽才抛；
+ *     · **过得了契约、过不了业务校验**（引用族 · 自洽族 · 屏幕空间）⇒ 那是**确定性的编译错误** ⇒
+ *       **不重采样、直接抛**，而且**不落盘**。
+ *    ⚠️ 「不落盘」是**与旧行为相反**的一处：`compileGame` 当年 audit 不过也照落（理由是票 09 裁决 2
+ *    「人过目」）—— 而 **R9 把人工点收成了唯一一个、且在清单处**，config 那里**已经没有读者**了
+ *    ⇒ 「坏配置比没配置更坏」（旧代码自己的注释）这一条终于说了算。
+ */
+export async function compileRuntime(opts: CompileRuntimeOptions): Promise<CommandResult> {
+  const readJson = (p: string, what: string): unknown => {
+    try { return JSON.parse(fs.readFileSync(p, "utf8")); }
+    catch (e) { throw new CommandError("invalid", `${what}读不出来或不是 JSON：${p} —— ${(e as Error).message}`); }
+  };
+  const fmt = (e: { issues: readonly { path: readonly PropertyKey[]; message: string }[] }) =>
+    e.issues.slice(0, 4).map((i) => `${i.path.join(".")}: ${i.message}`).join("；");
+
+  const d = GameDesignSpecSchema.safeParse(readJson(opts.designPath, "设计"));
+  if (!d.success) throw new CommandError("invalid", `设计不过 schema：${fmt(d.error)}`);
+  const design = d.data;
+
+  // ── 哪一代外壳（票 14 的 Q2）────────────────────────────────────────────
+  // ⚠️ 查不到 = **调用方的错**（选了一个不存在的代）—— 与票 10 的 `pickProfile` 同一条口径。
+  const want = design.game.runtimeProfile;   // ⚠️ 从**设计层**读（不从入参）—— 开个入参就是给同一个事实第二个来源
+  const profile = resolveRuntimeProfile(want);
+  if (profile === undefined)
+    throw new CommandError("invalid",
+      `设计指着的那一代外壳不存在：\`${runtimeProfileRef(want)}\`（注册表里第一阶段只有 ` +
+      `\`${runtimeProfileRef(PLATFORMER_V1)}\`）—— ⚠️ 拒绝**本该在** compile-design 那一步就发生（票 10）。`);
+  const shape = CONFIG_SHAPES[profile.id];
+  if (shape === undefined)
+    throw new CommandError("invalid",
+      `这一代外壳还没有对应的 config 形状：\`${runtimeProfileRef(profile)}\` —— ` +
+      "⚠️ 加一个成员 = 往 `CONFIG_SHAPES` 加一行 + 一份新的 config 契约，**不是**改现有 config 的形状（票 05 Q3(b)）。");
+
   const manifestPath = path.join(opts.packDir, "manifest.json");
   if (!fs.existsSync(manifestPath)) throw new CommandError("usage", `不是资源包（没有 manifest.json）：${opts.packDir}`);
   const mp = parseAssetPack(JSON.parse(fs.readFileSync(manifestPath, "utf8")));
   if (!mp.ok) throw new CommandError("invalid", `资源包不过 schema：${mp.errors.slice(0, 4).join("；")}`);
   const manifest = mp.value;
-  if (!opts.transport) throw new CommandError("upstream", "编译需要文本上游；它现在不可达（配置是文件，人可以直接写一份）");
+
+  const levelId = opts.levelId ?? design.levels[0]?.id;
+  const level = design.levels.find((l) => l.id === levelId);
+  if (level === undefined)
+    throw new CommandError("usage",
+      `设计里没有这一关：\`${levelId ?? "（空）"}\`（现有：${design.levels.map((l) => l.id).join(" / ") || "无"}）`);
+
+  // ⚠️ **查的是两个字段空不空，不是对象在不在** —— 生产里两个壳永远传一个「定义了、但 `baseUrl`
+  //   可能是空串」的对象（票 06 量到的）⇒ 只查对象的话，`fetch("" + "/v1/messages")` 那一枪会被记成
+  //   `failure: "http"`，**一个本地配置错被计成上游故障**。⚠️ 报错里点名那两个环境变量。
+  if (!opts.transport || opts.transport.baseUrl === "" || opts.transport.apiKey === "")
+    throw new CommandError("upstream",
+      "编译需要文本上游：ANTHROPIC_BASE_URL 与 ANTHROPIC_AUTH_TOKEN **两个都要给**。" +
+      "⚠️ 但配置是文件 —— 人可以直接写一份。");
 
   const vp = opts.viewport ?? DEFAULT_VIEWPORT;
-  const prompt = `你是游戏关卡设计师。根据下面的**需求**与**资源包清单**，产出一份 game-config（game-config/v1）。
+  const prompt = `你是游戏关卡设计师。把下面这一关的**设计**编译成一份 game-config（game-config/v1）——
+那是**给外壳吃的菜谱**，你只填「哪里有、参数是多少」。
 
-只输出 JSON 本体，不要 markdown 围栏，不要解释。
+只调 ${CONFIG_TOOL_NAME} 工具，不要解释。
 
 # 铁律（**每条都会被校验器检查，违反直接拒收**）
 
@@ -452,8 +622,13 @@ export async function compileGame(opts: CompileGameOptions): Promise<CommandResu
 9. \`anim\` 只在资源有**多个**动画时才需要，且必须是清单里**真实存在**的动画名。
    ⚠️ **只许用下面清单里的 id 与动画名** —— 清单里没有的一律拒收。
 
-# 需求
-${requirement}
+# 你在给哪一代外壳编
+\`${runtimeProfileRef(profile)}\` —— 它**只实现了上面那套行为原语**，别写它做不了的东西（写了也跑不动）。
+
+# 这一关的设计（GameDesignSpec）
+⚠️ **照它摆**：\`world.structure\` 说的是**空间怎么分层**（几条横带、前景中景背景），
+而这一关的 \`layout\` 说的是**从哪儿走到哪儿、路上有什么** —— 别自己发明一套布局。
+${designBrief(design)}
 
 # 资源包清单（**只许用这里面的东西**）
 ${resourceBrief(manifest)}
@@ -464,55 +639,65 @@ ${[...new Set(manifest.assets.map((a) => `${a.kind}：${anchorHint(a.anchor)}`))
 # 形状（**逐字照抄这个骨架**；\`<…>\` 是占位符，换成清单里真实的 id 与动画名）
 ${JSON.stringify(gameConfigExample, null, 2)}
 
-⚠️ 骨架里的**位置只是示意**（都摆在地面线上）—— 按需求把东西铺开，并让关卡真的可通关：
+⚠️ 骨架里的**位置只是示意**（都摆在地面线上）—— 按这一关的设计把东西铺开，并让它真的可通关：
 玩家能跳的高度是有限的，台阶别高过它。`;
 
-  // 有界重试，与 derive 同一条道理：编译是**重采样**，不是修复循环（不把错误喂回去）
+  // ⚠️ **账**：一格 = 一次调用（`STRUCTURED_CALL_ATTEMPTS` 次往返都记在里面）。
+  const call = spentCall("compile-runtime", "game-config");
   let checked: ReturnType<typeof parseGameConfig> | null = null;
   let lastError = "";
-  //
-  // ⚠️ **票 28 之前这里一分账都不交** —— 而根因是 `LedgerStep` 枚举里**根本没有 `compile-game`**
-  //   这个值：一次上游调用**没地方记**（枚举已补上）。而 `site` 那条链上它是**唯一**会调上游的
-  //   `compile-*`，于是在账上是隐形的。
-  const call = spentCall("compile-game", "game-config");
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const once = await onceThrough({
-      transport: opts.transport, prompt, what: "编译出来的配置", parse: parseGameConfig,
+  for (let attempt = 0; attempt < STRUCTURED_CALL_ATTEMPTS; attempt++) {
+    const once = await onceThroughTool({
+      transport: opts.transport, body: JSON.stringify({
+        // ⚠️ 与 `callText` 同源（票 24 的实况：代理**请求一个、回另一个**）。
+        model: "deepseek-v4-pro", max_tokens: 16_000, thinking: { type: "disabled" },
+        ...forcedTool(CONFIG_TOOL_NAME, CONFIG_TOOL_DESCRIPTION, ConfigToolSchema),
+        messages: [{ role: "user", content: [{ type: "text", text: prompt }] }]
+      }),
+      tool: CONFIG_TOOL_NAME, schema: ConfigToolSchema,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
-      ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
+      ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {})
     });
-    call.trip(once.kind === "ok" ? { spent: once.spent }
-      : once.kind === "not-sent" ? {}
-      : once.kind === "upstream" ? { failure: once.failure }
-      : { failure: once.failure, spent: once.spent });
+    if (once.kind === "upstream") {
+      call.trip({ failure: once.failure });
+      throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
+    }
     if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
-    if (once.kind === "upstream") throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
-    if (once.kind === "bad") { lastError = once.detail; continue; }
-    checked = once.result;
+    if (once.kind === "bad") { call.trip({ failure: once.failure, spent: once.spent }); lastError = once.detail; continue; }
+    // ⚠️ **线形状过了不算数**：真正的判据是 v3 那份契约（实体 id 不重复那条 refine 住在它里面）。
+    const truth = parseGameConfig(once.result.value);
+    if (!truth.ok) {
+      call.trip({ failure: "schema", spent: once.spent });
+      lastError = `配置不过契约：${truth.errors.slice(0, 4).join("；")}`;
+      continue;
+    }
+    call.trip({ spent: once.spent });
+    checked = truth;
     break;
   }
   if (!checked?.ok) throw new CommandError("invalid", lastError, ledgerCarrying(call.record()));
 
   const config = checked.value;
 
-  // ── 落盘**之前**先校验：产物是给机器吃的，坏配置比没配置更坏 ──────────────
+  // ── ⚠️ **业务校验：确定性失败，不重采样、不落盘**（票 14 的 Q5 裁定）────────────
   //
-  // ⚠️ 这里跑的是 `site` 要跑的同一批校验（减去第四族 —— 那条是**包**的性质，
-  //   与模型写的配置无关：可平铺的层对任何世界宽都盖得住，不平铺的层只有 parallax = 0 才行，
-  //   两条都不看 config）。
-  const issues: string[] = [];
-  for (const i of auditGameConfig(config, manifest))
-    issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
-
-  // HUD 的**屏幕空间**边界 —— ⚠️ **共用一份**（`auditScreenSpace`），
-  // 不再在这里自己写一遍（票 03：判断那两行两个副本一模一样，差的是措辞与输出形状）。
-  // ⚠️ 而「**有哪些 HUD 项**」也只此一份（`gameHudScreenItems`）——
-  // 两份名单可以**各漏各的**，票 03 量到塔防那边就漏了两个成员。
-  {
-    const screen = auditScreenSpace(vp, gameHudScreenItems(config, manifest,
-      { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT }));
-    for (const i of screen) issues.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
-  }
+  // ⚠️ 这里跑的是 `site` 要跑的同一批校验（**减去第四族** —— 几何族要世界描述与视口常量，
+  //   而它们住 `demo`；见 `ops.ts` 里塔防那一段的注释）。**同一份实现，不抄第二份**。
+  const issues: ConfigIssue[] = [
+    ...auditGameConfig(config, manifest),
+    ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
+      { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT }))
+  ];
+  const hard = issues.filter((i) => i.severity === "error");
+  if (hard.length > 0)
+    throw new CommandError("invalid",
+      `编译出来的配置**过不了校验**（${hard.length} 条硬失败）：\n` +
+      hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
+      "\n⚠️ **这不是模型没生成好** —— 一份过得了契约、过不了业务校验的配置，说明是**这份设计配这个包**" +
+      "做不出合法的关卡（引用解不到 / 东西摆在世界外 / HUD 跑出屏幕）⇒ **不重采样、也不落盘**：" +
+      "重抽一次改不了这些事实，而落一份坏配置比不落更坏。\n" +
+      "   要去的地方：设计层或资源清单（不是再抽一次）。",
+      ledgerCarrying(call.record()));
 
   const dir = path.join(opts.outRoot, manifest.id, "game-configs");
   fs.mkdirSync(dir, { recursive: true });
@@ -521,23 +706,22 @@ ${JSON.stringify(gameConfigExample, null, 2)}
   fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
 
   const pickups = config.entities.filter((e) => e.kind === "pickup").length;
-  const bad = issues.filter((i) => i.startsWith("❌"));
   return {
-    command: "compile-game",
+    command: "compile-runtime",
     summary: [
       `配置已落盘：${rel(opts.outRoot, file)}（v${version}）`,
-      `${config.entities.length} 个实体 · ${pickups} 个拾取物 · 世界 ${config.world.size.w}×${config.world.size.h}`,
-      bad.length === 0
-        ? `✅ 校验全过${issues.length ? `（${issues.length} 条警告）` : ""} —— 下一步：game-maker site ${rel(opts.outRoot, opts.packDir)} --config ${rel(opts.outRoot, file)}`
-        : `❌ **这份配置过不了校验**（${bad.length} 条）—— 改完再 \`site\`：`,
-      ...(bad.length ? issues : []),
+      `${config.entities.length} 个实体 · ${pickups} 个拾取物 · 世界 ${config.world.size.w}×${config.world.size.h}` +
+        ` · 这一关 \`${level.id}\` · 外壳 \`${runtimeProfileRef(profile)}\``,
+      `✅ 校验全过${issues.length ? `（${issues.length} 条警告）` : ""} —— 下一步：game-maker site ${rel(opts.outRoot, opts.packDir)} --config ${rel(opts.outRoot, file)}`,
+      ...issues.map((i) => `⚠️ ${i.where}: ${i.message}`)
     ],
     data: {
-      gameId: manifest.id, version, configPath: rel(opts.outRoot, file),
+      gameId: manifest.id, levelId: level.id, version, configPath: rel(opts.outRoot, file),
       entityCount: config.entities.length, pickupCount: pickups,
-      worldSize: config.world.size, issues, ok: bad.length === 0, ledger: asLedger(call.record()),
+      worldSize: config.world.size, issues: issues.map((i) => `⚠️ ${i.where}: ${i.message}`),
+      ok: true, ledger: asLedger(call.record())
     },
-    artifacts: [{ path: rel(opts.outRoot, file), kind: "game-config" }],
+    artifacts: [{ path: rel(opts.outRoot, file), kind: shape.artifactKind }]
   };
 }
 

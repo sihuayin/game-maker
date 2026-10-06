@@ -1,0 +1,581 @@
+{
+  "label": "01-plan",
+  "ms": 12693,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 1281,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5760,
+    "output_tokens": 3270,
+    "service_tier": "standard"
+  },
+  "wireOk": true,
+  "wireFailure": null,
+  "wireDetail": null,
+  "truthOk": true,
+  "truthErrors": null,
+  "inspect": {
+    "strategies": {
+      "image": 3,
+      "drawlist": 16
+    },
+    "kinds": {
+      "animation": 2,
+      "sprite": 12,
+      "background": 1,
+      "ui": 4
+    },
+    "dangling": [],
+    "selfRef": [],
+    "cycle": null,
+    "ratioBad": [],
+    "withChar": 2,
+    "authors": 2
+  },
+  "input": {
+    "format": "asset-recipe/v1",
+    "id": "scavenger-wasteland",
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png",
+    "authoring": [
+      {
+        "id": "master-player",
+        "role": "player base master",
+        "description": "拾荒者母版：方块低分辨率人形——方檐帽、高矩形躯干、深藏青长风衣与浅色腰带横带、方形小头、仅几枚深色像素点作五官、短腿、小浅色手；直立中性站姿",
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art character master, boxy hat with brim, tall rectangle body in long dark navy coat with one lighter horizontal belt band, oversized square head, tiny pale hands, short legs, no outline, no gradient, limited color ramp, side view, plain background"
+        },
+        "characterId": "e-player",
+        "size": {
+          "w": 32,
+          "h": 48
+        }
+      },
+      {
+        "id": "master-mutant",
+        "role": "enemy base master",
+        "description": "变异体母版：与拾荒者同一套方块人比例——矮胖宽躯干、超大方形头、短腿、小方形肢，通体少数几个色阶的剪影块，无细节",
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art creature master, stubby wide torso, oversized square head, short legs, small rectangular limbs, chunky 8-bit proportions, hard-edged silhouette, no outline, no gradient, limited color ramp, side view, plain background"
+        },
+        "characterId": "e-mutant",
+        "size": {
+          "w": 32,
+          "h": 40
+        }
+      }
+    ],
+    "assets": [
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "e-player",
+          "role": "player character",
+          "description": "拾荒者：方檐帽、深藏青长风衣、矮胖宽躯干配方形大头与短腿的方块人，动作只靠腿与身体的错位读出",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 48
+          },
+          "characterId": "e-player",
+          "masterAsset": "master-player",
+          "required": true,
+          "animations": [
+            {
+              "name": "idle",
+              "frames": 2,
+              "fps": 2,
+              "loop": true
+            },
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 8,
+              "loop": true
+            },
+            {
+              "name": "jump",
+              "frames": 2,
+              "fps": 6,
+              "loop": false
+            },
+            {
+              "name": "fall",
+              "frames": 2,
+              "fps": 6,
+              "loop": true
+            },
+            {
+              "name": "hurt",
+              "frames": 2,
+              "fps": 6,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet of a scavenger: boxy hat with brim, long dark navy coat with lighter belt band, stubby wide torso, oversized square head, short legs, side view, identical size across all frames, no outline, solid background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "e-mutant",
+          "role": "enemy mutant",
+          "description": "变异体：同类方块人比例的剪影块，在平台带上来回游荡，转身只靠身体水平翻转与腿脚错位",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 40
+          },
+          "characterId": "e-mutant",
+          "masterAsset": "master-mutant",
+          "required": true,
+          "animations": [
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 6,
+              "loop": true
+            },
+            {
+              "name": "idle",
+              "frames": 2,
+              "fps": 2,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet of a small mutant creature, stubby wide torso, oversized square head, short legs, hard-edged silhouette, side view facing right, identical size across all frames, no outline, solid background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-scrap",
+          "role": "pickup scrap",
+          "description": "一份散落的废料：一块轴对齐的浅色矩形金属块，带一两道更暗的横向分块，尺寸按角色尺度取大",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-water",
+          "role": "pickup water",
+          "description": "一份净水：一块竖立的轴对齐矩形容器，顶部一条更亮的色带表示水面",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 14,
+            "h": 18
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-terminal",
+          "role": "resource gate terminal",
+          "description": "资源闸门终端：嵌在长墙矩形面板里的方形屏面，外框一圈硬边深色板，中央一块发光平面；废料够数时开闸，不够只回一段暗红光提示",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 48,
+            "h": 48
+          },
+          "required": true,
+          "dependsOn": [
+            "p-wall-panel"
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-l01-l02",
+          "role": "level backdrop",
+          "description": "两关共用的废土黄昏背景：三段色带的天空与低垂日盘、深色山脊剪影、平齐屋顶线、横贯画面的长墙带与铁路楼层带",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 640,
+            "h": 360
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "sky",
+              "parallax": 0.1
+            },
+            {
+              "name": "sun",
+              "parallax": 0.15
+            },
+            {
+              "name": "ridge",
+              "parallax": 0.3
+            },
+            {
+              "name": "skyline",
+              "parallax": 0.5
+            },
+            {
+              "name": "wall",
+              "parallax": 0.8,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            },
+            {
+              "name": "railband",
+              "parallax": 1,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art side-scrolling background, matte three-band dusk sky, low sun disc pinned near top edge, dark ridge silhouette, flat roof line silhouette, long repeating wall strip with inset rectangular panels, dark rail band, pure flat color blocks, no texture, no gradient banding, no outline"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-wall-panel",
+          "role": "wall feature panel",
+          "description": "长墙内嵌的矩形面板：一块深色硬边矩形，占据墙面色带中的一格，终端就嵌在其中",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-lamp-post",
+          "role": "lamp post",
+          "description": "细灯柱：一根竖直细矩形杆上顶一枚平涂发光圆盘头，无光晕，全场景仅立一根",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 96
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-bench",
+          "role": "bench prop",
+          "description": "长椅：一块浅棕平涂坐板加两侧短矩形腿，轴对齐无细节",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 40,
+            "h": 18
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-luggage-stack",
+          "role": "luggage stack prop",
+          "description": "行李堆：两三块大小不一的浅棕方块上下错位堆叠，体积感只靠明度阶梯",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 28
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-rail-signal",
+          "role": "railway signal",
+          "description": "铁路信号机：竖直细杆加一枚方形灯箱，灯箱面为平涂发光色块",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 20,
+            "h": 64
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-tile-platform",
+          "role": "platform slab tile",
+          "description": "平台地面块：完全平直的浅灰平面板，下方压一条更暗的基座色带，硬边、可沿水平重复",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 48
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-tile-rail",
+          "role": "rail band tile",
+          "description": "铁路带块：更暗的条带上排一列暗色横向短划，重复铺成横贯画面的铁路楼层带",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 24
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-tile-base",
+          "role": "platform base band tile",
+          "description": "平台基座块：比地面带更暗的纯色矩形，构成下层基座带与垂直切边台阶的侧壁",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 48
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-gate",
+          "role": "safe zone gate",
+          "description": "安全区闸门：一块厚实的轴对齐矩形门板，横向分几段色块，与长墙面板同高，开启即抵达区域终点",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 96
+          },
+          "required": true,
+          "dependsOn": [
+            "p-wall-panel"
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-scrap-counter",
+          "role": "scrap count display",
+          "description": "废料计数显示：左侧一枚废料小图标，右侧随字数拉伸的深色底板",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 96,
+            "h": 24
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-water-counter",
+          "role": "water count display",
+          "description": "净水计数显示：左侧一枚净水小图标，右侧随字数拉伸的深色底板",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 96,
+            "h": 24
+          },
+          "required": false
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-gate-prompt",
+          "role": "gate hint banner",
+          "description": "闸门提示条：一条会被拉伸到任意宽度的深色底板加硬边发光外框，中央留空以叠加文字",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 128,
+            "h": 32
+          },
+          "required": false,
+          "ninePatch": {
+            "left": 8,
+            "right": 8,
+            "top": 8,
+            "bottom": 8
+          }
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-dusk-timer",
+          "role": "daylight timer bar",
+          "description": "天光计时条：一条会被拉伸到任意长度的窄地平底板，内部按剩余天光比例推进",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 1,
+            "y": 0
+          },
+          "size": {
+            "w": 160,
+            "h": 16
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 4,
+            "right": 4,
+            "top": 4,
+            "bottom": 4
+          }
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      }
+    ]
+  }
+}

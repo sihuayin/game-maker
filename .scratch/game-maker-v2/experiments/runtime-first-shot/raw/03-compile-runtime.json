@@ -1,0 +1,24 @@
+{
+  "label": "03-compile-runtime",
+  "levelId": "l-01",
+  "ok": false,
+  "kind": "invalid",
+  "message": "编译出来的配置**过不了校验**（2 条硬失败）：\n  · entity \"lamp-1\": 资源 \"signal-endlight\" 有多个可画的动画，引用必须指明 anim（可选：red, green）\n  · entity \"lamp-2\": 资源 \"signal-endlight\" 有多个可画的动画，引用必须指明 anim（可选：red, green）\n⚠️ **这不是模型没生成好** —— 一份过得了契约、过不了业务校验的配置，说明是**这份设计配这个包**做不出合法的关卡（引用解不到 / 东西摆在世界外 / HUD 跑出屏幕）⇒ **不重采样、也不落盘**：重抽一次改不了这些事实，而落一份坏配置比不落更坏。\n   要去的地方：设计层或资源清单（不是再抽一次）。",
+  "ms": 3697,
+  "ledger": [
+    {
+      "step": "compile-runtime",
+      "target": "game-config",
+      "upstream": "messages",
+      "ms": 3697,
+      "attempts": 1,
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 195,
+        "outputTokens": 1172
+      }
+    }
+  ],
+  "issues": null,
+  "config": null
+}

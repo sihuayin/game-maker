@@ -7,7 +7,7 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  CommandError, compileGame, deriveRecipe, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, verifyPack,
+  CommandError, compileRuntime, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, planAssets, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, VIEWPORT } from "@game-maker/demo";
@@ -17,20 +17,22 @@ const PROTOCOL_VERSION = "2025-06-18";
 /** 工具面。**description 内嵌「什么时候用 / 什么样的输入会失败」**（票 30 问题 6）。 */
 const TOOLS = [
   {
-    name: "derive_recipe",
+    name: "plan_assets",
     description:
-      "从一段需求文本 + 一份 StyleSpec 推导出一份资源清单（asset-recipe/v1），落盘到 <out>/<id>/recipes/v<N>.json。\n" +
-      "**两阶段的第一步** —— 推完先让人过目，再用 build_asset_pack 生成。清单绝不覆盖，每次写新的 v<N>。\n" +
-      "何时用：用户给了新的需求文本，且还没有资源清单。已经有清单时不要用它，直接 build_asset_pack。\n" +
-      "会失败的情况：上游不可达（清单是文件，这时人可以自己写一份）；推出来的 JSON 不过 schema。",
+      "从一个游戏设计（game-design.json）+ 这个世界的视觉语法（visual-world.json）规划出一份资源清单（asset-recipe/v1），" +
+      "落盘到 <out>/<id>/recipes/v<N>.json（风格文件与参考图拷在同一个目录）。\n" +
+      "**两阶段的第一步** —— 规划完先让人过目，再用 build_asset_pack 生成。清单绝不覆盖，每次写新的 v<N>。\n" +
+      "何时用：已经有了设计（compile-design 的产物），且还没有资源清单。已经有清单时不要用它，直接 build_asset_pack。\n" +
+      "⚠️ 它取代了旧的 derive_recipe（后者吃「需求 + StyleSpec」）。\n" +
+      "会失败的情况：上游不可达（清单是文件，这时人可以自己写一份）；规划出来的 JSON 不过 schema 或不过清单契约。",
     inputSchema: {
       type: "object",
       properties: {
-        requirementPath: { type: "string", description: "需求文本的路径（markdown 或纯文本）" },
-        stylePath: { type: "string", description: "StyleSpec JSON 的路径" },
+        designPath: { type: "string", description: "game-design.json 的路径" },
+        visualWorldPath: { type: "string", description: "visual-world.json 的路径" },
         outDir: { type: "string", description: "产物根目录，默认 ./out。回报的路径都相对于它" },
       },
-      required: ["requirementPath", "stylePath"],
+      required: ["designPath", "visualWorldPath"],
     },
   },
   {
@@ -68,21 +70,26 @@ const TOOLS = [
     inputSchema: { type: "object", properties: { packDir: { type: "string", description: "资源包目录" } }, required: ["packDir"] },
   },
   {
-    name: "compile_game",
+    name: "compile_runtime",
     description:
-      "从一段需求文本 + 一个资源包编译出一份 game-config（game-config/v1），落盘到 <out>/<id>/game-configs/v<N>.json。\n" +
-      "**两阶段的第一步** —— 编完先让人过目，再用 assemble_site 装配。绝不覆盖，每次写新的 v<N>。\n" +
-      "何时用：用户给了需求文本，且已经有一个资源包（配置必须只引用包里真实存在的资源与动画）。\n" +
-      "⚠️ 配置**照常落盘**，但校验不过时回报里会逐条列出 —— 那是给人改的依据。\n" +
-      "会失败的情况：上游不可达；两次都吐不出合法 JSON；编译结果不过 schema。",
+      "从一份设计（game-design.json）+ 一个资源包编译出一份 game-config（game-config/v1），" +
+      "落盘到 <out>/<id>/game-configs/v<N>.json。\n" +
+      "**链的倒数第二步** —— 编完再用 assemble_site 装配。绝不覆盖，每次写新的 v<N>。\n" +
+      "何时用：已经有了设计（compile-design / plan-assets 之后），且已经有一个资源包" +
+      "（配置必须只引用包里真实存在的资源与动画）。\n" +
+      "⚠️ 它取代了旧的 compile_game（后者吃「需求 + 资源包」）。\n" +
+      "⚠️ **业务校验不过时它就地失败、且不落盘** —— 那是**确定性的编译错误**（这份设计配这个包做不出合法的关卡），" +
+      "不是模型没生成好，所以**不重采样**；要去改设计或清单。\n" +
+      "会失败的情况：上游不可达；三次都吐不出过契约的配置；过契约但过不了校验。",
     inputSchema: {
       type: "object",
       properties: {
-        requirementPath: { type: "string", description: "需求文本的路径（markdown 或纯文本）" },
+        designPath: { type: "string", description: "game-design.json 的路径" },
         packDir: { type: "string", description: "资源包目录 —— 它既是模型要看的资源清单，也是校验的依据" },
+        levelId: { type: "string", description: "编哪一关；省略 = 设计层的第一关" },
         outDir: { type: "string", description: "产物根目录，默认 ./out。回报的路径都相对于它" },
       },
-      required: ["requirementPath", "packDir"],
+      required: ["designPath", "packDir"],
     },
   },
   {
@@ -141,10 +148,10 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
       try {
         let result: CommandResult;
         switch (name) {
-          case "derive_recipe":
-            tick(0.05, "正在推导资源清单…");
-            result = await deriveRecipe({
-              requirementPath: String(args.requirementPath), stylePath: String(args.stylePath),
+          case "plan_assets":
+            tick(0.05, "正在规划资源清单…");
+            result = await planAssets({
+              designPath: String(args.designPath), visualWorldPath: String(args.visualWorldPath),
               outRoot: String(args.outDir ?? "out"),
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
             });
@@ -159,10 +166,11 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
           case "verify_asset_pack":
             result = verifyPack({ packDir: String(args.packDir) });
             break;
-          case "compile_game":
+          case "compile_runtime":
             tick(0.2, "正在编译游戏配置…");
-            result = await compileGame({
-              requirementPath: String(args.requirementPath), packDir: String(args.packDir),
+            result = await compileRuntime({
+              designPath: String(args.designPath), packDir: String(args.packDir),
+              ...(args.levelId !== undefined ? { levelId: String(args.levelId) } : {}),
               outRoot: String(args.outDir ?? "out"),
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
               viewport: VIEWPORT,

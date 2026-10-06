@@ -225,3 +225,42 @@ describe("parseGameConfig", () => {
     if (!r.ok) expect(r.errors.join()).toMatch(/world|player|objective/);
   });
 });
+
+// ── 票 14 补的那条判据 ─────────────────────────────────────────────────────────
+//
+// ⚠️ 票 09 的九条硬规矩里，**只有这一条此前没有任何判据看着**：`scale` 进不来靠的是 `.strict()`
+//   这个**结构**保证。而结构保证会**静默失效** —— 下一个人把某个子对象从 `.strict()` 改回 `z.object()`
+//   （比如为了收一个可选键），`scale` 就悄悄能进来了，而**没有任何测试会红**。
+describe("⚠️ 禁 `scale`（票 09 裁决 5）+「资源自身的性质归包」", () => {
+  const ok = (x: unknown) => parseGameConfig(x).ok;
+  /** 往某个子对象上塞一个键。 */
+  const withKey = (at: (c: Record<string, unknown>) => Record<string, unknown>, k: string) => {
+    const c = base() as unknown as Record<string, unknown>;
+    at(c)[k] = 1.7;
+    return c;
+  };
+
+  it("`scale` 在**任何一层**出现都当场拒（顶层 / 实体 / HUD / 玩家）", () => {
+    expect(ok({ ...(base() as unknown as Record<string, unknown>), scale: 1.7 }), "顶层").toBe(false);
+    expect(ok(withKey((c) => (c["entities"] as Record<string, unknown>[])[0]!, "scale")), "实体").toBe(false);
+    expect(ok(withKey((c) => c["hud"] as Record<string, unknown>, "scale")), "HUD").toBe(false);
+    expect(ok(withKey((c) => c["player"] as Record<string, unknown>, "scale")), "玩家").toBe(false);
+  });
+
+  it("而 `size` / `anchor`（**资源自身的性质**）也进不来 —— 它们只住资源包里", () => {
+    expect(ok(withKey((c) => (c["entities"] as Record<string, unknown>[])[0]!, "size")), "实体自己声明 size").toBe(false);
+    expect(ok(withKey((c) => (c["entities"] as Record<string, unknown>[])[0]!, "anchor")), "实体自己声明 anchor").toBe(false);
+  });
+
+  it("⚠️ 而唯一的例外**照样合法**：`Hud.panel.size`（九宫格的定义）", () => {
+    const c = base();
+    expect(c.hud.panel.size.w).toBeGreaterThan(0);
+    expect(ok(c)).toBe(true);
+  });
+
+  it("⚠️ 速度/重力**故意是浮点** —— 那条整数规矩管的是位置与尺寸，别顺手取整", () => {
+    const c = base();
+    (c.player as { move?: unknown }).move = { speed: 90.5, jumpVelocity: 330.25, gravity: 900.125 };
+    expect(ok(c), "浮点速度不该被拒").toBe(true);
+  });
+});

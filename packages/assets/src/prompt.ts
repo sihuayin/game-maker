@@ -1,3 +1,4 @@
+import type { GameDesignSpec, VisualWorldSpec } from "@game-maker/contracts";
 // schema-to-prompt 渲染器 —— **生成与推导共用的那一份**（票 22 问题 4 的落点）。
 //
 // 归 `assets` 而不是 `contracts`：它是 schema 的**镜像**，会随提示工程调优而改；
@@ -543,3 +544,182 @@ ${JSON.stringify(example, null, 2)}
 **照抄它 = 没有按上面的需求设计这一关**：需求说了这一关的场地长什么样，按那个画。
 （行列数、字符集、走道要连通这三条不变。）`;
 }
+
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// 票 12：**资产规划**那一步的问话面（它取代了 `derive` 的提示词 —— 输入从「需求 + StyleSpec」
+// 换成「设计 + 这个世界」）。
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+export const PLAN_TOOL_NAME = "emit_asset_recipe";
+
+/**
+ * 工具说明 = **schema 说不清的东西唯一的家**（票 08 的 R2-Q5）。
+ *
+ * ⚠️ 这里每一条都是「线形状表达不出来的」：JSON Schema 说得出类型、可选性、枚举，
+ *   说不出「这两条是同一件事的两种参数化」，也说不出「哪些值**不是**策略」。
+ */
+export const PLAN_TOOL_DESCRIPTION = `输出一份 AssetRecipe（asset-recipe/v1）—— **要造哪些资源**的完整清单。
+⚠️ 清单说的是**要什么**，不是**怎么画**：没有颜色、没有像素、没有画面。
+
+五条线形状表达不出来的规矩：
+
+1. **策略只有三个值**：\`drawlist\`（画出来的）· \`image\`（生成出来的）· \`import\`（人给的位图）。
+   ⚠️ \`character-reference\` / \`image-edit\` / \`procedural\` **不是值**：
+   前两个是 \`image\` 的两种**参数化**（见第 2 条），第三个是失败的意思。
+   经验：角色 / 敌人 / 背景 / 复杂道具 → \`image\`；UI 与简单几何 → \`drawlist\`。
+
+2. \`image\` 的**两种参数化**，别混：
+   · \`source.reference\` —— **配方外的文件路径**（人放好的参考图）；
+   · \`masterAsset\` —— **配方里那张母版的 id**（见第 4 条）。
+   ⚠️ 用 \`masterAsset\` 时**照样**是 \`{"kind":"image"}\`，不是另立一个策略。
+
+3. \`characterId\` —— **这个资产属于设计层里哪个实体**，取值**照抄设计层的 id**（不许自己起名）。
+   只有**属于角色**的资产才写它；木条箱、地面砖、拾取物不写。
+
+4. \`authoring[]\` 是**创作态母版**（\`{id, role, description, source, characterId, size}\`）：
+   它**不进交付包**，是给同角色的资产当「参考图」用的。资产的 \`masterAsset\` 指它的 \`id\`。
+   ⚠️ **母版的 \`size\` 是画布**（不是缩放目标），而它与引用它的资产的 \`size\` **宽高比必须一致**
+   —— 否则同一个角色会有两套头身比。
+   ⚠️ 母版**不必每份清单都有**；但只要你写了，就必须有资产指着它（否则它是一张没有入边的表）。
+
+5. \`dependsOn\` 是**资产 → 资产**的顺序边：写**别的资产的 \`id\`**。
+   ⚠️ 不许指向母版（那一类边由 \`masterAsset\` 表达）· 不许指向自己 · **整张图不许有环**。
+
+只调这个工具，不要解释。`;
+
+/** 设计层那些**要人读**的字段，逐条点名地摊开。
+ *
+ *  ⚠️ 票 10 的裁定：设计层那 **12 个 ① 档字段**由票 10 的提示词「逐条点名地生产」，而**具名插值在下游**
+ *    —— 下游有**两处**：票 12（规划清单）与票 14（编译运行档），**两处都插一遍**。
+ *    ⇒ 每个字段带着它的**点号路径**，那是那条欠条的兑现方式，别改成一句转述。 */
+export function designBrief(d: GameDesignSpec): string {
+  const lines = [
+    `- 标题 \`game.title\`：${d.game.title}`,
+    `- 题材 / 镜头：${d.game.genre} · ${d.game.camera}（外壳 ${d.game.runtimeProfile.id}/v${d.game.runtimeProfile.version}）`,
+    `- 核心循环：${d.coreLoop.join(" / ")}`,
+    `- \`player.role\` —— 玩家是：${d.player.role}`,
+    `- \`player.abilities\` —— 他能：${d.player.abilities.join(" / ")}`,
+    `- \`world.theme\`：${d.world.theme}`,
+    `- \`world.setting\`：${d.world.setting}`,
+    `- \`world.structure\`：${d.world.structure}`
+  ];
+  for (const e of d.enemies) lines.push(`- 敌人 \`${e.id}\` —— \`enemies[].behavior\`：${e.behavior}｜\`enemies[].threat\`：${e.threat}`);
+  for (const e of d.npcs) lines.push(`- NPC \`${e.id}\` —— \`npcs[].role\`：${e.role}｜\`npcs[].interaction\`：${e.interaction}`);
+  for (const e of d.interactables) lines.push(`- 交互物 \`${e.id}\` —— \`interactables[].type\`：${e.type}｜\`interactables[].behavior\`：${e.behavior}`);
+  for (const e of d.resources) lines.push(`- 可拾取物 \`${e.id}\`：${e.purpose}`);
+  for (const l of d.levels)
+    lines.push(`- 关卡 \`${l.id}\` —— \`levels[].purpose\`：${l.purpose}｜怎么走：${l.layout}｜这一关有：${l.entities.join(" / ") || "（空）"}`);
+  return lines.join("\n");
+}
+
+/** 这个世界的视觉语法 —— 「该造哪些东西、它们该有什么气质」照它写。 */
+function worldBrief(v: VisualWorldSpec): string {
+  const c = v.composition;
+  const buckets = Object.entries(v.palette).map(([k, refs]) => `${k}=${refs.join(",") || "∅"}`).join(" · ");
+  const mats = Object.entries(v.materials).map(([k, m]) => `${k}（${m.appearance}）`).join(" · ");
+  const pick = (xs: (string | undefined)[]) => xs.filter((x): x is string => typeof x === "string" && x !== "").join(" · ") || "（没写）";
+  return [
+    `- 视觉身份：${v.styleIdentity.description}`,
+    `- 关键词：${v.styleIdentity.keywords.join(" / ") || "（没写）"}`,
+    `- 相机：${v.camera.mode}`,
+    `- **空间分层**（前景 / 中景 / 背景 / 物尺度 / 密度）：${pick([c.foreground, c.midground, c.background, c.objectScale, c.density])}`,
+    `- **颜色分工（六桶）**：${buckets}`,
+    ...(mats === "" ? [] : [`- 材质：${mats}`]),
+    `- 这个世界里**角色**共有的长相：${pick([v.character.silhouette, v.character.proportions, v.character.clothing, v.character.poseLanguage])}`,
+    `- 环境：${pick([v.environment.architecture, v.environment.terrain, v.environment.props, v.environment.textureDensity])}`
+  ].join("\n");
+}
+
+/**
+ * 把「这个游戏的设计」读成一份资源清单。
+ *
+ * ⚠️ **本层那 12 个 ① 档字段的具名插值就发生在这里**（票 10 落地时人类裁的：设计层那 12 个由
+ *   票 10 的提示词**逐条点名地生产**，而**具名插值在下游** —— 票 12 与票 14 的模板）。
+ *   ⇒ `designBrief` 里每一个字段都带着它的**点号路径**，那是这条欠条的兑现方式，别改成一句转述。
+ */
+export function assetPlanPrompt(input: {
+  design: GameDesignSpec;
+  vws: VisualWorldSpec;
+  /** 照抄值（与票 08 让模型照抄 `style.id` 同款）：装配/落盘时会**强制改写**。 */
+  echo: { styleRef: string; styleId: string; referenceImage?: string };
+}): string {
+  const { design, vws, echo } = input;
+  return `你是游戏资源策划。根据下面的**设计**与**这个世界的视觉语法**，产出一份完整的资源清单。
+
+⚠️ 清单说的是**要造什么**（有哪些资源 · 长什么样的一句话 · 多大 · 几帧 · 哪一类），
+   **不是怎么画**：没有颜色、没有像素、没有画面 —— 那是后面几步的事。
+
+# 要做的是一个什么样的游戏（GameDesignSpec）
+${designBrief(design)}
+
+# 这个世界长什么样（VisualWorldSpec）
+⚠️ 「该造哪些东西、它们该有什么气质」**照它写** —— 尤其是**空间分层**（背景几层、每层是什么）
+   与**角色的共同长相**。
+${worldBrief(vws)}
+
+# 清单格式（asset-recipe/v1）
+⚠️ **每一条是 \`{spec, source}\` 两层**：\`kind\`/\`id\`/\`size\`/**那三个可选键**都在 **\`spec\` 里面**；
+   \`source\` 只说「怎么造出来」。⚠️ 放错一层会被拒收。
+⚠️ \`source.kind\` **三种都要按需选** —— 下面骨架里写的是「三选一」的占位，
+   别照抄成 \`drawlist\`（角色 / 敌人 / 背景 / 复杂道具该走 \`image\`）。
+
+{"format":"asset-recipe/v1","id":"<这份清单的 slug>","styleRef":"${echo.styleRef}"${echo.referenceImage === undefined ? "" : `,"referenceImage":"${echo.referenceImage}"`},
+ "authoring":[{"id":"<母版 slug>","role":"...","description":"...","source":{"kind":"drawlist|image|import"},
+   "characterId":"<设计层那个角色的 id>","size":{"w":int,"h":int}}],
+ "assets":[
+  {"spec":{"kind":"sprite|animation|background|ui","id":"<slug>","role":"...","description":"...",
+    "styleId":"${echo.styleId}","anchor":{"x":0..1,"y":0..1},"size":{"w":int,"h":int},
+    "required":true,
+    "characterId":"<设计层那个实体的 id，属于角色的资产才写>",
+    "masterAsset":"<authoring[] 里那张母版的 id，用母版才写>",
+    "dependsOn":["<别的资产 id，要先造完它才轮到这一条>"],
+    "animations":[{"name":"...","frames":int,"fps":num,"loop":bool}]},
+   "source":{"kind":"drawlist|image|import"}}]}
+⚠️ \`authoring[]\` **只有真给了母版才写**（没写它就得把 \`masterAsset\` 也去掉 —— 指过去而那边没有，是拒绝）。
+四条硬规则（**会被 schema 强制检查，违反直接拒收**）：
+1. \`sprite\` —— **不许出现 \`animations\` 这个键**（它只有一帧）。会动的才是 animation。
+2. \`animation\` —— 必须有 \`animations\`，至少一个。
+3. \`background\` 是场景尺度；\`ui\` 是**屏幕空间**（世界里的招牌是 sprite，不是 ui）。
+4. \`animations[].frames\` 是**帧数**（整数），不是帧名。
+
+⚠️ 四个槽的 \`id\` **沿用上面设计层给的那些 id**（一个字都不许改）；设计层没点名、但**设计说得出**
+的东西可以新加，给它们起新 id。
+⚠️ 背景层：**层数按画面需要定**（三层的写法：由远到近，一层一段描述），**没有「必须三层」这回事**。
+
+${recipeShapeSpec()}
+
+只调 ${PLAN_TOOL_NAME} 工具，不要解释。`;
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// 票 14：**运行档编译**那一步的问话面（它取代了 `compile-game` 的提示词 —— 输入从「需求 + 资源包」
+// 换成「设计 + 这一代外壳 + 资源包」）。
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+export const CONFIG_TOOL_NAME = "emit_game_config";
+
+/**
+ * 工具说明 = **schema 说不清的东西唯一的家**（票 08 的 R2-Q5）。
+ *
+ * ⚠️ 那九条铁律**住在提示词里**（它们要看视口与包，schema 看不见）—— 这里只放
+ * 「线形状表达不出来、又不依赖任何入参」的那几条。
+ */
+export const CONFIG_TOOL_DESCRIPTION = `输出一份 GameConfig（game-config/v1）—— 这是**给外壳吃的**一份菜谱。
+⚠️ 它**只说「哪里有、参数是多少」**，不是一门语言：外壳写死实现了一组行为原语，你只能在里面选。
+
+四条线形状表达不出来的规矩：
+
+1. \`at\` 是「**资源锚点落在的那个点**」，**不是左上角**。角色的锚点是**脚**、
+   世界里的道具是**底边中心**、HUD 面板是**左下角** —— 所以站在地面线上的东西写
+   \`at.y = 地面线的 y\`，**不是** \`地面线 − 高\`。写错整个世界的道具都会浮在半空。
+2. **看不见的碰撞进 \`terrain\`**（地面线、关卡边界、隐形墙 —— 它**不引用任何资源**）；
+   **看得见的静态碰撞体**（一摞行李、一段台阶）是一条 \`kind:"solid"\` 的**实体**，带资源。
+   同一块碰撞体**只写一次**。
+3. \`objective\` **不带数量**：要捡几件由 \`kind:"pickup"\` 的实体条数**派生**。
+4. 实体**不重复声明自己的几何**（\`size\`/\`anchor\` 只住在资源包里）—— **没有 \`scale\` 这个键**，
+   写了会被当场拒（\`1.7\` 会**静默**糊掉像素网格）。
+
+只调这个工具，不要解释。`;
+

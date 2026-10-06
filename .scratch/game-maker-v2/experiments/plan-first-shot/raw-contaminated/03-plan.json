@@ -1,0 +1,17 @@
+{
+  "label": "03-plan",
+  "ms": 989571,
+  "http": null,
+  "error": "超时（180s）",
+  "servedModel": null,
+  "requestedModel": "deepseek-v4-pro",
+  "stopReason": null,
+  "usage": null,
+  "wireOk": false,
+  "wireFailure": "timeout",
+  "wireDetail": "超时（180s）",
+  "truthOk": null,
+  "truthErrors": null,
+  "inspect": null,
+  "input": null
+}

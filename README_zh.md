@@ -14,19 +14,21 @@
 ## 管线
 
 ```
-                            ┌── derive ──────────▶ 资源清单 ──▶ pack ──▶ 资源包 (A) ─┐
+                            ┌── plan ────────────▶ 资源清单 ──▶ pack ──▶ 资源包 (A) ─┐
 一段需求 ───────────────────┤                                                       ├──▶ site ──▶ 站点 (B) ──▶ 打开即玩
-一张风格参考图 ─────────────┴─ StyleSpec ──▶ compile-game / compile-td-game ──▶ 关卡配置 ─┘
+一张风格参考图 ─────────────┴─ StyleSpec ──▶ compile-runtime / compile-td-game ──▶ 关卡配置 ─┘
 ```
 
-两个入口都是**故意开着的**：资源清单可以由需求**推导**，也可以**人手写**；关卡配置可以由需求**编译**，也可以**人手写**。文件一落盘，两条路在下游完全同构。
+两个入口都是**故意开着的**：资源清单可以由设计**规划**出来，也可以**人手写**；关卡配置可以由需求**编译**，也可以**人手写**。文件一落盘，两条路在下游完全同构。
+⚠️ **2026-10-05**：规划那一步取代了老的 `derive`（它吃「需求 + StyleSpec」，而新的吃「设计 + 这个世界」）——
+见 `docs/v2/03-claude-code.md §12`。
 
 ## 仓库结构
 
 | 路径 | 里面是什么 |
 |---|---|
 | [`packages/contracts`](packages/contracts) | Zod schema 与纯类型 —— **唯一的共享代码** |
-| [`packages/assets`](packages/assets) | 资源管线（drawlist → 静态校验 → 光栅化 → 量化 → 图集 → manifest），以及 `derive` / `pack` / `compile-*` / `verify` / `inspect` 这些操作 |
+| [`packages/assets`](packages/assets) | 资源管线（drawlist → 静态校验 → 光栅化 → 量化 → 图集 → manifest），以及 `plan` / `pack` / `compile-*` / `verify` / `inspect` 这些操作 |
 | [`packages/demo`](packages/demo) | 产物 B：固定 runtime 外壳与站点装配器 |
 | [`packages/cli`](packages/cli) | CLI 薄壳 —— 只解析参数、渲染结果，别的什么都不做 |
 | [`packages/mcp`](packages/mcp) | MCP stdio server 薄壳 |
@@ -104,16 +106,17 @@ game-maker inspect fixtures/packs/counter-siege/v4
 **第 0 步是一次人机交互，不是一次管线调用**：把参考图变成 StyleSpec。操作规程与可直接复制的提示词在 [`docs/stylespec-extraction.md`](docs/stylespec-extraction.md)。`fixtures/` 里已经躺着两份现成的 StyleSpec，探索阶段可以先跳过这一步。
 
 ```bash
-# 1. 需求 + StyleSpec → 资源清单（它是文件，所以可以先读一遍再决定要不要花钱）
-game-maker derive --requirement inputs/last-train/PROMPT.md --style fixtures/style-spec.halt-dusk.json
-# → out/<id>/recipes/v1.json   —— id 由模型给出，命令会把确切路径打出来
+# 1. 资源清单 —— ⚠️ **今天请走「人手写」那条路**：`plan`（规划）的输入是**设计层 + 这个世界**，
+#    而那两份产物由新链产出，那条链还在建。⇒ 抄一份 fixtures/recipes/ 里的改（8 份都是真的）。
+cp fixtures/recipes/shift-change.json /tmp/my-recipe.json
+# ⚠️ 规划那一步落地成什么样、以及它什么时候能用，见 docs/v2/03-claude-code.md §12。
 
 # 2. 资源清单 → 资源包（清单里有 image 资源时，这一步才是花钱的那一步）
 game-maker pack --recipe out/<id>/recipes/v1.json
 # → out/<id>/pack/v1
 
-# 3a. 横版：需求 + 资源包 → 关卡配置
-game-maker compile-game --requirement inputs/last-train/PROMPT.md --pack out/<id>/pack/v1
+# 3a. 横版：设计 + 资源包 → 关卡配置
+game-maker compile-runtime --design out/<id>/run/v1/game-design.json --pack out/<id>/pack/v1
 # 3b. 塔防：需求 + 资源包 → 关卡配置
 game-maker compile-td-game --requirement inputs/counter-siege/PROMPT.md --pack out/<id>/pack/v1
 
@@ -123,13 +126,13 @@ game-maker site out/<id>/pack/v1 --config out/<id>/game-configs/v1.json
 
 关卡配置也可以**人手写**，[`fixtures/game-configs/last-train.json`](fixtures/game-configs/last-train.json) 就是人写的那一份。两条路都合法，而且出来的不总是同一关 —— 手写那份把三件失物都摆在地面线上，编译那份把第二件摆到了行李堆顶上。
 
-走塔防这条路的人，请**先**读 [`docs/td-requirement.md`](docs/td-requirement.md) 再写需求。`derive` 与 `compile-td-game` **不是玩法感知的**：需求没说的，它们只能拿示例填。一份没提「场地是一格格砖」的需求，会安安静静地产出一份「一整张大背景图」的合法清单，而那个失败要到很远的 `compile-td-game` 才响。
+走塔防这条路的人，请**先**读 [`docs/td-requirement.md`](docs/td-requirement.md) 再写需求。`compile-td-game` **不是玩法感知的**：需求没说的，它只能拿示例填。⚠️ 而竖版那条新链上的 `plan` **是**玩法感知的（它读的是**设计层**）。一份没提「场地是一格格砖」的需求，会安安静静地产出一份「一整张大背景图」的合法清单，而那个失败要到很远的 `compile-td-game` 才响。
 
 ## 配置
 
 两个互相独立的上游，用不用得上取决于你跑哪些命令。
 
-**文本上游** —— `derive`、`compile-game`、`compile-td-game` 要用：
+**文本上游** —— `plan`、`compile-runtime`、`compile-td-game` 要用：
 
 ```bash
 export ANTHROPIC_BASE_URL=...
@@ -149,9 +152,9 @@ cp game-maker.local.example.json game-maker.local.json   # 真文件已 gitignor
 ## CLI 参考
 
 ```
-game-maker derive          --requirement <需求.md> --style <stylespec.json> [--out <目录>] [--json]
+game-maker plan            --design <game-design.json> --visual-world <visual-world.json> [--out <目录>] [--json]
 game-maker pack            --recipe <清单.json> [--out <目录>] [--concurrency <n>] [--json]
-game-maker compile-game    --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
+game-maker compile-runtime --design <game-design.json> --pack <资源包目录> [--level <关卡 id>] [--out <目录>] [--json]
 game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
 game-maker site            <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
 game-maker verify          <资源包目录> [--json]
@@ -175,7 +178,7 @@ game-maker inspect         <资源包目录> [--json]
 node packages/mcp/dist/server.mjs      # stdio
 ```
 
-六个工具：`derive_recipe` · `build_asset_pack` · `verify_asset_pack` · `inspect_asset_pack` · `compile_game` · `assemble_site`。长任务的进度走 MCP **原生的** `notifications/progress`；不支持通知的客户端照样能用，只是看不到进度。
+六个工具：`plan_assets` · `build_asset_pack` · `verify_asset_pack` · `inspect_asset_pack` · `compile_runtime` · `assemble_site`。长任务的进度走 MCP **原生的** `notifications/progress`；不支持通知的客户端照样能用，只是看不到进度。
 
 注册进任何 MCP 客户端，例如 `.mcp.json`：
 

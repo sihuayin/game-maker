@@ -14,19 +14,20 @@ The two artifacts share **data files only, never code**. Both are driven by the 
 ## Pipeline
 
 ```
-                            ┌── derive ──────────▶ asset recipe ──▶ pack ──▶ ASSET PACK (A) ─┐
+                            ┌── plan ────────────▶ asset recipe ──▶ pack ──▶ ASSET PACK (A) ─┐
 a piece of requirement ─────┤                                                                ├──▶ site ──▶ demo site (B) ──▶ open & play
-a style reference image ────┴─ StyleSpec ──▶ compile-game / compile-td-game ──▶ level config ─┘
+a style reference image ────┴─ StyleSpec ──▶ compile-runtime / compile-td-game ──▶ level config ─┘
 ```
 
-Two entry points are deliberate: the asset recipe can be **derived** from the requirement *or* **written by hand**, and the level config can be **compiled** from the requirement *or* **written by hand**. Once the file exists on disk, both paths are fully isomorphic.
+Two entry points are deliberate: the asset recipe can be **planned** from the design *or* **written by hand**, and the level config can be **compiled** from the requirement *or* **written by hand**. Once the file exists on disk, both paths are fully isomorphic.
+⚠️ **2026-10-05**: planning replaced the old `derive` (which took *requirement + StyleSpec*; the new one takes *design + the visual world*) — see `docs/v2/03-claude-code.md §12`.
 
 ## Repository layout
 
 | Path | What lives there |
 |---|---|
 | [`packages/contracts`](packages/contracts) | Zod schemas and pure types — **the only shared code** |
-| [`packages/assets`](packages/assets) | The asset pipeline (drawlist → static validation → raster → quantize → atlas → manifest) and the `derive` / `pack` / `compile-*` / `verify` / `inspect` operations |
+| [`packages/assets`](packages/assets) | The asset pipeline (drawlist → static validation → raster → quantize → atlas → manifest) and the `plan` / `pack` / `compile-*` / `verify` / `inspect` operations |
 | [`packages/demo`](packages/demo) | Artifact B: the fixed runtime shell and the site assembler |
 | [`packages/cli`](packages/cli) | CLI thin shell — it parses arguments and renders results, nothing else |
 | [`packages/mcp`](packages/mcp) | MCP stdio server thin shell |
@@ -104,16 +105,18 @@ This path calls a model, so it needs the text upstream configured first (see [Co
 **Step 0 is a human-in-the-loop interaction, not a pipeline call**: turning a reference image into a StyleSpec. The runbook and a copy-pasteable prompt live in [`docs/stylespec-extraction.md`](docs/stylespec-extraction.md). Two ready-made StyleSpecs are checked in under `fixtures/`, so you can skip this step while exploring.
 
 ```bash
-# 1. requirement + StyleSpec → asset recipe (a file, so you can read it before spending anything)
-game-maker derive --requirement inputs/last-train/PROMPT.md --style fixtures/style-spec.halt-dusk.json
-# → out/<id>/recipes/v1.json   — the id comes from the model; the command prints the exact path
+# 1. asset recipe — ⚠️ **take the hand-written path today**: `plan`'s inputs are the *design* and
+#    *the visual world*, and those are produced by the new chain, which is still being built.
+#    So copy one of the 8 real recipes under fixtures/recipes/ and edit it.
+cp fixtures/recipes/shift-change.json /tmp/my-recipe.json
+# ⚠️ What the planning step landed as, and when it becomes usable, is in docs/v2/03-claude-code.md §12.
 
 # 2. recipe → asset pack (this is the step that costs money if the recipe has image assets)
 game-maker pack --recipe out/<id>/recipes/v1.json
 # → out/<id>/pack/v1
 
-# 3a. side-scroller: requirement + pack → level config
-game-maker compile-game --requirement inputs/last-train/PROMPT.md --pack out/<id>/pack/v1
+# 3a. side-scroller: design + pack → level config
+game-maker compile-runtime --design out/<id>/run/v1/game-design.json --pack out/<id>/pack/v1
 # 3b. tower defense: requirement + pack → level config
 game-maker compile-td-game --requirement inputs/counter-siege/PROMPT.md --pack out/<id>/pack/v1
 
@@ -123,13 +126,13 @@ game-maker site out/<id>/pack/v1 --config out/<id>/game-configs/v1.json
 
 A level config may also be **hand-written**; [`fixtures/game-configs/last-train.json`](fixtures/game-configs/last-train.json) is exactly that. Both routes stay legal, and they do not always produce the same level — the hand-written config puts all three lost items on the ground line, while the compiled one stacks the second item on top of the luggage pile.
 
-For the tower-defense route, read [`docs/td-requirement.md`](docs/td-requirement.md) **before** writing the requirement. `derive` and `compile-td-game` are not genre-aware: whatever the requirement does not say, they fill in from the example. A requirement that never states its arena is tiled will happily produce a legal recipe for one big background image, and that failure only surfaces much later.
+For the tower-defense route, read [`docs/td-requirement.md`](docs/td-requirement.md) **before** writing the requirement. `compile-td-game` is not genre-aware: whatever the requirement does not say, it fills in from the example. ⚠️ The new chain's `plan` **is** genre-aware — it reads the **design**, not the raw requirement. A requirement that never states its arena is tiled will happily produce a legal recipe for one big background image, and that failure only surfaces much later.
 
 ## Configuration
 
 Two independent upstreams. Each is optional depending on which commands you run.
 
-**Text upstream** — used by `derive`, `compile-game`, `compile-td-game`:
+**Text upstream** — used by `plan`, `compile-runtime`, `compile-td-game`:
 
 ```bash
 export ANTHROPIC_BASE_URL=...
@@ -149,9 +152,9 @@ A pack whose recipe contains no image assets needs **no** image credentials at a
 ## CLI reference
 
 ```
-game-maker derive          --requirement <requirement.md> --style <stylespec.json> [--out <dir>] [--json]
+game-maker plan            --design <game-design.json> --visual-world <visual-world.json> [--out <dir>] [--json]
 game-maker pack            --recipe <recipe.json> [--out <dir>] [--concurrency <n>] [--json]
-game-maker compile-game    --requirement <requirement.md> --pack <pack dir> [--out <dir>] [--json]
+game-maker compile-runtime --design <game-design.json> --pack <pack dir> [--level <level id>] [--out <dir>] [--json]
 game-maker compile-td-game --requirement <requirement.md> --pack <pack dir> [--out <dir>] [--json]
 game-maker site            <pack dir> --config <level config> [--shell <shell.js>] [--out <dir>] [--json]
 game-maker verify          <pack dir> [--json]
@@ -175,7 +178,7 @@ Two properties worth knowing up front:
 node packages/mcp/dist/server.mjs      # stdio
 ```
 
-Six tools: `derive_recipe` · `build_asset_pack` · `verify_asset_pack` · `inspect_asset_pack` · `compile_game` · `assemble_site`. Long-running calls stream progress over the MCP-native `notifications/progress`; clients that ignore notifications still work, they just see no progress.
+Six tools: `plan_assets` · `build_asset_pack` · `verify_asset_pack` · `inspect_asset_pack` · `compile_runtime` · `assemble_site`. Long-running calls stream progress over the MCP-native `notifications/progress`; clients that ignore notifications still work, they just see no progress.
 
 Register it with any MCP client, for example `.mcp.json`:
 

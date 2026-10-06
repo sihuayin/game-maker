@@ -1,0 +1,671 @@
+{
+  "label": "04-plan",
+  "ms": 17442,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 134,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 6907,
+    "output_tokens": 4575,
+    "service_tier": "standard"
+  },
+  "wireOk": true,
+  "wireFailure": null,
+  "wireDetail": null,
+  "truthOk": true,
+  "truthErrors": null,
+  "inspect": {
+    "strategies": {
+      "image": 14,
+      "drawlist": 8
+    },
+    "kinds": {
+      "background": 1,
+      "animation": 6,
+      "sprite": 12,
+      "ui": 3
+    },
+    "dangling": [],
+    "selfRef": [],
+    "cycle": null,
+    "ratioBad": [],
+    "withChar": 6,
+    "authors": 2
+  },
+  "input": {
+    "format": "asset-recipe/v1",
+    "id": "scavenger-wasteland",
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png",
+    "authoring": [
+      {
+        "id": "master-player-scavenger",
+        "role": "player master",
+        "description": "拾荒者母版：粗壮方块人，oversized 方形头 + 低檐方帽，高矩形躯干裹深色海军蓝长外套、腰上一道浅色腰带带，短腿小方手，五官仅四个深色像素点；站立中立姿态，无光影，纯色块拼接",
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, side view, chunky 8-bit proportions blocky human, oversized square head, boxy hat with wide flat brim, tall rectangle torso in long dark navy coat with lighter belt band, stubby short legs, small pale square hands, face made of four dark pixel dots only, no outline, no gradient, no shading, matte flat colors, neutral upright idle pose, transparent background"
+        },
+        "characterId": "player",
+        "size": {
+          "w": 48,
+          "h": 64
+        }
+      },
+      {
+        "id": "master-mutant",
+        "role": "enemy master",
+        "description": "变异体母版：与角色同一套方块人比例，粗短宽躯干、超大方形头、短腿；无帽或扁平头壳，肢体为小矩形，整体靠明度阶梯区别于玩家；侧视，无光影",
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, side view, chunky 8-bit proportions blocky mutant creature, oversized square head, stubby wide torso, small rectangular limbs, short legs, hard-edged solid color blocks, no outline, no gradient, no shading, flat matte palette, hunched neutral standing pose, transparent background"
+        },
+        "characterId": "e-mutant",
+        "size": {
+          "w": 48,
+          "h": 64
+        }
+      }
+    ],
+    "assets": [
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-l01-dusk",
+          "role": "level background",
+          "description": "黄昏废土三层横向色带背景：远景为三段平滑色带拼出的天空，压一道深色山脊剪影与一枚钉在画面上缘的低垂日盘；中景是一条极长重复的横向墙体带，内嵌矩形面板，仅立一根细灯柱；近景是平台结构带——平直平台地面带、其下铁路带、再下更暗的平台基座带",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 960,
+            "h": 540
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "sky",
+              "parallax": 0.15
+            },
+            {
+              "name": "wall",
+              "parallax": 0.5,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            },
+            {
+              "name": "platform",
+              "parallax": 1,
+              "tileable": {
+                "x": true,
+                "y": false
+              }
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art background, side-scroller wasteland dusk: three smooth matte color bands forming a gradient dusk sky with a dark mountain ridge silhouette and a low sun disc pinned near the top edge; a very long repeating horizontal wall strip with inset rectangular panels and a single thin lamp post; foreground platform structure with a flat platform floor band, a rail band of dark repeating horizontal dashes, and a darker platform base band below; hard edges only, no outline, no texture, no blur, poster-flat layering"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-idle",
+          "role": "player idle",
+          "description": "拾荒者站立中立待机，仅一两帧的极轻微呼吸/重心偏移；身形与母版一致",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "master-player-scavenger",
+          "animations": [
+            {
+              "name": "idle",
+              "frames": 2,
+              "fps": 4,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet, 2 frames, side view, chunky blocky wasteland scavenger in long dark navy coat with lighter belt band and boxy hat, standing upright neutral idle with barely perceptible weight shift, solid flat color blocks, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-walk",
+          "role": "player walk",
+          "description": "拾荒者左右匀速行走：只有腿部与躯干整体做小幅纵向偏移与交替，上身姿态不变",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "master-player-scavenger",
+          "animations": [
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 8,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet, 4 frames walk cycle, side view, chunky blocky wasteland scavenger in long dark navy coat with lighter belt band and boxy hat, walking left and right at constant speed, motion reads only through leg alternation and small vertical body offset, no arm swing flourish, solid flat color blocks, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-jump",
+          "role": "player jump",
+          "description": "拾荒者单次跳跃：起跳→滞空→落地的三段式，落地即停无惯性余韵；仅靠腿部收放与身体偏移表达",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "master-player-scavenger",
+          "animations": [
+            {
+              "name": "jump",
+              "frames": 3,
+              "fps": 10,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet, 3 frames jump, side view, chunky blocky wasteland scavenger in long dark navy coat with lighter belt band and boxy hat, launch frame with legs tucked, airborne frame, landing frame with legs planted, motion reads only through leg and body offset, solid flat color blocks, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "player-hurt",
+          "role": "player knockback",
+          "description": "拾荒者被变异体顶开：短暂后仰与双臂外张，之后迅速回到站立；不表现死亡",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "player",
+          "masterAsset": "master-player-scavenger",
+          "dependsOn": [
+            "player-idle"
+          ],
+          "animations": [
+            {
+              "name": "hurt",
+              "frames": 3,
+              "fps": 10,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet, 3 frames get-hit, side view, chunky blocky wasteland scavenger in long dark navy coat with lighter belt band and boxy hat, shoved backward with torso tilted and small hands flung out, brief stagger then recover to standing, no death pose, solid flat color blocks, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "mutant-walk",
+          "role": "enemy walk",
+          "description": "变异体在平台带来回游荡的行走循环：短腿交替、扁平头壳前后小幅晃动，无攻击动作",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "e-mutant",
+          "masterAsset": "master-mutant",
+          "animations": [
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 6,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet, 4 frames walk cycle, side view, chunky blocky mutant creature with oversized square head, stubby wide torso, small rectangular limbs and short legs, wandering tide at slow steady pace, motion reads only through leg alternation, solid flat color blocks, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "mutant-turn",
+          "role": "enemy turn",
+          "description": "变异体在平台边缘或墙面前转身：两帧的原地翻转，不跳跃不追击",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true,
+          "characterId": "e-mutant",
+          "masterAsset": "master-mutant",
+          "dependsOn": [
+            "mutant-walk"
+          ],
+          "animations": [
+            {
+              "name": "turn",
+              "frames": 2,
+              "fps": 6,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art sprite sheet, 2 frames turn in place, side view, chunky blocky mutant creature with oversized square head, stubby wide torso, small rectangular limbs and short legs, pivoting to face the opposite direction at a platform edge, solid flat color blocks, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-scrap",
+          "role": "pickup",
+          "description": "散落的废料：一块轴对齐的小矩形金属块，顶面比侧面亮一阶，尺寸约角色手掌大小；既是终端的消耗品也是被顶开时的掉落物",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, single small axis-aligned rectangular scrap metal block, one flat shape with a lighter top face and darker side face, matte flat colors, hard edges, no outline, no gradient, no detail, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-water",
+          "role": "pickup",
+          "description": "净水：一枚轴对齐的小矩形水罐/水块，浅色正面配一道更亮的横向色带，尺寸与废料同级",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, single small axis-aligned rectangular water canister, one flat shape with a lighter horizontal band across its face, matte flat colors, hard edges, no outline, no gradient, no detail, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-terminal",
+          "role": "resource gate terminal",
+          "description": "资源闸门终端：嵌在长墙矩形面板里的方形面板，带一枚暗红发光状态格；废料净水够数时开闸，不够只回一段暗红光提示；按角色尺度取大",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true,
+          "dependsOn": [
+            "e-scrap"
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, square inset wall panel terminal with a rectangular frame and one flat emissive indicator block, hard-edged solid blocks, matte finish, emissive area is flat with no blur halo, no outline, no gradient, no readable text, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-lamp-post",
+          "role": "wall prop",
+          "description": "细灯柱：一根极细的竖条杆配一枚扁平的圆盘头，立在长墙前；画面里只此一根",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 96
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art, thin tall lamp post made of a very narrow vertical bar with a flat disc head on top, emissive disc is flat with no blur halo, matte flat colors, hard edges, no outline, no gradient, transparent background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-wall-panel",
+          "role": "wall feature",
+          "description": "长墙内嵌的矩形面板：一个轴对齐的方形内凹色块，明度比墙低一阶，沿横向重复排布",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-wall-plates",
+          "role": "wall feature",
+          "description": "一组三块小墙板：三枚轴对齐的小矩形并排贴在墙上，作稀疏点缀",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 24
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-signal",
+          "role": "rail feature",
+          "description": "铁路信号灯：竖杆顶端一枚方形色块，立在铁路带上，按角色尺度取大",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 64
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-bench",
+          "role": "platform prop",
+          "description": "长椅：座板与两条腿共几个轴对齐矩形拼成，软棕色调的木块感，摆在平台地面带上",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 32
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-luggage",
+          "role": "platform prop",
+          "description": "行李箱堆：两三个大小不一的轴对齐矩形箱子叠放，软棕色木块面",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 40
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "p-crate",
+          "role": "platform prop",
+          "description": "废料木条箱：一个大的轴对齐方形木箱，正面一道横向色带，摆在平台顶部与台阶边缘作落脚参照",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 40,
+            "h": 40
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "ui-scrap-icon",
+          "role": "ui icon",
+          "description": "HUD 废料计数图标：一枚与拾取物同形的小矩形金属块，屏显原尺寸",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true,
+          "dependsOn": [
+            "e-scrap"
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "ui-water-icon",
+          "role": "ui icon",
+          "description": "HUD 净水计数图标：一枚与拾取物同形的小矩形水罐，屏显原尺寸",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true,
+          "dependsOn": [
+            "e-water"
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-hud-bar",
+          "role": "hud bar background",
+          "description": "HUD 底栏：一条会被拉伸到任意宽度的横向色带底板，中央区平坦无图案，用于承载废料/净水图标与计数",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 24
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 8,
+            "right": 8,
+            "top": 6,
+            "bottom": 6
+          }
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art nine-slice ui panel, a plain horizontal band with four equal-width border edges and a completely flat empty center, matte flat colors, hard edges, no outline, no gradient, no pattern, no text"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-gate-prompt",
+          "role": "terminal prompt frame",
+          "description": "终端交互提示底板：会被拉伸成不同宽度的矩形底框，中央区平坦无图案与文字，开启/拒绝两种状态靠外框色区分",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 48,
+            "h": 32
+          },
+          "required": true,
+          "dependsOn": [
+            "e-terminal"
+          ],
+          "ninePatch": {
+            "left": 8,
+            "right": 8,
+            "top": 8,
+            "bottom": 8
+          }
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art nine-slice ui panel, rectangular prompt plate with four equal-width border edges and a completely flat empty center, matte flat colors, hard edges, no outline, no gradient, no pattern, no text"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-dusk-timer",
+          "role": "daylight timer bar",
+          "description": "天光倒计时条：会被水平拉伸成任意长度的进度槽，中央区平坦可重复，仅两端保留边框",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 16
+          },
+          "required": true,
+          "ninePatch": {
+            "left": 8,
+            "right": 8,
+            "top": 4,
+            "bottom": 4
+          }
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel art nine-slice ui bar, plain horizontal groove with four equal-width border edges and a completely flat empty center, matte flat colors, hard edges, no outline, no gradient, no pattern, no text"
+        }
+      }
+    ]
+  }
+}

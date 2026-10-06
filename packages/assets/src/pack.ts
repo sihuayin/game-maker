@@ -270,9 +270,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   /** 生图调用的账 —— 一次调用就是一笔钱，逐条记下来交调用方报出来。 */
   const imageCalls: ({ assetId: string } & ImageGenCall)[] = [];
 
-  // ⚠️ **并发跑**（票 47）：资源之间**没有任何数据依赖** —— 每一次调用只吃自己的
-  //   `spec` + StyleSpec，`dependencies` 那条线**从来没有过消费者**（本节末尾有交代）。
+  // ⚠️ **并发跑**（票 47）：每一次调用只吃自己的 `spec` + StyleSpec。
   //   串行纯属浪费：实测 9 个资源串行 43.7s，而墙钟本可以贴着最慢的那一个走。
+  //   ⚠️ **2026-10-05（票 11）：资源之间**开始**可能有序了** —— `spec.dependsOn` 是一条真的边。
+  //     今天 8 份 fixture 里**一条都没有**，所以下面那条链在今天的输入上**恒等于全并发**；
+  //     有依赖时才退化成「等前置」，而闸门与 `--concurrency` 的语义**一个字不变**。
   //
   // ⚠️ **两个闸门而不是一个**：限流是**上游**的属性。文本与生图是两个不同的上游
   //   （票 34：千问 RPS 5 / 并发 5；文本那侧查不到，取保守值），一个全局数会把
@@ -290,7 +292,24 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   //   ⚠️ 不等还有第二个后果：失败那条 `renameSync` 先生效，还在飞的那笔随后往**旧路径**写
   //   ⇒ 报错，而它的产物永远进不了现场；工作目录那时若是空的，**连现场都不留**（整笔白花）。
   //   ⚠️ 等的上界是**现成的调用超时**（240–300s），不新拍一个数。
-  const settled = await Promise.allSettled(recipe.assets.map(async (entry, idx) => {
+  // ⚠️ **依赖边（票 11 的 Q4）**：两道闸门只管「同时在飞几笔」，**不管顺序**；顺序在这里 ——
+  //   每个资产挂一个**自己的 promise**，依赖它的那些先进来 `await` 它。
+  //   ⚠️ **环不会到这儿**：`parseRecipe` 已经拒过（`recipe.ts` 的 superRefine）⇒ 这张图一定是 DAG，
+  //     所以「互等的 promise 链」这种东西不存在。**契约判环 + pack 排序**是配套的两半。
+  //   ⚠️ **依赖没造出来 ⇒ 这个资产一个字节都不往外发** —— 那正是这条边省下来的钱。
+  const done = new Map<string, { promise: Promise<void>; resolve: () => void; reject: (e: unknown) => void }>();
+  for (const e of recipe.assets) {
+    let resolve!: () => void;
+    let reject!: (e: unknown) => void;
+    const promise = new Promise<void>((res, rej) => { resolve = res; reject = rej; });
+    // ⚠️ 没人 `await` 的那条失败**不许变成 unhandledRejection** —— 失败已经有 `allSettled` 收着。
+    promise.catch(() => {});
+    done.set(e.spec.id, { promise, resolve, reject });
+  }
+  const depFailure = new Map<string, string>();
+
+  /** 造**一个**资产。⚠️ 抽成函数只是为了让外面能套一层「先等依赖」—— 里面的逻辑一个字没动。 */
+  const buildOne = async (entry: { spec: AssetSpec; source: AssetSourceLike }, idx: number) => {
       const spec = entry.spec;
       opts.onProgress?.(idx, recipe.assets.length, spec.id);
       const plan = framePlan(spec);
@@ -531,7 +550,34 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         : undefined;
       // 按下标落位 —— 并发下**完成顺序是乱的**，而 manifest 里的资源顺序必须稳定。
       built[idx] = { spec, origin, paletteBinding: binding, frames, ...(animations ? { animations } : {}), authoring };
-  }));
+  };
+
+  const settled = await Promise.allSettled(
+    recipe.assets.map(async (entry, idx) => {
+      const spec = entry.spec;
+      const mine = done.get(spec.id);
+      try {
+        for (const d of spec.dependsOn ?? []) {
+          const up = done.get(d);
+          if (up === undefined) continue; // 解不到的 id 由契约拒（这里不该发生）
+          await up.promise.catch(() => {}); // 前置的失败由下一句报出来，别在这里炸
+          const why = depFailure.get(d);
+          if (why !== undefined)
+            throw new Error(
+              `前置资产 "${d}" 没造出来（${why}）—— "${spec.id}" **不再往下走**：` +
+                "⚠️ 依赖不成立时发出去的那一笔是白花的钱（票 11 的 Q4）"
+            );
+        }
+        const out = await buildOne(entry, idx);
+        mine?.resolve();
+        return out;
+      } catch (e) {
+        depFailure.set(spec.id, e instanceof Error ? e.message : String(e));
+        mine?.reject(e);
+        throw e;
+      }
+    })
+  );
   // ⚠️ 逐条看过再抛**第一条**失败 —— 取**清单顺序**，与「谁先挂」无关（并发下那个不可复现）
   const firstFailure = settled.find((r): r is PromiseRejectedResult => r.status === "rejected");
   if (firstFailure) throw firstFailure.reason;

@@ -1,0 +1,504 @@
+{
+  "label": "04-plan",
+  "ms": 30718,
+  "http": 200,
+  "error": null,
+  "servedModel": "deepseek-flash",
+  "requestedModel": "deepseek-v4-pro",
+  "stopReason": "tool_use",
+  "usage": {
+    "input_tokens": 136,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 6656,
+    "output_tokens": 2839,
+    "service_tier": "standard"
+  },
+  "wireOk": true,
+  "wireFailure": null,
+  "wireDetail": null,
+  "truthOk": true,
+  "truthErrors": null,
+  "inspect": {
+    "strategies": {
+      "image": 2,
+      "drawlist": 15
+    },
+    "kinds": {
+      "animation": 2,
+      "sprite": 13,
+      "background": 2
+    },
+    "dangling": [],
+    "selfRef": [],
+    "cycle": null,
+    "ratioBad": [],
+    "withChar": 1,
+    "authors": 1
+  },
+  "input": {
+    "format": "asset-recipe/v1",
+    "id": "scavenger-wasteland",
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png",
+    "authoring": [
+      {
+        "id": "master-p-scavenger",
+        "role": "角色母版 · 拾荒者",
+        "description": "粗壮低分辨率的方块人：过宽的方帽檐、高矩形身躯、粗短方头、短腿、小手；深藏青长外套配一条较亮的腰带横带；直立中性站姿",
+        "source": {
+          "kind": "image",
+          "prompt": "side-view flat vector pixel character, boxy wide hat brim, oversized square head, tall rectangle body in long dark navy coat with a lighter belt band, stubby wide torso, short rectangular legs, small pale square hands, upright neutral idle, no outline, no gradient, hard-edged flat color blocks only, 4-color limited ramp, plain background"
+        },
+        "characterId": "p-scavenger",
+        "size": {
+          "w": 48,
+          "h": 48
+        }
+      }
+    ],
+    "assets": [
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "p-scavenger",
+          "role": "玩家角色 · 拾荒者",
+          "description": "方块人拾荒者：宽方帽檐、方头、深藏青长外套配亮腰带，直立中性站姿；行走与跳跃只靠腿部与身体位移区分",
+          "styleId": "halt-dusk",
+          "characterId": "p-scavenger",
+          "masterAsset": "master-p-scavenger",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 48
+          },
+          "required": true,
+          "animations": [
+            {
+              "name": "idle",
+              "frames": 1,
+              "fps": 4,
+              "loop": true
+            },
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 8,
+              "loop": true
+            },
+            {
+              "name": "jump",
+              "frames": 2,
+              "fps": 6,
+              "loop": false
+            },
+            {
+              "name": "hurt",
+              "frames": 2,
+              "fps": 6,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "flat vector pixel sprite sheet of the same boxy scavenger, side view, 4 frames of plain walking, then jump and hurt frames; hard-edged flat color blocks, no outline, no gradient, plain background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "e-mutant",
+          "role": "敌人 · 变异体",
+          "description": "同样厚重方块比例但更矮更压扁的变异体剪影，无外套无腰带的整块躯体，来回游荡",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 40
+          },
+          "required": true,
+          "animations": [
+            {
+              "name": "walk",
+              "frames": 4,
+              "fps": 6,
+              "loop": true
+            },
+            {
+              "name": "idle",
+              "frames": 1,
+              "fps": 4,
+              "loop": true
+            }
+          ]
+        },
+        "source": {
+          "kind": "image",
+          "prompt": "side-view flat vector pixel mutant: squat chunky blocky torso, oversized square head, short stubby legs, no outline, no gradient, solid hard-edged flat color blocks, plain background"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-scrap",
+          "role": "可拾取物 · 废料",
+          "description": "一块轴对齐的矩形废料块，约一人之半高，纯色硬边",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 16
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "water-can",
+          "role": "可拾取物 · 净水",
+          "description": "矩形净水罐剪影，一道横向亮带作瓶身分段，与废料同尺度",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 16,
+            "h": 20
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-terminal",
+          "role": "交互物 · 资源闸门终端",
+          "description": "嵌在长墙矩形面板里的方形终端面板，够数时亮起、不够时回一段暗红光",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 64,
+            "h": 64
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "prop-gate",
+          "role": "场景道具 · 安全区闸门",
+          "description": "轴对齐的矩形闸门，一人多高，闭合时整块平板，开启时向上缩入墙体",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 96
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "prop-lamp-post",
+          "role": "场景道具 · 细灯柱",
+          "description": "细直柱身顶一枚圆盘灯头，立在长墙前，是整条墙带唯一的立物",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 128
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "prop-bench",
+          "role": "场景道具 · 长椅",
+          "description": "两块轴对齐矩形叠成的长椅：坐面板与两侧粗腿",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 48,
+            "h": 24
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "prop-luggage-stack",
+          "role": "场景道具 · 行李堆",
+          "description": "几只软褐色的方块行李相互堆叠，最大不超过一人高",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 40,
+            "h": 48
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "prop-rail-signal",
+          "role": "场景道具 · 铁路信号机",
+          "description": "细柱顶着一块方形信号板，立在铁路带旁，按角色尺度取大",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 64
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "prop-wall-panel",
+          "role": "场景道具 · 墙面嵌板",
+          "description": "长墙内嵌的矩形面板，纯色硬边、无细节无描边",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 48,
+            "h": 64
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "tile-platform-top",
+          "role": "地形块 · 平台地面带",
+          "description": "平直的平台顶面带，上表面绝对水平、垂直切边相接，供平铺",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 32
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "tile-rail-band",
+          "role": "地形块 · 铁路带",
+          "description": "更暗的横向条带上排一行深色短划，横贯画面，供平铺",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 32
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "tile-platform-base",
+          "role": "地形块 · 平台基座带",
+          "description": "比地面带更暗的平台基座，纯色平板，供平铺",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 32,
+            "h": 32
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "tile-wall-strip",
+          "role": "地形块 · 长墙带",
+          "description": "中褐色哑光横墙条，仅靠上下带边区分明度，供横向重复",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 64,
+            "h": 128
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-dusk-sky",
+          "role": "背景 · 黄昏天空与天际线",
+          "description": "三段平滑色带拼出的黄昏天空，压一道深色山脊剪影，一枚低垂日盘钉在画面上缘",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "size": {
+            "w": 960,
+            "h": 540
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "sky",
+              "parallax": 0.1,
+              "description": "三段平滑色带由远到近拼出黄昏渐变，平涂无纹理，钉着低垂的日盘"
+            },
+            {
+              "name": "ridge",
+              "parallax": 0.25,
+              "description": "深色山脊与平齐屋顶剪影，无细节，压在天际线上"
+            }
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-wasteland-wall",
+          "role": "背景 · 中景长墙与前景平台结构",
+          "description": "一条极长的横向墙体带内嵌矩形面板、仅立一根细灯柱；前景为平直平台地面带、其下铁路带、再下更暗的平台基座带，台阶垂直切边相接",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 960,
+            "h": 540
+          },
+          "required": true,
+          "layers": [
+            {
+              "name": "wall",
+              "parallax": 0.5,
+              "tileable": {
+                "x": true,
+                "y": false
+              },
+              "description": "长横向墙体带，中褐色哑光，内嵌矩形面板，仅立一根细灯柱"
+            },
+            {
+              "name": "rail",
+              "parallax": 0.85,
+              "tileable": {
+                "x": true,
+                "y": false
+              },
+              "description": "更暗的横向铁路条带，上面排一行深色短划"
+            },
+            {
+              "name": "platform",
+              "parallax": 1,
+              "tileable": {
+                "x": true,
+                "y": false
+              },
+              "description": "最上层的平直平台地面带，其下是更暗的平台基座带，台阶以垂直切边相接"
+            }
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      }
+    ]
+  }
+}

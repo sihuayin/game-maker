@@ -1,0 +1,256 @@
+{
+  "label": "04-compile-runtime",
+  "levelId": "l-01",
+  "ok": true,
+  "kind": null,
+  "message": null,
+  "ms": 3055,
+  "ledger": [
+    {
+      "step": "compile-runtime",
+      "target": "game-config",
+      "upstream": "messages",
+      "ms": 3055,
+      "attempts": 1,
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 195,
+        "outputTokens": 1123
+      }
+    }
+  ],
+  "issues": [],
+  "config": {
+    "format": "game-config/v1",
+    "world": {
+      "size": {
+        "w": 1440,
+        "h": 270
+      }
+    },
+    "scene": {
+      "background": {
+        "asset": "bg-dusk-halt"
+      }
+    },
+    "player": {
+      "asset": "player-traveler",
+      "anims": {
+        "idle": "idle",
+        "run": "run",
+        "jump": "jump"
+      },
+      "at": {
+        "x": 40,
+        "y": 250
+      },
+      "move": {
+        "speed": 130,
+        "jumpVelocity": 300,
+        "gravity": 780
+      }
+    },
+    "terrain": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 1440,
+        "h": 20
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 270
+      },
+      {
+        "x": 1432,
+        "y": 0,
+        "w": 8,
+        "h": 270
+      }
+    ],
+    "entities": [
+      {
+        "id": "scrap-1",
+        "kind": "pickup",
+        "at": {
+          "x": 300,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "scrap-2",
+        "kind": "pickup",
+        "at": {
+          "x": 380,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "scrap-3",
+        "kind": "pickup",
+        "at": {
+          "x": 700,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "scrap-4",
+        "kind": "pickup",
+        "at": {
+          "x": 780,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "scrap-5",
+        "kind": "pickup",
+        "at": {
+          "x": 1040,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "scrap-6",
+        "kind": "pickup",
+        "at": {
+          "x": 1120,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "scrap-7",
+        "kind": "pickup",
+        "at": {
+          "x": 1210,
+          "y": 250
+        },
+        "asset": "pickup-suitcase"
+      },
+      {
+        "id": "step-1",
+        "kind": "solid",
+        "at": {
+          "x": 560,
+          "y": 250
+        },
+        "asset": "prop-awning-steps"
+      },
+      {
+        "id": "step-2",
+        "kind": "solid",
+        "at": {
+          "x": 620,
+          "y": 240
+        },
+        "asset": "prop-awning-steps"
+      },
+      {
+        "id": "barrier-1",
+        "kind": "solid",
+        "at": {
+          "x": 560,
+          "y": 230
+        },
+        "asset": "prop-awning-steps"
+      },
+      {
+        "id": "barrier-2",
+        "kind": "solid",
+        "at": {
+          "x": 900,
+          "y": 250
+        },
+        "asset": "prop-luggage-pile"
+      },
+      {
+        "id": "mutant-1",
+        "kind": "hazard",
+        "at": {
+          "x": 760,
+          "y": 250
+        },
+        "asset": "hazard-sweeping-carriage",
+        "anim": "sweep",
+        "motion": {
+          "kind": "cycle",
+          "axis": "x",
+          "distance": 150,
+          "periodMs": 3600
+        }
+      },
+      {
+        "id": "mutant-2",
+        "kind": "hazard",
+        "at": {
+          "x": 1120,
+          "y": 250
+        },
+        "asset": "hazard-sweeping-carriage",
+        "anim": "sweep",
+        "motion": {
+          "kind": "cycle",
+          "axis": "x",
+          "distance": 180,
+          "periodMs": 4200
+        }
+      },
+      {
+        "id": "decor-1",
+        "kind": "decor",
+        "at": {
+          "x": 200,
+          "y": 250
+        },
+        "asset": "signal-endlight",
+        "anim": "red"
+      },
+      {
+        "id": "gate-terminal",
+        "kind": "goal",
+        "at": {
+          "x": 1400,
+          "y": 250
+        },
+        "asset": "signal-endlight",
+        "anim": "green"
+      }
+    ],
+    "hud": {
+      "panel": {
+        "asset": "hud-lost-slots",
+        "at": {
+          "x": 8,
+          "y": 262
+        },
+        "size": {
+          "w": 72,
+          "h": 32
+        }
+      },
+      "pip": {
+        "asset": "hud-pip",
+        "at": {
+          "x": 12,
+          "y": 228
+        },
+        "step": {
+          "x": 20,
+          "y": 0
+        }
+      }
+    },
+    "objective": {
+      "kind": "collect-then-reach",
+      "gate": "gate-terminal"
+    }
+  },
+  "configPath": "last-train/game-configs/v1.json"
+}

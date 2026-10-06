@@ -41,7 +41,7 @@ describe("MCP 协议面", () => {
     const [r] = await drive([{ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }]);
     const tools = r.result.tools;
     expect(tools.map((t: { name: string }) => t.name)).toEqual(
-      ["derive_recipe", "build_asset_pack", "verify_asset_pack", "inspect_asset_pack", "compile_game", "assemble_site"]);
+      ["plan_assets", "build_asset_pack", "verify_asset_pack", "inspect_asset_pack", "compile_runtime", "assemble_site"]);
     for (const t of tools) {
       expect(t.description, t.name).toMatch(/何时用/);
       expect(t.inputSchema.type).toBe("object");

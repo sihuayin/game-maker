@@ -138,6 +138,46 @@ export const AuthoringAsset = z.object({
   size: z.object({ w: z.number().int().positive(), h: z.number().int().positive() }).strict(),
 }).strict();
 
+/** **依赖图里找一个环**（找不到返回 `null`）。⚠️ 图很小（一份清单至多几十个资产），DFS 足够。
+ *
+ *  ⚠️ **边走两类**：`dependsOn`（资产 → 资产）与 `masterAsset`（资产 → 母版）—— 票 11 的 Q4 裁定
+ *    「完整图 = 两类边」。今天母版**没有出边**（`AuthoringAsset` 不收回指），所以环只可能出在
+ *    资产之间；照两类边走是为了两件事：免得下一个人以为母版不在图上，以及母版哪天也能依赖时**这条判据不用改**。
+ *
+ *  ⚠️ 它在这里而不是在 `pack` 里，是因为**时机**：`packAssets` 第一行就 `parseRecipe`
+ *    （`ops.ts:837`）⇒ 含环的配方在**任何生图、任何排版之前**被拒（退出码 4）。
+ *    把环留到生成期才发现，就是「跑到一半死」。 */
+function findCycle(r: {
+  assets: readonly { spec: { id: string; dependsOn?: string[]; masterAsset?: string } }[];
+}): string[] | null {
+  const out = new Map<string, string[]>();
+  for (const e of r.assets) {
+    const { id, dependsOn, masterAsset } = e.spec;
+    out.set(id, [...(dependsOn ?? []), ...(masterAsset === undefined ? [] : [masterAsset])]);
+  }
+  const state = new Map<string, 0 | 1 | 2>(); // 0 没见过 · 1 在栈上 · 2 走完了
+  const stack: string[] = [];
+  const walk = (n: string): string[] | null => {
+    const st = state.get(n) ?? 0;
+    if (st === 2) return null;
+    if (st === 1) return [...stack.slice(stack.indexOf(n)), n]; // 顺着栈把环抄出来
+    state.set(n, 1);
+    stack.push(n);
+    for (const m of out.get(n) ?? []) {
+      const c = walk(m);
+      if (c !== null) return c;
+    }
+    stack.pop();
+    state.set(n, 2);
+    return null;
+  };
+  for (const e of r.assets) {
+    const c = walk(e.spec.id);
+    if (c !== null) return c;
+  }
+  return null;
+}
+
 /** 清单的一项 = **纯意图的规格** + **帧从哪来**。两层在文件里就是分开的。 */
 export const RecipeEntry = z.object({
   spec: AssetSpecSchema,
@@ -196,6 +236,44 @@ export const AssetRecipe = z.object({
       issue(["assets", i, "spec", "masterAsset"],
         `资产 "${e.spec.id}" 指着母版 "${m}"，但 authoring[] 里没有它` +
         (authoringIds.size === 0 ? "（这份配方压根没有 authoring[]）" : ""));
+  });
+
+  // ── 依赖图（票 11 的 Q3/Q4）─────────────────────────────────────────────────
+  // ⚠️ 三条判据都住在契约里、都只在**同一份文件内**判 —— 与上面 `masterAsset` 的存在性同一条理由
+  //   （跨文件的引用族归票 15 的 pipeline 统一校验，这里看不见那些文件）。
+  r.assets.forEach((e, i) => {
+    for (const [j, dep] of (e.spec.dependsOn ?? []).entries()) {
+      if (dep === e.spec.id)
+        issue(["assets", i, "spec", "dependsOn", j], `资产 "${e.spec.id}" 依赖它自己`);
+      else if (!ids.has(dep))
+        issue(["assets", i, "spec", "dependsOn", j],
+          `资产 "${e.spec.id}" 依赖 "${dep}"，而 assets[] 里没有这个 id` +
+          (authoringIds.has(dep)
+            ? " —— ⚠️ 那是个**母版**：引用母版要用 `masterAsset`，不是 `dependsOn`（两类边各管各的）"
+            : ""));
+    }
+  });
+
+  const cycle = findCycle(r);
+  if (cycle !== null)
+    issue(["assets"], `依赖图里有环：${cycle.join(" → ")} —— ⚠️ 造不出来的清单不是清单，**当场拒**（票 11 的 Q4）`);
+
+  // ⚠️ 母版的**画布**尺寸 vs 引用它的资产的**缩放目标**尺寸（票 04 Q2/Q4：**同名不同义**）
+  //   ⇒ 宽高比必须一致：母版的画布决定它的头身比，而动画的比例由这里的尺寸定。
+  //   两套比例 = 同一个角色两种长相（票 22 撞过这个坑）。
+  //   ⚠️ 这条判据在 `AuthoringAsset` 的注释里**自己写着却没人实现**（票 11 的 Q5 把它兑现了）——
+  //      一条只写在注释里的判据，与一条永远绿的判据是同一种东西。
+  r.assets.forEach((e, i) => {
+    const m = e.spec.masterAsset;
+    if (m === undefined) return;
+    const master = (r.authoring ?? []).find((a) => a.id === m);
+    if (master === undefined) return; // 「母版不存在」上面已经报过了，别报两遍
+    const { w, h } = e.spec.size;
+    const c = master.size;
+    if (w * c.h !== c.w * h)
+      issue(["assets", i, "spec", "size"],
+        `资产 "${e.spec.id}" 的尺寸 ${w}×${h} 与母版 "${m}" 的画布 ${c.w}×${c.h} **宽高比不一致**` +
+        " —— ⚠️ 母版的画布决定它的头身比，而动画的比例由这里的尺寸定；两套比例 = 同一个角色两种长相");
   });
 
   r.assets.forEach((e, i) => {

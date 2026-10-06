@@ -250,4 +250,15 @@ describe("票 08 搬进来的那个超时常量与那个新的账目档位", () 
     //   因为变异判据跑的是 vitest、不是 tsc。
     expect(LedgerStep.options).toContain("compile-design");
   });
+
+  it('`LedgerStep` 认得 `"plan-assets"`，而 `"derive"` **不被删掉**（历史账还要能解析）', () => {
+    expect(LedgerStep.options).toContain("plan-assets");
+    // ⚠️ `derive` 是**只能出现在历史文件里**的那个值 —— 删它，磁盘上已有的 `ledger.json` 当场读不出来。
+    expect(LedgerStep.options).toContain("derive");
+  });
+
+  it('`LedgerStep` 认得 `"compile-runtime"`，而 `"compile-game"` 同样不被删', () => {
+    expect(LedgerStep.options).toContain("compile-runtime");
+    expect(LedgerStep.options).toContain("compile-game");
+  });
 });

@@ -4,7 +4,7 @@
 > 的产物。它存在的理由与 [`stylespec-extraction.md`](stylespec-extraction.md) 一模一样：
 > **这件事每个世界都要重做一次**，而不能被依赖的东西**必须有承载它的地方**。
 >
-> ⚠️ 而它更硬的一条理由是**量出来的**：`derive` 与 `compile-td-game` 都**不是玩法感知的** ——
+> ⚠️ 而它更硬的一条理由是**量出来的**：`compile-td-game` **不是玩法感知的** ——
 > 它们是「**照需求列资源 / 画关卡**」的机器。**需求没说的，它们只能拿示例填。**
 
 ## ⚠️ 先读这一条：需求没说的，模型会拿示例填
@@ -12,7 +12,7 @@
 两处真跑各量到一次，形状完全一样：
 
 - [票 01](../.scratch/td-compile-v1/issues/01-derive-for-td.md)：需求点名「场地是一格格砖」时，
-  `derive` **给出 5 块 15×15 的砖**并真出包；只说「店铺的场地」时，它给一张 **640×360 的三层大背景图**
+  老那道推导**给出 5 块 15×15 的砖**并真出包；只说「店铺的场地」时，它给一张 **640×360 的三层大背景图**
   —— 而塔防的 `arena` **表达不了**它。⚠️ 那份清单**完全合法**，失败在很远的 `compile-td-game` 才响。
 - [票 05](../.scratch/td-compile-v1/issues/05-first-td-prompt.md)：提示词里明明写着「骨架那张地图
   **是行格式的演示，不是一张可以拿来用的地图**……照抄它 = 没有按需求设计这一关」，
@@ -50,11 +50,15 @@
 1. **写一段需求**（自由中文散文即可）。可以照下面那份提示词让模型起草，也可以自己写。
 2. **自查那三件**：场地是砖吗？布局说清了吗？走道是**一条**（一个入口、不断、不分叉）吗？
 3. **存进 `inputs/<世界名>/PROMPT.md`** —— 与 [`inputs/last-train/PROMPT.md`](../inputs/last-train/PROMPT.md) 同款。
-   它同时是 `derive` 的输入（产资源清单）与 `compile-td-game` 的输入（产关卡）。
+   它是 `compile-td-game` 的输入（产关卡）。
+   ⚠️ **2026-10-05**：它**曾经**也是推导资源清单的输入，而那条路（`derive`）已随新链合并掉了
+   （[票 12](../.scratch/game-maker-v2/issues/12-asset-planner.md)）。⇒ 塔防这条路的清单**今天请人手写**
+   （`fixtures/recipes/counter-siege.json` 就是人写的那一份，抄它改）。
 4. **喂给管线**：
 
    ```sh
-   game-maker derive          --requirement inputs/<名>/PROMPT.md --style fixtures/style-spec.json --out out
+   # 1. 清单：**人手写**（抄 fixtures/recipes/counter-siege.json 改），放进一个目录
+   cp fixtures/recipes/counter-siege.json out/<recipeId>/recipes/v1.json
    game-maker pack            --recipe out/<recipeId>/recipes/v1.json --out out
    game-maker compile-td-game --requirement inputs/<名>/PROMPT.md --pack out/<recipeId>/pack/v1 --out out
    game-maker site            out/<recipeId>/pack/v1 --config out/<recipeId>/td-configs/v1.json --out out

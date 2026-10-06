@@ -115,6 +115,11 @@ export * from "./screen-space.js";
 export * from "./asset-spec.js";
 export * from "./audit.js";
 export * from "./recipe.js";
+// ⚠️ **`asset-recipe/v1` 的 v4 镜像** —— 只为 `plan-assets` 那一次工具调用存在（票 12）。
+//   权威仍是上面那份 v3 契约；镜像只供 `toolInputSchema` 转线形状。
+export * from "./recipe-tool.js";
+// ⚠️ **`game-config/v1` 的 v4 镜像** —— 只为 `compile-runtime` 那一次工具调用存在（票 14）。
+export * from "./config-tool.js";
 
 // ── 三个 QA 跑完之后留下的那一份东西（票 06）──────────────────────────────
 // ⚠️ **判据阻断、观察只报**（R3）—— 落实它的办法不是注释，是**让「通过」那个位置

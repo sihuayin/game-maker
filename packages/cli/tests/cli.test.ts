@@ -26,9 +26,9 @@ const hasPack = (() => { try { readFileSync(PACK + "/manifest.json"); return tru
 
 describe("参数解析（手写，无依赖）", () => {
   it("子命令 + 带值选项 + 布尔开关", () => {
-    const p = parseArgs(["derive", "--requirement", "a.md", "--style", "s.json", "--json"]);
-    expect(p.command).toBe("derive");
-    expect(p.flags).toMatchObject({ requirement: "a.md", style: "s.json", json: true });
+    const p = parseArgs(["plan", "--design", "d.json", "--visual-world", "w.json", "--json"]);
+    expect(p.command).toBe("plan");
+    expect(p.flags).toMatchObject({ design: "d.json", "visual-world": "w.json", json: true });
   });
   it("位置参数与短选项", () => {
     expect(parseArgs(["inspect", "some/pack", "-h"]).positionals).toEqual(["some/pack"]);

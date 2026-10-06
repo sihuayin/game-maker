@@ -40,6 +40,23 @@ const COMMON = {
    *  而「零消费者的字段不进契约」正是票 04 一直在用的那把尺子。
    *  ⚠️ 存在的校验在 `recipe.ts` 的 `superRefine` 里（**同一份文件内**的引用族）。 */
   masterAsset: z.string().min(1).optional(),
+
+  /** **造这个资产之前，得先有哪些资产**（票 11 的 Q3）—— 指向**别的资产的 `spec.id`**。
+   *
+   *  ⚠️ 它是「资产 → 资产」那一类边；`masterAsset` 是「资产 → 母版」那一类。
+   *    **`§6` 说的四条边最后只活了两条**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 的 Q3）：
+   *    `derivedFrom` 与 `masterAsset` 说的是同一件事（母版是它在角色那一档的具体化）·
+   *    `referenceAssets` 与 `source.reference`（**路径**）重叠 —— 分野是干净的：
+   *    **引配方外的文件用 `reference`，引配方内的资产用 `dependsOn`**。
+   *
+   *  ⚠️ **它是一项制造顺序，不是交付语义** —— 与 `masterAsset` 同款：只被图读到，不进交付包。
+   *
+   *  ⚠️ **不要求人把 `masterAsset` 也写进来**：那一类边由契约**派生**（图 = `dependsOn` ∪ `{masterAsset}`）。
+   *    这份文件是**唯一的人工编辑点**（R9/R10），让人把同一条边写两遍就是让人写错一遍。
+   *
+   *  ⚠️ 三条校验在 `recipe.ts` 的 `superRefine` 里（**同一份文件内**）：每一项都解得到 ·
+   *    不许指向自己 · **整张图不许有环**。 */
+  dependsOn: z.array(z.string().min(1)).optional(),
 };
 
 /**

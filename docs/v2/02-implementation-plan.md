@@ -311,50 +311,34 @@ tower-defense/v1
 
 # Phase 5：Asset Planner
 
-修改现有：
+✅ **2026-10-05 落地**（[票 12](../../.scratch/game-maker-v2/issues/12-asset-planner.md)），落点就是本节写的那两处
+（`ops.ts` 的 `deriveRecipe` **被改写成** `planAssets` · `prompt.ts` 加规划提示词）。
+
+当前 → 修改为：
 
 ```text
-packages/assets/src/ops.ts
-packages/assets/src/prompt.ts
+Requirement + StyleSpec → AssetRecipe          （旧 deriveRecipe；这一条**没有了**）
+GameDesignSpec + VisualWorldSpec → AssetRecipe （同一个 op，新的输入；同一份 asset-recipe/v1）
 ```
 
-当前：
-
-```text
-Requirement
-+
-StyleSpec
-→ AssetRecipe
-```
-
-修改为：
-
-```text
-GameDesignSpec
-+
-VisualWorldSpec
-→ AssetRecipe
-```
+⚠️ **不是并存**（票 12 的 Q1：(a) 合并）：两者产同一种文件，而旧那一道**拒绝决定策略**，
+与 §6 的要求正面冲突。⇒ CLI `derive` → `plan`、MCP `derive_recipe` → `plan_assets`；
+⚠️「清单可以**人手写**」那条性质不变。
+⚠️ 调用协议是 **R16**（强制工具调用 + 过 Zod + 3 次），配一份 **v4 镜像**（`contracts/src/recipe-tool.ts`）。
 
 ---
 
 # Phase 6：Generation Strategy
 
-修改：
+✅ **2026-10-05 落地**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md)）。
+
+⚠️ 「加入六个策略」**不成立** —— 策略**早就在清单里**（`AssetSource.kind` 的判别式），
+而六值里另外三个分别是**别名**与**脏词**。⇒ **本阶段改的是文档，不是契约**：
 
 ```text
-packages/contracts/src/recipe.ts      ⚠️ 原写 asset-recipe.ts，该文件不存在
-```
-
-加入：
-
-```text
-image
-character-reference
-image-edit
-drawlist
-procedural
-import
+drawlist / image / import          ← 就这三个（image 的两种参数化由 reference / masterAsset 表达）
+✗ image-edit / character-reference ← 别名
+✗ procedural                       ← 失败的意思（降级链遗物）
 ```
 
 ---
@@ -364,7 +348,8 @@ import
 复杂角色：
 
 ```text
-character-reference
+image + masterAsset      ← ⚠️ 2026-10-05 更正（票 11 的 Q1）：`character-reference` **不是一个策略值** ——
+                           它就是 `image` + `masterAsset`（票 04 的原话：一张被当作参考图喂给生图模型的角色位图）
 ```
 
 复杂环境：
@@ -387,9 +372,8 @@ drawlist
 
 碰撞体：
 
-```text
-procedural
-```
+⚠️ **不进清单**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 的 Q2）—— 它是 [[地形]]，
+「**不引用任何资源**」。可见的碰撞体是 [[实体]]，走上面已有的 `image` / `drawlist`。
 
 简单几何对象：
 
@@ -500,20 +484,19 @@ attack
 
 # Phase 10：Asset Dependency Graph
 
-修改：
+✅ **2026-10-05 落地**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 的 Q3/Q4）。
+
+落点两处：**契约**在 `packages/contracts/src/{asset-spec,recipe}.ts`（字段 + 三条引用族判据，含**环**）·
+**排程**在 `packages/assets/src/pack.ts`（promise-DAG）。
 
 ```text
-packages/contracts/src/recipe.ts      ⚠️ 同上
+dependsOn       资产 → 资产（唯一的新字段）
+masterAsset     资产 → 母版（票 04 已落）
+✗ derivedFrom ✗ referenceAssets    ← 与上面两条说的是同一件事
 ```
 
-支持：
-
-```text
-dependsOn
-derivedFrom
-masterAsset
-referenceAssets
-```
+⚠️ **`pack` 今天连 `authoring[]` 都够不着** ⇒「母版的位图当参考图喂进去」那条管道归
+[票 13](../../.scratch/game-maker-v2/issues/13-character-master-gen.md)；本阶段只保证**顺序**。
 
 ---
 
@@ -536,16 +519,21 @@ referenceAssets
 
 # Phase 12：Runtime Compiler
 
-⚠️ 同样**不是 `packages/runtime/`**。⇒ **落点由
-[票 14](../../.scratch/game-maker-v2/issues/14-runtime-compiler.md) 定**
-（候选：`game-design` 或 `pipeline`）。
+✅ **2026-10-05 落地**（[票 14](../../.scratch/game-maker-v2/issues/14-runtime-compiler.md)）。
+
+⚠️ 同样**不是 `packages/runtime/`**。⇒ **落点定了：`packages/assets/src/ops.ts`**（把 `compileGame`
+**改写成** `compileRuntime`，与 `compile-td-game` 并列）—— 本阶段原来给的两个候选
+（`game-design` / `pipeline`）是**包还不存在时写的**：它要的东西**全在 `contracts`**
+（`GameConfig` + `auditGameConfig` + `auditScreenSpace` + profile），资源包只是个目录
+（`parseAssetPack` 也在 contracts）⇒ 不需要任何新依赖边；而与塔防那道同处，才让那句
+「同一个口径」有落点。
 
 输入：
 
 ```text
 GameDesignSpec
 AssetPack
-RuntimeProfile
+RuntimeProfile（只用于**分派**：哪一代 ⇒ 哪一种 config 形状）
 ```
 
 输出：
@@ -553,6 +541,9 @@ RuntimeProfile
 ```text
 GameConfig
 ```
+
+⚠️ 改名：CLI `compile-game` → `compile-runtime`、MCP `compile_game` → `compile_runtime`（票 14 的 Q1）。
+⚠️ **业务校验不过 ⇒ 不落盘、也不重采样**（那是确定性的编译错误，不是模型没生成好）。详见 §19 那四处出入。
 
 ---
 

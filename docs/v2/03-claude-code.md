@@ -368,15 +368,9 @@ unsupportedRequirements
 
 # 12. Asset Planner
 
-修改当前 Asset derive 流程。
-
-旧：
-
-```text
-Requirement
-+
-StyleSpec
-```
+✅ **2026-10-05 落地**（[票 12](../../.scratch/game-maker-v2/issues/12-asset-planner.md)）。落点就是本节说的
+「**修改当前 Asset derive 流程**」：`packages/assets/src/{ops.ts, prompt.ts}` —— 旧的 `deriveRecipe`
+**被改写成 `planAssets`**，而不是与它并存。
 
 新：
 
@@ -386,28 +380,49 @@ GameDesignSpec
 VisualWorldSpec
 ```
 
-输出：
+输出（**同一份 `asset-recipe/v1`**，所以下游 `pack` 一行不用改）：
 
 ```text
 AssetRecipe
 ```
 
+⚠️ **三条与本节字面的出入**：
+① **旧入口不再存在**（票 12 的 Q1：(a) 合并）—— CLI 的 `derive` 与 MCP 的 `derive_recipe` 随之变成
+   `plan` / `plan_assets`。理由：两者产**同一种文件**，而旧的 `derive` 提示词**明确拒绝决定策略**
+   （「所有资源的 source 都写 drawlist……那一项由人后续自己填」），而 §13/§14 要求 LLM 决定它。
+   ⇒ 于是**写入侧只有一处**（`derivePackMode` 那条教训）。⚠️ 但「清单可以**人手写**」那条性质不变。
+② 调用走 **R16**（强制工具调用 + 入参过 Zod + 3 次重采样）—— 不是旧 `derive` 那条「纯文本 +
+   剥围栏 + 2 次」的路。⚠️ 它需要一份 **v4 镜像**（`contracts/src/recipe-tool.ts`）：
+   `toolInputSchema` 只吃 `zod/v4`，而 `asset-recipe/v1` 是 v3（票 28 的边界；先例是票 02 给 `StyleSpec` 立的那份）。
+③ 风格**从 VWS 里抽**：`vws.style` 落成配方旁边的 `stylespec.json`（`styleRef` 就是它的文件名），
+   世界的风格参考图也**拷进配方目录**（`referenceImage`）—— `03 §15` 要的「原图参与」由此接上。
+   ⚠️ 而 `VisualWorldSpec` 的**新视图**（六桶 / materials / 构图）**今天一个消费者都没有** ⇒ 见
+   [票 32](../../.scratch/game-maker-v2/issues/32-vws-in-generation-prompt.md)。
+
 ---
 
 # 13. Generation Strategy
 
-AssetRecipe 必须允许：
+> ⚠️ **2026-10-05 更正（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md)）**：下面那张六值单子**不成立** ——
+> **策略就是 `drawlist` / `image` / `import`**（它们早就是 `AssetSource` 的判别式，R10「策略住清单里」因此**今天已经满足**）。
+> `image-edit` 与 `character-reference` 是 `image` 的**两种参数化**（`reference` / `masterAsset` 两个可选字段）；
+> `procedural` 是**失败**的意思（降级链的遗物），**出局**。详见 [`01-contracts.md §5`](01-contracts.md)。
+
+AssetRecipe 允许（**落地形状**）：
 
 ```text
-image
-character-reference
-image-edit
 drawlist
-procedural
+image        （带 reference = 配方外的参考图；带 masterAsset = 配方内的母版）
 import
 ```
 
-LLM 必须根据资产复杂度自动选择。
+⚠️ **现在是 LLM 选**（票 12 的 Asset Planner 写清单），而**人可改**（R10）。
+
+~~下面这段是更正前的字面，留作史料：~~
+
+```text
+image / character-reference / image-edit / drawlist / procedural / import
+```
 
 ---
 
@@ -418,7 +433,8 @@ LLM 必须根据资产复杂度自动选择。
 ### 角色
 
 ```text
-character-reference
+image + masterAsset      ← ⚠️ 2026-10-05 更正（票 11 的 Q1）：`character-reference` 不是策略值，
+                           它是 `image` 的**一种参数化**（母版当参考图）
 ```
 
 ### 敌人
@@ -453,9 +469,13 @@ drawlist
 
 ### 碰撞体
 
-```text
-procedural
-```
+⚠️ **2026-10-05（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 的 Q2）：碰撞体不建资产。**
+它是 [[地形]]（`GameConfig` 里只有碰撞、没有画面的那部分），而 [[地形]] 的定义就是
+「**它不引用任何资源**」。一份「不引用资源的资产」是自相矛盾的说法，而且画出来也没人看。
+⇒ 一律走 `terrain`，**清单里没有它**。⚠️ 可见的碰撞体（行李堆、台阶）按定义是 [[实体]]，
+走上面已有的 `image` / `drawlist`。
+
+~~原文：`procedural`~~
 
 ---
 
@@ -526,14 +546,17 @@ jump
 
 # 17. Asset Dependency
 
-扩展 AssetRecipe：
+⚠️ **2026-10-05（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 的 Q3）：四条边只活了两条。**
 
 ```text
-dependsOn
-derivedFrom
-masterAsset
-referenceAssets
+dependsOn      资产 → 资产（asset-spec.ts 的 COMMON，与 masterAsset 并排）
+masterAsset    资产 → 母版（票 04 已落，指向 authoring[].id）
 ```
+
+⚠️ `derivedFrom`（与 `masterAsset` 同一件事）· `referenceAssets`（与 `source.reference` 路径重叠）**出局**。
+⚠️ **图 = `dependsOn` ∪ `{masterAsset}`**，而人**不写两遍**。
+⚠️ **契约判环，`pack` 排序**（promise-DAG；闸门与 `--concurrency` 语义不变）。
+详见 [`01-contracts.md §6`](01-contracts.md)。
 
 ---
 
@@ -557,7 +580,8 @@ Material DNA
 
 # 19. Runtime Compiler
 
-增加：
+✅ **2026-10-05 落地**（[票 14](../../.scratch/game-maker-v2/issues/14-runtime-compiler.md)），落点
+`packages/assets/src/ops.ts`（**改写** `compileGame`，与 `compile-td-game` 并列 —— 那一道**一个字不动**，R4）。
 
 ```text
 GameDesignSpec
@@ -569,7 +593,23 @@ AssetPack
 GameConfig
 ```
 
-不要修改 Runtime 核心代码来适应每个游戏。
+不要修改 Runtime 核心代码来适应每个游戏。✅ 这条**照旧成立**：本步只产数据，外壳一行没动。
+
+⚠️ **四处与本节字面的出入**：
+① **旧入口不再存在**（票 14 的 Q1：(a) 取代）—— CLI 的 `compile-game` 与 MCP 的 `compile_game` 随之变成
+   `compile-runtime` / `compile_runtime`。理由：新链的 config 必须**从设计层长出来**
+   （`levels[].layout`、每关的 `entities[]`、`world.structure` 都在设计层），而从需求硬猜正是
+   塔防那条「需求没说的，它们只能拿示例填」的老路。⚠️「配置可以**人手写**」那条性质不变。
+② `RuntimeProfile` **被读，但只用于分派**（`CONFIG_SHAPES`：哪一代 ⇒ 出哪一种 config 形状）——
+   **拒绝**早在 `compile-design`（票 10）就发生了，本步**不重复拒**（票 06 的先例：「留码等于把一次拒绝再说一遍」）。
+   今天那张表只有一行、**恒等于常数是预期的** —— 它是给第二个成员留的位。
+③ ⚠️ **业务校验不过 ⇒ 抛、且不落盘**（**与旧行为相反**）：旧 `compileGame` audit 不过也照落，
+   理由是「人过目」—— 而 **R9 把人工点收成了唯一一个、且在清单处**，config 那里**已经没有读者**了
+   ⇒ 「坏配置比没配置更坏」（旧代码自己的注释）这一条终于说了算。
+   ⚠️ 而**两类失败要分开**：入参/结构不过 = **模型没生成好** ⇒ **重采样**；
+   过得了契约、过不了业务校验 = **确定性的编译错误** ⇒ **不重采样、直接抛**。
+④ 调用走 **R16**（强制工具调用 + 过 Zod + 3 次），配一份 **v4 镜像**（`contracts/src/config-tool.ts`，
+   先例是票 02 / 票 12 那两份）。
 
 ---
 

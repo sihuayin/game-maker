@@ -151,15 +151,14 @@ AssetRecipe
 drawlist
 ```
 
-V2 必须允许 LLM 决定：
+V2 必须允许 LLM 决定 —— ⚠️ **但那张六值单子不成立**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 逐值裁过）：
+**策略就是 `drawlist` / `image` / `import` 三个**（`image` 的「带参考图」「带母版」是它的两种参数化，
+`procedural` 是**失败**的意思、已出局）。见 [`01-contracts.md §5`](01-contracts.md)。
 
 ```text
-image
-character-reference
-image-edit
-drawlist
-procedural
-import
+drawlist     ← 简单几何 / UI：画出来的
+image        ← 复杂角色 / 敌人 / 背景 / 道具：生成出来的（带 reference 或 masterAsset 就是那两种参数化）
+import       ← 人给的位图（+ 可选 sheet 网格）
 ```
 
 ---
@@ -388,7 +387,7 @@ Style Image + Game Intent          ← ⚠️ 两个**并列**的输入（票 08
 ↓
 VisualWorldSpec  +  GameIntentSpec ← ⚠️ 两步**并列**：都吃上面那两样，vision 不等 intent
 ↓
-GameDesignSpec
+GameDesignSpec + VisualWorldSpec   ← ⚠️ 规划清单要**两样**（票 12 的 Q2）：视觉语法**不进**设计层
 ↓
 AssetRecipe
 ↓
@@ -518,6 +517,9 @@ V2 第一阶段完成必须满足：
 | `03 §6` / `02 §2.1` 的 Vision 输入与 `AnalyzeReferenceInput` | 已按落地形状重写；另有**三件事 schema 表达不出来**，写在工具声明里（票 08 的 R2-Q5） |
 | `03 §9` 那张「至少识别」清单里的 `resources` | **出局**：降成 `entities[].type = "resource"`（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 Q5）；契约另加一条**结构性空值 gate**（该票的 R2-Q1） |
 | `03 §10` / `§19` 的编译器输入表 | `compile-design` **多一个 `RuntimeProfile` 输入** —— R12 的拒绝必须发生在**生图之前**，而票 14 看不见意图与 VWS（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 Q3a） |
+| `03 §13` / `§14` / `§17` · `02 Phase 6` / `§6.1` / `Phase 10` 的策略与依赖清单 | **六值策略单子不成立**（只有 `drawlist`/`image`/`import`；`procedural` 是**失败**的意思）· 依赖边只剩 `dependsOn` + `masterAsset` · **碰撞体是 [[地形]]、不进清单**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) 的 Q1/Q2/Q3） |
+| `03 §12` 的「**修改**当前 Asset derive 流程」 | 照做了，而且是**合并**不是并存：`deriveRecipe` 被改写成 `planAssets`，CLI `derive` → `plan`、MCP `derive_recipe` → `plan_assets`（[票 12](../../.scratch/game-maker-v2/issues/12-asset-planner.md) 的 Q1） |
+| `03 §19` 的编译器输入表 + 旧行为「**audit 不过照样落盘**」 | `compile-game` → **`compile-runtime`**（吃「设计 + 这一代外壳 + 包」）；`RuntimeProfile` **只用于分派**（拒绝早在 `compile-design`）；⚠️ **业务校验不过 ⇒ 抛且不落盘**（R9 之后 config 那里没有读者了）——[票 14](../../.scratch/game-maker-v2/issues/14-runtime-compiler.md) 的 Q1/Q2/Q5 |
 
-> ⚠️ 上表最后五行**不是 R 表改的，是票解出来的决定**（三行来自[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md)、一行来自[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md)、一行来自[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md)）。
+> ⚠️ 上表最后八行**不是 R 表改的，是票解出来的决定**（三行来自[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md)、一行来自[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md)、一行来自[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md)、三行来自[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md) / [票 12](../../.scratch/game-maker-v2/issues/12-asset-planner.md) / [票 14](../../.scratch/game-maker-v2/issues/14-runtime-compiler.md)）。
 > 本文件的规矩同样适用：**票的决定是决策记录，`docs/` 是它的表达层** —— 冲突时改文档。

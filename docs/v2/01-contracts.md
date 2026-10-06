@@ -318,33 +318,30 @@ export interface GameDesignSpec {
 
 # 5. AssetRecipe 扩展
 
-现有 AssetRecipe 保留。
-
-增加：
+⚠️ **2026-10-05 落地**（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md)）。**上面那个六值枚举不成立** ——
+逐值裁下来只剩**今天已经有的三个**：
 
 ```ts
-export type AssetGenerationStrategy =
-  | "image"
-  | "character-reference"
-  | "image-edit"
-  | "drawlist"
-  | "procedural"
-  | "import";
+kind: "drawlist" | "image" | "import"    // ← 它就是「策略」，而且它**早就住在清单里**（R10 已经满足）
 ```
 
-Asset source：
+| 原枚举值 | 裁决 |
+|---|---|
+| `drawlist` · `image` · `import` | **就是它们**（`AssetSource` 的判别式，`recipe.ts:108`） |
+| `image-edit` | **别名**：它就是 `image` + `reference` —— `image-gen.ts` 已经按「有没有输入图」**自动**翻到 `/images/edits`（`/generations` 收不下图，会**静默忽略**并回一张无关的图） |
+| `character-reference` | **别名**：它就是 `image` + `masterAsset` —— 票 04 的原话是「一张被当作**参考图喂给生图模型**的角色位图」，机制一模一样 |
+| `procedural` | **出局**：它在本仓库是**失败**的意思（拆掉的降级链的遗物，见 [`CONTEXT.md`](../../CONTEXT.md) 的 [[Degradation]]），而且它唯一的候选消费者（碰撞体）根本不该建资产（见 §6） |
+
+⇒ 于是**不新加 `AssetGenerationStrategy` 字段**：「带参考图的生图」「带母版的生图」是 `image` 的**两种参数化**，
+由 `reference` / `masterAsset` 两个可选字段表达，不是三个策略。⚠️ 加第六个 `kind` 值就是同一件事的第二个说法。
+
+Asset source 的真实形状（`recipe.ts`）：判别式三变体 + 两个**边**（`dependsOn` 落在 `AssetSpec` 上，
+与 `masterAsset` 并排）：
 
 ```ts
 interface AssetSource {
-  kind: AssetGenerationStrategy;
-
-  referenceAssets?: string[];
-
-  masterAsset?: string;
-
-  dependsOn?: string[];
-
-  parameters?: Record<string, unknown>;
+  kind: "drawlist" | "image" | "import";
+  // image 的两个参数化：reference（配方外的文件路径）· masterAsset（配方内的母版 id，在 AssetSpec 上）
 }
 ```
 
@@ -363,28 +360,47 @@ interface AssetSource {
 `DNA → 母版 → 动画`；`Master → DNA` **禁止**（那会让权威倒挂）。
 母版**不进交付包**，且「不交付」是**结构性**的 —— 它与交付资产在两个不同的数组里。
 
-剩下的（票 11 接手）：每个资产支持
+⚠️ **2026-10-05（[票 11](../../.scratch/game-maker-v2/issues/11-recipe-extensions.md)）：四条边最后只活了**两条**。**
 
 ```ts
-interface AssetDependency {
-  dependsOn: string[];
-
-  derivedFrom?: string;
-
-  masterAsset?: string;
-
-  referenceAssets?: string[];
-}
+// 资产 → 资产（asset-spec.ts 的 COMMON，与 masterAsset 并排）：
+dependsOn?: string[]          // 「造这个之前得先有那些」
+// 资产 → 母版（票 04 已落）：
+masterAsset?: string          // 指向 AssetRecipe.authoring[].id
 ```
+
+| 原字段 | 裁决 |
+|---|---|
+| `dependsOn` | **留** —— **唯一的依赖表达**；读者是**环判据**与 `pack` 的排序 |
+| `masterAsset` | **已落**（票 04）—— 它是 `derivedFrom` 在**角色那一档的具体化**，而票 04 立母版为「一号公民」的理由正是**命名** |
+| `derivedFrom` | **出局**：与 `masterAsset` 说的是同一件事，留它 = 同一个事实两个家 |
+| `referenceAssets` | **出局**：与 `source.reference`（**路径**）重叠。分野是干净的 —— **引配方外的文件用 `reference`，引配方内的资产用 `dependsOn`** |
+
+⚠️ **图 = `dependsOn` ∪ `{masterAsset}`**，而人不写两遍：`masterAsset` 是**语义命名**，那条边由契约**派生**
+（这份文件是**唯一的人工编辑点**，让人把同一条边写两遍就是让人写错一遍）。
+
+⚠️ **三条判据住 `recipe.ts` 的 `superRefine`**（都是**同一份文件内**的引用族）：
+`dependsOn` 每一项解得到（指向**资产** id，指到母版要报「该用 `masterAsset`」）· 不许指向自己 ·
+**整张图不许有环** · 外加一条**母版画布与引用它的资产的宽高比必须一致**（票 11 把 `AuthoringAsset`
+注释里那句「自己写着却没人实现」的判据兑现了）。
+
+⚠️ **谁排序：契约判环，`pack` 排序**（票 11 的 Q4）。⚠️ 时机是这条判据的一半 ——
+`packAssets` **第一行就 `parseRecipe`** ⇒ 含环的配方在**任何生图之前**被拒（退出码 4），
+不是跑到一半死。`pack` 那边是 **promise-DAG**：有依赖的等前置，闸门与 `--concurrency` 的语义**一个字不变**
+（今天 8 份 fixture 一条依赖都没有 ⇒ 行为**恒等于全并发**）。
+⚠️ **「把母版的位图当参考图喂进去」那条管道归票 13** —— `pack` 今天连 `authoring[]` 都够不着（那是票 04「结构性」的后果）。
+
+⚠️ **碰撞体不进清单**（票 11 的 Q2）：它是 [[地形]] —— `GameConfig` 里**只有碰撞、没有画面**的那部分，
+而 [[地形]] 的定义就是「**它不引用任何资源**」。一份「不引用资源的资产」是自相矛盾的说法；
+可见的碰撞体（行李堆、台阶）按定义是 [[实体]]，走已有的 `image` / `drawlist`。
 
 例如：
 
 ```text
-player-master
- ├── player-idle
+player-master            ← authoring[]（不交付）
+ ├── player-idle         ← 三条都是 masterAsset: "player-master"
  ├── player-run
- ├── player-jump
- └── player-attack
+ └── player-jump
 ```
 
 ---
@@ -487,9 +503,14 @@ export const RuntimeProfileRefSchema = z.strictObject({
 
 | 字段 | 谁读它 |
 |---|---|
-| `id` · `version` | `GameDesignSpec.game.runtimeProfile` 那条**引用**；Runtime Compiler 拿它给拒绝**署名** |
-| `mechanics[]` | Runtime Compiler 的差集 `mechanics[].mechanic − profile.mechanics` |
-| `capabilities[]` | Runtime Compiler 的差集 `runtimeRequirements − profile.capabilities` |
+| `id` · `version` | `GameDesignSpec.game.runtimeProfile` 那条**引用**；`compile-design` 拿它给拒绝**署名**；**`compile-runtime` 拿它做分派**（哪一代 ⇒ 出哪一种 config 形状，票 14 的 Q2） |
+| `mechanics[]` | **`compile-design`（票 10）** 的差集 `mechanics[].mechanic − profile.mechanics` |
+| `capabilities[]` | **`compile-design`（票 10）** 的差集 `runtimeRequirements − profile.capabilities` |
+
+⚠️ **表里那两格原本写的是「Runtime Compiler」，2026-10-05 改成 `compile-design`**（[票 14](../../.scratch/game-maker-v2/issues/14-runtime-compiler.md) 的 Q2）：
+R12 要的拒绝必须发生在**生图之前、且免费**，而**唯一同时看得见设计层与 profile 的那一步就是 `compile-design`**
+（票 10 把它加成了第三个输入）。⇒ 那两条差集**在那里算**；本步（`compile-runtime`）再算一遍就是
+「把一次拒绝**再说一遍**」（票 06 删 `CAMERA_MISMATCH` 的同一条先例）。
 
 **砍掉的六个，连同死因**（票 05 Q4 / Q7）：
 
