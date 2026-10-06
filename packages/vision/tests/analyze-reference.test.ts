@@ -47,6 +47,24 @@ function stage(parts: (Response | (() => Promise<Response>))[]) {
   return { f, seen, calls: () => n };
 }
 
+/**
+ * ⚠️ **等一次「必须抛」的调用，并把抛出来的那个错误拿回来**。
+ *
+ * `.catch((e) => e as AnalyzeReferenceError)` 看着对，**类型上却留下一个联合**
+ * （`AnalyzeReferenceResult | AnalyzeReferenceError`）—— 因为 `.catch` 只换掉**失败**那一支，「成功」那一支仍在类型里
+ * ⇒ 下面每一处 `err.failure` / `err.message` 都是类型错（`tsc -p tsconfig.spec.json` 红的那些）。
+ * ⚠️ 而那个联合里「成功」那一支**根本不该出现**：它出现就说明这一步**没抛**，是这张用例的失败。
+ * ⇒ 改用 `.then(onFulfilled, onRejected)`：成功那一支**当场抛**（并把它拿到的值带上，好认），
+ *   失败那一支断言成 `AnalyzeReferenceError` —— 每个调用点下面仍有字段断言兜底。
+ * ⚠️ 一处小谎：**「普通 `Error`」那一处**（凭据没配）也走这个函数（它只要 `.message`），
+ *   那一处下面有 `not.toBeInstanceOf` 兜着。
+ */
+const thrown = (p: Promise<unknown>): Promise<AnalyzeReferenceError> =>
+  p.then(
+    (ok) => { throw new Error(`这一步**应当抛**，但它成功了：${JSON.stringify(ok)?.slice(0, 160)}`); },
+    (e: unknown) => e as AnalyzeReferenceError
+  );
+
 const input = (over: Partial<AnalyzeReferenceInput> = {}): AnalyzeReferenceInput => ({
   styleReferences: REFS, requirementText: "做一个末班车小站的横版过关", styleId: "halt-dusk",
   transport: { baseUrl: "http://upstream.test", apiKey: "k" }, ...over,
@@ -139,7 +157,7 @@ describe("重采样（R16）", () => {
 
   it("三发全败 ⇒ 抛错，且**账跟着错一起出来**", async () => {
     const s = stage([res(reply({}))]);
-    const err = await analyzeReference(input({ fetchImpl: s.f })).catch((e) => e as AnalyzeReferenceError);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
     expect(err).toBeInstanceOf(AnalyzeReferenceError);
     expect(err.failure).toBe("empty-input");
     expect(err.ledger).toHaveLength(1);
@@ -152,7 +170,7 @@ describe("重采样（R16）", () => {
 describe("传输层的失败 **不重采样**（与 assets 那条链一致）", () => {
   it("HTTP 500 ⇒ 立刻抛，账上只有一趟", async () => {
     const s = stage([res({ error: "boom" }, 500)]);
-    const err = await analyzeReference(input({ fetchImpl: s.f })).catch((e) => e as AnalyzeReferenceError);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
     expect(err.failure).toBe("http");
     expect(s.calls()).toBe(1);
     expect(err.ledger![0]!.attempts).toBe(1);
@@ -163,7 +181,7 @@ describe("传输层的失败 **不重采样**（与 assets 那条链一致）", 
       setTimeout(() => rej(new Error("aborted")), 50);
     })) as () => Promise<Response>;
     const s = stage([hang]);
-    const err = await analyzeReference(input({ fetchImpl: s.f, timeoutMs: 10 })).catch((e) => e as AnalyzeReferenceError);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f, timeoutMs: 10 })));
     expect(err).toBeInstanceOf(AnalyzeReferenceError);
     expect(err.failure).toBe("timeout");
     expect(err.message).toContain("已中止");
@@ -172,7 +190,7 @@ describe("传输层的失败 **不重采样**（与 assets 那条链一致）", 
 
 describe("出发前的三处免费拦停（都**不**记账 —— 账只记真的发出去过的往返）", () => {
   it("没配凭据 ⇒ 普通 Error，**不是** `AnalyzeReferenceError`", async () => {
-    const err = await analyzeReference(input({ transport: { baseUrl: "", apiKey: "" } })).catch((e) => e as Error);
+    const err = await thrown(analyzeReference(input({ transport: { baseUrl: "", apiKey: "" } })));
     expect(err).not.toBeInstanceOf(AnalyzeReferenceError);
     expect(err.message).toContain("ANTHROPIC_BASE_URL");
   });

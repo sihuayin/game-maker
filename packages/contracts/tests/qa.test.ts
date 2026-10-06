@@ -44,8 +44,11 @@ const OBSERVATIONS: Observation[] = [
   { source: "review", outcome: "unavailable", reason: "没配视觉上游" }
 ];
 
+/** ⚠️ **`format` 不在这里重复写**：`buildQAReport` 自己产出它（写在这里会被展开**盖掉**，
+ *  `tsc` 的 TS2783 提醒的正是这件事）。「产出的 format 对不对」由下面那些 `safeParse`
+ *  与 `{ ...report(), format: "1.0" }` 那条反例管 —— 不靠这一行摆样子。 */
 const report = (results = allPass(), observations: unknown[] = OBSERVATIONS) =>
-  ({ format: QA_REPORT_FORMAT, ...buildQAReport(results, observations as Observation[]) });
+  buildQAReport(results, observations as Observation[]);
 
 describe("§一个枚举两用：判据名只有一处（票 06 Q2 / Q10）", () => {
   it("`QA_JUDGEMENTS` 恰好六条 —— 判据表几条，这里就几个值", () => {

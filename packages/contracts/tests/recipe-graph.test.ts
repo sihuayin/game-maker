@@ -59,8 +59,15 @@ describe("§依赖边 `dependsOn`（资产 → 资产）", () => {
     const r = dep(recipe(), 0, "没有这个资产");
     const p = parseRecipe(r);
     expect(p.ok).toBe(false);
-    if (!p.ok) return;
-    expect(p.errors.join()).toMatch(/没有这个资产/);
+    // ⚠️ **收窄写在失败那一支里**（本文件后面几条同款）—— 不这么写，两支会挤在一行里，
+    //   而这里原本那句 `if (!p.ok) return;` 让**这一整块断言从来没跑过**：
+    //   解析失败（正是要测的那条路）时它当场返回 ⇒ 「报错里有没有那个 id、指不指得到那一格」
+    //   谁也没查 —— 一张**因为错误的理由而绿**的用例（票 11 自己命名的那个病）。
+    if (!p.ok) {
+      const msg = p.errors.join();
+      expect(msg).toContain("没有这个资产");
+      expect(msg).toContain("assets[0].spec.dependsOn[0]");   // ← `formatIssues` 把 `path` 摊在行首
+    }
   });
 
   it("⚠️ 指向**自己** ⇒ 拒（一个资产不能是自己的前置）", () => {

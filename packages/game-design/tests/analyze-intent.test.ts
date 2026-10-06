@@ -43,6 +43,24 @@ function stage(parts: (Response | (() => Promise<Response>))[]) {
   return { f, seen, calls: () => n };
 }
 
+/**
+ * ⚠️ **等一次「必须抛」的调用，并把抛出来的那个错误拿回来**。
+ *
+ * `.catch((e) => e as AnalyzeIntentError)` 看着对，**类型上却留下一个联合**
+ * （`AnalyzeIntentResult | AnalyzeIntentError`）—— 因为 `.catch` 只换掉**失败**那一支，「成功」那一支仍在类型里
+ * ⇒ 下面每一处 `err.failure` / `err.message` 都是类型错（`tsc -p tsconfig.spec.json` 红的那些）。
+ * ⚠️ 而那个联合里「成功」那一支**根本不该出现**：它出现就说明这一步**没抛**，是这张用例的失败。
+ * ⇒ 改用 `.then(onFulfilled, onRejected)`：成功那一支**当场抛**（并把它拿到的值带上，好认），
+ *   失败那一支断言成 `AnalyzeIntentError` —— 每个调用点下面仍有字段断言兜底。
+ * ⚠️ 一处小谎：**「普通 `Error`」那一处**（凭据没配）也走这个函数（它只要 `.message`），
+ *   那一处下面有 `not.toBeInstanceOf` 兜着。
+ */
+const thrown = (p: Promise<unknown>): Promise<AnalyzeIntentError> =>
+  p.then(
+    (ok) => { throw new Error(`这一步**应当抛**，但它成功了：${JSON.stringify(ok)?.slice(0, 160)}`); },
+    (e: unknown) => e as AnalyzeIntentError
+  );
+
 const input = (over: Partial<AnalyzeIntentInput> = {}): AnalyzeIntentInput => ({
   requirementText: "做一个废土横版寻宝游戏",
   transport: { baseUrl: "http://upstream.test", apiKey: "k" }, ...over,
@@ -136,7 +154,7 @@ describe("重采样（R16）", () => {
   it("三发全败 ⇒ 抛错，且**账跟着错一起出来**（`failures` 长度 == 地板值）", async () => {
     const s = stage([res(reply({}))]);
     await expect(analyzeIntent(input({ fetchImpl: s.f }))).rejects.toThrowError(AnalyzeIntentError);
-    const err = await analyzeIntent(input({ fetchImpl: stage([res(reply({}))]).f })).catch((e) => e as AnalyzeIntentError);
+    const err = await thrown(analyzeIntent(input({ fetchImpl: stage([res(reply({}))]).f })));
     expect(err.ledger![0]!.attempts).toBe(STRUCTURED_CALL_ATTEMPTS);
     expect(err.ledger![0]!.failures).toHaveLength(STRUCTURED_CALL_ATTEMPTS);
     expect(s.calls()).toBe(STRUCTURED_CALL_ATTEMPTS);
@@ -146,7 +164,7 @@ describe("重采样（R16）", () => {
 describe("传输层的失败 **不重采样**", () => {
   it("HTTP 500 ⇒ 立刻抛，只走一趟（与 vision / assets 同一条规矩）", async () => {
     const s = stage([res({ error: "boom" }, 500), res(reply(modelOut()))]);
-    const err = await analyzeIntent(input({ fetchImpl: s.f })).catch((e) => e as AnalyzeIntentError);
+    const err = await thrown(analyzeIntent(input({ fetchImpl: s.f })));
     expect(err).toBeInstanceOf(AnalyzeIntentError);
     expect(err.failure).toBe("http");
     expect(s.calls()).toBe(1);
@@ -157,7 +175,7 @@ describe("传输层的失败 **不重采样**", () => {
 
   it("超时 ⇒ `timeout`，且报错说得出「已中止」", async () => {
     const s = stage([() => new Promise<Response>((_, rej) => setTimeout(() => rej(new Error("aborted")), 0))]);
-    const err = await analyzeIntent(input({ fetchImpl: s.f, timeoutMs: 1 })).catch((e) => e as AnalyzeIntentError);
+    const err = await thrown(analyzeIntent(input({ fetchImpl: s.f, timeoutMs: 1 })));
     expect(err.failure).toBe("timeout");
     expect(err.message).toContain("已中止");
   });
