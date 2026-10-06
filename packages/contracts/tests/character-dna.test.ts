@@ -108,3 +108,40 @@ describe("§工具协议（R16 新）", () => {
     expect(js["required"]).toContain("characters");
   });
 });
+
+// ── 票 31 补上的那条顶层 gate：**空串不是「没有」**（`01-contracts.md` §7 早就写下、契约里没人兑现）──
+//
+//   ⚠️ 「必填」只挡得住**缺席** —— `.min(1)` 挡不住 `"   "`，`z.array(z.string())` 挡不住 `[""]`。
+//   而这条判决是票 09 / 票 10 各立过一遍的**同一条 gate**（那两条在同名的 `*-gate.test.ts` 里）。
+describe("§空值 gate：空串不许当第二个隐形缺省（票 31 的 Q4）", () => {
+  it("⚠️ **trim 之后为空也算空** —— `.min(1)` 挡不住 `\"   \"`，gate 挡得住", () => {
+    for (const k of ["identity", "silhouette", "face", "clothing"])
+      expect(parse([{ ...ODIN, [k]: "   " }]).success, `${k} 三个空格`).toBe(false);
+    expect(parse([{ ...ODIN, id: " " }]).success).toBe(false);
+  });
+
+  it("数组的**元素**不许是空串 —— 空串不是「没有这一条」，是占位符", () => {
+    for (const k of ["gear", "visualConstraints"])
+      expect(parse([{ ...ODIN, [k]: ["撬棍", "  "] }]).success, `${k} 里混了空串`).toBe(false);
+  });
+
+  it("⚠️ 但 **`\"none\"` 是合法值** —— gate 只查「空」、不查「是不是 none」", () => {
+    // 票 04 Q2 的原话：非人形写 "none"。那是**写下来的不存在**，不是敷衍 ——
+    // 判据只收「精确可算 + 错了一定不是设计」，而「这句话算不算敷衍」不是它判得了的。
+    expect(parse([DRONE]).success).toBe(true);
+    expect(parse([{ ...ODIN, silhouette: "none" }]).success).toBe(true);
+  });
+
+  it("三个数组**本身可空** —— 无人机没有装备、没有配色偏好（`[]` 就是一种「说出来」）", () => {
+    expect(parse([{ ...ODIN, gear: [], visualConstraints: [], palette: [] }]).success).toBe(true);
+  });
+
+  it("⚠️ 它同时管**从磁盘上读回来的**文件：报错说得出口是第几个角色的哪一格", () => {
+    const bad = parse([ODIN, { ...DRONE, identity: " " }]);
+    expect(bad.success).toBe(false);
+    if (!bad.success) {
+      expect(bad.error.issues[0]!.path).toEqual(["characters", 1, "identity"]);
+      expect(bad.error.issues[0]!.message).toContain("none");   // 提示「没有也要写出来」
+    }
+  });
+});

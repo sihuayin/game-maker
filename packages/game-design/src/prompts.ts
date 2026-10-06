@@ -10,7 +10,10 @@
 // ⚠️ 提示词里**不出现的字段**就是出局的字段（票 03 的「① 档欠条」）——
 //   下面那段骨架把 16 个键**逐个点名**，所以 `subgenre` / `camera` 这类可选档也活在台账上
 //   （票 09 第 2 轮 R2-Q3：① 档那两个要求「尽力填」，其余推不出就省）。
-import { CAPABILITIES, MECHANICS, type GameDesignSpec, type GameIntentSpec, type VisualWorldSpec } from "@game-maker/contracts";
+import {
+  CAPABILITIES, MECHANICS,
+  type CharacterDNA, type GameDesignSpec, type GameIntentSpec, type VisualWorldSpec
+} from "@game-maker/contracts";
 
 export const TOOL_NAME = "emit_game_intent";
 
@@ -234,4 +237,164 @@ function describeComposition(vws: VisualWorldSpec): string {
     (x): x is string => typeof x === "string" && x.trim() !== ""
   );
   return parts.length === 0 ? "（参考图没给出分层信息 —— 按需求自己定，但要说清纵向几段）" : parts.join(" · ");
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 票 31：角色基因那一步的问话面（与上面两段**同一个形状**，三段各管各的）
+// ═════════════════════════════════════════════════════════════════════════════
+
+export const CHARACTER_DNA_TOOL_NAME = "emit_character_dna";
+
+/**
+ * 工具说明 = **schema 说不清的东西唯一的家**（票 08 的 R2-Q5）。
+ *
+ * ⚠️ 第 1 条同时是**唯一**告诉模型「契约带一条空值 gate」的地方，
+ *   第 3 条是**唯一**告诉它「有一个守门人在比那三对」的地方 ——
+ *   `toJSONSchema` 把 `superRefine` 静默丢掉（票 08 实测），而守门人住在装配步、**根本不在 schema 里**。
+ *
+ * ⚠️ 但**说辞要老实**：第 3 条写的是**语义规矩**（类 vs 个体），不是「我们查得出来」——
+ *   那条检查是**守门人、必要不充分**（票 31 第 1 轮 Q1），把它说成天网会让模型学会绕、
+ *   而不是学会不抄（票 10 的「做不了就整条省掉」是同一种诚实的写法）。
+ */
+export const CHARACTER_DNA_TOOL_DESCRIPTION = `输出一份 character-dna/v1 —— 给这个游戏里的**每一个**角色一份基因。
+⚠️ 这一层问的是「**这一个是谁**」（个体），不是「这个世界的角色都长什么样」（类）—— 后者已经有了。
+
+五条 schema 表达不出来的规矩：
+
+1. **八个键一个都不许省**，包括「确实没有」的那种：\`face\` / \`clothing\` 写 \`"none"\`、
+   \`gear\` / \`visualConstraints\` / \`palette\` 写 \`[]\`。
+   ⚠️ 省掉与「确实没有」在文件里长得**一模一样**，而这份文件存在的意义正是**让重生成一字不变** ——
+   省掉的那一格会被重新自由发挥。⚠️ 也**不许拿空串占位**（\`""\` 或 \`"  "\`）：那是第二个隐形缺省。
+   \`gear[]\` / \`visualConstraints[]\` 里也不许留空串。
+
+2. \`id\` **原样沿用**设计层那个实体的 id，**每个角色恰好一条**：少一条、多一条、改一个都算不合格
+   （构造性判据）。⚠️ 有基因的**只有** player + enemies + npcs ——
+   interactables / resources（木条箱、补给、终端）**没有基因**，别给它们写。
+
+3. ⚠️ 世界那五格（\`proportions\` / \`silhouette\` / \`poseLanguage\` / \`clothing\` / \`faceAbstraction\`）
+   说的是**这一类共有**的画法，**不许整句抄进某个角色的 DNA** ——
+   抄下来那一格就没有说出关于**它**的任何新东西。要把共有的画法**落到这一个身上**。
+
+4. \`palette\` 只能写 \`palette:<下标>\`（从上面那份色板里**选**），**不许**写 hex 或颜色名。
+   ⚠️ 它的用途是「这个角色身上哪些颜色」，不是「这个世界的色板长什么样」。
+
+5. \`visualConstraints\` 是**叠加**在世界约束之上的**追加**，不是替代 ——
+   不许拿它把世界的约束关掉（「不要抗锯齿」那类话写在这里是**反向**的）。
+
+只调这个工具，不要解释。`;
+
+/** 骨架里的字段台账。⚠️ **键集必须与 `CharacterDNASchema` 逐字对齐**（下面有一条测试盯着）。 */
+const DNA_FIELD_HINTS: Record<keyof CharacterDNA, string> = {
+  id: "**原样沿用**上面括号里的那个 id（一个都不许改、不许漏、不许加）",
+  identity: "「**这一个**是谁」—— 它是谁、过着什么日子、为什么在这儿。" +
+    "⚠️ 这是**全世界唯一**说得出它是谁的地方（世界语法规格化的是「角色怎么画」，不规格化「谁」）；" +
+    "写**它自己**，不要写它长什么样、也不要写它干什么",
+  silhouette: "形态语言：**画法**（头形、边缘、量感、怎么站立），不是数值比例。" +
+    "⚠️ 与世界的 `character.silhouette` 相容，但**不许整句抄** —— 写**它**在这一类里偏成什么样",
+  face: "脸部画法。⚠️ **没有脸就写 `\"none\"`**（不许省掉这一格）",
+  clothing: "穿着，**一段散文**（无服装写 `\"none\"`）。⚠️ 与 `gear` 的分野是**真**边界：" +
+    "穿着是「**看起来怎样**」，`gear` 是「**带了什么**」",
+  gear: "携带物 / 器械 / 佩戴物，**一条一句**；没有就写 `[]`",
+  palette: "这个角色身上的颜色，从世界色板里**选**：只能写 `palette:<下标>`（如 `palette:0`）。" +
+    "⚠️ 不许写 hex 或颜色名（写了下游会被量化掉，等于没写）",
+  visualConstraints: "这个角色**特有**的追加约束，一条一句（没有就写 `[]`）。" +
+    "⚠️ **叠加**在世界约束之上，**不是替代** —— 在这里写「不要抗锯齿」那类话是**反向**的"
+};
+
+/**
+ * 把「这份设计 + 这个世界」读成一份角色基因。
+ *
+ * ⚠️ **外观的两半都在这里插值**（票 31 的 Q1）：
+ *   · **类**（`vws`：`character` 五格 + `styleIdentity` + 六桶色板 + `materials`）——
+ *     ⚠️ 这是 `VWS` 在这条链上的**第三个具名读者**（前两个是票 12 的规划与票 14 的编译），
+ *     也是**六桶与 `materials` 第一次真的被读**（票 32 的票面说它们「零消费者」——
+ *     那句话现在只对**生图那一步**成立了，见票 32）；
+ *   · **个体**（`design` 里那几个实体的行为字段）—— ⚠️ 票 03 给它们标的 ① 档欠条
+ *     **在这里第一次真的兑现**（设计层那 12 个 ① 档字段的具名插值之一，票 10 定的「下游插」）。
+ *
+ * ⚠️ 设计层**没有**外观字段（票 31 的 F3）—— 所以「这个世界 + 它的行为」是**唯一**的输入，
+ *   而 `identity` 那一格没有别的地方能出（世界语法里根本没有「谁」）。
+ */
+export function characterDnaPrompt(input: { design: GameDesignSpec; vws: VisualWorldSpec }): string {
+  const { design, vws } = input;
+  const nothing = [...design.interactables.map((x) => x.id), ...design.resources.map((x) => x.id)];
+  return `你在给这个游戏里的**每一个角色**写一份基因（\`CharacterDNA\`）。
+⚠️ 这一层问的是「**这一个是谁**」，**不是**「这个世界的角色长什么样」—— 后者已经有了，见下。
+
+# 这个世界里**所有角色共有**的长相（VisualWorldSpec —— ⚠️ 这是**类**，管所有角色）
+${characterClassBrief(vws)}
+
+⚠️ **上面那五格说的是这一类共有的画法**：你要写的每一个角色**必须与它相容**，
+   但**不许把它整句抄下来**当某个角色的那一格 —— 抄下来，那一格就**没有说出关于这个角色的任何新东西**。
+   装配时会逐字比对三对（\`silhouette\` · \`clothing\` · \`face\` ↔ 世界的 \`faceAbstraction\`），整句相同会被判失败。
+   ⇒ 该做的是「把共有的画法**落到这一个身上**」：它比同类更胖 / 少一条胳膊 / 帽檐压得更低 …
+
+# 这个游戏里的角色（GameDesignSpec —— ⚠️ 这些是**个体**）
+⚠️ 设计层这些字段说的全是「**它干什么**」，**一个外观字段都没有** ——
+   外观只能从「**这一条的行为**」×「**这个世界的类**」推出来。
+${characterIndividualBrief(design)}
+⚠️ \`id\` **原样沿用**上面括号里的每一个 id —— 这一族**恰好**覆盖这些实体，少一条 / 多一条都算不合格。
+⚠️ \`interactables[]\` / \`resources[]\` 里那些东西${nothing.length === 0 ? "（本例没有）" : `（${nothing.join(" / ")}）`}
+   **没有基因**（木条箱与补给没有「是谁」这回事），**别给它们写**。
+
+# 逐字段（${Object.keys(DNA_FIELD_HINTS).length} 个键，一个都不许漏）
+${Object.entries(DNA_FIELD_HINTS).map(([k, v]) => `- \`${k}\` —— ${v}`).join("\n")}
+
+# 「没有」也要**写出来**
+⚠️ 非人形（无人机、机器、无脸的东西）：\`face\` 写 \`"none"\`、\`clothing\` 写 \`"none"\`、
+   \`gear\` 写 \`[]\`。**省掉一个键与「确实没有」在文件里长得一模一样** ——
+   而这个文件存在的意义就是让**重生成一字不变**：省掉的那一格会被重新自由发挥。
+⚠️ 空串（\`""\` 或 \`"  "\`）**不算写出来**，它只是第二个隐形缺省。
+
+只调 ${CHARACTER_DNA_TOOL_NAME} 工具，不要解释。`;
+}
+
+/** 这个世界的**类**：角色共有的五格 + 颜色分工 + 材质 + 形状语言 + 世界约束。
+ *  ⚠️ **五格逐个具名**（那是票 04 那张硬约束要的对照面），六桶与 `materials` 也摊开 ——
+ *  它们的原话模型读不懂，但**分工**（哪一笔是主色 / 强调色 / 背景色）就是这一层要用的东西。 */
+function characterClassBrief(vws: VisualWorldSpec): string {
+  const ch = vws.character;
+  const say = (s: string | undefined) => (typeof s === "string" && s.trim() !== "" ? s.trim() : "（这一格世界没给）");
+  const buckets = Object.entries(vws.palette)
+    .map(([k, refs]) => `${k}=${refs.join(",") || "∅"}`)
+    .join(" · ");
+  const mats = Object.entries(vws.materials)
+    .map(([name, m]) => {
+      const bits = [m.appearance, m.texture, (m.color ?? []).join(",")].filter((x): x is string => typeof x === "string" && x !== "");
+      return `${name}（${bits.join("；") || "没写"}` + "）";
+    })
+    .join(" · ");
+  const lines = [
+    `- 视觉身份：${vws.styleIdentity.description}`,
+    ...(vws.styleIdentity.keywords.length === 0 ? [] : [`- 关键词：${vws.styleIdentity.keywords.join(" / ")}`]),
+    `- \`character.proportions\`：${say(ch.proportions)}`,
+    `- \`character.silhouette\`：${say(ch.silhouette)}`,
+    `- \`character.poseLanguage\`：${say(ch.poseLanguage)}`,
+    `- \`character.clothing\`：${say(ch.clothing)}`,
+    `- \`character.faceAbstraction\`：${say(ch.faceAbstraction)}`,
+    `- **色板**（\`palette:<下标>\` 指的就是它）：${vws.style.palette.map((hex, i) => `${i}=${hex}`).join(" · ") || "（空）"}`,
+    `- **颜色分工（六桶）**：${buckets}`,
+    `- 形状语言：${vws.shapeLanguage.join(" · ") || "（没写）"}`,
+    `- 世界的约束（⚠️ 你的 \`visualConstraints\` 是**叠加**在它之上，不是替代）：${vws.constraints.join("｜") || "（没有）"}`
+  ];
+  if (mats !== "") lines.splice(lines.length - 2, 0, `- 材质：${mats}`);
+  return lines.join("\n");
+}
+
+/** 这个游戏里的**个体**：那几条配得上 DNA 的实体，逐条摊开它的行为字段。
+ *  ⚠️ **`id` 括在括号里、逐条给**（那是 `id` 沿用这条判据的兑现方式：模型不必猜、也不必自己起名）。 */
+function characterIndividualBrief(design: GameDesignSpec): string {
+  const lines = [
+    `- \`player\`（\`id\` = \`${design.player.id}\`）：他是 ${design.player.role}；` +
+      `他能 ${design.player.abilities.join(" / ")}；他要 ${design.player.goals.join(" / ")}`
+  ];
+  for (const [i, e] of design.enemies.entries())
+    lines.push(`- \`enemies[${i}]\`（\`id\` = \`${e.id}\`）：它怎么动 —— ${e.behavior}；它怎么威胁 —— ${e.threat}`);
+  for (const [i, e] of design.npcs.entries())
+    lines.push(`- \`npcs[${i}]\`（\`id\` = \`${e.id}\`）：他是 ${e.role}；能跟他做什么 —— ${e.interaction}`);
+  lines.push(
+    `- 这个游戏是什么：${design.game.title}（${design.game.genre} · ${design.game.camera}）——` +
+      `世界的主题是 ${design.world.theme}，场景是 ${design.world.setting}，空间结构是 ${design.world.structure}`
+  );
+  return lines.join("\n");
 }

@@ -28,6 +28,15 @@
 //     若 `VWS.character.proportions` 与 `CharacterDNA` 里的某格可以是同一句话，
 //     它们就是**同一件事的粗细两版** —— 那正是票 09 删 `GameSpec` 的理由。
 //
+//   ⚠️ **票 31 给这条硬约束配了一个守门人，而它只是个守门人**（票 31 第 1 轮 Q1 的收紧）：
+//     `game-design/src/build-character-dna.ts` 的 `verbatimCopyGuard` 逐字比**三对** ——
+//     `dna.silhouette` vs `vws.character.silhouette` · `dna.clothing` vs `…clothing` ·
+//     `dna.face` vs `…faceAbstraction`（⚠️ **最后一对名字不同、语义对应**），逐字相同就判失败。
+//     ⚠️ **它必要不充分**：模型换一个标点、加一个「的」就绕过了。
+//     ⇒ 它的名字、错误消息与一切注释**一律**写成「**守门人**」，
+//       **不许**被引用成「『不许复制』这条语义规矩的判据」——
+//       真正管住那层语义的是**提示词**（世界说「类」、DNA 说「个体」），不是这一条。
+//
 //   ⇒ 于是 `identity` 这一格是**必须的**：它说的是「**这一个**是谁」，
 //     而那在世界语法里**根本没有**（世界语法规格化了「角色怎么画」，不规格化「谁」）。
 //
@@ -113,19 +122,65 @@ export const CharacterDNASchema = z.strictObject({
  *
  *  ⚠️ **单文件装全部角色**（票 04 Q3），与 `asset-recipe.json` 一个文件装全部资产同形 ——
  *  而不是一个角色一份文件。 */
+// ── 顶层 gate：**「确实没有」与「模型忘了填」不许长得一样**（票 31 的 Q4）────────────
+//
+//   本契约**全部必填、一个 `.optional()` 都没有**（票 04 Q2），而「必填」只挡得住**缺席**：
+//   `z.string().min(1)` 挡不住 `"   "`，`z.array(z.string())` 挡不住 `[""]`。
+//   ⇒ 而这条判决**文档里早就写着、契约里没人兑现**（`docs/v2/01-contracts.md` §7 那节的原话）：
+//     「⚠️ **因此空串（`""`）也不算 —— 否则它会变成第二个隐形缺省。**」
+//   ⚠️ 那是票 09（`game-intent.ts`）与票 10（`game-design.ts`）各立过一遍的**同一条 gate** ——
+//     同一份判决落在这份契约上时只剩一句自白，**票 31 是兑现它的地方**。
+//
+//   **进 gate**（这一发算 `schema` 失败、重采样）：
+//     · 必填字符串 **trim 后**非空：`id` · `identity` · `silhouette` · `face` · `clothing`
+//     · 数组**元素**非空：`gear[]` · `visualConstraints[]`
+//       （⚠️ `palette[]` 的元素由 `PaletteRefShape` 的正则保证是 `palette:<下标>` ⇒ 空串进不来）
+//
+//   **不进 gate**（⚠️ **逐条写下来，免得下一个人往里加**）：
+//     · **`"none"` 是合法值** —— 那是**写下来的不存在**（票 04 Q2 的原话：非人形写 `"none"`）。
+//       ⚠️ gate **只查「空」、不查「是不是 `none`」**：与 `game-intent` / `game-design` 那两条同一口径
+//       —— 判据只收「精确可算 + 错了一定不是设计」，「这句话算不算敷衍」不是它判得了的。
+//     · `gear: []` · `palette: []` · `visualConstraints: []` **本身可空**：
+//       无人机没有装备、没有配色偏好的角色都存在 —— 与「非人形必须写 `"none"`」是同一条取向
+//       （「没有」要被**说出来**，而 `[]` 就是一种说出来；`[]` 与「忘了填」在这里长得**不一样**）。
+//
+//   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 静默丢掉 `superRefine`（票 08 实测）。
+//     ⇒ 规矩由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+//   ⚠️ **它同时也管从磁盘上读回来的 `character-dna.json`**（与 `visual-world` / `game-intent` 同款）：
+//     手改过的文件在这里就该响 —— 而不是等到下游拿它去重生成时才发现少了一个字母。
 export const CharacterDNAFileSchema = z.strictObject({
   format: z.literal(CHARACTER_DNA_FORMAT),
   characters: z.array(CharacterDNASchema)
 }).superRefine((f, ctx) => {
+  const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: "custom", path, message });
+  const blank = (s: string | undefined) => (s ?? "").trim() === "";
+  const HINT = " —— ⚠️ 「**这个角色确实没有**」也要被**说出来**（`face` / `clothing` 写 `\"none\"`、" +
+    "`gear` 写 `[]`），**不许**拿空值当第二个隐形缺省（`01-contracts.md` §7 的判决）";
+
   const seen = new Set<string>();
   for (const [i, c] of f.characters.entries()) {
+    // ① id 重复 —— `characterId` 靠 id 命中，重了就说不出是哪一个
     if (seen.has(c.id))
-      ctx.addIssue({
-        code: "custom",
-        path: ["characters", i, "id"],
-        message: `角色 id 重复："${c.id}" —— characterId 会变得含糊（它靠 id 命中）`
-      });
+      issue(["characters", i, "id"], `角色 id 重复："${c.id}" —— characterId 会变得含糊（它靠 id 命中）`);
     seen.add(c.id);
+
+    // ② 必填字符串 trim 后非空（`.min(1)` 挡不住 `"   "`）
+    const strings: [string, string][] = [
+      ["id", c.id], ["identity", c.identity], ["silhouette", c.silhouette],
+      ["face", c.face], ["clothing", c.clothing]
+    ];
+    for (const [label, s] of strings)
+      if (blank(s)) issue(["characters", i, label], `\`characters[${i}].${label}\` 是空的${HINT}`);
+
+    // ③ 数组的**元素** —— 空串不是「没有这一条」，是一个占位符
+    const elems: [string, readonly string[]][] = [["gear", c.gear], ["visualConstraints", c.visualConstraints]];
+    for (const [label, arr] of elems)
+      arr.forEach((x, j) => {
+        if (blank(x))
+          issue(["characters", i, label, j],
+            `\`characters[${i}].${label}[${j}]\` 是空串 —— 空串不是「没有这一条」，是占位符` +
+            "（这一条整个不要，就把元素删掉，而不是留一个空串）");
+      });
   }
 });
 

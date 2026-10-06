@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "意图理解与设计编译：GameIntentSpec · GameDesignSpec。",
+  "description": "意图理解、设计编译与角色基因：GameIntentSpec · GameDesignSpec · CharacterDNA。",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
