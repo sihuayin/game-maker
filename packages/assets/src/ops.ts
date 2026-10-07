@@ -21,6 +21,7 @@ import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
 import { buildAssetPack, type FailureSite } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError, type ImageGenerator } from "./image-gen.js";
+import { referenceImagesOf } from "./master.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
@@ -1028,6 +1029,26 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
     throw new CommandError("usage",
       `这份清单里有 source.kind="image" 的资源，但**没配生图凭据** —— ` +
       `写 game-maker.local.json（已 gitignore）或设 GAME_MAKER_IMAGE_* 环境变量。`);
+
+  // ⚠️ **有一整类协议接不了参考图，而它是静默失败的**（票 13 的 Q6）：
+  //   `dashscope-mcp` 那条的 `tools/call` 参数里根本没有 `reference` / `styleReference`
+  //   两个键（`image-gen.ts` 的 `createDashScopeMcpGenerator` 入参解构里就没有它们）
+  //   ⇒ 传了**静默丢掉**，账上一个字都不记。后果是「一个看起来正常、但完全没照参考图画的包」
+  //   ——「错得安静」的正品。
+  //   ⇒ **在花钱之前、免费地拒**（R12 的同一条原则）。⚠️ 判据是「**真的有一张图会被丢**」：
+  //     `styleRef` 只是指向 `stylespec.json` 的**路径**，不是图，**永远不触发**（人类在这一轮
+  //     专门点了这一条）；触发的是 `referenceImage` / `source.reference` / `masterAsset` 那三样。
+  if (opts.imageTransport?.protocol === "dashscope-mcp") {
+    const images = referenceImagesOf(r.value);
+    if (images.length > 0)
+      throw new CommandError("usage",
+        `这份清单要递参考图，而配置的生图协议是 \`dashscope-mcp\` —— ⚠️ **那家接不了参考图**：\n` +
+        images.map((x) => `  · ${x}`).join("\n") +
+        `\n它的 \`tools/call\` 参数里没有这两个键 ⇒ 参考图会被**静默丢掉**（账上都不记一笔），` +
+        `交付出来会是一个「看起来正常、但完全没照参考图画的包」。\n` +
+        `⇒ 换一个支持参考图的协议（实测 Gemini 那条**真的把角色保持住了**），` +
+        `或者把这几张参考图从清单里去掉。`);
+  }
 
   // ⚠️ 这个数组是**调用方与构建器共用**的：文本那一路由生成器直接记进来
   //   （`createDrawListGenerator({ onCall })`），生图那一路由 `buildAssetPack` 追加。

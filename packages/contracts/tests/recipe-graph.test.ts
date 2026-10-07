@@ -75,6 +75,29 @@ describe("§依赖边 `dependsOn`（资产 → 资产）", () => {
     expect(errors(dep(r, 0, r.assets[0]!.spec.id))).toMatch(/依赖它自己/);
   });
 
+  it("⚠️ **两条参考图的路不许同时走**（票 13 的 Q4）：`source.reference` + `spec.masterAsset` ⇒ 拒", () => {
+    // ⚠️ 必须是一份 **`kind: "image"`** 的资产 —— 两条路都只对生图那一发有意义
+    //   （`drawlist` / `import` 的资产根本不看 `masterAsset`）。
+    const r: Recipe = {
+      ...recipe(),
+      authoring: [{ id: "player-master", role: "母版", description: "一张参考图", source: { kind: "drawlist" }, characterId: "p-scavenger", size: { w: 64, h: 96 } }],
+      assets: [{
+        spec: { kind: "sprite", id: "player-idle", role: "玩家", description: "待机一帧", styleId: "s", anchor: { x: 0.5, y: 1 }, size: { w: 32, h: 48 }, required: true, masterAsset: "player-master" },
+        source: { kind: "image", reference: "some-other-character.png" },
+      }],
+    };
+    const p = parseRecipe(r);
+    expect(p.ok).toBe(false);
+    if (!p.ok) {
+      const msg = p.errors.join();
+      expect(msg).toContain("同时");
+      expect(msg).toContain("reference");     // 两条路都点名
+      expect(msg).toContain("masterAsset");
+      // ⚠️ 而 `path` 指得到**那一格**（两条路都在这个资产上）
+      expect(msg).toContain("assets[0]");
+    }
+  });
+
   it("⚠️ 指向一个**母版** id ⇒ 拒，而且消息说得出「该用 `masterAsset`」", () => {
     const r = recipe();
     withMaster(r, 1, sameRatio(r, 1));

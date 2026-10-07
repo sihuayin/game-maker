@@ -236,6 +236,17 @@ export const AssetRecipe = z.object({
       issue(["assets", i, "spec", "masterAsset"],
         `资产 "${e.spec.id}" 指着母版 "${m}"，但 authoring[] 里没有它` +
         (authoringIds.size === 0 ? "（这份配方压根没有 authoring[]）" : ""));
+    // ⚠️ **两条参考图的路不许同时走**（票 13 的 Q4）：`source.reference` 是一条**路径**
+    //   （外部给的一张图），`masterAsset` 是一个 **id**（这个角色的母版，进 `authoring[]`、
+    //   受比例判据管、可被多个资产共用）。两个都写 = 「照文件 A 画」与「照母版 B 画」**两种意图打架**,
+    //   而生成那一步只收得下一张 `reference`（`image-gen.ts` 的 `GenerateImageRequest.reference`）
+    //   ⇒ 谁赢都是静默丢一半。**免费拒掉**比猜一个更好。
+    if (e.source.kind === "image" && e.source.reference !== undefined)
+      issue(["assets", i, "source", "reference"],
+        `资产 "${e.spec.id}" **同时**写了 \`source.reference\`（一张路径）与 \`spec.masterAsset\`（母版 "${m}"）` +
+        " —— ⚠️ 两条路都能表达「照哪张图画」，而生成那一步只收得下**一张**参考图" +
+        "（谁赢都是静默丢一半）⇒ 二选一：要外部的图就用 `reference`（并把 `masterAsset` 去掉），" +
+        "要用这个角色的母版就把 `reference` 去掉。");
   });
 
   // ── 依赖图（票 11 的 Q3/Q4）─────────────────────────────────────────────────

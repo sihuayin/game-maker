@@ -1,0 +1,135 @@
+{
+  "label": "D-failure",
+  "arms": {
+    "withMaster": true,
+    "withCrate": true
+  },
+  "recipes": {
+    "format": "asset-recipe/v1",
+    "id": "master-probe",
+    "styleRef": "stylespec.json",
+    "authoring": [
+      {
+        "id": "p-scavenger-master",
+        "role": "玩家角色母版",
+        "description": "DNA 的一张渲染图：全身、正视、中性站姿",
+        "source": {
+          "kind": "image",
+          "background": {
+            "tolerance": 30
+          }
+        },
+        "characterId": "p-scavenger",
+        "size": {
+          "w": 64,
+          "h": 96
+        }
+      }
+    ],
+    "assets": [
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "p-scavenger-idle",
+          "role": "玩家：待机",
+          "description": "拾荒者的待机一帧",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 48
+          },
+          "required": true,
+          "characterId": "p-scavenger",
+          "animations": [
+            {
+              "name": "idle",
+              "frames": 1,
+              "fps": 1,
+              "loop": true
+            }
+          ],
+          "masterAsset": "p-scavenger-master"
+        },
+        "source": {
+          "kind": "image",
+          "background": {
+            "tolerance": 30
+          }
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "crate",
+          "role": "障碍：木条箱",
+          "description": "一只旧木条箱",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 24,
+            "h": 24
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "image",
+          "background": {
+            "tolerance": 30
+          }
+        }
+      }
+    ]
+  },
+  "calls": [
+    {
+      "which": "crate",
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "hasReference": false,
+      "hasStyleReference": false,
+      "requestedSize": "aspect 1:1",
+      "ms": 38362,
+      "promptLen": 973
+    }
+  ],
+  "ledger": [
+    {
+      "step": "master",
+      "target": "p-scavenger-master",
+      "attempts": 1,
+      "ms": 0
+    },
+    {
+      "step": "image",
+      "target": "crate",
+      "attempts": 1,
+      "ms": 38362,
+      "requestedSize": "aspect 1:1"
+    }
+  ],
+  "outcome": "failed",
+  "error": "资产 \"p-scavenger-idle\" 的母版 \"p-scavenger-master\" **没造出来**（母版那一发挂了（探针注入）） —— ⚠️ 参考图不成立时发出去的那一笔是白花的钱（票 13 的 Q5）。",
+  "frames": {},
+  "images": [
+    {
+      "which": "crate",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "prompts": [
+    {
+      "which": "crate",
+      "prompt": "画一张游戏用的**单个物体**贴图，占满整个画面，四周只留很窄的一圈空白。\n\n⚠️⚠️ 最重要的一条，请先读它：**背景必须是纯色 #ff00ff**。\n   整张图的背景区域要被这个颜色填满，不要渐变、不要噪点、不要纹理、不要图案。\n   背景上不要出现任何东西：没有墙、没有地面、没有影子、没有边框、没有文字、没有水印。\n   列表里的其他颜色**一个都不要**用来画背景。\n\n这个物体是：一只旧木条箱（障碍：木条箱）\n\n画面里**只有这一个物体**，不要画场景、不要画房间、不要画货架、不要加画框或边框、\n不要画成一整张插画。就是一件道具，像游戏贴图那样单独摆着。\n\n这个物体的**外接矩形**长宽比必须**精确**是 24 : 24（宽 : 高）——\n交付管线会把它两方向独立缩放到 24×24 像素，比例不对就是硬拉伸。\n\n这个物体**本身**的颜色只用下面这些：\n#f2c14e  #2d3f63  #1d2739  #e8a95c  #3c5a8a  #e9c05a  #8a5a34  #6b4526  #26314d  #8f8f96  #f5f0d8  #1b2540  #d97a2b  #3a3038  #141b2b  #c9be6a\n（注意：这条是给**物体**定的，背景的 #ff00ff 是唯一的例外。）\n\n这个世界的视觉语法（只用于物体本身的配色与质感）：\nidentity: [\"flat vector pixel\",\"hard-edged color blocking\",\"banded dusk sky\",\"silhouette landmark\",\"limited warm-on-cool palette\",\"side-scroller platformer strip\"]\nmaterial: [\"matte flat fills\",\"no specular\",\"no texture maps\",\"one value step per material\"]\n\n画法：硬边色块、边缘干净利落、不要抗锯齿、不要柔边、不要渐变、不要写实照片质感、\n不要体积光、不要景深。正视角度、正交投影、不要任何透视。\n\n再强调一次：背景是纯色 #ff00ff，而这件物体上**不要**出现 #ff00ff 这个颜色。"
+    }
+  ]
+}

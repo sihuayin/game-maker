@@ -3,7 +3,7 @@ import type { GameDesignSpec, VisualWorldSpec } from "@game-maker/contracts";
 //
 // 归 `assets` 而不是 `contracts`：它是 schema 的**镜像**，会随提示工程调优而改；
 // 而 contracts 只放不随便动的东西。schema 一改，这里必须跟着改 —— 所以 op 集只有这一处描述。
-import type { AssetSpec, StyleSpec } from "@game-maker/contracts";
+import type { AssetSpec, CharacterDNA, StyleSpec } from "@game-maker/contracts";
 
 /** 色板行。`palette:N` 的下标就是这里的序号 —— 模型必须能一一对上。 */
 export function paletteLine(palette: readonly string[]): string {
@@ -43,6 +43,56 @@ export function drawListFewShot(): string {
    {"op":"rect","x":3,"y":16,"w":2,"h":3,"fill":"palette:3"},
    {"op":"rect","x":10,"y":16,"w":2,"h":3,"fill":"palette:3"}]}]}
 注意上例：**头与躯干的 ops 两帧完全相同**，只有腿的 x 变了。这就是帧间一致性。`;
+}
+
+/**
+ * ⚠️ **键集就是 `keyof CharacterDNA`** —— 契约加一格而这里不补，**编译就过不去**。
+ *   「8 个字段一个都不许漏」这条在这一层因此不是纪律，是**类型**（票 13 的 Q3 把这一条收紧了）。
+ */
+const DNA_HINTS: Record<keyof CharacterDNA, string> = {
+  id: "**内部键** —— ⚠️ **不要把它画进图里**（图上不许出现任何文字）",
+  identity: "**它是谁** —— 这是全世界唯一说得出这一格的地方（世界语法里只有「角色怎么画」，没有「谁」）",
+  silhouette: "形态语言（**画法**：头形、边缘、量感），不是数值比例",
+  face: "脸部画法",
+  clothing: "穿着",
+  gear: "携带物 / 器械 / 佩戴物",
+  palette: "它身上的颜色",
+  visualConstraints: "这个角色**特有**的追加约束（⚠️ **叠加**在世界约束之上，不是替代）",
+};
+
+/**
+ * **角色基因的八个字段**逐个摊开（票 13 的 Q3：人类把这一条收紧了 —— **八个，不是七个**）。
+ *
+ * ⚠️ `id` 也在台账里：它是这条链上**认人用的键**（`GameDesignSpec` 的实体 id = `CharacterDNA.id`
+ *   = `AssetSpec.characterId`，票 04 那条链）⇒ 它必须被点出来。而它下面那句「不要画进图里」
+ *   是必需的 —— 模型会照着字面把文字画上去，而「图上一个字都不许有」是本文件每一份模板的头一条。
+ *
+ * ⚠️ **`palette:N` 要翻译成色值**：模型不认 `palette:3` 这个说法，它认颜色。
+ *   世界的色板在 `StyleSpec.palette`（那份**有序数组**）里 —— 这正是「颜色只有一个来源」的落点。
+ */
+export function dnaBrief(dna: CharacterDNA, style: StyleSpec): string {
+  /** `"none"` 不是「随便画」，是**写下来的不存在**（票 04 Q2）—— 要翻成人话，别原样丢给模型。 */
+  const norm = (v: string) =>
+    v.trim().toLowerCase() === "none" ? `**没有**（契约里写的是 \`"none"\` —— 那就**别画它**）` : v.trim();
+  const colors =
+    dna.palette.length === 0
+      ? "（没指定 —— 从世界的色板里挑最像这个角色的几个）"
+      : dna.palette
+          .map((ref) => style.palette[Number(ref.slice("palette:".length))] ?? ref)
+          .join("  ");
+  const values: Record<keyof CharacterDNA, string> = {
+    id: `\`${dna.id}\``,
+    identity: dna.identity,
+    silhouette: norm(dna.silhouette),
+    face: norm(dna.face),
+    clothing: norm(dna.clothing),
+    gear: dna.gear.length === 0 ? "**没有**（清单是空的）" : dna.gear.join("；"),
+    palette: colors,
+    visualConstraints: dna.visualConstraints.length === 0 ? "（没有追加约束）" : dna.visualConstraints.join("；"),
+  };
+  return Object.entries(DNA_HINTS)
+    .map(([k, hint]) => `- \`${k}\`（${hint}）：${values[k as keyof CharacterDNA]}`)
+    .join("\n");
 }
 
 /** 风格约束块。**生成与推导共用同一份** —— 两处各写一份必然漂移。 */
@@ -217,14 +267,17 @@ export function imageNegativePrompt(): string {
  *     里面的 "nested panel frames" 会让它画一张带边框的面板而不是一个物体。
  *     所以这里只取 identity / material / constraints，把 camera 换成"正交、无透视"的一句。
  */
-/** 这次画的是**哪一个东西** —— 一段动画，或者分层背景的某一层。 */
+/** 这次画的是**哪一个东西** —— 一段动画，或者分层背景的某一层。
+ *  ⚠️ 票 13 多了一样：**这个角色是谁**（`dna`）。它**只在有值时用**（见 `dnaBrief`）。 */
 export type ImagePromptTarget = {
   anim?: string;
   layer?: { name: string; index: number; total: number; tileX: boolean };
+  /** 这个资产的角色的基因。⚠️ 由 `pack` 按 `spec.characterId` 解析后递进来 —— 这一层不读磁盘。 */
+  dna?: CharacterDNA;
 };
 
 export function imagePrompt(spec: AssetSpec, style: StyleSpec, target: ImagePromptTarget = {}): string {
-  if (spec.kind === "animation") return animationSheetPrompt(spec, style, target.anim);
+  if (spec.kind === "animation") return animationSheetPrompt(spec, style, target.anim, target.dna);
   // ⚠️ 分层背景走**独立模板**（票 43）。不能在单物体那份上打补丁：那一份的头一条是
   //   「物体占满整个画面」，而一层背景的头一条恰恰是「**没东西的地方留空**」——
   //   同一份提示词里写两条互相打架的规矩，模型只会执行一条（动画那一支已经吃过一次这个亏）。
@@ -304,7 +357,7 @@ material: ${JSON.stringify(style.material)}
 }
 
 /** 单帧资源：就一件道具，像贴图那样单独摆着。 */
-function singleObjectPrompt(spec: AssetSpec, style: StyleSpec): string {
+function singleObjectPrompt(spec: AssetSpec, style: StyleSpec, dna?: CharacterDNA): string {
   const bg = keyColorFor(style.palette);
   return `画一张游戏用的**单个物体**贴图，占满整个画面，四周只留很窄的一圈空白。
 
@@ -313,7 +366,7 @@ function singleObjectPrompt(spec: AssetSpec, style: StyleSpec): string {
    背景上不要出现任何东西：没有墙、没有地面、没有影子、没有边框、没有文字、没有水印。
    列表里的其他颜色**一个都不要**用来画背景。
 
-这个物体是：${spec.description}（${spec.role}）
+这个物体是：${spec.description}（${spec.role}）${dna === undefined ? "" : `\n\n⚠️ 这个物体**属于角色 ${dna.id}** —— 它是那个角色身上的东西，画法与配色要跟那个角色一致：\n${dnaBrief(dna, style)}`}
 
 画面里**只有这一个物体**，不要画场景、不要画房间、不要画货架、不要加画框或边框、
 不要画成一整张插画。就是一件道具，像游戏贴图那样单独摆着。
@@ -343,7 +396,7 @@ material: ${JSON.stringify(style.material)}
  * 两处的画布长宽比也**不一样**：单帧说的是物体的比例，这里说的是**每个角色**的比例
  * （画布本身是 N 倍宽的横条）。
  */
-function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: string): string {
+function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: string, dna?: CharacterDNA): string {
   const bg = keyColorFor(style.palette);
   if (spec.kind !== "animation") throw new Error("animationSheetPrompt 只用于 animation 资源");
   const anim = animName === undefined ? spec.animations[0]! : spec.animations.find((a) => a.name === animName);
@@ -358,7 +411,13 @@ function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: stri
    ${n} 个角色之间要留出**明显的空隙**（背景色露出来），这样才切得开。
    列表里的其他颜色**一个都不要**用来画背景。
 
-这个角色是：${spec.description}（${spec.role}）
+${dna === undefined
+    // ⚠️ **回落**：没有 DNA 就照旧用 `spec.description` —— 8 份 fixture 与「人给一张参考图」
+    //   那条老路因此一字不改（票 13 的 Q3）。
+    ? `这个角色是：${spec.description}（${spec.role}）`
+    // ⚠️ **有 DNA 就替换，不是叠加**：同一条提示词里写着两个身份源，模型只会执行一条
+    //   （那次「既说 4 个角色又说只有 1 个物体」的教训）。
+    : `这个角色是：\n${dnaBrief(dna, style)}`}
 这组动作是「${anim.name}」（共 ${total} 帧里的第 ${spec.animations.findIndex((a) => a.name === anim.name) + 1} 组）。
 
 硬性要求：

@@ -203,3 +203,54 @@ describe("⚠️ 失败时报的是**真实发出的笔数**，不是「回来�
     expect(calls.filter((c) => c.ms === undefined), "没有哪一笔还悬着").toEqual([]);
   });
 });
+
+// ── 票 13 的 Q6：**参考图在某家协议上会静默丢掉** ──────────────────────────────
+//
+// ⚠️ 手法：上游配成**死的**（`http://127.0.0.1:9`）—— 于是
+//   · 拦停**没响** ⇒ 一路撞到死上游上 ⇒ `CommandError("upstream")`（退出码 3）
+//   · 拦停**响了** ⇒ 在花钱之前就停下 ⇒ `CommandError("usage")`（退出码 2）
+//   两种结局分得开，所以不用真上游也能测这条判据。
+describe("⚠️ 「带参考图」在某家协议上会**静默地不成立**（票 13 的 Q6）", () => {
+  const IMG_SPEC = {
+    kind: "sprite", id: "player-idle", role: "玩家", description: "待机一帧", styleId: "style-ref",
+    anchor: { x: 0.5, y: 1 }, size: { w: 32, h: 48 }, required: true, masterAsset: "player-master",
+  };
+  const recipe = (over: Record<string, unknown> = {}) => ({
+    format: "asset-recipe/v1", id: "q6", styleRef: "stylespec.json",
+    assets: [{ spec: { ...IMG_SPEC }, source: { kind: "image" } }],
+    authoring: [{ id: "player-master", role: "母版", description: "一张参考图", source: { kind: "import", ref: "x.png" }, characterId: "p", size: { w: 64, h: 96 } }],
+    ...over,
+  });
+  const run = async (doc: unknown, protocol: "dashscope-mcp" | "gemini") => {
+    fs.writeFileSync(path.join(dir, "q6.json"), JSON.stringify(doc));
+    return packAssets({
+      recipePath: path.join(dir, "q6.json"), outRoot: OUT,
+      transport: { baseUrl: dead, apiKey: "x" },
+      imageTransport: { protocol, baseUrl: dead, apiKey: "x" },
+    }).catch((e: unknown) => e);
+  };
+
+  it("dashscope-mcp + 清单里**真有图要递**（母版）⇒ **开跑前**拒，且说得出是哪一张", async () => {
+    const e = await run(recipe(), "dashscope-mcp");
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("usage");
+    expect((e as Error).message).toContain("player-master");
+    expect((e as Error).message).toContain("静默丢掉");
+  });
+
+  it("dashscope-mcp + 世界风格图（`referenceImage`）⇒ 同样拒（它也是要递出去的一张图）", async () => {
+    const e = await run(recipe({ referenceImage: "../reference/test.png" }), "dashscope-mcp");
+    expect((e as CommandError).kind).toBe("usage");
+    expect((e as Error).message).toContain("referenceImage");
+  });
+
+  it("⚠️ **`styleRef` 不是图，永远不触发** —— 只有它的时候照跑（撞死在死上游上，不是 `usage`）", async () => {
+    const e = await run(recipe({ assets: [{ spec: { ...IMG_SPEC, masterAsset: undefined }, source: { kind: "drawlist" } }], authoring: undefined }), "dashscope-mcp");
+    expect((e as CommandError).kind).not.toBe("usage");
+  });
+
+  it("换一个支持参考图的协议（gemini）⇒ 不拒 —— 这条只针对那一家", async () => {
+    const e = await run(recipe(), "gemini");
+    expect((e as CommandError).kind).not.toBe("usage");
+  });
+});

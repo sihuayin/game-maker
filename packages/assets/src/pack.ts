@@ -13,7 +13,8 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import {
   ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, derivePackMode, paletteBindingOf, summarizeCalls,
-  type AssetPackManifest, type AssetSpec, type DrawList, type Ledger, type LedgerCall, type StyleSpec,
+  type AssetPackManifest, type AssetSpec, type AuthoringAsset, type CharacterDNA, type CharacterDNAFile,
+  type DrawList, type Ledger, type LedgerCall, type StyleSpec,
 } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -21,6 +22,7 @@ import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
 import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
+import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioMismatch } from "./master.js";
 import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
 import { rasterize } from "./raster.js";
@@ -34,7 +36,18 @@ export type DrawListGenerator = (spec: AssetSpec, style: StyleSpec) => DrawList[
 //   漂的那一天就是「这里多一个参数、那里没跟上」（2026-09-30 票 06 差一点就是）。
 
 export type BuildPackOptions = {
-  recipe: { id: string; styleRef: string; referenceImage?: string; assets: readonly { spec: AssetSpec; source: AssetSourceLike }[] };
+  // ⚠️ **这是一份结构子集**（不是 `AssetRecipe` 本身）—— 它只列「组装真正要读的」那些格。
+  //   ⚠️ 因此它是一处**手抄的镜像**：配方那侧加一个组装要读的字段，这里也得加
+  //   （票 11 记下过这个坑：`AssetSourceLike` 与契约的 `AssetSource` 是两份）。
+  recipe: {
+    id: string;
+    styleRef: string;
+    referenceImage?: string;
+    /** ⚠️ **创作态母版**（票 13 才开始真的被读）—— 在它之前这个字段**够不着** `pack`。
+     *  它**不进交付包**：下面只迭代 `assets`，母版只活在 `authoring/` 那一侧（票 04 的结构性保证）。 */
+    authoring?: readonly AuthoringAsset[];
+    assets: readonly { spec: AssetSpec; source: AssetSourceLike }[];
+  };
   style: StyleSpec;
   /** 产物根目录。**必填** —— 产物不属于任何单个包（票 29），由调用方定。
    *  实际写入 `outDir/<recipe.id>/pack/v<N>/`。 */
@@ -54,6 +67,15 @@ export type BuildPackOptions = {
   generate: DrawListGenerator;
   /** 清单里有 `kind: "image"` 的资源时必填，否则**开跑前**就失败（不静默跳过）。 */
   generateImage?: ImageGenerator;
+  /**
+   * 角色的**基因**（票 13）。**给了才用** —— 不给就整条回落（提示词照旧用 `spec.description`），
+   * 所以磁盘上那 8 份 fixture 与「人给一张参考图」那条老路**一字不改**。
+   *
+   * ⚠️ 读文件、拼路径是**调用方**的活（与 `recipe` / `style` 同款）—— 本模块不读清单之外的东西。
+   * ⚠️ 两条边界：**没给文件** ⇒ 回落（不是错）；**给了文件却查不到那个 `characterId`** ⇒ 抛
+   *   （文书自相矛盾 —— 静默回落就是「画了一个别的角色」）。
+   */
+  characterDna?: CharacterDNAFile;
   /** 覆盖 `createdAt`（可复现构建）。不给则读 `SOURCE_DATE_EPOCH`，再不给用当前时间。 */
   sourceDateEpoch?: number;
   /**
@@ -86,8 +108,9 @@ type AssetSourceLike =
 export type BuildPackResult = {
   manifest: AssetPackManifest;
   packDir: string;
-  /** 生图调用的事实记录（几个资源、几次调用、各自多久）—— 这是**钱**的账，交调用方报出来。 */
-  imageCalls: ({ assetId: string } & ImageGenCall)[];
+  /** 生图调用的事实记录（几个资源、几次调用、各自多久）—— 这是**钱**的账，交调用方报出来。
+   *  ⚠️ 票 13 之后这里**也含创作态母版**那几发（`master: true`，`assetId` 是**母版 id**）。 */
+  imageCalls: ({ assetId: string; master?: true } & ImageGenCall)[];
   /** spec ↔ 产物的对账结果（`auditAssetSpec`）。**有内容不等于失败** —— 交调用方决定。 */
   audit: string[];
   /** 写进包的那份账（票 45）。没传 `ledger` 进来就是 undefined。 */
@@ -268,7 +291,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
 
   type Built = { spec: AssetSpec; origin: "generated" | "imported"; paletteBinding: "exact" | "composited" | "quantized"; frames: { name: string; state?: string; image: RasterImage }[]; animations?: { name: string; frames: string[]; fps?: number; loop: boolean }[]; authoring: { kind: "drawlist" | "bitmap"; ref: string; original?: string }[] };
   /** 生图调用的账 —— 一次调用就是一笔钱，逐条记下来交调用方报出来。 */
-  const imageCalls: ({ assetId: string } & ImageGenCall)[] = [];
+  const imageCalls: ({ assetId: string; master?: true } & ImageGenCall)[] = [];
 
   // ⚠️ **并发跑**（票 47）：每一次调用只吃自己的 `spec` + StyleSpec。
   //   串行纯属浪费：实测 9 个资源串行 43.7s，而墙钟本可以贴着最慢的那一个走。
@@ -286,6 +309,128 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   const textGate = semaphore(opts.concurrency?.text ?? DEFAULT_CONCURRENCY.text, stop);
   const imageGate = semaphore(opts.concurrency?.image ?? DEFAULT_CONCURRENCY.image, stop);
   const built: Built[] = new Array<Built>(recipe.assets.length);
+
+  // ── 母版前段（票 13 的 Q5）──────────────────────────────────────────────────
+  //
+  // ⚠️ **它是资产之前的一段独立前段，不进下面那张 DAG**：母版之间**没有依赖**（`AuthoringAsset`
+  //   不收回指），而资产要的只是**它那张图** ⇒ 塞进 DAG 会让整包在第一个母版上串行，
+  //   而它们本来可以并发跑（同一道生图闸门）。
+  //
+  // ⚠️ **失败语义照 `dependsOn` 抄、但只阻断该阻断的**（Q5 的原话：「只阻断引用失败 master 的 assets」）：
+  //   · 母版失败**不**去踢那道共享的 `stop` 闸 —— 别的资产照造；
+  //   · **引用它的**资产一个字节都不往外发（参考图不成立时发出去的那一笔是白花的钱）；
+  //   · 而整包**仍然失败**（末尾把那条母版的病因抛出来）—— 失败了却不报，就是「错得安静」。
+  const masterImages = new Map<string, RasterImage>();
+  const masterFailure = new Map<string, string>();
+  const authoringEntries = recipe.authoring ?? [];
+
+  // ⚠️ **免费拦停**：三件「调用方/清单的错」，全部在**第一笔钱之前**（与 `dependsOn` 那条同一条规矩）。
+  for (const a of authoringEntries) {
+    if ((MASTER_SOURCES as readonly string[]).includes(a.source.kind)) continue;
+    throw new Error(
+      `母版 "${a.id}" 的 \`source.kind="${a.source.kind}"\` **没有实现**（票 13 的 Q1：只实现了 ` +
+      `\`image\` 与 \`import\` 两条）。⚠️ \`drawlist\` 在契约里也合法，但母版**不是** \`AssetSpec\`，` +
+      `画它的那条路要改生成器签名 —— 今天没人要，所以**没实现就喊**，不静默退回另一种画法。`);
+  }
+  if (authoringEntries.some((a) => a.source.kind === "image") && opts.generateImage === undefined)
+    throw new Error('authoring[] 里有 source.kind="image" 的母版，但调用方没给 generateImage —— 这是**调用方的 bug**，不静默跳过');
+
+  /** 这条 `characterId` 的基因。⚠️ **给了 DNA 文件却查不到 ⇒ 抛**（不是回落）：静默回落就是换了个角色。 */
+  const dnaOrThrow = (characterId: string, who: string): CharacterDNA => {
+    const hit = opts.characterDna?.characters.find((c) => c.id === characterId);
+    if (hit !== undefined) return hit;
+    throw new Error(
+      opts.characterDna === undefined
+        ? `${who} 的 characterId="${characterId}"，而调用方**没给 character-dna** ⇒ 这一张画不出来：` +
+          "母版是**基因的一张渲染图**（票 04），没有基因就只剩一句人写的描述可照。"
+        : `${who} 的 characterId="${characterId}" 在这份 character-dna.json 里**没有对家** —— ` +
+          "⚠️ 文件给了、id 却查不到，是**文书自相矛盾**（不是「这个角色没有基因」那种回落）。");
+  };
+
+  // ⚠️ **资产的基因在开跑前一次算完**（免费）：`buildOne` 里那次查找若放在第一笔调用之后，
+  //   一个写错的 id 就要等到钱花出去才被发现。
+  const assetDna: (CharacterDNA | undefined)[] = recipe.assets.map((e) =>
+    // ⚠️ **没给 DNA 文件 ⇒ 回落**（不是错）：8 份 fixture 与「人给一张参考图」那条老路照旧。
+    opts.characterDna === undefined || e.spec.characterId === undefined
+      ? undefined
+      : dnaOrThrow(e.spec.characterId, `资产 "${e.spec.id}"`)
+  );
+
+  // ⚠️ **母版的基因同样在开跑前一次算完**（免费）：`image` 的母版是「基因的一张渲染图」，
+  //   没有基因就画不出来 —— 而那该在**第一笔钱之前**知道（不是等别的资产都跑完了才报）。
+  const masterDna = new Map<string, CharacterDNA>();
+  for (const a of authoringEntries)
+    if (a.source.kind === "image") masterDna.set(a.id, dnaOrThrow(a.characterId, `母版 "${a.id}"`));
+
+  if (authoringEntries.length > 0) {
+    fs.mkdirSync(path.join(packDir, "authoring", "masters"), { recursive: true });
+    // 母版也看世界的风格图（它是这个世界的角色）—— 与资产那一发同一条路。
+    const masterStyleRef = recipe.referenceImage
+      ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, recipe.referenceImage)))
+      : undefined;
+    await Promise.all(
+      authoringEntries.map(async (a) => {
+        try {
+          const ref = `authoring/masters/${a.id}.png`;
+          if (a.source.kind === "import") {
+            // 人作（或上一次跑出来的）母版：一条路径。⚠️ 与资产的 `import` 同一条规则：**相对配方文件**解析。
+            const img = decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, a.source.ref)));
+            const bad = masterRatioMismatch(a.size, img);
+            if (bad !== null) throw new Error(bad);
+            fs.writeFileSync(path.join(packDir, ref), encodePNG(img));
+            masterImages.set(a.id, img);
+            return;
+          }
+          // `image`：DNA 的八个字段 + 世界风格 → 一张位图。⭐ 这就是「DNA → 母版」那条箭头。
+          const dna = masterDna.get(a.id)!;   // ⚠️ 开跑前算好的（上面那次「免费拦停」）
+          const prompt = masterPrompt({ master: a, dna, style, canvas: a.size });
+          // ⚠️ **失败必须吞在闸门**里面**（Q5：只阻断**引用它的**资产）。
+          //   那道 `imageGate` 是「失败即止」的共享信号（`semaphore` 的 `catch` 会
+          //   `stop.error ??= e`）—— 从它里面抛出去 = **全包即止**，而 Q5 裁的是「只阻断引用它的那些」。
+          await imageGate(async () => {
+            try {
+              // ⚠️ **发出即记**（与资产那一发同款）：这一笔已经花出去了 —— 它回不回来是另一回事。
+              const rec: LedgerCall = { step: "master", target: a.id, attempts: 1 };
+              opts.ledger?.push(rec);
+              const { image, call } = await opts.generateImage!(
+                {
+                  prompt,
+                  // ⚠️ **canonical 画布**（票 13 的 Q2：「size 是 canonical target；provider 尺寸是派生值」）
+                  //   —— 上游那张尺寸表（`requestSize` / `geminiAspect` / `openaiSize`）由协议**自己**换算。
+                  size: { w: a.size.w, h: a.size.h },
+                  negativePrompt: masterNegativePrompt(),
+                  ...(masterStyleRef ? { styleReference: masterStyleRef } : {}),
+                },
+                { onFailure: (f) => Object.assign(rec, f) }
+              );
+              Object.assign(rec, {
+                upstream: call.protocol, ms: call.ms, attempts: call.attempts,
+                ...(call.requestedSize !== undefined ? { requestedSize: call.requestedSize } : {}),
+                ...(call.requestedModel !== undefined ? { requestedModel: call.requestedModel } : {}),
+                ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
+                ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
+                ...(call.usage !== undefined ? { usage: call.usage } : {}),
+              } satisfies Omit<LedgerCall, "step" | "target">);
+              imageCalls.push({ assetId: a.id, master: true, ...call });
+              // ⚠️ **比例判据**（Q2）：回来的图与 canonical 画布对不上就抛 —— 它是参考图，
+              //   比例错了整条动画链一起错（票 22 那条「画布尺寸才是真约束」）。
+              const bad = masterRatioMismatch(a.size, image);
+              if (bad !== null) throw new Error(bad);
+              fs.writeFileSync(path.join(packDir, ref), encodePNG(image));
+              fs.writeFileSync(path.join(packDir, ref.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
+              masterImages.set(a.id, image);
+            } catch (e) {
+              // ⚠️ **吞在闸门里面**、只记在这一格 —— 不踢那道共享闸（见上）。
+              masterFailure.set(a.id, e instanceof Error ? e.message : String(e));
+            }
+          });
+        } catch (e) {
+          // ⚠️ 闸门外那一层接的是**非调用**的错（读文件、写文件…）—— 同样只记、不往外抛。
+          masterFailure.set(a.id, e instanceof Error ? e.message : String(e));
+        }
+      })
+    );
+  }
 
   // ⚠️ **失败不立刻抛**（2026-09-30 · 票 05）：并发在飞的**已经付过钱** —— 等它们收尾，
   //   多救几张原图进失败现场，账也更准（发出即记那一条让「花了几笔」成为事实）。
@@ -309,7 +454,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   const depFailure = new Map<string, string>();
 
   /** 造**一个**资产。⚠️ 抽成函数只是为了让外面能套一层「先等依赖」—— 里面的逻辑一个字没动。 */
-  const buildOne = async (entry: { spec: AssetSpec; source: AssetSourceLike }, idx: number) => {
+  const buildOne = async (
+    entry: { spec: AssetSpec; source: AssetSourceLike }, idx: number,
+    /** 这个资产的角色的基因（票 13）。⚠️ **开跑前算好的**（`assetDna`）—— 这里不再查、不会抛。 */
+    dna?: CharacterDNA
+  ) => {
       const spec = entry.spec;
       opts.onProgress?.(idx, recipe.assets.length, spec.id);
       const plan = framePlan(spec);
@@ -347,9 +496,18 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         const styleReference = recipe.referenceImage
           ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, recipe.referenceImage)))
           : undefined;
-        const reference = src.reference
+        // ⚠️ **参考图的两条路**（票 13）：`spec.masterAsset`（这个角色的母版，一个 **id**）
+        //   或 `src.reference`（一张**路径**）。契约**不许两个都写**（票 13 的 Q4 那条免费拒），
+        //   所以这里最多命中一条 —— 而「谁赢」这种问题因此根本不用答。
+        const master = spec.masterAsset === undefined ? undefined : masterImages.get(spec.masterAsset);
+        if (spec.masterAsset !== undefined && master === undefined)
+          // ⚠️ **一个字节都不往外发**：照着一张不存在的参考图画是白花钱（与 `dependsOn` 那条同款）。
+          throw new Error(
+            `资产 "${spec.id}" 的母版 "${spec.masterAsset}" **没造出来**（${masterFailure.get(spec.masterAsset) ?? "原因未知"}）` +
+            " —— ⚠️ 参考图不成立时发出去的那一笔是白花的钱（票 13 的 Q5）。");
+        const reference = master ?? (src.reference
           ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
-          : undefined;
+          : undefined);
         // ⚠️ **一个 unit 一次调用**。unit 的划分与 drawlist 路线的 `framePlan` **对称**（票 43）：
         //   · animation → 一个**动画**一个 unit（实测把 14 帧塞进一次调用，模型只给回来 1 个角色）
         //   · 分层背景 → **一层**一个 unit（票 40 撞到的那个洞：以前只出一张图，而 plan 有 N 项，
@@ -374,6 +532,9 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           const prompt = src.prompt ?? imagePrompt(spec, style, {
             ...(u.anim === undefined ? {} : { anim: u.anim }),
             ...(u.layer === undefined ? {} : { layer: u.layer }),
+            // ⚠️ **有 DNA 就把身份那一句换成基因的八个字段**（票 13 的 Q3，人类裁定「替换，不是叠加」）；
+            //   没有 DNA（不是角色 / 调用方没给文件）就照旧用 `spec.description`。
+            ...(dna === undefined ? {} : { dna }),
           });
           // ⚠️ 过**生图**那道闸 —— 一次调用就是一笔钱，别把它和文本调用共用一个上限
           // ⚠️ **发出即记**（2026-09-30 · 票 05）：这一笔**已经花出去了** —— 它回不回来是另一回事。
@@ -568,7 +729,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
                 "⚠️ 依赖不成立时发出去的那一笔是白花的钱（票 11 的 Q4）"
             );
         }
-        const out = await buildOne(entry, idx);
+        const out = await buildOne(entry, idx, assetDna[idx]);
         mine?.resolve();
         return out;
       } catch (e) {
@@ -581,6 +742,14 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   // ⚠️ 逐条看过再抛**第一条**失败 —— 取**清单顺序**，与「谁先挂」无关（并发下那个不可复现）
   const firstFailure = settled.find((r): r is PromiseRejectedResult => r.status === "rejected");
   if (firstFailure) throw firstFailure.reason;
+  // ⚠️ **母版失败也要说出来**（票 13 的 Q5）：它不踢那道共享闸、也只阻断引用它的资产 ——
+  //   但**没人引用它**时若就这么过去，包会「成功」而清单里那张母版**根本没造出来**（错得安静）。
+  const masterBad = [...masterFailure.entries()][0];
+  if (masterBad !== undefined)
+    throw new Error(
+      `创作态母版 "${masterBad[0]}" 没造出来：${masterBad[1]}\n` +
+      "⚠️ 引用它的资产已经**没有上路**（那几笔钱省下来了），而这一份包**不交付** —— " +
+      "母版是创作态，但它缺失说明清单与这次构建对不上（票 13 的 Q5）。");
 
   // ── 按 kind 各打一份图集（票 24：四类的最优打包参数不同）──────────────────
   const ATLAS_NAME: Record<string, string> = { sprite: "sprites", animation: "animations", background: "backgrounds", ui: "ui" };
