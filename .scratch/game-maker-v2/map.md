@@ -199,6 +199,48 @@ Effort: game-maker-v2
 > ✅ **前沿现在是 15 / 19 / 22 / 26 / 29 / 30 / 32 七张**（13 关掉**当场解冻 15** —— 它是 15 的最后一个前置）。
 > ⚠️ 前沿以**扫描**为准，不以本节的叙述为准。
 
+> ⚠️ **2026-10-07：票 15 的**设计面**收敛（三轮 18 问，**施工待做** —— 尚未进 Decisions）** ——
+> [15. `packages/pipeline` + `createGame`](issues/15-pipeline-create-game.md) 终于不只是「把函数串起来」，
+> 而是把**单游戏一次创建运行**立成一条有名字的生命周期：**显式 `RunHandle`** + 三次状态转移
+> （`openRun` 分配版本、开临时目录 / `commitRun` 改名定稿、撞名即原子抢 / `abandonRun` 改名 `failed-<ts>`，
+> **只改名不删**），而 **`gameId` 迟到**这件事（它只在 plan 之后才知道）正是「先临时后改名」的由来。
+> ⚠️ **人类在第二、三轮加的那条正式规则是这一票的骨**：「同一 Run 可以有**多次 construction attempt**；
+> **首次 attempt 默认与 Run version 对齐**；之后每次新的 attempt 用**由父 Run 显式分配**的新子树版本；
+> **所有子步骤只接受调用方传入的 version，禁止自行计算**；**失败 attempt 不消耗已提交版本**。」
+> ⇒ 于是 `buildAssetPack` 里那个 `nextPackVersion`（与 site 那一侧同款）要开「调用方指定则不重算」的口子，
+> 而 **site 的口子与接线播给票 16**。
+> ⚠️ 另外四条要紧的：① **九项落 `run/v<N>/`**，清单与 config **移进去**（`recipes/` 与 `game-configs/` 退役）；
+> ② **两份账、语义不同**（包里那份是**包的收据**，`run/` 那份是**链级并集**）；③ **`characterRef` 是 DNA 的
+> 唯一通道**（pipeline 只写清单、`packAssets` 读它 —— 单跑的 `pack` 与新链走同一条电路），并补上引用族缺的那一格
+> （**有 `characterId` 而 `characterRef` 缺席 ⇒ 生成开始前拒**）；④ **包内带一份 `visual-world.json`、
+> 但不动 `provenance`**（升版会判死**两份入库的 v2 fixture 包** —— `fixtures/packs/*/manifest.json`）。
+> ⚠️ QA 被立成**明确扩展点**（`QaRunner`/`QaContext` 住 `contracts`，`createGame` 收 `qa?`，
+> **今天缺席要说得出口**）⇒ `run/v<N>/qa-report.json` 今天不会出现，那一格由票 17-20 补。
+> ⚠️ **人类点名的验收面是五个 invariant**（Run 身份 · 构建 attempt 的版本 · recipe 磁盘真相 ·
+> character 引用完整性 · 失败现场保留）—— 「实现时最值得盯住的不是能不能跑通」。
+> ✅ **票 16 的最后一个前置是它**：15 一关，16 当场解冻（不过本票自己的施工还没做）。
+
+> ⚠️ **2026-10-07：票 15 已关** —— **`packages/pipeline` 从空骨架变成了一条真的链**，而**设计面**（三轮 18 问）
+> 上一轮就已经收敛：**单游戏一次创建运行**立成了一条有名字的生命周期（`RunHandle` + 三次状态转移），
+> 而施工把那 18 条裁决**逐条落成了代码**。**36 条新测试 · 套件 1036/1036**（此前 1007）· 14 发变异全红。
+> ⚠️ **人类那条正式规则是这一票的骨**（原话）：「同一 Run 可以有多次 construction attempt；首次 attempt
+> 默认与 Run version 对齐；之后每次由**父 Run 显式分配**新子树版本；**所有子步骤只接受调用方传入的
+> version，禁止自行计算**；**失败 attempt 不消耗已提交版本**。」⇒ 口子开在 `buildAssetPack`（`opts.version`，
+> 给了就**不自算**）与 `packAssets`；**site 那一侧的同类口子播给票 16**。
+> ⚠️ **三处落盘纪律**：① 清单与 config **移进 `run/v<N>/`**（create 链；单跑 `plan` 仍走旧路径）；
+> ② **两份账、语义不同** —— 包里那份是**包的收据**，`run/` 那份是**链级并集**，而它是**新契约
+> `run-ledger/v1`**（`Ledger` 那个形状带 `packId`/`packVersion`，硬套会写出说谎的字段）；
+> ③ 包内**带一份 `visual-world.json`**（拷进 `authoring/`，自动进 `files[]`、拿 checksum）而 `provenance` **一个字不动**。
+> ⚠️ **`characterRef` 那条死路径活了**：pipeline **只写清单**、`packAssets` 读它装载 DNA（单跑的 `pack`
+> 与新链走**同一条电路**），并补上引用族缺的那一格（**有 `characterId` 而 `characterRef` 缺席 ⇒ 生成开始前拒**）。
+> ⚠️ **施工时留下的七处判断**（裁决没覆盖到，见票的 §10.2）：版本分配从 `openRun` 挪到 `commitRun`
+> （那时才知道 gameId）、失败现场分两种位置（定了 id ⇒ `<gameId>/run/failed-<ts>`，没定 ⇒ `out/.failed-<ts>`）、
+> 理解段**随步落盘**（否则现场是空的）、第二次 attempt 的 config 覆盖 run 里那份（派生量）、
+> 旧路径**留着**、`analyzeReference` 多了个 `cwd`、建站仍然在 CLI 那一层（pipeline 够不着 `demo`）。
+> ✅ **前沿现在是 16 / 17 / 18 / 19 / 22 / 26 / 29 / 30 / 32 九张** —— 15 一关，**16 与 17/18 当场解冻**
+> （19/22/26/29/30/32 本来就在前沿上）。
+> ⚠️ 前沿以**扫描**为准，不以本节的叙述为准。
+
 ## Destination
 
 仓库升级到 **V2**：一条命令
@@ -396,6 +438,7 @@ Style Image + Game Intent
 ## Decisions so far
 
 <!-- 索引：一行一张已关的票，够判断相关性即可，细节 zoom 进票 -->
+- [`packages/pipeline` + `createGame`：一条链串起来，产物落 `run/v<N>/` 落地](issues/15-pipeline-create-game.md)：**单游戏一次创建运行**成了一条有名字的生命周期（`RunHandle`：`openRun` 只开临时目录 / `commitRun(run, gameId)` 改名定稿、**撞名即原子抢** / `abandonRun` 改名 `failed-<ts>`、**只改名不删**），而两段 API（`runUnderstanding` → 检查点 → `runBuild` **只吃 runDir**）把 R9 的人工点落在清单处。⚠️ **人类那条正式规则**：「同一 Run 允许多次 construction attempt；首次与 Run 版本对齐；之后每次由父显式分配；**子步骤禁止自行计算 version**；失败 attempt **不消耗已提交版本**」⇒ 口子开在 `buildAssetPack`/`packAssets`，**site 那侧播给 16**。⚠️ 四条要紧的：① **九项落 `run/v<N>/`**（清单与 config 移进去；单跑 `plan` 仍走旧路径）· ② **两份账语义不同** —— 包里那份是包的收据、`run/` 那份是**链级并集**，而后者是**新契约 `run-ledger/v1`**（`Ledger` 带 `packId`/`packVersion`，硬套会说谎）· ③ 包内**带 `visual-world.json`** 而 `provenance` 一个字不动（升版会判死两份**入库的** v2 fixture 包）· ④ **`characterRef` 那条死路径活了**（pipeline 只写清单、`packAssets` 读它装载 DNA ⇒ 单跑与新链同一条电路），并补上引用族缺的那格（**有 `characterId` 而 `characterRef` 缺席 ⇒ 生成开始前拒**）。⚠️ **QA 是明确扩展点**（`QaRunner`/`QaContext` 住 `contracts`，pipeline 落盘、缺席要说得出口）⇒ 今天 `qa-report.json` 不出现。⚠️ **施工时七处判断**（票 §10.2）：版本分配挪到 `commitRun`（那时才知道 gameId）· 失败现场分两种位置 · **理解段随步落盘**（否则现场是空的）· 第二次 attempt 的 config 覆盖 run 里那份（派生量）· 旧路径留着 · `analyzeReference` 多一个 `cwd` · 建站仍在 CLI 那一层（够不着 `demo`）。⚠️ **判据**：**36 条新测试 · 套件 1036/1036**（此前 1007）· `tsc -b` / `pnpm typecheck` 干净 · 两个守卫绿 · **14 发变异全红**（含五个 invariant 各一发）。✅ **16 与 17/18 当场解冻。**
 - [母版 → 动画：`character-gen.ts` 与 `character-reference` 策略落地](issues/13-character-master-gen.md)：**`DNA → 母版 → 动画` 这条链通了** —— 母版有**两条路**（`import`：手作那张位图自然落进来，零调用 · `image`：DNA 的八个字段 + 世界风格 → 一张位图，⭐ 票 04 那条箭头的字面兑现），而 **`drawlist` 明确不实现**（生成器签名吃 `AssetSpec`，母版不是它）。⚠️ **人类这一轮的三处收紧**：① 身份台账**必须是 8 个 DNA 字段**（`id` 也在里面，而那一行写着「不许画进图里」）；② `styleRef`（指向 `stylespec.json` 的路径）**永不触发**那条「参考图会被静默丢掉」的拒；③ `master.ts` 收紧职责、**CLI/DNA 接线留给 15/16**。⚠️ 另外四处要紧的：**(a)** **两条边今天才真的被执行**：`masterAsset` 在契约里躺了两票（票 11 只把它画进环检测）——接线是「母版前段产出的位图当 `reference` 内联进资产那一发」，而**没塞进依赖 DAG**（母版没有出边）；**(b)** **失败语义**：母版挂了**不踢共享闸**（否则全包即止）· **只阻断引用它的资产** · 而整包**仍然失败**（不静默）；**(c)** `source.reference` 与 `masterAsset` **双写直接拒**（生成那一步只收得下一张参考图）；**(d)** **Q6 的免费拦停**：`dashscope-mcp` + 真有一张参考图要递 ⇒ 开跑前拒（那条协议的 `tools/call` 参数里根本没有那两个键，传了**静默丢掉**、账上不记）。⚠️ **判据**：**31 条新测试 · 套件 1007/1007**（此前 976）·`tsc -b` / `pnpm typecheck` 干净 · 两个守卫绿 · **10 发变异全红** · **真探针 n=4 臂 / 10 张真图**（母版回图 832×1248 与 canonical 64×96 **比例一致** · 有参考图 vs 无参考图的**原图逐字节不同** ·打架时**参考图赢长相、文字赢东西** · 母版的那一发 31s、动画那一发 57s）。⚠️ **一处派生**：动画那一发的反向提示词与它自己的正向要求打架（`imageNegativePrompt()` 里有 `"character"`，而动画那一发要求画 N 个角色）—— 没动（票 51 的纪律：别跟一段量出来的话对着写）。✅ **票 15 当场解冻**（它是 15 的最后一个前置）。
 - [character-dna-gen：`VisualWorldSpec` + 设计层实体 → `CharacterDNA` 落地](issues/31-character-dna-gen.md)：**理解层的第五发**（`compile-character-dna`，住 `packages/game-design/`），也是第一条**一次调用产一族记录**的调用。⚠️ **人类这一轮的三处收紧是本票的骨**：① 「逐字抄世界那五格」的检查**做了**，但**称谓一律「守门人 · 必要不充分」**（换一个标点就绕过 ⇒ 不许被引用成判据；而**工具说明里反着写** —— 不出现「逐字」，只说「类 vs 个体」「落到这一个身上」）；② **集合相等（设计层角色实体 ⟷ `characters[].id`）升格为核心构造性 gate**，牙齿是「**两头都报、报的话不一样**」；③ Q5 的边界：**两条检查都阻断**（都算 `schema` ⇒ 重采样），但**称谓分明**。⚠️ 另外三处要紧的：**(a)** `id` 沿用的**机制换了形状** —— `style.id` 那种「注入 + 强制覆盖」在这里没有良定义（`id` 是**键**不是标量），改成「提示词给 id + 装配核集合」，而那条校验**正好就是**票面 §5 要的构造性判据（Q3 与 §5 合成一条）；**(b)** 兑现了 `01 §7` **早就判过、契约里没人实现**的那条判决（空串不算 ⇒ `character-dna.ts` 补顶层 gate：trim 后非空 + 数组元素非空，而 `"none"` 是**合法值**、三个数组**本身可空** —— 两者都逐条写在「不进 gate」里）；**(c)** ⚠️ **本票发现但故意没做的一条**：DNA 的 `palette:N` **今天没有任何东西查它落在世界色板里**（跨契约 ⇒ 装配步是天然落点）—— 不动它是因为 Q5 只裁了两条、人类还收紧过那个两档分法 ⇒ 记为派生。⚠️ **落地形状**：`build-character-dna.ts`（纯）+ `compile-character-dna.ts`（I/O）· **一个注入都没有**（与票 09 的干净同款、理由相反）· R16 · `LedgerStep += "character-dna"` · 工具名 `emit_character_dna` · `max_tokens = 16_000` · **不做 CLI** · **不写文件**（落盘归票 15）· 本步**只有一条错误路**（DNA 侧没有 R12 那种拒绝）。⚠️ **判据**：**48 条新测试 · 套件 976/976**（此前 928）· 16 发变异全红 · **真探针 n=4**（首发 4/4 · 非人形 `e-drone` 两发都老实写 `face:"none"`/`clothing:"none"` 而 `gear` 给了具体物 · 整句抄 0/4 ⚠️ 这条读数**弱**：世界那份是英文、产物是中文 · 一族一次 935~1195 token / 2~3 角色 ⇒ `max_tokens` 有 ~13 倍余量）。✅ **票 13 当场解冻。**
 
@@ -444,8 +487,9 @@ Style Image + Game Intent
   塔防是现成的候选，但它**不进新链**，所以等真有人要第二个成员再量。
 - **无参考图时视觉观察怎么报**：`review.ts` 今天喂的是 contact sheet（见上），
   原图进来之后两边怎么比、比不过时说什么，都还没量。
-- **生图并发与 `run/v<N>/` 的关系**：并发上限（`pack --concurrency`）与「失败时半成品怎么落」
-  在新增了理解层之后会不会变，要等链跑起来才知道。
+- ✅ **「生图并发与 `run/v<N>/` 的关系」已毕业**（[票 15](issues/15-pipeline-create-game.md)）：
+  并发上限**不变**（仍是 `pack --concurrency`，闸门与「失败即止」一个字不动）；「失败时半成品怎么落」
+  在 run 这一层有了答案 —— **临时目录 → 定稿 / `failed-<ts>`**，且**失败不占版本号**。
 - **提示词自动优化**（改良，不挡终点）。
 
 - **动画那一发的反向提示词与正向要求打架**（票 13 派生）：`pack.ts` 对**每一次**生图都递

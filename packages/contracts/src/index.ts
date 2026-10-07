@@ -95,6 +95,8 @@ export * from "./structured-call.js";
 
 // ── 一次资源生成「花了什么」的账（跟着包走的收据）──────────────────────────
 export * from "./ledger.js";
+// ⚠️ **链级的账**（票 15）—— 与包那份同口径、不同射程（见那个文件的文件头）。
+export * from "./run-ledger.js";
 export * from "./coverage.js";
 
 // ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────

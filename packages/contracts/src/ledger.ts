@@ -132,7 +132,9 @@ export const LedgerCall = z.object({
   usage: LedgerUsage.optional(),
 }).strict();
 
-const CallCount = z.object({
+/** ⚠️ **导出**（2026-10-07 · 票 15）：`run-ledger` 的 `byStep` 与这份**逐字同形** ——
+ *  两份账是两种视图，而「一格 = 一次调用、`attempts` = 往返」这条口径只有一份定义。 */
+export const CallCount = z.object({
   calls: z.number().int().nonnegative(),
   /** 往返总数。⚠️ `> calls` 就是「重试过」的证据（`CONTEXT.md`「调用 / 往返」那条纪律的落点）。 */
   attempts: z.number().int().nonnegative(),

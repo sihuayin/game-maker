@@ -1,10 +1,12 @@
-// ⚠️ **骨架，尚未实现。**
+// **端到端流水线**：一条 `create` 链串起来（票 15）。
 //
-// 这一包要做的事在
-// `../../../.scratch/game-maker-v2/issues/15-pipeline-create-game.md`
-// —— 那才是有消费者的地方；这里空空如也**是有意的**。
+// ⚠️ 本包是**唯一**把新包串起来的地方（R11 的依赖图）—— 而它**够不着 `demo`**：
+//   **站点装配不在这一层**（它归 CLI / MCP，票 16）。
 //
-// 它现在存在的唯一理由：让 `scripts/check-deps.mjs` 与根 `tsconfig.json` 能**先表态**
-// （见票 07 的 Answer —— 那个守卫是**双向**的，图和 `packages/` 必须时刻同步），
-// 从而下游那张票写代码时不必再碰构建管线。
-export {};
+// ⚠️ 三个模块各管一件事，别混：
+//   · `run.ts`      —— **一次运行的生命周期**（`RunHandle` + 三次状态转移 + 版本分配）；
+//   · `artifacts.ts`—— `run/v<N>/` 里那九项的**写与读**（序列化只此一处）；
+//   · `create-game.ts` —— 两段（理解 / 构建）与 `createGame` 的串联。
+export * from "./run.js";
+export * from "./artifacts.js";
+export * from "./create-game.js";

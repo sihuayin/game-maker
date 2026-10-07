@@ -48,6 +48,15 @@ export type AnalyzeReferenceInput = {
   requirementText: string;
   /** 风格身份（R2-Q2：参考图 basename 的 slug，由 CLI 生成）。提示词递给模型照抄，这里**强制覆盖**。 */
   styleId: string;
+  /**
+   * `styleReferences[].path` **相对谁解析**（默认 `process.cwd()`）。
+   *
+   * ⚠️ 2026-10-07（票 15）加上它：那几条相对路径是**调用方给的**，而「相对谁」是个真问题 ——
+   *   CLI 从哪儿跑就是哪；而 pipeline 里的 `createGame` 可能带着一个**别的**工作目录。
+   *   ⚠️ 形状是仓库现成的规矩（R5）：**环境由壳读、core 只收结构体** ——
+   *   与 `resolveImageTransport({env, cwd})` 同款，**不**让这一层去读全局状态。
+   */
+  cwd?: string;
   transport: { baseUrl: string; apiKey: string };
   /** 测试可注入（`review.ts` 同款用法）。 */
   fetchImpl?: typeof fetch;
@@ -156,7 +165,7 @@ function assertRequirement(text: string): string {
   return t;
 }
 
-function imageBlocks(refs: StyleReference[]): Record<string, unknown>[] {
+function imageBlocks(refs: StyleReference[], cwd: string): Record<string, unknown>[] {
   return refs.map((r) => {
     const ext = path.extname(r.path).toLowerCase();
     const media = MEDIA_TYPES[ext];
@@ -164,7 +173,7 @@ function imageBlocks(refs: StyleReference[]): Record<string, unknown>[] {
       throw new Error(`参考图 ${r.path} 的扩展名 "${ext}" 不在白名单里（${Object.keys(MEDIA_TYPES).join(" / ")}）` +
         " —— 我们**按扩展名**判媒体类型，不解析图片内容（R1-Q7）。");
     let bytes: Buffer;
-    try { bytes = fs.readFileSync(r.path); }
+    try { bytes = fs.readFileSync(path.resolve(cwd, r.path)); }
     catch (e) { throw new Error(`参考图读不出来：${r.path} —— ${(e as Error).message}`); }
     return { type: "image", source: { type: "base64", media_type: media, data: bytes.toString("base64") } };
   });
@@ -219,6 +228,8 @@ async function onceThrough(o: {
 export async function analyzeReference(input: AnalyzeReferenceInput): Promise<AnalyzeReferenceResult> {
   assertConfigured(input.transport);
   const styleReferences = assertStyleReferences(input.styleReferences);
+  /** ⚠️ 参考图那几条相对路径**相对谁** —— 调用方给（见 `AnalyzeReferenceInput.cwd`）。 */
+  const cwd = input.cwd ?? process.cwd();
   const requirementText = assertRequirement(input.requirementText);
 
   const doFetch = input.fetchImpl ?? fetch;
@@ -228,7 +239,7 @@ export async function analyzeReference(input: AnalyzeReferenceInput): Promise<An
     ...forcedTool(TOOL_NAME, TOOL_DESCRIPTION, ModelFacingSpec),
     messages: [{
       role: "user",
-      content: [...imageBlocks(styleReferences), { type: "text", text: visionPrompt({ requirementText, styleId: input.styleId }) }],
+      content: [...imageBlocks(styleReferences, cwd), { type: "text", text: visionPrompt({ requirementText, styleId: input.styleId }) }],
     }],
   });
 

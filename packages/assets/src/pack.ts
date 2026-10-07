@@ -14,7 +14,7 @@ import { createHash } from "node:crypto";
 import {
   ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, derivePackMode, paletteBindingOf, summarizeCalls,
   type AssetPackManifest, type AssetSpec, type AuthoringAsset, type CharacterDNA, type CharacterDNAFile,
-  type DrawList, type Ledger, type LedgerCall, type StyleSpec,
+  type DrawList, type Ledger, type LedgerCall, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -67,6 +67,24 @@ export type BuildPackOptions = {
   generate: DrawListGenerator;
   /** 清单里有 `kind: "image"` 的资源时必填，否则**开跑前**就失败（不静默跳过）。 */
   generateImage?: ImageGenerator;
+  /**
+   * **调用方显式指定的包版本号**（票 15 的 Q16/Q17 那条正式规则）。
+   * 给了就**绝不自算** —— 「子树版本号一律由父运行显式给定，**子步骤禁止自行计算**」。
+   * 不给（单跑 `pack`）才落到 `nextPackVersion`。
+   * ⚠️ 它与「失败不消耗版本号」是一对：`.building-<pid>-<version>` 只有在 `renameSync` 那一刻
+   *   才变成 `pack/v<version>`，中途挂掉 ⇒ 现场改名 `failed-<ts>`，那个 N **没被用掉**。
+   */
+  version?: number;
+  /**
+   * 这个世界的 `VisualWorldSpec`（票 15 的 Q15 α）：给了就**拷一份进包**
+   * （`authoring/visual-world.json`），让包自描述到**类型化视图**那一层
+   * （`StyleSpec` 只是文字转述，拿不回 `camera.mode` 这类封闭枚举）。
+   *
+   * ⚠️ **不动 `provenance`**：它是 `.strict()`，加一格就是升版（`assetpack/v2 → v3`），
+   *   而升版会**判死磁盘上那份入库的 v2 包**（`fixtures/packs/…`）—— 纯**增加一个文件**
+   *   不需要动契约：`files[]` 是 `walk(packDir)` 穷举 ⇒ 它自动进 checksum 覆盖。
+   */
+  visualWorld?: VisualWorldSpec;
   /**
    * 角色的**基因**（票 13）。**给了才用** —— 不给就整条回落（提示词照旧用 `spec.description`），
    * 所以磁盘上那 8 份 fixture 与「人给一张参考图」那条老路**一字不改**。
@@ -274,7 +292,8 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
 
   const { recipe, style, outDir, generate } = opts;
   const palette = normalizePalette(style.palette);
-  const version = nextPackVersion(outDir, recipe.id);
+  // ⚠️ **显式优先**（票 15 的 Q16/Q17）：调用方给了就**一个字节都不自算**。
+  const version = opts.version ?? nextPackVersion(outDir, recipe.id);
   const finalDir = path.join(outDir, recipe.id, "pack", `v${version}`);
   // ⚠️ **先建在工作目录里，成功之后再改名过去。**
   //   否则一次失败的构建会留下一个半成品 `v<N>`，还白吃掉一个版本号 ——
@@ -288,6 +307,12 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   fs.mkdirSync(path.join(packDir, "authoring", "imported"), { recursive: true });
   // 生图产物的原图与提示词落在这里（这两个目录是**创作态**，与 imported/ 并列）
   fs.mkdirSync(path.join(packDir, "authoring", "generated"), { recursive: true });
+
+  // ⚠️ **包内那份 `VisualWorldSpec`**（票 15 的 Q15 α）：写在**任何资产之前** ——
+  //   `files[]` 是最后那一次 `walk(packDir)` 穷举，所以写在这里它自动进 checksum 覆盖，
+  //   而 manifest 的 `provenance` **一个字都不动**（见那个字段的注释）。
+  if (opts.visualWorld !== undefined)
+    fs.writeFileSync(path.join(packDir, "authoring", "visual-world.json"), jstr(opts.visualWorld));
 
   type Built = { spec: AssetSpec; origin: "generated" | "imported"; paletteBinding: "exact" | "composited" | "quantized"; frames: { name: string; state?: string; image: RasterImage }[]; animations?: { name: string; frames: string[]; fps?: number; loop: boolean }[]; authoring: { kind: "drawlist" | "bitmap"; ref: string; original?: string }[] };
   /** 生图调用的账 —— 一次调用就是一笔钱，逐条记下来交调用方报出来。 */

@@ -20,6 +20,10 @@ Map: ../map.md
 CharacterDNA · Generation Strategy」**，并且补一句**「不要只把 VisualWorldSpec 转成文本 Prompt」**；
 `02 Phase 8` 是同一张单子。而**今天 `VisualWorldSpec` 一个消费者都没有**：
 
+> ⚠️ **2026-10-07 更新（票 15 关掉时）**：`buildAssetPack` 的入参里**现在有了** `visualWorld?`
+> （票 15 的 Q15 α：把一份 `VisualWorldSpec` **拷进包**的 `authoring/visual-world.json`）。
+> ⚠️ **但那是「带一份」，不是「读它」** —— 生图提示词那一侧仍然零消费者，本票的问题一个字没变。
+
 - `buildAssetPack`（`pack.ts:37`）的入参里**根本没有 VWS** —— 那是个结构子集类型，只有
   `{recipe, style, referenceImage, assets}`；
 - `imagePrompt(spec, style)` / `renderPrompt(spec, style)` 各只拿**两样**；

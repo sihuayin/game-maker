@@ -9,12 +9,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, ConfigToolSchema, entityBox, FALLBACK_ANCHOR, forcedTool, GameDesignSpecSchema,
+  auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, entityBox, FALLBACK_ANCHOR, forcedTool,
+  GameDesignSpecSchema,
   parseAssetPack, parseGameConfig, parseLedger, parseRecipe, parseToolUse, PLATFORMER_V1,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   summarizeCalls, VisualWorldSpecSchema,
-  type AssetPackManifest, type CallFailure, type ConfigIssue, type LedgerCall, type LedgerStep,
-  type LedgerUsage, type StructuredSchema, type StyleSpec,
+  type AssetPackManifest, type CallFailure, type CharacterDNAFile, type ConfigIssue, type LedgerCall,
+  type LedgerStep, type LedgerUsage, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
@@ -983,6 +984,11 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
 // ── pack：清单 → 资源包 ─────────────────────────────────────────────────────
 export type PackOptions = {
   recipePath: string; outRoot: string; transport: Transport;
+  /** ⚠️ **显式包版本号**（票 15 的 Q16/Q17）：给了就**绝不自算**。拿来给 create 链用。 */
+  version?: number;
+  /** 这个世界（`run/v<N>/visual-world.json`）：给了就拷一份进包（票 15 的 Q15 α）。
+   *  ⚠️ 路径**相对配方文件**解析 —— 与 `styleRef` / `source.ref` / `characterRef` 同一条规则。 */
+  visualWorldPath?: string;
   /** 生图上游。清单里有 `kind:"image"` 的资源时必填 —— 缺了就是**用法错**（2），不是上游错。 */
   imageTransport?: ImageTransport;
   fetchImpl?: typeof fetch;
@@ -1015,6 +1021,46 @@ function imageGeneratorFor(t: ImageTransport, fetchImpl?: typeof fetch): ImageGe
     case "minimax":
       throw new CommandError("usage", `生图协议 "${t.protocol}" 的客户端**还没写**（已有的是 dashscope-mcp / gemini / openai）。不要猜形状 —— 猜错了就是花着钱拿到一个空回应。`);
   }
+}
+
+/**
+ * 读 `recipe.characterRef` 指向的那份基因（票 15 的 Q13）。
+ *
+ * ⚠️ **有 `characterId` 而 `characterRef` 缺席 ⇒ 拒**（票 15 的 Q18）：
+ *   票 04 的原话是「`AssetSpec.characterId` **必须命中** `character-dna.json` 里某条的 id」——
+ *   而票 13 那条**回落**说的是「**调用方没给 DNA 文件**」这种兼容情形；
+ *   一份**自己声明了 `characterId`** 的清单不属于那一类（那种清单画出来的角色是谁，就随提示词的缘了）。
+ */
+function readCharacterRef(recipe: { assets: readonly { spec: { id: string; characterId?: string } }[]; characterRef?: string }, recipeDir: string): CharacterDNAFile | undefined {
+  const claiming = recipe.assets.filter((a) => a.spec.characterId !== undefined);
+  if (recipe.characterRef === undefined) {
+    if (claiming.length > 0)
+      throw new CommandError("invalid",
+        `清单里有资产写了 \`characterId\`（第一个是 "${claiming[0]!.spec.id}" → "${claiming[0]!.spec.characterId}"），` +
+        `而这份配方**没有 \`characterRef\`** ⇒ 那个 id **无从命中**。\n` +
+        "⚠️ 两种都算错：要么这份清单**该有一份角色基因**（把 `characterRef` 指过去），" +
+        "要么那些 `characterId` **是多余的**（把它删掉 —— 全是道具的配方没有角色）。");
+    return undefined;
+  }
+  const p = path.resolve(recipeDir, recipe.characterRef);
+  let raw: unknown;
+  try { raw = JSON.parse(fs.readFileSync(p, "utf8")); }
+  catch (e) { throw new CommandError("invalid", `角色基因读不出来或不是 JSON：${p} —— ${(e as Error).message}`); }
+  const d = CharacterDNAFileSchema.safeParse(raw);
+  if (!d.success)
+    throw new CommandError("invalid", `角色基因不过 schema：${d.error.issues.slice(0, 4).map((i) => `${i.path.join(".")}: ${i.message}`).join("；")}`);
+  return d.data;
+}
+
+/** 读那份 `VisualWorldSpec`（票 15 的 Q15 α）。⚠️ 不过 schema ⇒ **拒**（它是产物，不是手写物）。 */
+function readVisualWorld(p: string): VisualWorldSpec {
+  let raw: unknown;
+  try { raw = JSON.parse(fs.readFileSync(p, "utf8")); }
+  catch (e) { throw new CommandError("invalid", `这个世界读不出来或不是 JSON：${p} —— ${(e as Error).message}`); }
+  const w = VisualWorldSpecSchema.safeParse(raw);
+  if (!w.success)
+    throw new CommandError("invalid", `这个世界不过 schema：${w.error.issues.slice(0, 4).map((i) => `${i.path.join(".")}: ${i.message}`).join("；")}`);
+  return w.data;
 }
 
 export async function packAssets(opts: PackOptions): Promise<CommandResult> {
@@ -1050,6 +1096,10 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
         `或者把这几张参考图从清单里去掉。`);
   }
 
+  // ⚠️ **DNA 的唯一通道是清单里那一格**（票 15 的 Q13）：pipeline **只写清单**、从不把对象递进来 ——
+  //   于是**单跑的 `pack`** 与新链走的是**同一条电路**。
+  const characterDna = readCharacterRef(r.value, path.dirname(path.resolve(opts.recipePath)));
+
   // ⚠️ 这个数组是**调用方与构建器共用**的：文本那一路由生成器直接记进来
   //   （`createDrawListGenerator({ onCall })`），生图那一路由 `buildAssetPack` 追加。
   //   ⚠️ 而它在这里**就存在了**，所以中途失败时已经花掉的那几笔还在 —— 那是票 46 的地基。
@@ -1060,6 +1110,11 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       recipe: r.value, style, outDir: opts.outRoot,
       // `source.ref` 相对**配方文件**解析（契约 `InputPath` 定的规则，与 `styleRef` 一致）
       recipeDir: path.dirname(path.resolve(opts.recipePath)),
+      ...(opts.version !== undefined ? { version: opts.version } : {}),
+      ...(opts.visualWorldPath !== undefined
+        ? { visualWorld: readVisualWorld(path.resolve(path.dirname(path.resolve(opts.recipePath)), opts.visualWorldPath)) }
+        : {}),
+      ...(characterDna !== undefined ? { characterDna } : {}),
       generate: createDrawListGenerator({
         baseUrl: opts.transport.baseUrl, apiKey: opts.transport.apiKey,
         onCall: (c) => ledger.push(c),

@@ -362,3 +362,30 @@ export const QA_JUDGEMENT_LABELS: Record<QAJudgement, string> = {
   "reachability": "可达性（boot → spawn → goal）",
   "intent-coverage": "意图覆盖（集合差）"
 };
+
+// ── QA 的**扩展点**（票 15 的 Q12）──────────────────────────────────────────
+//
+// ⚠️ **这两个类型住这里、不住 `pipeline`**：`packages/qa` 的白名单只有 `contracts`
+//   （`check-deps.mjs`）—— 类型住 pipeline，实现者就得**反向依赖**。
+// ⚠️ 而 `pipeline` 的白名单里**有** `qa`：所以那一侧将来 import 的是**实现**，
+//   两边共用的**形状**留在这里。
+
+/** 一次 QA 要看的四样东西。⚠️ **全是路径**：QA 跑在各步的产物都落盘**之后**（票 15 的 Q12）。 */
+export type QaContext = {
+  /** `run/v<N>/` 的绝对路径（设计 / 基因 / 清单都在里面）。 */
+  runDir: string;
+  /** `pack/v<N>/` 的绝对路径。 */
+  packDir: string;
+  /** 已落盘的 `game-config.json` 的绝对路径。 */
+  configPath: string;
+  gameId: string;
+};
+
+/**
+ * QA 的**扩展点** —— `createGame` 收一个可选的它（票 15 的 Q7「γ + α」）。
+ *
+ * ⚠️ **它只返回、不落盘**：写 `run/v<N>/qa-report.json` 的是 pipeline（票 15 的 Q3）。
+ * ⚠️ **它是可缺席的**：今天 `packages/qa` 还是空骨架（票 17-20）⇒ `createGame` 的返回里
+ *   **要说得出这一格缺席**，而不是假装查过。
+ */
+export type QaRunner = (ctx: QaContext) => Promise<QAReport>;
