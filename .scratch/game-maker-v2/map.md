@@ -261,6 +261,25 @@ Effort: game-maker-v2
 > ✅ **前沿现在是 17 / 18 / 19 / 22 / 26 / 29 / 30 / 32 八张**（16 关掉**没解冻 23** —— 它还在等 20）。
 > ⚠️ 前沿以**扫描**为准，不以本节的叙述为准。
 
+> ⚠️ **2026-10-08：票 17 已关** —— **Visual QA 的判据那一半落地**（`packages/qa/src/visual.ts`，
+> 那是那个空骨架的**第一个填充者**）。⚠️ **`03 §21` 那七项 `similarity` 一条判据都不加**（全是观察），
+> 而**当前包边界内可达**的两条构造性约束接进了 `QAReport`：`constructive-constraint`（逐资产调
+> **contracts 的** `auditAssetSpec` ⇒ 一行业务判断都没重写）与 `palette-binding`（**报表级对账**：
+> 逐条目的 `paletteBinding` ⟷ 包级 `palette.coverage` 那四个数 —— 它们是**同一件事的两种说法**）。
+> **16 条新测试 · 套件 1070/1070** · 8 发变异全红。
+> ⚠️ **`packages/qa` 的白名单只有 `contracts`（票 07）—— 这一条决定了射程**：扫不了像素（解码器住 `assets`）、
+> 够不着视口与 `auditGeometry`（住 `demo`）⇒ 于是 **`layer-coverage` 留在装配期、QA 的 `checked` 里没有它**
+> （人类裁的 β：**不重写**，第二份真相），另外三条 `reference-resolution`/`reachability`/`intent-coverage`
+> 明写归**票 18 / 19**。⇒ 本票之后 `qaVerdict` **必然是 `incomplete`** —— 那是**对的**，不是缺口：
+> `checked` 的意思是「这一次**真跑过**哪几条」，差集自己就说明了缺什么。
+> ⚠️ **观察那一栏空着**（人类的修正）：「不归我」**不许**拿 `unavailable` 表示（那个分支说的是
+> 「**我去拿了、没拿到**」）⇒ **空数组**。而 `review` 归票 22、`inspect` 的用色观察归票 20。
+> ⚠️ **写测试时撞出两处「契约已经挡在前面」的检查**：改 manifest 的帧数/色板大小，先炸的是**包契约**
+> ⇒ `palette.size == values.length` 那条**从 QA 里删掉了**（一条永远绿的判据），而「清单里有、包里没有」
+> 那条得从**清单**那一侧破坏才够得着 ✓ —— 两处都留了测试。
+> ✅ **前沿现在是 18 / 19 / 22 / 26 / 29 / 30 / 32 七张**（17 关掉**没解冻 20** —— 它还在等 18/19）。
+> ⚠️ 前沿以**扫描**为准，不以本节的叙述为准。
+
 ## Destination
 
 仓库升级到 **V2**：一条命令
@@ -458,6 +477,7 @@ Style Image + Game Intent
 ## Decisions so far
 
 <!-- 索引：一行一张已关的票，够判断相关性即可，细节 zoom 进票 -->
+- [Visual QA 的**判据**：只收构造性约束与层覆盖，七个 `similarity` 一个都不要落地](issues/17-qa-visual-judgements.md)：**`packages/qa` 从空骨架变成有实现的包**（`visual.ts` = 空骨架的**第一个填充者**），而 ⚠️ **`03 §21` 那七项 `similarity` 一条判据都不加** —— 逐项的理由分三种：`style`/`silhouette`/`composition`/`material` **没有可算的形式**；`character`/`animation consistency` 唯一可算的是外接矩形而**跳跃帧本来就该变**（票 13 的 Q7 裁过同一条）；⚠️ 而 `palette similarity` **别和 `palette-binding` 混**（后者是「颜色 ∈ 色板」= 判据 ✓）。⚠️ **白名单只有 `contracts`（票 07）决定了射程**：✅ `constructive-constraint`（逐资产调 **contracts 的** `auditAssetSpec`，**一行业务判断都没重写**）+ ✅ `palette-binding`（**报表级对账**：逐条目的 `paletteBinding` ⟷ 包级 `coverage` 四值 —— **同一件事的两种说法**，对不上就有一个在说谎）；❌ `layer-coverage`（规则要同时知道世界多宽与视口多大 ⇒ **住装配期**，那儿已经硬失败；人类裁 β：**不重写**，第二份真相）· ❌ `reference-resolution`/`reachability`（**票 18**）· ❌ `intent-coverage`（**票 19**）。⇒ 本票之后 `qaVerdict` **必然 `incomplete`** —— **那是对的**：`checked` = 「这一次真跑过哪几条」。⚠️ **观察那一栏空着**（人类修正：「不归我」**不许**拿 `unavailable` 表示 —— 那个分支说的是「我去拿了、没拿到」）；`review` 归票 22、`inspect` 用色观察归票 20。⚠️ **两处「契约已经挡在前面」的检查**（写测试时撞出来的）：改 manifest 的帧数/色板大小先炸**包契约** ⇒ `palette.size == values.length` **从 QA 删掉**（永远绿的判据），而「清单里有、包里没有」得从**清单**侧破坏才够得着 —— 两处都留了测试。⚠️ **判据**：**16 条新测试 · 套件 1070/1070**（此前 1054）· typecheck 全绿 · 守卫绿 · **8 发变异全红**（其中一发第一遍是绿的 ⇒ 补了「响了就是 `fail`」那条 —— `severity` 才是让裁决**阻断**的东西）。
 - [CLI `create`：`--style` + `--intent`，以及唯一的检查点落地](issues/16-cli-create.md)：**V2 那条链在 CLI 上有了入口**，而**人工点只有一个、就在清单处**（R9）—— `create`（理解段）跑到清单**打印摘要就退出**（退出码 **0** + `data.status = awaiting`，机器可读），`build <runDir>` 接着跑（生图 → 配置 → **站点**），`--yes` 一路到底，而**两条路的产物逐字节等价**（有测试钉着）。⚠️ **检查点是一次成功的返回、不是一次交互**（CLI 零交互、MCP 无交互 ⇒ 交互式会把它变成 CLI 独有的东西）；停的时候必须让「要不要花这笔钱」看得见：run 目录 · 清单摘要 · **生图资产数** · **`ambiguity[]` 逐条**（票 03 押在这一票上的两条之一 —— **兑现**了 ⇒ 字段**留下**）· 下一步那两行命令。⚠️ **`--intent` 一条死线**（像路径就当路径，否则裸文本）+ **两档退出码**（参数错 2 · 模型没过契约 **4** —— 与 `plan`/`pack` 同档）。⚠️ **七条旧命令一条没删**；`--style` 今天**恰好一张**（票 26 延后）；MCP 加了第七个工具 `create_game`（无交互 ⇒ 自动跳过检查点）；站点的 **N 由父给**（票 15 的口子开在 `layout.ts`）。⚠️ **施工时撞出五处**（票 §5）：**`parseArgs` 一直在 `try` 外面**（参数错崩栈、退 1 而表上写 2）· `--style` 的绝对路径被契约拒（壳要相对化）· 外壳 bundle 按 `cwd` 找 · **理解层错误类壳不认识** ⇒ 退成 1（**E2E 当场撞出来的**，已修）· **跨包 TS import 过不了 `rootDir`**（TS6059）⇒ 假上游骨架挪进 `fixtures/upstream/canned.json`。⚠️ **判据**：**18 条新测试 · 套件 1054/1054**（此前 1036）· typecheck 全绿 · 两个守卫绿 · **12 发变异全红** · **E2E 真跑 4 次**（全停在上游、一次都没走到生图 ⇒ 没花生成的钱；而它照出的退出码缺陷已修）。
 - [`packages/pipeline` + `createGame`：一条链串起来，产物落 `run/v<N>/` 落地](issues/15-pipeline-create-game.md)：**单游戏一次创建运行**成了一条有名字的生命周期（`RunHandle`：`openRun` 只开临时目录 / `commitRun(run, gameId)` 改名定稿、**撞名即原子抢** / `abandonRun` 改名 `failed-<ts>`、**只改名不删**），而两段 API（`runUnderstanding` → 检查点 → `runBuild` **只吃 runDir**）把 R9 的人工点落在清单处。⚠️ **人类那条正式规则**：「同一 Run 允许多次 construction attempt；首次与 Run 版本对齐；之后每次由父显式分配；**子步骤禁止自行计算 version**；失败 attempt **不消耗已提交版本**」⇒ 口子开在 `buildAssetPack`/`packAssets`，**site 那侧播给 16**。⚠️ 四条要紧的：① **九项落 `run/v<N>/`**（清单与 config 移进去；单跑 `plan` 仍走旧路径）· ② **两份账语义不同** —— 包里那份是包的收据、`run/` 那份是**链级并集**，而后者是**新契约 `run-ledger/v1`**（`Ledger` 带 `packId`/`packVersion`，硬套会说谎）· ③ 包内**带 `visual-world.json`** 而 `provenance` 一个字不动（升版会判死两份**入库的** v2 fixture 包）· ④ **`characterRef` 那条死路径活了**（pipeline 只写清单、`packAssets` 读它装载 DNA ⇒ 单跑与新链同一条电路），并补上引用族缺的那格（**有 `characterId` 而 `characterRef` 缺席 ⇒ 生成开始前拒**）。⚠️ **QA 是明确扩展点**（`QaRunner`/`QaContext` 住 `contracts`，pipeline 落盘、缺席要说得出口）⇒ 今天 `qa-report.json` 不出现。⚠️ **施工时七处判断**（票 §10.2）：版本分配挪到 `commitRun`（那时才知道 gameId）· 失败现场分两种位置 · **理解段随步落盘**（否则现场是空的）· 第二次 attempt 的 config 覆盖 run 里那份（派生量）· 旧路径留着 · `analyzeReference` 多一个 `cwd` · 建站仍在 CLI 那一层（够不着 `demo`）。⚠️ **判据**：**36 条新测试 · 套件 1036/1036**（此前 1007）· `tsc -b` / `pnpm typecheck` 干净 · 两个守卫绿 · **14 发变异全红**（含五个 invariant 各一发）。✅ **16 与 17/18 当场解冻。**
 - [母版 → 动画：`character-gen.ts` 与 `character-reference` 策略落地](issues/13-character-master-gen.md)：**`DNA → 母版 → 动画` 这条链通了** —— 母版有**两条路**（`import`：手作那张位图自然落进来，零调用 · `image`：DNA 的八个字段 + 世界风格 → 一张位图，⭐ 票 04 那条箭头的字面兑现），而 **`drawlist` 明确不实现**（生成器签名吃 `AssetSpec`，母版不是它）。⚠️ **人类这一轮的三处收紧**：① 身份台账**必须是 8 个 DNA 字段**（`id` 也在里面，而那一行写着「不许画进图里」）；② `styleRef`（指向 `stylespec.json` 的路径）**永不触发**那条「参考图会被静默丢掉」的拒；③ `master.ts` 收紧职责、**CLI/DNA 接线留给 15/16**。⚠️ 另外四处要紧的：**(a)** **两条边今天才真的被执行**：`masterAsset` 在契约里躺了两票（票 11 只把它画进环检测）——接线是「母版前段产出的位图当 `reference` 内联进资产那一发」，而**没塞进依赖 DAG**（母版没有出边）；**(b)** **失败语义**：母版挂了**不踢共享闸**（否则全包即止）· **只阻断引用它的资产** · 而整包**仍然失败**（不静默）；**(c)** `source.reference` 与 `masterAsset` **双写直接拒**（生成那一步只收得下一张参考图）；**(d)** **Q6 的免费拦停**：`dashscope-mcp` + 真有一张参考图要递 ⇒ 开跑前拒（那条协议的 `tools/call` 参数里根本没有那两个键，传了**静默丢掉**、账上不记）。⚠️ **判据**：**31 条新测试 · 套件 1007/1007**（此前 976）·`tsc -b` / `pnpm typecheck` 干净 · 两个守卫绿 · **10 发变异全红** · **真探针 n=4 臂 / 10 张真图**（母版回图 832×1248 与 canonical 64×96 **比例一致** · 有参考图 vs 无参考图的**原图逐字节不同** ·打架时**参考图赢长相、文字赢东西** · 母版的那一发 31s、动画那一发 57s）。⚠️ **一处派生**：动画那一发的反向提示词与它自己的正向要求打架（`imageNegativePrompt()` 里有 `"character"`，而动画那一发要求画 N 个角色）—— 没动（票 51 的纪律：别跟一段量出来的话对着写）。✅ **票 15 当场解冻**（它是 15 的最后一个前置）。
