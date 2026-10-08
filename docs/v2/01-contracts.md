@@ -604,9 +604,16 @@ R3 只收三类：**集合差 · 构造性约束 · 引用族**。门槛是 `CON
 | `palette-binding` | 色板绑定四值自洽（`exact`/`composited`/`quantized`/`unbound`） | `assetpack.ts` · `quantize.ts`（[票 36]） |
 | `constructive-constraint` | `size` 与帧 bounds 一致 · `anchor` ∈ [0,1] · 九宫格只在面板上读 | `pack.ts` · 校验处 |
 | `layer-coverage` | 不平铺的层 ≥ 视口；**最远那层必须 100%** | 装配期（`pack.ts` 已硬失败） |
-| `reference-resolution` | `hud.panel` 必须是 `ui` · 砖的尺寸 == `arena.cell` · 引用解得到（含 `characterId`） | `game-config.ts` · `td-config.ts` |
-| `reachability` | 冒烟：`boot → spawn → goal` 可达 | ⚠️ **怎么跑还没定**（[票 18] §2） |
+| `reference-resolution` | `hud.panel` 必须是 `ui` · 砖的尺寸 == `arena.cell` · 引用解得到 ⚠️ **只吃引用族** | `auditReferences()`（`game-config.ts`）· `td-config.ts` |
+| `reachability` | 冒烟：`boot → spawn → goal` 可达 —— **纯层的静态可达性**（不跑游戏），**只报够不到**的终点与拾取物 | `auditReachability()`（`game-config.ts`，[票 18]） |
 | `intent-coverage` | 集合差：意图里每个实体/机制在设计里**有对应项** | `game-intent.ts` × `game-design.ts`（见 §11） |
+
+⚠️ **更正（[票 18]，2026-10-08）**：上表原来把 **`characterId`** 列在 `reference-resolution` 名下，
+那是**串了侧** —— `characterId` 住 `AssetSpec`（**清单**，不在 `game-config` 里），而
+「它必须命中一条 `CharacterDNA`」由 **`pack` 抛**（`pack.ts` 的 `dnaOrThrow`），是**资源侧**的事。
+config 侧那一族碰不到它。⚠️ 而 `reference-resolution` **只吃引用族**（`auditReferences()`）——
+`auditGameConfig` 的自洽族（东西摆在世界外 · 出生点卡在墙里）**不在任何一条 QA 判据里**，
+它归 `compile-runtime` / `site` 的硬失败（[票 18] 的 Q1(b)：同一次拒绝不说第二遍）。
 
 ⚠️ **尺寸那条判据是劈开的**：**config 侧**的关系（砖 == `arena.cell`）归 `reference-resolution`；
 **asset 侧**自身（声明的 `size` 与帧 bounds）归 `constructive-constraint`。
@@ -640,7 +647,10 @@ JudgementResult = { ran: true;  findings: QAFinding[] }   // findings 空 = 成�
 
 ## 自白：今天恒真的三件事
 
-1. **六条判据 6/6 全跑** ⇒ `"incomplete"` **今天走不到**。真口子在 [票 18] §2。
+1. **六条判据今天 6/6 跑得动** ⇒ `"incomplete"` 的来源只剩「**链上还没接的那一族**」。
+   ⚠️ [票 18] 已把「冒烟可达**怎么跑**」定了（纯层静态可达性，不跑游戏），
+   而**装配**那一侧仍空着：三个族是**分别**产自己那几条的（`QaFamilyResult`），
+   谁把它们凑成一份报告、谁补齐两条观察，归 [票 20]。
 2. **`severity: "warning"` 今天一条都不报** —— 类型允许，报不报是[票 20] §3 的事。
 3. **`checked` 今天恒等于全集，是链的性质、不是类型的要求。**
 

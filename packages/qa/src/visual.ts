@@ -36,17 +36,30 @@
 //     `checked` 的意思是「**这一次真跑过哪几条**」（票 06），差集自己就说明了缺什么。
 //
 // ─────────────────────────────────────────────────────────────────────────────
-// 四、**观察那一栏空着**（票 17 的 Q4，人类裁定）
+// 四、⚠️ **出口是「族结果」而不是一份报告**（票 18 的 R2-Q4，与 `gameplay.ts` 统一）
 //
-//   `review`（视觉差异）归票 22、`inspect` 的用色观察归票 20 —— 本 Runner **一个都不跑**。
+//   本族**只声明自己那两条**（`QaFamilyResult.judgements` 是 `Partial`）—— 缺席 = **不归我**。
+//   谁把三族凑成一份 `qa-report.json`、谁补齐那两条观察，归**票 20**（合成器）。
+//   ⚠️ 而在票 18 之前这里返回的是**整份报告**，另外四条 `ran:false` 各带一句「归谁」——
+//   那正是「**替别人填格子**」，也是这份报告**落盘过不了 `qa-report/schema` 的原因**（票 18 实测）。
+//
+//   剩下的四条**归谁**（那些「归谁」原来写在 `ran:false` 的 reason 里，现在归这里）：
+//     · `layer-coverage`   —— 装配期（见上面三）；
+//     · `reference-resolution` / `reachability` —— **玩法族**（`gameplay.ts`）；
+//     · `intent-coverage`  —— 意图族（票 19）。
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// 五、**观察那一栏空着**（票 17 的 Q4，人类裁定）
+//
+//   `review`（视觉差异）归票 22、`inspect` 的用色观察归票 20 —— 本族 **一个都不跑**。
 //   ⚠️ 而且**不许拿 `unavailable` 去表示「这不归我」**：那个分支的意思是
 //     「**我去拿了、没拿到**（并说得出为什么）」，而「不归我」是**没有这一条** ⇒ **空数组** ✓。
 import fs from "node:fs";
 import path from "node:path";
 import {
-  auditAssetSpec, buildQAReport, parseAssetPack, parseDrawList, parseRecipe,
+  auditAssetSpec, parseAssetPack, parseDrawList, parseRecipe,
   type AssetPackEntry, type AssetPackManifest, type AssetSpec, type DrawList, type JudgementResult,
-  type QAFinding, type QAJudgementResults, type QAReport, type QaContext, type QaRunner,
+  type QAFinding, type QaContext, type QaFamilyResult, type QaFamilyRunner,
 } from "@game-maker/contracts";
 
 /** ⚠️ 坏 JSON 要说得清**是哪一样东西、哪个文件**（`JSON.parse` 的原话里只有后者）。 */
@@ -59,34 +72,28 @@ const read = (p: string, what: string): unknown => {
 const ran = (findings: QAFinding[]): JudgementResult => ({ ran: true, findings });
 
 /**
- * **Visual QA 的 Runner**（票 15 的 `QaRunner` 缝的第一个实现）。
+ * **视觉族**的 `QaFamilyRunner`（本包的第一份实现）。
  *
- * ⚠️ 它**只返回**报告：写 `run/v<N>/qa-report.json` 的是 pipeline（票 15 的 Q3）。
+ * ⚠️ 它**只声明自己那两条**、**只返回不落盘**：写 `run/v<N>/qa-report.json` 的
+ *   （以及把三族凑成一份的）是装配那一侧（票 15 的 Q3 · 票 20）。
  * ⚠️ 它读的三样都在 `ctx` 指着的目录里：`runDir/asset-recipe.json` · `packDir/manifest.json` ·
  *   包内那些创作态 drawlist（`manifest.assets[].authoring[]` 指着）✓。
  */
-export const visualQaRunner: QaRunner = async (ctx: QaContext): Promise<QAReport> => {
+export const visualQaRunner: QaFamilyRunner = async (ctx: QaContext): Promise<QaFamilyResult> => {
   const recipe = parseRecipe(read(path.join(ctx.runDir, "asset-recipe.json"), "清单"));
   if (!recipe.ok) throw new Error(`清单读不回来或不过契约：${recipe.errors.slice(0, 4).join("；")}`);
   const manifest = parseAssetPack(read(path.join(ctx.packDir, "manifest.json"), "包清单"));
   if (!manifest.ok) throw new Error(`包清单读不回来或不过契约：${manifest.errors.slice(0, 4).join("；")}`);
 
-  // ⚠️ **六格要给全**（`QAJudgementResults` 是**全映射**）：跑了的给 `{ran:true}`，
-  //   剩下的给 `{ran:false, reason}`。⚠️ 那个 `reason` **只在产侧被读到**（落盘的形式是「不在 `checked` 里」）
-  //   —— 所以它写的是「**这条今天归谁**」，好让下一个人接得上。
-  const results: QAJudgementResults = {
-    "constructive-constraint": constructiveConstraint(recipe.value.assets, manifest.value, ctx.packDir),
-    "palette-binding": paletteBinding(manifest.value),
-    "layer-coverage": { ran: false, reason:
-      "层覆盖的规则要**同时**知道世界多宽与视口多大（480×270 是外壳常量）⇒ 它住**装配期**（`demo` 的 auditGeometry，那儿已经硬失败）。" +
-      "⚠️ 本包的白名单只许依赖 contracts ⇒ 这里**故意不重写**（第二份真相）。" },
-    "reference-resolution": { ran: false, reason: "config 侧那一半的引用族归票 18 的玩法判据族。" },
-    "reachability": { ran: false, reason: "冒烟可达（boot → spawn → goal）归票 18 —— 「怎么跑」也在那一票里定。" },
-    "intent-coverage": { ran: false, reason: "意图的集合差归票 19。" },
+  // ⚠️ **只放自己那两条**（其余四条缺席 = 不归我，见文件头四）。
+  return {
+    judgements: {
+      "constructive-constraint": constructiveConstraint(recipe.value.assets, manifest.value, ctx.packDir),
+      "palette-binding": paletteBinding(manifest.value)
+    },
+    // ⚠️ **观察那一栏空着**（见文件头五）。
+    observations: []
   };
-
-  // ⚠️ **观察那一栏空着**（见文件头四）。
-  return buildQAReport(results, []);
 };
 
 /**

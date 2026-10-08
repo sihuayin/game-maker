@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { qaVerdict, type QAReport, type QaContext } from "@game-maker/contracts";
+import type { QaContext, QaFamilyResult } from "@game-maker/contracts";
 import { visualQaRunner } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -35,27 +35,29 @@ const patch = (ctx: QaContext, f: (m: ReturnType<typeof load>) => void): void =>
   f(m);
   fs.writeFileSync(manifestPath(ctx), JSON.stringify(m, null, 2) + "\n");
 };
-const run = (ctx: QaContext): Promise<QAReport> => visualQaRunner(ctx);
+const run = (ctx: QaContext): Promise<QaFamilyResult> => visualQaRunner(ctx);
+
+/** ⚠️ **测试自己的**摊平小工具：把族结果铺成「带判据名的一列失败」。
+ *  真正的投影（`checked` / `failures` 那份报告）归**票 20** 的合成器 —— 这里不替它做。 */
+const flat = (r: QaFamilyResult) => Object.entries(r.judgements)
+  .flatMap(([j, res]) => (res.ran ? res.findings.map((f) => ({ ...f, judgement: j })) : []));
+const keys = (r: QaFamilyResult) => Object.keys(r.judgements).sort();
 type AnyManifest = { assets: { id: string; size: { w: number; h: number }; paletteBinding: string }[]; palette: { size: number; ref: string; coverage: { exact: number } } };
 
 describe("§干净的真包：两条判据都跑、都没有怨言", () => {
-  it("`checked` 恰好是那两条（`layer-coverage` **不在**里 —— 它住装配期）", async () => {
+  it("⚠️ **只声明自己那两条** —— 另外四条**缺席**，不是 `ran:false`（票 18 的 R3-Q1：缺席 = 不归我）", async () => {
     const r = await run(stage());
-    expect([...r.checked].sort()).toEqual(["constructive-constraint", "palette-binding"]);
-    expect(r.failures).toEqual([]);
+    expect(keys(r)).toEqual(["constructive-constraint", "palette-binding"]);
+    expect(flat(r)).toEqual([]);
   });
 
   it("⚠️ **观察那一栏是空的** —— 不是 `unavailable`（那说的是「我去拿了、没拿到」）", async () => {
     expect((await run(stage())).observations).toEqual([]);
   });
 
-  it("⚠️ 于是裁决是 **`incomplete`** —— 那是对的：六条里今天只真跑过两条", async () => {
-    expect(qaVerdict(await run(stage()))).toBe("incomplete");
-  });
-
-  it("`format` 是契约那份（报告的形状由票 06 定，这里不另立）", async () => {
-    expect((await run(stage())).format).toBe("qa-report/v1");
-  });
+  // ⚠️ 票 17 在这里还断过两件事，**都跟着出口改成族结果搬走了**：
+  //   · 「裁决是 `incomplete`」—— `qaVerdict` 吃的是**整份报告**，而凑成报告的是票 20；
+  //   · 「`format` 是契约那份」—— 族结果里没有 `format`，那是报告的字段。
 });
 
 describe("§故意损坏 ①：构造性约束**真的会响**", () => {
@@ -65,9 +67,9 @@ describe("§故意损坏 ①：构造性约束**真的会响**", () => {
       const a = (m as unknown as AnyManifest).assets.find((x) => x.id === "player-traveler")!;
       a.size = { w: a.size.w + 1, h: a.size.h };
     });
-    const r = await run(ctx);
-    expect(r.failures).toHaveLength(1);
-    const f = r.failures[0]!;
+    const all = flat(await run(ctx));
+    expect(all).toHaveLength(1);
+    const f = all[0]!;
     expect(f.judgement).toBe("constructive-constraint");
     expect(f.target).toBe("player-traveler");
     expect(f.severity).toBe("error");
@@ -83,8 +85,7 @@ describe("§故意损坏 ①：构造性约束**真的会响**", () => {
     const spec = recipe.assets.find((a) => a.spec.id === "player-traveler")!.spec;
     spec.animations = spec.animations?.map((an, i) => (i === 0 ? { ...an, frames: an.frames + 1 } : an));
     fs.writeFileSync(recipePath, JSON.stringify(recipe, null, 2) + "\n");
-    const r = await run(ctx);
-    expect(r.failures.some((f) => f.judgement === "constructive-constraint" && /帧/.test(f.detail))).toBe(true);
+    expect(flat(await run(ctx)).some((f) => f.judgement === "constructive-constraint" && /帧/.test(f.detail))).toBe(true);
   });
 });
 
@@ -97,8 +98,7 @@ describe("§故意损坏 ①'：清单里有、包里没有", () => {
     const recipe = JSON.parse(fs.readFileSync(recipePath, "utf8")) as { assets: { spec: { id: string }; source: unknown }[] };
     recipe.assets.push({ ...recipe.assets[0]!, spec: { ...recipe.assets[0]!.spec, id: "prop-人加的箱子" } });
     fs.writeFileSync(recipePath, JSON.stringify(recipe, null, 2) + "\n");
-    const r = await run(ctx);
-    const f = r.failures.find((x) => x.target === "prop-人加的箱子")!;
+    const f = flat(await run(ctx)).find((x) => x.target === "prop-人加的箱子")!;
     expect(f.judgement).toBe("constructive-constraint");
     expect(f.severity).toBe("error");          // ⚠️ 「没做出来」不是「也许吧」—— 它得阻断
     expect(f.detail).toMatch(/没被做出来/);
@@ -112,19 +112,16 @@ describe("§故意损坏 ①'：清单里有、包里没有", () => {
     const dl = JSON.parse(fs.readFileSync(dlPath, "utf8")) as { viewBox: number[] };
     dl.viewBox = [0, 0, dl.viewBox[2]! + 1, dl.viewBox[3]!];
     fs.writeFileSync(dlPath, JSON.stringify(dl, null, 2) + "\n");
-    const r = await run(ctx);
-    expect(r.failures.some((f) => f.judgement === "constructive-constraint" && /viewBox/.test(f.detail))).toBe(true);
+    expect(flat(await run(ctx)).some((f) => f.judgement === "constructive-constraint" && /viewBox/.test(f.detail))).toBe(true);
   });
 });
 
-describe("§响了就是 **`fail`**（不是 `incomplete`）", () => {
-  it("⚠️ 判据说「错」的那一档 `severity` 必须是 `error` —— 它才是让裁决**阻断**的那个东西", async () => {
+describe("§响了就是 **`error`**（那一档才是让裁决**阻断**的东西）", () => {
+  it("⚠️ 判据说「错」的时候一律 `severity: \"error\"` —— 降成 `warning` 就悄悄不阻断了", async () => {
     const ctx = stage();
     patch(ctx, (m) => { (m as unknown as AnyManifest).palette.coverage.exact += 1; });
-    const r = await run(ctx);
-    expect(r.failures.every((f) => f.severity === "error")).toBe(true);
-    // ⚠️ 而这一条正是 `severity` 的用途：有 `error` ⇒ `fail`（降成 `warning` 就悄悄不阻断了）
-    expect(qaVerdict(r)).toBe("fail");
+    // ⚠️ 「有 `error` ⇒ `fail`」那句归票 20（只有它拿得到整份报告）—— 这里只钉 severity。
+    expect(flat(await run(ctx)).every((f) => f.severity === "error")).toBe(true);
   });
 });
 
@@ -132,9 +129,9 @@ describe("§故意损坏 ②：色板绑定**真的会响**", () => {
   it("把包级那四个数里的一个改掉 ⇒ 一条 `error`，而 `target` 是 `recipe`（它不是某个资产的事）", async () => {
     const ctx = stage();
     patch(ctx, (m) => { (m as unknown as AnyManifest).palette.coverage.exact += 1; });
-    const r = await run(ctx);
-    expect(r.failures).toHaveLength(1);
-    const f = r.failures[0]!;
+    const all = flat(await run(ctx));
+    expect(all).toHaveLength(1);
+    const f = all[0]!;
     expect(f.judgement).toBe("palette-binding");
     expect(f.target).toBe("recipe");
     expect(f.detail).toMatch(/说的是同一件事/);
@@ -145,15 +142,13 @@ describe("§故意损坏 ②：色板绑定**真的会响**", () => {
     patch(ctx, (m) => {
       (m as unknown as AnyManifest).assets.find((x) => x.id === "player-traveler")!.paletteBinding = "quantized";
     });
-    const r = await run(ctx);
-    expect(r.failures.some((f) => f.judgement === "palette-binding" && /quantized/.test(f.detail))).toBe(true);
+    expect(flat(await run(ctx)).some((f) => f.judgement === "palette-binding" && /quantized/.test(f.detail))).toBe(true);
   });
 
   it("把 `palette.ref` 指到 `files[]` 之外 ⇒ 也响（那份色板因此**在 checksum 覆盖之外**）", async () => {
     const ctx = stage();
     patch(ctx, (m) => { (m as unknown as AnyManifest & { palette: { ref: string } }).palette.ref = "authoring/不存在的色板.json"; });
-    const r = await run(ctx);
-    expect(r.failures.some((f) => f.judgement === "palette-binding" && /checksum/.test(f.detail))).toBe(true);
+    expect(flat(await run(ctx)).some((f) => f.judgement === "palette-binding" && /checksum/.test(f.detail))).toBe(true);
   });
 
   it("⚠️ 而 `palette.size == values.length` **不是这里的判据** —— 那是包契约自己的 superRefine 守住的", async () => {
@@ -165,12 +160,12 @@ describe("§故意损坏 ②：色板绑定**真的会响**", () => {
 });
 
 describe("§边界：本包**够不着**的东西，一条都不碰", () => {
-  it("`checked` 里没有 `layer-coverage` —— 它的规则住装配期（那儿已经硬失败）", async () => {
-    expect((await run(stage())).checked).not.toContain("layer-coverage");
+  it("没有 `layer-coverage` —— 它的规则住装配期（那儿已经硬失败）", async () => {
+    expect(keys(await run(stage()))).not.toContain("layer-coverage");
   });
 
-  it("也没有 18/19 那三条（它们各自的票还没落地）", async () => {
-    const c = (await run(stage())).checked;
+  it("⚠️ 也**没有**玩法那两条（它们归 `gameplay.ts`）与意图那一条（票 19 还没落地）", async () => {
+    const c = keys(await run(stage()));
     for (const j of ["reference-resolution", "reachability", "intent-coverage"]) expect(c).not.toContain(j);
   });
 

@@ -109,6 +109,11 @@ export * from "./command.js";
 // 已经存在的每一份横版关卡当场读不出来（那个坑 assetpack 的 v1→v2 踩过一次）。
 export * from "./game-config.js";
 export * from "./td-config.js";
+// ⚠️ **可达性**住 contracts 而**不在 `demo` 的纯层**（票 18 的裁决）：`packages/qa` 的白名单
+//   只有 `contracts`，而它要用 `entityBox` / `playerMoveOf` / `maxJumpHeight` 那三样原语 ——
+//   它们本来就在 `game-config.ts` 里。⚠️ 它**不**被 `compile-runtime` / `site` 调用：
+//   要不要让那两处也硬失败是**另一张票**（票 17 对 `layer-coverage` 判过同款）。
+export * from "./reachability.js";
 
 // ── 屏幕空间：两种玩法共用的那条判据与各自的 HUD 项清单（票 03 · 09）────
 export * from "./screen-space.js";

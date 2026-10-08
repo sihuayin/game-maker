@@ -222,10 +222,19 @@ export type ConfigIssue = {
  * 可通关那族精确可算，但**不构成判决** —— 越不过某块台阶可能正是设计（玩家该走另一条路）。
  * 与票 27 立的规矩一致：**精确的硬失败、上界的报警告**。
  */
-export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest): ConfigIssue[] {
+/**
+ * **引用族**（`03 §22` 的引用那一半）—— 票 18 从 `auditGameConfig` 里**抽出来的**。
+ *
+ * ⚠️ **为什么抽**：票 06 把 `reference-resolution` 这条判据的**家**钉在这里
+ *   （`qa.ts` 写着「住 `game-config.ts` 的 `auditGameConfig`」），而票 18 的裁决只要
+ *   **引用族**那一半 —— 自洽族不进 QA，它归 `compile-runtime` / `site` 的硬失败。
+ *   抽成一个具名函数之后，「哪几条属于引用族」在代码里**只有一处说法**。
+ * ⚠️ 而 `auditGameConfig` 仍然**调它** ⇒ 既有那两个调用点一行不改，报出来的东西一字不变
+ *   （**连顺序也一致**：引用族仍在最前）。
+ */
+export function auditReferences(config: GameConfig, manifest: AssetPackManifest): ConfigIssue[] {
   const out: ConfigIssue[] = [];
   const err = (where: string, message: string) => out.push({ severity: "error", where, message });
-  const warn = (where: string, message: string) => out.push({ severity: "warning", where, message });
 
   /**
    * **只看种类**：这个 id 在不在包里、是不是该有的那一类。**不解引用。**
@@ -256,10 +265,6 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
     return res;
   };
 
-  // ── 引用族（硬失败）────────────────────────────────────────────────────
-  const sizeOf = (assetId: string): { w: number; h: number } | null =>
-    manifest.assets.find((a) => a.id === assetId)?.size ?? null;
-
   ref("scene.background", { asset: config.scene.background.asset }, ["background"]);
   // ⚠️ 玩家**只核对种类，不在这里解引用** —— 它是「有多个可画动画」的常态资源，
   //   而下面那三个动作名才是真正要解的东西。
@@ -279,8 +284,25 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
   if (pickupCount(config) === 0)
     err("entities", "一个 pickup 都没有 —— 而 objective 是「捡齐 N 件再到达终点」，N = 0 让这一关没有内容");
 
+  return out;
+}
+
+export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest): ConfigIssue[] {
+  const out: ConfigIssue[] = [];
+  const err = (where: string, message: string) => out.push({ severity: "error", where, message });
+  const warn = (where: string, message: string) => out.push({ severity: "warning", where, message });
+
+  // ── 引用族（硬失败）────────────────────────────────────────────────────
+  // ⚠️ **只此一处实现**（票 18 的 R2-Q1）：本函数调它，QA 的 `reference-resolution` 也调它。
+  //   抄第二份 = 第二份真相 —— 两边的措辞会漂移，而措辞本身就是裁决过的东西。
+  out.push(...auditReferences(config, manifest));
+
   // ── 自洽族（硬失败）────────────────────────────────────────────────────
   const { w: W, h: H } = config.world.size;
+
+  /** 资源尺寸（manifest 上那一份）。取不到就当下面的兜底。 */
+  const sizeOf = (assetId: string): { w: number; h: number } | null =>
+    manifest.assets.find((a) => a.id === assetId)?.size ?? null;
 
   /** 资源级锚点（manifest 上那一份）。取不到就用兜底 —— 与外壳（票 44）同款。 */
   const anchorOf = (assetId: string | undefined) =>
