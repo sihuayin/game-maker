@@ -39,6 +39,8 @@ export type AssembleOptions = {
   shellJsPath: string;
   outRoot: string;
   gameId?: string;
+  /** ⚠️ **显式站点版本号**（票 16，承票 15：「父指定、子不自算」）。给了就不自算、撞名即拒。 */
+  siteVersion?: number;
 };
 
 /**

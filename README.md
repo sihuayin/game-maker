@@ -132,7 +132,7 @@ For the tower-defense route, read [`docs/td-requirement.md`](docs/td-requirement
 
 Two independent upstreams. Each is optional depending on which commands you run.
 
-**Text upstream** — used by `plan`, `compile-runtime`, `compile-td-game`:
+**Text upstream** — used by `create` / `build` / `plan`, `compile-runtime`, `compile-td-game`:
 
 ```bash
 export ANTHROPIC_BASE_URL=...
@@ -152,8 +152,10 @@ A pack whose recipe contains no image assets needs **no** image credentials at a
 ## CLI reference
 
 ```
+game-maker create          --style <one reference image> --intent <text | intent.md> [--yes] [--style-id <slug>] [--out <dir>] [--json]
+game-maker build           <run dir> [--out <dir>] [--concurrency <n>] [--json]
 game-maker plan            --design <game-design.json> --visual-world <visual-world.json> [--out <dir>] [--json]
-game-maker pack            --recipe <recipe.json> [--out <dir>] [--concurrency <n>] [--json]
+game-maker pack            --recipe <recipe.json> [--visual-world <visual-world.json>] [--version <n>] [--out <dir>] [--concurrency <n>] [--json]
 game-maker compile-runtime --design <game-design.json> --pack <pack dir> [--level <level id>] [--out <dir>] [--json]
 game-maker compile-td-game --requirement <requirement.md> --pack <pack dir> [--out <dir>] [--json]
 game-maker site            <pack dir> --config <level config> [--shell <shell.js>] [--out <dir>] [--json]
@@ -166,6 +168,20 @@ game-maker inspect         <pack dir> [--json]
 - `--concurrency <n>` — parallel generation cap.
 
 Exit codes: `0` success · `1` failure · `2` usage error · `3` upstream unreachable · `4` invalid pack/recipe.
+
+### `create` / `build`: the V2 chain, in two stages
+
+```bash
+game-maker create --style ./style.png --intent "a wasteland side-scroller scavenger game"
+# → out/<gameId>/run/v1/… (the understanding layer plus the recipe) — and it **stops there**:
+#   it prints how many assets will hit image generation and what you left unsaid, then exits 0
+game-maker build out/<gameId>/run/v1
+# → image generation → out/<gameId>/pack/v1 · config · site at out/<gameId>/site/v1
+```
+
+⚠️ **There is exactly one human checkpoint, and that stop is it** (R9). The recipe is the one artifact you may hand-edit; `build` then reads **the copy on disk**, so your edit takes effect. Add `--yes` to run straight through instead — the two paths produce **byte-identical** artifacts.
+
+⚠️ `--style` takes **exactly one** image today ([multiple style references](.scratch/game-maker-v2/issues/26-multiple-style-references.md) is deferred). `--intent` accepts two things: something that **looks like a path** (ends in `.md`/`.txt`, or contains a path separator) is read as a file; anything else is taken as the requirement text itself — so a mistyped filename fails loudly instead of being fed to the model as a sentence.
 
 Two properties worth knowing up front:
 

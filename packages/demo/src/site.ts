@@ -134,6 +134,8 @@ export type SiteOptions = {
   outRoot: string;
   /** 站点目录名。缺省用包自己的 id。 */
   gameId?: string;
+  /** ⚠️ **显式站点版本号**（票 16，承票 15 的 Q16/Q17：「父指定、子不自算」）。给了就不自算、撞名即拒。 */
+  siteVersion?: number;
 };
 
 const jstr = (o: unknown) => JSON.stringify(o, null, 2) + "\n";
@@ -197,6 +199,8 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   const laid = laySite({
     packDir: opts.packDir, outRoot, gameId, packVersion,
     shellJsPath: opts.shellJsPath, config, configFileName: "game-config.json",
+    // ⚠️ **父指定的版本号原样透下去**（票 15 的 Q16/Q17）—— 给了就不自算。
+    ...(opts.siteVersion !== undefined ? { siteVersion: opts.siteVersion } : {}),
   });
   const { siteDir, siteVersion: n, packCopied } = laid;
 

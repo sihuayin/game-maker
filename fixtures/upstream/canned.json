@@ -1,0 +1,394 @@
+{
+  "visualWorld": {
+    "format": "visual-world/v1",
+    "styleIdentity": {
+      "keywords": [
+        "低饱和",
+        "像素"
+      ],
+      "description": "黄昏的铁路小站"
+    },
+    "camera": {
+      "mode": "side"
+    },
+    "composition": {
+      "foreground": "铁轨与碎石",
+      "midground": "月台",
+      "background": "远山剪影",
+      "density": "中"
+    },
+    "lighting": {},
+    "character": {
+      "silhouette": "矮壮方头、硬边"
+    },
+    "environment": {
+      "architecture": "木构小站",
+      "terrain": "碎石与枕木"
+    },
+    "palette": {
+      "primary": [],
+      "secondary": [],
+      "accent": [],
+      "background": [],
+      "shadow": [],
+      "highlight": []
+    },
+    "materials": {},
+    "shapeLanguage": [],
+    "constraints": [],
+    "style": {
+      "id": "halt-dusk",
+      "identity": [],
+      "camera": {},
+      "composition": {},
+      "palette": [
+        "#2e3b4e",
+        "#4a6076"
+      ],
+      "lighting": {},
+      "shapeLanguage": [],
+      "material": [],
+      "environment": [],
+      "characterStyle": [],
+      "constraints": [],
+      "confidence": 0.5
+    }
+  },
+  "intent": {
+    "format": "game-intent/v1",
+    "title": "拾荒者",
+    "genre": "platformer",
+    "targetExperience": "荒凉、压抑",
+    "coreLoop": [
+      "在废土上跳跃移动",
+      "收集废料"
+    ],
+    "player": {
+      "role": "拾荒者",
+      "goals": [
+        "在天黑前抵达"
+      ]
+    },
+    "world": {
+      "theme": "后启示录废土",
+      "setting": "沙暴侵蚀的废弃都市",
+      "atmosphere": "荒凉孤寂"
+    },
+    "mechanics": [
+      {
+        "id": "m-jump",
+        "name": "跳跃"
+      }
+    ],
+    "entities": [
+      {
+        "id": "e-drone",
+        "type": "enemy",
+        "role": "巡逻的无人机"
+      }
+    ],
+    "winConditions": [
+      "抵达终点"
+    ],
+    "loseConditions": [],
+    "ambiguity": []
+  },
+  "design": {
+    "format": "game-design/v1",
+    "game": {
+      "title": "拾荒者",
+      "genre": "占位（装配时覆盖）",
+      "camera": "占位",
+      "runtimeProfile": {
+        "id": "占位",
+        "version": "1"
+      }
+    },
+    "coreLoop": [
+      "在废墟间探索并收集零件"
+    ],
+    "player": {
+      "id": "p-scavenger",
+      "role": "拾荒者",
+      "abilities": [
+        "跑"
+      ],
+      "goals": [
+        "在天黑前抵达"
+      ]
+    },
+    "enemies": [
+      {
+        "id": "e-drone",
+        "behavior": "沿月台往复巡逻",
+        "threat": "接触即伤"
+      }
+    ],
+    "npcs": [],
+    "interactables": [],
+    "resources": [],
+    "world": {
+      "theme": "废土",
+      "setting": "铁轨旁的废墟",
+      "structure": "三条横带：铁轨 / 月台 / 远山"
+    },
+    "levels": [
+      {
+        "id": "l-1",
+        "purpose": "教学",
+        "layout": "左侧出发、右侧终点",
+        "entities": [
+          "e-drone"
+        ]
+      }
+    ],
+    "progression": {
+      "model": "linear",
+      "description": "三关"
+    },
+    "mechanics": [
+      {
+        "id": "m-jump",
+        "mechanic": "jump"
+      }
+    ],
+    "winConditions": [
+      "抵达终点"
+    ],
+    "loseConditions": [],
+    "runtimeRequirements": []
+  },
+  "characterDna": {
+    "format": "character-dna/v1",
+    "characters": [
+      {
+        "id": "p-scavenger",
+        "identity": "沙暴废城里最后一个还在翻垃圾的人",
+        "silhouette": "比同类窄一号，左肩塌下去",
+        "face": "两个像素眼窝",
+        "clothing": "深蓝长大衣",
+        "gear": [
+          "半截撬棍"
+        ],
+        "palette": [
+          "palette:0"
+        ],
+        "visualConstraints": [
+          "帽檐压到眼线上方"
+        ]
+      },
+      {
+        "id": "e-drone",
+        "identity": "仍在按旧指令巡逻的无人机",
+        "silhouette": "扁平梭形，四角旋翼",
+        "face": "none",
+        "clothing": "none",
+        "gear": [],
+        "palette": [
+          "palette:1"
+        ],
+        "visualConstraints": []
+      }
+    ]
+  },
+  "gameConfig": {
+    "format": "game-config/v1",
+    "world": {
+      "size": {
+        "w": 480,
+        "h": 270
+      }
+    },
+    "scene": {
+      "background": {
+        "asset": "bg-dusk"
+      }
+    },
+    "player": {
+      "asset": "p-body",
+      "anims": {
+        "idle": "idle",
+        "run": "run",
+        "jump": "jump"
+      },
+      "at": {
+        "x": 40,
+        "y": 200
+      },
+      "move": {
+        "speed": 60,
+        "jumpVelocity": 180,
+        "gravity": 400
+      }
+    },
+    "terrain": [
+      {
+        "x": 0,
+        "y": 240,
+        "w": 480,
+        "h": 30
+      }
+    ],
+    "entities": [
+      {
+        "id": "e-pickup-1",
+        "kind": "pickup",
+        "at": {
+          "x": 120,
+          "y": 220
+        },
+        "asset": "ui-pip"
+      },
+      {
+        "id": "e-goal",
+        "kind": "goal",
+        "at": {
+          "x": 440,
+          "y": 220
+        },
+        "asset": "ui-pip"
+      }
+    ],
+    "hud": {
+      "panel": {
+        "asset": "ui-hud",
+        "at": {
+          "x": 4,
+          "y": 4
+        },
+        "size": {
+          "w": 48,
+          "h": 8
+        }
+      },
+      "pip": {
+        "asset": "ui-pip",
+        "at": {
+          "x": 6,
+          "y": 6
+        },
+        "step": {
+          "x": 5,
+          "y": 0
+        }
+      }
+    },
+    "objective": {
+      "kind": "collect-then-reach",
+      "gate": "e-goal"
+    }
+  },
+  "recipe": {
+    "format": "asset-recipe/v1",
+    "id": "PLACEHOLDER_ID",
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png",
+    "assets": [
+      {
+        "spec": {
+          "kind": "background",
+          "id": "bg-dusk",
+          "role": "黄昏的站台",
+          "description": "三条横带的站台背景",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 480,
+            "h": 270
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "animation",
+          "id": "p-body",
+          "role": "玩家：身体",
+          "description": "拾荒者的待机/走/跳",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 48
+          },
+          "required": true,
+          "characterId": "p-scavenger",
+          "animations": [
+            {
+              "name": "idle",
+              "frames": 1,
+              "fps": 1,
+              "loop": true
+            },
+            {
+              "name": "run",
+              "frames": 1,
+              "fps": 1,
+              "loop": true
+            },
+            {
+              "name": "jump",
+              "frames": 1,
+              "fps": 1,
+              "loop": false
+            }
+          ]
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-hud",
+          "role": "HUD 面板",
+          "description": "一条 HUD 底板",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 48,
+            "h": 8
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "ui",
+          "id": "ui-pip",
+          "role": "HUD 指示点",
+          "description": "一枚指示点",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "size": {
+            "w": 4,
+            "h": 4
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      }
+    ]
+  }
+}

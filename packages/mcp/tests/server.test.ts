@@ -35,13 +35,15 @@ describe("MCP 协议面", () => {
     expect(await drive([{ jsonrpc: "2.0", method: "notifications/initialized" }])).toEqual([]);
   });
 
-  it("工具面是六个，且每个的 description 都写了「何时用」与「会失败的情况」", async () => {
+  it("工具面是七个，且每个的 description 都写了「何时用」与「会失败的情况」", async () => {
     // ⚠️ 票 30 落地时是**四个**；票 33 加了 `assemble_site`（装配）；票 49 加了 `compile_game`
     //   （需求 → 配置）。后两个合起来才是 R6 那条「一段需求 → 打开即玩」的完整入口。
+    //   ⚠️ **票 16 加了 `create_game`** —— 它才是那条 R6 入口的**字面兑现**（一步到底），
+    //   而前两个留在这里是因为「想在生图之前看一眼清单」那条路仍然要它们。
     const [r] = await drive([{ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }]);
     const tools = r.result.tools;
     expect(tools.map((t: { name: string }) => t.name)).toEqual(
-      ["plan_assets", "build_asset_pack", "verify_asset_pack", "inspect_asset_pack", "compile_runtime", "assemble_site"]);
+      ["plan_assets", "build_asset_pack", "verify_asset_pack", "create_game", "inspect_asset_pack", "compile_runtime", "assemble_site"]);
     for (const t of tools) {
       expect(t.description, t.name).toMatch(/何时用/);
       expect(t.inputSchema.type).toBe("object");

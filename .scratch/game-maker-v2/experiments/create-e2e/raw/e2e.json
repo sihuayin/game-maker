@@ -1,0 +1,9 @@
+{
+  "code": 4,
+  "ms": 20503,
+  "text": "{\n  \"command\": \"create\",\n  \"error\": \"重采样 3 次都没有拿到一份过契约的 GameIntentSpec（最后一次：empty-input）。最后一次的病因：工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。\",\n  \"exitCode\": 4,\n  \"ledger\": [\n    {\n      \"step\": \"analyze-intent\",\n      \"target\": \"game-intent\",\n      \"upstream\": \"messages\",\n      \"ms\": 11521,\n      \"attempts\": 3,\n      \"failures\": [\n        \"schema\",\n        \"schema\",\n        \"empty-input\"\n      ],\n      \"requestedModel\": \"deepseek-v4-pro\",\n      \"model\": \"deepseek-flash\",\n      \"usage\": {\n        \"inputTokens\": 163,\n        \"outputTokens\": 874\n      }\n    }\n  ]\n}\n  · visual-world\n  · intent\n",
+  "steps": [
+    "  · visual-world\n",
+    "  · intent\n"
+  ]
+}

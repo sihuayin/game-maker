@@ -7,12 +7,32 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  CommandError, compileRuntime, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, planAssets, verifyPack,
+  CommandError, compileRuntime, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, planAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
-import { assembleSite, VIEWPORT } from "@game-maker/demo";
+import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
+import { runBuild, runUnderstanding } from "@game-maker/pipeline";
+import path from "node:path";
+import fs from "node:fs";
 
 const PROTOCOL_VERSION = "2025-06-18";
+
+/** `--intent` 的判别与 CLI **同一条规则**（票 16 的 Q3）：像路径就当路径，否则当裸文本。
+ *  ⚠️ 两个壳各自接线（`demo` 与 `pipeline` 彼此看不见，没有一处能放共享的壳代码）——
+ *   而这条规则只有一行，两边都写一遍比引一个包划算。**改的时候两处一起改。** */
+function readIntent(v: string): string {
+  const looksLikePath = /\.(md|txt)$/i.test(v) || v.includes("/") || v.includes("\\") || v.startsWith("./") || v.startsWith("../");
+  if (!looksLikePath) return v;
+  const p = path.resolve(process.cwd(), v);
+  if (!fs.existsSync(p))
+    throw new CommandError("usage", `intent 看起来是一个路径（"${v}"），而它不存在：${p}`);
+  return fs.readFileSync(p, "utf8");
+}
+
+/** 生图上游：**环境变量优先**，其次本地那份（已 gitignore 的）配置 —— 与 CLI 同源。 */
+function imageTransportOf() {
+  return resolveImageTransport({ env: process.env, cwd: process.cwd() }).transport;
+}
 
 /** 工具面。**description 内嵌「什么时候用 / 什么样的输入会失败」**（票 30 问题 6）。 */
 const TOOLS = [
@@ -60,6 +80,28 @@ const TOOLS = [
       "何时用：拿到一个来源不明的包、或者怀疑产物被外部改动过的时候。\n" +
       "**这是唯一能发现「包被人手改过」的手段** —— 而且它不会自动被别处调用，要主动跑。",
     inputSchema: { type: "object", properties: { packDir: { type: "string", description: "资源包目录（含 manifest.json 的那一层）" } }, required: ["packDir"] },
+  },
+  {
+    name: "create_game",
+    description:
+      "端到端：**一张风格参考图 + 一句需求（或一份需求 .md）→ 跑完整条链** —— " +
+      "参考图 → 这个世界 → 意图 → 设计 → 角色基因 → 资源清单 → 生图 → 配置 → 站点，产物落 <out>/<gameId>/run|pack|site/v<N>/。\n" +
+      "⚠️ **它不停**（R9 那个检查点只活在 CLI 上）：它等于 `game-maker create --yes`。" +
+      "想在生图之前看一眼清单，就用 plan_assets + build_asset_pack 那一对。\n" +
+      "⚠️ **这一步会花钱**：清单里有多少个 image 资源，就发多少次生图调用（而在它跑完之前你不会知道那个数）。\n" +
+      "何时用：从零做一个游戏。已经有一份清单 / 包 / 配置时，用别的工具。\n" +
+      "会失败的情况：上游不可达（退出码 3）；参考图或需求读不出来（参数错 2）；" +
+      "模型三发都没给出过契约的文书（4）；清单里有**这一代外壳做不了**的东西（R12 的拒绝，4）。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        stylePath: { type: "string", description: "风格参考图（第一阶段恰好一张）" },
+        intent: { type: "string", description: "需求文本；以 .md/.txt 结尾或含路径分隔符时**当路径**读那个文件" },
+        outDir: { type: "string", description: "产物根目录，默认 ./out。回报的路径都相对于它" },
+        styleId: { type: "string", description: "风格身份的 slug，默认取参考图 basename" },
+      },
+      required: ["stylePath", "intent"],
+    },
   },
   {
     name: "inspect_asset_pack",
@@ -176,6 +218,45 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               viewport: VIEWPORT,
             });
             break;
+          case "create_game": {
+            tick(0.05, "理解层：参考图 → 这个世界 → 意图 → 设计 → 角色基因…");
+            const understanding = await runUnderstanding({
+              outRoot: String(args.outDir ?? "out"),
+              requirement: readIntent(String(args.intent)),
+              styleReferences: [{ path: String(args.stylePath), role: "global" }],
+              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...(args.styleId === undefined ? {} : { styleId: String(args.styleId) }),
+              onProgress: (p) => tick(0.4, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),
+            });
+            tick(0.5, "构建层：生图 → 配置 → 站点…");
+            const built = await runBuild({
+              outRoot: String(args.outDir ?? "out"), runDir: understanding.run.dir,
+              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...(imageTransportOf() === undefined ? {} : { imageTransport: imageTransportOf()! }),
+              viewport: VIEWPORT,
+              onProgress: (p) => tick(0.7, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),
+            });
+            const site = assembleSite({
+              packDir: built.paths.packDir, configPath: built.paths.config,
+              shellJsPath: defaultShellPath("", process.cwd()),
+              outRoot: String(args.outDir ?? "out"), gameId: built.gameId,
+              // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）
+              siteVersion: built.packVersion,
+            });
+            result = {
+              command: "create",
+              summary: [
+                `这次运行：${path.relative(String(args.outDir ?? "out"), understanding.run.dir)}` +
+                  `（v${understanding.run.version} · ${understanding.run.gameId}）· 包 v${built.packVersion}`,
+                ...understanding.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`),
+                ...(built.qa === undefined ? ["⚠️ 没有跑 QA（这一版还没有 QA 实现 —— 票 17-20）"] : []),
+                ...site.summary,
+              ],
+              data: { status: "complete", gameId: built.gameId, runVersion: understanding.run.version, packVersion: built.packVersion, ...site.data },
+              artifacts: [...site.artifacts, { path: path.relative(String(args.outDir ?? "out"), built.paths.packDir), kind: "asset-pack" }],
+            };
+            break;
+          }
           case "assemble_site":
             result = assembleSite({
               packDir: String(args.packDir), configPath: String(args.configPath),

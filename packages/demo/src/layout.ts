@@ -32,6 +32,12 @@ export type LayoutOptions = {
   config: unknown;
   /** 它在站点目录里叫什么（`game-config.json` / `td-config.json`）。 */
   configFileName: string;
+  /**
+   * **调用方显式指定的站点版本号**（票 16，承票 15 的 Q16/Q17）。
+   * ⚠️ 给了就**不自算**；而**那个位置已经存在 ⇒ 拒**（不静默覆盖）。
+   * 不给（单跑 `site`）才落到 `nextSiteVersion`。
+   */
+  siteVersion?: number;
 };
 
 export type LaidSite = {
@@ -78,8 +84,16 @@ export function laySite(opts: LayoutOptions): LaidSite {
 
   const siteRoot = path.join(gameDir, "site");
   fs.mkdirSync(siteRoot, { recursive: true });
-  const siteVersion = nextSiteVersion(siteRoot);
+  // ⚠️ **调用方可以指定版本号**（票 16，承票 15 的 Q16/Q17：「子树版本号一律由父运行显式给定，
+  //   **子步骤禁止自行计算**」）。create 链里 site 的 N 就是那次 attempt 的 N，所以父把它传进来。
+  //   ⚠️ 给了就**不自算**；而**目标已存在 ⇒ 拒**（「禁止覆盖」那条规矩在**这一处**也要守：
+  //     一个已经摆着东西的 `site/v3` 被重新装配，就是**静默的覆盖**）。
+  const siteVersion = opts.siteVersion ?? nextSiteVersion(siteRoot);
   const siteDir = path.join(siteRoot, `v${siteVersion}`);
+  if (opts.siteVersion !== undefined && fs.existsSync(siteDir))
+    throw new Error(
+      `站点目录已经存在：${siteDir} —— ⚠️ 调用方**显式指定**了版本号 v${siteVersion}，而这个位置已经摆着东西。\n` +
+      "「禁止覆盖」对子树同样成立：要么换一个版本号，要么让调用方**自己**去分配（不给 `siteVersion`）。");
   fs.mkdirSync(siteDir, { recursive: true });
 
   fs.copyFileSync(opts.shellJsPath, path.join(siteDir, "shell.js"));

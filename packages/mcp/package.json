@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "MCP \u8584\u58f3\uff08stdio server\uff0c\u4e0d shell out \u5230 CLI\uff09\u3002",
+  "description": "MCP 薄壳（stdio server，不 shell out 到 CLI）。",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -11,9 +11,10 @@
     }
   },
   "dependencies": {
-    "@game-maker/contracts": "workspace:*",
     "@game-maker/assets": "workspace:*",
-    "@game-maker/demo": "workspace:*"
+    "@game-maker/contracts": "workspace:*",
+    "@game-maker/demo": "workspace:*",
+    "@game-maker/pipeline": "workspace:*"
   },
   "bin": {
     "game-maker-mcp": "./dist/server.mjs"

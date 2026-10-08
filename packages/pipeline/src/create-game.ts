@@ -43,6 +43,12 @@ export type UnderstandingInput = {
   styleReferences: readonly { path: string; role: string }[];
   /** 文本上游（理解层那五发都要它）。 */
   transport: Transport;
+  /**
+   * 风格身份的**覆盖口**（票 08 的 R2-Q2：「参考图 basename 的 slug，由 CLI 生成」，
+   * 而票 08 的播下把「`--style-id` 是覆盖口」留给了票 16）。不给就由 basename 推。
+   * ⚠️ 它进 VWS 时是**强制覆盖**（模型照抄、这里换掉）—— 与 `style.id` 那条同款。
+   */
+  styleId?: string;
   /** 哪一代外壳。省略 ⇒ 注册表里那一个。 */
   runtimeProfile?: RuntimeProfileRef;
   fetchImpl?: typeof fetch;
@@ -168,7 +174,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     const world = await analyzeReference({
       styleReferences: input.styleReferences as { path: string; role: string }[],
       requirementText: input.requirement,
-      styleId: styleIdOf(input.styleReferences[0]!.path),
+      styleId: input.styleId ?? styleIdOf(input.styleReferences[0]!.path),
       // ⚠️ 那几条相对路径**相对谁**由调用方说 —— 而 `createGame` 的那个 `cwd` 与**进程**的
       //   可以不是同一个（测试里就不是）⇒ 一路传下去，别让 core 读全局状态。
       cwd,

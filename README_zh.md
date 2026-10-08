@@ -132,7 +132,7 @@ game-maker site out/<id>/pack/v1 --config out/<id>/game-configs/v1.json
 
 两个互相独立的上游，用不用得上取决于你跑哪些命令。
 
-**文本上游** —— `plan`、`compile-runtime`、`compile-td-game` 要用：
+**文本上游** —— `create` / `build` / `plan`、`compile-runtime`、`compile-td-game` 要用：
 
 ```bash
 export ANTHROPIC_BASE_URL=...
@@ -152,8 +152,10 @@ cp game-maker.local.example.json game-maker.local.json   # 真文件已 gitignor
 ## CLI 参考
 
 ```
+game-maker create          --style <一张参考图> --intent <需求文本 | 需求.md> [--yes] [--style-id <slug>] [--out <目录>] [--json]
+game-maker build           <run 目录> [--out <目录>] [--concurrency <n>] [--json]
 game-maker plan            --design <game-design.json> --visual-world <visual-world.json> [--out <目录>] [--json]
-game-maker pack            --recipe <清单.json> [--out <目录>] [--concurrency <n>] [--json]
+game-maker pack            --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--json]
 game-maker compile-runtime --design <game-design.json> --pack <资源包目录> [--level <关卡 id>] [--out <目录>] [--json]
 game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
 game-maker site            <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
@@ -163,6 +165,20 @@ game-maker inspect         <资源包目录> [--json]
 
 - `--out <目录>` —— 产物根，默认 `./out`。**所有回报的路径都相对于它**。
 - `--json` —— 机器可解析的输出。它与人类输出、与 MCP 工具返回的是**同一份数据**，不是第二套表示。
+
+### `create` / `build`：V2 的那条链（两段）
+
+```bash
+game-maker create --style ./style.png --intent "做一个废土横版寻宝游戏"
+# → out/<gameId>/run/v1/…（理解层那几份 + 清单）—— **在这里停**：
+#   它把「清单里几个资源要走生图」与「你没说清的地方」打给你看，然后退出（退出码 0）
+game-maker build out/<gameId>/run/v1
+# → 生图 → out/<gameId>/pack/v1 · 配置 · 站点 out/<gameId>/site/v1
+```
+
+⚠️ **人工点只有一个，就在那个停的地方**（R9）：清单是**唯一**可以手改的产物，改完再跑 `build` —— 而 `build` 读的是**磁盘上那一份**（所以改的确实生效）。加 `--yes` 就一路跑到底（等于跳过检查点），两条路的产物**逐字节等价**。
+
+⚠️ `--style` 今天**恰好收一张**（[多参考图](.scratch/game-maker-v2/issues/26-multiple-style-references.md) 实现延后）。`--intent` 收两种东西：**像路径就当路径**（以 `.md`/`.txt` 结尾、或含路径分隔符），否则当裸文本 —— 写错文件名会当场报参数错，而不会把文件名当成一句需求喂给模型。
 - `--concurrency <n>` —— 并发生成的上限。
 
 退出码：`0` 成功 · `1` 失败 · `2` 参数错 · `3` 上游不可达 · `4` 产物/清单不合法。

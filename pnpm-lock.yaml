@@ -63,6 +63,9 @@ importers:
       '@game-maker/demo':
         specifier: workspace:*
         version: link:../demo
+      '@game-maker/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -127,6 +130,9 @@ importers:
       '@game-maker/demo':
         specifier: workspace:*
         version: link:../demo
+      '@game-maker/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
