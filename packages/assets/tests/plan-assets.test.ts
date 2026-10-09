@@ -19,7 +19,7 @@ const RECIPE = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/recipes/shif
 const DESIGN: GameDesignSpec = {
   format: "game-design/v1",
   game: { title: "拾荒者", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
-  coreLoop: ["探索废墟", "收集零件"],
+  coreLoopSteps: ["探索废墟", "收集零件"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑", "跳"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿月台往复巡逻", threat: "接触即伤" }],
   npcs: [{ id: "n-trader", role: "废土商人", interaction: "用零件换补给" }],

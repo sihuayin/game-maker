@@ -1,0 +1,176 @@
+{
+ "候选": [
+  {
+   "where": "CharacterDNASchema",
+   "key": "gear",
+   "路径": "gear"
+  },
+  {
+   "where": "CharacterDNASchema",
+   "key": "palette",
+   "路径": "palette"
+  },
+  {
+   "where": "GameIntentSpecSchema",
+   "key": "ambiguity",
+   "路径": "ambiguity"
+  },
+  {
+   "where": "QAReportSchema",
+   "key": "checked",
+   "路径": "checked"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "primary",
+   "路径": "palette.primary"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "secondary",
+   "路径": "palette.secondary"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "accent",
+   "路径": "palette.accent"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "background",
+   "路径": "palette.background"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "shadow",
+   "路径": "palette.shadow"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "highlight",
+   "路径": "palette.highlight"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "shapeLanguage",
+   "路径": "shapeLanguage"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "identity",
+   "路径": "style.identity"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "palette",
+   "路径": "style.palette"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "shapeLanguage",
+   "路径": "style.shapeLanguage"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "material",
+   "路径": "style.material"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "environment",
+   "路径": "style.environment"
+  },
+  {
+   "where": "VisualWorldSpecSchema",
+   "key": "characterStyle",
+   "路径": "style.characterStyle"
+  }
+ ],
+ "计数": {
+  "GameIntentSpecSchema.ambiguity": {
+   "array": 66,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.palette.primary": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.palette.secondary": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.palette.accent": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.palette.background": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.palette.shadow": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.palette.highlight": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.shapeLanguage": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.style.identity": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.style.palette": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.style.shapeLanguage": {
+   "array": 5,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.style.material": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.style.environment": {
+   "array": 7,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  },
+  "VisualWorldSpecSchema.style.characterStyle": {
+   "array": 8,
+   "string": 0,
+   "object": 0,
+   "other": 0
+  }
+ },
+ "扫过的文件数": 106
+}

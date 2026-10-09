@@ -656,7 +656,7 @@ export function designBrief(d: GameDesignSpec): string {
   const lines = [
     `- 标题 \`game.title\`：${d.game.title}`,
     `- 题材 / 镜头：${d.game.genre} · ${d.game.camera}（外壳 ${d.game.runtimeProfile.id}/v${d.game.runtimeProfile.version}）`,
-    `- 核心循环：${d.coreLoop.join(" / ")}`,
+    `- 核心循环：${d.coreLoopSteps.join(" / ")}`,
     `- \`player.role\` —— 玩家是：${d.player.role}`,
     `- \`player.abilities\` —— 他能：${d.player.abilities.join(" / ")}`,
     `- \`world.theme\`：${d.world.theme}`,

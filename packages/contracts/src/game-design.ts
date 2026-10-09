@@ -18,7 +18,7 @@
 //
 //   ⇒ 于是两条集合关系的**方向是不对称的**：
 //     · **意图 ⊆ 设计** —— **判据**（票 10 的 `build-design.ts` 逐条查；少了就是 R12 的拒绝）；
-//     · **设计多出意图 = 允许** —— 那叫**补全**。先例是探针当场抓到的那个：意图层的 `coreLoop`
+//     · **设计多出意图 = 允许** —— 那叫**补全**。先例是探针当场抓到的那个：意图层的 `coreLoopSteps`
 //       说了「收集废料与**净水**」，而 `entities[]` 里只有废料 —— 设计层补一个 `e-water`
 //       **是对的**（依据在**需求/意图的语义**里，不在模型的口味里）。
 //   ⚠️ **「多出来的那个有没有依据」不可机械判定** ⇒ 它**不是判据**（R3：判据只收
@@ -90,9 +90,9 @@ export const GameDesignMechanicSchema = z.strictObject({
 //   **进 gate**（这一发算 `schema` 失败、重采样）：
 //     · 必填字符串非空（`game.*` · `player.role` · `world.*` · `progression.*` · 四桶每一项 ·
 //       `levels[].purpose` / `levels[].layout`）
-//     · 数组**元素**非空（`coreLoop[]` · `player.abilities[]` · `player.goals[]` ·
+//     · 数组**元素**非空（`coreLoopSteps[]` · `player.abilities[]` · `player.goals[]` ·
 //       `winConditions[]` · `loseConditions[]` · `runtimeRequirements[]` · `levels[].entities[]`）
-//     · 数组**本身 ≥ 1**：`levels` · `player.abilities` · `mechanics` · `coreLoop` · `player.goals`
+//     · 数组**本身 ≥ 1**：`levels` · `player.abilities` · `mechanics` · `coreLoopSteps` · `player.goals`
 //     · **id 跨四桶唯一** —— 一个实体只有一种 `type`（票 03 Q3），跨桶重了就说不出是哪一个
 //     · **`levels[].entities[]` 解得到** —— 引用族：每一项都要在四桶里有家。
 //       ⚠️ 与票 08 的 `palette:N` 越界**同形**：都是「**文书自己跟自己对不对**」，
@@ -142,7 +142,7 @@ export const GameDesignSpecSchema = z.strictObject({
    *  （票 19 的 Q1，2026-10-09）：设计层做的是**放大**，与意图层逐字相等**从来不成立**
    *  （4 发真输出 **0/3** 命中）⇒ 文本相减**砍掉了**，见 `intent-coverage.ts` 的头一。
    *  今天它的读者是**下游模板**（票 12 / 14 的具名插值），**不是判据**。 */
-  coreLoop: z.array(z.string()),
+  coreLoopSteps: z.array(z.string()),
 
   player: z.strictObject({
     id: Id,
@@ -229,7 +229,7 @@ export const GameDesignSpecSchema = z.strictObject({
 
   // ③ 数组的**元素**非空
   const elems: [string, readonly string[]][] = [
-    ["coreLoop", v.coreLoop],
+    ["coreLoopSteps", v.coreLoopSteps],
     ["player.abilities", v.player.abilities],
     ["player.goals", v.player.goals],
     ["winConditions", v.winConditions],
@@ -242,7 +242,7 @@ export const GameDesignSpecSchema = z.strictObject({
 
   // ④ 「一条都说不出」的数组 —— ⚠️ 四桶**不在**这一档（障碍跑式关卡是对的）
   const nonEmpty: [string, number][] = [
-    ["coreLoop", v.coreLoop.length],
+    ["coreLoopSteps", v.coreLoopSteps.length],
     ["player.abilities", v.player.abilities.length],
     ["player.goals", v.player.goals.length],
     ["mechanics", v.mechanics.length],

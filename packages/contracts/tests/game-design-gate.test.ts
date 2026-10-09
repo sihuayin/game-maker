@@ -10,7 +10,7 @@ import { GAME_DESIGN_FORMAT, GameDesignSpecSchema, PLATFORMER_V1, toolInputSchem
 const DESIGN = {
   format: GAME_DESIGN_FORMAT,
   game: { title: "拾荒者", genre: "platformer", camera: "side", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } },
-  coreLoop: ["探索废墟"],
+  coreLoopSteps: ["探索废墟"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["run", "jump"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿固定路线往复", threat: "接触即伤" }],
   npcs: [],
@@ -47,14 +47,14 @@ describe("⚠️ 结构性空值 + 层内引用族 gate（票 10 的 Q4）", () 
   });
 
   it("数组**元素**是空串 ⇒ 拒（空串不是「没有这一条」，是占位符）", () => {
-    const r = parse({ coreLoop: ["探索废墟", ""] });
+    const r = parse({ coreLoopSteps: ["探索废墟", ""] });
     expect(r.success).toBe(false);
-    if (!r.success) expect(r.error.issues[0]!.path).toEqual(["coreLoop", 1]);
+    if (!r.success) expect(r.error.issues[0]!.path).toEqual(["coreLoopSteps", 1]);
   });
 
-  it("`coreLoop` / `player.abilities` / `player.goals` / `mechanics` / `levels` 是**空数组** ⇒ 拒", () => {
+  it("`coreLoopSteps` / `player.abilities` / `player.goals` / `mechanics` / `levels` 是**空数组** ⇒ 拒", () => {
     for (const [over, path] of [
-      [{ coreLoop: [] }, ["coreLoop"]],
+      [{ coreLoopSteps: [] }, ["coreLoopSteps"]],
       [{ player: { ...DESIGN.player, abilities: [] } }, ["player", "abilities"]],
       [{ player: { ...DESIGN.player, goals: [] } }, ["player", "goals"]],
       [{ mechanics: [] }, ["mechanics"]],

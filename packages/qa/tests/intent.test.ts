@@ -74,11 +74,11 @@ describe("§干净的真的那一对：判据跑了、没话说", () => {
     expect(r.judgements["intent-coverage"]).toEqual({ ran: true, findings: [] });
   });
 
-  it("⚠️ **文本那一半不在这里**：这份绿的设计把 `coreLoop` 整个改写了", async () => {
+  it("⚠️ **文本那一半不在这里**：这份绿的设计把 `coreLoopSteps` 整个改写了", async () => {
     // 票 19 的钉子（`contracts/tests/intent-coverage.test.ts` 里有完整那条）：
     // 交付态这条路（真读两份文件）上再钉一次 —— 有人把文本相等加回来时，这里先红。
-    expect(CANNED.intent["coreLoop"]).toEqual(["在废土上跳跃移动", "收集废料"]);
-    expect(CANNED.design["coreLoop"]).toEqual(["在废墟间探索并收集零件"]);
+    expect(CANNED.intent["coreLoopSteps"]).toEqual(["在废土上跳跃移动", "收集废料"]);
+    expect(CANNED.design["coreLoopSteps"]).toEqual(["在废墟间探索并收集零件"]);
     expect(flat(await run(stage()))).toEqual([]);
   });
 });

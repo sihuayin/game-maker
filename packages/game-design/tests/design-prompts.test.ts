@@ -77,7 +77,7 @@ describe("提示词骨架", () => {
     expect(p).toContain("补全");   // 「这一层可以补全」那句
     expect(p).toContain("**可以多，不可以少、不可以改**");
     // ⚠️ 而依据必须是**需求**，不是模型自己的口味 —— 探针那次 `e-water` 是对的，
-    //   因为意图层的 `coreLoop` 说了「收集废料与净水」
+    //   因为意图层的 `coreLoopSteps` 说了「收集废料与净水」
     expect(p).toContain("依据是需求");
     expect(p).toContain("别加");
   });

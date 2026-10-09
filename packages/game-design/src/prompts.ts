@@ -50,7 +50,7 @@ export const TOOL_DESCRIPTION = `输出一份 GameIntentSpec —— 把一段**�
 
 5. **不许有空串**：必填的字符串字段都得有内容，数组里也不许留空串占位。
    「用户没说」走 \`ambiguity[]\`，**不是**空串 —— 空串与「用户要的就是这样」在文件里长得一样。
-   \`coreLoop\` / \`player.goals\` / \`mechanics\` **至少一条**；
+   \`coreLoopSteps\` / \`player.goals\` / \`mechanics\` **至少一条**；
    \`entities\` / \`winConditions\` / \`loseConditions\` / \`ambiguity\` **可以是空数组**（空就说「没有」）。
 
 6. \`entities[].id\` 与 \`mechanics[].id\` **不许重复** —— 下游按 id 认东西，重了就说不出是哪一个。
@@ -87,7 +87,7 @@ const FIELD_HINTS: Record<keyof GameIntentSpec, string> = {
   subgenre: "细分题材。需求提了、或能可靠推出来就填；**推不出来就省掉**",
   camera: "用户想要的视角。同上 —— 提了或推得出就填，推不出就省掉",
   targetExperience: "「想要什么感觉」—— 氛围、情绪，一句话",
-  coreLoop: "核心循环，**一条一句**，**至少一条**",
+  coreLoopSteps: "核心循环，**一条一句**，**至少一条**",
   player: "`{ role, goals }`：他是谁、他要什么（`goals` **至少一条**）",
   world: "`{ theme, setting, atmosphere }`：题材 / 场景 / 氛围，各一句",
   mechanics: "用户说的机制，一条一个 `{ id, name }`，**至少一条**。⚠️ `name` 照原话记，别按外壳能力筛",
@@ -121,7 +121,7 @@ export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把�
 
 1. **不许有空串、也不许有空的必填数组**。必填字符串（\`game.genre\` · \`game.camera\` · \`player.role\` ·
    \`world.*\` · \`progression.*\` · 四个桶与 \`levels\` 里每一条的每一项）都得有内容；
-   \`coreLoop\` · \`player.abilities\` · \`player.goals\` · \`mechanics\` · \`levels\` **至少一条**。
+   \`coreLoopSteps\` · \`player.abilities\` · \`player.goals\` · \`mechanics\` · \`levels\` **至少一条**。
    ⚠️ 但**四个桶本身可以是空的**：只有平台、没有敌人/拾取物/交互物的关卡是真的。
 
 2. \`mechanics[].mechanic\` 是**封闭枚举**（下面给了全部 8 个值）。⚠️
@@ -136,7 +136,7 @@ export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把�
    · **这一层新加的** —— **允许**：需求里说得出来、而意图层没点名的东西（补给、危险、机关），
      给它们起**新**的 \`id\` 就是你的活。
    ⚠️ **但新东西的依据是需求，不是「你觉得游戏里应该有」。** 需求没说、你只是觉得
-   「一个游戏总该有 X」的 —— **别加**。（先例：意图层的 \`coreLoop\` 说了「收集废料与净水」，
+   「一个游戏总该有 X」的 —— **别加**。（先例：意图层的 \`coreLoopSteps\` 说了「收集废料与净水」，
    而 \`entities[]\` 里只有废料 ⇒ 补一个净水是**对的**；凭空加一个 Boss 是**错的**。）
 
 4. \`levels[].entities\` 是**引用**：每一项都必须是上面四个桶里**真的存在**的 \`id\`。
@@ -150,7 +150,7 @@ const BUCKET_ID_RULE = "（意图里给的 `id` **原样沿用**；需求说得�
 const DESIGN_FIELD_HINTS: Record<keyof GameDesignSpec, string> = {
   format: `固定写 "game-design/v1"`,
   game: "`{ title, genre, camera, runtimeProfile }` —— ⚠️ **后三个照抄下面给的值**，别自己编；`title` 是你给它起的名字（必填）",
-  coreLoop: "核心循环，**一条一句**，**至少一条**（对着意图层那条写，可以改写得更具体）",
+  coreLoopSteps: "核心循环，**一条一句**，**至少一条**（对着意图层那条写，可以改写得更具体）",
   player: "`{ id, role, abilities, goals }` —— ⚠️ `player.role` 与 `player.abilities` 是**具名生产**的字段：能力一条一句（至少要有一条），`goals` 也至少一条",
   enemies: "`{ id, behavior, threat }[]` —— ⚠️ `enemies[].behavior` 与 `enemies[].threat` 是**具名生产**的：它怎么动、它怎么威胁" + BUCKET_ID_RULE,
   npcs: "`{ id, role, interaction }[]` —— ⚠️ `npcs[].role` 与 `npcs[].interaction` 是**具名生产**的：他是谁、能跟他做什么" + BUCKET_ID_RULE,
@@ -195,7 +195,7 @@ export function designPrompt(input: {
 - 题材：${intent.genre}${intent.subgenre === undefined ? "" : `（细分：${intent.subgenre}）`}
 - 想要的视角：${intent.camera ?? "（用户没说，按这个世界与外壳的实际情况定）"}
 - **想要什么感觉**：${intent.targetExperience}
-- 核心循环：${intent.coreLoop.join(" / ")}
+- 核心循环：${intent.coreLoopSteps.join(" / ")}
 - 玩家：${intent.player.role}；他要的是 ${intent.player.goals.join(" / ")}
 - 世界：${intent.world.theme} · ${intent.world.setting} · **氛围**：${intent.world.atmosphere}
 - 用户说的机制：${intent.mechanics.map((m) => `\`${m.id}\`=${m.name}`).join(" · ")}

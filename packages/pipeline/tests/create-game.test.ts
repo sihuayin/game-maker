@@ -350,7 +350,9 @@ describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的
   it("⚠️ 文案里带着**报告路径**与失败详情 —— 走异常那一路也丢不掉它（票 20 的 Q5）", async () => {
     const h = unreachableHarness();
     const u = await understand(h);
-    const e = await build(h, u.run.dir).catch((x: unknown) => x as Error);
+    // ⚠️ 转型在**外面**：`build()` 正常那一路返回 `BuildResult`，`.catch` 的返回类型于是是
+    //    `BuildResult | Error` —— 在 catch 里转型，`e.message` 仍会撞在 `BuildResult` 上（TS2339）。
+    const e = (await build(h, u.run.dir).catch((x: unknown) => x)) as Error;
     expect(e.message).toMatch(/qa-report\.json/);          // 报告路径
     expect(e.message).toMatch(/\[reachability\]/);         // 哪条判据
     expect(e.message).toMatch(/QA 判据没过/);

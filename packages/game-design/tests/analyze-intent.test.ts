@@ -13,7 +13,7 @@ const modelOut = (over: Record<string, unknown> = {}) => ({
   title: "拾荒者",
   genre: "platformer",
   targetExperience: "孤独但一直向上",
-  coreLoop: ["探索废墟", "收集零件"],
+  coreLoopSteps: ["探索废墟", "收集零件"],
   player: { role: "拾荒者", goals: ["在天黑前抵达"] },
   world: { theme: "废土", setting: "铁轨旁的废墟", atmosphere: "黄昏，尘土悬浮" },
   mechanics: [{ id: "m-jump", name: "跳跃" }, { id: "m-double-jump", name: "二段跳" }],

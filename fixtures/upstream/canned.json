@@ -59,7 +59,7 @@
     "title": "拾荒者",
     "genre": "platformer",
     "targetExperience": "荒凉、压抑",
-    "coreLoop": [
+    "coreLoopSteps": [
       "在废土上跳跃移动",
       "收集废料"
     ],
@@ -104,7 +104,7 @@
         "version": "1"
       }
     },
-    "coreLoop": [
+    "coreLoopSteps": [
       "在废墟间探索并收集零件"
     ],
     "player": {

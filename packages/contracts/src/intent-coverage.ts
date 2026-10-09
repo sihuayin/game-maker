@@ -4,17 +4,17 @@
 // 一、⚠️ **只有 id 那一半活下来 —— 文本那一半被测死了**（票 19 的 Q1）
 //
 //   票 03 当年定的是两半：`entities` / `mechanics` 按 **id** 相减，
-//   `coreLoop` / `winConditions` / `loseConditions` / `progression` 按**文本相等**相减。
+//   `coreLoopSteps` / `winConditions` / `loseConditions` / `progression` 按**文本相等**相减。
 //   票 10 把 id 那一半做进了 `compile-design` 的拒绝，并把「剩下的文本那一半」播给了票 19。
 //
 //   ⚠️ 票 19 拿票 10 探针留下的 **4 发真输出**（`experiments/design-first-shot/raw/*.json`，
 //     两份 `ok` + 两份 `hostile`）量了文本那一半，结果是 **0% 命中**：
 //
-//       `coreLoop`       0/3 · 0/3 · 0/3 · 0/3
+//       `coreLoopSteps`       0/3 · 0/3 · 0/3 · 0/3
 //       `winConditions`  0/1 ×4        `loseConditions`  0/1 ×4      `player.goals`  0/1 ×4
 //       `player.role` · `world.theme` · `world.setting` —— 四条全是 ≠
 //
-//     意图 3 条 `coreLoop` → 设计 4 条，每条更长更具体
+//     意图 3 条 `coreLoopSteps` → 设计 4 条，每条更长更具体
 //     （「在废土平台上跳跃移动」→「在废土平台上左右移动，跨过断裂的台阶与地缝。」）。
 //     ⇒ **设计层不复述意图层，它放大意图层** —— 那不是模型不听话，那是 `game-design.ts`
 //       要的东西（「设计层必须**完整**、必须**可执行**」），它照做了。

@@ -1,0 +1,26 @@
+{
+ "a-现状(coreLoop)": {
+  "field": "coreLoop",
+  "array": 0,
+  "string": 3,
+  "other": 0
+ },
+ "b-复数(coreLoops)": {
+  "field": "coreLoops",
+  "array": 0,
+  "string": 3,
+  "other": 0
+ },
+ "c-描述性(coreLoopSteps)": {
+  "field": "coreLoopSteps",
+  "array": 3,
+  "string": 0,
+  "other": 0
+ },
+ "d-无关词(zorbixList)": {
+  "field": "zorbixList",
+  "array": 3,
+  "string": 0,
+  "other": 0
+ }
+}

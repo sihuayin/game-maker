@@ -1,0 +1,17 @@
+{
+ "a-schema仍是coreLoop·提示词表是Steps（意外那一发）": {
+  "array": 3,
+  "string": 0,
+  "other": 0
+ },
+ "b-两处都coreLoop（改名前的原状）": {
+  "array": 0,
+  "string": 1,
+  "other": 2
+ },
+ "c-schema是Steps·提示词表是coreLoop": {
+  "array": 3,
+  "string": 0,
+  "other": 0
+ }
+}

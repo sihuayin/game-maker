@@ -51,11 +51,11 @@ describe("§真夹具：覆盖成立 ⇒ 一条都不报", () => {
 });
 
 describe("§⚠️ 钉子：**文本那一半不在里面**（票 19 的 Q1）", () => {
-  it("这份**绿**的设计把 `coreLoop` 整个改写了 —— 文本相等会在同一个位置上误报两条", () => {
+  it("这份**绿**的设计把 `coreLoopSteps` 整个改写了 —— 文本相等会在同一个位置上误报两条", () => {
     // ⚠️ 这一条是**故意**的：票 19 拿票 10 探针的 4 发真输出来量文本相等，命中 **0/3 ×4**。
     //   夹具这里就是那个形状的缩影（意图 2 条 → 设计 1 条、措辞全不一样）——
-    //   而**同一个** `coreLoop` 如果按文本相等去减，会报两条「缺失」。
-    const textualWouldMiss = INTENT.coreLoop.filter((x) => !DESIGN.coreLoop.includes(x));
+    //   而**同一个** `coreLoopSteps` 如果按文本相等去减，会报两条「缺失」。
+    const textualWouldMiss = INTENT.coreLoopSteps.filter((x) => !DESIGN.coreLoopSteps.includes(x));
     expect(textualWouldMiss).toEqual(["在废土上跳跃移动", "收集废料"]);
     expect(auditIntentCoverage(INTENT, DESIGN)).toEqual([]);   // 而这条判据一个字都不报
   });

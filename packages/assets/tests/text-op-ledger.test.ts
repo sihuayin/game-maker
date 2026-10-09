@@ -50,7 +50,7 @@ describe("`plan-assets` 的账（它取代了 `derive` —— 而协议从「纯
   const DESIGN: GameDesignSpec = {
     format: "game-design/v1",
     game: { title: "拾荒者", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
-    coreLoop: ["探索废墟"],
+    coreLoopSteps: ["探索废墟"],
     player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑"], goals: ["在天黑前抵达"] },
     enemies: [{ id: "e-drone", behavior: "沿月台巡逻", threat: "接触即伤" }],
     npcs: [], interactables: [], resources: [],
@@ -198,7 +198,7 @@ describe("`compile-runtime` 的账（它取代了 `compileGame` —— 协议换
   const DESIGN = {
     format: "game-design/v1",
     game: { title: "末班车", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
-    coreLoop: ["躲开行李", "捡齐失物", "走到信号灯"],
+    coreLoopSteps: ["躲开行李", "捡齐失物", "走到信号灯"],
     player: { id: "p", role: "邮差", abilities: ["跑"], goals: ["赶上末班车"] },
     enemies: [], npcs: [], interactables: [], resources: [],
     world: { theme: "黄昏的铁路小站", setting: "月台", structure: "三条横带" },

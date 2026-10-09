@@ -267,7 +267,7 @@ VisualWorldSpec.styleReferences
 > ① 下面那张「至少识别」清单里的 **`resources` 已出局** —— 它降成 `entities[].type = "resource"`
 > （票 09 的 Q5：两个家指向设计层同一个桶）；
 > ② `confidence` 不存在（票 03 已砍），所以「缺项」只能写进 `ambiguity[]`；
-> ③ 契约带一条**顶层 gate**：空串 / 空数组（`coreLoop`·`player.goals`·`mechanics`）/ id 重复
+> ③ 契约带一条**顶层 gate**：空串 / 空数组（`coreLoopSteps`·`player.goals`·`mechanics`）/ id 重复
 > ⇒ 这一发算 `schema` 失败、重采样（票 09 的 R2-Q1）。
 >
 > ⚠️ 落点在 `packages/game-design/src/analyze-intent.ts`（**不在** `vision` —— 两个新包彼此不依赖），

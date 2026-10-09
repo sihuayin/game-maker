@@ -15,7 +15,7 @@ const INTENT = {
   format: GAME_INTENT_FORMAT,
   genre: "platformer",
   targetExperience: "孤独但一直向上",
-  coreLoop: ["探索废墟"],
+  coreLoopSteps: ["探索废墟"],
   player: { role: "拾荒者", goals: ["在天黑前抵达"] },
   world: { theme: "废土", setting: "铁轨旁的废墟", atmosphere: "黄昏，尘土悬浮" },
   mechanics: [{ id: "m-jump", name: "跳跃" }],
@@ -46,9 +46,9 @@ describe("⚠️ 结构性空值 gate（票 09 的 R2-Q1）", () => {
   });
 
   it("数组元素是**空串** ⇒ 拒（空串不是「没有这一条」，是占位符）", () => {
-    const r = parse({ coreLoop: ["探索废墟", ""] });
+    const r = parse({ coreLoopSteps: ["探索废墟", ""] });
     expect(r.success).toBe(false);
-    if (!r.success) expect(r.error.issues[0]!.path).toEqual(["coreLoop", 1]);
+    if (!r.success) expect(r.error.issues[0]!.path).toEqual(["coreLoopSteps", 1]);
   });
 
   it("`entities[].role` 是空串 ⇒ 拒（它是 ① 档，空了这个实体就只是半个）", () => {
@@ -57,9 +57,9 @@ describe("⚠️ 结构性空值 gate（票 09 的 R2-Q1）", () => {
     if (!r.success) expect(r.error.issues[0]!.path).toEqual(["entities", 0, "role"]);
   });
 
-  it("`coreLoop` / `player.goals` / `mechanics` 是**空数组** ⇒ 拒 —— 「一条都说不出」是模型没干活", () => {
+  it("`coreLoopSteps` / `player.goals` / `mechanics` 是**空数组** ⇒ 拒 —— 「一条都说不出」是模型没干活", () => {
     for (const [over, path] of [
-      [{ coreLoop: [] }, ["coreLoop"]],
+      [{ coreLoopSteps: [] }, ["coreLoopSteps"]],
       [{ player: { ...INTENT.player, goals: [] } }, ["player", "goals"]],
       [{ mechanics: [] }, ["mechanics"]]
     ] as const) {

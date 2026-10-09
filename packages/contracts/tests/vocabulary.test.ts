@@ -84,14 +84,14 @@ describe("§桶对齐：意图层的 type 与设计层四个数组一一对应",
     for (const home of Object.values(ENTITY_BUCKETS)) expect(shape).toHaveProperty(home);
 
     // ⚠️ 行为验证：一份**除了「那个敌人缺 id」之外完全合法**的设计必须不过。
-    //   ⚠️ 这份 fixture 第一版是**全空的壳**（`coreLoop: []`、`world: {"","",""}`、`levels: []`）——
+    //   ⚠️ 这份 fixture 第一版是**全空的壳**（`coreLoopSteps: []`、`world: {"","",""}`、`levels: []`）——
     //   票 10 给本契约加了 gate 之后，那种壳会因为**一堆别的理由**被拒，
     //   于是这条断言在「`id` 被改成可选」时**照样绿**（假阳性）。
     //   若哪天有人把 id 改可选，`compile-design` 就没法沿用意图层的 id，覆盖度判据**当场失效**。
     const legal = {
       format: "game-design/v1",
       game: { title: "t", genre: "platformer", camera: "side", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } },
-      coreLoop: ["走"],
+      coreLoopSteps: ["走"],
       player: { id: "p", role: "r", abilities: ["run"], goals: ["到头"] },
       npcs: [], interactables: [], resources: [],
       world: { theme: "t", setting: "s", structure: "st" },

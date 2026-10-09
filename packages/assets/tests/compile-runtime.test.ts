@@ -19,7 +19,7 @@ const GOOD = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/game-configs/l
 const DESIGN: GameDesignSpec = {
   format: "game-design/v1",
   game: { title: "末班车", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
-  coreLoop: ["躲开行李", "捡齐失物", "走到信号灯"],
+  coreLoopSteps: ["躲开行李", "捡齐失物", "走到信号灯"],
   player: { id: "p-postman", role: "送信的邮差", abilities: ["跑", "跳"], goals: ["赶上末班车"] },
   enemies: [{ id: "e-dog", behavior: "沿地面来回走", threat: "碰到扣血" }],
   npcs: [], interactables: [{ id: "i-signal", type: "信号灯", behavior: "捡齐后变绿" }],

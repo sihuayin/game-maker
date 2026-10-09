@@ -1,0 +1,10 @@
+# ⚠️ 生出来的**位图**不入库 —— 它们是 **build 产物**（票 23 这一跑出了 14 张 · 9.5 MB）。
+# 与仓库根 `.gitignore` 那条 Q9 精神一致（**只有 `inputs/` 与 `fixtures/` 入库**），
+# 也与本仓库其它实验目录的 `out/` 惯例同款（见 `.scratch/game-creation-v1/experiments/*/.gitignore`）。
+#
+# ⚠️ **留下的**是**读数**，不是像素：`run/v1/` 那一摞契约 JSON 与账 · `drawlist/` ·
+# 每张图同名的那份 `*.prompt.txt`（提示词是**发出去的东西**，重跑不一定复原）。
+# 「生图确实发生了」这条判据的证据是**票 23 里记下的读数**（1344×768 RGBA · 魔数 · 字节数），
+# 而位图本身**重跑一次就有**（那要花钱，但不必进 git 的历史）。
+raw/run-out/*/*/authoring/generated/*.png
+raw/run-out/*/*/authoring/masters/*.png

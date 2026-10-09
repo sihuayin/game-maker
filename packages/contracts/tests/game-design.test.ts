@@ -16,7 +16,7 @@ const REF = { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version };
 const DESIGN = {
   format: GAME_DESIGN_FORMAT,
   game: { title: "拾荒者", genre: "platformer", camera: "side-scroll", runtimeProfile: REF },
-  coreLoop: ["探索废墟", "收集零件", "抵达终点"],
+  coreLoopSteps: ["探索废墟", "收集零件", "抵达终点"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["run", "jump"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿固定路线往复", threat: "接触即伤" }],
   npcs: [],

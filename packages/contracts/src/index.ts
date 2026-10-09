@@ -38,7 +38,7 @@ export const StyleSpecSchema = z.object({
 export type StyleSpec = z.infer<typeof StyleSpecSchema>;
 
 // ── 游戏 ── `GameSpecSchema` 已删除（票 09，2026-09-26）──────────────────────
-// 这里曾有 `GameSpecSchema`（设计文档：coreLoop / world / player / mechanics / entities /
+// 这里曾有 `GameSpecSchema`（设计文档：coreLoopSteps / world / player / mechanics / entities /
 // scenes / ui / rules / winConditions / loseConditions / requirements）。删它的理由：
 // 它描述的是「这个游戏**设计上**是什么」（大半字段是 `z.record(z.unknown())` 逃生舱），
 // 而 [[Game Config]] 描述的是「**外壳要执行的数据**是什么」—— **两件事，不是一件事的

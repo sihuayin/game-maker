@@ -162,7 +162,7 @@ GameDesignSpec  =「我们做成的」（必须完整、必须可执行）
 ⇒ 因此本层的自由文本**不许因为设计层也有就被砍**。
 
 ⚠️ **但可减的只有 id 那一半**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md)，2026-10-09）：票 03 当年把描述性文本
-（`coreLoop` / `winConditions` / `loseConditions` / `progression`）也划进了「按**文本相等**相减」，
+（`coreLoopSteps` / `winConditions` / `loseConditions` / `progression`）也划进了「按**文本相等**相减」，
 而票 19 拿票 10 探针的 4 发真输出量出它 **0% 命中** —— 设计层做的是**放大**，不是复述。
 ⇒ 那一条**砍掉**了（**不是**降成 warning）。测量与理由见 §10。
 
@@ -188,7 +188,12 @@ export interface GameIntentSpec {
   camera?: string;
   targetExperience: string;
 
-  coreLoop: string[];                 // ⚠️ 裸串：减集靠「沿用原文」，噪声见 §10
+  coreLoopSteps: string[];            // ⚠️ 裸串：减集靠「沿用原文」，噪声见 §10
+  //                                  ⚠️ **2026-10-09（票 34）：原名 `coreLoop`。**
+  //                                  工具 schema 里它写的是数组、也在 `required` 里，而上游
+  //                                  **12/12 吐字符串**（同一发里 `winConditions` 那些 12/12 都是数组）；
+  //                                  改提示词 9 发一发没救回来，键名换 `coreLoopSteps` ⇒ **3/3 数组**。
+  //                                  ⇒ `coreLoop` 撞上了「核心循环就是一句话」这个**强先验**。§4 那份同名，同日一并改。
 
   player: { role: string; goals: string[] };
 
@@ -220,7 +225,7 @@ export interface GameIntentSpec {
 | `resources: string[]` | **同层之内**与 `entities[].type = "resource"` 重复：设计层的那个桶**只认** `entities[].type = "resource"`（见 §4 四个桶的注释），于是「两个家 → 下游同一个桶」，模型每次运行都得猜一次（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 Q5）。⚠️ 它与票 03 说的「13 处**跨层**重名」不是一回事 —— 那些是意图层 X ↔ 设计层 X |
 
 ⚠️ **契约带一条顶层 gate**（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 R2-Q1）：
-必填字符串为空串 · `coreLoop` / `player.goals` / `mechanics` 为空数组 · `entities` 与 `mechanics` 的 id 重复
+必填字符串为空串 · `coreLoopSteps` / `player.goals` / `mechanics` 为空数组 · `entities` 与 `mechanics` 的 id 重复
 ⇒ 这一发**算 `schema` 失败、重采样**。分界线是「**空了就说明这一趟没说出一件事**」进 gate、
 「**空了本身是一句设计陈述**」不进 —— 所以 `winConditions: []` / `loseConditions: []` / `ambiguity: []` /
 **`entities: []`** 都是**合法**的。逐条理由与那张「别往里加」的名单在 `game-intent.ts` 的注释里。
@@ -259,7 +264,8 @@ export interface GameDesignSpec {
     runtimeProfile: { id: string; version: string };  // ⚠️ 引用不是裸串 —— 单一个名字对不上版本
   };
 
-  coreLoop: string[];                 // ② 判据：与 §3 的同名数组相减
+  coreLoopSteps: string[];            // ② 判据：与 §3 的同名数组相减
+  //                                  ⚠️ **2026-10-09（票 34）：原名 `coreLoop`，与 §3 同日一并改**（病因见 §3）。
 
   player: { id: string; role: string; abilities: string[]; goals: string[] };
 
@@ -298,7 +304,7 @@ export interface GameDesignSpec {
 **说的是同一件事**，而那两个在场上。
 
 ⚠️ **契约带一条顶层 gate**（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 Q4）：
-必填字符串为空串 · `coreLoop` / `player.abilities` / `player.goals` / `mechanics` / `levels` 为空数组 ·
+必填字符串为空串 · `coreLoopSteps` / `player.abilities` / `player.goals` / `mechanics` / `levels` 为空数组 ·
 **id 跨四桶重复** · **`levels[].entities[]` 解不到** ⇒ 这一发算 `schema` 失败、重采样。
 ⚠️ **四个桶本身可以为空**（障碍跑式关卡是真的，与意图层把 `entities: []` 划出去同一条理由）；
 `winConditions` / `loseConditions` 可空；`difficulty` 可缺席。逐条理由在 `game-design.ts` 的注释里。
@@ -632,15 +638,15 @@ config 侧那一族碰不到它。⚠️ 而 `reference-resolution` **只吃引�
 两个家指向设计层同一个桶）—— **别再找那个已经不存在的字段**。
 
 ⚠️ **描述性文本那一半：砍掉了，而且是量出来的**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md) 的 Q1 —— **更正票 03 的一条决定**）。
-票 03 当年把 `coreLoop` / `winConditions` / `loseConditions` / `progression` 划进「按**文本相等**相减」，
+票 03 当年把 `coreLoopSteps` / `winConditions` / `loseConditions` / `progression` 划进「按**文本相等**相减」，
 票 10 把「剩下的文本那一半」播给了票 19。票 19 拿票 10 探针留下的 **4 发真输出**
 （`.scratch/game-maker-v2/experiments/design-first-shot/raw/*.json`，两份 `ok` + 两份 `hostile`）量了一遍：
 
 ```text
-coreLoop       0/3 · 0/3 · 0/3 · 0/3        winConditions  0/1 ×4
+coreLoopSteps       0/3 · 0/3 · 0/3 · 0/3        winConditions  0/1 ×4
 loseConditions 0/1 ×4                        player.goals   0/1 ×4
 player.role · world.theme · world.setting —— 四条全是 ≠
-（意图 3 条 coreLoop → 设计 4 条，每条更长更具体）
+（意图 3 条 coreLoopSteps → 设计 4 条，每条更长更具体）
 ```
 
 ⇒ **设计层不复述意图层，它放大意图层**（§4 要求它「完整、可执行」，它照做了）。

@@ -14,7 +14,7 @@ export const INTENT: GameIntentSpec = {
   subgenre: "metroidvania-lite",
   camera: "横向卷轴",
   targetExperience: "孤独但一直向上",
-  coreLoop: ["探索废墟", "收集零件"],
+  coreLoopSteps: ["探索废墟", "收集零件"],
   player: { role: "拾荒者", goals: ["在天黑前抵达"] },
   world: { theme: "废土", setting: "铁轨旁的废墟", atmosphere: "黄昏，尘土悬浮" },
   mechanics: [{ id: "m-jump", name: "跳跃" }, { id: "m-double-jump", name: "二段跳" }],
@@ -43,7 +43,7 @@ export const VWS: VisualWorldSpec = {
 export const designFromModel = (over: Partial<GameDesignSpec> = {}): GameDesignSpec => ({
   format: "game-design/v1",
   game: { title: "拾荒者", genre: "模型瞎写的", camera: "模型瞎写的", runtimeProfile: { id: "胡编", version: "9" } },
-  coreLoop: ["在废墟间探索并收集零件"],
+  coreLoopSteps: ["在废墟间探索并收集零件"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑", "跳"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿月台往复巡逻", threat: "接触即伤" }],
   npcs: [], interactables: [],

@@ -16,7 +16,7 @@ const INTENT: GameIntentSpec = {
   title: "拾荒者",
   genre: "platformer",
   targetExperience: "孤独但一直向上",
-  coreLoop: ["探索废墟"],
+  coreLoopSteps: ["探索废墟"],
   player: { role: "拾荒者", goals: ["在天黑前抵达"] },
   world: { theme: "废土", setting: "铁轨旁的废墟", atmosphere: "黄昏，尘土悬浮" },
   mechanics: [{ id: "m-jump", name: "跳跃" }, { id: "m-double-jump", name: "二段跳" }],
@@ -45,7 +45,7 @@ const VWS: VisualWorldSpec = {
 const design = (over: Partial<GameDesignSpec> = {}): GameDesignSpec => ({
   format: "game-design/v1",
   game: { title: "拾荒者", genre: "模型瞎写的", camera: "模型瞎写的", runtimeProfile: { id: "胡编", version: "9" } },
-  coreLoop: ["探索废墟", "抵达终点"],
+  coreLoopSteps: ["探索废墟", "抵达终点"],
   player: { id: "p", role: "拾荒者", abilities: ["跑"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿固定路线往复", threat: "接触即伤" }],
   npcs: [], interactables: [],
@@ -121,7 +121,7 @@ describe("R12 ①：意图 → 设计的覆盖（今天最常响的那条）", (
   });
 
   it("⚠️ **单向的**：设计里**新加**意图没点名的实体 ⇒ **什么都不触发**（那是「需求补全」，是它的活）", () => {
-    // 探针的正例（票 10 的 R2-Q1）：意图层的 `coreLoop` 说了「收集废料与净水」，而 `entities[]` 里
+    // 探针的正例（票 10 的 R2-Q1）：意图层的 `coreLoopSteps` 说了「收集废料与净水」，而 `entities[]` 里
     // 只有废料 ⇒ 设计层补一个 `e-water` 是**对的**。这条判据**只查「少」，不查「多」**。
     const r = build({
       resources: [{ id: "r-part", purpose: "收集目标" }, { id: "e-water", purpose: "喝一口回血" }],

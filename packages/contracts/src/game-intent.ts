@@ -17,9 +17,9 @@
 //   ⇒ 反面同样成立：**本层的自由文本不许因为「设计层也有」就被砍**。
 //
 //   ⚠️ **但可减的只有 id 那一半 —— 描述性文本那一半被测死了**（票 19 的 Q1，2026-10-09）。
-//     票 03 当年把 `coreLoop` / `winConditions` / `loseConditions` / `progression` 也划进了
+//     票 03 当年把 `coreLoopSteps` / `winConditions` / `loseConditions` / `progression` 也划进了
 //     「按文本相等相减」，而票 19 拿票 10 探针的 **4 发真输出**量出它 **0% 命中**
-//     （意图 3 条 `coreLoop` → 设计 4 条，措辞全不一样）—— 因为**设计层要的就是「放大」**，
+//     （意图 3 条 `coreLoopSteps` → 设计 4 条，措辞全不一样）—— 因为**设计层要的就是「放大」**，
 //     不是复述。⇒ 那一条**砍掉了**，测量与理由在 `contracts/intent-coverage.ts` 的头一。
 //   ⇒ 于是这几条自由文本**今天的读者是提示词**（① 档那张欠条，见下面那一段），**不是判据**。
 //     ⚠️ 它们**该在的位置没变**（两层同名、意图 ⊆ 设计），只是「同名 ⇒ 一定能相减」到此为止。
@@ -83,15 +83,15 @@ export const GameIntentMechanicSchema = z.strictObject({
 
 // ── 顶层 gate：**「模型没做决定」与「用户要的就是这样」不许长得一样**（票 09 的 R2-Q1）────────
 //
-//   本契约的必填字段**没有 `.min(1)`**（`genre: z.string()`、`coreLoop: z.array(z.string())`），
-//   于是 `genre: ""` 与 `coreLoop: []` **完全合法** —— 而它们在文件里与「用户要的就是这样」
+//   本契约的必填字段**没有 `.min(1)`**（`genre: z.string()`、`coreLoopSteps: z.array(z.string())`），
+//   于是 `genre: ""` 与 `coreLoopSteps: []` **完全合法** —— 而它们在文件里与「用户要的就是这样」
 //   **一模一样**。票 04 砍 `bodyProportions`、票 05 砍 `cameraModel` 都是同一种病：
 //   两个不同的东西在文件里长得一样，下一个人分不出来。
 //
 //   **这条 gate 管什么** —— 分界线是「结构性 / 语义性」（人类拍板，票 09 第 2 轮 R2-Q1）：
 //     凡「空了就说明**这一趟没说出一件事**」的 ⇒ 进 gate（这一发算 `schema` 失败、重采样）；
 //     凡「空了**本身是一句设计陈述**」的 ⇒ **不进**。
-//   进：必填字符串非空 · 数组元素非空 · `coreLoop` / `player.goals` / `mechanics` ≥ 1 ·
+//   进：必填字符串非空 · 数组元素非空 · `coreLoopSteps` / `player.goals` / `mechanics` ≥ 1 ·
 //       可选对象出现时不得是空壳 · id 不得重复。
 //   不进（**逐条写下来，免得下一个人往里加**）：
 //     · `winConditions: []` / `loseConditions: []` —— 「不会死 / 没有终点」是真设计
@@ -139,7 +139,7 @@ export const GameIntentSpecSchema = z.strictObject({
   targetExperience: z.string(),
 
   /** 核心循环。⚠️ **裸串且不封口**（Q3(a)）—— 减集靠**沿用原文**，见该票已认的噪声。 */
-  coreLoop: z.array(z.string()),
+  coreLoopSteps: z.array(z.string()),
 
   player: z.strictObject({
     role: z.string(),
@@ -197,7 +197,7 @@ export const GameIntentSpecSchema = z.strictObject({
 
   // ② 数组的**元素**：空串不是「没有这一条」，是一个占位符
   const arrays: [string, string[]][] = [
-    ["coreLoop", v.coreLoop],
+    ["coreLoopSteps", v.coreLoopSteps],
     ["player.goals", v.player.goals],
     ["winConditions", v.winConditions],
     ["loseConditions", v.loseConditions],
@@ -209,7 +209,7 @@ export const GameIntentSpecSchema = z.strictObject({
 
   // ③ 「一条都说不出」的数组（⚠️ `entities` **不在**这一档 —— 理由见上面那段）
   const nonEmpty: [string, number][] = [
-    ["coreLoop", v.coreLoop.length],
+    ["coreLoopSteps", v.coreLoopSteps.length],
     ["player.goals", v.player.goals.length],
     ["mechanics", v.mechanics.length]
   ];

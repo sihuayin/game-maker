@@ -14,7 +14,7 @@ const INTENT = {
   subgenre: "metroidvania-lite",
   camera: "横向卷轴",
   targetExperience: "孤独但一直向上",
-  coreLoop: ["探索废墟", "收集零件", "抵达终点"],
+  coreLoopSteps: ["探索废墟", "收集零件", "抵达终点"],
   player: { role: "拾荒者", goals: ["在天黑前抵达"] },
   world: { theme: "废土", setting: "铁轨旁的废墟", atmosphere: "黄昏，尘土悬浮" },
   mechanics: [
@@ -69,9 +69,9 @@ describe("§id 是集合差的键（票 03 Q3(a)）", () => {
     expect(parse({ mechanics: [{ id: "m-1", name: "跳" }] }).success).toBe(true);
   });
 
-  it("而 `coreLoop` / `winConditions` 保持裸串 —— 它们是被**沿用**的描述，不是被造出来的东西", () => {
-    expect(parse({ coreLoop: [{ id: "c-1", text: "探索" }] }).success).toBe(false);
-    expect(parse({ coreLoop: ["探索"] }).success).toBe(true);
+  it("而 `coreLoopSteps` / `winConditions` 保持裸串 —— 它们是被**沿用**的描述，不是被造出来的东西", () => {
+    expect(parse({ coreLoopSteps: [{ id: "c-1", text: "探索" }] }).success).toBe(false);
+    expect(parse({ coreLoopSteps: ["探索"] }).success).toBe(true);
   });
 });
 
