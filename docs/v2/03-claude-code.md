@@ -75,6 +75,9 @@ Intent QA
 Repair
 ```
 
+⚠️ **2026-10-09**：**`§33` 的验收链止于三个 QA，不含这个 `Repair` 环** —— 第一阶段不建修复循环
+（[票 33](../../.scratch/game-maker-v2/issues/33-r13-amendment.md) 改写 R13），`Repair` 整段**推后**。
+
 ---
 
 # 2. 第一原则
@@ -730,6 +733,18 @@ GameDesignSpec
 ---
 
 # 24. Repair Loop
+
+> ⚠️ **2026-10-09 —— 本阶段不建修复循环**（R13，按 [票 33](../../.scratch/game-maker-v2/issues/33-r13-amendment.md) 改写）。
+> **`§33` 的验收链止于三个 QA**，不含 `Repair`。下面这一节**留作史料**。
+>
+> ⚠️ **就地更正一处结构性错误**：本节曾让 `packages/qa/diagnose.ts` + `packages/qa/repair.ts` **都住 `qa`** ——
+> 那**做不到**（`scripts/check-deps.mjs` 的 `ALLOWED` 里 `@game-maker/qa` **只有 `contracts`**）。
+> 分法是：**诊断住 `qa`**（只需 `contracts` 类型，可行）· **执行重生成住 `pipeline`**（它才够得着 `assets`）。
+>
+> ⚠️ **真要建循环时，起点是** [票 21 的 Answer §5](../../.scratch/game-maker-v2/issues/21-repair-loop.md) ——
+> 那份「整包」（四条冻结的循环设计 + 三个押后的问题 + `repairAttempts` 的落点）**只住那里，本节不复述**。
+
+**原规格（史料）**
 
 实现：
 

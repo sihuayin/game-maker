@@ -508,7 +508,7 @@ V2 第一阶段完成必须满足：
 | `03 §18` 要建 `packages/visual-memory/` | **不建**（R11/R14）。世界视觉记忆 = `VisualWorldSpec`，角色基因 = `CharacterDNA` 契约 |
 | `03 §28` 的 `out/<gameId>/` 扁平文件 + `playable/` | `run/v<N>/` + `pack/v<N>/` + `site/v<N>/`，**禁止覆盖**（R8） |
 | `03 §21` 的视觉七项（style/palette/silhouette/composition/character/material/animation） | **全是观察**，不进判据（R3） |
-| `03 §24` 的修复含 Config Regen | 第一阶段**只做资源级重生成**（R13） |
+| `03 §24` 的修复含 Config Regen | 第一阶段**不建修复循环**；**资源级 / config 级重生成均未决**（后续独立决策），全链重跑不做（R13，[票 33](../../.scratch/game-maker-v2/issues/33-r13-amendment.md) 改写） |
 | `03 §11` 的「记录 `unsupportedRequirements`」 | **不采用**：`RuntimeProfile` 是外壳能力的**事实投影**，构建期**拒绝**（R12） |
 | `03 §7/§16` 的 Material DNA | **延后**，等真有消费者（R14） |
 | `03 §2/§6/§25` 让复用 `packages/runtime` 与 `packages/site` | 这两个包**不存在**；实际是 `contracts` / `assets` / `demo` / `cli` / `mcp` |

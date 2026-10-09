@@ -661,14 +661,25 @@ IntentQAResult   ← ⚠️ 不采用：`score` 与「不带分数」正面冲�
 
 # Phase 16：Repair Loop
 
-新增：
+> ⚠️ **2026-10-09 —— 本阶段不建。**（R13，按 [票 33](../../.scratch/game-maker-v2/issues/33-r13-amendment.md) 改写：
+> **第一阶段不建修复循环**；**资源级重生成**与 **config 级重新生成**均**未决** —— 后续独立决策，
+> **不预先批准其中任一方案**；全链重跑**不做**。）
+>
+> **本阶段不新增任何文件。** 下面这份设计**不属于第一阶段**，原文留作**史料**；
+> 真要建循环时，**起点是** [票 21 的 Answer §5](../../.scratch/game-maker-v2/issues/21-repair-loop.md)
+> （那份「整包」—— 四条冻结的循环设计 + 三个押后的问题 + `repairAttempts` 的落点 —— **只住那里，本文件不复述**）。
+
+**原设计（史料）** —— 曾计划新增：
 
 ```text
 packages/qa/diagnose.ts
 packages/qa/repair.ts
 ```
 
-⚠️ **按 R13，第一阶段只做「资源级重生成」。** 去掉 `Config Regen`：
+⚠️ **这两个落点**今天**结构性做不到**（[票 33](../../.scratch/game-maker-v2/issues/33-r13-amendment.md) 量到）：
+`scripts/check-deps.mjs` 的 `ALLOWED` 里 `@game-maker/qa` **只有 `contracts`** ⇒
+**诊断**（只需 `contracts` 类型）住 `qa` **可行**，而**执行重生成**够不着 `assets` ⇒ 它住 `pipeline` 才可行。
+**两个文件都住 `qa`** 是错的。
 
 ```text
 判据 Failure
@@ -682,17 +693,11 @@ Asset Regen（只重生成那一个资源）
 QA（同一条判据）
 ```
 
-**不做**：`Config Regen` · 全链重跑。理由：全链重跑会把 LLM 的随机性引进循环里 ——
-那不叫修复，叫**再抽一次奖**。⇒ 第一阶段的修复**很可能只覆盖视觉判据**，
-「引用族」与「意图覆盖」两类失败**就是失败**。
-
-详见[票 21](../../.scratch/game-maker-v2/issues/21-repair-loop.md)。
-
-最多：
-
-```text
-3 attempts
-```
+⚠️ **原设计里那句预承诺已删**：曾写着「第一阶段的修复**很可能只覆盖视觉判据**，「引用族」与「意图覆盖」
+两类失败**就是失败**」—— [票 21](../../.scratch/game-maker-v2/issues/21-repair-loop.md) 量到那**六条判据里只有
+`reachability` 一条会响**（且响在**首次生成的信息缺口**上，票 21 已补），所以那句预承诺**没有依据**。
+**全链重跑仍然不做**（理由不变：它把 LLM 的随机性引进循环里 —— 那不叫修复，叫**再抽一次奖**）。
+原设计的那道上限（`最多 3 attempts`，超过后 `status = failed`，不得无限循环）也**随循环一起推后**。
 
 ---
 
