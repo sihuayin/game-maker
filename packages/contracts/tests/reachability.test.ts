@@ -6,7 +6,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  auditGameConfig, auditReferences, auditReachability, maxJumpHeight, parseAssetPack, parseGameConfig, playerMoveOf,
+  auditGameConfig, auditReferences, auditReachability, DEFAULT_PLAYER_MOVE, jumpSpan, maxJumpHeight,
+  parseAssetPack, parseGameConfig, playerMoveOf,
   type AssetPackManifest, type ConfigIssue, type GameConfig,
 } from "../src/index.js";
 
@@ -112,6 +113,54 @@ describe("§它**不**报什么（宽松的那一侧 —— 误伤比漏报贵�
 
   it("⚠️ 玩家资源解不到 ⇒ 也不报（那是**引用族**的事，本判据不重复说一遍）", () => {
     expect(reach(withConfig((c) => { c.player.asset = "查无此资源"; }))).toEqual([]);
+  });
+});
+
+describe("§⚠️ 票 21：提示词里那个「同高跨度」就是**真的边界**（不是判据那套宽松模型的上界）", () => {
+  // 两个**不同的命题**，本票的补丁同时压着它们：
+  //   ① 模型拿到了正确参数（那条判据在 `packages/assets/tests/compile-runtime.test.ts`）；
+  //   ② 照那些参数摆出来的布局确实可达 —— 就是这一条。
+  //
+  // ⚠️ 为什么要分开：`compile-runtime` 现在把 `jumpSpan(move, 0)`（同高 = **最紧**的那一半）
+  //   告诉模型，而**判据自己**搜索时用的是 `jumpSpan(move, 世界高)`（落点掉到世界底部 = **最宽**
+  //   的那一半，给的是上界）。两个数**不一样**（66 vs 110.13），而会响的是**紧**的那个 ⇒
+  //   拿宽松那个去教模型，会让「照提示词摆的关卡照样红」。
+  const gapAt = (w: number) => withConfig((c) => {
+    c.terrain = [{ x: 0, y: 250, w: 600, h: 20 }, { x: 600 + w, y: 250, w: 840 - w, h: 20 }];
+  });
+
+  it("沟宽 60px ⇒ 通（在 66px 之内）；沟宽 100px ⇒ 报够不到 —— **槽宽 100 远比判据的搜索半径 111 窄**", () => {
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE)).toBeCloseTo(66, 1);                       // 紧的那一半
+    expect(Math.ceil(jumpSpan(DEFAULT_PLAYER_MOVE, 270))).toBeGreaterThan(100);      // 松的那一半 = 111
+    expect(reach(gapAt(60))).toEqual([]);
+    expect(who(reach(gapAt(100)))).toContain('entity "signal"');
+  });
+
+  it("⚠️ 而**顶点**那一半照旧：100px 高的墙过不去、40px 的过得去（与提示词说的 60.5px 同一个数）", () => {
+    expect(maxJumpHeight(playerMoveOf(CONFIG))).toBeCloseTo(60.5, 1);
+    const wall = (h: number) => withConfig((c) => {
+      c.entities.push({ id: "wall", kind: "solid", at: { x: 600, y: 250 }, asset: "prop-luggage-pile", body: { w: 20, h } });
+    });
+    expect(reach(wall(40))).toEqual([]);
+    expect(who(reach(wall(100)))).toContain('entity "signal"');
+  });
+
+  it("⚠️ **判据自己用的是宽的那一半**：从高台掉到地面（落差 150px）时，一趟能跨 70px —— 而提示词给模型的是 66px", () => {
+    // ⚠️ 这条钉的是**判据的搜索半径**（`maxDx = ceil(jumpSpan(move, 世界高))`）——
+    //   有落差时滞空更久、一趟更远，而「全局重跑式」的搜索必须覆盖到那一趟。
+    //   把半径退化成同高跨度（66）⇒ 这一条**当场红**（BFS 根本不去看 70px 外的落脚点）。
+    const dropHop = withConfig((c) => {
+      c.terrain = [{ x: 0, y: 100, w: 200, h: 20 }, { x: 300, y: 250, w: 1140, h: 20 }];
+      c.player.at = { x: 40, y: 100 };                       // 从台上出发
+      c.entities = c.entities.filter((e) => e.id === "signal");
+      c.entities[0]!.at = { x: 340, y: 250 };                // 目标在地面上（离台右缘一趟的距离）
+      c.objective = { kind: "collect-then-reach", gate: "signal" };
+    });
+    expect(reach(dropHop)).toEqual([]);
+    // ⇒ 落差 150px 时那一趟的上界（94.6）比同高那半（66）宽 —— 两个数**不一样**，
+    //   而给模型的是**紧**的那个（教模型用宽的那个，照它摆的关卡照样红）。
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE, 150)).toBeCloseTo(94.6, 1);
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE, 150)).toBeGreaterThan(jumpSpan(DEFAULT_PLAYER_MOVE));
   });
 });
 

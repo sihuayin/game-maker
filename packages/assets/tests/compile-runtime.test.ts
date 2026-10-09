@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { parseGameConfig, STRUCTURED_CALL_ATTEMPTS, type GameDesignSpec } from "@game-maker/contracts";
+import { DEFAULT_PLAYER_MOVE, jumpSpan, maxJumpHeight, parseGameConfig, STRUCTURED_CALL_ATTEMPTS, type GameDesignSpec } from "@game-maker/contracts";
 import { CommandError, compileRuntime, gameConfigExample } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
@@ -217,6 +217,32 @@ describe("§问话面：发出去的那一发", () => {
     expect(b.messages[0].content).toHaveLength(1);
     expect(b.thinking).toEqual({ type: "disabled" });
     expect(b.max_tokens).toBe(16_000); // 与 08/09/10/12 同档
+  });
+
+  it("⚠️ **手感那一节把数给出去**（票 21）—— 而那些数是**从契约推的**，不是抄进提示词的字面量", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+
+    // ⚠️ 期望值**在这里现算**（从 `DEFAULT_PLAYER_MOVE`）—— 提示词里写死一个字面量
+    //   （比如「60.5」）今天照样绿，但默认手感一改就**当场红**。这就是这条判据的全部牙齿：
+    //   模型必须拿到**当前那一套**的数，而不是某一次抄下来的数。
+    const apex = maxJumpHeight(DEFAULT_PLAYER_MOVE);
+    const span = jumpSpan(DEFAULT_PLAYER_MOVE);           // ⚠️ 同高落点 —— 紧的那一半
+    expect(text).toContain(apex.toFixed(1));              // 跳跃顶点
+    expect(text).toContain(span.toFixed(1));              // 同高跨度
+    // 三个原始参数也在（模型要能自己推「落点更低时更远」）
+    for (const n of [DEFAULT_PLAYER_MOVE.speed, DEFAULT_PLAYER_MOVE.jumpVelocity, DEFAULT_PLAYER_MOVE.gravity])
+      expect(text).toContain(String(n));
+
+    // ⚠️ 而它**不许**把判据那套宽松模型（落点掉到世界底部 ⇒ 110.1px）当成给模型的数 ——
+    //   那是**上界**，会响的是紧的那个（票 21：两个数不一样，教错了照样红）。
+    expect(text).not.toContain(jumpSpan(DEFAULT_PLAYER_MOVE, 270).toFixed(1));
+
+    // 老那句话（**没有数**的手势）换掉了 —— 它正是这条信息缺口的原文
+    expect(text).not.toContain("台阶别高过它");
+    expect(text).toContain("手感");
   });
 
   it("⚠️ **设计层那 12 个 ① 档字段逐个具名**进提示词（票 10 的裁定：具名插值在下游 —— 本步是下游之一）", async () => {

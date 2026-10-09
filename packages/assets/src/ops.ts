@@ -9,8 +9,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, entityBox, FALLBACK_ANCHOR, forcedTool,
+  auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
   GameDesignSpecSchema,
+  jumpSpan, maxJumpHeight,
   parseAssetPack, parseGameConfig, parseLedger, parseRecipe, parseToolUse, PLATFORMER_V1,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   summarizeCalls, VisualWorldSpecSchema,
@@ -535,6 +536,20 @@ const CONFIG_SHAPES: Record<string, { format: string; artifactKind: string }> = 
   platformer: { format: "game-config/v1", artifactKind: "game-config" }
 };
 
+// ── 手感：模型**必须拿到**的两个数（票 21）────────────────────────────────────
+//
+// ⚠️ 提示词从前只写「玩家能跳的高度是有限的，台阶别高过它」—— 一句**没有数**的话。
+//   于是模型被要求摆出一个走得到的关卡，却**没被告知能跳多远**，而 `auditReachability`
+//   正好是六条判据里唯一能在正常链路上响的那条（票 21 量到的）⇒ 那一声响是**信息缺口**，
+//   不是模型不听话。
+//
+// ⚠️ 数**从契约推、不写成字面量**：默认手感只有一处来源（`DEFAULT_PLAYER_MOVE` ——
+//   外壳（`demo/src/world.ts`）与判据（`playerMoveOf`）读的是同一个常量）⇒ 把 60.5 抄进
+//   提示词就是「两套真相」，而它漂移的代价是**模型照提示词摆、判据照自己算**，两边打架。
+// ⚠️ `jumpSpan` 与 `auditReachability` 的 `hop` **是同一条抛物线的同一个函数**（票 21 抽的）。
+const DEFAULT_JUMP_APEX = maxJumpHeight(DEFAULT_PLAYER_MOVE);
+const DEFAULT_JUMP_SPAN = jumpSpan(DEFAULT_PLAYER_MOVE);   // ⚠️ 同高落点 —— 最紧的那一半
+
 /**
  * 设计 + 这一代外壳 + 资源包 → 一份 game-config，落盘到 `<out>/<id>/game-configs/v<N>.json`。
  *
@@ -638,11 +653,25 @@ ${resourceBrief(manifest)}
 # 锚点的意思（照这个摆）
 ${[...new Set(manifest.assets.map((a) => `${a.kind}：${anchorHint(a.anchor)}`))].join(" · ")}
 
+# 手感：玩家跳多高、一跃多远（⚠️ **关卡不照这套摆就会「够不到」**）
+玩家**只有单跳**（没有二段跳、没有冲刺）。**默认手感** —— ⚠️ 正是**你不写 \`player.move\` 时外壳读的那一套**：
+
+跑速 \`speed\` = ${DEFAULT_PLAYER_MOVE.speed}px/s · 起跳初速 \`jumpVelocity\` = ${DEFAULT_PLAYER_MOVE.jumpVelocity}px/s · 重力 \`gravity\` = ${DEFAULT_PLAYER_MOVE.gravity}px/s²
+
+由它推出的两条**硬上限** —— 照它们摆，关卡就是通的：
+
+1. **跳跃顶点 = ${DEFAULT_JUMP_APEX.toFixed(1)}px**（= 初速² ÷ (2 × 重力)）。
+   **台阶、平台、墙的落差别高过这个数** —— 高过就是够不到。
+2. **同一高度上，一跳最多跨 ${DEFAULT_JUMP_SPAN.toFixed(1)}px**（= 跑速 × 滞空时间，滞空 = 2 × 初速 ÷ 重力）。
+   落点**比起点低**时可以更远（掉得越久走得越远），但**同一水平线上这就是上限** —— 比它宽的沟过不去。
+
+⚠️ **别写 \`player.move\`**（骨架里也没有它）—— 写了上面两条数就不成立了。真要写，就照同样的两条公式重算、并照你写的那一套摆。
+
 # 形状（**逐字照抄这个骨架**；\`<…>\` 是占位符，换成清单里真实的 id 与动画名）
 ${JSON.stringify(gameConfigExample, null, 2)}
 
-⚠️ 骨架里的**位置只是示意**（都摆在地面线上）—— 按这一关的设计把东西铺开，并让它真的可通关：
-玩家能跳的高度是有限的，台阶别高过它。`;
+⚠️ 骨架里的**位置只是示意**（都摆在地面线上）—— 按这一关的设计把东西铺开，并让它**真的可通关**：
+照上面「手感」那一节的两条硬上限摆 —— **台阶别高过跳跃顶点、沟别宽过同高跨度**。`;
 
   // ⚠️ **账**：一格 = 一次调用（`STRUCTURED_CALL_ATTEMPTS` 次往返都记在里面）。
   const call = spentCall("compile-runtime", "game-config");

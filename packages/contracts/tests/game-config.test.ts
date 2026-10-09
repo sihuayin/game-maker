@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  DEFAULT_PLAYER_MOVE, GameConfigSchema, auditGameConfig, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
+  DEFAULT_PLAYER_MOVE, GameConfigSchema, auditGameConfig, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
   parseAssetPack, type AssetPackManifest, type GameConfig, type ConfigIssue,
 } from "../src/index.js";
 
@@ -98,6 +98,18 @@ describe("形状：一份真配置能过，逃生舱全被堵死", () => {
   it("`pickupCount` 从实体派生 —— 数量**不重复声明**", () => {
     expect(pickupCount(base())).toBe(3);
     expect(maxJumpHeight(DEFAULT_PLAYER_MOVE)).toBeCloseTo(60.5, 1);
+  });
+
+  it("⚠️ 票 21：`jumpSpan` 是**一次跳跃的水平跨度** —— 同高 66px，落点越低越远（同一条抛物线）", () => {
+    // 滞空 `2v/g` = 2×330÷900 = 0.7333s ⇒ 90 × 0.7333 = 66px。
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE)).toBeCloseTo(66, 1);
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE, 0)).toBeCloseTo(66, 1);
+    // 落点掉到世界的底（270px）⇒ 滞空变长 ⇒ 跨度变大（`auditReachability` 的搜索半径就是这么来的）
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE, 270)).toBeCloseTo(110.13, 1);
+    // ⚠️ **单调**：掉得越久走得越远 —— 这条式子只有一处实现（判据与提示词共用它）
+    expect(jumpSpan(DEFAULT_PLAYER_MOVE, 270)).toBeGreaterThan(jumpSpan(DEFAULT_PLAYER_MOVE));
+    // 跑得更快就跨得更远（换一套手感，同一式子照算）
+    expect(jumpSpan({ ...DEFAULT_PLAYER_MOVE, speed: 180 })).toBeCloseTo(132, 0);
   });
 });
 

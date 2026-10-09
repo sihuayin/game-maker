@@ -202,6 +202,22 @@ export const playerMoveOf = (c: GameConfig) => c.player.move ?? DEFAULT_PLAYER_M
 export const maxJumpHeight = (move: { jumpVelocity: number; gravity: number }): number =>
   (move.jumpVelocity * move.jumpVelocity) / (2 * move.gravity);
 
+/**
+ * 一次跳跃的**水平跨度**（像素）—— 落点比起跳点低 `drop` 像素时，最远能落到多远。
+ *
+ * ⚠️ **它与 `auditReachability` 的 `hop` 是同一条抛物线**（票 21 抽出来、**两个调用方共用**）：
+ *   判据拿它算搜索半径，`compile-runtime` 拿它**把数告诉模型**。
+ *   ⇒ 同一条式子写两遍就是这个仓库一直在打的「两套真相」，而这里漂移的代价是
+ *   **模型照提示词摆出来的关卡被自己的判据判死**。
+ *
+ * `drop` 省略 = 落点与起点**同高**（滞空 `2·v/g`）—— 那是**最紧**的那一半，
+ * 也正是提示词该给模型的那个数（落点更低时判据会放宽，判据的**上界**是 `drop = 世界高`）。
+ */
+export const jumpSpan = (
+  move: { speed: number; jumpVelocity: number; gravity: number }, drop = 0,
+): number =>
+  (move.speed * (move.jumpVelocity + Math.sqrt(move.jumpVelocity ** 2 + 2 * move.gravity * drop))) / move.gravity;
+
 // ── 三族构建期校验（票 09 §4）─────────────────────────────────────────────
 //
 // 跑在**装配站点那一步** —— 那是唯一同时看得到包与 config 的地方，

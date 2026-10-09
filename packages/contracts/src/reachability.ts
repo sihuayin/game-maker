@@ -29,7 +29,7 @@
 //   「出生点卡在 solid 里」是一条**硬失败**，而它住 `auditGameConfig`（另有其判据）。
 //   本函数遇到它**不报任何东西** —— 报「全都够不到」是把一次拒绝说第二遍，
 //   而且会把人指到一个**不存在的出路**上。同一条纪律：`pack` 先炸的检查，QA 不重写。
-import { FALLBACK_ANCHOR, entityBox, maxJumpHeight, playerMoveOf } from "./game-config.js";
+import { FALLBACK_ANCHOR, entityBox, jumpSpan, maxJumpHeight, playerMoveOf } from "./game-config.js";
 import type { ConfigIssue, GameConfig } from "./game-config.js";
 import type { AssetPackManifest } from "./assetpack.js";
 
@@ -139,8 +139,9 @@ export function auditReachability(config: GameConfig, manifest: AssetPackManifes
   // ── 一次跳跃的上界 ─────────────────────────────────────────────────────
   const apex = maxJumpHeight(move);
   // 飞得最久的那一次（掉到世界的底）：`t = (v0 + √(v0² + 2gH)) / g` ⇒ 水平最多跑这么远。
-  const maxT = (move.jumpVelocity + Math.sqrt(move.jumpVelocity ** 2 + 2 * move.gravity * H)) / move.gravity;
-  const maxDx = Math.ceil(move.speed * maxT);
+  // ⚠️ **票 21 之后这条式子只有一处实现**（`jumpSpan`）—— `compile-runtime` 的提示词要把它
+  //   给模型，两处各写一遍必然漂移，而漂移的后果是「模型照提示词摆、判据照自己算」打架。
+  const maxDx = Math.ceil(jumpSpan(move, H));
 
   /**
    * 从落脚点 A 跳到 B：能不能到，顺路把经过的靶子划掉。
