@@ -1,0 +1,542 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-run",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-idle",
+        "role": "主角待机",
+        "description": "拾荒者直立正面朝屏的极简方块像素小人，深蓝制服、亮腰带与帽子，单帧近乎静止的待机",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 2,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view scavenger hero idle, 32x32, stocky blocky rectangle-built body, deep blue uniform coat, bright belt, cap, front-facing, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-run",
+        "role": "主角横向奔跑",
+        "description": "拾荒者横向奔跑的方块像素循环：躯干整体位移并伴有腿部方块交替，帽子与腰带保持在固定位置",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "dependsOn": [
+          "scavenger-idle"
+        ],
+        "animations": [
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 10,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view scavenger hero run cycle, 4 frames, blocky rectangle legs alternating, whole body shifts, deep blue uniform coat, bright belt, cap, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-jump",
+        "role": "主角跳跃",
+        "description": "拾荒者起跳与滞空的方块像素姿态：身体上抬，腿部方块收拢成团",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "dependsOn": [
+          "scavenger-run"
+        ],
+        "animations": [
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view scavenger hero jump, 2 frames, legs tucked as blocky rectangles, body lifted, deep blue uniform coat, bright belt, cap, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-idle",
+        "role": "敌人徘徊待机",
+        "description": "废弃城市中徘徊的敌人，矮胖方块剪影，深蓝制服式外衣配亮色腰带与帽子，正面朝屏",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "enemy",
+        "masterAsset": "master-enemy",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 2,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view enemy idle, 32x32, stocky blocky hostile humanoid, deep blue uniform coat, bright belt, cap, front-facing, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-patrol",
+        "role": "敌人巡逻逼近",
+        "description": "敌人沿固定路线左右徘徊、近身时加速逼近的方块像素循环：腿部方块交替，躯干整体位移",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "enemy",
+        "masterAsset": "master-enemy",
+        "dependsOn": [
+          "enemy-idle"
+        ],
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view enemy patrol walk cycle, 4 frames, blocky rectangle legs alternating, hostile posture, deep blue uniform coat, bright belt, cap, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource",
+        "role": "可拾取资源",
+        "description": "散落在街区地面上的小方块资源，饱和暖色块，硬边矩形，无渐变",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "treasure-chest-closed",
+        "role": "宝箱·锁闭态",
+        "description": "静止立在地面或平台上的锁闭宝箱：方块化箱体加深色箱盖缝与金属锁扣，饱和暖色块为主",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view closed treasure chest, 32x32, blocky rectangular crate with lid seam and metal lock plate, saturated warm gold blocks, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "treasure-chest-open",
+        "role": "宝箱·已开启态",
+        "description": "箱盖向后翻起、内部露出空腔的开启态宝箱，与锁闭态同尺寸同色块语言",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "dependsOn": [
+          "treasure-chest-closed"
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view opened treasure chest, 32x32, lid flipped back, dark empty interior, metal lock plate, saturated warm gold blocks, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "signpost",
+        "role": "路牌",
+        "description": "立在平直地面上的方块化路牌：细立柱上方一块硬边矩形牌面，作视觉引导",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "bench",
+        "role": "长椅",
+        "description": "中景墙面与地面点缀用的极简长椅：矩形坐面与两支方块椅腿，低色数",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": false
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hanging-block",
+        "role": "悬吊方块平台",
+        "description": "伸在大道上方、供踩踏的悬吊方块平台：硬边矩形色块，顶部平坦可落脚",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view suspended block platform, 48x16, hard-edged rectangle slab with short hanging chain stubs, muted wall tones, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wall-frame",
+        "role": "墙面画框",
+        "description": "贴在楼体立面上的方块画框装饰：外圈矩形边框内含平坦色块，无图案细节",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": false
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "track-segment",
+        "role": "地面轨道段",
+        "description": "贯穿全城的平直轨道：硬边矩形交替的枕木与双条平行轨，左右可无缝拼接",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "goal-marker",
+        "role": "终点目标物",
+        "description": "立在城市尽头无遮挡长平地道尽头的终点目标物：高立柱上方一块醒目饱和色块方牌",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view goal marker post, 32x64, tall thin pillar with a big saturated rectangular sign on top, hard edges, no gradient, no antialiasing, low color count"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-wasteland-city",
+        "role": "关卡特有远景墙面",
+        "description": "废弃城市远景：一条平直无起伏的楼体立面带，点缀矩形窗洞与坡顶剪影，与近景之间无高低起伏",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 240,
+          "h": 160
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "far-sky",
+            "parallax": 0.15
+          },
+          {
+            "name": "far-city",
+            "parallax": 0.35
+          },
+          {
+            "name": "wall",
+            "parallax": 0.7,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "ground",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-scrolling wasteland city background, layered bands: deep dark sky band, distant blocky building silhouette with pitched roofs, large flat wall band of building facades with rectangular window holes, flat ground band with track, no gradients, no antialiasing, low color count, retro arcade"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-bar",
+        "role": "顶部状态栏底板",
+        "description": "屏幕顶部横贯的状态栏底板：平坦中央区，四周等宽硬边框，可横向拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 6,
+          "right": 6,
+          "top": 5,
+          "bottom": 5
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "icon-resource",
+        "role": "资源计数图标",
+        "description": "状态栏里表示资源数量的方形小图标，与场景中的资源同色块语言，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "icon-heart",
+        "role": "生命图标",
+        "description": "状态栏里表示生命的心形方块图标，由矩形与三角基本几何拼合，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "icon-chest",
+        "role": "宝箱进度图标",
+        "description": "状态栏里表示已开宝箱的方箱图标，与宝箱同色块语言，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-scavenger",
+      "role": "主角母版",
+      "description": "矩形拼合的直立小人母版：矮胖方块比例，头身近似等宽，深蓝制服式外衣配亮色腰带与帽子，正面朝屏站立",
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view character master sheet, stocky blocky proportions, head nearly as wide as body, deep blue uniform coat, bright belt, matching cap, front-facing standing idle, no gradient, no antialiasing, low color count, retro arcade"
+      },
+      "characterId": "scavenger",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    {
+      "id": "master-enemy",
+      "role": "敌人母版",
+      "description": "矩形拼合的直立小人母版：与主角同头身比的矮胖方块剪影，深蓝制服式外衣配亮色腰带与帽子，轮廓更凶",
+      "source": {
+        "kind": "image",
+        "prompt": "flat pixel minimal side-view enemy master sheet, stocky blocky humanoid silhouette, same head-to-body ratio as hero, deep blue uniform coat, bright belt, matching cap, front-facing standing idle, hostile look, no gradient, no antialiasing, low color count, retro arcade"
+      },
+      "characterId": "enemy",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

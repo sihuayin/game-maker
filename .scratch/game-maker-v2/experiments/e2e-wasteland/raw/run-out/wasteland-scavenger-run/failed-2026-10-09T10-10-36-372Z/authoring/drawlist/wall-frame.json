@@ -1,0 +1,153 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "wall-frame",
+  "frame": "wall-frame",
+  "viewBox": [
+    0,
+    0,
+    24,
+    24
+  ],
+  "expectedSize": [
+    24,
+    24
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:9",
+      "strokeWidth": 1,
+      "x": 3,
+      "y": 2,
+      "w": 18,
+      "h": 20
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 3,
+      "w": 16,
+      "h": 18,
+      "colors": [
+        "palette:1",
+        "palette:9"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "stroke": "palette:9",
+      "strokeWidth": 1,
+      "x": 5,
+      "y": 4,
+      "w": 14,
+      "h": 16
+    },
+    {
+      "op": "dither",
+      "x": 6,
+      "y": 5,
+      "w": 12,
+      "h": 14,
+      "colors": [
+        "palette:2",
+        "palette:7"
+      ],
+      "ratio": 0.4,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 6,
+      "y": 5,
+      "w": 12,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 6,
+      "y": 17,
+      "w": 12,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 6,
+      "y": 5,
+      "w": 2,
+      "h": 14
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 16,
+      "y": 5,
+      "w": 2,
+      "h": 14
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 5,
+      "y": 4,
+      "w": 14,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 5,
+      "y": 19,
+      "w": 14,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 4,
+      "y": 21,
+      "w": 16,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 4,
+      "y": 2,
+      "w": 1,
+      "h": 19
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 19,
+      "y": 2,
+      "w": 1,
+      "h": 19
+    },
+    {
+      "op": "line",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x1": 4,
+      "y1": 2,
+      "x2": 19,
+      "y2": 2
+    },
+    {
+      "op": "line",
+      "stroke": "palette:9",
+      "strokeWidth": 1,
+      "x1": 4,
+      "y1": 22,
+      "x2": 19,
+      "y2": 22
+    }
+  ]
+}

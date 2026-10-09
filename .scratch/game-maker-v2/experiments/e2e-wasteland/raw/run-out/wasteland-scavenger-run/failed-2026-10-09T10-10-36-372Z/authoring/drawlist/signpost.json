@@ -1,0 +1,154 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "signpost",
+  "frame": "signpost",
+  "viewBox": [
+    0,
+    0,
+    16,
+    32
+  ],
+  "expectedSize": [
+    16,
+    32
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 6,
+      "y": 4,
+      "w": 4,
+      "h": 25
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 6,
+      "y": 4,
+      "w": 1,
+      "h": 25
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 9,
+      "y": 4,
+      "w": 1,
+      "h": 25
+    },
+    {
+      "op": "dither",
+      "x": 6,
+      "y": 4,
+      "w": 4,
+      "h": 25,
+      "colors": [
+        "palette:1",
+        "palette:9"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "stroke": "palette:9",
+      "strokeWidth": 1,
+      "x": 2,
+      "y": 6,
+      "w": 12,
+      "h": 9
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 7,
+      "w": 10,
+      "h": 7,
+      "colors": [
+        "palette:4",
+        "palette:5"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 3,
+      "y": 8,
+      "w": 10,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 3,
+      "y": 11,
+      "w": 10,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 4,
+      "y": 9,
+      "w": 8,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 4,
+      "y": 15,
+      "w": 6,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 2,
+      "y": 15,
+      "w": 12,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 5,
+      "y": 29,
+      "w": 2,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 9,
+      "y": 29,
+      "w": 2,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 4,
+      "y": 31,
+      "w": 8,
+      "h": 1
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 6,
+      "w": 12,
+      "h": 9,
+      "colors": [
+        "palette:4",
+        "palette:9"
+      ],
+      "ratio": 0.08,
+      "pattern": "bayer4"
+    }
+  ]
+}

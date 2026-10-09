@@ -1,0 +1,25 @@
+{
+  "command": "create",
+  "error": "重采样 3 次都没有拿到一份过契约的 GameIntentSpec（最后一次：schema）。最后一次的病因：工具入参不过契约：coreLoop: Invalid input: expected array, received string；<根>: Unrecognized key: \"coreLoop_note\"",
+  "exitCode": 4,
+  "ledger": [
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 9400,
+      "attempts": 3,
+      "failures": [
+        "schema",
+        "schema",
+        "schema"
+      ],
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 191,
+        "outputTokens": 671
+      }
+    }
+  ]
+}

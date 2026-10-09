@@ -1,0 +1,59 @@
+{
+  "id": "style",
+  "identity": [
+    "横版平面像素风",
+    "极简几何拼装",
+    "低色数硬边色块"
+  ],
+  "camera": {
+    "mode": "2D正交侧面视角",
+    "angle": "平视",
+    "projection": "无透视"
+  },
+  "composition": {
+    "layout": "底部地面条带 + 中部主体 + 顶部天空带"
+  },
+  "palette": [
+    "#2e3a4f",
+    "#8a5a34",
+    "#d99a63",
+    "#8c8c8c",
+    "#f2c14e",
+    "#f7d67a",
+    "#3a465e",
+    "#e8b07a",
+    "#5a5f6b",
+    "#3d261a",
+    "#d9d9d9"
+  ],
+  "lighting": {
+    "direction": "无定向光源",
+    "contrast": "中低"
+  },
+  "shapeLanguage": [
+    "矩形",
+    "三角形",
+    "像素方块"
+  ],
+  "material": [
+    "哑光",
+    "纯色块",
+    "硬边"
+  ],
+  "environment": [
+    "废弃城市立面",
+    "轨道",
+    "空旷地面"
+  ],
+  "characterStyle": [
+    "方块矮比例",
+    "极简面部",
+    "制服配色"
+  ],
+  "constraints": [
+    "无渐变",
+    "像素对齐",
+    "色板限定"
+  ],
+  "confidence": 0.7
+}

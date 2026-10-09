@@ -1,0 +1,1 @@
+flat pixel minimal side-view enemy idle, 32x32, stocky blocky hostile humanoid, deep blue uniform coat, bright belt, cap, front-facing, no gradient, no antialiasing, low color count

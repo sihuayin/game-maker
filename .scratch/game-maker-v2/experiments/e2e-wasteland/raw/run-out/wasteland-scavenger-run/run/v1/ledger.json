@@ -1,0 +1,104 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "wasteland-scavenger-run",
+  "runVersion": 1,
+  "createdAt": "2026-10-09T10:09:09.509Z",
+  "run": {
+    "wallClockMs": 64946,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 2
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 3
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 14090,
+      "attempts": 2,
+      "failures": [
+        "schema"
+      ],
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 230,
+        "outputTokens": 1305
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 3652,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 195,
+        "outputTokens": 811
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 27643,
+      "attempts": 3,
+      "failures": [
+        "schema",
+        "schema"
+      ],
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 243,
+        "outputTokens": 2002
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 6407,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2219,
+        "outputTokens": 929
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 13024,
+      "attempts": 1,
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2918,
+        "outputTokens": 3489
+      }
+    }
+  ]
+}
