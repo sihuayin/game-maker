@@ -100,12 +100,20 @@ describe("R12 ①：意图 → 设计的覆盖（今天最常响的那条）", (
     if (r.ok || r.kind !== "rejected") return;
     expect(r.rejections.map((x) => x.reason)).toEqual(["intent-entity-missing"]);
     expect(r.rejections[0]!.detail).toContain("巡逻的无人机");
+    // ⚠️ **真缺失**就不许说「串桶」—— 那句话只有同 id 躺在别的桶里时才成立（票 19 的 Q12）。
+    expect(r.rejections[0]!.detail).not.toContain("串桶");
   });
 
   it("⚠️ 同一个 id **落在错的桶里不算有对家**（`e-drone` 出现在 `npcs` 里，`enemies` 是空的）", () => {
     const r = build({ enemies: [], npcs: [{ id: "e-drone", role: "r", interaction: "i" }] });
     expect(r.ok).toBe(false);
-    if (!r.ok && r.kind === "rejected") expect(r.rejections.map((x) => x.reason)).toContain("intent-entity-missing");
+    if (r.ok || r.kind !== "rejected") return;
+    expect(r.rejections.map((x) => x.reason)).toContain("intent-entity-missing");
+    // ⚠️ 票 19 的 Q12：**「放错桶」与「没做」要分开说** —— 这条文案是给人改需求看的，
+    //   不说清的话人会去那个空桶里找一个**就在隔壁**的东西。
+    expect(r.rejections[0]!.detail).toContain("串桶");
+    expect(r.rejections[0]!.detail).toContain("npcs");
+    expect(r.rejections[0]!.detail).toContain("不是没做");
   });
 
   it("全都有对家 ⇒ 放行（负判据不许误伤正例）", () => {

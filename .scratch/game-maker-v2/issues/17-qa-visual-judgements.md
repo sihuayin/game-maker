@@ -156,3 +156,15 @@ R3 定了判据只收三类（**集合差 / 构造性约束 / 引用族**）。R
 | `packages/qa/src/visual.ts` | **新**：`visualQaRunner`（`QaRunner` 的实现）+ `constructiveConstraint` + `paletteBinding` + `drawlistsOf` |
 | `packages/qa/src/index.ts` | 从空骨架变成导出 `visual.js`（并写明三个读者：17 / 18-19 / 20） |
 | `packages/qa/tests/visual.test.ts` | **新**：16 条（干净真包 · 七种故意损坏 · 边界三条） |
+
+---
+
+## ⚠️ 2026-10-09 追记（[票 19](19-qa-intent-coverage.md) 动过本票的落地物**一行**）
+
+`visualQaRunner` 原来**自己拼** `path.join(ctx.runDir, "asset-recipe.json")` —— 票 19 把
+「**QA 不猜 artifact 路径**」立成 `QaContext` 的一条原则（路径由调用方给，理由：那九个文件名的家
+`RUN_ARTIFACT` 在 `pipeline`，而 `packages/qa` 的白名单只有 `contracts`）之后，这一处成了包里的**唯一例外**，
+于是顺手治了：清单路径改成 **`ctx.recipePath`**（判据内容一条未动）。
+**连带**：`packages/qa/tests/visual.test.ts` 的 `stage()` 改成给出**四份路径**
+（另外两份指向**不存在的文件** —— 那正说明本族**不读**它们，读错哪份当场炸）。
+⇒ 本票 §2/§5 那些判定**一个字没变**，变的只是「那份清单的路径从哪来」。

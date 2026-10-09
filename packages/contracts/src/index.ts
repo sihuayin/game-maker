@@ -85,6 +85,13 @@ export * from "./game-intent.js";
 //   ⚠️ 它**不落盘**（不在 `01 §13` 的九项里），也**不被外壳 import** —— 它是**读侧**的契约。
 export * from "./runtime-profile.js";
 export * from "./game-design.js";
+
+// ⚠️ **意图覆盖**（`03 §23` 那条 Intent QA，票 19 落地）：**意图 ⊆ 设计**的集合差。
+//   住 contracts 是因为它**有两个调用方**（`compile-design` 的拒绝与 QA 的意图族），
+//   而 `packages/qa` 的白名单只有本包（票 07）—— 抽上来，是为了让那两处**只有一处实现**
+//   （与 `auditReferences` 被抽出 `auditGameConfig`、`auditReachability` 落在这里同款）。
+//   ⚠️ 它**只**返回「缺了哪几项」的中性形状：两个调用方各自渲染自己的话，见那个文件的头。
+export * from "./intent-coverage.js";
 // ⚠️ 角色基因（票 04）—— 落 `run/v<N>/character-dna.json`，**不交付**。
 //   它的消费者是 R13 的资源级重生成：没有它，修复会**静默换掉角色**。
 export * from "./character-dna.js";

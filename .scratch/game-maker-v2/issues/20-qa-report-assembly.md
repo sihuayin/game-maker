@@ -38,6 +38,21 @@ Map: ../map.md
 >    「`format` 是契约那份」—— 它们在**整份报告**上才算得出来 ⇒ 归本票重写。
 > ④ 另：票 18 的 [R2-Q3](18-qa-gameplay-judgements.md) 把 `auditGameConfig` 那两条**旧的警告**
 >    留在了原处、**没有**并进 QA 的判据 ⇒ 下面 §3 那一问（「哪一条判据真去报警告」）**仍然完全是本票的事**。
+>
+> ⚠️ **2026-10-09（[票 19](19-qa-intent-coverage.md) 已关）：第三个族到齐了，而你的一件事**收窄**了、另两件要说清。**
+> ① ⚠️ **本票不要求「六条判据每条恰好被一个族声明一次」**（那句在数学上做不到）：
+>    三个族加起来只声明 **5 条** —— 第六条 `layer-coverage`（层覆盖）由**装配期**的硬失败保证
+>    （`pack.ts`），**不属于任何族**。⇒ 报告的 `checked` 恒为 **5/6**，`qaVerdict` 恒为 `incomplete`。
+>    ⚠️ 那是**说真话**（有判据没由 QA 跑）—— **不要**为了让它变成 `pass` 去动 `checked`
+>    （`contracts/src/qa.ts` 的四① 已按这一条改准）。本票要保证的是**不重复**（没有两条判据被同一个族
+>    各声明一次），不是「全覆盖」。
+> ② ⚠️ **`QaContext` 从 4 个字段变成 7 个**（票 19 的 Q4/Q11）：`runDir` · `packDir` · `configPath` ·
+>    **`intentPath`** · **`designPath`** · **`recipePath`** · `gameId` ——
+>    **每一份产物的路径由调用方给，QA 不自己拼文件名**（`RUN_ARTIFACT` 的家在 `pipeline`，
+>    而 `packages/qa` 的白名单只有 `contracts`）。`pipeline/src/create-game.ts` 的调用点已经改过，
+>    合成器拿到 ctx 要**原样往下传**（漏一个键是**编译错误**）。
+> ③ ⚠️ **票 19 那条判据在链上恒绿**（`compile-design` 先拒 ⇒ 链根本走不到 QA），与票 18 的
+>    `reference-resolution` 同一个形状 —— 本票**不要**顺手替它找一条「更早的路」。
 
 ## Question
 

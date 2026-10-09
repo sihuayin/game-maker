@@ -692,12 +692,22 @@ lose
 
 ---
 
-# 23. Intent QA
+> ⚠️ **2026-10-09 已落地**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md)）。与本文的出入有**三处要紧**的：
+> ① **只有 id 那一半** —— 票 03 定的「描述性文本按**文本相等**相减」被票 19 用 4 发真输出
+>   量出 **0% 命中**（设计层做的是放大，不是复述）⇒ **砍掉**（不是降成 warning）。
+> ② **实现不住这里** —— 集合差落在 `packages/contracts/src/intent-coverage.ts` 的
+>   `auditIntentCoverage()`，因为**它有两个调用方**（`compile-design` 的 R12 拒绝 + 本族），
+>   而 `packages/qa` 的白名单只有 `contracts`。本族只剩**话**。
+> ③ **产出是 `QAFinding`，不是一份结果对象** —— 一条 finding、`target` 恒 `game-design`、
+>   `severity` 恒 `error`，缺项逐行进 `detail`。
+> ⚠️ 另：「必须输出缺失项」这条**由 `compile-design` 更早兑现**（它在生图之前就拒，
+> 且报的是**用户自己的原话**）—— 本族在新链上因此**恒绿**，那是**知道**的（自白在族文件头三）。
 
-新增：
+实现：
 
 ```text
-packages/qa/intent.ts
+packages/qa/intent.ts        （本族的出口）
+packages/contracts/src/intent-coverage.ts   （集合差本身 —— 两个调用方共用）
 ```
 
 根据：
@@ -705,8 +715,9 @@ packages/qa/intent.ts
 ```text
 GameIntentSpec
 GameDesignSpec
-Playable Game
 ```
+
+⚠️ 本文原来列了第三样 `Playable Game` —— **用不上**：这条判据只看两份文书（票 19 的 Q2）。
 
 判断：
 

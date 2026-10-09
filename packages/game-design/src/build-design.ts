@@ -14,7 +14,7 @@
 //   `failures[]` 里**不留痕**（那一发上游调用是**成功**的）。
 //   把它和 `schema` 那些混在一个桶里，就是票 27 的 Q4(ii) 立 `CALL_FAILURES` 要治的病。
 import {
-  ENTITY_BUCKETS, GameDesignSpecSchema,
+  auditIntentCoverage, GameDesignSpecSchema,
   type Capability, type GameDesignSpec, type GameIntentSpec, type RuntimeProfile, type VisualWorldSpec,
 } from "@game-maker/contracts";
 
@@ -85,29 +85,36 @@ export const callerKnownGame = (profile: RuntimeProfile, vws: VisualWorldSpec) =
  *   ⇒ 这里**不查**「设计里多出来的东西」：那是**合法的**，而「多出来的那个有没有依据」
  *     （依据是需求还是模型自己的口味）**不可机械判定** ⇒ 它**不是判据**（R3：判据只收
  *     「精确可算 + 错了一定不是设计」），只活在提示词纪律里。谁也别把它写成一条永远绿的判据。
+ *
+ * ⚠️ **票 19 之后本函数只剩「话」**：集合差是 `contracts` 的 `auditIntentCoverage()`
+ *   —— 本包与 QA 的意图族共用它。而**文本那一半在这两处都不存在**（票 19 量出它 0% 命中，
+ *   见那个文件的头一）。
  */
 function intentCoverage(design: GameDesignSpec, intent: GameIntentSpec): Rejection[] {
-  const out: Rejection[] = [];
-  for (const e of intent.entities) {
-    const bucket = ENTITY_BUCKETS[e.type];
-    if (!design[bucket].some((x) => x.id === e.id))
-      out.push({
-        reason: "intent-entity-missing",
-        detail: `意图里的 ${e.type}「${e.role}」（\`${e.id}\`）在设计层的 \`${bucket}\` 里没有对家 —— ` +
-          "用户点名要的东西**不许悄悄做丢**（票 03 §11 防的就是这个）",
-      });
-  }
-  const have = new Set(design.mechanics.map((m) => m.id));
-  for (const m of intent.mechanics)
-    if (!have.has(m.id))
-      out.push({
+  // ⚠️ **集合差本身住 contracts**（`auditIntentCoverage`，票 19 抽上来的）—— 这里只剩**话**。
+  //   抽的理由：QA 的意图族要用**同一处实现**（`packages/qa` 的白名单只有 `contracts`，
+  //   够不着本包），而写第二遍就是第二份真相（`auditReferences` 被抽出去的同款动作）。
+  return auditIntentCoverage(intent, design).map((m): Rejection => {
+    if (m.kind === "mechanic")
+      return {
         reason: "intent-mechanic-missing",
-        detail: `意图里的机制「${m.name}」（\`${m.id}\`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** ` +
+        detail: `意图里的机制「${m.saidAs}」（\`${m.id}\`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** ` +
           "（只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— " +
           "两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。" +
           "（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
-      });
-  return out;
+      };
+    return {
+      reason: "intent-entity-missing",
+      detail: `意图里的 ${m.type}「${m.saidAs}」（\`${m.id}\`）在设计层的 \`${m.bucket}\` 里没有对家 —— ` +
+        "用户点名要的东西**不许悄悄做丢**（票 03 §11 防的就是这个）" +
+        // ⚠️ **串桶与「没做」是两种结论，而这句话是给人改需求看的**（票 19 的 Q12）：
+        //   不说清的话，人会去那个空桶里找一个**就在隔壁**的东西。
+        (m.foundIn === undefined
+          ? ""
+          : `。⚠️ 但它**其实落在 \`${m.foundIn}\` 里** —— 这是**串桶**（同一个 id 换了 \`type\`），` +
+            `不是没做：把它的 \`type\` 按意图改回来（意图层说的是 \`${m.type}\`）`),
+    };
+  });
 }
 
 /** 参考图的视角，这一代外壳承载得了吗（票 06 把这条押在了本票上）。 */

@@ -76,11 +76,13 @@ const ran = (findings: QAFinding[]): JudgementResult => ({ ran: true, findings }
  *
  * ⚠️ 它**只声明自己那两条**、**只返回不落盘**：写 `run/v<N>/qa-report.json` 的
  *   （以及把三族凑成一份的）是装配那一侧（票 15 的 Q3 · 票 20）。
- * ⚠️ 它读的三样都在 `ctx` 指着的目录里：`runDir/asset-recipe.json` · `packDir/manifest.json` ·
+ * ⚠️ 它读的三样都在 `ctx` 指着的路径上：`ctx.recipePath` · `packDir/manifest.json` ·
  *   包内那些创作态 drawlist（`manifest.assets[].authoring[]` 指着）✓。
+ *   ⚠️ **清单的路径由调用方给、本族不自己拼**（票 19 的 Q11）——那九个文件名的家是
+ *     `pipeline` 的 `RUN_ARTIFACT`，而本包的白名单只有 `contracts`。
  */
 export const visualQaRunner: QaFamilyRunner = async (ctx: QaContext): Promise<QaFamilyResult> => {
-  const recipe = parseRecipe(read(path.join(ctx.runDir, "asset-recipe.json"), "清单"));
+  const recipe = parseRecipe(read(ctx.recipePath, "清单"));
   if (!recipe.ok) throw new Error(`清单读不回来或不过契约：${recipe.errors.slice(0, 4).join("；")}`);
   const manifest = parseAssetPack(read(path.join(ctx.packDir, "manifest.json"), "包清单"));
   if (!manifest.ok) throw new Error(`包清单读不回来或不过契约：${manifest.errors.slice(0, 4).join("；")}`);

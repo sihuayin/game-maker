@@ -48,14 +48,23 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // 四、自白：**今天恒真的三件事**（票 06 Q17，写法照票 05）
 //
-//   ① **六条判据今天 6/6 全跑** ⇒ `qaVerdict` 的 `"incomplete"` **今天走不到**。
-//      这不是「一条写坏了的判据」，是**给第二种玩法 / 第二个成员留的位**。
-//      ⚠️ **[票 18] 把那个真口子答了**：横版**有**纯层那条路 ——「冒烟可达」落在
-//        `auditReachability()`（见 `QA_JUDGEMENTS` 里那一条）。
+//   ① ⚠️ **`checked` 今天恒为 5/6，而 `"incomplete"` 是预期**（[票 19] 改准）。
+//      原来的写法是「六条判据今天 6/6 全跑 ⇒ `incomplete` 今天走不到」——
+//      那句话从 [票 17] 那天起就**已经是假的**：`layer-coverage`（层覆盖）**故意不住在 QA 里**，
+//      它由**装配期**的硬失败保证（`pack.ts`），于是没有一族会声明它。
+//      ⇒ 两件事要分开：**判据的全集**（`QA_JUDGEMENTS`，六条）与
+//        **这一次 QA 真跑过的子集**（`checked`，五条）。
+//      ⚠️ 所以**不要**为了让它变成 `pass` 去动 `checked` —— `incomplete` 在这里说的是
+//        **真话**（有判据没由 QA 跑），而 `fail` / `pass` 说的是**跑过的那几条**如何。
+//      ⚠️ **[票 20] 的义务因此收窄**：它**不**要求「六条判据每条恰好被一个族声明一次」
+//        —— 那句在数学上做不到（`layer-coverage` 不属于任何族）。
 //   ② **`severity: "warning"` 今天一条都不报**。类型**允许**它（`auditGameConfig`
 //      那一档「精确可算、但不构成判决」的形状一字不改地搬过来），但**哪一条判据
 //      真去报警告**是**装配侧**的事（[票 20] §3），不是本契约的事。
-//   ③ **`checked` 今天恒等于全集，是链的性质、不是类型的要求。** 类型**允许**缺席 ——
+//   ③ **`checked` 里缺席的两种意思要分得开**：今天缺席**只**能是「这一次没跑」
+//      （暂时只有 `layer-coverage` 那一种，见①），**不是**「这条不归我」——
+//      后者是**没有那个键**（`QaFamilyResult.judgements` 是 `Partial`，[票 18] 的 R3-Q1）。
+//      类型**允许**缺席，是链的性质让它今天恰好缺一格 ——
 //      把「允许」与「今天如此」分开写，是为了让下一个人在链变了的时候**看得见差别**。
 //
 //   ④ ⚠️ **一份「族结果」落盘会过不了本契约**（[票 18] 实测）。`superRefine` ④ 要求
@@ -75,7 +84,9 @@
 //     而复用账的词汇是唯一能让下游**机器**读懂归因的办法
 //     （`game-config.ts:233` 立过的规矩：**同一个事实在哪里说都是同一句话**）。
 //
+// [票 17]: ../../../.scratch/game-maker-v2/issues/17-qa-visual-judgements.md
 // [票 18]: ../../../.scratch/game-maker-v2/issues/18-qa-gameplay-judgements.md
+// [票 19]: ../../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md
 // [票 20]: ../../../.scratch/game-maker-v2/issues/20-qa-report-assembly.md
 // [票 21]: ../../../.scratch/game-maker-v2/issues/21-repair-loop.md
 
@@ -125,9 +136,14 @@ export const QA_JUDGEMENTS = [
    *  移动模型（跳跃顶点 · 跑速 · 危险物当空气 · 下落不设限）做一次 BFS，**只报够不到**的
    *  终点与拾取物。⚠️ 过宽是**故意的**：可达集因此是上界，「不在里面」才可靠。 */
   "reachability",
-  /** **集合差**：`GameIntentSpec` 里每个实体 / 机制在 `GameDesignSpec` 里有对应项。
-   *  按 **id**（`entities` / `mechanics`）或**文本相等**（其余）。
-   *  够得上判据：它是**可减的集合**。⚠️ 文本相等**是脆的**，那条已知噪声由票 19 写下。 */
+  /** **集合差**：`GameIntentSpec` 里每个实体 / 机制在 `GameDesignSpec` 里有对应项
+   *  —— 住 `contracts` 的 `auditIntentCoverage()`（[票 19]），由**意图族**声明。
+   *  ⚠️ **只有 id 那一半**：`entities` 按 `type` 落桶（串桶也算缺）、`mechanics` 按 id。
+   *    票 03 当年还定了「其余字段按**文本相等**」，而 [票 19] 拿票 10 探针留下的 4 发真输出
+   *    量出它 **0% 命中**（意图 3 条 `coreLoop` → 设计 4 条，**设计层放大意图层、不复述它**）
+   *    ⇒ **砍掉**，而且不是降成 warning。理由与测量全在 `intent-coverage.ts` 的头一。
+   *  够得上判据：它是**可减的集合**，且「用户点名要的东西被丢了 / 串了桶」
+   *  **错的一定不是设计**。 */
   "intent-coverage"
 ] as const;
 
@@ -392,9 +408,12 @@ export const QA_JUDGEMENT_LABELS: Record<QAJudgement, string> = {
  * ⚠️ 于是 `ran: false` 在家族形状里只剩「**我确实没跑这一条**」一种合法用法，而那种情况
  *   今天不存在（`CONFIG_SHAPES` 只有一行）。真出现时是**加一个值**，不是现在替它开口。
  *
- * ⚠️ **谁来凑成一份 `QAReport`**：合成器（[票 20]）—— 它要保证六条判据**每条恰好被一个族
- *   声明一次**，并补齐上面 §四④ 那两条观察。本类型**不住 pipeline**：`packages/qa` 的白名单
+ * ⚠️ **谁来凑成一份 `QAReport`**：合成器（[票 20]）—— 它要保证**一条判据不会被两个族
+ *   各声明一次**，并补齐上面 §四④ 那两条观察。本类型**不住 pipeline**：`packages/qa` 的白名单
  *   只有 `contracts`，类型住 pipeline 会逼出一次反向依赖（与 `QaRunner` / `QaContext` 同一条理由）。
+ * ⚠️ **它要求的是「不重复」，不是「每条判据恰好被一个族声明一次」**（[票 19] 改准）：
+ *   后者**在数学上做不到** —— `layer-coverage`（层覆盖）由**装配期**的硬失败保证，
+ *   **不属于任何族**（见文件头四①）。今天三个族加起来声明 5 条，第六条在装配期。
  */
 export type QaFamilyResult = {
   judgements: Partial<QAJudgementResults>;
@@ -404,14 +423,29 @@ export type QaFamilyResult = {
 /** 一个族的出口。⚠️ 拿 `Partial` 说话的 `QaRunner`（合成器**是**一个 `QaRunner`）。 */
 export type QaFamilyRunner = (ctx: QaContext) => Promise<QaFamilyResult>;
 
-/** 一次 QA 要看的四样东西。⚠️ **全是路径**：QA 跑在各步的产物都落盘**之后**（票 15 的 Q12）。 */
+/**
+ * 一次 QA 要看的那些东西。⚠️ **全是路径**：QA 跑在各步的产物都落盘**之后**（票 15 的 Q12）。
+ *
+ * ⚠️ **每一份产物的路径都由调用方给，QA 不自己拼**（[票 19] 的 Q4/Q11）。
+ *   理由：那九个文件名的家（`RUN_ARTIFACT`）在 `pipeline`，而 `packages/qa` 的白名单
+ *   **只有 `contracts`**（票 07）—— 让 QA 自己拼就是把那九个名字抄第二遍，
+ *   而 `artifacts.ts` 明写「**只此一处** —— 别在别处再拼一遍」。
+ *   （`configPath` 本来就是照这条规矩单开的字段；票 19 把 `recipePath` 也收了回来 ——
+ *    那之前 `visual.ts` 是自己拼的。）
+ */
 export type QaContext = {
-  /** `run/v<N>/` 的绝对路径（设计 / 基因 / 清单都在里面）。 */
+  /** `run/v<N>/` 的绝对路径。⚠️ 产物**在同一棵树里**，但每一份的路径**单独给**（见上）。 */
   runDir: string;
   /** `pack/v<N>/` 的绝对路径。 */
   packDir: string;
   /** 已落盘的 `game-config.json` 的绝对路径。 */
   configPath: string;
+  /** 已落盘的 `game-intent.json` 的绝对路径 —— 意图族（[票 19]）要读它。 */
+  intentPath: string;
+  /** 已落盘的 `game-design.json` 的绝对路径 —— 意图族（[票 19]）要读它。 */
+  designPath: string;
+  /** 已落盘的 `asset-recipe.json` 的绝对路径 —— 视觉族（票 17）要读它。 */
+  recipePath: string;
   gameId: string;
 };
 

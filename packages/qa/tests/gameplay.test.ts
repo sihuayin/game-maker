@@ -26,7 +26,15 @@ function stage(): QaContext {
   fs.mkdirSync(runDir, { recursive: true });
   fs.cpSync(PACK, packDir, { recursive: true });
   fs.copyFileSync(CONFIG, path.join(runDir, "game-config.json"));
-  return { runDir, packDir, configPath: path.join(runDir, "game-config.json"), gameId: "last-train" };
+  // ⚠️ 本族只读 `configPath` 与 `packDir` —— 另外三份路径给了但**那份文件不存在**，
+  //   那正说明**没人读它**（票 19 的 Q4/Q11 把四份路径都摆出来，读错哪份当场炸）。
+  return {
+    runDir, packDir, gameId: "last-train",
+    configPath: path.join(runDir, "game-config.json"),
+    intentPath: path.join(runDir, "game-intent.json"),
+    designPath: path.join(runDir, "game-design.json"),
+    recipePath: path.join(runDir, "asset-recipe.json")
+  };
 }
 const run = (ctx: QaContext): Promise<QaFamilyResult> => gameplayQaRunner(ctx);
 

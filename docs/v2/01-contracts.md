@@ -161,6 +161,11 @@ GameDesignSpec  =「我们做成的」（必须完整、必须可执行）
 若两层各存一份不相干的东西，**没有可以相减的两个集合**，R3 的判据当场蒸发、退回 LLM 打分。
 ⇒ 因此本层的自由文本**不许因为设计层也有就被砍**。
 
+⚠️ **但可减的只有 id 那一半**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md)，2026-10-09）：票 03 当年把描述性文本
+（`coreLoop` / `winConditions` / `loseConditions` / `progression`）也划进了「按**文本相等**相减」，
+而票 19 拿票 10 探针的 4 发真输出量出它 **0% 命中** —— 设计层做的是**放大**，不是复述。
+⇒ 那一条**砍掉**了（**不是**降成 warning）。测量与理由见 §10。
+
 ⚠️ 唯一的不对称：`title` 本层**可空**（用户真可能不起名），§4 的 `game.title` **必填**
 （起名是**设计行为**，空着 `compile-design` 得造一个）。
 
@@ -606,7 +611,7 @@ R3 只收三类：**集合差 · 构造性约束 · 引用族**。门槛是 `CON
 | `layer-coverage` | 不平铺的层 ≥ 视口；**最远那层必须 100%** | 装配期（`pack.ts` 已硬失败） |
 | `reference-resolution` | `hud.panel` 必须是 `ui` · 砖的尺寸 == `arena.cell` · 引用解得到 ⚠️ **只吃引用族** | `auditReferences()`（`game-config.ts`）· `td-config.ts` |
 | `reachability` | 冒烟：`boot → spawn → goal` 可达 —— **纯层的静态可达性**（不跑游戏），**只报够不到**的终点与拾取物 | `auditReachability()`（`game-config.ts`，[票 18]） |
-| `intent-coverage` | 集合差：意图里每个实体/机制在设计里**有对应项** | `game-intent.ts` × `game-design.ts`（见 §11） |
+| `intent-coverage` | 集合差：意图里每个实体/机制在设计里**有对应项**（⚠️ **只有 id 那一半**） | `auditIntentCoverage()`（`contracts`，[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md)）· 由**意图族**（`qa/intent.ts`）声明 |
 
 ⚠️ **更正（[票 18]，2026-10-08）**：上表原来把 **`characterId`** 列在 `reference-resolution` 名下，
 那是**串了侧** —— `characterId` 住 `AssetSpec`（**清单**，不在 `game-config` 里），而
@@ -619,14 +624,34 @@ config 侧那一族碰不到它。⚠️ 而 `reference-resolution` **只吃引�
 **asset 侧**自身（声明的 `size` 与帧 bounds）归 `constructive-constraint`。
 归错侧，[票 21] 的「判据 → 阶段」映射会指向**错的资源**。
 
-⚠️ **`intent-coverage` 集合差怎么算**：`entities` 与 `mechanics` 按 **id**
+⚠️ **`intent-coverage` 集合差怎么算**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md) 落地，2026-10-09）：**按 id** ——
+`entities` 按 `type` **落到那个桶**去找（`ENTITY_BUCKETS`：**串桶也算缺**，`foundIn` 说得清是
+「放错桶」还是「没做」），`mechanics` 在 `design.mechanics[]` 里找 id
 （设计层沿用意图层的 id，**不加 `fromIntent` 回指** —— 那是一个只能被复述、不能被校验的字段）。
 ⚠️ **资源那一桶的键是 `entities[]` 里 `type === "resource"` 的那些 id**（[票 09](../../.scratch/game-maker-v2/issues/09-intent-analyzer.md) 的 Q5 删掉了顶层的 `resources[]`，
-两个家指向设计层同一个桶）—— 票 19 落地时按这一条写，别再找那个已经不存在的字段；
-`coreLoop` / `winConditions` / `loseConditions` / `progression` 按**文本相等**。
-⚠️ **文本相等是脆的**（设计层把「收集三枚硬币」改写成「搜集三枚硬币」就误报）——
-票 03 **明确拒绝**用 id 去掩盖它（给描述性字段发 id ＝ 发一个只会被复述的字段），
-**要求把这条当作判据的已知噪声写下**。这是上面那个「重名不是冗余」的另一面。
+两个家指向设计层同一个桶）—— **别再找那个已经不存在的字段**。
+
+⚠️ **描述性文本那一半：砍掉了，而且是量出来的**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md) 的 Q1 —— **更正票 03 的一条决定**）。
+票 03 当年把 `coreLoop` / `winConditions` / `loseConditions` / `progression` 划进「按**文本相等**相减」，
+票 10 把「剩下的文本那一半」播给了票 19。票 19 拿票 10 探针留下的 **4 发真输出**
+（`.scratch/game-maker-v2/experiments/design-first-shot/raw/*.json`，两份 `ok` + 两份 `hostile`）量了一遍：
+
+```text
+coreLoop       0/3 · 0/3 · 0/3 · 0/3        winConditions  0/1 ×4
+loseConditions 0/1 ×4                        player.goals   0/1 ×4
+player.role · world.theme · world.setting —— 四条全是 ≠
+（意图 3 条 coreLoop → 设计 4 条，每条更长更具体）
+```
+
+⇒ **设计层不复述意图层，它放大意图层**（§4 要求它「完整、可执行」，它照做了）。
+接成 `error` 的话 `qaVerdict` 会在**每一个**游戏上 `fail`，包括那两发 R12 一条都挑不出来的 ——
+那不是「脆」，是**恒错**（门槛是「**错了一定不是设计**」，而它错的时候设计恰恰是对的）。
+⇒ 所以它**砍掉**，也**没有**降成 `warning`（一条永远响的警告不带信息，还会推翻 §10 自白 2）。
+⚠️ 顺带两笔：`progression` 两边**连字段名都不一样**（意图 `type` / `description` 两个可选字段 /
+设计 `model` / `description` 两个必填字段），「文本相等」在它身上**没有定义**；
+而票 10 播过来的那笔残余噪声（模型把做不了的机制**挑个近似的**顶上去，如 `m-double-jump` → `jump`）
+**没有机械的落点** —— 探针里它甚至漏进了散文（`progression.description` 写着「越来越依赖二段跳」）。
+反制只在**提示词与工具说明**里（「做不了就整条省掉」）。
 
 ⚠️ **原来的十二个 `QAFailureCode` 出局了六个**（见 §12 的表）——
 `Camera` / `Silhouette` / `Material` / `Animation` / `Scale` 那五个**今天没有判据撑着**，
@@ -647,12 +672,20 @@ JudgementResult = { ran: true;  findings: QAFinding[] }   // findings 空 = 成�
 
 ## 自白：今天恒真的三件事
 
-1. **六条判据今天 6/6 跑得动** ⇒ `"incomplete"` 的来源只剩「**链上还没接的那一族**」。
-   ⚠️ [票 18] 已把「冒烟可达**怎么跑**」定了（纯层静态可达性，不跑游戏），
-   而**装配**那一侧仍空着：三个族是**分别**产自己那几条的（`QaFamilyResult`），
-   谁把它们凑成一份报告、谁补齐两条观察，归 [票 20]。
-2. **`severity: "warning"` 今天一条都不报** —— 类型允许，报不报是[票 20] §3 的事。
-3. **`checked` 今天恒等于全集，是链的性质、不是类型的要求。**
+1. ⚠️ **`checked` 今天恒为 5/6，而 `"incomplete"` 是预期**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md) 改准）。
+   原话是「六条判据今天 6/6 跑得动 ⇒ `incomplete` 的来源只剩链上还没接的那一族」——
+   那句话从 [票 17] 那天起就**已经是假的**：`layer-coverage`（层覆盖）**故意不住在 QA 里**，
+   它由**装配期**的硬失败保证（`pack.ts`），于是没有一族会声明它。
+   ⇒ **判据的全集**（六条）与**这一次 QA 真跑过的子集**（`checked`，五条）是两件事；
+     `incomplete` 在这里说的是**真话**。⚠️ **不要**为了让它变成 `pass` 去动 `checked`。
+   ⚠️ 而**装配**那一侧仍空着：三个族是**分别**产自己那几条的（`QaFamilyResult`），
+   谁把它们凑成一份报告、谁补齐两条观察，归 [票 20] —— 而它**不**要求
+   「六条判据每条恰好被一个族声明一次」（那句在数学上做不到）。
+2. **`severity: "warning"` 今天一条都不报** —— 类型允许，报不报是[票 20] §3 的事
+   （意图族那条判据的 `severity` 恒 `error`）。
+3. **`checked` 里缺席的两种意思要分得开**：今天缺席**只**能是「这一次没跑」（见①），
+   **不是**「这条不归我」—— 后者是**没有那个键**。类型**允许**缺席，
+   是链的性质让它今天恰好缺一格。
 
 ---
 
@@ -880,6 +913,11 @@ VisualWorldSpec
 GameIntentSpec
 GameDesignSpec
 ```
+
+⚠️ 那是**三个族合起来**要的东西，不是每一族都要全部（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md)）：
+意图族（`intent.ts`）**只吃 `intent-path` × `design-path` 两份**，`Playable Game` 与
+`VisualWorldSpec` 都用不上。⚠️ 各族要读的**每一份产物的路径**由调用方经 `QaContext`
+逐个传（**QA 不自己拼文件名** —— `RUN_ARTIFACT` 的家在 `pipeline`）。
 
 输出：
 

@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { RUN_LEDGER_FORMAT, parseRecipe, type AssetRecipe, type AssetSpec, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { RUN_LEDGER_FORMAT, parseRecipe, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { fakeUpstream, tinyPng } from "./upstream.js";
@@ -275,12 +275,17 @@ describe("§QA 是一个**明确的扩展点**（Q7/Q12）", () => {
     const report: QAReport = { format: "qa-report/v1", checked: [], failures: [], observations: [] };
     let saw = "";
     const b = await build(h, u.run.dir, {
-      qa: async (ctx: { runDir: string; packDir: string; configPath: string; gameId: string }) => {
-        saw = `${ctx.gameId}|${fs.existsSync(ctx.packDir)}|${fs.existsSync(ctx.configPath)}`;
+      qa: async (ctx: QaContext) => {
+        // ⚠️ **四份产物路径逐个查**（票 19 的 Q4/Q11）：QA 看到的是**已经落盘**的那四样 ——
+        //   手打的窄参数类型在这里会**编译不过**（逆变），那正是这条纪律想要的。
+        saw = [
+          ctx.gameId, fs.existsSync(ctx.packDir), fs.existsSync(ctx.configPath),
+          fs.existsSync(ctx.intentPath), fs.existsSync(ctx.designPath), fs.existsSync(ctx.recipePath)
+        ].join("|");
         return report;
       },
     });
-    expect(saw).toBe("wasteland|true|true");       // ⚠️ QA 看到的是**已经落盘**的三样
+    expect(saw).toBe("wasteland|true|true|true|true|true");   // ⚠️ QA 看到的是**已经落盘**的那五份产物（外加 `gameId`）
     expect(b.qa).toEqual(report);
     expect(readJson(runPath(h, "qa-report.json"))["format"]).toBe("qa-report/v1");
   });

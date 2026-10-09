@@ -362,7 +362,15 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   let qa: QAReport | undefined;
   if (input.qa !== undefined) {
     say("qa");
-    qa = await input.qa({ runDir, packDir, configPath: path.join(runDir, RUN_ARTIFACT.config), gameId });
+    // ⚠️ **四份产物的路径逐个传**（票 19 的 Q4/Q11）：QA 不自己拼文件名 ——
+    //   那九个名字的家是本模块的 `RUN_ARTIFACT`，而 `packages/qa` 的白名单只有 `contracts`。
+    qa = await input.qa({
+      runDir, packDir, gameId,
+      configPath: path.join(runDir, RUN_ARTIFACT.config),
+      intentPath: path.join(runDir, RUN_ARTIFACT.gameIntent),
+      designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
+      recipePath: path.join(runDir, RUN_ARTIFACT.recipe)
+    });
     // ⚠️ **落盘归本层**（Q3）：QA 只**返回**报告。
     writeJson(path.join(runDir, RUN_ARTIFACT.qaReport), qa);
   }

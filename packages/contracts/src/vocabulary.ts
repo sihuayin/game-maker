@@ -111,4 +111,12 @@ export const ENTITY_BUCKETS: Record<IntentEntityType, "enemies" | "npcs" | "inte
   interactable: "interactables",
   resource: "resources"
 };
+
+/** **桶名**（`enemies` / `npcs` / `interactables` / `resources`）。
+ *  ⚠️ **从 `ENTITY_BUCKETS` 派生**（票 19），不新写一遍那四个字面量 ——
+ *    否则桶名就有两张表，而它们必须一直相等（`game-design.ts` 那边还有第三处内联的清单，
+ *    它是**遍历用**的，不是类型，见那张票的范围）。
+ *  ⚠️ 它存在的理由：`auditIntentCoverage` 要说得出「它**本该**在哪个桶」（`bucket`）
+ *    与「它**其实**在哪个桶」（`foundIn`）—— 那两个位置都需要一个名字。 */
+export type EntityBucket = (typeof ENTITY_BUCKETS)[keyof typeof ENTITY_BUCKETS];
 export type IntentEntityType = z.infer<typeof IntentEntityTypeSchema>;

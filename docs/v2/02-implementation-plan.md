@@ -624,11 +624,19 @@ IntentQAResult   ← ⚠️ 不采用：`score` 与「不带分数」正面冲�
                     Record<string, boolean> 的键也从没定过
 ```
 
-⚠️ 它今天**就是一条判据** —— **集合差**：`GameIntentSpec` 里每个实体/机制在
-`GameDesignSpec` 里有对应项（按 **id** 或**文本相等**），产出的是
-`QAFailure { judgement: "intent-coverage", target, detail, severity }`。
-⚠️ 「文本相等是脆的」那条**已知噪声**由
-[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md) 写下。
+✅ **2026-10-09 落地**（[票 19](../../.scratch/game-maker-v2/issues/19-qa-intent-coverage.md)），落点就是本节说的 `packages/qa/intent.ts`。
+与本文的出入有**三处**：
+
+1. **集合差只按 id**（本文括号里那个「或**文本相等**」**砍掉了**）。票 03 当年把
+   `coreLoop` / `winConditions` / `loseConditions` / `progression` 划进文本相减，而票 19 拿
+   票 10 探针的 4 发真输出量出它 **0% 命中**（意图 3 条 `coreLoop` → 设计 4 条，措辞全不一样）——
+   **设计层做的是放大，不是复述**。⇒ 接成判据会让**每一个**游戏红，包括 R12 一条都没挑出来的那两个。
+   ⚠️ 顺带：那笔「文本相等是脆的」噪声**没有**被写下来 —— 它不再是噪声，它是**恒错**，所以整条出局。
+2. **输入清单少了第三样**：`Playable Game` 用不上，这条判据只看两份文书。
+3. **实现住 `contracts`**（`auditIntentCoverage()`），**不是**住 `qa` —— 它有两个调用方
+   （`compile-design` 的 R12 拒绝与意图族），而 `packages/qa` 的白名单只有 `contracts`
+   ⇒ 抽上去，两处**只有一处实现**。产出的是 `QAFinding { judgement, target: "game-design", detail, severity: "error" }`
+   （**一条** finding，缺项并入 `detail`）。
 
 ---
 

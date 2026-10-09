@@ -5,7 +5,8 @@
 //
 // ─────────────────────────────────────────────────────────────────────────────
 // ⚠️ **本层是「我们做成的」，与意图层 13 处重名是故意的**（票 03 Q2(a)）——
-//   重名让 Intent QA 的覆盖度**有东西可减**。详见 `game-intent.ts` 的文件头。
+//   重名让 Intent QA 的覆盖度**有东西可减**；⚠️ 但**可减的只有 id 那一半**
+//   （描述性文本那一半被票 19 量出 0% 命中、当场砍掉）。详见 `game-intent.ts` 的文件头。
 //   ⇒ 本层与意图层的**唯一**分工：这里的每一个字段都必须**完整**，那边可以缺。
 //
 // ─────────────────────────────────────────────────────────────────────────────
@@ -137,7 +138,10 @@ export const GameDesignSpecSchema = z.strictObject({
     runtimeProfile: RuntimeProfileRefSchema
   }),
 
-  /** ② 判据：Intent QA 拿它与意图层的同名数组相减。 */
+  /** ⚠️ **原来的注释是「② 判据：Intent QA 拿它与意图层的同名数组相减」—— 那句收回了**
+   *  （票 19 的 Q1，2026-10-09）：设计层做的是**放大**，与意图层逐字相等**从来不成立**
+   *  （4 发真输出 **0/3** 命中）⇒ 文本相减**砍掉了**，见 `intent-coverage.ts` 的头一。
+   *  今天它的读者是**下游模板**（票 12 / 14 的具名插值），**不是判据**。 */
   coreLoop: z.array(z.string()),
 
   player: z.strictObject({
@@ -150,7 +154,10 @@ export const GameDesignSpecSchema = z.strictObject({
   // ⚠️ 四个桶与意图层 `entities[].type` 的封闭枚举**一一对应**（票 03 Q3）：
   //   enemy → enemies · npc → npcs · interactable → interactables · resource → resources。
   //   每一桶的 `id` **沿用意图层**（票 03 Q2(b)：不加 `fromIntent` 回指，靠 id 延续）——
-  //   `compile-design` 被要求**沿用而非改名**，改名就是误报，这笔噪声见票 19。
+  //   `compile-design` 被要求**沿用而非改名**。⚠️ 而改名**不是**「误报」：改了的那个 id
+  //   在意图层**找不到对家**，`auditIntentCoverage` 当场报「缺了 `e-drone`」——
+  //   那**正是**要抓的事（票 03 那条「不许改名」不是建议）。这句话此前写着
+  //   「改名就是误报，这笔噪声见票 19」，2026-10-09 收回了：票 19 没有、也不该为它写一笔噪声。
   enemies: z.array(z.strictObject({ id: Id, behavior: z.string(), threat: z.string() })),
   npcs: z.array(z.strictObject({ id: Id, role: z.string(), interaction: z.string() })),
   interactables: z.array(z.strictObject({ id: Id, type: z.string(), behavior: z.string() })),
