@@ -19,11 +19,12 @@ const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const CANNED = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/upstream/canned.json"), "utf8")) as Record<string, Record<string, unknown>>;
 
 /** 一条假 `fetch`：理解层那五发按 `tool_choice.name` 回骨架；drawlist 那一支回一段 JSON 文本。 */
-function fakeUpstream(over: { recipeId: string; intent?: Record<string, unknown> }): typeof fetch {
+function fakeUpstream(over: { recipeId: string; intent?: Record<string, unknown>; config?: Record<string, unknown> }): typeof fetch {
   const TOOL: Record<string, unknown> = {
     emit_visual_world: CANNED["visualWorld"], emit_game_intent: over.intent ?? CANNED["intent"],
     emit_game_design: CANNED["design"], emit_character_dna: CANNED["characterDna"],
-    emit_game_config: CANNED["gameConfig"],
+    // ⚠️ 可覆盖：票 20 那条「判据真响了」的用例要一份**够不到终点**的配置（其余字段照旧）
+    emit_game_config: over.config ?? CANNED["gameConfig"],
   };
   const json = (body: unknown) => ({ ok: true, status: 200, json: async () => body, text: async () => JSON.stringify(body) }) as Response;
   return (async (_url: string, init: RequestInit) => {
@@ -62,7 +63,7 @@ const capture = (): CliIo & { lines: string[]; errors: string[] } => {
  *   而 `defaultShellPath(cwd)` 按 cwd 找它 —— 与 `site` 命令同款（真实用户从仓库根跑，
  *   或者用 `--shell` 指过去）。⇒ 几张输入路径都写绝对的。
  */
-function stage() {
+function stage(over: { config?: Record<string, unknown> } = {}) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "gm-cli-create-"));
   dirs.push(cwd);
   const style = path.join(cwd, "style.png");
@@ -70,7 +71,7 @@ function stage() {
   fs.writeFileSync(style, tinyPng());
   fs.writeFileSync(intent, "做一个废土横版寻宝游戏\n第二行\n");
   const deps: CliDeps = {
-    fetchImpl: fakeUpstream({ recipeId: "wasteland" }),
+    fetchImpl: fakeUpstream({ recipeId: "wasteland", ...over }),
     env: { ANTHROPIC_BASE_URL: "http://up.test", ANTHROPIC_AUTH_TOKEN: "k" },
     cwd: ROOT,
   };
@@ -80,7 +81,8 @@ const runC = async (argv: string[], deps: CliDeps) => {
   const io = capture();
   return { code: await run(argv, io, deps), io, text: () => io.lines.join("") + io.errors.join("") };
 };
-const jsonOf = (io: { lines: string[] }) => JSON.parse(io.lines.join("")) as { data?: Record<string, unknown> };
+const jsonOf = (io: { lines: string[] }) =>
+  JSON.parse(io.lines.join("")) as { data?: Record<string, unknown>; artifacts?: { path: string; kind: string }[]; error?: string };
 const create = (s: ReturnType<typeof stage>, extra: string[] = []) =>
   ["create", "--style", s.style, "--intent", s.intent, "--out", s.outRoot, ...extra];
 const jread = (p: string) => JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, unknown>;
@@ -226,6 +228,51 @@ describe("§⚠️ **两条路的产物等价**（票 16 的 Q9*）", () => {
     expect(r.code, r.text()).toBe(EXIT.ok);
     const manifest = jread(path.join(s.outRoot, "wasteland", "pack", "v1", "manifest.json")) as { assets: { id: string }[] };
     expect(manifest.assets.map((a) => a.id)).toContain("crate-added");
+  });
+});
+
+describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5）", () => {
+  /** 一份**够不到终点**的配置：拾取物摆到跳不到的高处（世界是平的、跳跃顶点只有 40.5px）。
+   *  ⚠️ 它过得了配置契约、也过得了 `compile-runtime` 的业务校验 —— 只有 QA 的 `reachability` 看得见。 */
+  function unreachable(): Record<string, unknown> {
+    const config = structuredClone(CANNED["gameConfig"]!) as { entities: { id: string; at: { x: number; y: number } }[] };
+    config.entities.find((e) => e.id === "e-pickup-1")!.at = { x: 120, y: 60 };
+    return config as unknown as Record<string, unknown>;
+  }
+
+  it("跑通的那一路：`data` 里有裁决与报告路径、`artifacts` 里指得到它、人看的那一行说得清", async () => {
+    const s = stage();
+    const r = await runC(create(s, ["--yes", "--json"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    const out = jsonOf(r.io);
+    expect(out.data!["qaVerdict"]).toBe("incomplete");      // ⚠️ 恒真：第六条不归 QA，而它**不是**失败
+    expect(String(out.data!["qaReport"])).toBe("wasteland/run/v1/qa-report.json");
+    expect(out.artifacts!.some((a) => a.kind === "qa-report")).toBe(true);
+
+    // ⚠️ 那一行要把「跑了五条」与「哪条没跑」**分开说** —— 否则 `incomplete` 会被读成「有问题」
+    expect(r.text()).toMatch(/QA：没有一条判据说不行 · 5\/6 条由 QA 跑过（裁决 incomplete）/);
+    expect(r.text()).toMatch(/没跑的：层覆盖/);
+    // ⚠️ 「这一版还没有 QA 实现 —— 票 17-20」**从票 17 起就是假话**，已经删了
+    expect(r.text()).not.toMatch(/还没有 QA 实现/);
+  });
+
+  it("⚠️ 判据硬失败 ⇒ 退出码 **4**、**站点不产**、报告**已经落盘**，而文案里有路径与详情", async () => {
+    const s = stage({ config: unreachable() });
+    const r = await runC(create(s, ["--yes", "--json"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.invalid);           // 4 —— 沿用既有的「产物不合法」档，**不新增值**
+    // ⚠️ 站点那一步**走不到**：判据说这一版不行，就不该产出一个能打开来玩的站点
+    expect(fs.existsSync(path.join(s.outRoot, "wasteland", "site"))).toBe(false);
+    // ⚠️ 而报告**在**（落盘在阻断之前）—— 判据说不行了，正是最该读它的时候
+    const report = jread(path.join(s.outRoot, "wasteland", "run", "v1", "qa-report.json")) as {
+      failures: { judgement: string }[];
+    };
+    expect(report.failures.map((f) => f.judgement)).toContain("reachability");
+
+    // ⚠️ 走异常那一路也丢不掉**报告路径**与**失败详情**（票 20 的 Q5 的明确要求）
+    const err = jsonOf(r.io);
+    expect(err.data).toBeUndefined();
+    expect(String(err.error)).toMatch(/wasteland\/run\/v1\/qa-report\.json/);
+    expect(String(err.error)).toMatch(/\[reachability\]/);
   });
 });
 

@@ -453,7 +453,12 @@ export type QaContext = {
  * QA 的**扩展点** —— `createGame` 收一个可选的它（票 15 的 Q7「γ + α」）。
  *
  * ⚠️ **它只返回、不落盘**：写 `run/v<N>/qa-report.json` 的是 pipeline（票 15 的 Q3）。
- * ⚠️ **它是可缺席的**：今天 `packages/qa` 还是空骨架（票 17-20）⇒ `createGame` 的返回里
- *   **要说得出这一格缺席**，而不是假装查过。
+ * ⚠️ **它的实现者是汇合处**（票 20）：`packages/qa` 的 `qaRunner` —— 把三个族凑成一份报告、
+ *   并按契约 §四④ 补齐那两条观察的，就是它。
+ * ⚠️ **「可缺席」的原由已经变了**（票 20 就地更正）：票 15 写这一句时的理由是
+ *   「`packages/qa` 还是空骨架（票 17-20）」—— 那个理由没了。今天的缺席只有**一种**来路：
+ *   **调用方显式写 `null`**（`BuildInput.qa`），用于「只想测构建段」的场景；
+ *   **省略** = 跑默认的合成器。⇒ `BuildResult.qa` 缺席仍然只表示「没跑」，而它不再
+ *   是链的常态 —— 报账的那一侧（两个壳）读的就是这个字段。
  */
 export type QaRunner = (ctx: QaContext) => Promise<QAReport>;

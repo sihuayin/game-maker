@@ -11,6 +11,7 @@ import {
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
+import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
 import { runBuild, runUnderstanding } from "@game-maker/pipeline";
 import path from "node:path";
 import fs from "node:fs";
@@ -27,6 +28,37 @@ function readIntent(v: string): string {
   if (!fs.existsSync(p))
     throw new CommandError("usage", `intent 看起来是一个路径（"${v}"），而它不存在：${p}`);
   return fs.readFileSync(p, "utf8");
+}
+
+/**
+ * **QA 那一份回报**（票 20 的 Q5）—— 与 CLI **同一份内容**（那一侧在 `cli.ts` 里，
+ * 两处各写一遍：`demo` 与 `pipeline` 彼此看不见，没有一处能放共享的壳代码，
+ * 与上面 `readIntent` 的注释同一条理由。**改的时候两处一起改。**）
+ *
+ * ⚠️ 裁决**不在这里判**：`qaVerdict()` 是契约里那**一处**（`ledger.ts` 尾注那条纪律）。
+ * ⚠️ **`incomplete` 不是失败**，而它今天**恒真**（`checked` 恒 5/6）⇒ 把「跑了的那几条怎么样」
+ *   与「哪几条没跑」**分开说**，否则那一行会被读成「有问题」。
+ * ⚠️ **观察不打**：今天两条都是 `unavailable`（链上还没接采集），打出来只是噪声。
+ * ⚠️ **判据失败那一路不在这里**：`runBuild` 在硬失败上**抛**，文案与报告路径都在那个异常里。
+ */
+function qaReportOf(qa: QAReport, qaReportPath: string, outDir: string): {
+  summary: string[]; data: Record<string, unknown>; artifact: { path: string; kind: string };
+} {
+  const verdict = qaVerdict(qa);
+  const missing = QA_JUDGEMENTS.filter((j) => !qa.checked.includes(j));
+  const ran = `${qa.checked.length}/${QA_JUDGEMENTS.length} 条由 QA 跑过（裁决 ${verdict}）`
+    + (missing.length === 0 ? "" : ` —— 没跑的：${missing.map((j) => QA_JUDGEMENT_LABELS[j]).join(" · ")}`);
+  const p = path.relative(outDir, qaReportPath);
+  return {
+    summary: [
+      qa.failures.length === 0
+        ? `✅ QA：没有一条判据说不行 · ${ran}`
+        : `✅ QA：没有一条 error，但有 ${qa.failures.length} 条警告 · ${ran}`,
+      ...qa.failures.map((f) => `  ⚠️ [${f.judgement}] ${f.target}：${f.detail.replace(/\n/g, "\n    ")}`),
+    ],
+    data: { qaVerdict: verdict, qaReport: p },
+    artifact: { path: p, kind: "qa-report" },
+  };
 }
 
 /** 生图上游：**环境变量优先**，其次本地那份（已 gitignore 的）配置 —— 与 CLI 同源。 */
@@ -228,7 +260,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               ...(args.styleId === undefined ? {} : { styleId: String(args.styleId) }),
               onProgress: (p) => tick(0.4, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),
             });
-            tick(0.5, "构建层：生图 → 配置 → 站点…");
+            tick(0.5, "构建层：生图 → 配置 → QA → 站点…");
             const built = await runBuild({
               outRoot: String(args.outDir ?? "out"), runDir: understanding.run.dir,
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
@@ -243,17 +275,27 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）
               siteVersion: built.packVersion,
             });
+            const outDir = String(args.outDir ?? "out");
+            const qa = built.qa === undefined || built.paths.qaReport === undefined
+              ? undefined : qaReportOf(built.qa, built.paths.qaReport, outDir);
             result = {
               command: "create",
               summary: [
-                `这次运行：${path.relative(String(args.outDir ?? "out"), understanding.run.dir)}` +
+                `这次运行：${path.relative(outDir, understanding.run.dir)}` +
                   `（v${understanding.run.version} · ${understanding.run.gameId}）· 包 v${built.packVersion}`,
                 ...understanding.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`),
-                ...(built.qa === undefined ? ["⚠️ 没有跑 QA（这一版还没有 QA 实现 —— 票 17-20）"] : []),
+                ...(qa?.summary ?? []),
                 ...site.summary,
               ],
-              data: { status: "complete", gameId: built.gameId, runVersion: understanding.run.version, packVersion: built.packVersion, ...site.data },
-              artifacts: [...site.artifacts, { path: path.relative(String(args.outDir ?? "out"), built.paths.packDir), kind: "asset-pack" }],
+              data: {
+                status: "complete", gameId: built.gameId, runVersion: understanding.run.version,
+                packVersion: built.packVersion, ...site.data, ...(qa?.data ?? {}),
+              },
+              artifacts: [
+                ...site.artifacts,
+                { path: path.relative(outDir, built.paths.packDir), kind: "asset-pack" },
+                ...(qa === undefined ? [] : [qa.artifact]),
+              ],
             };
             break;
           }

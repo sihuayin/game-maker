@@ -8,6 +8,7 @@ import {
   type CommandResult,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
+import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
 import { runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -27,8 +28,10 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   · 不带 \`--yes\` ⇒ 跑到清单为止就**停下**（退出码 0，\`data.status = "awaiting"\`），
     把「这一步要生几张图」与「用户没说清的地方」打给你看；人看完或改完清单，再跑
     \`game-maker build <那个 run 目录>\` 接着往下。
-  · 带 \`--yes\` ⇒ 一路跑到底：生图 → 配置 → 站点（**等于跳过那个检查点**）。
+  · 带 \`--yes\` ⇒ 一路跑到底：生图 → 配置 → QA → 站点（**等于跳过那个检查点**）。
   ⚠️ 两条路的产物**逐字节等价** —— 只是分两次跑、还是连着跑。
+  ⚠️ **QA 判据硬失败 ⇒ 退出码 4、且站点不产** —— 报告**已经落在** \`run/v<N>/qa-report.json\`
+     （判据说的是**产物**的问题，重抽一次改不了它 ⇒ 要去的地方是设计 / 清单 / 包）。
 
 通用选项：
   --out <目录>   产物根。默认 ./out。**所有回报的路径都相对于它**。
@@ -236,6 +239,7 @@ function createComplete(
   b: Awaited<ReturnType<typeof runBuild>>, site: CommandResult, outRoot: string,
 ): CommandResult {
   const r = recipeLines(u);
+  const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot);
   return {
     command: "create",
     summary: [
@@ -243,7 +247,7 @@ function createComplete(
       `清单：${r.oneLine}`,
       ...(u.intent.ambiguity.length === 0 ? [] : u.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`)),
       ...b.packVersion === u.run.version ? [] : [`⚠️ 这次构建用了包版本 v${b.packVersion}（run 是 v${u.run.version}）`],
-      ...b.qa === undefined ? ["⚠️ 没有跑 QA（这一版还没有 QA 实现 —— 票 17-20）"] : [],
+      ...(qa?.summary ?? []),
       ...site.summary,
     ],
     data: {
@@ -252,10 +256,12 @@ function createComplete(
       config: relPath(outRoot, b.paths.config), siteDir: String(site.data["siteDir"] ?? ""),
       entry: String(site.data["entry"] ?? ""), serveRoot: String(site.data["serveRoot"] ?? ""),
       imageAssetCount: r.imageAssetCount, ambiguity: u.intent.ambiguity,
+      ...(qa?.data ?? {}),
     },
     artifacts: [
       { path: relPath(outRoot, u.run.dir), kind: "run" },
       { path: relPath(outRoot, b.paths.packDir), kind: "asset-pack" },
+      ...(qa === undefined ? [] : [qa.artifact]),
       ...site.artifacts,
     ],
   };
@@ -268,13 +274,14 @@ function buildComplete(
   const intentPath = path.join(b.runDir, "game-intent.json");
   let ambiguity: string[] = [];
   try { ambiguity = (JSON.parse(fs.readFileSync(intentPath, "utf8")) as { ambiguity?: string[] }).ambiguity ?? []; } catch { /* 读不到就算了 */ }
+  const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot);
   return {
     command: "build",
     summary: [
       `这次运行：${relPath(outRoot, b.runDir)}（v${b.runVersion} · ${b.gameId}）· 包 v${b.packVersion}`,
       `包：${relPath(outRoot, b.paths.packDir)}（${b.manifest.assets.length} 个资源）`,
       ...(ambiguity.length === 0 ? [] : ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`)),
-      ...b.qa === undefined ? ["⚠️ 没有跑 QA（这一版还没有 QA 实现 —— 票 17-20）"] : [],
+      ...(qa?.summary ?? []),
       ...site.summary,
     ],
     data: {
@@ -283,10 +290,12 @@ function buildComplete(
       config: relPath(outRoot, b.paths.config), siteDir: String(site.data["siteDir"] ?? ""),
       entry: String(site.data["entry"] ?? ""), serveRoot: String(site.data["serveRoot"] ?? ""),
       ambiguity,
+      ...(qa?.data ?? {}),
     },
     artifacts: [
       { path: relPath(outRoot, b.runDir), kind: "run" },
       { path: relPath(outRoot, b.paths.packDir), kind: "asset-pack" },
+      ...(qa === undefined ? [] : [qa.artifact]),
       ...site.artifacts,
     ],
   };
@@ -297,6 +306,38 @@ export function renderHuman(r: CommandResult): string {
   const out = [...r.summary];
   for (const a of r.artifacts) out.push(`→ ${a.path}`);
   return out.join("\n");
+}
+
+/**
+ * **QA 那一份回报**（票 20 的 Q5）—— `create --yes` 与 `build` 共用这一份。
+ *
+ * ⚠️ 裁决**不在这里判**：`qaVerdict()` 是契约里那**一处**（`ledger.ts` 尾注那条纪律）。
+ * ⚠️ **`incomplete` 不是失败**，而它今天**恒真**（`checked` 恒 5/6 —— 第六条「层覆盖」由
+ *   装配期的硬失败保证，不归任何族，见票 19）。⇒ 这里把「跑了的那几条怎么样」与
+ *   「哪几条没跑」**分开说**，否则那一行会被读成「有问题」。
+ * ⚠️ **观察不打**：今天两条都是 `unavailable`（链上还没接采集）—— 打出来只是噪声，
+ *   而它要说话的时候，话在 `qa-report.json` 里。
+ * ⚠️ **判据失败那一路不在这里**：`runBuild` 在硬失败上**抛**（报告先落盘、再抛），
+ *   文案与报告路径都在那个异常里 —— 别在这里再判一次「过没过」。
+ */
+function qaReportOf(qa: QAReport, qaReportPath: string, outRoot: string): {
+  summary: string[]; data: Record<string, unknown>; artifact: { path: string; kind: string };
+} {
+  const verdict = qaVerdict(qa);
+  const missing = QA_JUDGEMENTS.filter((j) => !qa.checked.includes(j));
+  const ran = `${qa.checked.length}/${QA_JUDGEMENTS.length} 条由 QA 跑过（裁决 ${verdict}）`
+    + (missing.length === 0 ? "" : ` —— 没跑的：${missing.map((j) => QA_JUDGEMENT_LABELS[j]).join(" · ")}`);
+  const path = relPath(outRoot, qaReportPath);
+  return {
+    summary: [
+      qa.failures.length === 0
+        ? `✅ QA：没有一条判据说不行 · ${ran}`
+        : `✅ QA：没有一条 error，但有 ${qa.failures.length} 条警告 · ${ran}`,
+      ...qa.failures.map((f) => `  ⚠️ [${f.judgement}] ${f.target}：${f.detail.replace(/\n/g, "\n    ")}`),
+    ],
+    data: { qaVerdict: verdict, qaReport: path },
+    artifact: { path, kind: "qa-report" },
+  };
 }
 
 /** 出站通道。测试注入收集器就能完全离线地驱动它（否则测试会把 stdout 刷满）。 */

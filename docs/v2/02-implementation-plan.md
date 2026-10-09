@@ -645,6 +645,18 @@ IntentQAResult   ← ⚠️ 不采用：`score` 与「不带分数」正面冲�
 `qaVerdict()` 派生的三值），判据与观察在类型上分开住。
 汇合处是[票 20](../../.scratch/game-maker-v2/issues/20-qa-report-assembly.md)。
 
+✅ **2026-10-09 落地**（[票 20](../../.scratch/game-maker-v2/issues/20-qa-report-assembly.md)），
+落点是 `packages/qa/src/assemble.ts` 的 `qaRunner`（**它就是** `QaRunner`）。
+与本文的出入有两处：
+
+1. **它不只「汇」，它还「断」**：`runBuild` 默认接上它，而在**报告落盘之后**按
+   `failures` 里的 `severity: "error"` 抛 `CommandError("invalid")`（**退出码 4**、**站点不产**）。
+   ⚠️ 闸**不看** `qaVerdict` —— 那个值今天**恒为 `incomplete`**（`checked` 恒 5/6），
+   拿它当闸会让每一次运行都红；而 `incomplete` **不是失败**，它说的是「有一条判据没由 QA 跑」。
+2. **观察那一半今天是空的**：两条都 `unavailable`（合成器**只装配、不采集** —— 它住 `qa`，
+   白名单只有 `contracts`，够不着 `inspectPack` / `reviewPack`）。
+   详见 [票 20 的 Answer](../../.scratch/game-maker-v2/issues/20-qa-report-assembly.md)。
+
 ---
 
 # Phase 16：Repair Loop

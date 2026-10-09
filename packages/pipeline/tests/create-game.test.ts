@@ -7,10 +7,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { RUN_LEDGER_FORMAT, parseRecipe, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { RUN_LEDGER_FORMAT, parseRecipe, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
-import { fakeUpstream, tinyPng } from "./upstream.js";
+import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
 
 const dirs: string[] = [];
 const tmp = () => { const d = fs.mkdtempSync(path.join(os.tmpdir(), "gm-create-")); dirs.push(d); return d; };
@@ -259,11 +259,26 @@ describe("§invariant 5 · 失败现场保留", () => {
   });
 });
 
-describe("§QA 是一个**明确的扩展点**（Q7/Q12）", () => {
-  it("不给 ⇒ **缺席**（返回里没有 `qa`、run 里没有 `qa-report.json`）—— 不是「跑了但没问题」", async () => {
+describe("§QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3）", () => {
+  it("⚠️ 不给 ⇒ 跑默认的合成器 —— 而**`incomplete` 不是失败**，它照样不阻断", async () => {
     const h = harness();
     const u = await understand(h);
     const b = await build(h, u.run.dir);
+    // ⚠️ 干净的一次运行：五条判据全跑、一条怨言都没有
+    expect(b.qa?.failures).toEqual([]);
+    // ⚠️ **第六条不归 QA**（层覆盖由装配期的硬失败保证）⇒ `checked` 恒 5/6、裁决恒 `incomplete`
+    //   —— 而**这一次构建成功了**：那正是「闸看 `failures`，不看 `qaVerdict`」的证据。
+    expect(b.qa?.checked).toHaveLength(5);
+    expect(b.qa?.checked).not.toContain("layer-coverage");
+    expect(qaVerdict(b.qa!)).toBe("incomplete");
+    expect(readJson(runPath(h, "qa-report.json"))["format"]).toBe("qa-report/v1");
+    expect(b.paths.qaReport).toBeDefined();
+  });
+
+  it("⚠️ **`qa: null` ⇒ 缺席**（返回里没有 `qa`、run 里没有 `qa-report.json`）—— 不是「跑了但没问题」", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir, { qa: null });
     expect(b.qa).toBeUndefined();
     expect(b.paths.qaReport).toBeUndefined();
     expect(fs.existsSync(runPath(h, "qa-report.json"))).toBe(false);
@@ -272,7 +287,14 @@ describe("§QA 是一个**明确的扩展点**（Q7/Q12）", () => {
   it("给了 ⇒ 跑、**pipeline 落盘**、返回里带着那份报告", async () => {
     const h = harness();
     const u = await understand(h);
-    const report: QAReport = { format: "qa-report/v1", checked: [], failures: [], observations: [] };
+    const report: QAReport = {
+      format: "qa-report/v1", checked: [], failures: [],
+      // ⚠️ **每个来源恰好一条**（契约的 `superRefine` ④）—— 少一条，`runBuild` 的契约校验当场拒。
+      observations: [
+        { source: "inspect", outcome: "unavailable", reason: "测试用：没跑" },
+        { source: "review", outcome: "unavailable", reason: "测试用：没跑" },
+      ],
+    };
     let saw = "";
     const b = await build(h, u.run.dir, {
       qa: async (ctx: QaContext) => {
@@ -289,10 +311,56 @@ describe("§QA 是一个**明确的扩展点**（Q7/Q12）", () => {
     expect(b.qa).toEqual(report);
     expect(readJson(runPath(h, "qa-report.json"))["format"]).toBe("qa-report/v1");
   });
+
+  it("⚠️ 一份**过不了契约**的报告 ⇒ 当场拒（那是**我们自己的 bug**，不是模型没生成好）", async () => {
+    const h = harness();
+    const u = await understand(h);
+    // 观察缺一条 —— 正是票 18 实测到的那个形状（一份「族结果」直接落盘）
+    const broken = {
+      format: "qa-report/v1", checked: [], failures: [],
+      observations: [{ source: "inspect", outcome: "unavailable", reason: "只给了一条" }],
+    } as unknown as QAReport;
+    await expect(build(h, u.run.dir, { qa: async () => broken }))
+      .rejects.toThrowError(/过不了 `qa-report\/v1`/);
+  });
+});
+
+describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的 Q4）", () => {
+  /** 一个**真链上会响**的现场：把拾取物摆到跳不到的高处 ⇒ `reachability` 报一条 error。
+   *  ⚠️ 世界是平的、跳跃顶点只有 40.5px（`180²/(2×400)`），而 y=60 离脚下的 200 有一大截。 */
+  function unreachableHarness() {
+    const config = structuredClone(CANNED.gameConfig) as { entities: { id: string; at: { x: number; y: number } }[] };
+    config.entities.find((e) => e.id === "e-pickup-1")!.at = { x: 120, y: 60 };
+    return harness({ override: { emit_game_config: config } });
+  }
+
+  it("⚠️ 真链上响一次 ⇒ 抛 `invalid`（= 退出码 4），而报告**已经在磁盘上**", async () => {
+    const h = unreachableHarness();
+    const u = await understand(h);
+    await expect(build(h, u.run.dir)).rejects.toMatchObject({ kind: "invalid" });
+
+    // ⚠️ **落盘在阻断之前**：判据说不行了，正是最该读它的时候（也是修复循环要读的那一份）
+    const report = readJson(runPath(h, "qa-report.json")) as {
+      checked: string[]; failures: { judgement: string; severity: string }[];
+    };
+    expect(report.failures.map((f) => f.judgement)).toContain("reachability");
+    expect(report.checked).toContain("reachability");      // 跑过才产得出失败（契约的 `superRefine` ③）
+  });
+
+  it("⚠️ 文案里带着**报告路径**与失败详情 —— 走异常那一路也丢不掉它（票 20 的 Q5）", async () => {
+    const h = unreachableHarness();
+    const u = await understand(h);
+    const e = await build(h, u.run.dir).catch((x: unknown) => x as Error);
+    expect(e.message).toMatch(/qa-report\.json/);          // 报告路径
+    expect(e.message).toMatch(/\[reachability\]/);         // 哪条判据
+    expect(e.message).toMatch(/QA 判据没过/);
+    // ⚠️ **不能**出现「再抽一次」那类话：判据说的是**产物**的问题，重抽改不了那些事实。
+    expect(e.message).toMatch(/不是「再抽一次」的理由/);
+  });
 });
 
 describe("§两段各报自己那几步（Q6 的进度）", () => {
-  it("理解段报 5 步、构建段报 3 步（有 QA 时）", async () => {
+  it("理解段报 5 步、构建段报 3 步（QA 默认在，所以是 pack → config → qa）", async () => {
     const h = harness();
     const got: string[] = [];
     await understand(h, { onProgress: (p: { step: string }) => got.push(p.step) });
@@ -300,6 +368,12 @@ describe("§两段各报自己那几步（Q6 的进度）", () => {
     const u = await understand(h);
     const got2: string[] = [];
     await build(h, u.run.dir, { onProgress: (p: { step: string }) => got2.push(p.step) });
-    expect(got2.filter((s, i) => s !== got2[i - 1])).toEqual(["pack", "config"]);   // 资产级进度也报在 pack 那一步
+    expect(got2.filter((s, i) => s !== got2[i - 1])).toEqual(["pack", "config", "qa"]);   // 资产级进度也报在 pack 那一步
+
+    // ⚠️ `qa: null` ⇒ 那一步**根本不报**（不是报一个「跳过了」）—— 步级进度说的是**发生过**的事
+    const u2 = await understand(h);
+    const got3: string[] = [];
+    await build(h, u2.run.dir, { qa: null, onProgress: (p: { step: string }) => got3.push(p.step) });
+    expect(got3.filter((s, i) => s !== got3[i - 1])).toEqual(["pack", "config"]);
   });
 });

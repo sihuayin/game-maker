@@ -15,7 +15,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  parseAssetPack, parseGameConfig, parseRecipe, RUN_LEDGER_FORMAT, summarizeCalls,
+  CommandError, formatIssues, parseAssetPack, parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
+  RUN_LEDGER_FORMAT, summarizeCalls,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
   type GameIntentSpec, type LedgerCall, type QAReport, type QaRunner, type RunLedger,
   type RuntimeProfileRef, type VisualWorldSpec,
@@ -23,6 +24,10 @@ import {
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
 import { compileRuntime, nextPackVersion, packAssets, planAssets, type ImageTransport } from "@game-maker/assets";
+// ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
+//   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
+//   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
+import { qaRunner } from "@game-maker/qa";
 import { RUN_ARTIFACT, flattenPlannerOutput, injectCharacterRef, jstr, readRunJson, writeIntentMd, writeJson, writeVisualWorld } from "./artifacts.js";
 import { abandonRun, commitRun, openRun, parseRunVersion, type RunIdentity } from "./run.js";
 
@@ -68,6 +73,18 @@ export type BuildPaths = {
   runDir: string; packDir: string; config: string; qaReport?: string; ledger: string;
 };
 
+/**
+ * **QA 那一格**（票 15 的 Q7/Q12 立的口子，票 20 定的默认值）。
+ *
+ * ⚠️ **不给 = 跑默认的合成器**（`packages/qa` 的 `qaRunner`）—— 不是「缺席」。
+ *   票 15 当年把「不给 ⇒ 缺席」写成扩展点，理由是「`packages/qa` 还是空骨架（票 17-20）」；
+ *   **那个理由在票 20 关掉的那一刻消失了**：三个族都在，而终点要求
+ *   `run/v<N>/qa-report.json` **必须**在产物里。
+ * ⚠️ **关掉它要显式写 `null`**，不能靠省略 —— `??` 那条又短又顺的写法**恰好**会把 `null`
+ *   也换成默认值，于是「我只想测构建段」的调用方**以为**自己关掉了，而实际上没有。
+ */
+export type QaOption = QaRunner | null;
+
 export type UnderstandingResult = {
   run: RunIdentity;
   visualWorld: VisualWorldSpec;
@@ -89,8 +106,12 @@ export type BuildInput = {
   /** 生图上游。⚠️ 清单里有 `image` 资源而这里没给 ⇒ `packAssets` 会在开跑前拒（usage）。 */
   imageTransport?: ImageTransport;
   concurrency?: { text?: number; image?: number };
-  /** **QA 的扩展点**（票 15 的 Q7/Q12）：不给 ⇒ 这一步**缺席**，返回里说得出它缺席。 */
-  qa?: QaRunner;
+  /**
+   * **QA 那一格**（票 20 的 Q3）：不给 ⇒ 跑 `@game-maker/qa` 的合成器；`null` ⇒ **关掉**。
+   * ⚠️ 两个壳（CLI / MCP）**不许**依赖 `qa` ⇒ 它们**只能**走默认值这条路；
+   *   显式传一个 runner 的口子是留给**测试**与将来的替换者的。
+   */
+  qa?: QaOption;
   fetchImpl?: typeof fetch;
   onProgress?: (p: Progress) => void;
   sourceDateEpoch?: number;
@@ -106,7 +127,7 @@ export type BuildResult = {
   packVersion: number;
   manifest: AssetPackManifest;
   config: GameConfig;
-  /** ⚠️ **缺席 = 没跑**（今天 `packages/qa` 还是空骨架，票 17-20）—— 不是「跑了但没问题」。 */
+  /** ⚠️ **缺席 = 没跑**（调用方显式写了 `null`）—— 不是「跑了但没问题」。 */
   qa?: QAReport;
   paths: BuildPaths;
   ledger: LedgerCall[];
@@ -141,6 +162,41 @@ const ledgerOf = (data: Record<string, unknown>): LedgerCall[] => {
   const v = data["ledgerCalls"] ?? data["ledger"];
   return Array.isArray(v) ? (v as LedgerCall[]) : [];
 };
+
+/**
+ * 这一格到底跑不跑（票 20 的 Q3）。
+ *
+ * ⚠️ **「没给」与 `null` 要分得开**：`input.qa ?? qaRunner` 那一行又短又顺，而它**恰好**
+ *   会把 `null` 也换成默认值 —— 读起来像「`null` 关掉了 QA」，实际没有。
+ *   ⇒ 先认 `null`，再兜默认值。
+ */
+const qaRunnerOf = (q: QaOption | undefined): QaRunner | undefined =>
+  q === null ? undefined : q ?? qaRunner;
+
+/**
+ * **判据失败 ⇒ 阻断**（R3 · 票 20 的 Q4）。
+ *
+ * ⚠️ 闸看的是 **`failures` 里的 `error`**，**不是 `qaVerdict`** —— 后者今天**恒为
+ *   `incomplete`**（`checked` 恒 5/6：第六条「层覆盖」不属于任何族，它由装配期的硬失败保证，
+ *   见契约 §四①）。拿 `verdict !== "pass"` 当闸，会让**每一次**运行都红，
+ *   而那不是判据响了 —— 是「还有一条没查」被读成了失败。⚠️ 它**不是**失败：那是**说真话**。
+ *
+ * ⚠️ 文案里**不能**出现「再抽一次」：判据说的是**产物**的问题（设计 / 清单 / 包 / 配置），
+ *   而重抽一次改不了那些事实（与 `compileRuntime` 的业务校验同一条纪律）。
+ * ⚠️ **报告路径要带上**：走异常那一路也丢不掉它（票 20 的 Q5 的明确要求）。
+ */
+function assertQaPassed(report: QAReport, reportPath: string): void {
+  const hard = report.failures.filter((f) => f.severity === "error");
+  if (hard.length === 0) return;
+  throw new CommandError(
+    "invalid",
+    `QA 判据没过（${hard.length} 条硬失败，${qaVerdict(report)}）：\n`
+    + hard.slice(0, 8).map((f) => `  · [${f.judgement}] ${f.target}：${f.detail.replace(/\n/g, "\n      ")}`).join("\n")
+    + `\n⚠️ 报告已经落盘：${reportPath} —— 那是这一次运行的**诊断**，不是「再抽一次」的理由：`
+    + "判据说的是**产物**的问题，重抽改不了那些事实。\n"
+    + "   要去的地方：设计层 / 资源清单 / 包（不是上游模型）。",
+  );
+}
 
 /** 风格身份 = 参考图 basename 的 slug（票 08 的 R2-Q2：**由调用方生成**，模型照抄、这里强制覆盖）。 */
 export function styleIdOf(referencePath: string): string {
@@ -270,11 +326,13 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
 }
 
 /**
- * **第二段：构建**（清单 → 包 → 配置 [→ QA]）。
+ * **第二段：构建**（清单 → 包 → 配置 → QA）。
  *
  * ⚠️ **只吃 `runDir`**：清单、风格、参考图、基因**一概从磁盘读回** —— R10「人可改」要的就是这个。
  * ⚠️ **两条判据**（票 15 的 Q11）：① 清单里的 `id` 与运行目录的 `gameId` **不一致 ⇒ 拒**；
  *   ② 照跑 `parseRecipe`（清单可能被人改过）。
+ * ⚠️ **QA 默认跑**（票 20 的 Q3）：`input.qa` 省略 ⇒ 用 `@game-maker/qa` 的合成器；
+ *   显式 `null` ⇒ 关掉。它的硬失败在**报告落盘之后**抛 `invalid`（见 `assertQaPassed`）。
  */
 export async function runBuild(input: BuildInput): Promise<BuildResult> {
   const runDir = path.isAbsolute(input.runDir) ? input.runDir : path.join(input.outRoot, input.runDir);
@@ -304,7 +362,8 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
 
   const t0 = Date.now();
   const ledger: LedgerCall[] = [];
-  const total = BUILD_STEPS.length + (input.qa === undefined ? -1 : 0);
+  const runner = qaRunnerOf(input.qa);
+  const total = BUILD_STEPS.length + (runner === undefined ? -1 : 0);
   const say = (step: CreateStep) =>
     input.onProgress?.({ step, index: BUILD_STEPS.indexOf(step as never) + 1, total });
 
@@ -358,21 +417,35 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   const config = parseGameConfig(readRunJson(runDir, RUN_ARTIFACT.config));
   if (!config.ok) throw new Error(`刚写下的 config 读不回来：${config.errors.slice(0, 3).join("；")}`);
 
-  // ── QA：**扩展点**（Q7/Q12）。给了就跑，没给就**缺席**（返回里说得出这件事）。 ──
+  // ── QA：**默认跑**（票 20 的 Q3），而它的硬失败**阻断**（R3 · 票 20 的 Q4）──────────
   let qa: QAReport | undefined;
-  if (input.qa !== undefined) {
+  if (runner !== undefined) {
     say("qa");
     // ⚠️ **四份产物的路径逐个传**（票 19 的 Q4/Q11）：QA 不自己拼文件名 ——
     //   那九个名字的家是本模块的 `RUN_ARTIFACT`，而 `packages/qa` 的白名单只有 `contracts`。
-    qa = await input.qa({
+    const produced = await runner({
       runDir, packDir, gameId,
       configPath: path.join(runDir, RUN_ARTIFACT.config),
       intentPath: path.join(runDir, RUN_ARTIFACT.gameIntent),
       designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
       recipePath: path.join(runDir, RUN_ARTIFACT.recipe)
     });
-    // ⚠️ **落盘归本层**（Q3）：QA 只**返回**报告。
-    writeJson(path.join(runDir, RUN_ARTIFACT.qaReport), qa);
+    // ⚠️ **先过一遍它自己的契约**（票 20 的 Q4 的第 2 步）：落一份**过不了 schema** 的报告，
+    //   等于让下游（修复循环）拿到它解析不了的东西 —— 而今天不炸，只因为没人 parse 它。
+    //   ⚠️ 这一条**不是**给模型兜底的：报告是我们自己拼的 ⇒ 不过就是**我们的 bug**，
+    //     所以文案里不说「再去抽一次」。
+    const checkedReport = QAReportSchema.safeParse(produced);
+    if (!checkedReport.success)
+      throw new CommandError("invalid",
+        "装配出来的 QA 报告过不了 `qa-report/v1` —— ⚠️ 这是本仓库自己的 bug，不是模型的："
+        + `${formatIssues(checkedReport.error).slice(0, 4).join("；")}`);
+    qa = checkedReport.data;
+    // ⚠️ **落盘在阻断之前**（票 20 的 Q4 定死的顺序）：报告是判据的**产出**，也是这一次运行的
+    //   **诊断** —— 判据说不行了，正是最该读它的时候。
+    //   ⚠️ 与「配置过不了校验就**不落盘**」那条不冲突：坏配置是**输入**，报告是**诊断**。
+    const qaReportPath = path.join(runDir, RUN_ARTIFACT.qaReport);
+    writeJson(qaReportPath, qa);
+    assertQaPassed(qa, rel(input.outRoot, qaReportPath));
   }
 
   // ⚠️ **链级并集**（Q14）：理解段那几发 ∪ 这一次构建的（包 + 配置）。
