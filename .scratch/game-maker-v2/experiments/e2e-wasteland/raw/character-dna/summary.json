@@ -1,0 +1,83 @@
+{
+ "角色条数": {
+  "3": 6
+ },
+ "id组合": {
+  "scavenger,enemy,scavenger": 6
+ },
+ "过闸": {
+  "ok": 0,
+  "bad": 6
+ },
+ "病由": {
+  "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）": 6
+ },
+ "逐发": [
+  {
+   "i": 1,
+   "角色条数": 3,
+   "ids": [
+    "scavenger",
+    "enemy",
+    "scavenger"
+   ],
+   "过闸": false,
+   "病由": "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）"
+  },
+  {
+   "i": 2,
+   "角色条数": 3,
+   "ids": [
+    "scavenger",
+    "enemy",
+    "scavenger"
+   ],
+   "过闸": false,
+   "病由": "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）"
+  },
+  {
+   "i": 3,
+   "角色条数": 3,
+   "ids": [
+    "scavenger",
+    "enemy",
+    "scavenger"
+   ],
+   "过闸": false,
+   "病由": "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）"
+  },
+  {
+   "i": 4,
+   "角色条数": 3,
+   "ids": [
+    "scavenger",
+    "enemy",
+    "scavenger"
+   ],
+   "过闸": false,
+   "病由": "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）"
+  },
+  {
+   "i": 5,
+   "角色条数": 3,
+   "ids": [
+    "scavenger",
+    "enemy",
+    "scavenger"
+   ],
+   "过闸": false,
+   "病由": "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）"
+  },
+  {
+   "i": 6,
+   "角色条数": 3,
+   "ids": [
+    "scavenger",
+    "enemy",
+    "scavenger"
+   ],
+   "过闸": false,
+   "病由": "工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）"
+  }
+ ]
+}

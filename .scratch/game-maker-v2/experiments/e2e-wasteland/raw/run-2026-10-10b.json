@@ -1,0 +1,11 @@
+{
+ "code": 4,
+ "ms": 58087,
+ "text": "{\n  \"command\": \"create\",\n  \"error\": \"重采样 3 次都没有拿到一份过契约的 CharacterDNA（最后一次：schema）。最后一次的病因：工具入参不过契约：characters[2].id: 角色 id 重复：\\\"scavenger\\\" —— characterId 会变得含糊（它靠 id 命中）\",\n  \"exitCode\": 4,\n  \"ledger\": [\n    {\n      \"step\": \"character-dna\",\n      \"target\": \"character-dna\",\n      \"upstream\": \"messages\",\n      \"ms\": 19978,\n      \"attempts\": 3,\n      \"failures\": [\n        \"schema\",\n        \"schema\",\n        \"schema\"\n      ],\n      \"requestedModel\": \"deepseek-v4-pro\",\n      \"model\": \"deepseek-flash\",\n      \"usage\": {\n        \"inputTokens\": 149,\n        \"outputTokens\": 877\n      }\n    }\n  ]\n}\n  · visual-world\n  · intent\n  · design\n  · character-dna\n",
+ "steps": [
+  "  · visual-world\n",
+  "  · intent\n",
+  "  · design\n",
+  "  · character-dna\n"
+ ]
+}

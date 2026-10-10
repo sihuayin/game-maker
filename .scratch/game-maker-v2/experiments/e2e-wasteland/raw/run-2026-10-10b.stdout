@@ -1,0 +1,47 @@
+票 23 —— 从 fixture 真跑到站点（第五次 · 2026-10-10b · 第四跑的原样重试）
+  style : fixtures/e2e/wasteland-platformer/style.png（借 halt-dusk.png，有意错配）
+  intent: fixtures/e2e/wasteland-platformer/intent.md（§27 逐字节）
+  out   : .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-10b（⚠️ 不动第四跑那些字节）
+  生图走: https → http://127.0.0.1:7890（注入 fetchImpl）· http → 直连
+  并发  : --concurrency 2 ⇒ **text 2 / image 2**（裁定原话是 image 2；CLI 只能一起设）
+  叫停  : 150 分钟
+
+  · visual-world
+  · intent
+  · design
+  · character-dna
+
+退出码 4 · 墙钟 58.1s（1.0 分钟）
+步：· visual-world → · intent → · design → · character-dna
+
+❌ 失败现场（前 2500 字）：
+{
+  "command": "create",
+  "error": "重采样 3 次都没有拿到一份过契约的 CharacterDNA（最后一次：schema）。最后一次的病因：工具入参不过契约：characters[2].id: 角色 id 重复：\"scavenger\" —— characterId 会变得含糊（它靠 id 命中）",
+  "exitCode": 4,
+  "ledger": [
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 19978,
+      "attempts": 3,
+      "failures": [
+        "schema",
+        "schema",
+        "schema"
+      ],
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 149,
+        "outputTokens": 877
+      }
+    }
+  ]
+}
+  · visual-world
+  · intent
+  · design
+  · character-dna
+

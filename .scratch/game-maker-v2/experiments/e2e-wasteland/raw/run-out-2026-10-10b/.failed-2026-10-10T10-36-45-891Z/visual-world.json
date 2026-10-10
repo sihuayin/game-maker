@@ -1,0 +1,246 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "Flat Pixel Side-Scroller",
+    "keywords": [
+      "flat",
+      "pixel",
+      "2D side-scroller",
+      "limited palette",
+      "orthographic",
+      "chunky silhouette",
+      "geometric primitives"
+    ],
+    "description": "极简扁平像素横版风格：正交侧视、无视差、纯色块拼接出形体，形体只用矩形/三角/圆形等基本几何构成，无渐变无描边无纹理；角色为小尺寸方块人，剪影清晰可辨；场景由横向分层色带与少量道具构成，暗色天空压在顶部，中间为建筑立面，底部为平坦地面与轨道带。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "正交无透视，正侧面平视"
+  },
+  "composition": {
+    "foreground": "下部为地面带与横向轨道/分隔条，最底为暗色边缘带",
+    "midground": "中部为主体建筑立面，内含窗框、海报、招牌等矩形开口",
+    "background": "上部为深色天空色带与一层地平线色带，后方是远景剪影",
+    "objectScale": "道具（长椅、路灯、宝箱）与角色同量级，窗框等结构件远大于角色",
+    "characterScale": "角色高度约占画面高度四分之一到三分之一，居中间位置",
+    "density": "低密度，大面积留空，元素横向排列"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1"
+    ],
+    "secondary": [
+      "palette:2",
+      "palette:3"
+    ],
+    "accent": [
+      "palette:4",
+      "palette:5"
+    ],
+    "background": [
+      "palette:6",
+      "palette:7"
+    ],
+    "shadow": [
+      "palette:8",
+      "palette:9"
+    ],
+    "highlight": [
+      "palette:10"
+    ]
+  },
+  "lighting": {
+    "direction": "无明确方向，各面均匀受光",
+    "softness": "硬边平涂，无阴影过渡",
+    "contrast": "低到中等，靠明度阶差区分层次",
+    "mood": "冷清、黄昏般的荒废感"
+  },
+  "materials": {
+    "sky": {
+      "appearance": "平涂深色天空，无云无渐变",
+      "texture": "none",
+      "color": [
+        "palette:6",
+        "palette:7"
+      ]
+    },
+    "distant_band": {
+      "appearance": "地平线处单层暖色带，象征远处荒原或光带",
+      "texture": "none",
+      "color": [
+        "palette:0"
+      ]
+    },
+    "building": {
+      "appearance": "大面积暖褐色墙面与深褐结构",
+      "texture": "none",
+      "color": [
+        "palette:1",
+        "palette:9"
+      ]
+    },
+    "opening": {
+      "appearance": "窗框、门洞、海报等矩形开口，内填浅色或深色块",
+      "texture": "none",
+      "color": [
+        "palette:7",
+        "palette:8"
+      ]
+    },
+    "metal_sign": {
+      "appearance": "悬吊招牌与指示牌，亮黄纯色块",
+      "texture": "none",
+      "color": [
+        "palette:4"
+      ]
+    },
+    "glow": {
+      "appearance": "灯头、宝箱金属件等发光或反光小点",
+      "texture": "none",
+      "color": [
+        "palette:5",
+        "palette:10"
+      ]
+    },
+    "ground": {
+      "appearance": "平坦道路面，中性灰蓝",
+      "texture": "none",
+      "color": [
+        "palette:2",
+        "palette:3"
+      ]
+    },
+    "rail_track": {
+      "appearance": "横向重复的虚线轨道条与深色轨枕",
+      "texture": "repeating dashes",
+      "color": [
+        "palette:8",
+        "palette:9"
+      ]
+    },
+    "wood": {
+      "appearance": "长椅、木板等木质道具，中间调褐色",
+      "texture": "none",
+      "color": [
+        "palette:9"
+      ]
+    },
+    "cloth": {
+      "appearance": "角色衣物与帽子，深色块",
+      "texture": "none",
+      "color": [
+        "palette:8",
+        "palette:4"
+      ]
+    },
+    "white_plate": {
+      "appearance": "角色面部与手套的纯白块",
+      "texture": "none",
+      "color": [
+        "palette:7"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "头身比约 1:2，方块化的矮胖体型",
+    "silhouette": "方形头颅 + 方形躯干 + 短小四肢，外轮廓由直角构成",
+    "poseLanguage": "正面站立，四肢笔直，动作以整块平移与换位表达",
+    "clothing": "深色制服/工装配亮色腰带或帽徽，帽子为梯形或方形",
+    "faceAbstraction": "无五官细节，仅以两个深色像素点表示眼睛"
+  },
+  "environment": {
+    "architecture": "废弃城市建筑立面，横向长墙 + 矩形门窗开洞，屋顶为简单三角或平顶剪影",
+    "terrain": "完全平坦的水平地面，地面以下为多条横向色带分层",
+    "props": "长椅、路灯、悬吊招牌、墙面装饰板等少量分散道具，等距排布",
+    "textureDensity": "极低，所有表面为单色平涂，仅轨道处有重复短线"
+  },
+  "shapeLanguage": [
+    "严格矩形与正方形为主，直角优先",
+    "三角形用于屋顶与远山剪影",
+    "圆形仅用于灯头、光点、宝箱锁等小装饰",
+    "形体边缘无描边，靠色块邻接区分",
+    "所有元素吸附像素网格，边长为整数像素"
+  ],
+  "constraints": [
+    "必须保持正交侧视、无视差、无透视变形",
+    "必须使用硬边平涂色块，禁止渐变、描边、抗锯齿与柔和阴影",
+    "角色与道具必须由基本几何形（矩形/三角/圆）拼合，不添加内部细节纹理",
+    "天空必须为深色，与暖色地平线带形成明确明度分层",
+    "地面必须保持水平平坦，允许用横向色带与重复短线表现轨道与分层",
+    "角色与道具必须能读出剪影，避免与背景同明度而融掉",
+    "宝箱、资源点、敌人须用亮色或高对比色块从废土背景中凸显，可供玩家识别"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png",
+      "role": "global"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "极简扁平像素横版",
+      "正交侧视无透视",
+      "纯色块几何拼接",
+      "有限色板硬边平涂",
+      "小尺寸方块角色"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面视角",
+      "angle": "平视，无俯仰",
+      "perspective": "无透视，平行投影"
+    },
+    "composition": {
+      "layout": "横向分层：天空带 / 建筑立面 / 地面带 / 轨道带",
+      "focus": "角色居中，道具沿地平线等距散布",
+      "negativeSpace": "大面积空墙与天空，低密度"
+    },
+    "palette": [
+      "#2b3a52",
+      "#c48a55",
+      "#8f9aa3",
+      "#6f7883",
+      "#e0a63c",
+      "#f0c95c",
+      "#1f2733",
+      "#e8e4dc",
+      "#1a212b",
+      "#5a3a26",
+      "#f5d76e"
+    ],
+    "lighting": {
+      "type": "均匀环境光，无方向性主光",
+      "shadow": "仅用更暗的同色阶块表示体积，无投影",
+      "mood": "冷清荒废，微暖的黄昏光感"
+    },
+    "shapeLanguage": [],
+    "material": [
+      "纯色平涂",
+      "无纹理、无噪声、无光泽渐变",
+      "像素级硬边"
+    ],
+    "environment": [
+      "废弃城市建筑立面",
+      "平坦开阔地面",
+      "轨道与管线横贯",
+      "远景为单层剪影色带"
+    ],
+    "characterStyle": [
+      "方块人",
+      "极简面部（两点眼）",
+      "深色工装配亮色点缀",
+      "正面站立，动作块状位移"
+    ],
+    "constraints": [
+      "单一像素网格对齐",
+      "禁止任何滤镜、模糊、发光溢出",
+      "每个元素不超过三种色",
+      "背景与角色之间保持明度差以维持可读性"
+    ],
+    "confidence": 0.86
+  }
+}

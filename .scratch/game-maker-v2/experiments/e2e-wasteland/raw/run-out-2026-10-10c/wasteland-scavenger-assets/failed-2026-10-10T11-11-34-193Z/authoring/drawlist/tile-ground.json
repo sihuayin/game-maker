@@ -1,0 +1,136 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "tile-ground",
+  "frame": "tile-ground",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 0,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 0,
+      "y": 0,
+      "w": 16,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 0,
+      "y": 13,
+      "w": 16,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "x": 0,
+      "y": 3,
+      "w": 16,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 0,
+      "y": 12,
+      "w": 16,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 16
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 15,
+      "y": 0,
+      "w": 1,
+      "h": 16
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 1,
+      "y": 4,
+      "w": 6,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 9,
+      "y": 4,
+      "w": 6,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 1,
+      "y": 6,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 11,
+      "y": 9,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 4,
+      "w": 10,
+      "h": 8,
+      "colors": [
+        "palette:6",
+        "palette:9"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "line",
+      "stroke": "palette:10",
+      "strokeWidth": 1,
+      "x1": 0,
+      "y1": 3,
+      "x2": 16,
+      "y2": 3
+    },
+    {
+      "op": "line",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x1": 0,
+      "y1": 12,
+      "x2": 16,
+      "y2": 12
+    }
+  ]
+}

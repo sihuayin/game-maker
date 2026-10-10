@@ -1,0 +1,131 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "icon-water",
+  "frame": "icon-water",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "stroke": "palette:11",
+      "strokeWidth": 1,
+      "x": 4,
+      "y": 2,
+      "w": 8,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "stroke": "palette:11",
+      "strokeWidth": 1,
+      "x": 3,
+      "y": 4,
+      "w": 10,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 4,
+      "y": 5,
+      "w": 8,
+      "h": 7
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 5,
+      "w": 8,
+      "h": 7,
+      "colors": [
+        "palette:6",
+        "palette:9"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "x": 5,
+      "y": 6,
+      "w": 6,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 5,
+      "y": 7,
+      "w": 6,
+      "h": 4
+    },
+    {
+      "op": "circle",
+      "fill": "palette:4",
+      "cx": 7,
+      "cy": 9,
+      "r": 1
+    },
+    {
+      "op": "circle",
+      "fill": "palette:5",
+      "cx": 9,
+      "cy": 9,
+      "r": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 6,
+      "y": 12,
+      "w": 4,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "stroke": "palette:11",
+      "strokeWidth": 1,
+      "x": 5,
+      "y": 13,
+      "w": 6,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 6,
+      "y": 14,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 9,
+      "y": 14,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "line",
+      "stroke": "palette:5",
+      "strokeWidth": 1,
+      "x1": 8,
+      "y1": 4,
+      "x2": 8,
+      "y2": 13
+    }
+  ]
+}

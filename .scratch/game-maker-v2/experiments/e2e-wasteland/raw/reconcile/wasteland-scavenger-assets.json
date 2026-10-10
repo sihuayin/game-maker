@@ -1,0 +1,283 @@
+{
+ "side": "/Volumes/shy/some-projects/game-maker/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-10c/wasteland-scavenger-assets",
+ "recipe": "/Volumes/shy/some-projects/game-maker/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-10c/wasteland-scavenger-assets/run/v1/asset-recipe.json",
+ "authoring": "/Volumes/shy/some-projects/game-maker/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-10c/wasteland-scavenger-assets/failed-2026-10-10T11-11-34-193Z",
+ "declared": 24,
+ "bought": 20,
+ "saved": 4,
+ "perAsset": [
+  {
+   "asset": "scavenger",
+   "declared": 4,
+   "bought": 4,
+   "units": [
+    {
+     "asset": "scavenger",
+     "kind": "animation",
+     "what": "动画 idle",
+     "rel": "authoring/generated/scavenger.idle.png",
+     "bought": true
+    },
+    {
+     "asset": "scavenger",
+     "kind": "animation",
+     "what": "动画 walk",
+     "rel": "authoring/generated/scavenger.walk.png",
+     "bought": true
+    },
+    {
+     "asset": "scavenger",
+     "kind": "animation",
+     "what": "动画 jump",
+     "rel": "authoring/generated/scavenger.jump.png",
+     "bought": true
+    },
+    {
+     "asset": "scavenger",
+     "kind": "animation",
+     "what": "动画 fall",
+     "rel": "authoring/generated/scavenger.fall.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "enemy",
+   "declared": 2,
+   "bought": 2,
+   "units": [
+    {
+     "asset": "enemy",
+     "kind": "animation",
+     "what": "动画 walk",
+     "rel": "authoring/generated/enemy.walk.png",
+     "bought": true
+    },
+    {
+     "asset": "enemy",
+     "kind": "animation",
+     "what": "动画 turn",
+     "rel": "authoring/generated/enemy.turn.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "rubble-hound",
+   "declared": 3,
+   "bought": 0,
+   "units": [
+    {
+     "asset": "rubble-hound",
+     "kind": "animation",
+     "what": "动画 crouch",
+     "rel": "authoring/generated/rubble-hound.crouch.png",
+     "bought": false
+    },
+    {
+     "asset": "rubble-hound",
+     "kind": "animation",
+     "what": "动画 lunge",
+     "rel": "authoring/generated/rubble-hound.lunge.png",
+     "bought": false
+    },
+    {
+     "asset": "rubble-hound",
+     "kind": "animation",
+     "what": "动画 pant",
+     "rel": "authoring/generated/rubble-hound.pant.png",
+     "bought": false
+    }
+   ]
+  },
+  {
+   "asset": "wanderer",
+   "declared": 2,
+   "bought": 2,
+   "units": [
+    {
+     "asset": "wanderer",
+     "kind": "animation",
+     "what": "动画 idle",
+     "rel": "authoring/generated/wanderer.idle.png",
+     "bought": true
+    },
+    {
+     "asset": "wanderer",
+     "kind": "animation",
+     "what": "动画 talk",
+     "rel": "authoring/generated/wanderer.talk.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "chest",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "chest",
+     "kind": "sprite",
+     "what": "单张",
+     "rel": "authoring/generated/chest.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "chest-open",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "chest-open",
+     "kind": "sprite",
+     "what": "单张",
+     "rel": "authoring/generated/chest-open.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "chest-treasure",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "chest-treasure",
+     "kind": "sprite",
+     "what": "单张",
+     "rel": "authoring/generated/chest-treasure.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "sign-post",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "sign-post",
+     "kind": "sprite",
+     "what": "单张",
+     "rel": "authoring/generated/sign-post.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "sign-post-lit",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "sign-post-lit",
+     "kind": "sprite",
+     "what": "单张",
+     "rel": "authoring/generated/sign-post-lit.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "landmark-tower",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "landmark-tower",
+     "kind": "sprite",
+     "what": "单张",
+     "rel": "authoring/generated/landmark-tower.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "bg-wasteland",
+   "declared": 3,
+   "bought": 3,
+   "units": [
+    {
+     "asset": "bg-wasteland",
+     "kind": "background",
+     "what": "层 sky",
+     "rel": "authoring/generated/bg-wasteland.sky.png",
+     "bought": true
+    },
+    {
+     "asset": "bg-wasteland",
+     "kind": "background",
+     "what": "层 buildings",
+     "rel": "authoring/generated/bg-wasteland.buildings.png",
+     "bought": true
+    },
+    {
+     "asset": "bg-wasteland",
+     "kind": "background",
+     "what": "层 groundstrip",
+     "rel": "authoring/generated/bg-wasteland.groundstrip.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "master-scavenger",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "master-scavenger",
+     "kind": "master",
+     "what": "母版（首个引用者 scavenger）",
+     "rel": "authoring/masters/master-scavenger.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "master-patroller",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "master-patroller",
+     "kind": "master",
+     "what": "母版（首个引用者 enemy）",
+     "rel": "authoring/masters/master-patroller.png",
+     "bought": true
+    }
+   ]
+  },
+  {
+   "asset": "master-rubble-hound",
+   "declared": 1,
+   "bought": 0,
+   "units": [
+    {
+     "asset": "master-rubble-hound",
+     "kind": "master",
+     "what": "母版（首个引用者 rubble-hound）",
+     "rel": "authoring/masters/master-rubble-hound.png",
+     "bought": false
+    }
+   ]
+  },
+  {
+   "asset": "master-wanderer",
+   "declared": 1,
+   "bought": 1,
+   "units": [
+    {
+     "asset": "master-wanderer",
+     "kind": "master",
+     "what": "母版（首个引用者 wanderer）",
+     "rel": "authoring/masters/master-wanderer.png",
+     "bought": true
+    }
+   ]
+  }
+ ]
+}

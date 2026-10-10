@@ -1,0 +1,82 @@
+票 23 —— 从 fixture 真跑到站点（第六次 · 2026-10-10c）
+  style : fixtures/e2e/wasteland-platformer/style.png（借 halt-dusk.png，有意错配）
+  intent: fixtures/e2e/wasteland-platformer/intent.md（§27 逐字节）
+  out   : .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-10c（⚠️ 不动第四/第五跑那些字节）
+  生图走: https → http://127.0.0.1:7890（注入 fetchImpl）· http → 直连
+  并发  : --concurrency 2 ⇒ **text 2 / image 2**（裁定原话是 image 2；CLI 只能一起设）
+  叫停  : 150 分钟
+
+  · visual-world
+  · intent
+  · design
+  · character-dna
+  · recipe
+  · pack
+  · pack：scavenger（0/24）
+  · pack：enemy（1/24）
+  · pack：rubble-hound（2/24）
+  · pack：wanderer（3/24）
+  · pack：chest-open（5/24）
+  · pack：sign-post-lit（8/24）
+  · pack：resource（9/24）
+  · pack：water（10/24）
+  · pack：tile-ground（11/24）
+  · pack：tile-wall（12/24）
+  · pack：gap-edge（13/24）
+  · pack：street-lamp（14/24）
+  · pack：bench（15/24）
+  · pack：building-facade（16/24）
+  · pack：landmark-tower（17/24）
+  · pack：bg-wasteland（18/24）
+  · pack：hud-harvest（19/24）
+  · pack：hud-health（20/24）
+  · pack：icon-resource（21/24）
+  · pack：icon-water（22/24）
+  · pack：prompt-sign（23/24）
+  · pack：chest（4/24）
+  · pack：chest-treasure（6/24）
+  · pack：sign-post（7/24）
+
+退出码 1 · 墙钟 572.8s（9.5 分钟）
+步：· visual-world → · intent → · design → · character-dna → · recipe → · pack → · pack：scavenger（0/24） → · pack：enemy（1/24） → · pack：rubble-hound（2/24） → · pack：wanderer（3/24） → · pack：chest-open（5/24） → · pack：sign-post-lit（8/24） → · pack：resource（9/24） → · pack：water（10/24） → · pack：tile-ground（11/24） → · pack：tile-wall（12/24） → · pack：gap-edge（13/24） → · pack：street-lamp（14/24） → · pack：bench（15/24） → · pack：building-facade（16/24） → · pack：landmark-tower（17/24） → · pack：bg-wasteland（18/24） → · pack：hud-harvest（19/24） → · pack：hud-health（20/24） → · pack：icon-resource（21/24） → · pack：icon-water（22/24） → · pack：prompt-sign（23/24） → · pack：chest（4/24） → · pack：chest-treasure（6/24） → · pack：sign-post（7/24）
+
+📊 花掉几张：generated/ 17 张 + masters/ 3 张 = 20 张（数文件）
+   ledger.json 落盘数：1（=0 说明是失败跑 ⇒ 账上没有，只能数文件）
+
+❌ 失败现场（前 2500 字）：
+{
+  "command": "create",
+  "error": "资产 \"rubble-hound\" 的母版 \"master-rubble-hound\" **没造出来**（母版那一发回来的图是 1184×864（比例 1.370），而清单写的是 32×24（比例 1.333）—— **宽高比不一致**。⚠️ 母版是参考图：它的头身比会被后面每一个动画照着画，`authoring[].size` 就是那个 canonical 比例。\n⇒ 要么重出这一张（多半是上游没守住长宽比），要么把 `authoring[].size` 改成这张图真实的比例。） —— ⚠️ 参考图不成立时发出去的那一笔是白花的钱（票 13 的 Q5）。",
+  "exitCode": 1
+}
+  · visual-world
+  · intent
+  · design
+  · character-dna
+  · recipe
+  · pack
+  · pack：scavenger（0/24）
+  · pack：enemy（1/24）
+  · pack：rubble-hound（2/24）
+  · pack：wanderer（3/24）
+  · pack：chest-open（5/24）
+  · pack：sign-post-lit（8/24）
+  · pack：resource（9/24）
+  · pack：water（10/24）
+  · pack：tile-ground（11/24）
+  · pack：tile-wall（12/24）
+  · pack：gap-edge（13/24）
+  · pack：street-lamp（14/24）
+  · pack：bench（15/24）
+  · pack：building-facade（16/24）
+  · pack：landmark-tower（17/24）
+  · pack：bg-wasteland（18/24）
+  · pack：hud-harvest（19/24）
+  · pack：hud-health（20/24）
+  · pack：icon-resource（21/24）
+  · pack：icon-water（22/24）
+  · pack：prompt-sign（23/24）
+  · pack：chest（4/24）
+  · pack：chest-treasure（6/24）
+  · pack：sign-post（7/24）
+

@@ -1,0 +1,138 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "water",
+  "frame": "water",
+  "viewBox": [
+    0,
+    0,
+    12,
+    16
+  ],
+  "expectedSize": [
+    12,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 3,
+      "y": 6,
+      "w": 6,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 3,
+      "y": 14,
+      "w": 6,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 4,
+      "y": 4,
+      "w": 4,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 5,
+      "y": 2,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 4,
+      "y": 3,
+      "w": 4,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "opacity": 0.95,
+      "x": 4,
+      "y": 8,
+      "w": 4,
+      "h": 1
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 9,
+      "w": 4,
+      "h": 4,
+      "colors": [
+        "palette:5",
+        "palette:9"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "opacity": 0.85,
+      "x": 4,
+      "y": 11,
+      "w": 1,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "opacity": 0.9,
+      "x": 4,
+      "y": 7,
+      "w": 4,
+      "h": 1
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 12,
+      "w": 6,
+      "h": 2,
+      "colors": [
+        "palette:7",
+        "palette:9"
+      ],
+      "ratio": 0.45,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "opacity": 0.8,
+      "x": 4,
+      "y": 13,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "opacity": 0.7,
+      "x": 3,
+      "y": 6,
+      "w": 1,
+      "h": 1
+    }
+  ]
+}

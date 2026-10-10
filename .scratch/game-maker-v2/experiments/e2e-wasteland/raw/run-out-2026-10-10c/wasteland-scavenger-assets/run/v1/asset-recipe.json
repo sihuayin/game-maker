@@ -1,0 +1,698 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger",
+        "role": "主角：废土拾荒者",
+        "description": "矮壮方块人，深色制服式外套、浅色裤、宽檐帽、胸前亮色扣饰；横版侧视。含静止直立、行走、起跳、下落的单帧/短循环动作。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 1,
+            "fps": 1,
+            "loop": true
+          },
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 1,
+            "fps": 1,
+            "loop": false
+          },
+          {
+            "name": "fall",
+            "frames": 1,
+            "fps": 1,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy",
+        "role": "巡逻敌人：废墟街上往返行走的生物",
+        "description": "方块生物，矮壮、轮廓钝；沿水平地面往返行走，遇墙或缺口折返。含行走循环与折返时的极简单帧。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "enemy",
+        "masterAsset": "master-patroller",
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "turn",
+            "frames": 1,
+            "fps": 1,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "rubble-hound",
+        "role": "废墟野犬：蹲伏后直线冲刺扑击",
+        "description": "瘦小四足野犬，低矮躯干、方头前伸、四条短腿。含蹲伏待机、起身冲刺扑击、扑后站定喘息的单帧动作。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 24
+        },
+        "required": true,
+        "characterId": "rubble-hound",
+        "masterAsset": "master-rubble-hound",
+        "animations": [
+          {
+            "name": "crouch",
+            "frames": 1,
+            "fps": 1,
+            "loop": true
+          },
+          {
+            "name": "lunge",
+            "frames": 1,
+            "fps": 1,
+            "loop": false
+          },
+          {
+            "name": "pant",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "wanderer",
+        "role": "NPC：蹲在楼阴影下的流浪幸存者",
+        "description": "与主角同款的方块人，蹲坐不动；同一色块语言，胸前扣饰区分身份。含蹲坐待机与交谈时的极简单帧。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "wanderer",
+        "masterAsset": "master-wanderer",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 1,
+            "fps": 1,
+            "loop": true
+          },
+          {
+            "name": "talk",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest",
+        "role": "交互物：立在街上的宝箱",
+        "description": "木箱质感的方正箱体，深色金属包边；一帧为闭合态（关卡初始摆放），一帧为开启后箱盖弹起的形态。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-open"
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-open",
+        "role": "宝箱开启后的箱盖弹起形态",
+        "description": "同一宝箱的开启帧：箱盖向上弹开、箱口敞露，箱内空腔用一块暗色平涂表示。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-treasure",
+        "role": "宝箱弹出的可拾取宝物",
+        "description": "从箱中弹出的小件几何宝物：方正宝石状块体，发光材质、边缘干净，空中弹出用。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-open"
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "sign-post",
+        "role": "交互物：路边招牌方框指示牌",
+        "description": "一根细杆插在路边的招牌方框；一帧为常态暗色平涂，一帧为玩家靠近时亮起的发光态。杆与牌均为几何色块、无描边。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 48
+        },
+        "required": true,
+        "dependsOn": [
+          "sign-post-lit"
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "sign-post-lit",
+        "role": "指示牌亮起态",
+        "description": "同一招牌方框被靠近时亮起的形态：牌面整体为发光平涂色块，无文字图案。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource",
+        "role": "可拾取资源：废料",
+        "description": "地面上的一小堆几何废料块，硬边方块堆叠，深冷色金属感平涂，尺寸与主角脚部对齐网格。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "water",
+        "role": "可拾取补给：净水",
+        "description": "一小瓶净水：方正瓶身与方形瓶盖，浅色反光块表示液面，发光材质点缀，几何平涂无描边。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 12,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-ground",
+        "role": "地形件：硬质路面地面块",
+        "description": "浅灰冷色硬质路面方块，纯色平涂无纹理，边缘平直可无缝横向拼接。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-wall",
+        "role": "地形件：残墙与断墙方块",
+        "description": "大面积平涂的哑光墙体方块，无纹理无描边，顶部一条略深色块表示断面；可竖向堆叠成低矮残墙与断墙。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "gap-edge",
+        "role": "地形件：裂开路面缺口的边缘条带",
+        "description": "横向延伸的边缘条带：路面上沿的亮色硬边一条，下接深色缺口，用来标示裂开的路面与坠落区。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "street-lamp",
+        "role": "场景件：路灯杆",
+        "description": "细直方形杆体加顶端方形灯头，灯头为发光平涂块；无描边、等大对齐网格，用来标记街区段落。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "bench",
+        "role": "场景件：路边长凳",
+        "description": "矮长方块凳面加两条短方腿，暖棕木质平涂，无描边；低矮方正、边缘对齐网格。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "building-facade",
+        "role": "场景件：低矮方正建筑立面模块",
+        "description": "大面积平涂的方形建筑立面：矩形门窗为暗色方块、平顶，招牌方框贴于墙面；无描边无纹理，可横向重复排成街区。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "landmark-tower",
+        "role": "终局地标：封住街口的高楼立面",
+        "description": "占据画面高度的高楼立面地标：整块深色平涂墙体，规律排布的矩形小窗，平顶，底部封住街口；几何、极简、可远距离一眼辨识。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 96,
+          "h": 192
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-wasteland",
+        "role": "横版废土城市背景（三层视差）",
+        "description": "由远到近：整块深色天空带 + 水平地平线 + 天际线圆盘状天体；中景大面积平涂建筑立面与墙体，占画面主体、遮挡视线；近景平坦硬质路面与横向延伸的轨道/边缘条带。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0.15
+          },
+          {
+            "name": "buildings",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "groundstrip",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-harvest",
+        "role": "HUD：本次拾荒收获统计面板",
+        "description": "屏幕空间上方的一块横向条板：左侧一个资源图标位，右侧数字位数槽位；纯色平涂底板，无描边、无渐变，可被拉伸到任意宽度。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 48,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-health",
+        "role": "HUD：生存状态指示条",
+        "description": "屏幕空间的状态条底板加一段填充块，方形端头，纯色平涂；宽度随状态变化，可被拉伸。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 48,
+          "h": 12
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "icon-resource",
+        "role": "HUD 图标：废料资源",
+        "description": "方形小图标，画废料方块堆的轮廓剪影，按原尺寸绘制不拉伸。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "icon-water",
+        "role": "HUD 图标：净水补给",
+        "description": "方形小图标，画净水小瓶的轮廓剪影，按原尺寸绘制不拉伸。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "prompt-sign",
+        "role": "UI：街区名与前进方向提示底板",
+        "description": "屏幕空间的一块横向提示板，供指示牌被靠近时显示当前街区与前进方向；纯色平涂、矩形边角，可被拉伸到任意宽度。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0
+        },
+        "size": {
+          "w": 64,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-scavenger",
+      "role": "主角拾荒者的创作态母版",
+      "description": "矮壮方块人：矩形躯干 + 方形头 + 短方腿，约 3 头身以内；深蓝/黑制服式外套、浅色裤、宽檐帽，胸前一枚亮色扣饰；外轮廓干净、无描边、无渐变。静止直立，用作该角色全部资产的比例与长相基准。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    {
+      "id": "master-patroller",
+      "role": "巡逻敌人的创作态母版",
+      "description": "矮壮方块生物：矩形躯干 + 方形头 + 短方腿，比主角略矮、轮廓更钝；同一套色块语言，无描边无渐变。静止直立，用作该敌人全部资产的比例与长相基准。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    {
+      "id": "master-rubble-hound",
+      "role": "废墟野犬的创作态母版",
+      "description": "瘦小的四足方块野犬：低矮矩形躯干压低、方形头前伸、四条短方腿；无描边无渐变，几何色块平涂。蹲伏姿态，用作该敌人全部资产的比例与长相基准。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "rubble-hound",
+      "size": {
+        "w": 32,
+        "h": 24
+      }
+    },
+    {
+      "id": "master-wanderer",
+      "role": "流浪幸存者的创作态母版",
+      "description": "与主角同款方块人比例：矩形躯干 + 方形头 + 短方腿，约 3 头身以内；深色外套、浅色裤、宽檐帽，胸前亮色扣饰区分身份；蹲坐姿态，无描边无渐变。用作该角色全部资产的比例与长相基准。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "wanderer",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

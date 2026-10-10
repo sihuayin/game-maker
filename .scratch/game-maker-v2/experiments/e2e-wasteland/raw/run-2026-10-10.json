@@ -1,0 +1,8 @@
+{
+ "code": 4,
+ "ms": 26928,
+ "text": "{\n  \"command\": \"create\",\n  \"error\": \"重采样 3 次都没有拿到一份过契约的 VisualWorldSpec（最后一次：schema）。最后一次的病因：工具入参不过契约：palette: Invalid input: expected object, received array\",\n  \"exitCode\": 4,\n  \"ledger\": [\n    {\n      \"step\": \"analyze-reference\",\n      \"target\": \"style\",\n      \"upstream\": \"messages\",\n      \"ms\": 26575,\n      \"attempts\": 3,\n      \"failures\": [\n        \"schema\",\n        \"schema\",\n        \"schema\"\n      ],\n      \"requestedModel\": \"deepseek-v4-pro\",\n      \"model\": \"deepseek-flash\",\n      \"usage\": {\n        \"inputTokens\": 230,\n        \"outputTokens\": 1766\n      }\n    }\n  ]\n}\n  · visual-world\n",
+ "steps": [
+  "  · visual-world\n"
+ ]
+}

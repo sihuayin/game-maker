@@ -1,0 +1,63 @@
+{
+ "顶层palette": {
+  "object": 4,
+  "array": 2
+ },
+ "style_palette": {
+  "array": 6
+ },
+ "整体过schema": {
+  "ok": 2,
+  "bad": 4
+ },
+ "病由": {
+  "palette.primary.0: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema；palette.primary.1: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema": 1,
+  "palette: Invalid input: expected object, received array": 1,
+  "palette: Unrecognized key: \"style\"": 1,
+  "palette: Invalid input: expected object, received array；materials.clothingLight: Unrecognized key: \"color2\"": 1
+ },
+ "逐发": [
+  {
+   "i": 1,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "过schema": false,
+   "病由": "palette.primary.0: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema；palette.primary.1: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema"
+  },
+  {
+   "i": 2,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "过schema": true,
+   "病由": ""
+  },
+  {
+   "i": 3,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "过schema": false,
+   "病由": "palette: Invalid input: expected object, received array"
+  },
+  {
+   "i": 4,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "过schema": false,
+   "病由": "palette: Unrecognized key: \"style\""
+  },
+  {
+   "i": 5,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "过schema": false,
+   "病由": "palette: Invalid input: expected object, received array；materials.clothingLight: Unrecognized key: \"color2\""
+  },
+  {
+   "i": 6,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "过schema": true,
+   "病由": ""
+  }
+ ]
+}

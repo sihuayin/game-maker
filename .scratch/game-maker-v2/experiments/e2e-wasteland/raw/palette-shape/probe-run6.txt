@@ -1,0 +1,25 @@
+=== 多帧 unit：帧数核对（`segmentRowCells`）===
+  scavenger.walk  声明 4 帧 · 检出 4 块 · 按众数色抠掉 72.7%  ✅ 过
+  enemy.walk  声明 4 帧 · 检出 4 块 · 按众数色抠掉 89.4%  ✅ 过
+  rubble-hound.pant  声明 2 帧  · 盘上无图（未派发 / 母版失败）
+  wanderer.talk  声明 2 帧 · 检出 2 块 · 按众数色抠掉 71.1%  ✅ 过
+
+=== 单帧 unit（非背景）：票 37 的两条判据 ===
+  scavenger.idle         32x32    抠掉  86.1% ✅ · 最大块 100.0% ✅ · 块数 1 ［声明色只抠到 252 px］
+  scavenger.jump         32x32    抠掉  88.4% ✅ · 最大块 100.0% ✅ · 块数 1 ［声明色只抠到 228 px］
+  scavenger.fall         32x32    抠掉  87.9% ✅ · 最大块 100.0% ✅ · 块数 5 ［声明色只抠到 282 px］
+  enemy.turn             32x32    抠掉  79.8% ✅ · 最大块  99.0% ✅ · 块数 190 ［声明色只抠到 5166 px］
+  rubble-hound.crouch  盘上无图
+  rubble-hound.lunge  盘上无图
+  wanderer.idle          32x32    抠掉  84.6% ✅ · 最大块  88.4% ✅ · 块数 15 ［声明色只抠到 5593 px］
+  chest                  24x24    抠掉  88.1% ✅ · 最大块 100.0% ✅ · 块数 2 ［声明色只抠到 32 px］
+  chest-open             24x24    抠掉  85.1% ✅ · 最大块  94.1% ✅ · 块数 12 ［声明色只抠到 2251 px］
+  chest-treasure         12x12    抠掉  72.0% ✅ · 最大块  99.0% ✅ · 块数 5 ［声明色只抠到 69 px］
+  sign-post              16x48    抠掉  93.5% ✅ · 最大块  99.9% ✅ · 块数 8 ［声明色只抠到 1 px］
+  sign-post-lit          16x48    抠掉  81.4% ✅ · 最大块  99.6% ✅ · 块数 310 ［声明色只抠到 4 px］
+  landmark-tower         96x192   抠掉  55.2% ✅ · 最大块  99.9% ✅ · 块数 3 ［声明色只抠到 0 px］
+
+=== 背景层（票 38）：最远层不抠、非最远层按众数色抠 ===
+  [0] bg-wasteland.sky       最远层 ⇒ **不抠**  · ［若按众数色抠会抠掉 41.5% ⇒ 印证票 38 那条「按它抠 = 把这一层自己抠掉」］
+  [1] bg-wasteland.buildings 非最远层 ⇒ 按众数色抠掉 49.9%（pack 侧**无判据**；只在 site.ts 那条 FILLED 门禁上守）
+  [2] bg-wasteland.groundstrip 非最远层 ⇒ 按众数色抠掉 38.3%（pack 侧**无判据**；只在 site.ts 那条 FILLED 门禁上守）

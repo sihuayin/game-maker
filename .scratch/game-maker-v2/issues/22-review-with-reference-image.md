@@ -1,8 +1,8 @@
 # 22. 视觉观察要**喂原图**：`reviewPack` 今天比的是 contact sheet，不是参考图
 
 Type: grilling
-Status: open
-Owner: —
+Status: claimed
+Owner: claude (2026-10-10)
 Blocked by: 02, 06
 Map: ../map.md
 > 由 `packages/assets/src/review.ts:93` 与 `:6` 的对照量出来的缺口。
@@ -52,3 +52,23 @@ Map: ../map.md
 ## Answer
 
 （待解）
+
+## Comments
+
+⚠️ **2026-10-10 · 认领 + 第 1 轮已出**（`Status: claimed` · `Owner: claude (2026-10-10)`）。
+轮次全文（自包含，供离线作答）：[`clarifications/22-review-round-1.md`](../clarifications/22-review-round-1.md)。
+**3 问**（Q1 是不是缺口 · Q2 本票射程 · Q3 词表），**已拷进剪贴板**。等答案，未解。
+
+⚠️ **出题前挖到的四条，改变了票面的形状**（逐条带出处在上面那份副本里）：
+
+1. **票面 §1 那句引用在 `03 §21` 里没有字面** —— §21 只列七个检查**名字**，**没有一句**说「与原图比」。
+2. **那七项已被[票 17](17-qa-visual-judgements.md) 全判成观察**，且「`similarity` 这个词一次都不许进契约」
+   ⇒ §1 读法 (a) 里「算不出来（无论判据还是观察）」这句，**判据那一半已经不成立**。
+3. ⚠️ **`reviewPack` 今天零消费者**（全仓只有 `packages/assets/tests/review.test.ts` 调它），
+   而 `packages/qa/src/assemble.ts:133` 把 `qa-report.json` 的 `review` 观察**硬写 `unavailable`**，
+   **理由原文就是本票的未决问题**（「它今天比的是联系表、不是参考图」）
+   ⇒ **[票 20](20-qa-report-assembly.md) 把本票的开着状态写进了产物措辞**，本票一解那句话就过时。**Q2 问的就是它。**
+4. **原图够得着**（`run/v<N>/reference.png` 与 `stylespec.json` 同目录，`plan-assets` 今天就在读它，
+   `packages/assets/src/ops.ts:174`）⇒ 若判 (a)，「够不着」不是障碍。
+
+⚠️ **本轮没动任何代码、没花任何钱**（`reviewPack` 零消费者，真链上一次都没跑过 ⇒ 本票到今天**零真跑读数**）。

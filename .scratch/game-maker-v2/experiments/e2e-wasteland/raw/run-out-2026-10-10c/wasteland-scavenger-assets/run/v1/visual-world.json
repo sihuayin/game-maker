@@ -1,0 +1,212 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "flat",
+      "pixel-art",
+      "minimal",
+      "orthographic",
+      "side-scroller",
+      "wasteland"
+    ],
+    "description": "极简扁平像素风格的横版世界：几何色块、无描边、无渐变，用少数几个原色平涂构成可读的轮廓与地标。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "2D 正交侧视，无透视收敛"
+  },
+  "composition": {
+    "foreground": "下方为路面与横向延伸的轨道/边缘条带",
+    "midground": "大面积平涂的建筑立面/墙体，占画面主体",
+    "background": "上方为整块深色天空带，贴一条水平地平线",
+    "objectScale": "物件等大，边缘对齐网格",
+    "characterScale": "角色极小，约占画面高度 1/5，居中偏下",
+    "density": "低密度，大面积留空，元素稀疏"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1"
+    ],
+    "secondary": [
+      "palette:2",
+      "palette:3"
+    ],
+    "accent": [
+      "palette:4",
+      "palette:5"
+    ],
+    "background": [
+      "palette:6",
+      "palette:7"
+    ],
+    "shadow": [
+      "palette:8",
+      "palette:9"
+    ],
+    "highlight": [
+      "palette:10",
+      "palette:4"
+    ]
+  },
+  "lighting": {
+    "direction": "无方向性，平光",
+    "softness": "硬边，无衰减",
+    "contrast": "低对比，块面之间靠色相区分而非明度",
+    "mood": "萧瑟、安静、黄昏感的废弃世界"
+  },
+  "materials": {
+    "wall": {
+      "appearance": "大面积平涂的哑光墙面，无纹理",
+      "texture": "无纹理，纯色块",
+      "color": [
+        "palette:1",
+        "palette:2"
+      ]
+    },
+    "ground": {
+      "appearance": "浅灰冷色硬质地面",
+      "texture": "纯色，偶有横向条带",
+      "color": [
+        "palette:9"
+      ]
+    },
+    "metal": {
+      "appearance": "深冷色金属面板与箱体",
+      "texture": "纯色块",
+      "color": [
+        "palette:8",
+        "palette:9"
+      ]
+    },
+    "wood": {
+      "appearance": "暖棕木质家具与箱板",
+      "texture": "纯色块，可加一条深色分缝",
+      "color": [
+        "palette:3"
+      ]
+    },
+    "emissive": {
+      "appearance": "发光标识、宝石、金币、灯头",
+      "texture": "纯色，无光晕渐变",
+      "color": [
+        "palette:5",
+        "palette:10",
+        "palette:4"
+      ]
+    },
+    "cloth": {
+      "appearance": "拾荒者衣物的暗色布料",
+      "texture": "纯色块",
+      "color": [
+        "palette:0",
+        "palette:9",
+        "palette:11"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "矮壮方块人，头大身短，约 3 头身以内",
+    "silhouette": "矩形躯干 + 方形头 + 短方腿，外轮廓干净",
+    "poseLanguage": "静止直立或简单单帧动作，无中间帧",
+    "clothing": "深蓝/黑制服式外套，浅色裤，宽檐帽，胸前有一枚亮色扣饰",
+    "faceAbstraction": "两块方形亮色眼，无鼻无嘴"
+  },
+  "environment": {
+    "architecture": "低矮方正建筑立面，矩形门窗，平顶或简单三角屋顶",
+    "terrain": "平坦硬质地面，横向无限延伸",
+    "props": "招牌方框、长凳、路灯杆、小圆窗、天际线上的圆盘状天体",
+    "textureDensity": "极低，几乎无细节纹理"
+  },
+  "shapeLanguage": [
+    "纯矩形与正方形为基本形",
+    "三角形仅用于屋顶与山形地标",
+    "圆形仅用于太阳/月亮、金币、灯头等小体量物件",
+    "所有边缘水平垂直对齐网格",
+    "无圆角、无描边、无渐变"
+  ],
+  "constraints": [
+    "只用平涂色块，禁止渐变、光晕、阴影投射",
+    "禁止描边与圆角，所有形状保持硬边直角",
+    "角色与物件必须水平垂直对齐网格，横版正交视角",
+    "背景墙面保持大面积单色留白，不得堆叠纹理",
+    "发光物件用高饱和暖色实心块表示，不加模糊",
+    "新资源必须复用同一套色板，不引入色板外的新色"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png",
+      "role": "global"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "扁平像素风",
+      "极简几何",
+      "横版正交",
+      "平涂色块"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面视角",
+      "angle": "平视",
+      "movement": "横向滚动"
+    },
+    "composition": {
+      "rule": "天空带 / 建筑立面 / 地面条带 三层水平分割",
+      "negativeSpace": "大量单色留空"
+    },
+    "palette": [
+      "#1f2733",
+      "#6e4a33",
+      "#b2825c",
+      "#8a5f3c",
+      "#f0c14b",
+      "#e8a33d",
+      "#5a6a80",
+      "#31405a",
+      "#3a4453",
+      "#9aa3ad",
+      "#f5e6c8",
+      "#12161f"
+    ],
+    "lighting": {
+      "mode": "ambient-flat",
+      "shadows": false
+    },
+    "shapeLanguage": [
+      "矩形",
+      "方形",
+      "三角",
+      "小圆"
+    ],
+    "material": [
+      "哑光墙面",
+      "冷灰地面",
+      "深色金属",
+      "暖棕木",
+      "发光暖色"
+    ],
+    "environment": [
+      "废弃城市立面",
+      "轨道/路面",
+      "空旷天际线"
+    ],
+    "characterStyle": [
+      "方块化",
+      "方形眼",
+      "制服式着装",
+      "静帧直立"
+    ],
+    "constraints": [
+      "无渐变",
+      "无描边",
+      "网格对齐",
+      "色板封闭"
+    ],
+    "confidence": 0.72
+  }
+}
