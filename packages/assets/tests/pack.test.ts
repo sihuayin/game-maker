@@ -327,31 +327,45 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
     return gen;
   };
 
-  it("⚠️ **底色没抠到 ⇒ 硬失败**（票 03）—— 抠不掉的那层会一个洞都没有，把后面全挡住", async () => {
-    // ⚠️ 依据是实测：模型给的底色可以离声明色 **129–248**，而容差只有 40 ⇒ 一个像素都抠不掉。
-    //   后果不只是「该透明的地方留着底色」—— 这一层的不透明率会**恒为 1**，
-    //   于是「最远层必须画满」那条门禁**反而通过**（抠不掉的东西全是不透明的）。
+  it("⚠️ **底色画偏了不再报错，交付的 alpha 仍然是抠对的**（票 38 翻过来的那一条）", async () => {
+    // ⚠️⚠️ **这一条替换掉了票 38 之前的「底色没抠到 ⇒ 硬失败」（票 03 立 · 票 35 补到单帧与多帧）。**
+    //   那条哨兵判的是「按**声明色**一个像素都没抠到」。票 38 之后背景层**不再按声明色抠**：
+    //   · **非最远层**按**这张图上量出来的众数色**抠 ⇒ 「0 像素」**不可达**（众数色至少能抠到
+    //     它自己那些像素，与单帧 / 多帧同款）⇒ 留一条永远不响的判据，下一个人会把它当成活的；
+    //   · **最远层**压根不抠 ⇒ 更是连抠底这个动作都没有。
+    //   ⚠️ 而那条哨兵原来守的错**没有被丢掉**，只是换了执行者：非最远层「画满了整张场景」
+    //   住在 `site.ts` 那条反向门禁里（票 17 的先例：同一个事实不立两处）。
     const gen = callDrifted((name) => name !== "sky");
-    const e = await buildAssetPack({
+    const { packDir, audit } = await buildAssetPack({
       recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT,
       generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
-    }).catch((x: unknown) => x as Error);
-    expect(e).toBeInstanceOf(Error);
-    // 只报**第一条**（wall 在 ground 前面）—— 一次说清一个
-    expect((e as Error).message).toMatch(/底色\*\*一个像素都没抠到\*\*/);
-    expect((e as Error).message).toMatch(/station\.wall/);
-    expect((e as Error).message).toMatch(/把后面那几层整个挡住/);
-    // ⚠️ 票 37 的 Q6 删掉了此前那句「别改成「按四角取样兜底」」—— 那是**修法指引**，
-    //   而不是读数；顶替它的是**可核对的量**：声明色、实测众数色、各抠掉多少、两者的 L1。
-    expect((e as Error).message, "报实测众数色").toMatch(/实测的众数色/);
-    expect((e as Error).message, "报声明色这一侧抠到几个像素").toMatch(/按它只抠到 \d+ 像素/);
-    expect((e as Error).message, "报两者差多少").toMatch(/与声明色差 L1 = \d+/);
-    expect((e as Error).message, "并说清背景层本票没改").toMatch(/背景层保持原样/);
+    });
+    expect(audit, "底色偏了**不该**再让整个包挂掉").toEqual([]);
+
+    const atlas = JSON.parse(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.json"), "utf8"));
+    const img = decodePNG(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.png")));
+    const alphaAt = (frame: string, x: number, y: number) => {
+      const fr = atlas.frames[frame].frame as { x: number; y: number; w: number; h: number };
+      return img.data[((fr.y + y) * img.width + fr.x + x) * 4 + 3]!;
+    };
+
+    // ⚠️ **非最远层**：抠底用的必须是**这张图上交付的那个颜色**，不是我们声明的那个 ——
+    //   实测里两者差 129–248，按声明色抠是**一个像素都抠不掉**的。
+    for (const name of ["wall", "ground"]) {
+      expect(alphaAt(`station.${name}`, 2, 2), `${name}：四周的底色没被抠掉`).toBe(0);
+      expect(alphaAt(`station.${name}`, 48, 32), `${name}：正中是内容，不该被抠`).toBe(255);
+    }
+    // ⚠️ **最远层不抠**（票 38 的 Q1）⇒ 整帧不透明，**哪怕**模型把底色画偏了。
+    //   ⚠️ 这一条同时钉住了「不抠」的实现：它走的必须是 `importFrames` 的
+    //   `!opts.background` 原样返回，而**不是**按众数色抠（那会抠掉约七成）。
+    expect(alphaAt("station.sky", 2, 2), "最远层有意不抠 —— 它是唯一一处 alpha 恒 255 的地方").toBe(255);
+    expect(alphaAt("station.sky", 48, 32), "最远层连内容也不必抠").toBe(255);
   });
 
-  it("⚠️ **最远那层底色偏了不报错** —— 它本来就该是满的，抠得少是它对", async () => {
-    // 这一条钉的是「只查非最远层」那条边界。实测：四角取样会把最远层抠掉 **48–50%**
-    // （它的角上就是内容本身）—— 所以「一律兜底」是错的修法。
+  it("⚠️ **最远那层底色偏了不报错** —— 它本来就该是满的", async () => {
+    // ⚠️ 这一条钉的是「最远层与其余层不同款」这条边界。
+    //   票 38 之前它的理由是「四角取样会把最远层抠掉 48–50%」；**今天更强**：
+    //   最远层**压根不抠**（票 38 的 Q1），所以底色偏不偏与它无关。
     const gen = callDrifted((name) => name === "sky");
     const { audit } = await buildAssetPack({
       recipe: recipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT,
@@ -468,33 +482,51 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
  *
  * ⇒ 背景必须 `trim: false`：保住整张画布的构成，只把抠底留下的**透明**留下。
  */
-describe("分层背景：构成必须保住（票 43）", () => {
+describe("分层背景：构成必须保住（票 43 · 票 38 换了个层来钉）", () => {
+  // ⚠️⚠️ **2026-10-10 由票 38 改写。** 原来这一条用的是**单层**背景，靠「下半是抠底色 ⇒
+  //   交付态下半透明」来证明 `trim: false` 有效。而票 38 之后**最远层压根不抠** ——
+  //   单层背景的那一层 `index === 0` **就是最远层** ⇒ 整帧不透明 ⇒ 那条断言不再成立。
+  //   ⚠️ 而它**不是回归**：没有「内容 / 非内容」之分，`trim` 对最远层本来就变成了空操作
+  //   （ink 包围盒 = 整张画布）。⇒ 换成**两层**，让这条判据住在它今天还有意义的地方：
+  //   **近层**（`index > 0`，仍然要抠底，`trim` 也就仍然算数）。
   const recipe = (): AssetRecipe => ({
     ...RECIPE, referenceImage: undefined,
     assets: [{
       spec: {
-        kind: "background", id: "sky", role: "backdrop", description: "只有上半有东西",
+        kind: "background", id: "sky", role: "backdrop", description: "两层：最远层铺满，近层只在下沿",
         styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 64, h: 48 },
-        required: true, layers: [{ name: "sky", parallax: 0 }],
+        required: true, layers: [{ name: "sky", parallax: 0 }, { name: "ground", parallax: 1 }],
       },
       source: { kind: "image", background: { tolerance: 0 } },
     }],
   });
-  /** 内容**只占上半**，下半是抠底色 —— 构成要是被拉满，下半的透明就没了。 */
-  const upperHalfOnly = (w: number, h: number): RasterImage => {
+  /**
+   * 近层：内容**只占下沿三成**，其余是抠底色 —— 构成要是被拉满，那些透明就没了。
+   *
+   * ⚠️ **不能对半分**：50/50 时众数色的并列由「RGB 打包值最小」破（`dominantOpaqueColor`），
+   *   那会把**内容**选成底色、整层抠反 —— 那是**另一条已知的洞**（票 37 §6·3，
+   *   已有一条 characterization 测试故意钉着它）。别在这条测试里踩它。
+   */
+  const bottomBand = (w: number, h: number): RasterImage => {
     const data = Buffer.alloc(w * h * 4);
     const k = [255, 0, 255], f = [90, 106, 138];
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const o = (y * w + x) * 4;
-      const c = y < h / 2 ? f : k;
+      const c = y >= h * 0.7 ? f : k;
       data[o] = c[0]!; data[o + 1] = c[1]!; data[o + 2] = c[2]!; data[o + 3] = 255;
     }
     return { width: w, height: h, data };
   };
+  /** 最远层：照它该有的样子**铺满**（票 38 之后它压根不抠）。 */
+  const fullBleed = (w: number, h: number): RasterImage => {
+    const data = Buffer.alloc(w * h * 4);
+    for (let i = 0; i < w * h; i++) { data[i * 4] = 60; data[i * 4 + 1] = 70; data[i * 4 + 2] = 100; data[i * 4 + 3] = 255; }
+    return { width: w, height: h, data };
+  };
 
-  it("下半没有东西 ⇒ 交付态那一半必须是**透明**的，不是被拉满", async () => {
+  it("近层：下沿有东西 ⇒ 交付态**上面透明、下面不透明**（没被拉满）；最远层**整帧不抠**", async () => {
     const gen: ImageGenerator = async (req) => ({
-      image: upperHalfOnly(req.size.w, req.size.h),
+      image: req.prompt.includes("ground") ? bottomBand(req.size.w, req.size.h) : fullBleed(req.size.w, req.size.h),
       call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
     });
     const { packDir } = await buildAssetPack({
@@ -502,11 +534,19 @@ describe("分层背景：构成必须保住（票 43）", () => {
     });
     const atlas = JSON.parse(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.json"), "utf8"));
     const img = decodePNG(readFileSync(path.join(packDir, "delivery/atlas.backgrounds.png")));
-    const fr = atlas.frames["sky.sky"].frame as { x: number; y: number; w: number; h: number };
-    const alphaAt = (px: number, py: number) => img.data[((fr.y + py) * img.width + fr.x + px) * 4 + 3]!;
+    const alphaAt = (frame: string, px: number, py: number) => {
+      const fr = atlas.frames[frame].frame as { x: number; y: number; w: number; h: number };
+      return img.data[((fr.y + py) * img.width + fr.x + px) * 4 + 3]!;
+    };
 
-    expect(alphaAt(fr.w >> 1, 1), "上半有东西 ⇒ 不透明").toBe(255);
-    expect(alphaAt(fr.w >> 1, fr.h - 2), "下半没东西 ⇒ **透明**（构成保住了）").toBe(0);
+    // **近层**：按实测众数色抠了底 ⇒ 上沿透明。
+    //   ⚠️ 而 `trim: false` 让下沿那些内容**留在原来的位置** —— 这一条才是票 43 要保的「构成」：
+    //   要是 `trim` 打开了，ink 包围盒（下沿三成）会被裁出来再拉满整张 ⇒ 上沿也会变不透明。
+    expect(alphaAt("sky.ground", 32, 2), "上沿是底色 ⇒ 透明").toBe(0);
+    expect(alphaAt("sky.ground", 32, 46), "下沿有内容 ⇒ 不透明").toBe(255);
+    // **最远层**：**不抠**（票 38 的 Q1）⇒ 整帧不透明。
+    expect(alphaAt("sky.sky", 32, 2), "最远层不抠 ⇒ 上沿也不透明").toBe(255);
+    expect(alphaAt("sky.sky", 32, 46), "最远层不抠").toBe(255);
   });
 });
 
