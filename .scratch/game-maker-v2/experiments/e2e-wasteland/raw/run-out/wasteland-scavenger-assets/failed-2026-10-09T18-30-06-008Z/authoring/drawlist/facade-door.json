@@ -1,0 +1,150 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "facade-door",
+  "frame": "facade-door",
+  "viewBox": [
+    0,
+    0,
+    24,
+    48
+  ],
+  "expectedSize": [
+    24,
+    48
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 3,
+      "y": 24,
+      "w": 18,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 4,
+      "y": 25,
+      "w": 16,
+      "h": 22
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 2,
+      "y": 22,
+      "w": 20,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 3,
+      "y": 23,
+      "w": 18,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 2,
+      "y": 24,
+      "w": 1,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 21,
+      "y": 24,
+      "w": 1,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 3,
+      "y": 25,
+      "w": 1,
+      "h": 23
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 20,
+      "y": 25,
+      "w": 1,
+      "h": 23
+    },
+    {
+      "op": "dither",
+      "x": 6,
+      "y": 28,
+      "w": 12,
+      "h": 16,
+      "colors": [
+        "palette:9",
+        "palette:4"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 10,
+      "y": 26,
+      "w": 4,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 9,
+      "y": 27,
+      "w": 6,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 4,
+      "y": 46,
+      "w": 16,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 3,
+      "y": 47,
+      "w": 18,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 5,
+      "y": 34,
+      "w": 1,
+      "h": 5
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 18,
+      "y": 34,
+      "w": 1,
+      "h": 5
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 6,
+      "y": 44,
+      "w": 12,
+      "h": 1
+    }
+  ]
+}

@@ -115,7 +115,6 @@ export const AssetSourceShape = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("drawlist") }),
   z.strictObject({
     kind: z.literal("image"),
-    prompt: z.string().min(1).optional(),
     reference: InputPathShape.optional(),
     background: z.strictObject({ tolerance: z.number().nonnegative() }).optional(),
     alphaThreshold: z.number().min(0).max(1).nullable().optional()

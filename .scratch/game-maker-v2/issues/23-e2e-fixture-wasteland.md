@@ -3,7 +3,7 @@
 Type: task
 Status: open
 Owner: —
-Blocked by: 16, 20, 35
+Blocked by: 37
 Map: ../map.md
 > `docs/v2/03-claude-code.md` §27/§28。**这是终点的判据本身。**
 >
@@ -17,6 +17,17 @@ Map: ../map.md
 > **② 不改 `game-maker.local.json`**（那条死掉的 `9098` 代理得绕，不是修文件）；
 > **③ 验收从「跑到站点」收紧为「从 fixture 真跑到站点，并验证生图确实发生」。**
 > ⚠️ 票 34 只验到第 2 步（`analyze-intent` 首发过契约），**没有替本票跑过**。
+>
+> ❌ **2026-10-09 深夜 · 票 35 已关，本票按它的决定真跑了一次（第三次），还是没到站点。**
+> **退出码 1 · 墙钟 6175.3s（≈103 分钟）· 付了 9 张图的钱**（7 张生成图 + 2 张母版），
+> **抛在 `pack` 段的 `scavenger-idle` 上**（票 35 §6 那条 0 像素哨兵 —— **它响了，而且响对了**）。
+> ⚠️ 但**它报出来的真因推翻了票 35 决定表的第 2 行**：那个「确定的派生色」模型**从没交付过**
+> （9/9 在容差 30 下 **0 像素**，最近像素差 **L1 118~334**）⇒ 派生[票 37](37-key-colour-not-delivered.md)，
+> **本票改挂它**（`Blocked by: 37`）。现场与读数在
+> `experiments/e2e-wasteland/raw/key-colour-third-run/`（**原现场那 9 张已被复制出来** ——
+> 它们在下一次真跑开头会被 `rmSync` 删掉，而 `*.png` 在 `.gitignore` 里）。
+> ⚠️ **「验证生图确实发生」这一条今天验到了**（9 张真 PNG + 同名 `.prompt.txt`）；
+> **「跑到站点」还差 `pack` 尾 + `config` + `qa` + 站点。**
 
 ## Question
 
@@ -250,5 +261,7 @@ authoring/drawlist/     9 份 .json
 
 ## Answer
 
-（待解 —— 本票被[票 35](35-multiframe-needs-background.md) 挡住：
-链跑到 `pack` 段的第 19 件资源上断了，离站点还差 `config` + `qa` + 站点三步）
+（待解 —— 本票被[票 37](37-key-colour-not-delivered.md) 挡住：
+票 35 那轮改动**按是实现了**，而它把抠底从「四角量」换成了「按声明色抠」，
+⚠️ **模型从没交付过那个声明色**（第三次真跑 9/9 张在容差 30 下 0 像素）⇒ 抠底那一行要重裁。
+链跑到 `pack` 段的 `scavenger-idle` 上断了，离站点还差 `config` + `qa` + 站点三步）

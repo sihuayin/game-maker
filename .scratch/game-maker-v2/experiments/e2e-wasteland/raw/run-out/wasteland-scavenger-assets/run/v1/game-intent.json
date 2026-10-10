@@ -1,0 +1,83 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版废土寻宝游戏",
+  "subgenre": "横版动作探索 / 横版寻宝",
+  "camera": "横版视角",
+  "targetExperience": "在荒废危险的城市里探索寻宝的紧张与收获感",
+  "coreLoopSteps": [
+    "在废弃城市中横版移动、跳跃前进",
+    "搜索场景中的资源与宝箱",
+    "躲避危险与敌人",
+    "带着收获继续向最终目标推进"
+  ],
+  "player": {
+    "role": "一名拾荒者",
+    "goals": [
+      "在废弃城市中寻找资源",
+      "找到宝箱",
+      "躲避危险和敌人",
+      "达成最终目标"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒废、危险的末世氛围"
+  },
+  "mechanics": [
+    {
+      "id": "side-scrolling-movement",
+      "name": "横版移动"
+    },
+    {
+      "id": "jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "treasure-chest",
+      "name": "宝箱"
+    },
+    {
+      "id": "resource",
+      "name": "资源"
+    }
+  ],
+  "entities": [
+    {
+      "id": "scavenger",
+      "type": "npc",
+      "role": "玩家控制的拾荒者"
+    },
+    {
+      "id": "enemy",
+      "type": "enemy",
+      "role": "废弃城市中的危险敌人，需要躲避"
+    },
+    {
+      "id": "treasure-chest",
+      "type": "interactable",
+      "role": "可开启的宝箱"
+    },
+    {
+      "id": "resource",
+      "type": "resource",
+      "role": "可拾取的资源"
+    }
+  ],
+  "winConditions": [
+    "达成最终目标"
+  ],
+  "loseConditions": [],
+  "ambiguity": [
+    "title：需求没提游戏名，暂不填",
+    "camera：需求没提具体视角参数，暂按横版默认",
+    "final goal：需求只说要“最终目标”，没说是到达某处、收集多少还是别的，暂按收集/抵达终点这类默认处理",
+    "winConditions：需求没提“最终目标”具体是什么，暂按达成目标即胜利",
+    "loseConditions：需求只说“躲避危险和敌人”，没说被敌人碰到会失败还是掉血死亡",
+    "entities：需求没提任何具体敌人种类、NPC 或机关，暂只按通用敌人记",
+    "mechanics：需求没提战斗、血量、存档、道具使用等机制",
+    "progression：需求没提关卡推进或能力成长方式",
+    "challenge：需求没提难度来源，暂按躲避敌人与危险默认",
+    "player.goals：需求没提资源与宝箱具体用来做什么"
+  ]
+}

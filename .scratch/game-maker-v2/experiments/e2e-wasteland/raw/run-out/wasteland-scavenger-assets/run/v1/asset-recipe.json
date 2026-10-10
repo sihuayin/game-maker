@@ -1,0 +1,626 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-idle",
+        "role": "玩家待机",
+        "description": "拾荒者原地站立：方头方肩方靴正面朝向观众，帽檐与胸前扣件不动，仅手臂与身体以极轻微上下位移做呼吸感，逐帧切位不旋转",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-run",
+        "role": "玩家跑动",
+        "description": "拾荒者水平匀速跑动：侧视朝向观众的身体保持方块轮廓，双腿以逐帧位置切换做等宽短方块的交替迈步，手臂前后摆动画成方块位移，无旋转无倾斜",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 10,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-jump",
+        "role": "玩家跳跃",
+        "description": "拾荒者离地跳跃：上身保持方头方肩剪影，双腿收成一组并拢短方块，帽檐下压，落地帧回到站立姿态，逐帧切位不旋转",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "jump",
+            "frames": 3,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-fail",
+        "role": "玩家失败重置",
+        "description": "拾荒者被敌人或危险接触后的失败反应：整体剪影压扁成一堆叠方块并向后倾倒成水平块，用于本关重置到起点前的短促提示",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "fail",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-patrol",
+        "role": "敌人巡行",
+        "description": "在固定街区片段内沿地面左右往返巡行的敌人：矮块状躯干，双腿逐帧交替迈步，转向时整块水平翻转而不旋转，巡逻段尽头停驻姿态并入循环末帧",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "enemy",
+        "masterAsset": "master-enemy",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "treasure-chest",
+        "role": "宝箱（关闭态）",
+        "description": "约一个角色高的矩形方块宝箱，箱盖为一条横向亮色横条，箱体为中等明度实心块，仅靠明度差分层，无描边无纹理",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 40
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "treasure-chest-opened",
+        "role": "宝箱（开启态）",
+        "description": "同一只宝箱的开启态：箱盖亮色横条上翻分离于箱体之上，箱内露出暖色发光块作为贵重收获提示，其余块面不变",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 40
+        },
+        "required": true,
+        "dependsOn": [
+          "treasure-chest"
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource",
+        "role": "可拾取资源方块",
+        "description": "半角色高的方形废料/净水资源块：单一平涂色块加一处小高光小方块，接触即被拾取，轮廓为纯直角",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "spike-trap",
+        "role": "尖刺危险",
+        "description": "一排等距小方点组成的地面危险色块，底部为一条深色底条，尖点朝上，等距重复且间距均匀，无描边无渐变",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-slab",
+        "role": "地面与轨道路段",
+        "description": "可横向接续的平坦路面色带：浅灰中性色地面块，上缘一条较深分色带暗示路面，下缘等距方形枕木点，可无限平铺拼接",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "building-facade",
+        "role": "建筑立面墙体模块",
+        "description": "横向展开的中等明度实心墙面块，可上下左右平铺接续，表面仅以明度差分出檐口横条与垂直分段的街区界，保留大片纯色空墙",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "facade-window",
+        "role": "方形窗洞模块",
+        "description": "挂在立面上的方形窗洞：外框一圈中等明度方块，内部为深色暗块，部分窗内嵌一枚暖色发光小方块作窗内光",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "facade-door",
+        "role": "矩形门框模块",
+        "description": "挂在立面上的矩形门框：深色矩形门洞外一圈略亮门框横条，底部与地面色带对齐，纯直角无描边",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "facade-cornice",
+        "role": "突出檐口横条",
+        "description": "立面上方突出的水平檐口横条，可作可站立的平台：一块横向长条方块叠加一条更亮的顶面分色，下方投一条深色阴影带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "facade-sign",
+        "role": "外挂招牌",
+        "description": "外挂于立面的方形招牌：一块饱和深色实心方板，其上一条暖色发光窄横条作醒目点缀，板体为纯色平涂无文字",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "street-lamp",
+        "role": "杆状路灯",
+        "description": "细长方杆灯柱加顶部一段横向短臂，臂端一枚暖色发光小方块作灯头，全部由矩形拼合，杆身与地面色带对齐",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "pipe-segment",
+        "role": "管线模块",
+        "description": "横卧的管线色块：两段平行长条方块由间隔的方形法兰点连接，可横向接续，作低矮可跳越障碍",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "container-box",
+        "role": "集装箱式方块箱体",
+        "description": "集装箱式方块：一个矩形实心箱体，正面以数条等距竖向分色条分隔，底部一条深色阴影带，可作垫脚与搜索平台",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 40
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "rail-tie",
+        "role": "轨道枕木",
+        "description": "轨道带上的等距方形枕木：一块扁平深色方块，可横向等距重复摆放于地面色带之上作为小跳落点",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 8
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "goal-marker",
+        "role": "终点路标",
+        "description": "终点路标：一根竖直杆状方块，顶端叠一块醒目暖色方块作标头，底部一小块加深底座，与地面色带对齐，纯直角轮廓",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "wasteland-skyline",
+        "role": "废土背景（天空 / 天际线剪影 / 建筑立面 / 地面带四层）",
+        "description": "三段分层的横向舞台背景：上层通栏天空色带，其下一条远处废土天际线的单层剪影色带，中景为横向展开的堆叠建筑立面色带，底部为横向无限延伸的地面与路面色带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 384,
+          "h": 216
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0.1
+          },
+          {
+            "name": "skyline",
+            "parallax": 0.3
+          },
+          {
+            "name": "facade",
+            "parallax": 0.7,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "ground",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-resource-counter",
+        "role": "拾荒收获计数底板",
+        "description": "屏幕空间左上角的收获计数底板：一条横向可拉伸的平坦深色条块，四边等宽，中央区完全平坦可任意重复，无图案无字，用于承载资源与宝箱计数",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 96,
+          "h": 24
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-resource-icon",
+        "role": "资源计数图标",
+        "description": "屏幕空间的资源计数小图标：一枚方形平涂小色块加一处高光点，按原尺寸绘制不拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-chest-icon",
+        "role": "宝箱计数图标",
+        "description": "屏幕空间的宝箱计数小图标：一个矩形小箱体加顶部一条亮色横条，按原尺寸绘制不拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-scavenger",
+      "role": "玩家角色母版",
+      "description": "方头方块拾荒者：三层身以内的短矮比例，头大身小，方头方肩方靴直角剪影；厚实方块外套加带小帽檐的方帽，胸前一枚对比色小色块作扣件，四肢为等宽短方块，正侧视朝向观众",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger",
+      "size": {
+        "w": 32,
+        "h": 48
+      }
+    },
+    {
+      "id": "master-enemy",
+      "role": "巡行敌人母版",
+      "description": "废都游荡者：与拾荒者同一套方头方肩方靴直角剪影，更矮更钝的块状躯干，无帽或扁帽，暗部大块平涂，四肢等宽短方块，正侧视朝向观众",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy",
+      "size": {
+        "w": 32,
+        "h": 48
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

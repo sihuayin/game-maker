@@ -51,11 +51,17 @@ export const DrawlistSource = z.object({ kind: z.literal("drawlist") }).strict()
  * 等分切会让逐帧头宽极差到 144；按间隙切则降到 **4**。
  * ⚠️ **块数对不上就失败**，不静默取前 N 个 —— 与 drawlist 路线同一条规矩
  * （「清单说要有 N 帧，生成器给了 M 帧」）。
+ *
+ * ⚠️ **2026-10-09 删掉了 `source.prompt`**（[票 35](35-multiframe-needs-background.md) 的 Q1）：
+ *    它让计划阶段**能覆盖**派生的提示词，而真跑的量是——**20 条 `image` 资源里每一条都填了它**
+ *    ⇒ `imagePrompt()` **一次都没跑过**，而「背景必须是纯色 ${bg}」「画布是 N 倍宽」「一排 N 个」
+ *    那些话**全在它里面**。一个「怎么画」的字段住进了自称只装「要什么」的清单里
+ *    （`PLAN_TOOL_DESCRIPTION` 第一行就写着「清单说的是**要什么**，不是**怎么画**」），
+ *    而且它**挂在工具 schema 上** ⇒ 模型看得见、于是每次都填。**散文里禁止、形状里邀请**，
+ *    正是这个仓库反复记的那条病。⇒ 提示词**始终**由 `imagePrompt()` 从 spec + StyleSpec 派生。
  */
 export const ImageSource = z.object({
   kind: z.literal("image"),
-  /** 覆盖派生的提示词。不给就由 `imagePrompt()` 从 spec + StyleSpec 渲染。 */
-  prompt: z.string().min(1).optional(),
   /**
    * 参考图（**母版 → 动画**那条路）。相对**配方文件**解析，与 `import.ref` 同一条规则。
    *
@@ -64,12 +70,21 @@ export const ImageSource = z.object({
    */
   reference: InputPath.optional(),
   /**
-   * 抠背景。**默认不抠**。
+   * 抠背景**这个动作**的参数：**只剩一个容差**（默认 30）。**默认仍然不抠**。
+   *
+   * ⚠️ **2026-10-09 起，底色不再由清单声明**（[票 35](35-multiframe-needs-background.md) 的 Q2/Q5）：
+   *    底色**始终**是 `keyColorFor(style.palette)` —— 因为三份生图模板**每一份**都逐字告诉
+   *    模型「背景必须是纯色 ${bg}」，那个 `bg` 就是它 ⇒ `pack` **自己就能算出同一个值**，
+   *    让清单再声明一遍是**同一个事实的第二个来源**（而且它今天必被模型填错，见上）。
+   *    ⚠️ 字段名里的 `background` 今天指的是**「抠底这个动作」**，不是「背景是什么颜色」——
+   *    改名独立于本票，记在地图的 `Not yet specified`。
+   *    ⚠️ **单帧也走派生色**（此前是四角取样）。这条更对：`singleObjectPrompt` 逐字告诉过
+   *    模型那个颜色，按它抠才是**兑现承诺**。
    *
    * ⚠️ 实测这个上游**没有透明底**（返回的是纯 RGB），所以多半得抠。而抠背景是
    * `keyBackground`：**全局比色、不是连通域** —— 底色若同时是主体用色，会把主体抠穿。
-   * 实测同类角色的一帧有 73% 的像素就是世界色板的最暗色，所以提示词里的底色
-   * **绝不能在世界色板里**。见 `packages/assets/src/image-gen.ts` 的文件头。
+   * 实测同类角色的一帧有 73% 的像素就是世界色板的最暗色，所以那个派生的底色
+   * **绝不能在世界色板里**（`keyColorFor` 挑的正是色板外的纯色）。见 `packages/assets/src/image-gen.ts` 的文件头。
    */
   background: z.object({ tolerance: z.number().nonnegative() }).strict().optional(),
   /** alpha 二值化阈值，默认 0.5。`null` = 保留半透明边缘（不推荐，会产出色板外颜色）。 */

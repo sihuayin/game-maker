@@ -125,8 +125,23 @@ describe("⚠️ 失败时报的是**真实发出的笔数**，不是「回来�
   })) };
   const recipePath = path.join(D3, "recipe.json");
   fs.writeFileSync(recipePath, JSON.stringify(TWO_IMG));
-  /** 一张最小合法的 PNG（base64）—— 生图那条上游回的就是 b64。 */
-  const PNG = encodePNG({ width: 4, height: 4, data: Buffer.alloc(4 * 4 * 4, 0xff) }).toString("base64");
+  /**
+   * 一张最小合法的 PNG（base64）—— 生图那条上游回的就是 b64。
+   *
+   * ⚠️ **底色必须是我们告诉模型的那个**（[票 35](../../../.scratch/game-maker-v2/issues/35-multiframe-needs-background.md)）：
+   *   `pack` 现在**始终**按 `keyColorFor(style.palette)` 抠底（`STYLE.palette` 是 `#112233`/`#445566`
+   *   ⇒ 派生出 `#ff00ff`），而一张**没有那个颜色**的图会当场撞上
+   *   「底色一个像素都没抠到」那条哨兵 —— 那是**对的行为**，但它与这几个测试（量的是**账**）无关。
+   *   ⇒ 照着提示词会画出来的样子造：**外圈是底色、中间 2×2 是主体**。
+   */
+  const PNG = (() => {
+    const key = [0xff, 0x00, 0xff, 0xff];       // #ff00ff
+    const subject = [0x11, 0x22, 0x33, 0xff];   // 色板里的第一个
+    const data = Buffer.alloc(4 * 4 * 4);
+    for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++)
+      data.set(x >= 1 && x <= 2 && y >= 1 && y <= 2 ? subject : key, (y * 4 + x) * 4);
+    return encodePNG({ width: 4, height: 4, data }).toString("base64");
+  })();
 
   /** 四份**生图**资源 —— 用它量「闸门拒掉的那几笔有没有混进账」。 */
   const FOUR_IMG = { ...TWO_IMG, id: "img-four", assets: ["a", "b", "c", "d"].map((id) => ({

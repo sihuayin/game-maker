@@ -1,0 +1,134 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "resource",
+  "frame": "resource",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 4,
+      "y": 6,
+      "w": 8,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 6,
+      "w": 8,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 4,
+      "y": 14,
+      "w": 8,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 7,
+      "w": 1,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 11,
+      "y": 7,
+      "w": 1,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 5,
+      "y": 7,
+      "w": 6,
+      "h": 7
+    },
+    {
+      "op": "dither",
+      "x": 5,
+      "y": 10,
+      "w": 6,
+      "h": 4,
+      "colors": [
+        "palette:2",
+        "palette:3"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:11",
+      "x": 6,
+      "y": 7,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 8,
+      "y": 9,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 10,
+      "y": 7,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 5,
+      "y": 12,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 9,
+      "y": 13,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 7,
+      "y": 5,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 9,
+      "y": 5,
+      "w": 1,
+      "h": 1
+    }
+  ]
+}

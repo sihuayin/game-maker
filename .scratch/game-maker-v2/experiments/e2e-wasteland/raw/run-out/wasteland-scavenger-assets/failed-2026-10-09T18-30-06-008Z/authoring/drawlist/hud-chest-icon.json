@@ -1,0 +1,136 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-chest-icon",
+  "frame": "hud-chest-icon",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 2,
+      "y": 4,
+      "w": 12,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:11",
+      "x": 2,
+      "y": 4,
+      "w": 12,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 2,
+      "y": 6,
+      "w": 12,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 2,
+      "y": 6,
+      "w": 12,
+      "h": 8
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 3,
+      "y": 7,
+      "w": 10,
+      "h": 1
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 8,
+      "w": 10,
+      "h": 5,
+      "colors": [
+        "palette:1",
+        "palette:0"
+      ],
+      "ratio": 0.5,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 7,
+      "y": 8,
+      "w": 2,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:11",
+      "x": 7,
+      "y": 8,
+      "w": 1,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 6,
+      "y": 9,
+      "w": 4,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 7,
+      "y": 10,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 3,
+      "y": 13,
+      "w": 10,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 3,
+      "y": 14,
+      "w": 1,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 12,
+      "y": 14,
+      "w": 1,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 4,
+      "y": 15,
+      "w": 8,
+      "h": 1
+    }
+  ]
+}

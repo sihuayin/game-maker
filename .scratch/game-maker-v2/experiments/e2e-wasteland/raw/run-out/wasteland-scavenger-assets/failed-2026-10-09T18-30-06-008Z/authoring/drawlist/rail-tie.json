@@ -1,0 +1,140 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "rail-tie",
+  "frame": "rail-tie",
+  "viewBox": [
+    0,
+    0,
+    16,
+    8
+  ],
+  "expectedSize": [
+    16,
+    8
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 1,
+      "y": 3,
+      "w": 14,
+      "h": 5
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 1,
+      "y": 3,
+      "w": 14,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 2,
+      "y": 4,
+      "w": 12,
+      "h": 3
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 4,
+      "w": 12,
+      "h": 3,
+      "colors": [
+        "palette:0",
+        "palette:1"
+      ],
+      "ratio": 0.5,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 1,
+      "y": 3,
+      "w": 1,
+      "h": 5
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 14,
+      "y": 3,
+      "w": 1,
+      "h": 5
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 1,
+      "y": 7,
+      "w": 14,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 2,
+      "y": 5,
+      "w": 12,
+      "h": 1
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 5,
+      "w": 12,
+      "h": 1,
+      "colors": [
+        "palette:0",
+        "palette:1"
+      ],
+      "ratio": 0.65,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 3,
+      "y": 3,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 11,
+      "y": 3,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 4,
+      "y": 2,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 11,
+      "y": 2,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "opacity": 0,
+      "x": 1,
+      "y": 2,
+      "w": 14,
+      "h": 1
+    }
+  ]
+}
