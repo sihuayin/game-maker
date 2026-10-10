@@ -3,7 +3,7 @@
 Type: task
 Status: open
 Owner: —
-Blocked by: 37
+Blocked by: 38
 Map: ../map.md
 > `docs/v2/03-claude-code.md` §27/§28。**这是终点的判据本身。**
 >
@@ -23,7 +23,10 @@ Map: ../map.md
 > **抛在 `pack` 段的 `scavenger-idle` 上**（票 35 §6 那条 0 像素哨兵 —— **它响了，而且响对了**）。
 > ⚠️ 但**它报出来的真因推翻了票 35 决定表的第 2 行**：那个「确定的派生色」模型**从没交付过**
 > （9/9 在容差 30 下 **0 像素**，最近像素差 **L1 118~334**）⇒ 派生[票 37](37-key-colour-not-delivered.md)，
-> **本票改挂它**（`Blocked by: 37`）。现场与读数在
+> **本票先挂它**（`Blocked by: 37`）。⚠️ **2026-10-10 票 37 已 `resolved`** —— 它只改了**单帧 / 多帧**
+> 那一侧（按实测众数色抠），**背景层按 Q3 原样留着**，而背景层那条哨兵**必然**会响
+> （背景层同样不交付声明色）⇒ 派生出[票 38](38-background-layer-key-colour.md)，
+> **本票改挂票 38**。现场与读数在
 > `experiments/e2e-wasteland/raw/key-colour-third-run/`（**原现场那 9 张已被复制出来** ——
 > 它们在下一次真跑开头会被 `rmSync` 删掉，而 `*.png` 在 `.gitignore` 里）。
 > ⚠️ **「验证生图确实发生」这一条今天验到了**（9 张真 PNG + 同名 `.prompt.txt`）；
@@ -261,7 +264,9 @@ authoring/drawlist/     9 份 .json
 
 ## Answer
 
-（待解 —— 本票被[票 37](37-key-colour-not-delivered.md) 挡住：
-票 35 那轮改动**按是实现了**，而它把抠底从「四角量」换成了「按声明色抠」，
-⚠️ **模型从没交付过那个声明色**（第三次真跑 9/9 张在容差 30 下 0 像素）⇒ 抠底那一行要重裁。
-链跑到 `pack` 段的 `scavenger-idle` 上断了，离站点还差 `config` + `qa` + 站点三步）
+（待解 —— 本票被[票 38](38-background-layer-key-colour.md) 挡住：
+[票 37](37-key-colour-not-delivered.md) 已落地（**单帧 / 多帧**改按**实测众数色**抠，
+判据是「抠掉多数 + 剩余连成一块」），但票 37 的 **Q3** 把**背景层**原样留着 ——
+⚠️ 而背景层同样**不交付**那个声明色（第三次真跑 9/9 张在容差 30 下 0 像素）
+⇒ 下一次真跑**付完 13 张图之后**仍然会停在 `wasteland-skyline.skyline`。
+链上一轮跑到 `pack` 段的 `scavenger-idle` 上断了，离站点还差 `config` + `qa` + 站点三步）

@@ -76,6 +76,113 @@ export function keyBackground(
 }
 
 /**
+ * 这张图**实际交付**的底色：不透明像素里出现次数最多的那个颜色（**票 37 的 Q1**）。
+ *
+ * ⚠️ **为什么不能继续用「我们声明的那个颜色」抠底**：第三次真跑那 **9/9** 张在容差 30 下
+ *   抠到 **0 像素**，而画面里**离声明色最近的那个像素** L1 也差 **118~334**
+ *   —— 那个颜色模型**从来没交付过**（提示词里写了两到四遍，一次没听）。
+ *   而每张图**内部**极稳：逐格各取众数，与整图众数的 ΔL1 ≤ 3
+ *   ⇒ **「一张图一个底色」这个形状成立**，错的只是「那个底色 = 我们声明的那个」。
+ *   读数：`experiments/e2e-wasteland/raw/key-colour-third-run/measured-2026-10-09.txt`。
+ *
+ * ⚠️ **众数只是「量」，不是判据**：主体占多数时众数就是主体，按它抠会把**主体**当底抠掉。
+ *   「抠掉的是不是多数、剩下的连不连成一块」那两条判据在 `pack.ts` 那侧
+ *   —— 这里只负责**量得准、报得全**。
+ *
+ * ⚠️ **跳过 alpha < 128 的像素**：与 `keyBackground` 同一条线（那边也是 `>= 128` 才取样）。
+ *   补白出来的透明像素 RGB 是 0，算进来会凭空多出一大坨「黑色众数」。
+ *
+ * ⚠️ **并列时取 RGB 数值最小的那个**（不是「先遇到的那个」）：同一张图必须**每次量出同一个值**，
+ *   否则重跑一次就换一个底色，判据会随实现细节红绿。
+ */
+export function dominantOpaqueColor(img: RasterImage): {
+  /** 出现最多的那个不透明颜色。 */
+  color: [number, number, number];
+  /** 它出现了多少像素。 */
+  pixels: number;
+  /** 一共数了多少个不透明像素（分母 —— 覆盖率 = `pixels / opaquePixels`）。 */
+  opaquePixels: number;
+} {
+  const counts = new Map<number, number>();
+  let opaque = 0;
+  const n = img.width * img.height;
+  for (let i = 0; i < n; i++) {
+    const s = i * 4;
+    if (img.data[s + 3]! < 128) continue;
+    opaque++;
+    const packed = (img.data[s]! << 16) | (img.data[s + 1]! << 8) | img.data[s + 2]!;
+    counts.set(packed, (counts.get(packed) ?? 0) + 1);
+  }
+  let bestKey = 0, bestCount = -1;
+  for (const [k, c] of counts) {
+    // ⚠️ `>` 而不是 `>=`：并列时留下的是**键更小**的那个（键 = RGB 打包成的一个整数，
+    //   于是「RGB 数值最小」这件事有一条确定性定义，不依赖 `Map` 的插入顺序）。
+    if (c > bestCount || (c === bestCount && k < bestKey)) { bestKey = k; bestCount = c; }
+  }
+  return {
+    color: [(bestKey >> 16) & 0xff, (bestKey >> 8) & 0xff, bestKey & 0xff],
+    pixels: bestCount < 0 ? 0 : bestCount,
+    opaquePixels: opaque,
+  };
+}
+
+/**
+ * 抠完之后**剩下的墨连成几块**（4 连通 · 只算 alpha ≥ 128）。
+ *
+ * 用来判**主体还在、而且没被抠碎**（票 37 的 Q1 那条「剩余前景连成 1 块」）。
+ * ⚠️ 为什么给的是**每块面积**而不是一个「几块」的整数：实测里模型**每张图都会留一点贴边的碎墨**
+ *   （第三次真跑：`treasure-chest` 四周被画了一圈洋红描边 40289px，
+ *   几张图的左上角还有 267~312px 的小块）——严格「块数 === 1」会把**真图判成不合格**，
+ *   而那正是下一跑要花掉的钱。判据取**最大一块占剩下那些墨的比例**（阈值在 `pack.ts`）。
+ *
+ * `minArea` 以下的小块不计入（既不计入 `areas`，也不计入分母 `total`）——用来滤掉孤立噪点。
+ */
+export function foregroundBlocks(img: RasterImage, { minArea = 1 }: { minArea?: number } = {}): {
+  /** 各块面积，**从大到小**。 */
+  areas: number[];
+  /** 被数进去的墨一共多少像素（= `areas` 之和）。 */
+  total: number;
+  /** 最大的一块有多少像素（等价于 `areas[0] ?? 0`）。 */
+  largest: number;
+  /** 最大一块占 `total` 的比例；`total === 0` 时是 0。 */
+  largestShare: number;
+} {
+  const w = img.width, h = img.height;
+  const seen = new Uint8Array(w * h);
+  const ink = (x: number, y: number) => img.data[(y * w + x) * 4 + 3]! >= 128;
+  const areas: number[] = [];
+  const stack: number[] = [];
+  for (let y0 = 0; y0 < h; y0++) for (let x0 = 0; x0 < w; x0++) {
+    const start = y0 * w + x0;
+    if (seen[start] === 1 || !ink(x0, y0)) continue;
+    seen[start] = 1;
+    stack.length = 0;
+    stack.push(start);
+    let area = 0;
+    while (stack.length > 0) {
+      const i = stack.pop()!;
+      area++;
+      const x = i % w, y = (i - x) / w;
+      // 4 连通（上下左右）——**不用 8 连通**：对角相接的两块在视觉上是两件东西，
+      // 而 8 连通会把它们算成一块（碎墨更容易被"连"起来，判据随之变松）。
+      if (x > 0 && seen[i - 1] === 0 && ink(x - 1, y)) { seen[i - 1] = 1; stack.push(i - 1); }
+      if (x < w - 1 && seen[i + 1] === 0 && ink(x + 1, y)) { seen[i + 1] = 1; stack.push(i + 1); }
+      if (y > 0 && seen[i - w] === 0 && ink(x, y - 1)) { seen[i - w] = 1; stack.push(i - w); }
+      if (y < h - 1 && seen[i + w] === 0 && ink(x, y + 1)) { seen[i + w] = 1; stack.push(i + w); }
+    }
+    if (area >= minArea) areas.push(area);
+  }
+  areas.sort((a, b) => b - a);
+  const total = areas.reduce((s, a) => s + a, 0);
+  const largest = areas[0] ?? 0;
+  return { areas, total, largest, largestShare: total === 0 ? 0 : largest / total };
+}
+
+/** 两个 RGB 之间的 L1 距离（报错文案里那个「差了多少」，与 `keyBackground` 的容差同一把尺）。 */
+export const l1Distance = (a: readonly number[], b: readonly number[]): number =>
+  Math.abs(a[0]! - b[0]!) + Math.abs(a[1]! - b[1]!) + Math.abs(a[2]! - b[2]!);
+
+/**
  * 面积平均降采样（**按 alpha 加权**）。
  *
  * alpha 加权不是可选项：把不透明像素与透明像素直接平均，会把主体边缘拉向背景色，

@@ -19,7 +19,7 @@ import {
 import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
-import { importFrames, keyBackground, sliceGrid, type Box } from "./import.js";
+import { dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
 import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioMismatch } from "./master.js";
@@ -115,7 +115,10 @@ export type BuildPackOptions = {
 
 type AssetSourceLike =
   | { kind: "drawlist" }
-  | { kind: "image"; prompt?: string; reference?: string; background?: { tolerance: number }; alphaThreshold?: number | null }
+  // ⚠️ **没有 `prompt`**（票 35 的 Q1）：提示词**始终**由 `imagePrompt()` 派生，覆盖那个口子
+  //   已从契约里删掉（`recipe.ts`）—— 这份手抄镜像跟着一起删，否则模型不给、这里却仍写着可选，
+  //   下一个人会以为它活着。
+  | { kind: "image"; reference?: string; background?: { tolerance: number }; alphaThreshold?: number | null }
   | {
       kind: "import"; ref: string;
       sheet?: { columns: number; rows: number; frameWidth: number; frameHeight: number; offsetX?: number; offsetY?: number; spacingX?: number; spacingY?: number; names: string[]; animations?: { name: string; frames: string[] }[] };
@@ -516,6 +519,32 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         // 生图产物**同样过那条重建管线**（抠背景 → 裁框 → 降采样 → 二值化 → 量化），
         // 所以它与导入通道在结构上是同一种东西：都是「原生位图」这一创作态。
         binding = "quantized";
+        // ⚠️ **底色是运行时确定性规则，不问清单要**（[票 35](35-multiframe-needs-background.md) ·
+        //   2026-10-09）。删掉 `source.prompt` 之后，三份生图模板**每一次都会跑**，而它们**每一份**
+        //   都从 `keyColorFor(palette)` 取底色、逐字告诉模型「背景必须是纯色 ${bg}」
+        //   ⇒ **模型被告知的那个颜色是一个确定值**，于是 `pack` **自己就能算出同一个值**。
+        //   让清单再声明一遍，就是把**同一个事实**放进第二个来源 —— 而实测那个声明**必被填错**
+        //   （真跑 20 条 `image` 里模型自挑的底色落在 `(85,90,95)`，而色板里坐着
+        //   `#5a5f6b = (90,95,107)` ⇒ 按容差抠会把角色**抠穿**）。
+        //   ⚠️ **先例就是背景层**：它早就不问清单要颜色（直接注入 `colors: [hexToRgb(keyColorFor(palette))]`）。
+        //   ⇒ `source.background` 今天**只装一个可选的 `tolerance`**（默认 30，与背景层同值）。
+        //   ⚠️ **单帧也走这一条**（此前是四角取样，`import.ts:58-63`）：`singleObjectPrompt`
+        //      逐字告诉过模型那个颜色，按它抠才是**兑现承诺**；四角取样是那句承诺之前的老办法。
+        //   ⚠️ **`import` 那条路不走这里**（见下面 `else` 分支）：人给的 PNG **可能真的自带透明底**，
+        //      `recipe.ts` 那句「不给就假定人已经给了透明底」是它自己的语义。这条不对称是**故意的**。
+        const keyColor = hexToRgb(keyColorFor(palette));
+        const bgOpt = { tolerance: src.background?.tolerance ?? 30, colors: [keyColor] };
+        const declaredColors = bgOpt.colors;
+        const isBg = spec.kind === "background";
+        // ⚠️⚠️ **2026-10-10 · 票 37 就地更正上面那段「兑现承诺」**（带日期的注，不改原文）：
+        //   那段推论的**前提被真跑实测证伪了** —— 模型**从不交付**那个声明色。
+        //   第三次真跑 9/9 张图在容差 30 下抠到 **0 像素**，画面里离声明色最近的那个像素
+        //   也差 L1 **118~334**（提示词里那句话说两到四遍，一次没听）。
+        //   ⇒ **单帧 / 多帧改按「这张图上量出来的众数色」抠**（`dominantOpaqueColor`）；
+        //     声明色**仍然要写进提示词**（它是在要求模型「把背景画成一块与角色无关的平涂」，
+        //     这个作用实测是有效的），但它**不再是可依赖的交付物**。
+        //   ⇒ 而**背景层保持原样**（仍按声明色抠）——那是票 35 决定表里的**另一行**，
+        //     改不改"众数色"另开票（票 37 的 Q3）。
         // 世界的风格参考图（配方级）。给了就内联进每一次生图请求 —— 让模型**看着那个世界**画，
         // 而不是听一个文字转述（实测后者会走样成一张场景插画）。
         const styleReference = recipe.referenceImage
@@ -552,9 +581,16 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
 
         // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
         // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
-        const batches: RasterImage[][] = [];
+        // ⚠️ **抠底用的那个颜色跟着批次走**（票 37）：单帧/多帧是**逐张图量出来的**，
+        //   同一个资源的两个动画（两张图）各有各的众数色 ⇒ 它不能像 `bgOpt` 那样写在资产一级。
+        const batches: { cells: RasterImage[]; key: [number, number, number] }[] = [];
         for (const u of units) {
-          const prompt = src.prompt ?? imagePrompt(spec, style, {
+          // ⚠️ **始终派生**（[票 35](35-multiframe-needs-background.md) 的 Q1）：此前是
+          //   `src.prompt ?? imagePrompt(…)`，而真跑里 planner **每一条都填了** `src.prompt`
+          //   ⇒ `imagePrompt()` 一次都没跑过，把「背景必须是纯色 ${bg}」「画布是 N 倍宽」
+          //   「一排 N 个」那些话**整段丢掉**了。那个字段已经**从契约里删掉**
+          //   （`recipe.ts` / `recipe-tool.ts`），所以这里没有 `??` 可写了 —— 形状上就不可能再覆盖。
+          const prompt = imagePrompt(spec, style, {
             ...(u.anim === undefined ? {} : { anim: u.anim }),
             ...(u.layer === undefined ? {} : { layer: u.layer }),
             // ⚠️ **有 DNA 就把身份那一句换成基因的八个字段**（票 13 的 Q3，人类裁定「替换，不是叠加」）；
@@ -608,24 +644,134 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
           fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));
           fs.writeFileSync(path.join(packDir, u.raw.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
+          // ⚠️ **底色必须真的被抠掉**（2026-09-30 · 票 03 立 · **票 35 的 Q9 补齐到单帧与多帧**）——
+          //   抠不掉的后果不只是「该透明的地方留着底色」：这个 unit 的**不透明率会恒为 1**。
+          //   · 对背景层：它**把后面那几层整个挡住**，而「最远层必须画满」那条门禁**反而通过**
+          //     （抠不掉的东西全是不透明的 ⇒ 每一层看起来都是满的）。那是「错得安静」的正品。
+          //   · 对多帧：整排角色**连成 1 块** —— 而分块靠的就是抠完之后的空隙。
+          //
+          //   ⚠️⚠️ **所以它必须判在分块之前**（2026-10-09 由测试抓出来的一处顺序错）：
+          //   原来这段住在下面 `flatMap` 里（= 分块**之后**），于是底色不对时先响的是
+          //   「检测到 1 块」—— **一句指错方向的错**，真因（「那个颜色根本不在这张图里」）
+          //   一个字都没说到。判据的位置本身就是判据的一部分。
+          //
+          //   ⚠️ **判据为什么是「0」而不是某个百分比**：磁盘上 15 张真包的背景层实测下来，
+          //   抠掉 0 的只有 3 张（Gemini 那一包的三层），而**其次最低的一档是 38.3%** ——
+          //   0 不是「少」，是「那个颜色根本不在这张图里」。
+          //
+          //   ⚠️ **背景层只查「不是最远」的那几层**。最远那层**本来就该是满的**，抠得少是它对；
+          //   而实测里**四角取样会把最远层抠掉 48–50%**（它的角上就是内容本身）。
+          //   这也是为什么这一条不能写成「一律按四角取样兜底」。
+          //   （⚠️ 单帧 / 多帧没有这个例外 —— 提示词要它们「四周只留很窄的一圈空白」/「角色之间
+          //    留出明显的空隙」，所以画面里**一定**有底色像素。）
+          //   ⚠️ **单帧 / 多帧不再走这条 0 像素哨兵**（票 37 的 Q1）：它们改按**实测众数色**抠，
+          //   而众数色是"图上出现最多的那个颜色" ⇒ 按它抠**至少**能抠到它自己那些像素，
+          //   「0 像素」在单帧/多帧上**不可达**。那两条路上真正要判的是下面那两条结构判据。
+          //
+          // ⚠️ **抠底用的那个颜色**（**票 37 的 Q1**）：
+          //   · **单帧 / 多帧 → 这张图上量出来的众数色**（一次算、整张图共用、不逐格估色；
+          //     实测逐格各取众数与整图众数的 ΔL1 ≤ 3 ⇒ 「一张图一个底色」这个形状成立）。
+          //   · **背景层 → 照旧是声明色**（票 37 的 Q3：本票只改单帧/多帧那一侧；背景层要不要
+          //     也改成众数色，**另开票**）。
+          const measured = dominantOpaqueColor(image);
+          const unitKey: [number, number, number] = isBg ? keyColor : measured.color;
+          // ⚠️ **一个不透明像素都没有**是另一回事，得单独说：那时众数色是"空集里的众数"（`[0,0,0]`），
+          //   按它抠会把一张全透明的图抠得更空，后面每条判据都会**报出一个假的原因**。
+          if (!isBg && measured.opaquePixels === 0)
+            throw new Error(
+              `资源 "${spec.id}"${u.anim === undefined ? "" : ` 的动画 "${u.anim}"`} 生出来的图` +
+              `**一个不透明像素都没有**（${image.width}×${image.height} 全透明）—— 没有底色可量，也没有东西可抠。` +
+              `⚠️ 这不是重试能解决的问题：要么上游挂了，要么它把「背景透明」理解成了「整张透明」。`);
+          const keyed = keyBackground(image, { tolerance: bgOpt.tolerance, colors: [unitKey] });
+          /** 这张图的像素总数（判据的分母）。 */
+          const pixels = image.width * image.height;
+
+          /**
+           * 「我们声明的」与「这张图上量到的」摆在一起（票 37 的 Q6：报错要报**实测**）。
+           *
+           * ⚠️ 覆盖率报的是**按实测众数色抠掉了多少**，不是那个颜色逐像素占多少：模型的底是
+           *   一个**围绕众数色的云**（同族像素落在容差里）。实测 `treasure-chest` 众数色本身
+           *   只占 2.7%，而按它抠掉了 **80.9%** —— 报前者会让人以为抠底失败了。
+           * ⚠️ 声明色那一侧是**现算的**（只在抛错的路上跑一次，不花钱也不占常路）：实测 9/9 都是 0，
+           *   但不写成写死的一句话 —— 那句话在「模型这次真交付了」的场合就是假的。
+           */
+          const colourReport = (m: typeof measured, keyedPixels: number, pixels: number) => {
+            const declaredKeyed = keyBackground(image, { tolerance: bgOpt.tolerance, colors: declaredColors }).keyedPixels;
+            return `我们告诉模型的是 [${declaredColors[0]!.join(", ")}]（容差 ${bgOpt.tolerance}，按它只抠到 ${declaredKeyed} 像素），` +
+              `而这张图上**实测的众数色**是 [${m.color.join(", ")}]` +
+              `（按它抠掉 ${((keyedPixels / pixels) * 100).toFixed(1)}% 的像素，与声明色差 L1 = ${l1Distance(m.color, declaredColors[0]!) }）`;
+          };
+          /** ⚠️ **不许给一个必然失败的建议**（票 37 的 Q6 删掉的那句「⇒ 重出这一张」正是反例）。 */
+          const NOT_A_RETRY =
+            "⚠️ **这不是重试能解决的问题** —— 第三次真跑 9/9 张都如此，而那个声明色在提示词里" +
+            "写了两到四遍（含开头那句「最重要的一条，请先读它」）。重发一次，模型照样不交付它。";
+
+          // ⚠️「这个 unit 该不该被那条哨兵管」写成**显式分支**（票 37 的 Q3 要求覆盖缺失值）。
+          //    · `!isBg`：单帧 / 多帧 / 道具，**一律**在射程里。
+          //    · `u.layer === undefined` 只可能是「`spec.layers` 整段缺席」⇒ 这一个 unit 就是整张
+          //      背景（没有"层"这回事），它与最远层同款：**本来就该铺满**，不判。
+          //    ⚠️ **背景层的 `index` 不是清单给的**，是上面 `bgLayers.map((l, i) => …)` 按**数组下标**
+          //      发的。票 37 的 Q3 说「清单里那四层一个 `index` 都没写 ⇒ `undefined > 0` 恒假」
+          //      —— 那是我**读错了表达式**（读的是 `u.layer.index`，不是清单里的 `l.index`）。
+          //      2026-10-10 就地更正：这一段的行为与改动前**一致**，只是不再是「比较碰巧为假」。
+          const layerNeedsKeying = !isBg || (u.layer !== undefined && u.layer.index > 0);
+          if (isBg && layerNeedsKeying && keyed.keyedPixels === 0) {
+            throw new Error(
+              `背景层 "${spec.id}.${u.layer!.name}" 的底色**一个像素都没抠到** —— ${colourReport(measured, keyed.keyedPixels, pixels)}。\n` +
+              `⚠️ 抠不掉的后果不只是「该透明的地方留着底色」—— 这一层会**一个洞都没有**，` +
+              `把后面那几层整个挡住，而「最远层必须画满」那条门禁**反而会通过**。\n` +
+              `⚠️ 本票（票 37）**只把单帧/多帧改成了按实测众数色抠，背景层保持原样** —— ` +
+              `所以这一层今天**必然**如此：声明色模型从不交付。背景层要不要一起改，是**另一票**的事。\n` +
+              NOT_A_RETRY);
+          }
+
+          // ⚠️⬇️⬇️ **单帧的两条结构判据**（票 37 的 Q1：「抠掉的是多数 + 剩下的连成一块」）——
+          //   为什么要判「抠完之后过得去」，而不是只判「众数色量到了」：
+          //   **众数色本身不是成功判据** —— 主体占多数时众数**就是主体**，按它抠 = 把主体当底抠掉。
+          //   实测那 9 张的主体只占 10~20%（这个风格「大片留白」的巧合，**不是通用保证**）。
+          if (!isBg && u.frames === 1) {
+            const keyedRatio = keyed.keyedPixels / pixels;
+            // ① 抠掉的是不是**多数**（= 那个众数色确实在扮演"背景"）。
+            if (keyedRatio <= 0.5)
+              throw new Error(
+                `资源 "${spec.id}" 的底色判据没过：按**实测众数色**抠，只抠掉 **${(keyedRatio * 100).toFixed(1)}%**` +
+                ` 的像素（要求**超过一半**）。${colourReport(measured, keyed.keyedPixels, pixels)}。\n` +
+                `⚠️ 一种可能是**主体自己就占了多数** —— 那时"众数色"就是主体，按它抠是把主体当底抠掉；\n` +
+                `⚠️ 另一种可能是模型画的底**根本不是平涂**（渐变色带 / 噪点），单色众数只覆盖它的一部分。\n` +
+                NOT_A_RETRY);
+            // ② 剩下的墨有没有被抠碎 —— 主体应当还是**一块**。
+            //    ⚠️ 那条线取 0.6 是**量出来的**，不是拍的：真图 `treasure-chest` 抠完剩**两块**
+            //    （主体 156660px + 模型自己画的一圈洋红描边 40289px）⇒ 最大那块占 **79.6%**。
+            //    照字面写「块数 === 1」会把这张**真图判成不合格** —— 下一跑当场白花钱。
+            //    （边界见票 37 §8：**判据要挡得住真的错，不许把真图判死**。）
+            const blocks = foregroundBlocks(keyed.image);
+            if (blocks.largestShare < 0.6)
+              throw new Error(
+                `资源 "${spec.id}" 的底色判据没过：按**实测众数色**抠完，剩下的墨**碎成了 ${blocks.areas.length} 块**，` +
+                `最大的一块只占 ${(blocks.largestShare * 100).toFixed(1)}%（要求 ≥ 60%）—— 主体多半被抠穿了。\n` +
+                `${colourReport(measured, keyed.keyedPixels, pixels)}。\n` + NOT_A_RETRY);
+          }
           const cells: RasterImage[] = [];
-          batches.push(cells);
+          batches.push({ cells, key: unitKey });
           if (u.frames === 1) { cells.push(image); }
           else {
             // ⚠️ **按墨迹间隙分块**，不等分 —— 实测模型不按格子排版（见 sheet.ts 的文件头）。
-            // ⚠️ 分块看的是 alpha，所以要先**抠一份**出来当探针；原图（纯 RGB）每一列都有"墨"。
-            if (!src.background)
-              throw new Error(
-                `资源 "${spec.id}" 的动画 "${u.anim}" 是多帧，但 source 没给 \`background\` —— ` +
-                "分块靠的是抠掉背景之后的 alpha，不抠就切不开（实测会把一整排 4 个角色判成 1 块）。",
-              );
-            const probe = keyBackground(image, src.background).image;
-            const seg = segmentRowCells(image, probe);
+            // ⚠️ 分块看的是 alpha，所以探针必须是**抠过背景**的那一份；原图（纯 RGB）每一列都有"墨"。
+            // ⚠️ **探针与最终交付用的是同一个颜色**（`unitKey`）—— 票 35 时这里是「我们告诉模型的
+            //   那个底色」，票 37 之后单帧/多帧改成了**这张图上量出来的众数色**。
+            //   ⚠️ 两处一旦分家，就会出现「探针按 A 抠、交付按 B 抠」：分块数得对，出来的帧却是花的。
+            const seg = segmentRowCells(image, keyed.image);
             if (seg.cells.length !== u.frames)
               throw new Error(
                 `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
                 "生图模型的帧数不可信（实测要 6 给 5）。要么重出这张图，要么把 spec 的帧数改成它真能画出来的数量 —— " +
-                "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。",
+                "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。\n" +
+                // ⚠️ **把抠底那份读数一并附上**（票 35 §6 的老纪律：判据的位置本身就是判据的一部分，
+                //   而**指错方向的错**比不报还贵）：块数不对也可能是**抠底本身出了事**
+                //   —— 众数色若是主体，整排角色会被一起抠掉，那时先响的就是这条「检测到 1 块」。
+                `⚠️ 抠底用的是**实测众数色** —— ${colourReport(measured, keyed.keyedPixels, pixels)}；` +
+                `抠掉了 ${((keyed.keyedPixels / pixels) * 100).toFixed(1)}% 的像素。` +
+                `若那个众数色其实是**主体**，整排角色会被一起抠掉，块数就会先错在这里。`,
               );
             cells.push(...seg.cells);
           }
@@ -634,52 +780,22 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43），都要在这里定，不能留给默认：
         //   ① **按我们告诉模型的颜色抠底**，不四角取样 —— 背景层的角上就是内容本身
         //      （地面填满下半、墙填满中间那带），四角取样会把内容色当成底色，**整层抠光**。
+        //   （⚠️ 票 37 之后**只有背景层**是这条了：单帧 / 多帧改按**实测众数色**抠，
+        //     所以那个颜色跟着批次走 —— `b.key`。）
         //   ② **不裁框** —— 导入通道默认「裁到内容再拉到 spec.size」，对一件道具是对的
         //      （裁紧、归一化），对一层背景是**毁掉构成**：层里只画了上半，裁完拉满，
         //      层与层之间的空间关系就没了。
-        const isBg = spec.kind === "background";
-        const bgOpt = isBg
-          ? { tolerance: src.background?.tolerance ?? 30, colors: [hexToRgb(keyColorFor(palette))] }
-          : src.background;
-        // 背景层**声明**的那个底色（有就是有、没有就没有 —— 单物件走的是四角取样那条）
-        const declaredColors = bgOpt && "colors" in bgOpt ? bgOpt.colors : undefined;
-        const results = batches.flatMap((cells, u) => {
-          // ⚠️ **背景层的底色必须真的被抠掉**（2026-09-30 · 票 03）——
-          //   抠不掉的后果不只是「该透明的地方留着底色」：这一层的**不透明率会恒为 1**，
-          //   于是它**把后面那几层整个挡住**，而「最远层必须画满」那条门禁**反而通过**
-          //   （抠不掉的东西全是不透明的 ⇒ 每一层看起来都是满的）。那是「错得安静」的正品。
-          //
-          //   ⚠️ **只查「不是最远」的那几层**。最远那层**本来就该是满的**，抠得少是它对；
-          //   而实测里**四角取样会把最远层抠掉 48–50%**（它的角上就是内容本身）。
-          //   这也是为什么这一条不能写成「一律按四角取样兜底」。
-          //
-          //   ⚠️ **判据为什么是「0」而不是某个百分比**：磁盘上 15 张真包的背景层实测下来，
-          //   抠掉 0 的只有 3 张（Gemini 那一包的三层），而**其次最低的一档是 38.3%** ——
-          //   0 不是「少」，是「那个颜色根本不在这张图里」。
-          const layer = units[u]?.layer;
-          if (isBg && layer && layer.index > 0 && declaredColors && bgOpt) {
-            const declared = keyBackground(cells[0]!, { tolerance: bgOpt.tolerance, colors: declaredColors });
-            if (declared.keyedPixels === 0) {
-              const corners = keyBackground(cells[0]!, { tolerance: bgOpt.tolerance }).backgroundColors;
-              throw new Error(
-                `背景层 "${spec.id}.${layer.name}" 的底色**一个像素都没抠到** —— 声明的是 ` +
-                `[${declaredColors[0]!.join(", ")}]（容差 ${bgOpt.tolerance}），而画面里取样到的是 ` +
-                `${corners.map((c) => `[${c.join(", ")}]`).join(" / ")}。\n` +
-                `⚠️ 多半是**模型画了另一个相近的颜色**（实测差 129–248）。抠不掉的后果不只是` +
-                `「该透明的地方留着底色」—— 这一层会**一个洞都没有**，把后面那几层整个挡住，` +
-                `而「最远层必须画满」那条门禁**反而会通过**。\n` +
-                `⇒ 要么重出这一层，要么把 source.background 改成它真画的那个颜色。` +
-                `（⚠️ 别改成「按四角取样兜底」—— 实测那会把**最远**那层抠掉一半，` +
-                `因为最远层的角上就是内容。）`);
-            }
-          }
-          return importFrames(cells, {
-            palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
-            ...(bgOpt !== undefined ? { background: bgOpt } : {}),
-            ...(isBg ? { trim: false } : {}),
-            ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
-          });
-        });
+        //   ⚠️（票 35 之前这里还住着那条「底色一个像素都没抠到」的哨兵。它住错了地方 ——
+        //     分块**在它前面**跑，于是底色不对时先响的是帧数核对。已经搬到分块之前，见上。）
+        //   ⚠️⚠️ **`background` 必须是那个 unit 自己的颜色**：`importFrames` 会**再抠一遍**
+        //     （`prepareFrame` → `keyBackground`），而**这一遍才是最终交付的 alpha** ——
+        //     传错颜色的话，上面那些判据全绿而交付出来的帧是花的。
+        const results = batches.flatMap(({ cells, key }) => importFrames(cells, {
+          palette, targetWidth: spec.size.w, targetHeight: spec.size.h,
+          background: { tolerance: bgOpt.tolerance, colors: [key] },
+          ...(isBg ? { trim: false } : {}),
+          ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
+        }));
         const stateOf = new Map<string, string>();
         if (spec.kind === "animation") {
           let k = 0;

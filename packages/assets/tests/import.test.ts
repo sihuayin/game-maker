@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  cropToBox, decodePNG, downscaleArea, emptyImage, importBitmap, importFrames, inkBBox,
-  keyBackground, paletteExactness, quantizeToPalette, sliceGrid, thresholdAlpha, trimToInk,
-  unionInkBBox,
+  cropToBox, decodePNG, dominantOpaqueColor, downscaleArea, emptyImage, foregroundBlocks,
+  importBitmap, importFrames, inkBBox, keyBackground, l1Distance, paletteExactness, quantizeToPalette,
+  sliceGrid, thresholdAlpha, trimToInk, unionInkBBox,
 } from "../src/index.js";
 import type { RasterImage } from "../src/index.js";
 
@@ -309,5 +309,101 @@ describe("⚠️ 抠背景的四角必须跳过全透明像素（2026-09-26 修�
     expect(px(image, 10, 10)[3]).toBe(255);            // 角色
     expect(px(image, 15, 15)[3]).toBe(0);              // 洋红背景
     expect(px(image, 0, 10)[3]).toBe(0);               // 补白列本来就没东西
+  });
+});
+
+describe("⚠️ `dominantOpaqueColor` —— 「这张图实际交付的底色」（票 37 的 Q1）", () => {
+  /** 只把指定的一点涂成某个色 —— 用来搭「谁出现得最多」的场景。 */
+  const dot = (img: RasterImage, x: number, y: number, c: number[]) => setPx(img, x, y, c);
+
+  it("数的是**不透明**像素的众数，且跳开 alpha < 128 的那些", () => {
+    // 6×2 = 12 像素：洋红 8、主体深色 3、另留 1 个**全透明**（= 0）。
+    // 若把透明的算进来，黑色会凭空变成众数（这就是 `keyBackground` 2026-09-26 那个坑的同款）。
+    const img = emptyImage(6, 2);
+    for (const [x, y] of [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [0, 1], [1, 1]] as const)
+      dot(img, x, y, [201, 42, 143, 255]);
+    for (const [x, y] of [[2, 1], [3, 1], [4, 1]] as const) dot(img, x, y, [62, 50, 54, 255]);
+    // (5,1) 留作全透明 —— `emptyImage` 本来就是 0
+    const d = dominantOpaqueColor(img);
+    expect(d.color, "多数是不透明里的洋红，不是透明那坨黑").toEqual([201, 42, 143]);
+    expect(d.pixels).toBe(8);
+    expect(d.opaquePixels, "分母只数不透明的（11 个），不是全部 12 个").toBe(11);
+  });
+
+  it("⚠️ 并列时取 **RGB 数值最小**的那个 —— 同一张图必须每次量出同一个值", () => {
+    // 两个颜色各 2 个像素。若按 `Map` 的插入顺序，谁先被数到谁赢 ⇒ 重跑一次换个底色，
+    // 判据会随实现细节红绿（票 37 边界里明确要求「量得出、用得下」）。
+    const a = emptyImage(4, 1);
+    dot(a, 0, 0, [200, 30, 124, 255]); dot(a, 1, 0, [200, 30, 124, 255]);
+    dot(a, 2, 0, [10, 20, 30, 255]);   dot(a, 3, 0, [10, 20, 30, 255]);
+    expect(dominantOpaqueColor(a).color, "插入顺序不影响结果").toEqual([10, 20, 30]);
+    const b = emptyImage(4, 1);
+    dot(b, 0, 0, [10, 20, 30, 255]);   dot(b, 1, 0, [10, 20, 30, 255]);
+    dot(b, 2, 0, [200, 30, 124, 255]); dot(b, 3, 0, [200, 30, 124, 255]);
+    expect(dominantOpaqueColor(b).color, "两种顺序同一个答案").toEqual([10, 20, 30]);
+  });
+
+  it("⚠️ 众数**就是主体**时它照样报主体 —— 这个函数只「量」，不下判断（判据在 `pack.ts`）", () => {
+    // 这条钉的是**职责边界**：主体占多数 ⇒ 众数 = 主体。`dominantOpaqueColor` **必须**
+    // 如实报出来（否则就是它替判据做了决定）；「按它抠 = 把主体当底抠掉」那件事
+    // 由 `pack.ts` 的覆盖率判据挡住（见 pack.test.ts 的「单帧判据①」）。
+    const img = emptyImage(5, 1);
+    for (let x = 0; x < 4; x++) dot(img, x, 0, [62, 50, 54, 255]);   // 主体 4
+    dot(img, 4, 0, [201, 42, 143, 255]);                             // 底 1
+    expect(dominantOpaqueColor(img).color).toEqual([62, 50, 54]);
+  });
+
+  it("一个不透明像素都没有 ⇒ `opaquePixels` 为 0（`pack.ts` 拿它当硬失败的门）", () => {
+    const d = dominantOpaqueColor(emptyImage(3, 3));
+    expect(d.opaquePixels).toBe(0);
+    expect(d.pixels).toBe(0);
+  });
+});
+
+describe("⚠️ `foregroundBlocks` —— 抠完剩下的墨连成几块（票 37 的 Q1）", () => {
+  it("4 连通：**对角相接的两块算两块**（8 连通会把它们连起来，判据随之变松）", () => {
+    const img = emptyImage(4, 4);
+    setPx(img, 0, 0, [62, 50, 54, 255]);
+    setPx(img, 1, 1, [62, 50, 54, 255]);     // 只与 (0,0) **对角**相接
+    const b = foregroundBlocks(img);
+    expect(b.areas, "对角不算连通").toEqual([1, 1]);
+    expect(b.largestShare).toBe(0.5);
+  });
+
+  it("上下左右相接的算一块，面积按**从大到小**排", () => {
+    const img = emptyImage(5, 2);
+    for (const [x, y] of [[0, 0], [1, 0], [2, 0]] as const) setPx(img, x, y, [62, 50, 54, 255]); // 3 连
+    setPx(img, 4, 1, [62, 50, 54, 255]);                                                          // 1
+    const b = foregroundBlocks(img);
+    expect(b.areas).toEqual([3, 1]);
+    expect(b.largest).toBe(3);
+    expect(b.total).toBe(4);
+    expect(b.largestShare).toBe(0.75);
+  });
+
+  it("`minArea` 以下的小块**既不计入 areas 也不计入分母**（滤孤立噪点）", () => {
+    const img = emptyImage(6, 2);
+    for (const [x, y] of [[0, 0], [1, 0], [2, 0]] as const) setPx(img, x, y, [1, 1, 1, 255]); // 3
+    setPx(img, 5, 1, [1, 1, 1, 255]);                                                          // 1
+    const b = foregroundBlocks(img, { minArea: 2 });
+    expect(b.areas, "那块 1 像素的被滤掉了").toEqual([3]);
+    expect(b.total, "分母里也没有它 —— 否则最大那块占比会被一个小噪点拉低").toBe(3);
+    expect(b.largestShare).toBe(1);
+  });
+
+  it("墨被抠光（全透明）⇒ 不除零，`largestShare` 是 0", () => {
+    const b = foregroundBlocks(emptyImage(3, 3));
+    expect(b.areas).toEqual([]);
+    expect(b.total).toBe(0);
+    expect(b.largest).toBe(0);
+    expect(b.largestShare).toBe(0);
+  });
+});
+
+describe("`l1Distance` —— 报错文案里那个「差了多少」（与 `keyBackground` 的容差同一把尺）", () => {
+  it("三个通道的绝对差相加", () => {
+    expect(l1Distance([200, 30, 124], [200, 30, 124])).toBe(0);
+    expect(l1Distance([255, 0, 255], [200, 30, 124]), "实测那一对：55 + 30 + 131").toBe(216);
+    expect(l1Distance([0, 0, 0], [255, 255, 255])).toBe(765);
   });
 });

@@ -9,6 +9,7 @@ import {
   buildAssetPack, keyColorFor, nextPackVersion, verifyPack,
   type DrawListGenerator, type ImageGenerator, type RasterImage,
 } from "../src/index.js";
+import { deliveredColour } from "./_model-paint.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const RECIPE: AssetRecipe = JSON.parse(readFileSync(ROOT + "fixtures/recipes/shift-change.json", "utf8"));
@@ -340,8 +341,12 @@ describe("生图路线的分层背景：一层一次调用（票 43）", () => {
     expect((e as Error).message).toMatch(/底色\*\*一个像素都没抠到\*\*/);
     expect((e as Error).message).toMatch(/station\.wall/);
     expect((e as Error).message).toMatch(/把后面那几层整个挡住/);
-    // ⚠️ 而它**明确不许**被修成「按四角取样兜底」—— 那条路会毁掉最远层
-    expect((e as Error).message).toMatch(/别改成「按四角取样兜底」/);
+    // ⚠️ 票 37 的 Q6 删掉了此前那句「别改成「按四角取样兜底」」—— 那是**修法指引**，
+    //   而不是读数；顶替它的是**可核对的量**：声明色、实测众数色、各抠掉多少、两者的 L1。
+    expect((e as Error).message, "报实测众数色").toMatch(/实测的众数色/);
+    expect((e as Error).message, "报声明色这一侧抠到几个像素").toMatch(/按它只抠到 \d+ 像素/);
+    expect((e as Error).message, "报两者差多少").toMatch(/与声明色差 L1 = \d+/);
+    expect((e as Error).message, "并说清背景层本票没改").toMatch(/背景层保持原样/);
   });
 
   it("⚠️ **最远那层底色偏了不报错** —— 它本来就该是满的，抠得少是它对", async () => {
@@ -592,10 +597,24 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
       source: { kind: "image" as const, background: { tolerance: 0 } },
     })),
   });
-  /** 一张纯色图 —— 这里不关心内容，只关心「它被写下去过」。⚠️ 自己造，别去够别处的夹具。 */
+  /**
+   * 一张「中间有东西、四周是**我们告诉模型的那个抠底色**」的图 —— 与真生图模型的产出同构。
+   *
+   * ⚠️ **不许图省事画成一块任意纯色**（[票 35](../../../.scratch/game-maker-v2/issues/35-multiframe-needs-background.md)）：
+   *   生图那一路现在**始终**按 `keyColorFor(style.palette)` 抠底，而**抠不到一个像素**会当场
+   *   撞上那条哨兵 ⇒ 一块与派生底色无关的纯色图会让下面这几条测试**因为错误的理由而绿**
+   *   （失败的是哨兵，不是它们各自要量的那条规矩）。这里不关心内容，但要关心**底色对不对**。
+   */
   const flat = (w: number, h: number): RasterImage => {
+    const px = (hex: string) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)] as const;
+    const k = px(keyColorFor(STYLE.palette)), f = px(STYLE.palette[0]!);
     const data = Buffer.alloc(w * h * 4);
-    for (let i = 0; i < w * h; i++) { data[i * 4] = 0x44; data[i * 4 + 1] = 0x55; data[i * 4 + 2] = 0x66; data[i * 4 + 3] = 255; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const o = (y * w + x) * 4;
+      const inner = x >= w * 0.25 && x < w * 0.75 && y >= h * 0.25 && y < h * 0.75;
+      const c = inner ? f : k;
+      data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+    }
     return { width: w, height: h, data };
   };
   /** 第 `failAt` 次调用抛，其余照常返回一张图。⚠️ 调用方要把它配上 `concurrency: {image: 1}`（顺序才是确定的）。 */
@@ -686,5 +705,319 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
     const e = await fail(d, failingGen(1).gen);
     expect(e.failureDir).toBeUndefined();
     expect(readdirSync(path.join(d, "salvage")).filter((x) => x.startsWith("failed-") || x.startsWith(".building-"))).toEqual([]);
+  });
+});
+
+// ── 票 35：底色是**运行时确定性规则**，不是清单里的一行字 ────────────────────────
+//
+// ⚠️ 这一块问的是一个**值**的问题：提示词里逐字告诉模型的那个底色，与 `pack` 抠底时
+//   用的那个颜色，**是不是同一个**。
+//
+//   病根是「同一个事实有两个来源」：`source.prompt` 曾让计划阶段**覆盖整段提示词**
+//   （真跑 20 条 `image` 资源，**每一条**都填了它），于是 `imagePrompt()` **一次都没跑过** ——
+//   而「背景必须是纯色 ${bg}」「画布是 N 倍宽」「一排 N 个」那些话**全在它里面**。
+//   那个字段已从契约与工具 schema 两处删掉（`recipe.ts` / `recipe-tool.ts`）
+//   ⇒ 提示词**只能**派生，形状上就不可能再被覆盖。
+//
+// ⚠️⚠️ **票 37 把后半截推翻了**（2026-10-10）：上面那个「提示词里的色 === `pack` 抠的色」
+//   的守卫**不是一个守卫，它把错误钉死了** —— 实测两者**永远不等**：第三次真跑 9/9 张图在
+//   容差 30 下抠到 **0 像素**，画面里离声明色最近的像素也差 L1 118~334（提示词里那句话
+//   写了两到四遍，一次没听）。⇒ **抠底改用「这张图上量出来的众数色」**，
+//   而**提示词那一侧仍然派生同一个颜色**（它是在要求模型「把背景画成一块与角色无关的平涂」，
+//   这个作用实测有效 —— 9/9 都画了平涂、都没把洋红用到角色身上）。
+//
+//   ⇒ 于是这一块的桩**必须换**：此前它**照着提示词画**（一个只会照做的傀儡），
+//     「模型会交付我们声明的颜色」成了测试环境里**唯一**的可能 —— 那正是
+//     **三道闸全绿而规则是错的**（票 37 §4）的来源。现在它**画另一个颜色**
+//     （`deliveredColour`：9 组实测交付色），而「构建成功」本身就是判据：
+//     抠底要是还认声明色，样张**当场**就出不了包。
+describe("⚠️ 抠底用的是**这张图上量出来的**那个色，不是提示词里说的那个（票 37）", () => {
+  /**
+   * ⚠️ **色板里故意坐着 `#ff00ff`** —— 它是 `keyColorFor` 的**第一候选**，派生色因此
+   *   必须**跳开**它去拿 `#00ff00`。于是「把底色写死成 `#ff00ff`」这种实现（正是删掉
+   *   `source.prompt` 之前真跑里模型自挑的那个路子：`(85,90,95)` 撞上色板里的 `#5a5f6b`）
+   *   当场露馅。
+   */
+  const GUARD: StyleSpec = { ...STYLE, palette: [...STYLE.palette, "#ff00ff"] };
+  const DERIVED = "#00ff00";
+  /** 提示词里那句底色 —— 三份模板**都用这个说法**（「背景必须是纯色 X」/「必须是纯色 X」/「是纯色 X」）。 */
+  const COLOUR_IN_PROMPT = /纯色 (#[0-9a-fA-F]{6})/;
+  const px = (hex: string): [number, number, number] =>
+    [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+  const toHex = (c: readonly [number, number, number]): string =>
+    `#${c.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+
+  /**
+   * 「底色 = 参数给的那个、墨 = 参数给的那几个色」的图 —— 与真生图模型的产出同构。
+   * ⚠️ 多格时**每格用自己的颜色、格与格之间留干净的底色缝**：分块（`segmentRowCells`）
+   *   靠的就是那些缝，把格子画满会让整排连成一块。
+   * ⚠️ **墨只占中间 40%**（`0.3 ~ 0.7`）—— 真跑那 9 张的主体只占 10~20%
+   *   （极简像素 · 大片留白）；画成 75% 会**墨比底多**，众数色就成了主体本身。
+   */
+  const tinted = (w: number, h: number, key: string, fills: readonly string[]): RasterImage => {
+    const k = px(key);
+    const data = Buffer.alloc(w * h * 4);
+    const cellW = w / fills.length;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const cell = Math.min(fills.length - 1, Math.floor(x / cellW));
+      const inX = x - cell * cellW;
+      const inner = inX >= cellW * 0.3 && inX < cellW * 0.7 && y >= h * 0.3 && y < h * 0.7;
+      const c = inner ? px(fills[cell]!) : k;
+      const o = (y * w + x) * 4;
+      data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+    }
+    return { width: w, height: h, data };
+  };
+
+  /**
+   * 桩：**读得出**提示词里那个底色、但**画的是另一个**（`deliveredColour`，票 37 的 Q5）。
+   * `seen` 用来断言「每一次调用被告诉的都是同一个派生色」。
+   */
+  const modelLike = (fills: (i: number) => readonly string[]) => {
+    const seen: string[] = [];
+    const painted: string[] = [];
+    const canvas: { w: number; h: number }[] = [];
+    const gen: ImageGenerator = async (req) => {
+      const m = COLOUR_IN_PROMPT.exec(req.prompt);
+      if (m === null) throw new Error(`提示词里没写底色，桩没法照它画：\n${req.prompt}`);
+      seen.push(m[1]!);
+      const k = deliveredColour(m[1]!);
+      painted.push(`#${k.map((v) => v.toString(16).padStart(2, "0")).join("")}`);
+      canvas.push({ w: req.size.w, h: req.size.h });
+      return {
+        image: tinted(req.size.w, req.size.h, `#${k.map((v) => v.toString(16).padStart(2, "0")).join("")}`, fills(seen.length - 1)),
+        call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
+      };
+    };
+    return { gen, seen, painted, canvas };
+  };
+
+  /** 从图集里**逐帧**取中心那一点的 RGBA —— 「内容与顺序」就是把这一串读出来比，比的是**序列**。 */
+  const sampled = (packDir: string, metaRel: string, names: readonly string[]) => {
+    const at = JSON.parse(readFileSync(path.join(packDir, metaRel), "utf8")) as
+      { frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }> };
+    const img = decodePNG(readFileSync(path.join(packDir, metaRel.replace(/\.json$/, ".png"))));
+    return names.map((n) => {
+      const r = at.frames[n]!.frame;
+      const o = ((r.y + (r.h >> 1)) * img.width + r.x + (r.w >> 1)) * 4;
+      return [img.data[o]!, img.data[o + 1]!, img.data[o + 2]!, img.data[o + 3]!];
+    });
+  };
+
+  const SPRITE: AssetRecipe = {
+    ...RECIPE, id: "guard-sprite", referenceImage: undefined,
+    assets: [{
+      spec: { kind: "sprite", id: "lantern", role: "提灯", description: "一盏黄铜提灯",
+        styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true },
+      source: { kind: "image", background: { tolerance: 0 } },
+    }],
+  };
+
+  const WALK: AssetRecipe = {
+    ...RECIPE, id: "guard-walk", referenceImage: undefined,
+    assets: [{
+      spec: { kind: "animation", id: "walk", role: "角色", description: "一个走路的人",
+        styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true,
+        animations: [{ name: "idle", frames: 3, fps: 6, loop: true }] },
+      // ⚠️ **整个 `background` 键缺席** —— 真跑里 5/5 多帧资源就是这样，而那时链**当场抛**在
+      //   「source 没给 background」上（票 35 §1：真正的错一个字都没说到）。现在它合法：
+      //   颜色是派生的，这里只有一个可选的容差。
+      source: { kind: "image" },
+    }],
+  };
+
+  const SCENE: AssetRecipe = {
+    ...RECIPE, id: "guard-scene", referenceImage: undefined,
+    assets: [{
+      spec: { kind: "background", id: "yard", role: "院子", description: "黄昏的院子",
+        styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 32, h: 24 }, required: true,
+        layers: [{ name: "sky", parallax: 0 }, { name: "fence", parallax: 0.6 }] },
+      source: { kind: "image", background: { tolerance: 0 } },
+    }],
+  };
+
+  const build = (recipe: AssetRecipe, gen: ImageGenerator) => buildAssetPack({
+    recipe, style: GUARD, outDir: tmp(), recipeDir: ROOT, generate: stub, generateImage: gen, sourceDateEpoch: EPOCH,
+  });
+  const failed = (recipe: AssetRecipe, gen: ImageGenerator): Promise<Error> =>
+    build(recipe, gen).then(() => { throw new Error("本该失败，却出包了"); }, (x: unknown) => x as Error);
+
+  it("前提：派生色**跳开**了色板里坐着的 `#ff00ff`（写死它的实现会当场露馅）", () => {
+    expect(GUARD.palette, "前提：色板里坐着 #ff00ff").toContain("#ff00ff");
+    expect(keyColorFor(GUARD.palette), "所以派生出来的不是它").toBe(DERIVED);
+    expect(keyColorFor(STYLE.palette), "而原色板派生的正是它 —— 两条都要覆盖").toBe("#ff00ff");
+  });
+
+  it("前提②：桩交付的那个颜色**不等于**声明色（否则这整个 describe 就退化成傀儡）", () => {
+    // ⚠️ **这条是整个 describe 的地基**：下面每一条「照样抠得开」都只有在
+    //   「桩画的 ≠ 提示词说的」时才在验**交付色**。桩要是照声明色画，
+    //   它们就全都在验傀儡 —— 而那正是票 37 §4 那个「三道闸全绿而规则是错的」。
+    expect(deliveredColour("#ff00ff"), "实测那一对").toEqual([200, 30, 124]);
+    for (const declared of ["#ff00ff", "#00ff00", "#ff0000", "#0000ff", "#ffff00", "#00ffff"]) {
+      const d = px(declared), k = deliveredColour(declared);
+      expect(k, `${declared} 的交付色撞上了声明色`).not.toEqual(d);
+    }
+  });
+
+  it("单帧：提示词说 `#00ff00`、而模型交回**另一个**颜色 ⇒ 照样抠得开（票 37）", async () => {
+    // ⚠️ **构建成功本身就是判据**：桩画的是 `deliveredColour(DERIVED)`（9 组实测交付色之一），
+    //   抠底要是还认提示词里那个声明色，样张**当场**就出不了包。
+    const { gen, seen, painted, canvas } = modelLike(() => [GUARD.palette[0]!]);
+    const { manifest, audit } = await build(SPRITE, gen);
+    expect(audit).toEqual([]);
+    expect(seen, "一个资源一次调用，而提示词里仍然是那个派生色").toEqual([DERIVED]);
+    expect(painted, "而画出来的**不是**它").toEqual([toHex(deliveredColour(DERIVED))]);
+    expect(canvas[0], "单帧的画布就是 spec.size —— 没有 N 倍宽那回事").toEqual({ w: 16, h: 16 });
+    expect(manifest.assets[0]!.frames.map((f) => f.name)).toEqual(["lantern"]);
+  });
+
+  it("⚠️ 多帧：**画布是 N 倍宽**（那句话曾经整段丢掉），且切帧数量、内容、顺序都对", async () => {
+    // ⚠️ 这是票 35 的 Q6(b) 那条判据「用 stub 生图器真实验证切帧数量、内容和顺序」。
+    const COLOURS = [GUARD.palette[0]!, GUARD.palette[1]!, GUARD.palette[3]!];
+    const { gen, seen, canvas } = modelLike(() => COLOURS);
+    const { manifest, packDir, audit } = await build(WALK, gen);
+    expect(audit).toEqual([]);
+    expect(seen, "一个动画一次调用，而底色**还是那一个**派生色").toEqual([DERIVED]);
+    // ⚠️ 「画布是 N 倍宽」是 `animationSheetPrompt` 里的话 —— 它曾因 `src.prompt` 覆盖而不存在，
+    //   模型于是拿到一个 16×16 的方画布去画「一排 3 个」。
+    expect(canvas[0]).toEqual({ w: 48, h: 16 });
+
+    // 数量与顺序：`<资源 id>.<动画名><第几帧>`（单帧动画不带序号）
+    const NAMES = ["walk.idle1", "walk.idle2", "walk.idle3"];
+    expect(manifest.assets[0]!.frames.map((f) => f.name)).toEqual(NAMES);
+    expect(manifest.assets[0]!.animations![0]!.frames).toEqual(NAMES);
+
+    // 内容与顺序：**逐帧**读图集上那一点，比的是**序列**不是集合 —— 顺序颠倒了这条当场红
+    expect(sampled(packDir, "delivery/atlas.animations.json", NAMES))
+      .toEqual(COLOURS.map((c) => [...px(c), 255]));
+  });
+
+  it("背景层：**每一层**的每一次调用都被告诉同一个派生色（非最远那层真的被抠到）", async () => {
+    // ⚠️ 背景层**今天仍然按声明色抠**（票 37 的 Q3：那是决定表里的另一行，另开票）。
+    //   所以这一条里的桩**照声明色画** —— 它问的是「层与层的管线通不通」，
+    //   而不是「模型会不会交付那个颜色」（那个问题在下面那条里，答案是**不会**）。
+    const keyFaithful: ImageGenerator = async (req) => {
+      const m = COLOUR_IN_PROMPT.exec(req.prompt);
+      if (m === null) throw new Error(`提示词里没写底色：\n${req.prompt}`);
+      seen.push(m[1]!);
+      return {
+        image: tinted(req.size.w, req.size.h, m[1]!, [GUARD.palette[0]!]),
+        call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
+      };
+    };
+    const seen: string[] = [];
+    const { manifest, audit } = await build(SCENE, keyFaithful);
+    expect(audit).toEqual([]);
+    expect(seen, "一层一次调用，而两次的底色必须是**同一个值**").toEqual([DERIVED, DERIVED]);
+    expect(manifest.assets[0]!.frames.map((f) => f.name)).toEqual(["yard.sky", "yard.fence"]);
+  });
+
+  it("⚠️ **抠底不是写死的**：喂一张别的底色的图 ⇒ 照样抠得开（票 37 的 Q4 ①）", async () => {
+    // ⚠️ 这条专盯「把某个颜色写死进抠底」的实现：同一份配方、两种交付色，
+    //   写死任何一个都会在另一张上崩。（`[225,31,138]` 是实测交付过的那一族；
+    //   `[0,255,0]` 是**另一个量级的绿**，与那一族毫无关系。）
+    for (const delivered of [[225, 31, 138], [0, 255, 0]] as const) {
+      const flat: ImageGenerator = async (req) => ({
+        image: tinted(req.size.w, req.size.h, toHex(delivered), [GUARD.palette[0]!]),
+        call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
+      });
+      const { manifest, audit } = await build(SPRITE, flat);
+      expect(audit, `底为 [${delivered.join(", ")}]`).toEqual([]);
+      expect(manifest.assets[0]!.frames.map((f) => f.name)).toEqual(["lantern"]);
+    }
+  });
+
+  it("⚠️ 单帧判据①：底**不是平涂**（众数只占一小半）⇒ 抛，并说清是覆盖率不够", async () => {
+    // ⚠️ 四种颜色各占四分之一 ⇒ 众数色只覆盖 25% ⇒ 「抠掉的是多数」不成立。
+    //   这条挡的是「模型画的根本不是平涂」（渐变色带 / 噪点）—— 那时单色众数抠不干净。
+    const stripes: ImageGenerator = async (req) => {
+      const { w, h } = req.size;
+      const data = Buffer.alloc(w * h * 4);
+      const bands = [[200, 30, 124], [10, 200, 40], [30, 40, 210], [230, 210, 30]];
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const c = bands[Math.min(bands.length - 1, Math.floor((x / w) * bands.length))]!;
+        const o = (y * w + x) * 4;
+        data[o] = c[0]!; data[o + 1] = c[1]!; data[o + 2] = c[2]!; data[o + 3] = 255;
+      }
+      return {
+        image: { width: w, height: h, data } as RasterImage,
+        call: { protocol: "openai", requestedSize: `${w}x${h}`, ms: 1, attempts: 1 },
+      };
+    };
+    const e = await failed(SPRITE, stripes);
+    expect(e.message).toMatch(/底色判据没过/);
+    expect(e.message, "说清是**覆盖率**那一条").toMatch(/只抠掉/);
+    expect(e.message, "把声明色与实测众数色并排报出来").toMatch(/实测的众数色/);
+    // ⚠️ 票 37 的 Q6：**不许给一个必然失败的建议**
+    expect(e.message, "不能再出现「重出这一张」").not.toMatch(/重出这一[张层]/);
+    expect(e.message).toMatch(/这不是重试能解决的问题/);
+  });
+
+  it("⚠️ 单帧判据②：剩下的墨**被抠碎** ⇒ 抛，并说清是连通结构那一条", async () => {
+    // ⚠️ 底是平涂（众数占 93.75% ⇒ 覆盖率那条过），但主体被画成 16 个互不相连的小点
+    //   ⇒ 最大一块只占剩下的墨的 1/16 ⇒ 连通结构那条响。真跑里这条挡的是
+    //   「抠底把主体抠穿了 / 抠成碎片」。
+    const dots: ImageGenerator = async (req) => {
+      const { w, h } = req.size;
+      const data = Buffer.alloc(w * h * 4);
+      const bg = [200, 30, 124], ink = [62, 50, 54];
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const c = x % 4 === 0 && y % 4 === 0 ? ink : bg;
+        const o = (y * w + x) * 4;
+        data[o] = c[0]!; data[o + 1] = c[1]!; data[o + 2] = c[2]!; data[o + 3] = 255;
+      }
+      return {
+        image: { width: w, height: h, data } as RasterImage,
+        call: { protocol: "openai", requestedSize: `${w}x${h}`, ms: 1, attempts: 1 },
+      };
+    };
+    const e = await failed(SPRITE, dots);
+    expect(e.message).toMatch(/底色判据没过/);
+    expect(e.message, "说清是**连通结构**那一条").toMatch(/碎成了 16 块/);
+    expect(e.message).toMatch(/这不是重试能解决的问题/);
+  });
+
+  it("⚠️ 多帧的**两个错分得开**：交付色与提示词不同**不算错**；帧数真不对 ⇒ 帧数核对", async () => {
+    // ⚠️ 票 35 记的那个「**指错方向的错**」是这两条打架的结果。票 37 之后第一个错**消失**了：
+    //   底色与提示词不同**不再是一种失败**（那正是常态）。剩下的那个错 —— 模型多画一格 ——
+    //   由帧数核对报出来，而它**要附上抠底的读数**（否则下一次还是指错方向）。
+    const four = modelLike(() => [GUARD.palette[0]!, GUARD.palette[1]!, GUARD.palette[3]!, GUARD.palette[4]!]);
+    const e2 = await failed(WALK, four.gen);
+    expect(e2.message).toMatch(/检测到 4 块/);
+    expect(e2.message, "帧数那条要附上抠底用的那个颜色").toMatch(/实测众数色/);
+    expect(e2.message, "而底色那条**不该**在这时候响 —— 两个错各说各的").not.toMatch(/一个像素都没抠到/);
+  });
+
+  // ⚠️⚠️⚠️ **已知残留的洞 —— 这条测试钉住的是「今天还错着」的行为，不是「应当如此」。**
+  //
+  //   票 37 的边界原话：「不能把『众数色』本身当作成功判据（众数可能是主体；必须继续验证
+  //   覆盖率和连通结构）」。本票照做了 —— 覆盖率与连通结构两条都判。**但那两条挡不住这一种**：
+  //   主体自己占了多数（> 50%）**且**剩下的底连成一块 ⇒ 两条判据**都过** ⇒
+  //   交付出去的是**抠反了的图**：主体被当底抠掉，底被当主体留下，而且**静默**。
+  //
+  //   下面这个 8×8：内圈 36 像素（主体色 S，4 连通的一块）、外圈 28 像素（底 B，4 连通的环）。
+  //   众数 = S（36/64 = 56.25% > 50% ⇒ 判据①过；抠完剩下那个环，1 块 ⇒ 判据②过）。
+  //
+  //   ⚠️ **它今天是绿的**：它断言的是「这种图**会**出包，而且出的是反的」——
+  //   **谁要是把这条洞补上了（例如加了「众数色不该与四角取样差太远」之类），这条会红，
+  //   那时请把本测试改成断言它抛错**（而不是把断言放宽）。
+  it("⚠️ 已知的洞：主体自己就是众数**且**剩下的底连成一块 ⇒ 抠反了却照样出包（今天如此）", async () => {
+    const inverted: ImageGenerator = async (req) => {
+      const { w, h } = req.size;
+      const data = Buffer.alloc(w * h * 4);
+      const subject = [62, 50, 54], bg = [200, 30, 124];
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const border = x === 0 || y === 0 || x === w - 1 || y === h - 1;
+        const c = border ? bg : subject;      // 内圈 36 > 外圈 28 ⇒ 主体是众数
+        const o = (y * w + x) * 4;
+        data[o] = c[0]!; data[o + 1] = c[1]!; data[o + 2] = c[2]!; data[o + 3] = 255;
+      }
+      return {
+        image: { width: w, height: h, data } as RasterImage,
+        call: { protocol: "openai", requestedSize: `${w}x${h}`, ms: 1, attempts: 1 },
+      };
+    };
+    const { audit } = await build(SPRITE, inverted);   // ⚠️ **不抛** —— 这正是那个洞
+    expect(audit, "今天它一路走到出包，两条判据都没响").toEqual([]);
   });
 });
