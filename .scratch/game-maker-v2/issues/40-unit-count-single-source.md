@@ -1,8 +1,8 @@
 # 40. 图单元计数**一把尺子** —— 检查点与 `pack` 复用同一段展开逻辑
 
 Type: task
-Status: open
-Owner: —
+Status: claimed
+Owner: claude (2026-10-10)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 23「E2E fixture + 真跑一次」](23-e2e-fixture-wasteland.md) 第六次真跑量到的**账目缺口**。
@@ -56,6 +56,19 @@ image 源"图单元"数 = 20  ← pack 真会发出去的次数
 ## 裁定（2026-10-10 · 人类第 1 轮）
 
 **Q3：统一图单元计数。** 验收重点：**检查点与 `pack` 复用同一展开逻辑**。
+
+## 轮次
+
+**第 1 轮**：[`clarifications/40-round-1.md`](../clarifications/40-round-1.md) —— 7 问
+（抽到哪 · `pack` 回收哪一部分 · 母版算不算 · 报什么 · 另外两处同源的错尺子收不收 ·
+判据怎么立 · 代码注释里的跨图票号撞车）+ 一条边界（只收生图这一把尺子）。
+⚠️ **本轮量到的四条**：① 那段展开**今天有第二份抄件**，落在 `recipes-sweep.test.ts:112` 的 `imageUnits()`
+（注释自称「与 `pack.ts` 的划分同构」）；② **第三处错尺子在 MCP 的工具说明里**
+（`server.ts:123`「有多少个 image 资源，就发多少次生图调用」—— 两半今天都是假话）；
+③ `framePlan` **不是**同一条尺子（drawlist 一帧一份 / 生图一动画一份），别合并；
+④ `pack.ts:607` / `prompt.ts:123` 里的「票 40 / 42 / 43」指的是**另一张图**（`game-creation-v1`）的同号票。
+
+**人类作答**（裁定表附在该文件末尾）：**待答 —— 本票停在等这一轮。**
 
 ## Answer
 
