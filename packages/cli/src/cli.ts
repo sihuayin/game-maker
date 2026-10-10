@@ -11,6 +11,9 @@ import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFro
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
 // ⚠️ **观察的渲染与 `pack` 那条命令共用同一个函数**（票 39）—— 两条路各写一份文案就是两份漂移。
 import { masterRatioNotes } from "@game-maker/assets";
+// ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
+//   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
+import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
 import { runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -194,19 +197,32 @@ async function buildAndSite(o: {
 }
 
 /** 清单摘要里那几行**共用的**（`create` 停与不停都要打）。 */
-function recipeLines(u: { recipe: { assets: readonly { source: { kind: string }; spec: { kind: string } }[] } }): {
-  kinds: Record<string, number>; imageAssetCount: number; oneLine: string;
+function recipeLines(u: { recipe: AssetRecipe }): {
+  kinds: Record<string, number>; imageCalls: ImageCalls; lines: string[];
 } {
   const kinds: Record<string, number> = {};
   for (const a of u.recipe.assets) kinds[a.spec.kind] = (kinds[a.spec.kind] ?? 0) + 1;
-  const imageAssetCount = u.recipe.assets.filter((a) => a.source.kind === "image").length;
+  // ⚠️ **这里报的是「生图调用次数」，不是「image 源资源数」**（票 40 改的这一行）。
+  //   以前它是 `assets.filter(a => a.source.kind === "image").length` —— 而真发出去的次数
+  //   由**展开**决定（动画按**动画**数、分层背景按**层**数、母版另算），两者不是一回事：
+  //   第六跑那份清单报「11 个要走生图」，而实际是 **24 次**（20 个图单元 + 4 张母版）
+  //   ⇒ **报小了 2.2 倍**，而它**正是人批准付费跑时看的那个数**。
+  //   ⚠️ 现在两边**共用同一把尺子**（`imageUnitsOf`，住 contracts）—— 不许再有第二份展开。
+  const calls = imageCallsOf(u.recipe);
   const byKind = Object.entries(kinds).map(([k, v]) => `${k}×${v}`).join(" · ");
+  const b = calls.breakdown;
   return {
-    kinds, imageAssetCount,
-    oneLine: `${u.recipe.assets.length} 个资源（${byKind}）` +
-      (imageAssetCount > 0
-        ? ` —— ⚠️ 其中 **${imageAssetCount} 个要走生图**，\`game-maker build\` 那一步才花钱`
-        : " —— **没有生图资源**，下一步不花钱"),
+    kinds, imageCalls: calls,
+    lines: calls.total === 0
+      ? [`清单：${u.recipe.assets.length} 个资源（${byKind}）—— **没有生图调用**，下一步不花钱`]
+      : [
+        `清单：${u.recipe.assets.length} 个资源（${byKind}）—— ⚠️ **预计 ${calls.total} 次生图调用**` +
+        `（动画 ${b.animation} 次 · 单帧 ${b.single} 次 · 背景层 ${b.background} 层 · 母版 ${b.master} 张）`,
+        // ⚠️ **它是上限，不是预测**（票 40 的 Q4）：依赖失败 / 母版挂掉时，依赖者
+        //   **一个字节都不往外发**（票 11 / 票 13）⇒ 实际调用会**比它少**。人批准的就是这个数，
+        //   所以这句得挨着它、不能藏到别处。
+        `↑ 这是**清单完整派发时的上限** —— 依赖或母版失败时那几笔不会发出去，实际会更少；\`game-maker build\` 那一步才花钱`,
+      ],
   };
 }
 
@@ -221,14 +237,18 @@ function awaitingCheckpoint(
     command: "create",
     summary: [
       `理解层跑完了 —— 这次运行：${runDir}（v${u.run.version} · ${u.run.gameId}）`,
-      `清单：${r.oneLine}`,
+      ...r.lines,
       ...u.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`),
       `下一步：看一眼、或直接改那份清单（${recipePath}），然后跑：game-maker build ${runDir}`,
       "或者一开始就加 --yes —— 它会把生图、配置、站点一路做完（等于跳过这里）。",
     ],
     data: {
       status: "awaiting", gameId: u.run.gameId, runVersion: u.run.version, runDir,
-      recipe: recipePath, assetCount: u.recipe.assets.length, imageAssetCount: r.imageAssetCount,
+      recipe: recipePath, assetCount: u.recipe.assets.length,
+      // ⚠️ **`imageCalls` 是「预计生图调用次数」**（票 40）—— 换掉了旧的 `imageAssetCount`
+      //   （那个数说的是 image 源**资源**数，与真正发出去的次数差着**展开**那一层，
+      //   第六跑 11 vs 24）。⚠️ 明细那四项之和 === `imageCalls`（同一个事实一个来源）。
+      imageCalls: r.imageCalls.total, imageCallBreakdown: r.imageCalls.breakdown,
       kinds: r.kinds, ambiguity: u.intent.ambiguity,
     },
     artifacts: [{ path: runDir, kind: "run" }, { path: recipePath, kind: "asset-recipe" }],
@@ -246,7 +266,7 @@ function createComplete(
     command: "create",
     summary: [
       `这次运行：${relPath(outRoot, u.run.dir)}（v${u.run.version} · ${u.run.gameId}）`,
-      `清单：${r.oneLine}`,
+      ...r.lines,
       ...(u.intent.ambiguity.length === 0 ? [] : u.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`)),
       ...b.packVersion === u.run.version ? [] : [`⚠️ 这次构建用了包版本 v${b.packVersion}（run 是 v${u.run.version}）`],
       // ⚠️ **母版比例的观察**（票 39）：**观察不是错误** —— 它不改变退出码，只是报出来。
@@ -259,7 +279,8 @@ function createComplete(
       runDir: relPath(outRoot, u.run.dir), packDir: relPath(outRoot, b.paths.packDir),
       config: relPath(outRoot, b.paths.config), siteDir: String(site.data["siteDir"] ?? ""),
       entry: String(site.data["entry"] ?? ""), serveRoot: String(site.data["serveRoot"] ?? ""),
-      imageAssetCount: r.imageAssetCount, ambiguity: u.intent.ambiguity,
+      imageCalls: r.imageCalls.total, imageCallBreakdown: r.imageCalls.breakdown,
+      ambiguity: u.intent.ambiguity,
       ...(qa?.data ?? {}),
     },
     artifacts: [

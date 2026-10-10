@@ -18,8 +18,42 @@ const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 //   所以数据走**运行时读的 JSON**、逻辑各留一份。**会漂的那部分因此只有一处。**
 const CANNED = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/upstream/canned.json"), "utf8")) as Record<string, Record<string, unknown>>;
 
+/**
+ * 一份**带生图资源**的清单（票 40 的检查点用例）—— 在骨架那 4 条 drawlist 之上再添四类。
+ *
+ * ⚠️ 数字是**故意挑开的**：3 个 image 源**资产** → **9 次**生图**调用**
+ *   （3 个动画 · 1 个单帧 · 3 层背景 · 2 张生图母版；另有一个 `import` 源资产与一张 `import`
+ *   母版 —— 那是人给的图，**一次调用都不发**）。
+ *   ⇒ 「资产数」与「调用数」在这份夹具里**明确不相等**，报错那个就会当场红。
+ */
+function imageHeavyRecipe(): Record<string, unknown> {
+  const base = structuredClone(CANNED["recipe"]!) as { assets: unknown[] };
+  const C = { styleId: "halt-dusk", required: true };
+  return {
+    ...base,
+    assets: [
+      ...base.assets,
+      { spec: { kind: "animation", id: "scavenger", role: "拾荒者", description: "废土拾荒者", ...C, anchor: { x: 0.5, y: 1 }, size: { w: 32, h: 48 },
+        animations: [{ name: "idle", frames: 4 }, { name: "run", frames: 4 }, { name: "jump", frames: 6 }] },
+        source: { kind: "image" } },
+      { spec: { kind: "background", id: "bg-waste", role: "废土远景", description: "三层视差", ...C, anchor: { x: 0, y: 1 }, size: { w: 256, h: 96 },
+        layers: [{ name: "sky", parallax: 0 }, { name: "dunes", parallax: 0.4 }, { name: "rocks", parallax: 0.9 }] },
+        source: { kind: "image" } },
+      { spec: { kind: "sprite", id: "crate", role: "木箱", description: "可推的箱子", ...C, anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 } },
+        source: { kind: "image" } },
+      { spec: { kind: "sprite", id: "ported", role: "人给的图", description: "人手导入的", ...C, anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 } },
+        source: { kind: "import", ref: "art/ported.png" } },
+    ],
+    authoring: [
+      { id: "m-scavenger", role: "母版", description: "拾荒者的母版", source: { kind: "image" }, characterId: "p-scavenger", size: { w: 32, h: 48 } },
+      { id: "m-drone", role: "母版", description: "无人机的母版", source: { kind: "image" }, characterId: "e-drone", size: { w: 32, h: 32 } },
+      { id: "m-ported", role: "母版", description: "人手给的母版", source: { kind: "import", ref: "art/m.png" }, characterId: "p-scavenger", size: { w: 32, h: 48 } },
+    ],
+  };
+}
+
 /** 一条假 `fetch`：理解层那五发按 `tool_choice.name` 回骨架；drawlist 那一支回一段 JSON 文本。 */
-function fakeUpstream(over: { recipeId: string; intent?: Record<string, unknown>; config?: Record<string, unknown> }): typeof fetch {
+function fakeUpstream(over: { recipeId: string; recipe?: Record<string, unknown>; intent?: Record<string, unknown>; config?: Record<string, unknown> }): typeof fetch {
   const TOOL: Record<string, unknown> = {
     emit_visual_world: CANNED["visualWorld"], emit_game_intent: over.intent ?? CANNED["intent"],
     emit_game_design: CANNED["design"], emit_character_dna: CANNED["characterDna"],
@@ -37,7 +71,7 @@ function fakeUpstream(over: { recipeId: string; intent?: Record<string, unknown>
       return json({ content: [{ type: "text", text: JSON.stringify({ frames: Array.from({ length: n }, () => ({ ops: [{ op: "rect", x: 0, y: 0, w: 4096, h: 4096, fill: "palette:0" }] })) }) }], model: "deepseek-flash" });
     }
     const name = (body["tool_choice"] as { name: string }).name;
-    const input = name === "emit_asset_recipe" ? { ...CANNED["recipe"], id: over.recipeId } : TOOL[name];
+    const input = name === "emit_asset_recipe" ? { ...(over.recipe ?? CANNED["recipe"]), id: over.recipeId } : TOOL[name];
     return json({ content: [{ type: "tool_use", name, input }], stop_reason: "tool_use", model: "deepseek-flash", usage: { input_tokens: 1200, output_tokens: 900 } });
   }) as unknown as typeof fetch;
 }
@@ -63,7 +97,7 @@ const capture = (): CliIo & { lines: string[]; errors: string[] } => {
  *   而 `defaultShellPath(cwd)` 按 cwd 找它 —— 与 `site` 命令同款（真实用户从仓库根跑，
  *   或者用 `--shell` 指过去）。⇒ 几张输入路径都写绝对的。
  */
-function stage(over: { config?: Record<string, unknown> } = {}) {
+function stage(over: { config?: Record<string, unknown>; recipe?: Record<string, unknown> } = {}) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "gm-cli-create-"));
   dirs.push(cwd);
   const style = path.join(cwd, "style.png");
@@ -125,7 +159,8 @@ describe("§检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8�
     expect(r.code).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
     expect(d["status"]).toBe("awaiting");
-    expect(d["imageAssetCount"]).toBe(0);            // 夹具那份清单全是 drawlist ⇒ 下一步不花钱
+    expect(d["imageCalls"]).toBe(0);                 // 夹具那份清单全是 drawlist ⇒ 下一步不花钱
+    expect(d["imageCallBreakdown"]).toEqual({ animation: 0, single: 0, background: 0, master: 0 });
     expect(String(d["runDir"])).toBe("wasteland/run/v1");
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "pack"))).toBe(false);   // 停住了
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "site"))).toBe(false);
@@ -135,8 +170,26 @@ describe("§检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8�
     const s = stage();
     const t = (await runC(create(s), s.deps)).text();
     expect(t).toMatch(/清单：\d+ 个资源/);
-    expect(t).toMatch(/没有生图资源|要走生图/);
+    expect(t).toMatch(/没有生图调用|预计 \d+ 次生图调用/);
     expect(t).toMatch(/game-maker build wasteland\/run\/v1/);
+  });
+
+  // ⚠️⚠️ **本票（40）的主判据**：检查点报的必须是**生图调用次数**，不是 image 源**资产**数。
+  //   期望值**写死在这里**（不由 `imageCallsOf` 推出来 —— 那会变成同一份实现自证）。
+  //   「它真被 `pack` 用上了」那半边由 `assets/tests/recipes-sweep.test.ts` 的 `told` 兜着。
+  it("⚠️⚠️ **报的是调用次数**：3 个 image 源资产 = **9 次**（动画 3 · 单帧 1 · 背景层 3 · 母版 2）", async () => {
+    const s = stage({ recipe: imageHeavyRecipe() });
+    const r = await runC(create(s, ["--json"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    const d = jsonOf(r.io).data!;
+    expect(d["assetCount"]).toBe(8);                 // 4 条骨架 + 4 条新加的
+    expect(d["imageCalls"]).toBe(9);                 // ⚠️ **不是 3**（image 源资产数），也不是 8（资源总数）
+    expect(d["imageCallBreakdown"]).toEqual({ animation: 3, single: 1, background: 3, master: 2 });
+    // ⚠️ 旧字段**真的走了**（留着它 = 同一份 `data` 里两个「都在说生图数量」的字段）
+    expect(d["imageAssetCount"]).toBeUndefined();
+    // 人看的那一行：分类 + 那句「这是上限」
+    expect(r.text()).toMatch(/\*\*预计 9 次生图调用\*\*（动画 3 次 · 单帧 1 次 · 背景层 3 层 · 母版 2 张）/);
+    expect(r.text()).toMatch(/清单完整派发时的上限/);
   });
 
   it("⚠️ **`ambiguity` 逐条打出来**（票 03 把那个字段的存亡押在这一票上）——`--yes` 时也打", async () => {
@@ -165,6 +218,7 @@ describe("§`--yes`：一路跑到站点（票 16 的 Q6），三条产物**同�
     expect(r.code).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
     expect(d["status"]).toBe("complete");
+    expect(d["imageCalls"]).toBe(0);              // ⚠️ `createComplete` 那一份**也**报这把尺子（票 40）
     expect(d["runVersion"]).toBe(1);
     expect(d["packVersion"]).toBe(1);
     expect(String(d["siteDir"])).toBe("wasteland/site/v1");    // ⚠️ 父指定的那个 N

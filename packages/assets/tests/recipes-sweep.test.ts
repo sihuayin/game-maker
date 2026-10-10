@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { parseRecipe, type AssetRecipe, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { imageCallsOf, parseRecipe, type AssetRecipe, type DrawList, type StyleSpec } from "@game-maker/contracts";
 import {
   buildAssetPack, keyColorFor, verifyPack,
   type DrawListGenerator, type ImageGenerator, type RasterImage,
@@ -109,14 +109,10 @@ const modelLike = () => {
   return { gen, told, painted };
 };
 
-/** 一次生图调用 = 一个 **unit**（与 `pack.ts` 的划分同构）：动画按动画数、分层背景按层数、其余 1。 */
-const imageUnits = (a: AssetRecipe["assets"][number] | NonNullable<AssetRecipe["authoring"]>[number]) => {
-  if (!("spec" in a)) return 1;                       // 母版：一次一张
-  const s = a.spec;
-  if (s.kind === "animation") return s.animations.length;
-  if (s.kind === "background" && s.layers) return s.layers.length;
-  return 1;
-};
+// ⚠️ **这里曾经有第二份 `imageUnits()`**（7 行复制品，注释还自称「与 `pack.ts` 的划分同构」）。
+//   票 40 把它删了、改成 import 共享的那把尺子 —— 两份互相保证的实现在源码上再也看不见。
+//   ⚠️ **牙齿不在那把尺子上，在 `told` 上**：`told` 是**桩实际收到的调用**（观测到的真相），
+//   与「谁算的」无关 ⇒ `pack` 的展开真错了它就会红。**不能**拿共享函数同时生成预期值和实际值。
 
 describe("9 份手写 fixture：**每一份都过契约、都出得了包**（票 35 的全量校验）", () => {
   it("先把清单点清 —— 少测一份就等于少一份保证", () => {
@@ -165,9 +161,9 @@ describe("9 份手写 fixture：**每一份都过契约、都出得了包**（�
       expect(painted.filter((c) => c === key), "桩交付了声明色 —— 测试环境退化成傀儡了").toEqual([]);
 
       // ⚠️ 而**「一次都没发」也要能被看见**：`told` 全空的话上面那句是空转的真话。
-      //   条数 = image 资源的 unit 数（多帧动画一次、分层背景一层一次）+ 走生图那条路的母版。
-      const want = recipe.assets.filter((a) => a.source.kind === "image").reduce((n, a) => n + imageUnits(a), 0)
-        + (recipe.authoring ?? []).filter((a) => a.source.kind === "image").reduce((n, a) => n + imageUnits(a), 0);
+      //   预期值取自**与检查点同一把尺子**（`imageCallsOf`，票 40）—— 左半边是「谁算的」，
+      //   右半边 `told` 是「真发了什么」，**两边不同源**才有牙齿。
+      const want = imageCallsOf(recipe).total;
       expect(told, `这份清单该有 ${want} 次生图调用`).toHaveLength(want);
     });
   }

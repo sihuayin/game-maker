@@ -132,6 +132,12 @@ export * from "./screen-space.js";
 export * from "./asset-spec.js";
 export * from "./audit.js";
 export * from "./recipe.js";
+// ⚠️ **「这份清单意味着几次生图调用」那把尺子**（票 40）—— **全仓库只此一份**：
+//   检查点（`cli`）与 `pack`（真发出去的那一侧）都调它。它住这儿是因为**两边都依赖 contracts**
+//   （放 `assets` 里，`cli` 就得去拿一个文档级的事实），而它是个**读文档就能算的纯函数**。
+//   ⚠️ **别与 `prompt.ts` 的 `framePlan` 合并** —— 同一个分类骨架、**不同粒度**
+//   （那边一帧一份，这边一个动画一份），而那个区别**有钱的含义**，见那个文件的头。
+export * from "./image-units.js";
 // ⚠️ **`asset-recipe/v1` 的 v4 镜像** —— 只为 `plan-assets` 那一次工具调用存在（票 12）。
 //   权威仍是上面那份 v3 契约；镜像只供 `toolInputSchema` 转线形状。
 export * from "./recipe-tool.js";

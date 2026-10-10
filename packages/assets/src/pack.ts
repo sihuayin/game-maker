@@ -13,9 +13,9 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import {
   ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, MASTER_RATIOS_FILE, MASTER_RATIOS_FORMAT,
-  derivePackMode, paletteBindingOf, summarizeCalls,
+  derivePackMode, imageUnitsOf, paletteBindingOf, summarizeCalls,
   type AssetPackManifest, type AssetSpec, type AuthoringAsset, type CharacterDNA, type CharacterDNAFile,
-  type DrawList, type Ledger, type LedgerCall, type MasterRatio, type StyleSpec, type VisualWorldSpec,
+  type DrawList, type ImageUnit, type Ledger, type LedgerCall, type MasterRatio, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -604,22 +604,22 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         const reference = master ?? (src.reference
           ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
           : undefined);
-        // ⚠️ **一个 unit 一次调用**。unit 的划分与 drawlist 路线的 `framePlan` **对称**（票 43）：
+        // ⚠️ **一个 unit 一次调用**，而「**怎么切**」**不在这里** —— 那是 `imageUnitsOf` 那把尺子
+        //   （`@game-maker/contracts` · **票 40**）。⚠️ 抽它出来的理由：检查点报的那个数与这里
+        //   真发出去的次数以前**各切各的**（检查点数 image 源**资产**数 = 11，这里真发 20 次），
+        //   而检查点那个数**正是人批准付费跑时看的那个数**。
+        //   ⚠️ 本文件**只补 `raw`** —— 落盘文件名是「包长什么样」，不是契约事实（票 40 的 Q2=A）。
+        //   ⚠️ 而那把尺子的切法与 drawlist 路线的 `framePlan` **对称但粒度不同**
+        //   （`game-creation-v1` 那张图的票 43：那边**一帧一份**，这边**一个动画一份**）：
         //   · animation → 一个**动画**一个 unit（实测把 14 帧塞进一次调用，模型只给回来 1 个角色）
-        //   · 分层背景 → **一层**一个 unit（票 40 撞到的那个洞：以前只出一张图，而 plan 有 N 项，
-        //     `results[i]` 越界成 undefined，一路带到 buildAtlas 才炸成一个说不清哪里错的 TypeError）
+        //   · 分层背景 → **一层**一个 unit（`game-creation-v1` 的票 40 撞到的那个洞：以前只出一张图，
+        //     而 plan 有 N 项，`results[i]` 越界成 undefined，一路带到 buildAtlas 才炸成说不清哪里错的 TypeError）
         //   · 其余 → 一个资源一个 unit
-        const bgLayers = spec.kind === "background" ? spec.layers : undefined;
-        const units: { anim?: string; layer?: { name: string; index: number; total: number; tileX: boolean }; frames: number; raw: string }[] =
-          spec.kind === "animation"
-            ? spec.animations.map((a) => ({ anim: a.name, frames: a.frames, raw: `authoring/generated/${spec.id}.${a.name}.png` }))
-            : bgLayers
-              ? bgLayers.map((l, i) => ({
-                  layer: { name: l.name, index: i, total: bgLayers.length, tileX: l.tileable?.x ?? false },
-                  frames: 1,
-                  raw: `authoring/generated/${spec.id}.${l.name}.png`,
-                }))
-              : [{ frames: 1, raw: `authoring/generated/${spec.id}.png` }];
+        const rawName = (u: ImageUnit): string =>
+          u.anim !== undefined ? `authoring/generated/${spec.id}.${u.anim}.png`
+            : u.layer !== undefined ? `authoring/generated/${spec.id}.${u.layer.name}.png`
+              : `authoring/generated/${spec.id}.png`;
+        const units = imageUnitsOf(spec).map((u) => ({ ...u, raw: rawName(u) }));
 
         // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
         // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
