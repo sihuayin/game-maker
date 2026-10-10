@@ -12,9 +12,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, derivePackMode, paletteBindingOf, summarizeCalls,
+  ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, MASTER_RATIOS_FILE, MASTER_RATIOS_FORMAT,
+  derivePackMode, paletteBindingOf, summarizeCalls,
   type AssetPackManifest, type AssetSpec, type AuthoringAsset, type CharacterDNA, type CharacterDNAFile,
-  type DrawList, type Ledger, type LedgerCall, type StyleSpec, type VisualWorldSpec,
+  type DrawList, type Ledger, type LedgerCall, type MasterRatio, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -22,7 +23,7 @@ import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
 import { segmentRowCells } from "./sheet.js";
 import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
-import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioMismatch } from "./master.js";
+import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioReading } from "./master.js";
 import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
 import { rasterize } from "./raster.js";
@@ -134,6 +135,13 @@ export type BuildPackResult = {
   imageCalls: ({ assetId: string; master?: true } & ImageGenCall)[];
   /** spec ↔ 产物的对账结果（`auditAssetSpec`）。**有内容不等于失败** —— 交调用方决定。 */
   audit: string[];
+  /**
+   * **母版那几发的比例读数**（票 39）。⚠️ 它是**观察**那一侧的东西：不阻断、不打分。
+   * ⚠️ **含匹配的那些**（`match: true`）—— 只报不匹配的话，人分不清「这次全对」与「这次压根没量」。
+   * 顺序按 `authoring[]`。⚠️ **`import` 的母版不在里面**：它不调上游，而它对不上是**硬错**
+   * （根本走不到这里）。这里只记「上游回图」这一类。
+   */
+  masterRatios?: MasterRatio[];
   /** 写进包的那份账（票 45）。没传 `ledger` 进来就是 undefined。 */
   ledger?: Ledger;
 };
@@ -390,6 +398,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   for (const a of authoringEntries)
     if (a.source.kind === "image") masterDna.set(a.id, dnaOrThrow(a.characterId, `母版 "${a.id}"`));
 
+  // ⚠️ **母版那几发的比例读数**（票 39）：`Map` 而不是数组 —— 并发下**回来的先后是随机的**，
+  //   而落盘与汇总都要**按 `authoring[]` 的顺序**（与 `built[idx]` 同一条规矩）。
+  const masterRatios = new Map<string, MasterRatio>();
+
   if (authoringEntries.length > 0) {
     fs.mkdirSync(path.join(packDir, "authoring", "masters"), { recursive: true });
     // 母版也看世界的风格图（它是这个世界的角色）—— 与资产那一发同一条路。
@@ -403,8 +415,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           if (a.source.kind === "import") {
             // 人作（或上一次跑出来的）母版：一条路径。⚠️ 与资产的 `import` 同一条规则：**相对配方文件**解析。
             const img = decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, a.source.ref)));
-            const bad = masterRatioMismatch(a.size, img);
-            if (bad !== null) throw new Error(bad);
+            // ⚠️ **这一条仍然是判据、仍然阻断**（票 39 的 Q4）—— 别把它跟着下面那条一起降掉：
+            //   它比的两边**都不来自上游**（清单说这张图 32×24，而磁盘上那个文件不是）。
+            //   ⇒ 免费、确定、错了**必是输入错** ⇒ R3 的准入条件它**合格**。
+            const r = masterRatioReading(a.size, img);
+            if (!r.match) throw new Error(masterRatioLine({ master: a.id, ...r }));
             fs.writeFileSync(path.join(packDir, ref), encodePNG(img));
             masterImages.set(a.id, img);
             return;
@@ -440,12 +455,25 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
                 ...(call.usage !== undefined ? { usage: call.usage } : {}),
               } satisfies Omit<LedgerCall, "step" | "target">);
               imageCalls.push({ assetId: a.id, master: true, ...call });
-              // ⚠️ **比例判据**（Q2）：回来的图与 canonical 画布对不上就抛 —— 它是参考图，
-              //   比例错了整条动画链一起错（票 22 那条「画布尺寸才是真约束」）。
-              const bad = masterRatioMismatch(a.size, image);
-              if (bad !== null) throw new Error(bad);
+              // ⚠️ **比例降为观察**（票 39 的 Q1/Q4）：回来的图与 canonical 画布对不上**不再抛**。
+              //   它量的是**上游的手气**（同一个 `2:3` 回来过三种画布），不是设计 ⇒ 按 R3 不够格当判据。
+              //   ⚠️ **量法一个字没改**（`masterRatioReading` 仍是零容差整数判定），降的只是它的**后果**。
+              //   ⚠️ 也**别**顺手把上面 `import` 支那条一起降了 —— 那一条不量上游。
+              const ratio = { master: a.id, ...masterRatioReading(a.size, image) };
+              masterRatios.set(a.id, ratio);
               fs.writeFileSync(path.join(packDir, ref), encodePNG(image));
               fs.writeFileSync(path.join(packDir, ref.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
+              // ⚠️ **量到就写**（票 39 的 Q1 选的是「逐张母版量到就写」）：包根那份汇总要等母版段
+              //   全部跑完，而**这一份是扛得住失败的那一份** —— 后面任何一步抛了，`failed-<ts>/`
+              //   现场里活下来的正是这种「随步落盘」的东西。⚠️ 第六跑现场实测：那一跑死在母版上，
+              //   失败目录里**只有** `authoring/`（drawlist/generated/imported/**masters**）与一个空的
+              //   `delivery/` —— `manifest.json` / `ledger.json` / `coverage.json` **一个都没有**
+              //   （那三个都在 `pack` 末尾才写）。⇒ 想让「偏差仍可追溯」在失败里也成立，就得写在这儿。
+              //   ⚠️ 它**自己就是一份完整的 `MasterRatios` 文档**（一条记录）⇒ 单看一个文件也读得懂、
+              //     也被同一个 `parseMasterRatios` 认（与包根那份同形）。
+              fs.writeFileSync(path.join(packDir, ref.replace(/\.png$/, ".ratio.json")), jstr({
+                format: MASTER_RATIOS_FORMAT, packId: recipe.id, packVersion: version, masters: [ratio],
+              }));
               masterImages.set(a.id, image);
             } catch (e) {
               // ⚠️ **吞在闸门里面**、只记在这一格 —— 不踢那道共享闸（见上）。
@@ -459,6 +487,20 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       })
     );
   }
+
+  // ── 母版比例的**汇总**（票 39 的 Q1 ②）────────────────────────────────────
+  // ⚠️ **写在母版段之后、资产段之前** —— 再晚一点它就会跟包根那三个 sidecar 一样
+  //   **只在整包成功时才存在**（第六跑现场：失败目录里一个 sidecar 都没有）。写在这儿，
+  //   它是「母版段一跑完就有了」的那一份；而逐张那几份（`masters/<id>.ratio.json`）更早。
+  // ⚠️ **顺序按 `authoring[]`**，不按回来的先后（并发下回来是随机的）。
+  const masterRatioList = authoringEntries.flatMap((a) => {
+    const r = masterRatios.get(a.id);
+    return r === undefined ? [] : [r];
+  });
+  if (masterRatioList.length > 0)
+    fs.writeFileSync(path.join(packDir, MASTER_RATIOS_FILE), jstr({
+      format: MASTER_RATIOS_FORMAT, packId: recipe.id, packVersion: version, masters: masterRatioList,
+    }));
 
   // ⚠️ **失败不立刻抛**（2026-09-30 · 票 05）：并发在飞的**已经付过钱** —— 等它们收尾，
   //   多救几张原图进失败现场，账也更准（发出即记那一条让「花了几笔」成为事实）。
@@ -1047,6 +1089,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   // 全部成功才搬过去 —— 这一步之后才对「绝不覆盖」的版本号负责
   fs.mkdirSync(path.dirname(finalDir), { recursive: true });
   fs.renameSync(packDir, finalDir);
-  return { manifest, packDir: finalDir, audit, imageCalls, ...(ledgerDoc ? { ledger: ledgerDoc } : {}) };
+  return {
+    manifest, packDir: finalDir, audit, imageCalls,
+    ...(masterRatioList.length > 0 ? { masterRatios: masterRatioList } : {}),
+    ...(ledgerDoc ? { ledger: ledgerDoc } : {}),
+  };
 }
 

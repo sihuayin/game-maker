@@ -7,7 +7,7 @@
 import { describe, expect, it } from "vitest";
 import type { CharacterDNA, CharacterDNAFile, StyleSpec } from "@game-maker/contracts";
 import { imageNegativePrompt } from "../src/prompt.js";
-import { masterNegativePrompt, masterPrompt, masterRatioMismatch, referenceImagesOf, MASTER_SOURCES } from "../src/master.js";
+import { masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioNotes, masterRatioReading, referenceImagesOf, MASTER_SOURCES } from "../src/master.js";
 
 const STYLE: StyleSpec = {
   id: "halt-dusk", identity: ["低饱和、硬边"], camera: {}, composition: {},
@@ -92,16 +92,53 @@ describe("§母版的反向提示词：**不能**复用单物体那一份", () =
   });
 });
 
-describe("§比例判据（Q2：回来的图必须与 canonical 画布同比例）", () => {
-  it("同比例（尺寸不同也算，只比比例）⇒ 过", () => {
-    expect(masterRatioMismatch({ w: 64, h: 96 }, { width: 832, height: 1248 })).toBeNull();
+describe("§比例读数（票 39：它从**判据**降成**观察**）", () => {
+  const line = (c: { w: number; h: number }, i: { width: number; height: number }, id = "m") =>
+    masterRatioLine({ master: id, ...masterRatioReading(c, i) });
+
+  it("同比例（尺寸不同也算，只比比例）⇒ `match: true`", () => {
+    const r = masterRatioReading({ w: 64, h: 96 }, { width: 832, height: 1248 });
+    expect(r.match).toBe(true);
+    expect(r.ratioDelta).toBe(0);
   });
 
-  it("不同比例 ⇒ 说得出两个比例", () => {
-    const msg = masterRatioMismatch({ w: 64, h: 96 }, { width: 1024, height: 1024 });
-    expect(msg).toContain("宽高比不一致");
-    expect(msg).toContain("1024×1024");
-    expect(msg).toContain("64×96");
+  it("不同比例 ⇒ 说得出两个读数、差多少、以及**往哪边差**", () => {
+    const l = line({ w: 64, h: 96 }, { width: 1024, height: 1024 });
+    expect(l).toContain("1024×1024");
+    expect(l).toContain("64×96");
+    expect(l).toContain("1.000");            // 回来的比例
+    expect(l).toContain("0.667");            // canonical 的比例
+    expect(l).toContain("50.0%");
+    expect(l).toContain("回来的更宽");
+  });
+
+  it("⚠️ 判「一致」是**零容差整数判定**，不是浮点比较 —— 差一个像素就是不一致（票 39 的 Q3）", () => {
+    expect(masterRatioReading({ w: 64, h: 96 }, { width: 833, height: 1248 }).match).toBe(false);
+    expect(masterRatioReading({ w: 64, h: 96 }, { width: 832, height: 1248 }).match).toBe(true);
+  });
+
+  it("⚠️ 第六跑那一发（请求 32×24 · 回来 1184×864）⇒ 差 2.8%（读数要对得上现场）", () => {
+    const l = line({ w: 32, h: 24 }, { width: 1184, height: 864 }, "master-rubble-hound");
+    expect(l).toContain("1184×864");
+    expect(l).toContain("2.8%");
+  });
+
+  it("⚠️ 文案里**没有**那两条出路（票 39 的 Q2）—— 它只陈述读数，不指路", () => {
+    const l = line({ w: 64, h: 96 }, { width: 1024, height: 1024 });
+    expect(l).not.toContain("重出");
+    expect(l).not.toContain("authoring[].size");
+  });
+
+  it("⚠️ 报给人看的那几行**先报小计**（票 39 的 Q5）—— 「全对」与「压根没量」要分得开", () => {
+    const good = { master: "a", ...masterRatioReading({ w: 64, h: 96 }, { width: 832, height: 1248 }) };
+    const bad = { master: "b", ...masterRatioReading({ w: 64, h: 96 }, { width: 1024, height: 1024 }) };
+    expect(masterRatioNotes([])).toEqual([]);
+    // 一张都没有 vs 有一张全对 —— 都不能长得像「什么都不说」
+    expect(masterRatioNotes([good]).join()).toMatch(/1 张都量过.*全部一致/);
+    const mixed = masterRatioNotes([good, bad]).join("\n");
+    expect(mixed).toMatch(/一致 1 张 · \*\*不一致 1 张\*\*/);
+    expect(mixed).toContain("b");            // 只逐条列**不一致**的
+    expect(mixed).not.toContain("母版 \"a\"");
   });
 });
 

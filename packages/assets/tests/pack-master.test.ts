@@ -11,8 +11,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import type { AssetRecipe, AuthoringAsset, CharacterDNAFile, DrawList, StyleSpec } from "@game-maker/contracts";
-import { CharacterDNASchema } from "@game-maker/contracts";
-import { buildAssetPack, type DrawListGenerator, type ImageGenerator, type ImageRequest } from "../src/index.js";
+import { CharacterDNASchema, MASTER_RATIOS_FILE, parseMasterRatios } from "@game-maker/contracts";
+import { buildAssetPack, verifyPack, type DrawListGenerator, type ImageGenerator, type ImageRequest } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BASE: AssetRecipe = JSON.parse(readFileSync(ROOT + "fixtures/recipes/shift-change-master.json", "utf8"));
@@ -149,12 +149,61 @@ describe("§母版前段：`image` 的母版（⭐ DNA → 母版那条箭头）
     expect(master.target).toBe("player-master");
   });
 
-  it("⚠️ 回来的图**比例**与 canonical 对不上 ⇒ 硬失败（它是参考图，比例错了整条动画链一起错）", async () => {
+  /** 把一个落盘的读数文件读回**契约认过的形状**（顺带证明它过 schema）。 */
+  const ratiosOf = (p: string) => {
+    const r = parseMasterRatios(JSON.parse(readFileSync(p, "utf8")));
+    if (!r.ok) throw new Error(`读数不过 schema：${r.errors.join("；")}`);
+    return r.value;
+  };
+
+  it("⚠️ 回来的图**比例**与 canonical 对不上 ⇒ **不再硬失败**，改成一条观察（票 39）", async () => {
+    // ⚠️ **这一条是这次降级的 characterization**：改回抛错它就红。
     const r = recorder({ masterImage: () => image(1024, 1024, STYLE.palette[1]!) });
-    const e = await failed({ recipe: recipe({ master: asImage() }), generateImage: r.gen, characterDna: DNA });
-    expect(e).toBeInstanceOf(Error);
-    expect(e.message).toContain("宽高比不一致");
-    expect(r.of("anim"), "比例错的母版 ⇒ 引用它的资产不许上路").toHaveLength(0);
+    const { packDir, manifest } = await build({ recipe: recipe({ master: asImage() }), generateImage: r.gen, characterDna: DNA });
+    // ① 母版照旧落盘（降级前走不到这一步）
+    expect(existsSync(path.join(packDir, "authoring/masters/player-master.png"))).toBe(true);
+    // ② 引用它的资产照旧上路（降级前**一次都不许发**）
+    expect(r.of("anim")).toHaveLength(1);
+    // ③ 读数落盘：**逐张那一份**（量到就写）+ **包根汇总**（母版段跑完就写）
+    const one = ratiosOf(path.join(packDir, "authoring/masters/player-master.ratio.json"));
+    const all = ratiosOf(path.join(packDir, MASTER_RATIOS_FILE));
+    expect(one.masters).toHaveLength(1);
+    expect(one.masters[0]).toMatchObject({
+      master: "player-master", match: false,
+      requested: { w: 832, h: 1248 }, returned: { w: 1024, h: 1024 },
+    });
+    expect(all.masters).toEqual(one.masters);
+    // ④ 两份都**在 `files[]` 里** ⇒ 白拿 checksum 覆盖（票 39 选包内落点的那条理由）
+    expect(manifest.files.map((f) => f.path)).toContain(MASTER_RATIOS_FILE);
+    expect(manifest.files.map((f) => f.path)).toContain("authoring/masters/player-master.ratio.json");
+    // ⑤ `verify` 也认它（schema 过了 + checksum 对得上 + `files[]` 把两个文件都覆盖到了）——
+    //   ⚠️ checksum **只证明它没被改过**，不证明它是一份**合法的读数** ⇒ 这一条钉的是后者。
+    const v = verifyPack({ packDir });
+    expect(v.summary.join("\n")).toContain("通过");
+    expect(v.summary.join("\n")).toContain("差 50.0%");
+  });
+
+  it("⚠️ **一致的那些也记**（票 39 的 Q5）—— 只记不匹配的，分不清「全对」与「压根没量」", async () => {
+    const r = recorder();   // 默认回的就是 `req.size`（832×1248）⇒ 与 canonical 完全一致
+    const { packDir } = await build({ recipe: recipe({ master: asImage() }), generateImage: r.gen, characterDna: DNA });
+    const all = ratiosOf(path.join(packDir, MASTER_RATIOS_FILE));
+    expect(all.masters).toHaveLength(1);
+    expect(all.masters[0]!.match).toBe(true);
+    expect(all.masters[0]!.ratioDelta).toBe(0);
+  });
+
+  it("⚠️ **`import` 那一支仍然是判据、仍然阻断**（票 39 的 Q4）—— 它量的是**磁盘**，不是上游", async () => {
+    // ⚠️ 方向**相反**的那一条：人写的清单说 32×24，而 `player-master.png` 真是 832×1248。
+    //   两边都不来自上游 ⇒ 免费、确定、错了必是输入错 ⇒ **不许跟着降**（R3 的准入条件它合格）。
+    const r = recorder();
+    const e = await failed({ recipe: recipe({ master: { ...structuredClone(MASTER_IMPORT), size: { w: 32, h: 24 } } }), generateImage: r.gen, characterDna: DNA });
+    expect(e.message).toContain("32×24");        // canonical（清单里写的）
+    expect(e.message).toContain("832×1248");     // 回来的是磁盘上那张图真实的大小
+    // ⚠️ **引用它的资产一次都没发**（票 13 的 Q5：只阻断**引用它的**那些）——
+    //   ⚠️ 而不引用它的箱子**照造**：那是**母版失败一贯**的行为（上面「失败传播」那条钉的就是它），
+    //     与本票的降级无关，别把它当成这次引入的。
+    expect(r.of("anim"), "参考图不成立 ⇒ 那一笔是白花的钱").toHaveLength(0);
+    expect(r.of("crate")).toHaveLength(1);
   });
 });
 

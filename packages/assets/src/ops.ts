@@ -11,19 +11,19 @@ import { createHash } from "node:crypto";
 import {
   auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
   GameDesignSpecSchema,
-  jumpSpan, maxJumpHeight,
-  parseAssetPack, parseGameConfig, parseLedger, parseRecipe, parseToolUse, PLATFORMER_V1,
+  jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
+  parseAssetPack, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   summarizeCalls, VisualWorldSpecSchema,
   type AssetPackManifest, type CallFailure, type CharacterDNAFile, type ConfigIssue, type LedgerCall,
-  type LedgerStep, type LedgerUsage, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
+  type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
 import { buildAssetPack, type FailureSite } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError, type ImageGenerator } from "./image-gen.js";
-import { referenceImagesOf } from "./master.js";
+import { masterRatioNotes, referenceImagesOf } from "./master.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
@@ -1196,12 +1196,18 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       })(),
       ...(res.imageCalls.length > 0
         ? [`生图：${res.imageCalls.length} 次调用 · ${res.imageCalls.map((c) => c.assetId).join(" ")}`]
-        : [])],
+        : []),
+      // ⚠️ **母版比例的观察**（票 39 的 Q1 ①）：当场给人看的那一份。
+      //   ⚠️ 它**不是**「有内容就是错」—— 不阻断、不打分（上游守不守住 `aspectRatio` 不是设计能控的）。
+      //   真值在包内 `master-ratios.json`（+ 每张母版那一格），失败现场也留得住。
+      ...(res.masterRatios === undefined ? [] : masterRatioNotes(res.masterRatios))],
     data: {
       packId: m.id, version: m.version,
       ...(res.imageCalls.length > 0
         ? { imageCalls: res.imageCalls, imageUpstream: describeImageTransport(opts.imageTransport) }
         : {}),
+      // ⚠️ **结构化那一份**（不是渲染好的句子）—— 两个壳各自决定怎么呈现。
+      ...(res.masterRatios === undefined ? {} : { masterRatios: res.masterRatios }),
       ledgerCalls: ledger, ledgerRun: summarizeCalls(ledger),
       assetCount: m.assets.length, fileCount: m.files.length,
       provenanceMode: m.provenance.mode, paletteCoverage: m.palette.coverage,
@@ -1246,6 +1252,21 @@ export function verifyPack(opts: VerifyOptions): CommandResult {
     else ledgerRun = l.value.run.byStep;
   }
 
+  // ⚠️ **母版比例的读数（包里如果有）也要过 schema**（票 39）—— 与账本同一条理由：
+  //   checksum 只证明它**没被改过**，不证明它**是一份合法的读数**。
+  //   ⚠️ **没有不算错**（票 45 之前产的包都没有这个 sidecar）。
+  //   ⚠️ 也**不校验它「对不对」** —— 它是**观察**，不是判据：上游回什么比例都对，
+  //     这里只保证「这文件我们读得懂」。
+  const ratiosPath = path.join(opts.packDir, MASTER_RATIOS_FILE);
+  let masterRatios: MasterRatio[] | null = null;
+  if (fs.existsSync(ratiosPath)) {
+    const mr = parseMasterRatios(JSON.parse(fs.readFileSync(ratiosPath, "utf8")));
+    if (!mr.ok) problems.push(...mr.errors.map((e) => `${MASTER_RATIOS_FILE} 不过 schema：${e}`));
+    else if (mr.value.packId !== m.id || mr.value.packVersion !== m.version)
+      problems.push(`读数与包对不上：${MASTER_RATIOS_FILE} 说自己是 "${mr.value.packId}" v${mr.value.packVersion}，而 manifest 是 "${m.id}" v${m.version}`);
+    else masterRatios = mr.value.masters;
+  }
+
   const onDisk = walk(opts.packDir).filter((p) => p !== "manifest.json").sort();
   const declared = m.files.map((f) => f.path);
   for (const p of onDisk) if (!declared.includes(p)) problems.push(`files[] 没记录的文件：${p}`);
@@ -1259,7 +1280,8 @@ export function verifyPack(opts: VerifyOptions): CommandResult {
       `来源：${m.provenance.mode}`,
       ...(ledgerRun
         ? [`账：${Object.values(ledgerRun).reduce((n, v) => n + (v?.calls ?? 0), 0)} 次调用被记在包内 ledger.json 里`]
-        : ["账：这个包没有 ledger.json（**不是错** —— 票 45 之前产的包都没有）"])],
+        : ["账：这个包没有 ledger.json（**不是错** —— 票 45 之前产的包都没有）"]),
+      ...(masterRatios === null ? [] : masterRatioNotes(masterRatios))],
     data: { packId: m.id, version: m.version, ok: true, problems: [], provenanceMode: m.provenance.mode },
     artifacts: [],
   };

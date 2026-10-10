@@ -1,8 +1,8 @@
 # 39. 母版的长宽比判据**降为观察** —— 它量的是上游的手气，不是设计
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-10)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 23「E2E fixture + 真跑一次」](23-e2e-fixture-wasteland.md) 第六次真跑的**唯一断点**。
@@ -36,6 +36,16 @@ Map: ../map.md
 **不落 `ledger.json`**（那是**调用账**，而母版比例不是某一次调用的属性）；文案改成只陈述读数；
 函数改名（它今天返回 `string | null`，`null` 表示「一致」）；补一条 characterization 测试。
 
+⚠️ **上面这条推荐里有一半已被本票自己的读码推翻**（见下 §量到的 读数 D/E/F）：
+**③ 的前提不成立**（`manifest.json` 里**没有**母版记录可落），**② 的存活假设不成立**
+（`ledger.json` 写在 `runBuild` 最末尾，pack 段一挂就没有），而 **「那条判据」其实是三条**。
+
+## 轮次
+
+**第 1 轮**：[`clarifications/39-round-1.md`](../clarifications/39-round-1.md) —— 6 问（落点 · 文案 · 函数形状 ·
+三条判据分别去留 · 记什么 · 完成线）。**人类 2026-10-10 逐条作答**（裁定表附在该文件末尾）：**Q1=②+① · Q2=B ·
+Q3=B · Q4=A · Q5=B · Q6=A**，并授权「本票直接落地代码和免费测试，不授权任何付费真跑」。
+
 ## 量到的（为什么这条判据不合格）
 
 **R3 给了判据的准入条件**：只收「**精确可算** **+ 错了一定不是设计**」。这条判据过了前半句、**没过后半句**：
@@ -61,6 +71,17 @@ Map: ../map.md
 
 **Q1：比例不匹配降为观察。** 验收重点：**不再因此阻断母版生成**，**偏差仍可追溯**。
 
+## 裁定（2026-10-10 · 本票第 1 轮 · 落点）
+
+**Q1 = ②+①（包根 sidecar 留证 · `summary` 当场给人看 · 逐张量到就写）· Q2 = B（只留读数 + why）·
+Q3 = B（读数与渲染分家）· Q4 = A（只降 `pack.ts:445` 那一条）· Q5 = B（含匹配的都记）· Q6 = A（本票落地）。**
+
+**核心原则（人类原话）**：只把**上游回图**的比例偏差降为观察；观察必须**逐步落盘、可追溯**，
+而且**不能误伤另外两条有效判据**。
+
+⚠️ **Q4 是本票最要紧的一条**：票的标题是单数，而代码里**同一句话逐字出现在三处**（读数 D）——
+只降「量上游」的那一条，另外两条（设计层 · `import` 支）**保持阻断**并各配测试。
+
 ## 本票**不做**
 
 - **不加重生成 / 不加重试 / 不加修复循环**（R13 —— 人类本轮又明确了一次「不在本轮处理」）。
@@ -70,4 +91,79 @@ Map: ../map.md
 
 ## Answer
 
-（待解）
+**一句话**：把「母版比例」这条判据**只在上游回图那一支**降成观察 —— 读数**逐步落盘**
+（逐张 `authoring/masters/<id>.ratio.json`「量到就写」+ 包根 `master-ratios.json`），
+另外**两条同文判据一字不动**。本票把代码与免费测试都落了地，**没有开任何付费真跑**。
+
+### 落点：为什么是**包根 sidecar**（这里被本票自己的读码反驳了两回）
+
+| 候选落点 | 活过这次失败？ | 白拿 checksum？ | 契约改动 | 结论 |
+|---|---|---|---|---|
+| ① `pack` 的 `summary` | —（只在 stdout） | — | 无 | **要**（当场给人看），但**不留证** |
+| ② `run/v<N>/ledger.json` | ❌ **不活** | — | 无 | 弃 |
+| ③ `manifest.json` 里母版那条记录 | ✅ | ✅ | ⚠️ `v2 → v3` | 弃 |
+| ④ **包根 sidecar** | ✅ | ✅（`files[] = walk(packDir)`） | **零** | **选它** |
+
+- **②不成立**：运行账写在 `runBuild` **最末尾**（`create-game.ts`）—— 第六跑那个失败目录里
+  只有 `authoring/` + 空的 `delivery/`，`ledger.json`/`coverage.json`/`manifest.json` **三个都没有**。
+- **③不成立**：`AssetPackManifest` 里**根本没有母版记录**（它是 `.strict()` 的；母版只以
+  `authoring/masters/*.png` 的形式存在）。加字段 = `assetpack/v2 → v3`，**作废两个 checked-in fixture 包**。
+- **④** 是唯一同时满足「活过失败 + 白拿 checksum + 契约零改动」的落点 ⇒ 选它；
+  并且**逐张那一份在量到的当场就写**（`pack.ts:463` 附近），把可追溯性做到最强。
+
+### Q4 的落法（本票最要紧的一条）：三条同文判据，只降一条
+
+| 位置 | 量的是谁跟谁 | 有无上游 | 本票结论 |
+|---|---|---|---|
+| `recipe.ts:301`（设计层） | 我们的资产尺寸 ⟷ 我们的 canonical 画布 | 无 | **判据**，一字不动 |
+| `pack.ts:422`（`import` 支） | 画布 ⟷ **磁盘上那张图** | 无 | **判据**，仍然抛 |
+| `pack.ts:462`（`image` 支） | 画布 ⟷ **上游回来的图** | **有** | **观察**（本票降的就是它） |
+
+量法**一个字没改**：`masterRatioReading` 仍是**零容差整数判定**（`w1*h2 === w2*h1`），
+降的只是它的**后果**。
+
+### 落地（可点的）
+
+- **契约** `packages/contracts/src/master-ratio.ts` —— `assetpack-master-ratios/v1`（照 `ledger.json` /
+  `coverage.json` 的先例：**跟着包走的 sidecar，不进 manifest**；`.strict()` + `zod` v3）。
+- **算法** `master.ts`：`:117 masterRatioReading`（读数，Q3=B 与渲染分家）· `:141 masterRatioLine`（只陈述读数）·
+  `:158 masterRatioNotes`（**先报小计**：全对与「压根没量」要分得开）。**两条出路已删**（Q2=B）。
+- **写** `pack.ts`：`:422` 仍抛 · `:462` 改成记录（Q4=A）· `:500` 母版段跑完即写包根汇总。
+  用 `Map` 收集（并发 ⇒ 回来顺序随机，`Map` 回填成 `authoringEntries` 的序）。
+- **报** `ops.ts:1203`（pack summary）· `create-game.ts:174/402/479` · `cli.ts:253,289`（两条 CLI 路各自也报）。
+- **验** `ops.ts:1260` `verifyPack` 认它：**不过 schema / 跟包对不上**才算错；
+  ⚠️ **没有不算错**（票 45 之前产的包都没有）· ⚠️ **不校验它「对不对」** —— 它是观察，上游回什么比例都对。
+- **测试** `master.test.ts` §比例读数 6 条 + `pack-master.test.ts` 3 条
+  （降级 characterization · **一致的那些也记** · `import` 支仍阻断）。
+
+### 两处**判断**（请人复核）
+
+1. **Q2=B 顺手也剪了 `import` 支的报错文案** —— `masterRatioLine` 是一个**共用**渲染器，剪「出路」时两处一起剪。
+   我认为这是**修**不是**损**：被剪掉的那句「要么重出这一张（多半是上游没守住长宽比）」放在 `import` 支里**是假的**
+   —— 那一支**没有上游**，它量的是磁盘。
+2. **`import` 支故意不记 sidecar** —— 它没有上游调用可「静默」，而且它一旦不匹配**只能是硬错**，
+   记一份必然错误的读数没有意义。⇒ Q5 的「每一张都记」实际**只对 `image` 支成立**。
+
+### 没做到 / 顺带量到的（都不在本票内）
+
+- ⚠️ **覆盖缺口（诚实记）**：`packAssets` 的 `data.masterRatios` 与 `verifyPack` 的读数分支**没有端到端覆盖** ——
+  pipeline 的假上游（`packages/pipeline/tests/upstream.ts`）**不支持生图**，要跑穿它得另造一条假端口。
+  当前覆盖到的是 `buildAssetPack` → `verifyPack` 这一层（真包、真盘、真 checksum、真 `files[]`）。
+- ⚠️ **顺带量到一条既有行为**：`import` 母版比例不匹配时，**不引用它的资产照造**（钱照花）之后整包才抛。
+  这是[票 13](13-character-master-gen.md) Q5 定的**母版失败一贯**行为，**不是这次降级引入的**。
+
+### 验收（全免费，全部跑过）
+
+- `pnpm test` **1190/1190**（70 个文件）· `pnpm typecheck` ✅ · `pnpm build` ✅ · `pnpm check:deps` ✅
+- **变异验证**（两次，都只红该红的那一条，改回后 `MUTATION` 零残留）：
+  ① 把 `import` 支也降掉 ⇒ 守卫那条红；② verify 的读数不往下传 ⇒ 新加的 ⑤ 红。
+- **两个 checked-in fixture 包照常通过**（`counter-siege/v4` 35 文件 · `last-train/v2` 31 文件）——
+  **没有 `master-ratios.json` 不算错**。
+- ⚠️ `pnpm check:links` **红一条，与本票无关**：[票 23](23-e2e-fixture-wasteland.md) 第 658 行指向
+  `../../experiments/...`，实际该是 `../`（目标是 `.scratch/game-maker-v2/experiments/e2e-wasteland/pack-reconcile.mjs`）。
+  **没有动别票的文件**，在此报告。
+- ⚠️ **没有开任何付费真跑** —— 本票不授权，也没有得到授权。
+
+### R3 对账
+
+观察**不打分、不阻断、不参与任何验收判定**；它只做两件事：**落盘**（有 schema、有 checksum）与**报给人看**。

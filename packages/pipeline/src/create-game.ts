@@ -18,7 +18,7 @@ import {
   CommandError, formatIssues, parseAssetPack, parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
   RUN_LEDGER_FORMAT, summarizeCalls,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
-  type GameIntentSpec, type LedgerCall, type QAReport, type QaRunner, type RunLedger,
+  type GameIntentSpec, type LedgerCall, type MasterRatio, type QAReport, type QaRunner, type RunLedger,
   type RuntimeProfileRef, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
@@ -129,6 +129,12 @@ export type BuildResult = {
   config: GameConfig;
   /** ⚠️ **缺席 = 没跑**（调用方显式写了 `null`）—— 不是「跑了但没问题」。 */
   qa?: QAReport;
+  /**
+   * **母版那几发的比例读数**（票 39）。⚠️ 它是**观察**那一侧的东西：不阻断、不打分。
+   * ⚠️ **缺席 = 这一次没量到**（清单里没有 `authoring[]`，或那几条都不是 `image` 源）——
+   *   不是「量了、全对」（全对是 `match: true` 的记录，照样在数组里）。
+   */
+  masterRatios?: MasterRatio[];
   paths: BuildPaths;
   ledger: LedgerCall[];
 };
@@ -161,6 +167,13 @@ const ledgerOf = (data: Record<string, unknown>): LedgerCall[] => {
   //   而 `packAssets` 给的是 `ledgerCalls`（**整个数组** —— 生图那几发都在里面）。
   const v = data["ledgerCalls"] ?? data["ledger"];
   return Array.isArray(v) ? (v as LedgerCall[]) : [];
+};
+
+/** ⚠️ `CommandResult.data` 是 `Record<string, unknown>` ⇒ 这一处的收窄同样由我们负责。
+ *  **不是数组就是没量到**（`packAssets` 不传这个键），不猜。 */
+const masterRatiosOf = (data: Record<string, unknown>): MasterRatio[] | undefined => {
+  const v = data["masterRatios"];
+  return Array.isArray(v) ? (v as MasterRatio[]) : undefined;
 };
 
 /**
@@ -383,6 +396,10 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
       : {}),
   });
   ledger.push(...ledgerOf(packed.data));
+  // ⚠️ **母版比例的观察要跟着走**（票 39 的 Q1 ①）：`build` / `create --yes` 两条路的 summary
+  //   **各拼各的**（不复用 `pack` 那条命令的 summary）—— 不在这里接一下，人在整链路上就一个字
+  //   都看不到它，而「偏差仍可追溯」正是这次裁定的验收重点。
+  const masterRatios = masterRatiosOf(packed.data);
   const packDir = path.join(input.outRoot, packed.artifacts[0]!.path);
 
   say("config");
@@ -459,6 +476,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     manifest: manifest.value,
     config: config.value,
     ...(qa !== undefined ? { qa } : {}),
+    ...(masterRatios === undefined ? {} : { masterRatios }),
     paths: {
       runDir, packDir,
       config: path.join(runDir, RUN_ARTIFACT.config),

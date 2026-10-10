@@ -2,14 +2,14 @@
 // I/O（读文件、调生图、落盘、记帐）在 `pack.ts` 的**母版前段**里 —— 这里一个字都不碰网络与磁盘。
 //
 // ⚠️ **职责收紧**（票 13 的 Q8 的原话：「master.ts 收紧职责」）：本文件只放三样 ——
-//   ① 母版的提示词；② 「canonical 画布 vs 回来的那张图」那条判据；
+//   ① 母版的提示词；② 「canonical 画布 vs 回来的那张图」那个**读数**（票 39 起它不再是判据）；
 //   ③ 「这份配方会递哪些**参考图**」那份清单（Q6 的免费拦停用它）。
 //   ⚠️ 别把装配、落盘、账搬进来 —— 那些是 `pack.ts` 的活，而「一个模块两件事」是本仓库反复吃亏的地方。
 //
 // ⚠️ **母版是什么**：`AssetRecipe.authoring[]` 里的一项（票 04）——**创作态、不进交付包**。
 //   它是**基因的一张渲染图**（`DNA → 母版 → 动画`），后面所有动画都**照它画**：
 //   `pack` 把这张位图当 `reference` 内联进每一次生图（`image-gen.ts` 的 `GenerateImageRequest.reference`）。
-import type { CharacterDNA, StyleSpec } from "@game-maker/contracts";
+import type { CharacterDNA, MasterRatio, MasterRatioReading, StyleSpec } from "@game-maker/contracts";
 import { dnaBrief, keyColorFor, paletteLine } from "./prompt.js";
 
 /** 母版今天**实现了**的两种 `source.kind`（票 13 的 Q1）。
@@ -100,23 +100,70 @@ ${JSON.stringify(style.constraints)}`;
 }
 
 /**
- * **回图的宽高比必须与 canonical 画布一致**（票 13 的 Q2）。
+ * **那一发请求了什么 vs 回来了什么**（票 39 起它是**观察**，不再是判据）。
  *
- * ⚠️ 为什么这条判据是必要的：`authoring[].size` 是我们**要求**画多大（canonical），
+ * ⚠️ 为什么它曾经是判据、又为什么不够格：`authoring[].size` 是我们**要求**画多大（canonical），
  *   而上游回什么尺寸由它自己的规则定（`requestSize` 锁长边 1024 / `geminiAspect` 查表 /
- *   `openaiSize` 查表）⇒ 两者**可以对不上**。对不上的后果不是「难看」：
- *   母版是**参考图**，它的头身比会被后面的动画照着画（票 22 那条「比例指令模型不执行、
- *   画布尺寸才是真约束」）⇒ 一套比例错了，整条动画链一起错。
- * ⚠️ 只比**比例**，不比像素尺寸 —— 上游从来给不出我们要的那个像素数，那是**它的**表。
+ *   `openaiSize` 查表）⇒ 两者**可以对不上**。今天的实测说：**对不上是常态，不是异常** ——
+ *   同一个 `2:3` 回来过三种画布（832×1248 / 1184×864 / 1344×768），同一个 `1:1` 回来过两种
+ *   （1024×1024 / 1344×768）⇒ `aspectRatio` 是**提示**，不是契约。而 R3 的准入条件是
+ *   「**精确可算** **+ 错了一定不是设计**」—— 它过了前半句，**没过后半句**（量的是上游的手气）。
+ *   ⇒ 降成观察：**记下来、放行**，不再阻断母版生成。
+ *
+ * ⚠️ **降的只是它的后果，量法一个字没改**：判「一致」仍然是**零容差**的整数交叉相乘。
+ *   **不许顺手加容差** —— 加了，「差多少」这个读数就没了基准。
+ * ⚠️ `match` **不是** `ratioDelta === 0`：后者是浮点比较，前者是整数判定的**权威值**。
  */
-export function masterRatioMismatch(canvas: { w: number; h: number }, image: { width: number; height: number }): string | null {
-  if (canvas.w * image.height === image.width * canvas.h) return null;
-  return (
-    `母版那一发回来的图是 ${image.width}×${image.height}（比例 ${(image.width / image.height).toFixed(3)}），` +
-    `而清单写的是 ${canvas.w}×${canvas.h}（比例 ${(canvas.w / canvas.h).toFixed(3)}）—— ` +
-    "**宽高比不一致**。⚠️ 母版是参考图：它的头身比会被后面每一个动画照着画，`authoring[].size` 就是那个 canonical 比例。\n" +
-    "⇒ 要么重出这一张（多半是上游没守住长宽比），要么把 `authoring[].size` 改成这张图真实的比例。"
-  );
+export function masterRatioReading(
+  canvas: { w: number; h: number },
+  image: { width: number; height: number },
+): MasterRatioReading {
+  const requestedRatio = canvas.w / canvas.h;
+  const returnedRatio = image.width / image.height;
+  return {
+    requested: { w: canvas.w, h: canvas.h },
+    returned: { w: image.width, h: image.height },
+    requestedRatio,
+    returnedRatio,
+    ratioDelta: (returnedRatio - requestedRatio) / requestedRatio,
+    match: canvas.w * image.height === image.width * canvas.h,
+  };
+}
+
+/**
+ * 把那份读数说成人话 —— **只陈述读数**（票 39 的 Q2）。**一行**，不折行。
+ *
+ * ⚠️ **两条出路被删掉了**，而且是故意的：旧文案末尾指的两条路，一条是「重出这一张」
+ *   （按 **R13** 属未决 —— 人类在第六跑那一轮明确「不在本轮处理」），另一条是
+ *   「把 `authoring[].size` 改成这张图真实的比例」（= **改输入迁就判据**）。
+ *   ⇒ 而且**决策不该由一条观测文案来指**：观察报告事实，路是人选的。
+ */
+export function masterRatioLine(r: MasterRatio): string {
+  const head =
+    `母版 "${r.master}" 那一发回来的图是 ${r.returned.w}×${r.returned.h}` +
+    `（比例 ${r.returnedRatio.toFixed(3)}），而 canonical 画布是 ${r.requested.w}×${r.requested.h}` +
+    `（比例 ${r.requestedRatio.toFixed(3)}）`;
+  return r.match
+    ? `${head} —— **一致**。`
+    : `${head} —— **差 ${(Math.abs(r.ratioDelta) * 100).toFixed(1)}%**（${r.ratioDelta > 0 ? "回来的更宽" : "回来的更高"}）。`;
+}
+
+/**
+ * 那一组读数**报给人看**的那几行（票 39 的 Q1 ① / Q5）。
+ *
+ * ⚠️ **先报小计、再逐条列不一致的**：计数是让 `!` 与「这次压根没量」**分得开**的那一半 ——
+ *   只列不一致的，一个全对的包与一个没量的包在屏幕上长得一模一样。
+ * ⚠️ 那一句 why（母版是参考图）**只说一次**，不每条重复（它是**为什么值得看**，不是读数）。
+ */
+export function masterRatioNotes(rs: readonly MasterRatio[]): string[] {
+  if (rs.length === 0) return [];
+  const bad = rs.filter((r) => !r.match);
+  if (bad.length === 0) return [`母版比例：${rs.length} 张都量过，全部一致。`];
+  return [
+    `⚠️ **母版比例**：${rs.length} 张量过 —— 一致 ${rs.length - bad.length} 张 · **不一致 ${bad.length} 张**`,
+    ...bad.map((r) => `  · ${masterRatioLine(r)}`),
+    "  ⚠️ 母版是参考图：它的头身比会被后面每一个动画照着画。⇒ 读数在包内 `master-ratios.json` 里。",
+  ];
 }
 
 /** 会递出去的参考图 —— `recipe.referenceImage`（世界的风格图，走 `styleReference`）。 */

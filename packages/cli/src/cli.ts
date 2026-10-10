@@ -9,6 +9,8 @@ import {
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
+// ⚠️ **观察的渲染与 `pack` 那条命令共用同一个函数**（票 39）—— 两条路各写一份文案就是两份漂移。
+import { masterRatioNotes } from "@game-maker/assets";
 import { runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -247,6 +249,8 @@ function createComplete(
       `清单：${r.oneLine}`,
       ...(u.intent.ambiguity.length === 0 ? [] : u.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`)),
       ...b.packVersion === u.run.version ? [] : [`⚠️ 这次构建用了包版本 v${b.packVersion}（run 是 v${u.run.version}）`],
+      // ⚠️ **母版比例的观察**（票 39）：**观察不是错误** —— 它不改变退出码，只是报出来。
+      ...masterRatioNotes(b.masterRatios ?? []),
       ...(qa?.summary ?? []),
       ...site.summary,
     ],
@@ -281,6 +285,8 @@ function buildComplete(
       `这次运行：${relPath(outRoot, b.runDir)}（v${b.runVersion} · ${b.gameId}）· 包 v${b.packVersion}`,
       `包：${relPath(outRoot, b.paths.packDir)}（${b.manifest.assets.length} 个资源）`,
       ...(ambiguity.length === 0 ? [] : ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`)),
+      // ⚠️ **母版比例的观察**（票 39）：**观察不是错误** —— 它不改变退出码，只是报出来。
+      ...masterRatioNotes(b.masterRatios ?? []),
       ...(qa?.summary ?? []),
       ...site.summary,
     ],

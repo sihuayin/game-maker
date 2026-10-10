@@ -105,6 +105,9 @@ export * from "./ledger.js";
 // ⚠️ **链级的账**（票 15）—— 与包那份同口径、不同射程（见那个文件的文件头）。
 export * from "./run-ledger.js";
 export * from "./coverage.js";
+// ⚠️ **母版比例的读数**（票 39）—— 与上面两份同一个形状：**跟着包走的 sidecar，不进 manifest**。
+//   它是**观察**那一侧的东西（上游守不守住 `aspectRatio` 不是设计能控的）。
+export * from "./master-ratio.js";
 
 // ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────
 export * from "./command.js";
