@@ -9,6 +9,13 @@ Map: ../map.md
 > 人类在[第六跑决策轮第 1 轮](../clarifications/23-run6-round-1.md) 裁定：
 > 「**已有独立的确定性失败证据，应另行立票，不能塞进本轮**」。
 > ⚠️ **本票不挡票 23**（人类明确「不能塞进本轮」）—— 它是独立的一条。
+> ❌ **2026-10-11：这一行今天被推翻** —— 第七次真跑**在真跑上又踩了同一个洞**，
+> **票 23 已改挂本票**（`Blocked by: 42`）。理由与「人可否决」写在文末那一节。
+>
+> ⚠️ **2026-10-11 · 一处可能的标签错**（本 session 只报不改）：本票 `Type: task`，
+> 但它的 `## Question` 写的是「**要定的（三选一，或组合）**」，而且第一问（「`player` 当初没进那条判据
+> 是**故意**的还是**漏了**」）**只有人能答**。按本仓库的类型定义，这更像一张 **grilling（HITL）**票，
+> 不是 **task（AFK）**票 —— 标签决定了「谁来解、要不要人在场」。⚠️ **改标签等于改下一步的解法，留给人裁。**
 > 量到的现场：`raw/run-out-2026-10-10b/.failed-2026-10-10T10-36-45-891Z/game-design.json`
 > ＋ 探针 ⑥ 的读数 `.scratch/…/experiments/e2e-wasteland/raw/character-dna/summary.json`
 
@@ -73,6 +80,51 @@ Map: ../map.md
             —— characterId 会变得含糊（它靠 id 命中）
   逐发 ids：['scavenger', 'enemy', 'scavenger'] × 6
 ```
+
+## 第七跑：同一个洞在**真跑**上又踩了一次（2026-10-11）
+
+⚠️ 上面那句「**本票不挡票 23**」**今天作废** —— 理由见本节末。
+
+第七次真跑（[票 23](23-e2e-fixture-wasteland.md) · **段 A**，人类批的是「只批段 A」）
+**死在理解层第四步，正是本票这条缝**：
+
+```text
+退出码 4 · 墙钟 58.5s · 0 张图
+步：visual-world → intent → design → character-dna   ✗（前三关全过）
+错误逐字：重采样 3 次都没有拿到一份过契约的 CharacterDNA（最后一次：schema）。
+          最后一次的病因：工具入参不过契约：characters[2].id: 角色 id 重复："scavenger"
+          —— characterId 会变得含糊（它靠 id 命中）
+账：attempts 3 · failures ["schema","schema","schema"] · in 174 / out 918 · ms 20859
+现场：raw/run-out-2026-10-11a/.failed-2026-10-11T05-13-03-917Z/
+      ⚠️ 副本已留：[`…/raw/id-collision-run7/`](../experiments/e2e-wasteland/raw/id-collision-run7/NOTE.md)
+        （原现场在 `run-out-2026-10-11a/` **里面**，而那段驱动开头就 `rmSync(OUT)` ⇒ **下次段 A 一跑就没了**）
+```
+
+那一跑那份 `game-design.json` 里的桶（**逐桶读出来的**）：
+
+| 桶 | id |
+|---|---|
+| `player` | `scavenger` |
+| `enemies[0]` | `enemies` |
+| `npcs[0]` | **`scavenger`** ← 与 `player` **逐字同名** |
+| `interactables[0]` | `chest` |
+| `resources[0]` | `resources` |
+
+⚠️ **与第五跑那份是同一个形状**（`player.id = scavenger` ∧ `npcs = ["scavenger"]`），
+**连死在 `characters[2].id` 都一样** ⇒ **两次独立真跑 · 同一个病 · 同一个位置**。
+⚠️ 那一跑的 NPC 是设计层**自己补**出来的「**玩家控制的拾荒者本人**，无对话」（票 10 的 R2-Q1：
+设计多出意图是**合法**的）⇒ 它一落到 `character-dna` 就**必然**撞。
+⚠️ 顺带看出一条**同源**的毛病（这一跑**没撞**，因为桶名彼此不同，但同一个成因）：
+`enemies[0].id = "enemies"` · `resources[0].id = "resources"` —— **桶名被当成了 id**。
+
+### 为什么这一次它挡路了（而上一轮判的是「不挡」）
+
+人类上一轮的原话是「已有独立的确定性失败证据，应另行立票，**不能塞进本轮**」，
+当时的**前提**是：第六跑**过了** `character-dna` ⇒ 它是**潜伏**，不是挡在路上的。
+**那个前提今天被一次真跑证伪了** —— 潜伏的那条踩上了，而且**重采样救不了**
+（探针 ⑥：同一份输入重放 6 次全灭、模型**从不**自行合并那两条）。
+⇒ 本 session 据此**把票 23 改挂本票**（`Blocked by: 42`）。
+⚠️ **这是本 session 自己的决定，不是在执行人的话** —— 它与上面那行判词**相抵**，**人可否决**。
 
 ## Answer
 
