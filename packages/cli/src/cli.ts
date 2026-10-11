@@ -19,10 +19,10 @@ import { runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipelin
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 用法：
-  game-maker create --style <一张参考图> --intent <需求文本 | 需求.md> [--yes] [--style-id <slug>] [--out <目录>] [--json]
-  game-maker build  <run 目录> [--out <目录>] [--concurrency <n>] [--json]
+  game-maker create --style <一张参考图> --intent <需求文本 | 需求.md> [--yes] [--style-id <slug>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
+  game-maker build  <run 目录> [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
   game-maker plan   --design <game-design.json> --visual-world <visual-world.json> [--out <目录>] [--json]
-  game-maker pack   --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--json]
+  game-maker pack   --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
   game-maker compile-runtime --design <game-design.json> --pack <资源包目录> [--out <目录>] [--json]
   game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
   game-maker site   <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
@@ -41,6 +41,12 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 通用选项：
   --out <目录>   产物根。默认 ./out。**所有回报的路径都相对于它**。
   --json         输出机器可解析的 JSON（与人类输出是**同一份数据**，与 MCP 同源）
+  --concurrency <n>       并发上限，**文本与生图两边都设成 n**（默认：文本 4 · 生图 3）
+  --concurrency-image <n> ⚠️ **只设生图**那一边（文本仍走 \`--concurrency\`、没给就是默认 4）
+  ⚠️ 并发只影响**速度与上游压力**，不影响产物（是同一批调用的先后，不是不同的调用）；
+     两个都给时 \`--concurrency-image\` 只覆盖生图那一半。
+  ⚠️ 默认的那两个数是**实测挑的**（票 47：串行 50.1s → 并发 4 是 11.6s 的最优点；
+     再往上没有收益、只有被上游限流的风险）—— 生图 3 比文本保守也是这个原因。
 
 退出码：
   0  成功
@@ -65,7 +71,7 @@ export function parseArgs(argv: readonly string[]): Parsed {
   const positional: string[] = [];
   const flags: Record<string, string | boolean> = {};
   const takesValue = new Set([
-    "design", "visual-world", "out", "recipe", "config", "shell", "game-id", "pack", "concurrency", "level",
+    "design", "visual-world", "out", "recipe", "config", "shell", "game-id", "pack", "concurrency", "concurrency-image", "level",
     // 票 16：`create` / `build` 的那几个
     "style", "intent", "style-id", "version",
   ]);
@@ -99,11 +105,49 @@ function parseVersion(v: string): number {
   return n;
 }
 
-function concurrencyOf(v: string): number {
+/** `--concurrency` / `--concurrency-image` 的值：必须是 ≥1 的整数。⚠️ 报错要点**给的那个 flag 的名字**。 */
+function concurrencyOf(v: string, flag = "--concurrency"): number {
   const n = Number(v);
-  if (!Number.isInteger(n) || n < 1) throw new CommandError("usage", `--concurrency 必须是 ≥1 的整数（给的是 "${v}"）`);
+  if (!Number.isInteger(n) || n < 1) throw new CommandError("usage", `${flag} 必须是 ≥1 的整数（给的是 "${v}"）`);
   return n;
 }
+
+/** 并发覆盖：**两半各自可选**（票 41）—— 没给的那一半由引擎取 `DEFAULT_CONCURRENCY`。 */
+export type Concurrency = { text?: number; image?: number };
+
+/**
+ * 从 flags 算出**并发覆盖**（票 41 的 Q1 —— 第六跑 Q4 的裁定：「能独立控制 image concurrency」）。
+ *
+ * ⚠️⚠️ **没给的那一半不进返回值** —— 这正是本票要的那件事。`--concurrency-image 2` 给的是
+ *   `{ image: 2 }`：**没有 `text` 键**，于是引擎自己取 `DEFAULT_CONCURRENCY.text`（4）。
+ *   写成 `{ text: n, image: n }`（票 41 之前那四处代码的形状）就是「一个数两边都用」，
+ *   而第四/五/六跑每一跑都在偏离那条裁定 —— 原因是 CLI 表达不出「image 2」。
+ *
+ * · `--concurrency <n>` —— **原义不变**：text 与 image **两边都设成 n**。
+ * · `--concurrency-image <n>` —— **只设 image**；两者同时给时它**只覆盖 image**，text 仍走 `--concurrency`。
+ * · 两个都没给 ⇒ `undefined`（**不给覆盖**，而不是给一个空对象）。
+ *
+ * ⚠️ `--concurrency-text` **有意不加**（票 41 的 Q1：严格限定在本票要求的那一个入口）。
+ *
+ * ⚠️ **导出只为测试**（票 41 的 Q5 腿①）—— 它是纯函数，`run()` 之外没有别的消费者。
+ */
+export function concurrencyFromFlags(flags: Record<string, string | boolean>): Concurrency | undefined {
+  const both = typeof flags.concurrency === "string" ? concurrencyOf(flags.concurrency) : undefined;
+  const image = typeof flags["concurrency-image"] === "string"
+    ? concurrencyOf(flags["concurrency-image"], "--concurrency-image") : undefined;
+  if (both === undefined && image === undefined) return undefined;
+  // ⚠️ `image ?? both` —— 具体那个赢；而 `text` 只在 `--concurrency` 给了的时候出现。
+  return { ...(both === undefined ? {} : { text: both }), image: image ?? both! };
+}
+
+/**
+ * 那三个调用点**共用的那一行**（票 41 的 Q3/Q4）：把上面的结果摊成可展开的一小段。
+ * ⚠️ 两个 flag 都没给时返回**空对象**（展开后不给 `concurrency` 键），而不是 `{ concurrency: undefined }`。
+ */
+const concurrencyArg = (flags: Record<string, string | boolean>): { concurrency?: Concurrency } => {
+  const c = concurrencyFromFlags(flags);
+  return c === undefined ? {} : { concurrency: c };
+};
 
 /**
  * `--intent` 收两种东西（票 09 定的方向、票 16 落地）：**像路径就当路径，否则当裸文本**。
@@ -171,7 +215,7 @@ function asCommandError(e: unknown): unknown {
  */
 async function buildAndSite(o: {
   outRoot: string; runDir: string; transport: { baseUrl: string; apiKey: string };
-  env: NodeJS.ProcessEnv; cwd: string; io: CliIo; concurrency?: number; fetchImpl?: typeof fetch;
+  env: NodeJS.ProcessEnv; cwd: string; io: CliIo; concurrency?: Concurrency; fetchImpl?: typeof fetch;
   /** 显式指定外壳 bundle（与 `site` 命令同款）—— 独立安装时按仓库布局找不到它。 */
   shellJsPath?: string;
 }): Promise<{ built: Awaited<ReturnType<typeof runBuild>>; site: CommandResult }> {
@@ -181,7 +225,7 @@ async function buildAndSite(o: {
     outRoot: o.outRoot, runDir: o.runDir, transport: o.transport,
     ...(img.transport ? { imageTransport: img.transport } : {}),
     ...(o.fetchImpl === undefined ? {} : { fetchImpl: o.fetchImpl }),
-    ...(o.concurrency === undefined ? {} : { concurrency: { text: o.concurrency, image: o.concurrency } }),
+    ...(o.concurrency === undefined ? {} : { concurrency: o.concurrency }),
     viewport: VIEWPORT, hudLineHeight: HUD_LINE_HEIGHT,
     onProgress: progressTo(o.io),
   });
@@ -428,7 +472,7 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
           break;
         }
         const { built, site } = await buildAndSite({ outRoot, runDir: understanding.run.dir, transport, env, cwd, io, ...up,
-          ...(typeof flags.concurrency === "string" ? { concurrency: concurrencyOf(flags.concurrency) } : {}),
+          ...concurrencyArg(flags),
           ...(typeof flags.shell === "string" ? { shellJsPath: path.resolve(cwd, flags.shell) } : {}) });
         result = createComplete(understanding, built, site, outRoot);
         break;
@@ -440,7 +484,7 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         if (dir === undefined) throw new CommandError("usage", "build 需要一个 run 目录（create 打出来的那个：<out>/<gameId>/run/v<N>）");
         const runDir = path.resolve(dir);
         const { built, site } = await buildAndSite({ outRoot, runDir, transport, env, cwd, io, ...up,
-          ...(typeof flags.concurrency === "string" ? { concurrency: concurrencyOf(flags.concurrency) } : {}),
+          ...concurrencyArg(flags),
           ...(typeof flags.shell === "string" ? { shellJsPath: path.resolve(cwd, flags.shell) } : {}) });
         result = buildComplete(built, site, outRoot);
         break;
@@ -462,15 +506,13 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         // 生图凭据：文件（已 gitignore）或环境变量，环境变量优先。没配也能跑 —— 只要清单里没有 image 资源。
         const img = resolveImageTransport({ env, cwd });
         for (const w of img.warnings) io.err(`⚠️ ${w}\n`);
-        // 并发上限（票 47）：**按上游分别定**是本来的形状，但一个数就够人用了 ——
-        // 给了就两边都用它；要分开调就用 API。
-        const n = typeof flags.concurrency === "string" ? Number(flags.concurrency) : undefined;
-        if (n !== undefined && (!Number.isInteger(n) || n < 1))
-          throw new CommandError("usage", `--concurrency 必须是 ≥1 的整数（给的是 "${flags.concurrency}"）`);
+        // 并发上限（票 41）：**与 `create --yes` / `build` 同一个解析** —— 以前这一支自作主张，
+        // 连报错文案都是别处复制来的。⚠️ 那句被推翻的旧注释（票 47 的「一个数就够人用了 ·
+        // 要分开调就用 API」）**删掉**：第六跑 Q4 的裁定要的正是「能独立控制 image concurrency」。
         result = await packAssets({
           recipePath: path.resolve(flags.recipe), outRoot, transport, ...up,
           ...(img.transport ? { imageTransport: img.transport } : {}),
-          ...(n !== undefined ? { concurrency: { text: n, image: n } } : {}),
+          ...concurrencyArg(flags),
           // ⚠️ 票 15 播给本票的两个可选 flag：**单跑 `pack` 时**也想让包里带一份 VWS；
           //   而 `--version` 是「父指定、子不自算」那条规矩的手动口 —— ⚠️ **它不是覆盖**：
           //   那个位置已经摆着东西时，`pack` 会**拒**（「禁止覆盖」在子树同样成立）。

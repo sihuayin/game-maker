@@ -52,8 +52,31 @@ function imageHeavyRecipe(): Record<string, unknown> {
   };
 }
 
+/**
+ * **同时在飞的 drawlist 请求数**（票 41 的 Q5 腿②）。
+ *
+ * ⚠️ 这是**观测**，不是形状：峰值**由这条假 `fetch` 自己数**，与「谁算的并发」无关 ——
+ *   被测的是「那个对象真的走到了引擎、且真的没把 text 拖下来」，所以它当得起一条独立观测
+ *   （反面就是 `concurrencyFromFlags` 自证的那种**假牙**，那条由 `cli.test.ts` 的纯函数单测钉）。
+ * ⚠️ **只数 `body.tools === undefined` 那一支**：只有它走 `pack` 的**文本闸门**；
+ *   理解层那五发是 `tool_choice` 调用，不受 `--concurrency` 管。
+ */
+function makeProbe() {
+  let active = 0, peak = 0, total = 0;
+  return {
+    start: () => { active += 1; total += 1; if (active > peak) peak = active; },
+    end: () => { active -= 1; },
+    peak: () => peak,
+    total: () => total,
+  };
+}
+
 /** 一条假 `fetch`：理解层那五发按 `tool_choice.name` 回骨架；drawlist 那一支回一段 JSON 文本。 */
-function fakeUpstream(over: { recipeId: string; recipe?: Record<string, unknown>; intent?: Record<string, unknown>; config?: Record<string, unknown> }): typeof fetch {
+function fakeUpstream(over: {
+  recipeId: string; recipe?: Record<string, unknown>; intent?: Record<string, unknown>; config?: Record<string, unknown>;
+  /** ⚠️ **可选的**人为延迟（毫秒）：让并发的调用**真的重叠**，峰值才量得出来（票 41）。 */
+  delayMs?: number; probe?: ReturnType<typeof makeProbe>;
+}): typeof fetch {
   const TOOL: Record<string, unknown> = {
     emit_visual_world: CANNED["visualWorld"], emit_game_intent: over.intent ?? CANNED["intent"],
     emit_game_design: CANNED["design"], emit_character_dna: CANNED["characterDna"],
@@ -63,16 +86,21 @@ function fakeUpstream(over: { recipeId: string; recipe?: Record<string, unknown>
   const json = (body: unknown) => ({ ok: true, status: 200, json: async () => body, text: async () => JSON.stringify(body) }) as Response;
   return (async (_url: string, init: RequestInit) => {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
-    if (body["tools"] === undefined) {
+    if (body["tools"] !== undefined) {
+      const name = (body["tool_choice"] as { name: string }).name;
+      const input = name === "emit_asset_recipe" ? { ...(over.recipe ?? CANNED["recipe"]), id: over.recipeId } : TOOL[name];
+      return json({ content: [{ type: "tool_use", name, input }], stop_reason: "tool_use", model: "deepseek-flash", usage: { input_tokens: 1200, output_tokens: 900 } });
+    }
+    // ⚠️ **drawlist 那一支**（票 41 的 Q5 腿②：文本闸门的峰值在这一层看得见）
+    over.probe?.start();
+    try {
+      if (over.delayMs !== undefined) await new Promise((r) => setTimeout(r, over.delayMs));
       const content = (body["messages"] as { content: unknown }[])[0]!.content;
       const text = typeof content === "string" ? content : "";
       const n = Math.max(1, (text.match(/第 \d+ 帧：/g) ?? []).length);
       // ⚠️ 画满整帧（站点那一族有「最远那层必须画满」，票 50）
       return json({ content: [{ type: "text", text: JSON.stringify({ frames: Array.from({ length: n }, () => ({ ops: [{ op: "rect", x: 0, y: 0, w: 4096, h: 4096, fill: "palette:0" }] })) }) }], model: "deepseek-flash" });
-    }
-    const name = (body["tool_choice"] as { name: string }).name;
-    const input = name === "emit_asset_recipe" ? { ...(over.recipe ?? CANNED["recipe"]), id: over.recipeId } : TOOL[name];
-    return json({ content: [{ type: "tool_use", name, input }], stop_reason: "tool_use", model: "deepseek-flash", usage: { input_tokens: 1200, output_tokens: 900 } });
+    } finally { over.probe?.end(); }
   }) as unknown as typeof fetch;
 }
 
@@ -97,7 +125,11 @@ const capture = (): CliIo & { lines: string[]; errors: string[] } => {
  *   而 `defaultShellPath(cwd)` 按 cwd 找它 —— 与 `site` 命令同款（真实用户从仓库根跑，
  *   或者用 `--shell` 指过去）。⇒ 几张输入路径都写绝对的。
  */
-function stage(over: { config?: Record<string, unknown>; recipe?: Record<string, unknown> } = {}) {
+function stage(over: {
+  config?: Record<string, unknown>; recipe?: Record<string, unknown>;
+  /** 票 41 的观测口：**要峰值的那一条才开延迟**（其余用例一个字不变）。 */
+  delayMs?: number; probe?: ReturnType<typeof makeProbe>;
+} = {}) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "gm-cli-create-"));
   dirs.push(cwd);
   const style = path.join(cwd, "style.png");
@@ -393,5 +425,90 @@ describe("§参数面：几条硬线（票 16 的 Q4/Q5）", () => {
     expect(r.code).toBe(EXIT.ok);
     expect(r.text()).toMatch(/game-maker create --style/);
     expect(r.text()).toMatch(/game-maker build/);
+  });
+});
+
+// ⚠️⚠️ **票 41 的主判据（Q5 腿②）**：并发 flag **真的走到了引擎** —— 而且「只设 image」的那一半
+//   **真的没把 text 拖下来**。期望值由**假上游自己数的峰值**给，不由 `concurrencyFromFlags` 推。
+//   形状那一半（返回值里没有 `text` 键）住在 `cli.test.ts` 的纯函数单测里 —— 两层各钉一头。
+describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在飞的请求」）", () => {
+  // 夹具那 4 个 drawlist 资源**没有依赖边**，且在 `Promise.allSettled(recipe.assets.map(...))` 里
+  // **同步提交** ⇒ 默认闸门（文本 4）下四个同时在场，峰值**恰好 4**。
+  it("⚠️ 只给 `--concurrency-image 2` ⇒ **文本峰值仍是 4**（image 那一半没把 text 拖下去）", async () => {
+    const probe = makeProbe();
+    const s = stage({ delayMs: 12, probe });
+    const r = await runC(create(s, ["--yes", "--concurrency-image", "2"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    expect(probe.total()).toBe(4);   // 4 个 drawlist 资源 = 4 次文本调用（这一版没有生图资源）
+    expect(probe.peak()).toBe(4);    // ⚠️ **不是 2** —— 那正是票 41 之前那四处代码写出来的东西
+  });
+
+  it("⚠️ 而 `--concurrency 2` ⇒ 峰值 **2**（同一个数两边都用 —— 原义一个字没变）", async () => {
+    const probe = makeProbe();
+    const s = stage({ delayMs: 12, probe });
+    const r = await runC(create(s, ["--yes", "--concurrency", "2"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    expect(probe.total()).toBe(4);
+    expect(probe.peak()).toBe(2);
+  });
+
+  it("⚠️ 两个都给 ⇒ **具体的那个赢**：文本走 `--concurrency 3`（峰值 3），image 那一半不掺和", async () => {
+    const probe = makeProbe();
+    const s = stage({ delayMs: 12, probe });
+    const r = await runC(create(s, ["--yes", "--concurrency", "3", "--concurrency-image", "2"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    expect(probe.peak()).toBe(3);
+  });
+
+  it("参数面：`--concurrency-image 0` ⇒ 参数错（2），且文案点名**给的那个 flag**", async () => {
+    const s = stage();
+    const r = await runC(create(s, ["--yes", "--concurrency-image", "0"]), s.deps);
+    expect(r.code).toBe(EXIT.usage);
+    expect(r.text()).toMatch(/--concurrency-image 必须是 ≥1 的整数/);
+  });
+
+  // ⚠️ **第二条路**（票 41 的 Q3：`create --yes` 与 `build` **两条都接**）——
+  //   两条路各有一个调用点，只测一条的话，另一个调用点被人删掉时不会有任何东西红。
+  it("⚠️ `build` 那条路照样接（两段式的第二段）：`--concurrency 2` ⇒ 峰值 2", async () => {
+    const probe = makeProbe();
+    const s = stage({ delayMs: 12, probe });
+    // ⚠️ 第一段停在清单处 ⇒ **一次 drawlist 调用都不发**（那 4 发全在第二段），探头因此干净
+    expect((await runC(create(s, ["--json"]), s.deps)).code).toBe(EXIT.ok);
+    expect(probe.total()).toBe(0);
+    const runDir = path.join(s.outRoot, "wasteland", "run", "v1");
+    const r = await runC(["build", runDir, "--out", s.outRoot, "--concurrency", "2"], s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    expect(probe.total()).toBe(4);
+    expect(probe.peak()).toBe(2);
+  });
+});
+
+// ⚠️ 票 41 的 Q4：**`pack` 那条独立命令也接同一个解析** —— 以前它自己内联了一份，
+//   连报错文案都是从别处复制的。⚠️ 这里**量不到 image 那一半**（夹具没有生图资源，而 `CliDeps`
+//   没有 `generateImage` 的注入口 —— 票 40 已经记过这一条），所以这两条钉的是
+//   「**同一个 flag 在同一个壳里到处一个意思**」：报错点它的名、文本那一半照旧不被动。
+describe("§`pack` 也走同一个解析（票 41 的 Q4）", () => {
+  const packOf = (s: ReturnType<typeof stage>, recipe: string, extra: string[]) =>
+    ["pack", "--recipe", recipe, "--out", s.outRoot, ...extra];
+
+  it("⚠️ 参数错点名 `--concurrency-image`（以前这一支连这个 flag 都不认识，会**静默忽略**）", async () => {
+    const s = stage();
+    expect((await runC(create(s), s.deps)).code).toBe(EXIT.ok);
+    const recipe = path.join(s.outRoot, "wasteland", "run", "v1", "asset-recipe.json");
+    const r = await runC(packOf(s, recipe, ["--concurrency-image", "0"]), s.deps);
+    expect(r.code).toBe(EXIT.usage);
+    expect(r.text()).toMatch(/--concurrency-image 必须是 ≥1 的整数/);
+  });
+
+  it("只设 image 时**文本那一半不被拖下来**：峰值仍是 4（默认）", async () => {
+    const probe = makeProbe();
+    const s = stage({ delayMs: 12, probe });
+    expect((await runC(create(s), s.deps)).code).toBe(EXIT.ok);
+    expect(probe.total()).toBe(0);          // 第一段停在清单处，一发都没发
+    const recipe = path.join(s.outRoot, "wasteland", "run", "v1", "asset-recipe.json");
+    const r = await runC(packOf(s, recipe, ["--concurrency-image", "2"]), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    expect(probe.total()).toBe(4);
+    expect(probe.peak()).toBe(4);           // ⚠️ 不是 2
   });
 });

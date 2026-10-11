@@ -152,10 +152,10 @@ A pack whose recipe contains no image assets needs **no** image credentials at a
 ## CLI reference
 
 ```
-game-maker create          --style <one reference image> --intent <text | intent.md> [--yes] [--style-id <slug>] [--out <dir>] [--json]
-game-maker build           <run dir> [--out <dir>] [--concurrency <n>] [--json]
+game-maker create          --style <one reference image> --intent <text | intent.md> [--yes] [--style-id <slug>] [--out <dir>] [--concurrency <n>] [--concurrency-image <n>] [--json]
+game-maker build           <run dir> [--out <dir>] [--concurrency <n>] [--concurrency-image <n>] [--json]
 game-maker plan            --design <game-design.json> --visual-world <visual-world.json> [--out <dir>] [--json]
-game-maker pack            --recipe <recipe.json> [--visual-world <visual-world.json>] [--version <n>] [--out <dir>] [--concurrency <n>] [--json]
+game-maker pack            --recipe <recipe.json> [--visual-world <visual-world.json>] [--version <n>] [--out <dir>] [--concurrency <n>] [--concurrency-image <n>] [--json]
 game-maker compile-runtime --design <game-design.json> --pack <pack dir> [--level <level id>] [--out <dir>] [--json]
 game-maker compile-td-game --requirement <requirement.md> --pack <pack dir> [--out <dir>] [--json]
 game-maker site            <pack dir> --config <level config> [--shell <shell.js>] [--out <dir>] [--json]
@@ -165,7 +165,9 @@ game-maker inspect         <pack dir> [--json]
 
 - `--out <dir>` — artifact root, default `./out`. **Every reported path is relative to it.**
 - `--json` — machine-readable output. It is *the same data* the human rendering draws from and the MCP tools return, not a second representation.
-- `--concurrency <n>` — parallel generation cap.
+- `--concurrency <n>` — parallel generation cap, **both halves** (text and image) set to `n`. Defaults: text 4 · image 3.
+- `--concurrency-image <n>` — caps **image generation only**; text keeps `--concurrency` or the default 4. With both flags, `--concurrency-image` wins for the image half. (There is deliberately no `--concurrency-text`; image was the one the rulings asked to control separately.)
+- Concurrency affects **speed and upstream pressure only**, never the artifacts — it is the ordering of the same calls, not different calls. The defaults are measured, not guessed (serial 50.1s → 4 in parallel is 11.6s, the optimum; beyond that there is no gain, only rate-limit risk).
 
 Exit codes: `0` success · `1` failure · `2` usage error · `3` upstream unreachable · `4` invalid pack/recipe.
 

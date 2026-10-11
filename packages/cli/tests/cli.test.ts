@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { EXIT, exitCodeOfError, CommandError } from "@game-maker/assets";
-import { parseArgs, renderHuman, run, type CliIo } from "../src/cli.js";
+import { parseArgs, concurrencyFromFlags, renderHuman, run, type CliIo } from "../src/cli.js";
 
 /** 收下 CLI 的所有出站，测试因此不会把 stdout 刷满。 */
 const capture = (): CliIo & { lines: string[]; errors: string[] } => {
@@ -36,6 +36,36 @@ describe("参数解析（手写，无依赖）", () => {
   });
   it("⚠️ 带值选项后面缺值 → 报参数错，而不是把 undefined 当值", () => {
     expect(() => parseArgs(["pack", "--recipe"])).toThrow(/后面要跟一个值/);
+  });
+});
+
+describe("并发 flag 的语义（票 41 —— 「能独立控制 image concurrency」）", () => {
+  // ⚠️ 这一组的期望值**全部手工写死**，不由被测函数推 —— 否则就是假牙。
+  it("⚠️ **只给 `--concurrency-image` ⇒ 返回值里根本没有 `text` 键**（不是 2、也不是 4）", () => {
+    const r = concurrencyFromFlags({ "concurrency-image": "2" });
+    // 「没有 text 键」是**结构**上的断言：`{ text: 2 }` 会让 image 的并发被一个数拖住，
+    // `{ text: 4 }` 会把默认值**写死进 CLI**（引擎才是默认值的唯一来源）。
+    expect(r === undefined ? null : Object.keys(r)).toEqual(["image"]);
+    expect(r).toEqual({ image: 2 });
+  });
+  it("`--concurrency <n>` 原义不变：两边都设成 n", () => {
+    expect(concurrencyFromFlags({ concurrency: "2" })).toEqual({ text: 2, image: 2 });
+  });
+  it("两个都给 ⇒ 具体的那个赢：image 被覆盖，text 仍走 `--concurrency`", () => {
+    expect(concurrencyFromFlags({ concurrency: "3", "concurrency-image": "2" })).toEqual({ text: 3, image: 2 });
+  });
+  it("两个都没给 ⇒ `undefined`（不给覆盖，而不是给一个空对象）", () => {
+    expect(concurrencyFromFlags({})).toBeUndefined();
+    expect(concurrencyFromFlags({ json: true })).toBeUndefined();
+  });
+  it("⚠️ 报错点名**给的那个 flag**（不是一律说 `--concurrency`）", () => {
+    expect(() => concurrencyFromFlags({ "concurrency-image": "0" })).toThrow(/--concurrency-image 必须是 ≥1 的整数/);
+    expect(() => concurrencyFromFlags({ "concurrency-image": "2.5" })).toThrow(/--concurrency-image/);
+    expect(() => concurrencyFromFlags({ concurrency: "abc" })).toThrow(/--concurrency 必须是 ≥1 的整数/);
+  });
+  it("⚠️ `--concurrency-image` 在 `takesValue` 里 —— 否则 `2` 会掉成位置参数", () => {
+    expect(parseArgs(["create", "--concurrency-image", "2"]).flags["concurrency-image"]).toBe("2");
+    expect(parseArgs(["create", "--concurrency-image", "2"]).positionals).toEqual([]);
   });
 });
 

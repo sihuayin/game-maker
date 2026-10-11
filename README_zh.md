@@ -152,10 +152,10 @@ cp game-maker.local.example.json game-maker.local.json   # 真文件已 gitignor
 ## CLI 参考
 
 ```
-game-maker create          --style <一张参考图> --intent <需求文本 | 需求.md> [--yes] [--style-id <slug>] [--out <目录>] [--json]
-game-maker build           <run 目录> [--out <目录>] [--concurrency <n>] [--json]
+game-maker create          --style <一张参考图> --intent <需求文本 | 需求.md> [--yes] [--style-id <slug>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
+game-maker build           <run 目录> [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
 game-maker plan            --design <game-design.json> --visual-world <visual-world.json> [--out <目录>] [--json]
-game-maker pack            --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--json]
+game-maker pack            --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
 game-maker compile-runtime --design <game-design.json> --pack <资源包目录> [--level <关卡 id>] [--out <目录>] [--json]
 game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
 game-maker site            <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
@@ -179,7 +179,9 @@ game-maker build out/<gameId>/run/v1
 ⚠️ **人工点只有一个，就在那个停的地方**（R9）：清单是**唯一**可以手改的产物，改完再跑 `build` —— 而 `build` 读的是**磁盘上那一份**（所以改的确实生效）。加 `--yes` 就一路跑到底（等于跳过检查点），两条路的产物**逐字节等价**。
 
 ⚠️ `--style` 今天**恰好收一张**（[多参考图](.scratch/game-maker-v2/issues/26-multiple-style-references.md) 实现延后）。`--intent` 收两种东西：**像路径就当路径**（以 `.md`/`.txt` 结尾、或含路径分隔符），否则当裸文本 —— 写错文件名会当场报参数错，而不会把文件名当成一句需求喂给模型。
-- `--concurrency <n>` —— 并发生成的上限。
+- `--concurrency <n>` —— 并发生成的上限，**文本与生图两边都设成 n**（默认：文本 4 · 生图 3）。
+- `--concurrency-image <n>` —— ⚠️ **只设生图**那一边；文本仍走 `--concurrency`、没给就是默认 4。两个都给时 `--concurrency-image` 只覆盖生图那一半。（**有意不提供** `--concurrency-text` —— 裁定要求单独控制的是 image。）
+- 并发只影响**速度与上游压力**，**不影响产物**（是同一批调用的先后，不是不同的调用）。默认那两个数是**实测挑的**（串行 50.1s → 并发 4 是 11.6s 的最优点，再往上只有被限流的风险）。
 
 退出码：`0` 成功 · `1` 失败 · `2` 参数错 · `3` 上游不可达 · `4` 产物/清单不合法。
 
