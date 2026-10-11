@@ -19,6 +19,9 @@ Map: ../map.md
 > **票 23 已改挂本票**（`Blocked by: 42`）—— **人已于同日裁定「同意」**，理由与限定写在文末那一节。
 >
 > ✅ **2026-10-11 · 人裁：标签改成 `grilling`**（本 session 报的那处标签错，已按人裁定落地 —— 见票头那一块）。
+> ❓ **2026-10-11 · 第一轮问答副本已出**：[`clarifications/42-round-1.md`](../clarifications/42-round-1.md)
+> （自包含 · 5 问）—— ⚠️ **Q1（`player` 当初没进那条判据是「故意」还是「漏了」）不给推荐**：
+> 那是**设计意图**，按本票的 HITL 裁定**不替人作答**。**裁定回来之前本票不动。**
 > 量到的现场：`raw/run-out-2026-10-10b/.failed-2026-10-10T10-36-45-891Z/game-design.json`
 > ＋ 探针 ⑥ 的读数 `.scratch/…/experiments/e2e-wasteland/raw/character-dna/summary.json`
 
