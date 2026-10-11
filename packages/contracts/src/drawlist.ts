@@ -13,7 +13,9 @@
 import { z } from "zod";
 // ⚠️ 错误格式化器**搬去 `zod-issues.ts` 了**（票 28）—— 本文件是画图，不该兼当 Zod 错误桥。
 //   这里只**原样再导出**，免得既有调用方一行都要改（与 `ops.ts` 再导出 `CommandError` 同款）。
-export { formatIssues, parseWith, type IssueLike } from "./zod-issues.js";
+//   ⚠️ **`parseWith` 于 2026-10-11（票 29）从这条再导出里去掉** —— 它零调用者，本体已删。
+//   ⇒ 上面那句「既有调用方」**只对 `formatIssues` 成立**：`assetpack.ts` 与 `recipe.ts` 确实从这儿取它。
+export { formatIssues, type IssueLike } from "./zod-issues.js";
 import { formatIssues } from "./zod-issues.js";
 
 /** 颜色的唯一合法形式：`palette:<下标>` 指向 `StyleSpec.palette` 的有序数组。

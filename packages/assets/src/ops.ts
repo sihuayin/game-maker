@@ -10,18 +10,18 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import {
   auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
-  GameDesignSpecSchema,
+  formatIssues, GameDesignSpecSchema,
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
   parseAssetPack, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
-  summarizeCalls, VisualWorldSpecSchema,
+  StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
   type AssetPackManifest, type CallFailure, type CharacterDNAFile, type ConfigIssue, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
-import { buildAssetPack, type FailureSite } from "./pack.js";
+import { buildAssetPack, normalizePalette, type FailureSite } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError, type ImageGenerator } from "./image-gen.js";
 import { masterRatioNotes, referenceImagesOf } from "./master.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
@@ -1092,12 +1092,47 @@ function readVisualWorld(p: string): VisualWorldSpec {
   return w.data;
 }
 
+/**
+ * 读那份 `stylespec.json`（票 29 的 Q1）。
+ *
+ * ⚠️ **它是产物**（票 29 的 Q4）：不过 schema ⇒ **拒**，与 `readVisualWorld` / `readCharacterRef` 同款
+ *   —— 在这一票之前，它是 `pack` 里**唯一**没人验的产物读取（一句裸 cast，一个字段都不验）。
+ * ⚠️ **规范化在前、校验在后**，且**规范化归入口、校验归契约**（票 29 的 Q2 裁定 (c)）：
+ *     输入 → 小写 → 去重 → `StyleSpecSchema` → 下游
+ *   契约管的是**规范形式**（小写 `#rrggbb`），而**接受形式**大小写都收 —— 真提取脚本产出的就是
+ *   大写色板（`fixtures/style-spec.provenance.json`），拒掉它等于打掉仓库自己的基准 fixture。
+ *   ⚠️ 小写化与去重**复用 `pack.ts` 的 `normalizePalette`**（同一份逻辑，不许再写第二套）。
+ * ⚠️ **不扩范围**（人类这一轮的边界）：色板**整个缺席**时 schema 的 `.default([])` 会放行 ——
+ *   那是契约自己的形状，本票不动它（见 Answer §边界）。
+ */
+function readStyle(p: string): StyleSpec {
+  let raw: unknown;
+  try { raw = JSON.parse(fs.readFileSync(p, "utf8")); }
+  catch (e) { throw new CommandError("invalid", `风格规格读不出来或不是 JSON：${p} —— ${(e as Error).message}`); }
+  // ⚠️ 数组里混进非字符串时**整段跳过规范化**，交给 schema 去报类型错 ——
+  //   否则 `normalizePalette` 会在 `.toLowerCase()` 上炸成一个**指错方向**的 TypeError。
+  const rawPalette = (raw !== null && typeof raw === "object") ? (raw as { palette?: unknown }).palette : undefined;
+  let normalized: unknown = raw;
+  if (Array.isArray(rawPalette) && rawPalette.every((c) => typeof c === "string")) {
+    // ⚠️ `normalizePalette` **自己去重**（撞见重复色会抛）—— 那道拒绝也是本闸的一部分，
+    //   所以它得**走同一个出口**。原样放出去的话，同一份坏 `stylespec.json` 会按「重复色与否」
+    //   拿到**两个退出码**（schema 拒 ⇒ 4，它抛 ⇒ 1）—— 那正是本仓库反复吃的「两把尺子」。
+    try { normalized = { ...(raw as Record<string, unknown>), palette: normalizePalette(rawPalette) }; }
+    catch (e) { throw new CommandError("invalid", `风格规格不过 schema：${(e as Error).message}`); }
+  }
+  const s = StyleSpecSchema.safeParse(normalized);
+  if (!s.success)
+    throw new CommandError("invalid", `风格规格不过 schema：${formatIssues(s.error).slice(0, 4).join("；")}`);
+  return s.data;
+}
+
 export async function packAssets(opts: PackOptions): Promise<CommandResult> {
   const recipe = JSON.parse(fs.readFileSync(opts.recipePath, "utf8"));
   const r = parseRecipe(recipe);
   if (!r.ok) throw new CommandError("invalid", `清单不过 schema：${r.errors.slice(0, 4).join("；")}`);
   const styleAbs = path.resolve(path.dirname(opts.recipePath), r.value.styleRef);
-  const style = JSON.parse(fs.readFileSync(styleAbs, "utf8")) as StyleSpec;
+  // ⚠️ **票 29 的闸**：在这之前这一行是 `JSON.parse(...) as StyleSpec` —— 一句编译期的谎。
+  const style = readStyle(styleAbs);
 
   const needsImage = r.value.assets.some((a) => a.source.kind === "image");
   if (needsImage && !opts.imageTransport)

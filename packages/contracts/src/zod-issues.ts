@@ -7,8 +7,6 @@
 //
 // ⚠️ 值取决于「**能不能定位**」（R2 之后确定性校验是唯一留下的质量控制）——
 //   「某个 op 有问题」在 20 个 op 的产物上等于没说。
-import type { z } from "zod";
-
 /**
  * ⚠️ **形参故意是结构类型，不是 `z.ZodError`**：本仓库现在装着两套 Zod ——
  *   旧契约用 `zod`（v3），V2 新契约用 `zod/v4`，两者的错误对象**形状一样但类型不同**。
@@ -40,8 +38,11 @@ export function formatIssues(error: { issues: readonly IssueLike[] }): string[] 
   return out;
 }
 
-/** 收口成 `{ok}` 那种形状 —— 本仓库每个 `parseXxx` 都是它。 */
-export function parseWith<T>(schema: z.ZodType<T>, input: unknown): { ok: true; value: T } | { ok: false; errors: string[] } {
-  const r = schema.safeParse(input);
-  return r.success ? { ok: true, value: r.data } : { ok: false, errors: formatIssues(r.error) };
-}
+// ⚠️ **`parseWith` 已删除**（票 29，2026-10-11）。它从落地那天起就是**零调用者**
+//   （`drawlist.ts` 那条再导出注释写着「免得既有调用方一行都要改」—— 而既有调用方**一个都没有**）。
+//   人类 2026-10-11 的裁定：**不留空壳** —— 「为将来留着的辅助函数」正是票 09（`GameSpec`）
+//   与票 18（`ArtifactRef`）反复处死的那种东西，它会让下一个读代码的人以为它是活的。
+//   ⚠️ **它还有一条结构性的死因**：签名锚在 **v3** 的 `z.ZodType` 上，而 V2 新契约是 **v4**
+//   （票 28 的边界：两套 Zod 不许互相嵌套）⇒ 它在 V2 那一侧**用不了**（`qa/src/intent.ts` 记录过）。
+//   ⚠️ **`formatIssues` 留着**（它有真调用者），`IssueLike` 也留着（它是 `formatIssues` 的形参类型）。
+//   今天的收口写法是 `schema.safeParse(...)` + `formatIssues(error)` —— 全仓一致。

@@ -203,8 +203,13 @@ const jstr = (o: unknown) => JSON.stringify(o, null, 2) + "\n";
 /**
  * 色板规范化：小写 `#rrggbb`、不得重复（票 24 Q3）。
  * 重复色会让 `palette:N` 与 `palette:M` 等价 —— 那不是「风格问题」，是契约问题，直接失败。
+ *
+ * ⚠️ **2026-10-11（票 29）导出**：它**从 `packAssets` 起也被人调**，用来把磁盘上那份
+ *   `stylespec.json` **规范化在前、过 schema 在后**（票 29 的 Q2 裁定 (c)：契约管**规范形式**、
+ *   入口管**接受形式**）。⇒ **本函数是色板规范化的唯一一份**，别再写第二份 ——
+ *   票 29 之前它已经是「`PaletteSchema` 那一半的第二份实现」，两把尺子只在大写上分歧。
  */
-function normalizePalette(palette: readonly string[]): string[] {
+export function normalizePalette(palette: readonly string[]): string[] {
   const out = palette.map((c) => c.toLowerCase());
   for (const c of out) if (!/^#[0-9a-f]{6}$/.test(c)) throw new Error(`色板里有非规范色值 "${c}"（要求小写 #rrggbb）`);
   const seen = new Set<string>();
