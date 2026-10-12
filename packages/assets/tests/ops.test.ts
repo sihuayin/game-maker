@@ -6,7 +6,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { CommandError, EXIT, packAssets } from "../src/index.js";
+import { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, packAssets } from "../src/index.js";
 import { encodePNG } from "../src/png.js";
 
 const STYLE = {
@@ -267,5 +267,65 @@ describe("⚠️ 「带参考图」在某家协议上会**静默地不成立**�
   it("换一个支持参考图的协议（gemini）⇒ 不拒 —— 这条只针对那一家", async () => {
     const e = await run(recipe(), "gemini");
     expect((e as CommandError).kind).not.toBe("usage");
+  });
+});
+
+// ── 票 48：**判断失败**那条路 —— 账与失败现场一起跟着异常走 ────────────────────
+//
+// ⚠️ 病（票 48 的票面）：`pack` 段那些**判断**抛的是普通 `Error`，而兜底原来是一句
+//   `throw e` ⇒ **`carried` 组装好了又被整包扔掉** ⇒ 两个壳都报「没花钱」。
+//   2026-10-09 那次真跑就是这么丢掉 9 张已付费的图的。
+//
+// ⚠️ **这一条是端到端**（票 48 第 2 轮 Q2 = B）：它走的是 `packAssets` 这条**真**路 ——
+//   判定/渲染/现场改名全都真发生，而契约层那 8 条只钉了三个助手。⇒ 两者不互相顶替。
+//
+// ⚠️ **判据是四条一起看**（第 2 轮执行约束 2），缺一条这条测试就测不动它要测的东西：
+//   ① **错误身份**：它仍是**裸 `Error`**（不重包 ⇒ 栈与错误的类都保住）；
+//   ② **退出码**：**1**（不是 3 —— 3 是「上游死活」的意思，而这里上游好好的）；
+//   ③ **账**：跟着异常走，而且那**一笔是真的**（有 `ms`、有 target——不是个空壳数组）；
+//   ④ **失败现场指针**：**而且那个目录真的在磁盘上**（一句好话不算数）。
+describe("⚠️ 判断失败也带账与失败现场（票 48）", () => {
+  const D4 = fs.mkdtempSync(path.join(os.tmpdir(), "gm-ops-48-"));
+  fs.writeFileSync(path.join(D4, "stylespec.json"), JSON.stringify(STYLE));
+  const IMG = { protocol: "openai" as const, baseUrl: "http://x/v1", apiKey: "k", model: "m" };
+  const RECIPE_IMG = { ...RECIPE, id: "judgement", assets: [{ spec: { ...RECIPE.assets[0]!.spec, source: undefined }, source: { kind: "image" } }] };
+  const recipePath = path.join(D4, "recipe.json");
+  fs.writeFileSync(recipePath, JSON.stringify(RECIPE_IMG));
+  const outRoot = path.join(D4, "out");
+
+  it("生出来一张**全透明**的图 ⇒ 撞上 `pack.ts` 那条判断：裸 `Error` + 退出码 1 + 账 + 现场", async () => {
+    // 上游**好好的**：它 200 并且给了一张合法 PNG —— 只是那张图**一个不透明像素都没有**。
+    // ⚠️ 所以这条路上的失败**不是**上游的锅，而退出码必须说得出这个区别。
+    const b64 = encodePNG({ width: 16, height: 16, data: Buffer.alloc(16 * 16 * 4) }).toString("base64");
+    const fetchImpl = (async () => new Response(JSON.stringify({ data: [{ b64_json: b64 }] }),
+      { status: 200, headers: { "content-type": "application/json" } })) as typeof fetch;
+
+    const e = await packAssets({
+      recipePath, outRoot, transport: { baseUrl: "http://x", apiKey: "k" }, imageTransport: IMG, fetchImpl,
+    }).then(() => { throw new Error("本该失败，却出包了"); }, (x: unknown) => x);
+
+    // ⚠️ 这是一句**护栏**、不是判据：它确认我们撞的是**那条判断**，而不是别的什么也恰好失败。
+    //   （锚在行为上的四条判据在下面 —— 这一句只是免得测试**安静地**测了别的东西。）
+    expect((e as Error).message, "撞的不是「判断」那条路").toMatch(/不透明像素/);
+
+    // ① 错误身份：**不重包** —— 类、名字、栈都还是原样那一份（票 48 的 Q2 = A 的正面理由）
+    expect(e, "被重包成 CommandError 了（票 46 §5 反对的正是这件事）").not.toBeInstanceOf(CommandError);
+    expect((e as Error).name).toBe("Error");
+    expect((e as Error).stack, "栈丢了").toMatch(/pack\.ts:\d+/);
+    // ② 退出码：1 —— 不是 3。3 的含义是「上游死活」，而上游这一跑**好好的**。
+    expect(exitCodeOfError(e), "把「判断失败」报成了「上游不可达」").toBe(EXIT.failure);
+    expect(EXIT.failure).not.toBe(EXIT.upstream);
+    // ③ 账：真花掉的那一笔（`ms` 在 = 它发出去了、也回来了）
+    const spent = ledgerOfError(e);
+    expect(spent, "钱花了、账没人报回来（票 48 要治的就是这个）").toBeDefined();
+    expect(spent!.map((c) => c.target)).toEqual(["crate"]);
+    expect(spent![0]!.ms, "这一笔连「花没花」都说不清").toBeDefined();
+    // ④ 失败现场指针：**而且那个目录真的在磁盘上**（票 01 的现场 + 票 36 的账都在里面）
+    const kept = failureDirOfError(e);
+    expect(kept).toBeDefined();
+    // ⚠️ `path.resolve(outRoot, kept)` 而不是 `join` —— 这枚指针今天给的是**绝对**路径
+    //   （`pack.ts` 的 `keepFailureSite` 直接给 `path`）。resolve 两种都吃得下，
+    //   所以这条断言问的是「**它指的那个目录真的在磁盘上吗**」，而不是「它的形状对不对」。
+    expect(fs.existsSync(path.resolve(outRoot, kept!)), `现场不在：${kept}`).toBe(true);
   });
 });

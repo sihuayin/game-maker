@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, compileRuntime, compileTdGame, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, planAssets, resolveImageTransport, verifyPack,
+  CommandError, EXIT, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
@@ -591,20 +591,23 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
     const code = exitCodeOfError(e);
     const message = e instanceof Error ? e.message : String(e);
     // ⚠️ **失败时已经花掉的那几笔**（票 46）—— 包没产出来，它们没有别的家。
-    const spent = e instanceof CommandError ? e.ledger : undefined;
+    // ⚠️⚠️ **按能力读、不按类读**（2026-10-12 · 票 48 的 Q2 = A）：
+    //   账与现场可以挂在**任何**异常上 —— 而 `pack` 段那些判断抛的**正是**普通 `Error`，
+    //   它们**恰恰**是花钱之后抛的那一类。⇒ 写成 `e instanceof CommandError` 等于
+    //   对**一整类**失败报「没花钱」，第三跑那 9 张已付费的图就是这么丢的。
+    const spent = ledgerOfError(e);
     // ⚠️ **失败现场**（票 01）：生图那条路一次失败就是几笔已经付过钱的调用，
     //   而原图与逐字提示词在失败那一刻就在磁盘上 —— 现在**改名留下**，这里把它说给人。
-    const kept = e instanceof CommandError ? e.failureDir : undefined;
+    //   ⚠️ 它与账**是两项独立信息**：一项缺席**不许**连另一项一起吞（票 48 的执行约束 2）。
+    const kept = failureDirOfError(e);
     if (json) io.out(JSON.stringify({ command, error: message, exitCode: code,
       ...(spent?.length ? { ledger: spent } : {}), ...(kept ? { failureDir: kept } : {}) }, null, 2) + "\n");
     else {
       io.err(`✗ ${message}\n`);
-      if (kept)
-        io.err(`\n⚠️ **已经付过钱的那几张原图留着**（连同那时逐字发出去的提示词）：${kept}\n` +
-          `   想复用：把那些资源的 source 改成 {"kind":"import","ref":"…"} 指过去 —— **生图 0 次**。\n`);
-      if (spent?.length)
-        // ⚠️ 渲染**共用** `formatSpentCalls` —— 两个壳的输出必须一字不差（别在这里再写一份）
-        io.err(`\n${formatSpentCalls(spent)}\n`);
+      // ⚠️ 渲染**共用** `failureSiteNote` / `formatSpentCalls` —— 两个壳的输出必须说同一件事
+      //   （别在这里再写一份：2026-09-30 那两份拷贝就漂过一次）。
+      if (kept) io.err(`\n${failureSiteNote(kept)}\n`);
+      if (spent) io.err(`\n${formatSpentCalls(spent)}\n`);
     }
     return code;
   }

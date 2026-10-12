@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, formatIssues, parseAssetPack, parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
+  carryOnError, CommandError, formatIssues, parseAssetPack, parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
   RUN_LEDGER_FORMAT, summarizeCalls,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
   type GameIntentSpec, type LedgerCall, type MasterRatio, type QAReport, type QaRunner, type RunLedger,
@@ -333,7 +333,8 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     // ⚠️ **失败留现场**（image-route-v1 的 ①）：改名、不删；现场路径挂在异常上（与 `pack` 同款，
     //   两个壳各自渲染）—— 里面是**已经跑完那几步**的产物，看一眼就知道断在哪一步。
     const site = abandonRun(run, { why: why(e), ...(gameId !== undefined ? { gameId } : {}) });
-    if (site !== undefined) (e as { failureDir?: string }).failureDir = site;
+    // ⚠️ 与 `pack` 同一条路（票 48 的约束 2）：挂上就走，冻过的异常挂不上也不吞原异常。
+    if (site !== undefined) carryOnError(e, { failureDir: site });
     throw e;
   }
 }

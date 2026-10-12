@@ -12,7 +12,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  ASSET_PACK_FORMAT, COVERAGE_FORMAT, LEDGER_FORMAT, MASTER_RATIOS_FILE, MASTER_RATIOS_FORMAT,
+  ASSET_PACK_FORMAT, COVERAGE_FORMAT, carryOnError, LEDGER_FORMAT, MASTER_RATIOS_FILE, MASTER_RATIOS_FORMAT,
   derivePackMode, imageUnitsOf, paletteBindingOf, summarizeCalls,
   type AssetPackManifest, type AssetSpec, type AuthoringAsset, type CharacterDNA, type CharacterDNAFile,
   type DrawList, type ImageUnit, type Ledger, type LedgerCall, type MasterRatio, type StyleSpec, type VisualWorldSpec,
@@ -244,9 +244,7 @@ function scale9Of(spec: AssetSpec): { x: number; y: number; w: number; h: number
   return { x: left, y: top, w: spec.size.w - left - right, h: spec.size.h - top - bottom };
 }
 
-/** 失败时把现场留在哪 —— 挂在那条异常上，`packAssets` 会把它搬进 `CommandError`。 */
-export type FailureSite = { failureDir?: string };
-
+// ⚠️ **2026-10-12（票 48）**：这里原先有个 `FailureSite` 类型（「现场挂在哪」），**已删** —— 现场与账今天一律挂**原异常**上（`carryOnError`），两个壳按**能力**读（`failureDirOfError`）。
 /**
  * **失败现场**：把工作目录**改名**留下，而不是删掉（2026-09-30 · 票 01）。
  *
@@ -295,8 +293,9 @@ export async function buildAssetPack(opts: BuildPackOptions): Promise<BuildPackR
   } catch (e) {
     // ⚠️ **失败不删**（票 01）—— 留下的那份里是已经付过钱的原图与逐字提示词。
     //   （「失败不消耗版本号」是另一半 —— 见 buildInto 末尾那一步改名。）
+    // ⚠️ 挂在**任何**异常上，不分错误类（票 48 的 `carryOnError` 只加不改、且扛得住冻结对象）。
     const failureDir = keepFailureSite(opts);
-    if (failureDir !== undefined) (e as FailureSite).failureDir = failureDir;
+    if (failureDir !== undefined) carryOnError(e, { failureDir });
     throw e;
   }
 }

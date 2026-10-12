@@ -38,6 +38,11 @@ export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as 
  * ⚠️ 它**不是 outcome**：`CommandResult` 那条「成功这个类型里没有假货」的纪律照旧。
  *   **不要为了让账有地方放，就把失败塞回 `CommandResult`** —— 那是用「成功类型里掺假」
  *   换一处方便，正好换掉了当初立这条规矩要防的东西。
+ *
+ * ⚠️⚠️ **2026-10-12（[票 48](../../../.scratch/game-maker-v2/issues/48-error-carries-ledger.md)）：这个字段不再是唯一的载体**。
+ *   两个壳**一律按能力读**（`ledgerOfError` / `failureDirOfError`），
+ *   因为它们带的那一份**可以挂在任何异常上**（`carryOnError`）—— 见下面 `Carried` 那段。
+ *   ⇒ **`instanceof CommandError` 不再是一种可用的读法**（用它 = 对裸 `Error` 报「没花钱」）。
  */
 export class CommandError extends Error {
   readonly ledger?: LedgerCall[];
@@ -61,3 +66,49 @@ export class CommandError extends Error {
   }
 }
 export const exitCodeOfError = (e: unknown): number => (e instanceof CommandError ? EXIT[e.kind] : EXIT.failure);
+
+/**
+ * 异常上**带出来的东西** —— 两个壳按**能力**读，**不按类读**（2026-10-12 · 票 48）。
+ *
+ * ⚠️⚠️ **为什么是能力读、不是 `instanceof CommandError`**：
+ *   票 46 §5 立过一条二分（「上游失败」/「代码 bug」），而实测第三类**漏了** ——
+ *   「判据说这批图不行，**钱已经花完了**」（`pack` 段的判断，11 处）。
+ *   票 48 的裁定：**该带账的判据是「失败时有没有已经发生的花费」**（`ledger.length > 0`），
+ *   **不是**「抛的是哪个类」—— 因为**同一个抛点**在不同包形状下**有时免费、有时在花钱之后**
+ *   （全 `import` / 全 drawlist 的包一分钱没花），按行号贴类标签会在那些行上**说谎**。
+ *   ⇒ 于是**不重包成 `CommandError`**（那会**丢栈**，而丢栈正是票 46 §5 唯一的反对理由），
+ *   改成**挂在原异常上、原样抛出** ⇒ 栈、错误类、`cause` 链**一样不丢**。
+ */
+export type Carried = { ledger?: LedgerCall[]; failureDir?: string };
+
+/**
+ * **把 `carried` 挂到异常上**（票 48 的 Q2 = A）。
+ *
+ * ⚠️ 三条边界，缺一条就是「错得安静」：
+ *   · **没东西可带就什么都不做** —— 一分钱没花的真·代码 bug **原样抛出**，
+ *     不包装、不凭空附加账（票 46 §5 那个二分要保住的第二格）。
+ *   · **只能挂在可扩展的对象上**：冻过的异常对象 `Object.assign` 会抛 ⇒ 吞掉那个 `TypeError`，
+ *     但**绝不**因此替换或吞掉**原异常**（那是本末倒置）。挂不上时这一份就只剩**失败现场**里那份
+ *     （票 36 已经保证它在磁盘上）。
+ *   · **只加不改**：不覆盖异常上**已有**的同名键 —— 下层挂上去的那一份比这一层更接近现场，
+ *     覆盖它等于把更准的信息换成更糙的。
+ */
+export const carryOnError = (e: unknown, carried: Carried): void => {
+  if (Object.keys(carried).length === 0) return;
+  if (e === null || (typeof e !== "object" && typeof e !== "function")) return;
+  try {
+    for (const [k, v] of Object.entries(carried)) if (!(k in e)) (e as Record<string, unknown>)[k] = v;
+  } catch { /* 冻过的异常：挂不上就挂不上，原异常照抛（见上） */ }
+};
+
+/** 异常上带的账（**空数组算没有** —— 「有花费」才是判据）。 */
+export const ledgerOfError = (e: unknown): LedgerCall[] | undefined => {
+  const v = (e as Carried | null | undefined)?.ledger;
+  return Array.isArray(v) && v.length > 0 ? v : undefined;
+};
+
+/** 异常上带的失败现场路径。⚠️ 它与账**是两项独立信息** —— 缺一项**不许**连另一项一起丢（票 48）。 */
+export const failureDirOfError = (e: unknown): string | undefined => {
+  const v = (e as Carried | null | undefined)?.failureDir;
+  return typeof v === "string" ? v : undefined;
+};

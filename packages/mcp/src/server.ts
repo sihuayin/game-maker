@@ -7,7 +7,7 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  CommandError, compileRuntime, exitCodeOfError, formatSpentCalls, inspectPack, packAssets, planAssets, resolveImageTransport, verifyPack,
+  CommandError, compileRuntime, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack,
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
@@ -328,13 +328,23 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
         const message = e instanceof Error ? e.message : String(e);
         // ⚠️ **失败时已经花掉的那几笔**（票 46）—— 与 CLI 渲染的是**同一份数据**（R5）。
         //   包没产出来，它们没有别的家；而花了钱是事实。
-        const spent = e instanceof CommandError ? e.ledger : undefined;
-        const tail = spent?.length
-          ? `\n\n${formatSpentCalls(spent)}`
-          : "";
+        // ⚠️⚠️ **按能力读、不按类读**（2026-10-12 · 票 48 的 Q2 = A）—— 与 CLI **同源**，
+        //   理由见 `command.ts` 的 `Carried`：`pack` 段那些判断抛的**正是**普通 `Error`。
+        const spent = ledgerOfError(e);
+        // ⚠️ **失败现场**（票 48 的 Q5）：这个壳**以前从来不读它** ⇒ 同一个失败，
+        //   人看 CLI 有路径、agent 看 MCP 一个字都没有 —— 那就是「只修了一半的壳」。
+        //   ⚠️ 呈现形式两端不必一样，但**底层信息**是同一份（`failureSiteNote`）。
+        const kept = failureDirOfError(e);
+        const tail = (spent ? `\n\n${formatSpentCalls(spent)}` : "") +
+          (kept ? `\n\n${failureSiteNote(kept)}` : "");
         return reply(id, {
           content: [{ type: "text", text: `✗ ${message}${tail}` }],
-          ...(spent?.length ? { structuredContent: { ledger: spent } } : {}),
+          ...(spent !== undefined || kept !== undefined
+            ? { structuredContent: {
+                ...(spent !== undefined ? { ledger: spent } : {}),
+                ...(kept !== undefined ? { failureDir: kept } : {}),
+              } }
+            : {}),
           isError: true, _exitCode: exitCodeOfError(e),
         });
       }

@@ -21,7 +21,7 @@ import {
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
-import { buildAssetPack, normalizePalette, type FailureSite } from "./pack.js";
+import { buildAssetPack, normalizePalette } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError, type ImageGenerator } from "./image-gen.js";
 import { masterRatioNotes, referenceImagesOf } from "./master.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
@@ -31,8 +31,8 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
-export { CommandError, EXIT, exitCodeOfError, type CommandResult } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, carryOnError, failureDirOfError, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
+export { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
 
@@ -49,6 +49,19 @@ export function formatSpentCalls(calls: readonly LedgerCall[]): string {
   const trips = calls.reduce((n, c) => n + c.attempts, 0);
   return `已经花掉的（${calls.length} 次调用 · ${trips} 次往返）：\n` +
     calls.map((c) => `  · ${c.step} ${c.target} · ${c.ms === undefined ? "**还没回来**" : (c.ms / 1000).toFixed(1) + "s"} · 往返 ${c.attempts}${c.model ? ` · ${c.model}` : ""}`).join("\n");
+}
+
+/**
+ * **失败现场那一段**（票 01 的现场 + 票 48 把它补进 MCP）。
+ *
+ * ⚠️ 与 `formatSpentCalls` **同一条纪律**：**两个壳共用这一处**，别各写一份
+ *   （它们必须说同一件事 —— 人看 CLI、agent 看 MCP）。
+ * ⚠️ 账与现场**是两项独立信息**：只有一项时**只印那一项**，不许因为另一项缺席就把这一项也吞掉
+ *   （票 48 的执行约束 2）。
+ */
+export function failureSiteNote(dir: string): string {
+  return `⚠️ **已经付过钱的那几张原图留着**（连同那时逐字发出去的提示词）：${dir}\n` +
+    `   想复用：把那些资源的 source 改成 {"kind":"import","ref":"…"} 指过去 —— **生图 0 次**。`;
 }
 
 // ── plan-assets：设计 + 这个世界 → 资源清单（票 12）───────────────────────────
@@ -1211,13 +1224,18 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
   } catch (e) {
     // ⚠️ 生成失败**就是**「上游不可达」（3），不是「失败」（1）。
     // 拆掉降级链之前这条分支不会发生 —— 上游死活都被兜底吸收，pack 永远成功。
-    // ⚠️ **失败时账没有别的地方可去**（票 46）：包没产出来，所以没有 `ledger.json` 可写。
+    // ⚠️ **失败时账有两处可去，这一处是「当场看得见」的那一处**（票 46）：
+    //   ⚠️ **2026-10-12（票 36）**：`pack` 现在在**资产段之后**就先写一版包内账 ⇒
+    //   抛点之后的**失败现场里有一份 `ledger.json`**。但那一份要**先知道现场在哪**才读得到，
+    //   而跟着异常走的这一份是给人**当场**看的 —— 两者不互相顶替。
     //   而**已经花掉的那几笔是事实** —— 它们跟着异常走，两个壳各自渲染。
     //   ⚠️ 这个数组在 `buildAssetPack` **调用之前**就存在了，所以它活过了这次抛出；
     //   而票 47 的「失败即止」保证它只含**真的发出去过**的调用（没发的不算）。
     // ⚠️ **失败现场**（票 01）：`buildAssetPack` 已经把工作目录改名留下了，
     //   路径挂在异常上 —— 与账**同一处**搬进 `CommandError`（两个壳各自渲染）。
-    const failureDir = (e as FailureSite).failureDir;
+    // ⚠️ 按能力读（票 48）—— 这枚指针**已经**挂在异常上了（`pack.ts` 的 `carryOnError`），
+    //   以前那三处 `instanceof CommandError` 的读者把它当不存在。
+    const failureDir = failureDirOfError(e);
     const carried = {
       ...(ledger.length > 0 ? { ledger } : {}),
       ...(failureDir !== undefined ? { failureDir } : {}),
@@ -1225,6 +1243,20 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
     if (e instanceof GenerationError || e instanceof ImageGenerationError)
       throw new CommandError("upstream", e.message, carried);
     if (e instanceof CommandError) throw new CommandError(e.kind, e.message, carried);
+    // ⚠️⚠️ **其余一律原样抛出，只把「带出来的东西」挂上去**（2026-10-12 · 票 48 的 Q2 = A）。
+    //
+    //   原来是 `throw e;` —— **那一声把 `carried` 扔了**，而 `pack` 段的判断**全都**走这条路
+    //   （11 处普通 `Error`）⇒ 「钱花了、账没人报」。第三跑那 9 张已付费的图死的就是这一类。
+    //
+    //   ⚠️ **为什么不重包成 `CommandError`**：票 46 §5 反对套它的**唯一理由**是「只会把栈弄丢」，
+    //   而丢栈是这个仓库真吃过亏的东西（现场的栈是唯一能说明「哪一行判的」的凭据）。
+    //   挂上去**一样能报账**，且栈、错误类、`cause` 链**一样不丢** ⇒ 正面解决那条理由，而不是绕过它。
+    //
+    //   ⚠️ **判据是「有没有真花掉的钱」，不是「抛的是哪个类」**（票 48 的 Q3 = A）：
+    //   用的就是上面 `ledger.length > 0` 那把**已有的**尺子。⇒ 一分钱没花的真·代码 bug
+    //   `carried` 是空的 ⇒ `carryOnError` 什么都不做 ⇒ **它仍是裸 `Error`、原样抛出**
+    //   （票 46 §5 那个二分要保住的第二格，原样保住）。
+    carryOnError(e, carried);
     throw e;
   }
   const m = res.manifest;
