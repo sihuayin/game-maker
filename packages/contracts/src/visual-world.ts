@@ -112,6 +112,9 @@ export const StyleSpecShape = z.strictObject({
   environment: z.array(z.string()).default([]),
   characterStyle: z.array(z.string()).default([]),
   constraints: z.array(z.string()).default([]),
+  // ⚠️ **这与本文件顶层那个同名键是两张表**（顶层那张的说明写在它自己旁边）：
+  //   本张的消费者是 drawlist（`styleBrief`）、母版那一发、观察那一发；
+  //   而**三张资产生图模板故意不读它** —— 票 30 的裁定，理由写在 `prompt.ts` 的 `imagePrompt` 上。
   confidence: z.number().min(0).max(1)
 });
 
@@ -243,6 +246,10 @@ export const VisualWorldSpecSchema = z.strictObject({
   //   而 `rendering` 一个读者都没有（它拟人化的那部分由 `prompt.ts:299` 一句硬编码承担）。
   shapeLanguage: z.array(z.string()),
   constraints: z.array(z.string()),
+  // ⚠️ **这是顶层那一张。** `StyleSpec.constraints`（`style` 里那个同名键）是**另一张** ——
+  //   两批内容**七份真跑没有一次相等**（逐份比过）。`imagePrompt()` 读的是 `style` 里那张、
+  //   **不是这张**；这张的消费者是 DNA 那一发（`game-design/src/prompts.ts`）。
+  //   ⚠️ 两张该不该派生 / 合并：票 30 的 Q3 判**「本票不碰」** —— 今天记为**未定**。
 
   // ⚠️ **摊平成一项**（第 18 条裁决，R3-Q4）：`characterImages` / `materialImages` 已判不进，
   //   `references` 会是个只有一个孩子的容器，多一层不换任何东西。

@@ -4,8 +4,8 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { TD_REFERENCE_SCALE, assetTask, recipeShapeSpec, tdConfigPrompt } from "../src/index.js";
-import type { StyleSpec } from "@game-maker/contracts";
+import { TD_REFERENCE_SCALE, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
+import type { AssetSpec, StyleSpec } from "@game-maker/contracts";
 
 describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
   const spec = recipeShapeSpec();
@@ -124,5 +124,73 @@ describe("清单那条路（drawlist）也读**逐层描述**（票 02）", () =
     //   —— 把回落改成「接一个空格」就能带着整张场景的描述溜过去（实测过）。
     expect(wallLine).toBe("  第 2 帧（层名 wall）：从远到近的第 2/3 层");
     expect(wallLine).not.toContain("整张场景那一句");
+  });
+});
+
+describe("三张资产生图模板**不收** `style.constraints`（票 30 的裁定）", () => {
+  // ⚠️ **病根**：`imagePrompt` 的注释从**第一天**就写着「只取 identity / material / constraints」，
+  //   而三张模板只吐前两个 —— 那句话描述的是一个**从未实现过的意图**，且一直没人量过
+  //   （`git show 593c327` 那次提交里已经是这样）。票 30 裁的是「**代码是现状**」：
+  //   改注释、不改模板 ⇒ 这条测试把**现状**钉住，于是那条注释从今往后**是可证的**。
+  //   ⚠️ **它守的是两边，不是一边**：那三张**不收**，而 drawlist 那条路**照收** ——
+  //   只钉「不收」的话，把 `styleBrief` 里的 `constraints` 一起删掉也能过（而那会让
+  //   母版 / drawlist 的读者失去它）。⇒ 谁要把 `constraints` 补进生图模板，
+  //   必须**先改这条测试**（改测试 = 得去开一张票），不能再顺手改。
+  const STYLE: StyleSpec = JSON.parse(readFileSync(fileURLToPath(new URL(
+    "../../../.scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json", import.meta.url)), "utf8"));
+
+  // ⚠️ 断的是 `styleBrief` 真正吐出来的那一串（`JSON.stringify(constraints)`），
+  //   不是「constraints 这个词在不在」—— 三张模板里本来就有「世界的约束」这类说法，
+  //   断词会**恒真**。
+  const CONSTRAINT_BLOB = JSON.stringify(STYLE.constraints);
+
+  const SPRITE: AssetSpec = {
+    kind: "sprite", id: "crate", role: "木箱", description: "一个木箱",
+    styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 32, h: 32 }, required: true,
+  };
+  const ANIM: AssetSpec = {
+    kind: "animation", id: "guard", role: "角色", description: "一个走路的人",
+    styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true,
+    animations: [{ name: "idle", frames: 3, fps: 6, loop: true }],
+  };
+  const SCENE: AssetSpec = {
+    kind: "background", id: "bg", role: "三层视差背景", description: "整张场景那一句",
+    styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 480, h: 270 }, required: true,
+    layers: [{ name: "sky", parallax: 0 }, { name: "wall", parallax: 0.6 }],
+  };
+  const A_LAYER = { name: "sky", index: 0, total: 2, tileX: false };
+
+  it("⚠️ **前提**：这份风格规格真有 `constraints` —— 否则下面每一条都是**空过**", () => {
+    expect(STYLE.constraints.length).toBeGreaterThan(0);
+  });
+
+  it("单物体模板（`sprite`）：不收", () => {
+    const p = imagePrompt(SPRITE, STYLE);
+    expect(p).not.toContain(CONSTRAINT_BLOB);
+    for (const c of STYLE.constraints) expect(p).not.toContain(c);
+  });
+
+  it("动画模板（`animation`）：不收", () => {
+    const p = imagePrompt(ANIM, STYLE);
+    expect(p).not.toContain(CONSTRAINT_BLOB);
+    for (const c of STYLE.constraints) expect(p).not.toContain(c);
+  });
+
+  it("分层背景模板（`background` + 层目标）：不收", () => {
+    // ⚠️ **必须递 `layer`**：不给的话 `imagePrompt` 会**静默落到单物体模板**
+    //   （`spec.layers && target.layer` 那条判据），于是这条用例测的是**别的模板**。
+    const p = imagePrompt(SCENE, STYLE, { layer: A_LAYER });
+    expect(p).toContain("第 1 / 2 层");            // 钉住「确实走的是背景层那一支」
+    expect(p).not.toContain(CONSTRAINT_BLOB);
+    for (const c of STYLE.constraints) expect(p).not.toContain(c);
+  });
+
+  it("⚠️ **另一边**：drawlist 那条路**照收** —— 这两条规矩是分开的，别把一条推成两条", () => {
+    // ⚠️ **收它的不是 `assetTask` 而是 `renderPrompt`**：`assetTask` 只吐「任务」那一段，
+    //   风格块是 `renderPrompt` 用 `styleBrief(style)` 拼上去的（`generate.ts`）。
+    //   写成 `assetTask` 会**当场红** —— 这条用例第一版就是这么写的，被测试自己抓住了。
+    const t = renderPrompt(SPRITE, STYLE);
+    expect(t).toContain(CONSTRAINT_BLOB);
+    for (const c of STYLE.constraints) expect(t).toContain(c);
   });
 });

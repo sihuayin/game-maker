@@ -53,6 +53,13 @@ export function masterNegativePrompt(): string {
  * ⚠️ **画布是 canonical 的**（Q2 的裁定：「size 是 canonical target；provider 尺寸是派生值」）：
  *   提示词说的是 `authoring[].size` 那个比例，而上游请求尺寸由 `image-gen.ts` 按协议**派生**
  *   （`requestSize` / `geminiAspect` / `openaiSize`）—— 这一层不参与那条换算。
+ *
+ * ⚠️ **下面「世界的约束」那段（`style.constraints`）的来源与意图未确认**（票 30 的 Q2 判「不处理」）：
+ *   它是票 13 **新建本文件**时就带的，而票 13 的 Answer 里**没有记过这个决定**
+ *   ⇒ **说不清当初是故意还是顺手抄的**（两种读法都有证据，谁也没定案）。
+ *   ⇒ 今天**原样保留**，但**别把它读成一条被裁过的规矩** —— 票 30 只裁了
+ *   「**那三张资产生图模板**不收 `style.constraints`」（见 `prompt.ts` 的 `imagePrompt`），
+ *   那一条**不适用于这里**。裁定原文见 `.scratch/game-maker-v2/issues/30-constraints-not-in-image-prompt.md`。
  */
 export function masterPrompt(input: {
   master: { id: string; role: string; description: string };
