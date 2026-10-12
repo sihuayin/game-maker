@@ -1,0 +1,414 @@
+{
+  "① 200 + text/plain 说人话（不是 JSON）": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "upstream",
+      "exitCode": 3,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 1,
+          "attempts": 1,
+          "failures": [
+            "http"
+          ]
+        }
+      ],
+      "message": "上游回的不是 JSON：Unexpected token '上', \"上游今天心情不好，请稍后再试\" is not valid JSON"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "upstream",
+      "exitCode": 3,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 1,
+          "failures": [
+            "http"
+          ]
+        }
+      ],
+      "message": "上游回的不是 JSON：Unexpected token '上', \"上游今天心情不好，请稍后再试\" is not valid JSON"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "upstream",
+      "exitCode": 3,
+      "ledger": null,
+      "message": "Unexpected token '上', \"上游今天心情不好，请稍后再试\" is not valid JSON"
+    }
+  },
+  "② 200 + JSON 字面量 null": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应不是一个对象（拿到 null）"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 1,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应不是一个对象（拿到 null）"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "upstream",
+      "exitCode": 3,
+      "ledger": null,
+      "message": "Cannot read properties of null (reading 'usage')"
+    }
+  },
+  "③ 200 + JSON 空数组 []": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应不是一个对象（拿到 数组(0)）"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应不是一个对象（拿到 数组(0)）"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-td-game",
+          "target": "td-config",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "invalid-json",
+            "invalid-json",
+            "invalid-json"
+          ]
+        }
+      ],
+      "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+    }
+  },
+  "④ 200 + JSON 数字 123": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应不是一个对象（拿到 number）"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 2,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应不是一个对象（拿到 number）"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-td-game",
+          "target": "td-config",
+          "upstream": "messages",
+          "ms": 1,
+          "attempts": 3,
+          "failures": [
+            "invalid-json",
+            "invalid-json",
+            "invalid-json"
+          ]
+        }
+      ],
+      "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+    }
+  },
+  "⑤ 200 + {\"error\":{\"message\":…}}（代理把 500 转成 200）": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应里没有名为 \"emit_asset_recipe\" 的 tool_use 块（拿到的块：（空））。⚠️ 这一档八成是**上游不认 tools / tool_choice**，不"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应里没有名为 \"emit_game_config\" 的 tool_use 块（拿到的块：（空））。⚠️ 这一档八成是**上游不认 tools / tool_choice**，不是"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-td-game",
+          "target": "td-config",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "invalid-json",
+            "invalid-json",
+            "invalid-json"
+          ]
+        }
+      ],
+      "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+    }
+  },
+  "⑥ 200 + 合法 messages 形状但 content 全是非文本块": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应里没有名为 \"emit_asset_recipe\" 的 tool_use 块（拿到的块：tool_use）。⚠️ 这一档八成是**上游不认 tools / tool_choic"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 1,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应里没有名为 \"emit_game_config\" 的 tool_use 块（拿到的块：tool_use）。⚠️ 这一档八成是**上游不认 tools / tool_choice"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-td-game",
+          "target": "td-config",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "invalid-json",
+            "invalid-json",
+            "invalid-json"
+          ]
+        }
+      ],
+      "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+    }
+  },
+  "⑦ 200 + content 不是数组": {
+    "planAssets": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "plan-assets",
+          "target": "recipe",
+          "upstream": "messages",
+          "ms": 0,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应里没有名为 \"emit_asset_recipe\" 的 tool_use 块（拿到的块：（空））。⚠️ 这一档八成是**上游不认 tools / tool_choice**，不"
+    },
+    "compileRuntime": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "invalid",
+      "exitCode": 4,
+      "ledger": [
+        {
+          "step": "compile-runtime",
+          "target": "game-config",
+          "upstream": "messages",
+          "ms": 1,
+          "attempts": 3,
+          "failures": [
+            "no-tool-use",
+            "no-tool-use",
+            "no-tool-use"
+          ]
+        }
+      ],
+      "message": "响应里没有名为 \"emit_game_config\" 的 tool_use 块（拿到的块：（空））。⚠️ 这一档八成是**上游不认 tools / tool_choice**，不是"
+    },
+    "compileTdGame": {
+      "threw": true,
+      "name": "CommandError",
+      "kind": "upstream",
+      "exitCode": 3,
+      "ledger": null,
+      "message": "(j.content ?? []).filter is not a function"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "空凭据那条真 not-sent": {
+    "name": "CommandError",
+    "kind": "upstream",
+    "exitCode": 3,
+    "message": "文本上游没配：ANTHROPIC_BASE_URL 与 ANTHROPIC_AUTH_TOKEN **两个都要给**。⚠️ 但这一步的产物是文件 —— 资源清单"
+  },
+  "接上账之后 ledgerOfError(e)": [
+    {
+      "step": "compile-td-game",
+      "target": "td-config",
+      "upstream": "messages",
+      "ms": 0,
+      "attempts": 1
+    }
+  ]
+}

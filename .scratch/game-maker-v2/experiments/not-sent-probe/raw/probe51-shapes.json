@@ -1,0 +1,115 @@
+{
+  "JSON false": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  },
+  "JSON 字符串 \"abc\"": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  },
+  "{}（对象、没 content）": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  },
+  "{\"content\":5}（content 不是数组）": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "upstream",
+    "exitCode": 3,
+    "ledger": null,
+    "message": "(j.content ?? []).filter is not a function"
+  },
+  "{\"content\":[{\"type\":\"text\"}]}（text 缺）": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 1,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  },
+  "{\"content\":[{\"type\":\"text\",\"text\":null}]}": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 1,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  }
+}

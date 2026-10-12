@@ -31,6 +31,15 @@ export type CommandResult = {
  *   ⚠️ 它与「失败时带不带账」**是两把尺子、各答一问**：那把看**花费**（票 46/48），
  *   这把看**抛点**（票 49）—— **不许合并**（合并之后「花钱之后才发现我们代码坏了」会被报成
  *   「没花钱」）。先例：`ops.ts` 的 `compileTdGame`。
+ *
+ * ⚠️⚠️ **2026-10-12（[票 51](../../../.scratch/game-maker-v2/issues/51-not-sent-lies-both-ways.md) 的 Q3 = (B)）：有一条路从 4 挪到了 3**。
+ *   「HTTP 200、但 body **不是对象**（`null` / `[]` / `123` / `false` / `"abc"`）」这一族，
+ *   在 **R16 工具链**（`planAssets` · `compileRuntime`）上过去落 `invalid`(**4**)、还要**重采样 3 趟**
+ *   —— 现在落 `upstream`(**3**)、**一趟就收**（往返 3 → 1）。理由是**这一个事实两条路判成了两档**
+ *   （旧文本链一直说 3），而 3 的定义正是「上游没给一个可用的应答」（`UpstreamCallError` 的 `http` 档）；
+ *   ⚠️ 代理坏掉回一个 `null`，重试三次只是白花钱，**它的账因此也跟着变了**（`failures: ["http"]`）。
+ *   ⚠️ **`{"content":5}` 那种「是对象、只是字段形状不对」不在其中**：两条路照旧都落 `invalid`(**4**)。
+ *   ⚠️ 原文与 R 表**一个字没改**，只加这一注（照票 49 的先例）。
  */
 export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as const;
 

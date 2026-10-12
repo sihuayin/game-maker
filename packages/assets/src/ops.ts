@@ -140,6 +140,17 @@ async function onceThroughTool<T>(o: {
   try { body = await res.json(); }
   catch (e) { return { kind: "upstream", failure: "http", error: new UpstreamCallError("http", `上游回的不是 JSON：${(e as Error).message}`) }; }
 
+  // ⚠️⚠️ **body 不是对象 ⇒ 上游没给一个可用的应答，落 `upstream`/`http`、不重采样**
+  //   （[票 51](../../../.scratch/game-maker-v2/issues/51-not-sent-lies-both-ways.md) 的 Q3 = (B)，2026-10-12）。
+  //   这一道是**前置**的，**不动 `parseToolUse`**（它照旧把这种入参判成 `no-tool-use` 可重采样，
+  //   它的单元测试一个字没改）—— 因为同一个事实两条路（旧文本链 / R16 工具链）**判成两档**
+  //   正是票 51 标题那一句，而「代理坏掉、回了 `null`」重试三次只是**白花钱**。
+  //   ⚠️ **代价已裁定并记入票 51**：`planAssets` / `compileRuntime` 在「200 + body 不是对象」这一条上
+  //   退出码 **4 → 3**、往返 **3 → 1 次**（`{"content":5}` 那种**是对象**的不受影响，两条路本来就都落 4）。
+  if (!isResponseObject(body))
+    return { kind: "upstream", failure: "http",
+      error: new UpstreamCallError("http", `上游回的不是一个 messages 应答（拿到 ${describeShape(body)}）`) };
+
   const spent = spentOfTool(body);
   const parsed = parseToolUse(body, o.tool, o.schema);
   // 形式的失败（没调工具 / 入参丢了 / 不合线形状）由 `parseToolUse` 分好类 —— 那一档才是重采样的理由。
@@ -291,14 +302,45 @@ export class UpstreamCallError extends Error {
   }
 }
 
+/**
+ * ⚠️ **「没配凭据、请求真的没上路」的指名标记**（票 51 的 Q1 = (d)，2026-10-12）。
+ *
+ * ⚠️⚠️ **为什么非要一个类，而不是继续「抛的不是 `UpstreamCallError` 就是没发出去」**：
+ *   那不叫判据，那叫**兜底** —— 而兜底的方向是错的、且错得最贵。`callText` 里有四个抛点，
+ *   **只有这一个**真没上路；其余三个（`timeout` 一处 · `http` 两处）本来就抛 `UpstreamCallError`，
+ *   可**将来任何没设防的抛点**（`res.json()` 的 `SyntaxError`、取 `usage` 的 `TypeError`）
+ *   都会被那条兜底记成「我们没发出去」—— 而那两张脸**钱已经花了**（HTTP 200 都回来了）。
+ *   ⇒ 谎报的后果不是文案难看，是**整笔账丢掉**（不带账的那一档没人读得出花过钱）。
+ *   ⇒ 翻过来才对：**点名的这一处落 `"not-sent"`，其余的默认落 `upstream`**（保守，且与
+ *   `UpstreamCallError` 上面那句「上游没给一个可用的应答」逐字一致）。
+ *   ⚠️ 不是第三档病因 —— `CallFailure` 的**闭集一个字没动**，这只是「有没有上路」的标记。
+ */
+class NotSentError extends Error {
+  constructor(message: string) { super(message); this.name = "NotSentError"; }
+}
+
+/**
+ * ⚠️ 与 `contracts/structured-call.ts` 里那一对**逐字同义**（`isRecord` / `describe`）——
+ *   那边是模块私有的、没导出，而这里只需要它**报形状**这一个用法。
+ *   ⚠️ 故意**不**为了这两行去扩大 contracts 的公开面（那会动到一个本票边界外的包）。
+ */
+const describeShape = (u: unknown): string =>
+  u === null ? "null" : Array.isArray(u) ? `数组(${u.length})` : typeof u;
+
+/** 一个 body 是不是「一个能当 messages 应答读的对象」。⚠️ 数组、`null`、标量都不是。 */
+const isResponseObject = (u: unknown): u is Record<string, unknown> =>
+  typeof u === "object" && u !== null && !Array.isArray(u);
+
 async function callText(opts: Transport & { prompt: string; fetchImpl?: typeof fetch; timeoutMs?: number }):
 Promise<{ text: string; usage?: LedgerUsage; servedModel?: string; stopReason?: string }> {
   // ⚠️ **没配凭据要在**这里**拦住**，不能让它落到 fetch 上去失败。
   //   两个壳（CLI 一处 + MCP 三处）永远传一个**定义了、但 `baseUrl` 可能是空串**的对象，
   //   所以 `ops` 里那些 `if (!opts.transport)` 恒不触发 —— 用户看到的是一个原始 fetch 报错，
   //   而不是这句话。（票 06 量到的：那句好话站错了地方。）
+  //   ⚠️ **只可能在这里拦住**，所以「没上路」这件事**由这一处点名**（`NotSentError`，票 51）——
+  //   `onceThrough` 的判据挂在这个类上，而不是挂在那四个抛点之外的兜底上。
   if (opts.baseUrl === "" || opts.apiKey === "")
-    throw new Error(
+    throw new NotSentError(
       "文本上游没配：ANTHROPIC_BASE_URL 与 ANTHROPIC_AUTH_TOKEN **两个都要给**。" +
       "⚠️ 但这一步的产物是文件 —— 资源清单与关卡配置都可以由人直接写一份。");
 
@@ -321,13 +363,31 @@ Promise<{ text: string; usage?: LedgerUsage; servedModel?: string; stopReason?: 
     throw new UpstreamCallError("http", e instanceof Error ? e.message : String(e));
   } finally { clearTimeout(timer); }
   if (!res.ok) throw new UpstreamCallError("http", `上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
-  const j = (await res.json()) as {
+  // ⚠️⚠️ **HTTP 200 不等于「上游给了一个能用的应答」**（票 51 的病一，2026-10-12）——
+  //   下面这一句过去**裸着**：body 不是 JSON ⇒ `SyntaxError`，取了 `usage` / 调了 `.filter` ⇒ `TypeError`。
+  //   两个都从 `callText` 里冒出去，被 `onceThrough` 那条兜底记成「**我们没发出去**」——
+  //   可**钱已经花了**（200 都回来了）⇒ 账整笔丢掉、文案是原始 JS 错误。
+  //   ⚠️ 「body 不是 JSON」本来就写在上面 `UpstreamCallError` 的 `http` 档定义里 ——
+  //   这里只是把 `onceThroughTool`（R16 那条）与 `analyze-intent` 那两份**已经设了防**的实现对齐。
+  let body: unknown;
+  try { body = await res.json(); }
+  catch (e) { throw new UpstreamCallError("http", `上游回的不是 JSON：${(e as Error).message}`); }
+  // ⚠️ **形状也要设防，而且这一道只收「不是对象」**（票 51 的 Q1 = (d)）：
+  //   `null` / `[]` / `123` / `false` / `"abc"` 都是**合法 JSON**、却读不成一个 messages 应答 ——
+  //   不设防的话 `body.usage` 当场炸（`null` 那张脸），而它同样是**花了钱的**。
+  //   ⚠️ 是对象而 `content` 不是数组（`{"content":5}`）**不在这里**报：它要被归一成
+  //   「没有文本块」⇒ 空文本 ⇒ 调用方按「不是合法 JSON」处置 —— 与 `parseToolUse` 对 `content`
+  //   的同一条归一化一致，两条路因此**同判**（票 51 的 M3 那一行 `{"content":5}` 从此不再分歧）。
+  if (!isResponseObject(body))
+    throw new UpstreamCallError("http", `上游回的不是一个 messages 应答（拿到 ${describeShape(body)}）`);
+  const j = body as {
     model?: string; content?: { type: string; text?: string }[]; stop_reason?: string;
     usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
   };
   const u = j.usage;
+  const blocks = Array.isArray(j.content) ? j.content : [];
   return {
-    text: (j.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
+    text: blocks.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
     ...(j.model ? { servedModel: j.model } : {}),
     // ⚠️ `stop_reason` 要交出来（票 28）：以前这一层只顾着取文本，于是**截断**
     //   在三个调用点上一律表现为「不是合法 JSON」—— 一个**假病因**，而它会把人引去查模型。
@@ -377,10 +437,17 @@ async function onceThrough<T>(o: {
       ...(o.fetchImpl !== undefined ? { fetchImpl: o.fetchImpl } : {}),
       ...(o.timeoutMs !== undefined ? { timeoutMs: o.timeoutMs } : {}) });
   } catch (e) {
+    // ⚠️⚠️ **判据翻过来了：点名的那个类落「没上路」，其余**默认**落「上游没给可用的应答」**
+    //   （票 51 的 Q1 = (d)，2026-10-12）。以前是反的（「不是 `UpstreamCallError` ⇒ 我们没发出去」），
+    //   而那条兜底把**两张花了钱的脸**（200 + 非 JSON、200 + JSON 但形状炸）一律记成「没发」。
+    //   ⚠️ **方向为什么这样选**：兜底报「没发」是**记账撒谎**（丢掉一整笔真花销），
+    //   兜底报「上游没给可用的应答」是**记账保守** —— 而它在 `UpstreamCallError` 的文档里
+    //   本来就是 `http` 那一档的定义（「非 2xx、body 不是 JSON、连不上」，含「其余说不出名目的」）。
+    //   ⇒ `failure` 取不到时落 `"http"`：它正是「上游没给一个可用的应答」这个名字。
     const err = e as Error;
-    return e instanceof UpstreamCallError
-      ? { kind: "upstream", failure: e.failure, error: err }
-      : { kind: "not-sent", error: err };
+    return e instanceof NotSentError
+      ? { kind: "not-sent", error: err }
+      : { kind: "upstream", failure: e instanceof UpstreamCallError ? e.failure : "http", error: err };
   }
   // ⚠️ 上游自报的模型名与用量要带出来 —— 它们是「花了什么」的事实（票 45），而这一层以前把它们丢了。
   const spent: Spent = {
@@ -706,6 +773,12 @@ ${JSON.stringify(gameConfigExample, null, 2)}
       call.trip({ failure: once.failure });
       throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
     }
+    // ⚠️ 「没上路」那一档在**这条路上不该出现**（凭据上面已经查过）—— 留着这一句是为了让类型收窄
+    //   说得出口，而它真出现时按「上游不可达」报（与 `derive` 当年同款）。
+    //   ⚠️ **2026-10-12（票 51 的 Q4 = (a)）**：这一注是从 `planAssets` 那处**逐字补过来的**
+    //   —— 上面那条路的返回类型是 `Once<T>`（四档），而 `onceThroughTool` 的出口只有三档
+    //   （`upstream` / `bad` / `ok`），所以这一行**够不着**；删它得另给工具链单开一个三档类型，
+    //   那超出本票「只做 `not-sent` 这一档」的边界。⚠️ 而且它**不是** `not-sent` 的生产者。
     if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
     if (once.kind === "bad") { call.trip({ failure: once.failure, spent: once.spent }); lastError = once.detail; continue; }
     // ⚠️ **线形状过了不算数**：真正的判据是 v3 那份契约（实体 id 不重复那条 refine 住在它里面）。
@@ -954,10 +1027,18 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
         ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
         ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
       });
-      call.trip(once.kind === "ok" ? { spent: once.spent }
-        : once.kind === "not-sent" ? {}
-        : once.kind === "upstream" ? { failure: once.failure }
-        : { failure: once.failure, spent: once.spent });
+      // ⚠️⚠️ **`"not-sent"` 不 `trip`**（票 51 的 Q2 = (a)，2026-10-12）——
+      //   以前这里写着 `? {}`，看着像「什么都没记」，其实 `trip` **光把 `trips` 加 1** 就够了：
+      //   `record()` 于是交出一格 `{attempts: 1, ms, …}` 的**幻影**，而那一档**一个请求都没上路**
+      //   —— 它顶掉两处已经写着的字：`spentCall` 自己那句「一次都没发出去就返回 `null`」，
+      //   以及 `CONTEXT.md` 对 `attempts` 的定义（「这一次调用里**往返**了几次」，往返 = 一次 HTTP）。
+      //   ⚠️ 这**不是**「少记一件事」：`trips` 恒 0 ⇒ `record()` 恒 `null` ⇒ 将来谁把
+      //   `ledgerCarrying` 接到这一档上，也是**结构性**的 no-op —— 陷阱是**消掉**的，不是绕开的。
+      //   ⚠️ 「试过 1 次、没上路」这个事实**没有家**（也不该借 `attempts` 表达）：真要记，另开一格再说。
+      if (once.kind !== "not-sent")
+        call.trip(once.kind === "ok" ? { spent: once.spent }
+          : once.kind === "upstream" ? { failure: once.failure }
+          : { failure: once.failure, spent: once.spent });
       if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
       if (once.kind === "upstream") throw new CommandError("upstream", once.error.message, ledgerCarrying(call.record()));
       // ⚠️ **`bad` 记的是「这一趟上游没交出可用的东西」**；而下面「过不了校验」是**这一份关卡**

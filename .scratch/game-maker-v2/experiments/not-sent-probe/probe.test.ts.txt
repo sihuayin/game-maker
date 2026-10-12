@@ -1,0 +1,204 @@
+// 票 51「先量再问」的探针 —— **存档在 `experiments/not-sent-probe/`**，跑法见那边的 README。
+// ⚠️ 它是**临时**的：跑之前才拷进 `packages/assets/tests/`，跑完就删；连同两份 `probe-ops-*.ts` 副本
+//   一起，**都不该进任何一次提交**。
+// 全部走 `fetchImpl` 桩 —— 零真调用、零花费。
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, it } from "vitest";
+import type { GameDesignSpec, VisualWorldSpec } from "@game-maker/contracts";
+import { compileRuntime, compileTdGame, exitCodeOfError, ledgerOfError, planAssets } from "../src/index.js";
+import { spentCall } from "../src/probe-ops-a.js";
+import * as patched from "../src/probe-ops-a.js";
+import * as patchedB from "../src/probe-ops-b.js";
+
+const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
+const PACK_RUNTIME = path.join(ROOT, "fixtures/packs/last-train/v2");
+const PACK_TD = path.join(ROOT, "fixtures/packs/counter-siege/v4");
+
+const DESIGN: GameDesignSpec = {
+  format: "game-design/v1",
+  game: { title: "末班车", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
+  coreLoopSteps: ["躲开行李", "捡齐失物", "走到信号灯"],
+  player: { id: "p-postman", role: "送信的邮差", abilities: ["跑", "跳"], goals: ["赶上末班车"] },
+  enemies: [{ id: "e-dog", behavior: "沿地面来回走", threat: "碰到扣血" }],
+  npcs: [], interactables: [{ id: "i-signal", type: "信号灯", behavior: "捡齐后变绿" }],
+  resources: [{ id: "r-lost", purpose: "三件失物" }],
+  world: { theme: "黄昏的铁路小站", setting: "月台与铁轨", structure: "三条横带：铁轨 / 月台 / 远山" },
+  levels: [{ id: "l-1", purpose: "唯一一关", layout: "左侧出发，右侧信号灯", entities: ["e-dog", "r-lost", "i-signal"] }],
+  progression: { model: "linear", description: "一关到底" },
+  mechanics: [{ id: "m-jump", mechanic: "jump" }],
+  winConditions: ["捡齐三件失物并走到信号灯"], loseConditions: [], runtimeRequirements: ["input:keyboard"]
+};
+
+const tmp = (): string => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), "gm-probe51-"));
+  fs.writeFileSync(path.join(d, "game-design.json"), JSON.stringify(DESIGN));
+  const world: VisualWorldSpec = {
+    format: "visual-world/v1",
+    styleIdentity: { keywords: ["低饱和"], description: "黄昏的铁路小站" },
+    camera: { mode: "side" },
+    composition: { foreground: "铁轨", midground: "月台", background: "远山", density: "中" },
+    lighting: {}, character: { silhouette: "矮壮方头" }, environment: { architecture: "木构小站", terrain: "碎石" },
+    palette: { primary: [], secondary: [], accent: [], background: [], shadow: [], highlight: [] },
+    materials: { wood: { appearance: "哑光" } }, shapeLanguage: [], constraints: [],
+    styleReferences: [{ path: path.relative(d, path.join(ROOT, "fixtures/reference/halt-dusk.png")) }],
+    style: {
+      id: "halt-dusk", identity: [], camera: {}, composition: {}, palette: ["#112233", "#445566"],
+      lighting: {}, shapeLanguage: [], material: [], environment: [], characterStyle: [], constraints: [], confidence: 0.5
+    }
+  };
+  fs.writeFileSync(path.join(d, "visual-world.json"), JSON.stringify(world));
+  fs.writeFileSync(path.join(d, "requirement.md"), "做一个守着柜台的塔防小关卡，五波。");
+  return d;
+};
+
+/** 一份**逐字节固定**的回应体（200 那一路）。 */
+const raw = (body: string, contentType: string): typeof fetch =>
+  (async () => new Response(body, { status: 200, headers: { "content-type": contentType } })) as unknown as typeof fetch;
+
+type Landing = {
+  threw: boolean; name: string; kind: string | null; exitCode: number | null;
+  ledger: unknown; message: string;
+};
+const land = async (p: Promise<unknown>): Promise<Landing> => {
+  try {
+    await p;
+    return { threw: false, name: "(没抛)", kind: null, exitCode: null, ledger: null, message: "" };
+  } catch (e) {
+    const err = e as Error;
+    const kind = (err as unknown as { kind?: string }).kind ?? null;
+    return {
+      threw: true, name: err.name ?? err.constructor.name, kind, exitCode: exitCodeOfError(err),
+      ledger: ledgerOfError(err) ?? null, message: err.message.slice(0, 90)
+    };
+  }
+};
+
+/** 三个命令各跑一发同样的回应体。⚠️ `planAssets` / `compileRuntime` 走 R16 工具那条路，`compileTdGame` 走旧文本那条。 */
+const three = async (body: string, contentType: string): Promise<Record<string, Landing>> => {
+  const d = tmp();
+  const f = raw(body, contentType);
+  return {
+    planAssets: await land(planAssets({
+      designPath: path.join(d, "game-design.json"), visualWorldPath: path.join(d, "visual-world.json"),
+      outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: f
+    })),
+    compileRuntime: await land(compileRuntime({
+      designPath: path.join(d, "game-design.json"), packDir: PACK_RUNTIME,
+      outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: f
+    })),
+    compileTdGame: await land(compileTdGame({
+      requirementPath: path.join(d, "requirement.md"), packDir: PACK_TD,
+      outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: f
+    }))
+  };
+};
+
+const BODIES: [string, string, string][] = [
+  ["① 200 + text/plain 说人话（不是 JSON）", "上游今天心情不好，请稍后再试", "text/plain"],
+  ["② 200 + JSON 字面量 null", "null", "application/json"],
+  ["③ 200 + JSON 空数组 []", "[]", "application/json"],
+  ["④ 200 + JSON 数字 123", "123", "application/json"],
+  ["⑤ 200 + {\"error\":{\"message\":…}}（代理把 500 转成 200）", JSON.stringify({ error: { message: "upstream returned 500" } }), "application/json"],
+  ["⑥ 200 + 合法 messages 形状但 content 全是非文本块", JSON.stringify({ content: [{ type: "tool_use", name: "x", input: {} }] }), "application/json"],
+  ["⑦ 200 + content 不是数组", JSON.stringify({ content: 5 }), "application/json"]
+];
+
+describe("票 51 探针", () => {
+  it("量 1 · 2 · 4：同一份回应体走三个命令", async () => {
+    const report: Record<string, Record<string, Landing>> = {};
+    for (const [label, body, ct] of BODIES) report[label] = await three(body, ct);
+    fs.writeFileSync(path.join(process.env.PROBE_OUT ?? os.tmpdir(), "probe51-three.json"), JSON.stringify(report, null, 2));
+    console.log("\n=== 量 1/2/4：三个命令 × 六种 200 回应体 ===\n" + JSON.stringify(report, null, 2));
+  }, 60_000);
+
+  it("量 3：`trip({})` 之后 `record()` 的逐字段读数（真 `spentCall`，逐字复制、只加了 export）", () => {
+    const a = spentCall("compile-td-game", "td-config");
+    a.trip({});
+    const phantom = a.record();
+    const b = spentCall("compile-td-game", "td-config");
+    const empty = b.record();
+    // 对照：一次真往返（成功）
+    const c = spentCall("compile-td-game", "td-config");
+    c.trip({ spent: { model: "deepseek-v4-pro", usage: { outputTokens: 123 } } });
+    const real = c.record();
+    const out = { "trip({}) 之后的 record()": phantom, "一次都没 trip 的 record()": empty, "一次真往返的 record()": real };
+    fs.writeFileSync(path.join(process.env.PROBE_OUT ?? os.tmpdir(), "probe51-record.json"), JSON.stringify(out, null, 2));
+    console.log("\n=== 量 3：record() 逐字段 ===\n" + JSON.stringify(out, null, 2));
+  });
+
+  it("量 3b：陷阱演练 —— 把 `not-sent` 那一行照抄成带账，账里出现什么（真链路，只改了这一行）", async () => {
+    const d = tmp();
+    const e = await patched.compileTdGame({
+      requirementPath: path.join(d, "requirement.md"), packDir: PACK_TD,
+      outRoot: path.join(d, "out"), transport: { baseUrl: "", apiKey: "" }
+    }).catch((x: unknown) => x as Error);
+    const kind = (e as unknown as { kind?: string }).kind ?? null;
+    const out = {
+      "空凭据那条真 not-sent": { name: e.name, kind, exitCode: exitCodeOfError(e), message: e.message.slice(0, 80) },
+      "接上账之后 ledgerOfError(e)": ledgerOfError(e) ?? null
+    };
+    fs.writeFileSync(path.join(process.env.PROBE_OUT ?? os.tmpdir(), "probe51-phantom.json"), JSON.stringify(out, null, 2));
+    console.log("\n=== 量 3b：假账演练 ===\n" + JSON.stringify(out, null, 2));
+  }, 60_000);
+
+  it("量 5：空凭据（真 not-sent）走三个命令各自的对外落点", async () => {
+    const d = tmp();
+    const out = {
+      planAssets: await land(planAssets({ designPath: path.join(d, "game-design.json"), visualWorldPath: path.join(d, "visual-world.json"),
+        outRoot: path.join(d, "out"), transport: { baseUrl: "", apiKey: "" } })),
+      compileRuntime: await land(compileRuntime({ designPath: path.join(d, "game-design.json"), packDir: PACK_RUNTIME,
+        outRoot: path.join(d, "out"), transport: { baseUrl: "", apiKey: "" } })),
+      compileTdGame: await land(compileTdGame({ requirementPath: path.join(d, "requirement.md"), packDir: PACK_TD,
+        outRoot: path.join(d, "out"), transport: { baseUrl: "", apiKey: "" } }))
+    };
+    fs.writeFileSync(path.join(process.env.PROBE_OUT ?? os.tmpdir(), "probe51-credentials.json"), JSON.stringify(out, null, 2));
+    console.log("\n=== 量 5：空凭据 ===\n" + JSON.stringify(out, null, 2));
+  }, 60_000);
+});
+
+describe("票 51 探针 · 第 2 轮", () => {
+  const td = async (f: typeof fetch): Promise<Landing> => {
+    const d = tmp();
+    return land(compileTdGame({
+      requirementPath: path.join(d, "requirement.md"), packDir: PACK_TD,
+      outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: f
+    }));
+  };
+
+  it("量 6：`not-sent` 的**可达集合**到底有几条路（compileTdGame，旧文本链）", async () => {
+    const shapes: [string, string][] = [
+      ["JSON false", "false"],
+      ["JSON 字符串 \"abc\"", "\"abc\""],
+      ["{}（对象、没 content）", "{}"],
+      ["{\"content\":5}（content 不是数组）", JSON.stringify({ content: 5 })],
+      ["{\"content\":[{\"type\":\"text\"}]}（text 缺）", JSON.stringify({ content: [{ type: "text" }] })],
+      ["{\"content\":[{\"type\":\"text\",\"text\":null}]}", JSON.stringify({ content: [{ type: "text", text: null }] })]
+    ];
+    const out: Record<string, Landing> = {};
+    for (const [label, body] of shapes) out[label] = await td(raw(body, "application/json"));
+    fs.writeFileSync(path.join(process.env.PROBE_OUT ?? os.tmpdir(), "probe51-shapes.json"), JSON.stringify(out, null, 2));
+    console.log("\n=== 量 6：形状族 ===\n" + JSON.stringify(out, null, 2));
+  }, 60_000);
+
+  it("量 7：**修法 (a) 的预演** —— `callText` 的 `res.json()` 设防（逐字对齐 R16）之后，同样几发落在哪儿", async () => {
+    const bodies: [string, string, string][] = [
+      ["200 + text/plain 说人话", "上游今天心情不好", "text/plain"],
+      ["200 + null", "null", "application/json"],
+      ["200 + []", "[]", "application/json"],
+      ["200 + {\"error\":…}", JSON.stringify({ error: { message: "500" } }), "application/json"]
+    ];
+    const out: Record<string, Landing> = {};
+    for (const [label, body, ct] of bodies) {
+      const d = tmp();
+      out[label] = await land(patchedB.compileTdGame({
+        requirementPath: path.join(d, "requirement.md"), packDir: PACK_TD,
+        outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: raw(body, ct)
+      }));
+    }
+    fs.writeFileSync(path.join(process.env.PROBE_OUT ?? os.tmpdir(), "probe51-option-a.json"), JSON.stringify(out, null, 2));
+    console.log("\n=== 量 7：修法 (a) 预演 ===\n" + JSON.stringify(out, null, 2));
+  }, 60_000);
+});

@@ -1,0 +1,79 @@
+{
+  "200 + text/plain 说人话": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "upstream",
+    "exitCode": 3,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 1,
+        "failures": [
+          "http"
+        ]
+      }
+    ],
+    "message": "上游回的不是 JSON：Unexpected token '上', \"上游今天心情不好\" is not valid JSON"
+  },
+  "200 + null": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "upstream",
+    "exitCode": 3,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 1
+      }
+    ],
+    "message": "Cannot read properties of null (reading 'usage')"
+  },
+  "200 + []": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  },
+  "200 + {\"error\":…}": {
+    "threw": true,
+    "name": "CommandError",
+    "kind": "invalid",
+    "exitCode": 4,
+    "ledger": [
+      {
+        "step": "compile-td-game",
+        "target": "td-config",
+        "upstream": "messages",
+        "ms": 0,
+        "attempts": 3,
+        "failures": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ]
+      }
+    ],
+    "message": "上游返回的不是合法 JSON：Unexpected end of JSON input"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "trip({}) 之后的 record()": {
+    "step": "compile-td-game",
+    "target": "td-config",
+    "upstream": "messages",
+    "ms": 0,
+    "attempts": 1
+  },
+  "一次都没 trip 的 record()": null,
+  "一次真往返的 record()": {
+    "step": "compile-td-game",
+    "target": "td-config",
+    "upstream": "messages",
+    "ms": 0,
+    "attempts": 1,
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "outputTokens": 123
+    }
+  }
+}
