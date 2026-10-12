@@ -549,6 +549,17 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         // ⚠️ `async () =>` 不是多余的：`DrawListGenerator` 的返回是 `DrawList[] | Promise<DrawList[]>`，
       //   直接包一层会让闸门的泛型吃进那个**联合**（于是 await 完还剩一个 Promise）。
       const drawlists = await textGate(async () => generate(spec, style));
+        // ⚠️ **这是「注入契约」的断言，不是一条生产路径上的判据**（[票 49](../../../.scratch/game-maker-v2/issues/49-compiletdgame-mislabels-errors.md) 的裁定 Q5 = ① —— **保持原样，只把它说明白**）：
+        //   · `generate` 是**注入**进来的（`DrawListGenerator`），它承诺「清单要几帧就给几帧」；
+        //   · **生产路径上这一条够不着** —— 唯一的生产调用方 `packAssets` 造的是**真生成器**，
+        //     而它在**下一层**已经用**同一个** `framePlan(spec)` 判过同一件事（`generate.ts:171`，
+        //     措辞是「清单**要** N 帧、**模型**给了 M 帧」）⇒ 同一个错**先**在那里响；
+        //   · 而**注入桩上有意义**（测试 / 实验台直接调 `buildAssetPack`、自造生成器）——
+        //     它的语义是：**替代生成器违反了帧数契约 ⇒ 本地接线错误 ⇒ 抛原始错误、退出码 1**
+        //     （`EXIT.failure`，**不**进 `upstream` —— 上游只是照我们的话照办了）。
+        // ⚠️ **别把它与 `generate.ts:171` 合成一条**（那样「帧数不符」就不再重采样、直接失败；
+        //   票 49 量过：删掉 171 之后帧数**多**了会在同一函数 174 行的 `plan[i]!.anim` 上炸成
+        //   `TypeError`、把重试预算烧完）。**细分图像链的错误类别**是另一张票。
         if (drawlists.length !== plan.length)
           throw new Error(`资源 "${spec.id}"：清单说要有 ${plan.length} 帧，生成器给了 ${drawlists.length} 帧`);
         plan.forEach((p, i) => {

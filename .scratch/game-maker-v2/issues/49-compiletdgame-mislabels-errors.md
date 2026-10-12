@@ -1,8 +1,8 @@
 # 49. `compileTdGame` 把代码错误报成「上游不可达」—— 类别与退出码失真、原始栈丢掉
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-12)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 48「判断失败也要报账」](48-error-carries-ledger.md) 的 `## Answer` §0 **Q4 = A**。人类原话：
@@ -144,3 +144,122 @@ if (frames.length !== plan.length) throw new GenerationError(spec.id, `清单要
   的**形状**；若发现它们是错的，那是**回去改票 48**，不是在这里绕开。
 - ⚠️ 若最终选择的落法会**改 `compileTdGame` 的对外退出码**，那是**行为变更** ⇒ 要把
   「谁的退出码变了、哪些既有测试钉着它」**量清楚再说**。
+
+## 第 1 轮已量到的（2026-10-12 · claude 认领后，**先量再问**；读数都是跑出来的）
+
+> ⚠️ 本节是**第 1 轮问出去之前**的测量，不是裁定。裁定落在 `## Answer`（人答完再写）。
+> 一次测量手段：把契约的 `tdResolveConfig` 换成一个**会抛的实现**（`vi.mock`），跑真 `compileTdGame`
+> —— 那是这条路上**唯一**不需要改源码的注入口，顺手也是 Q6 那条见证的形状。
+
+| # | 读数 |
+|---|---|
+| **F1** | 今天这一处**实测**：`CommandError` · `kind: upstream` · **退出码 3** · **原始栈丢了**（`e.stack` 第二行 = `ops.ts:992`）· **账 1 笔** ⇒「它顺手做了件对的事」成立 |
+| **F2** | 那个 catch **今天够不着**：真 fixture 的 td-config 变异 **4000 发**（**822 发**过得了 schema），走同一条链 ⇒ **抛了 0 发**。历史那一次（`entityBox(undefined)`）已由 `td-config.ts:539` 的 `if (coreA && coreAt)` 修掉、`compile-td-game.test.ts:102` 钉住 ⇒ 本票治的是**一条潜伏的路**，不是一次正在发生的误报 |
+| **F3** | ⚠️ **票面 §3 的前提是假的**：`instanceof CommandError` 的**闸门**全仓只剩**这一处**（`ops.ts:991`）。票面点名的 `217 / 237`、`707 / 722` 是**抛点**、不是 catch —— `planAssets`（159-292）与 `compileRuntime`（583-871）**压根没有 `try`/`catch`**，裸 `Error` 从它们里出来本来就直接落 1。同形 catch 历史上只有**两处**，另一处（`packAssets`，1224）**票 48 已改完**，其余出现全在注释里 ⇒「一并收口」**已经做完了** |
+| **F4** | 循环里的不变量：`onceThrough` **只返回、不抛**（它把 `callText` 的抛在内部收成 `not-sent`/`upstream`）⇒ 落到 catch 的**只可能是** `tdResolveConfig` / `auditOf` 这两个纯函数 |
+| **F5** | `ledgerCarrying(call.record())` **已经就是**票 48 那把尺子（`spentCall.record()` 在 `trips === 0` 时给 `null` ⇒ `{}`）；且这条路上一次操作**只有一格账** ⇒「要不要对齐 `packAssets` 那个整段数组」**不成立** |
+| **F6** | `pack.ts:553` **在生产路径上没有注入口**：`packAssets`（`buildAssetPack` 唯一的生产调用方，`ops.ts:1203`）**不暴露 `generate`**（`PackOptions` 1027-1043 没有这个键），它自己造真生成器；而真生成器的 `generate.ts:171` 拿**同一个** `framePlan(spec)` 先判 ⇒ 553 只在**直接调 `buildAssetPack`** 的地方可达（测试 / 实验台） |
+| **F7** | 邻居一号：`not-sent`（`221` / `709` / **`961`**）抛 `upstream` 而**不带账**；而 `call.trip({})` 会把 `trips` 加 1 ⇒ 谁照抄 `ledgerCarrying(call.record())` 去补它，谁就报出**一笔没发出去过的假账**（`attempts:1`、无 `ms`）—— 与 `spentCall` 自己那句承诺相抵 |
+| **F8** | 邻居二号：`callText` 的 `await res.json()` **不设防**（`onceThroughTool` 那条同款路径**设了**防，139-141）⇒ 上游 200 回一份非 JSON 的 body ⇒ SyntaxError ⇒ 被 `onceThrough` 判成 **`not-sent`**（「我们没把请求发出去」——**与事实相反**）⇒ 报 upstream 且**丢账** |
+| **F9** | 路线②的隐藏代价（比票面写的更坏）：删掉 `generate.ts:171` 之后，帧数**多**了会在同一函数 174 行的 `plan[i]!.anim` 上炸成 `TypeError`，落进 `catch (e) { last = e }`（195）⇒ **重试把预算烧完**，最后原样抛出 ⇒ 在 `ops.ts:1224` 落成裸 `Error` + 一句 `plan[i] is undefined` |
+| **F10** | 谁会红：`compile-td-game.test.ts` **没有一条**钉住这个 catch；`pack.test.ts:103`（553 那句文案）与 `generate.test.ts:70`（171 那句文案）钉的是**文案**不是类别；`ops.test.ts` 那三条钉的是**传输失败**的 3（与「模型答不准」不是同一档） |
+| **F11** | 「原始栈丢掉」这条**今天没有读者** —— 全仓 `grep '\.stack'` 在 `packages/*/src` 里只有 `recipe.ts:178` 一处与异常无关的用法。它是票 46/48 选「挂原异常」的**理由**，但今天没有任何一条路会把它印出来 |
+
+### 第 1 轮问出去的六问（2026-10-12）
+
+Q1 判别（抛点 / 错误类 / 票 48 的尺子）· Q2 账与现场（带什么、对不对齐 `packAssets`）·
+Q3 机制（重抛原异常 / 加 `cause` / 加字段）· Q4 波及面（F3 的更正 + F7/F8 两个邻居怎么走）·
+Q5 并入的 553 三条路 · Q6 见证与手续。
+
+⚠️ 我给的推荐（**待人类裁定**）：Q1 类别按**抛点**判、账按 `ledgerCarrying` 判（两把尺子各答一问）·
+Q2 账原样、不带 `failureDir` · Q3 **重抛原异常**、不加字段 · Q4 只改这一处、F7/F8 **另开票** ·
+Q5 **①**（保持够不着 + 写明它是「注入契约的断言」）· Q6 四断言见证 + 两发变异、`command.ts` 加注不改原文。
+
+## Answer
+
+**这一票只改一处 catch**，它落地的是**一条判据**：**类别与退出码按「抛点」判**（这处的尺子），
+**带不带账按「花费」判**（[票 46/48](48-error-carries-ledger.md) 的老尺子）—— **两把尺子各答一问，不许合并**。
+⚠️ 而那处 catch 今天**够不着**（F2：4000 发变异、822 发过 schema、**抛了 0 发**）⇒
+本条改的是**一条潜伏的路**，不是一次正在发生的误报（历史那一次已由 `td-config.ts:539` 修掉）。
+
+### 0. 逐字裁定
+
+> **人类原话（本票的射程边界，逐字）**：
+>
+> 「六问全部采纳推荐：Q1–Q6 均为 A（Q5 的 ①）。
+> **本票只修 compileTdGame 这一处错误分类，不扩大到 callText / onceThrough 的共同实现，
+> 也不借机重构图像生成错误分类体系。**」
+
+| 题 | 裁定 | 裁定理由 / 执行约束（逐字） |
+|---|---|---|
+| Q1 判别按什么 | **A** | 「按抛点判类别，按花费判是否带账。当前 try 内的 onceThrough 只返回、不抛；上游两档已在 961/962 显式抛出带账的 `CommandError("upstream")`。因此，**这个 catch 捕获的异常归类为本地配置解析或审计阶段的失败，保留原错误类别与退出码 1**。账本仍使用现有 `ledgerCarrying(call.record())`，两种判据**不得合并**。」 |
+| Q2 账与现场 | **A** | 「账原样沿用，**不带 `failureDir`**。`ledgerCarrying(call.record())` 已符合票 48 的记账原则，一次操作只涉及一格账，不需要改成整段调用数组。该路径没有生图失败现场，**不新增 `failureDir` 字段，也不伪造现场路径**。」 |
+| Q3 机制 | **A** | 「**重抛原异常**。使用票 48 已确立的原异常携带机制，保留原始错误对象、错误类型和栈；不改成 `CommandError`，不额外引入 `cause`，不修改 `CommandError` 的结构。当前 `CommandError` 对 `ledger` 的无条件赋值确实限制了通用补账能力，但**本票不扩展到该契约问题**。」 |
+| Q4 波及面 | **A** | 「**本票只改这一处 catch，邻居另开票**。F3 已证实其他同形 catch 的收口工作已经完成。`not-sent` 错误的账本幻影，以及 `callText` 对非 JSON 响应的误分类，是另外两项共享代码路径问题，**应单独开票**，不在本票中修改 `planAssets`、`compileRuntime` 的共同实现。」 |
+| Q5 `pack.ts:553` | **①** | 「**保持现状，明确其断言语义**。该判断在生产生成器路径中不可达，但在直接注入替代生成器的测试或实验路径中仍有意义。将其明确记录为**注入契约的断言**：替代生成器违反帧数契约时，作为**本地接线错误**抛出原始错误，退出码为 **1**。**不删除 `generate.ts:171` 的前置校验，不引入重试耗尽风险**；若要细分图像链的错误类别，**另开票**。」 |
+| Q6 见证与手续 | **A** | 「增加**四项断言**的测试，变异验证两种回归；**只加注**。通过注入会抛出 `TypeError` 的 `tdResolveConfig` 实现，覆盖**真实 `compileTdGame` 链路**。测试同时断言裸 `TypeError`、`exitCodeOfError === 1`、原始栈保留、账本仍为 1 笔。**两种变异**分别验证重包回归与账本丢失。按照既有先例，在 `command.ts` 的 `EXIT` 说明处**增加带日期的注释，不改原文、不修改 R 表**。」 |
+
+> **由此确立的对外语义（本票唯一的新规则，落在 `command.ts` 的 `EXIT` 注里）**：
+> **3 只留给「上游死活」；「我们的代码坏了」一律落 1。** 判据是**抛点**，**不是错误的类** ——
+> 一个 `try` 里若已经把上游失败**显式**抛成了 `CommandError("upstream")`，同一个 `try` 里剩下的抛点
+> （纯函数 / 审计 / 派生）**只可能是我们的 bug** ⇒ 原样抛出（**1 + 原始栈**），**不许**被兜底重包成 3。
+> ⚠️ 它与「带不带账」是**两把尺子**：那把看**花费**（票 46/48），这把看**抛点**。
+> **不许合并** —— 合并之后「钱花了才发现我们代码坏了」会被报成「没花钱」。
+
+### 1. 落了哪些改动
+
+| 文件 | 改了什么 |
+|---|---|
+| `packages/assets/src/ops.ts`（`compileTdGame` 的 catch，`988-1007`；新那两行在 `1005-1006`） | `throw new CommandError("upstream", (e as Error).message, ledgerCarrying(call.record()))` → `carryOnError(e, ledgerCarrying(call.record())); throw e;`。⚠️ **`if (e instanceof CommandError) throw e;` 留着**（它不是闸门，只是捷径：`CommandError` 的构造器**无条件**赋 `ledger`/`failureDir` ⇒ `'ledger' in e` 恒真 ⇒ `carryOnError` 对它们本来就 no-op）；注释写清**为什么落到这里的只可能是我们的 bug**（上游两档在 `961-962` 显式抛了、`onceThrough` 只返回不抛）与**三处失真**（类别 / 退出码 / 原始栈） |
+| `packages/assets/src/pack.ts`（`551` 之上） | Q5 = ①：**判断一字不动**，在它上面写明它是**注入契约的断言**（真生成器在下一层 `generate.ts:171` 拿**同一个** `framePlan(spec)` 先判 ⇒ 生产路径够不着；注入桩上 = 本地接线错误 ⇒ 原始错误 + 退出码 1），并写明**为什么不能与 `generate.ts:171` 合成一条**（会烧掉重试预算，F9） |
+| `packages/contracts/src/command.ts`（`EXIT` 的文档注） | **只加注、不改原文、不动 R 表**：新增 2026-10-12 那一段（3 只留给上游死活 · 判据是抛点不是类 · 两把尺子不许合并 · 先例指 `compileTdGame`） |
+| `packages/assets/tests/compile-td-game-error-class.test.ts` | **新文件**（1 条）：Q6 那四项断言一起查 + 一条**护栏**（确认响的是注入的那一处） |
+
+⚠️ **既有测试一条都不用改**（F10 的预判成立）：全仓**没有一条**测试钉过这个 catch 的旧行为。
+
+⚠️ **行号更正（施工后的当前值，都是 `grep` 数出来的）**：本票在 `pack.ts:551` **之上**插了那段注（**11 行**）⇒
+**该文件 551 之后的行号一律 +11**（票 48 与本票此前引的 `pack.ts:553` 那条判断现在是 **564**；
+本图 `## Not yet specified` 里引的 `pack.ts:624` / `905` ⇒ **635 / 916**）。
+⚠️ `ops.ts` 那个 catch **仍在 `988`**（注插在它**里面**）：原先是 `991` 放行 + `992` 重包两行，
+现在是 `991` 放行 + `1005-1006` 的 `carryOnError` / `throw e` ⇒ **catch 整体 `988-1007`**。⚠️ 而 `ops.ts` **`993` 之后**的行号因此一律 **+14**（本票正文里引的：`PackOptions` `1027-1043` ⇒ **`1041` 起** · `buildAssetPack` 的调用点 `1203` ⇒ **`1217`** · `packAssets` 那条兜底 `1224` ⇒ **`1238`**（票 48 的 Answer 引的是**施工前**的值）。⚠️ `command.ts` 同款：本票在 `EXIT` 文档注里加了 **9 行** ⇒ **该文件 `25` 之后 +9**（本票正文引的 `EXIT` `26` ⇒ **`35`**；`CommandError` 那个类 `47-67` ⇒ **`56-76`**）。
+
+### 2. 见证与两发变异（Q6）
+
+**手段**：把契约模块的 `tdResolveConfig` 换成一个**必抛 `TypeError`** 的注入（`vi.mock("@game-maker/contracts", …)`），
+**源码一个字不改**，跑**真** `compileTdGame` 链路（真重采样循环、真 `spentCall`、真那个 catch）——
+上游照常回一份**本来能编译成功**的关卡，于是唯一失败的那一步就是被注入的那个纯函数。
+⚠️ **单独一个文件**：`vi.mock` 是**文件级**的，放进 `compile-td-game.test.ts` 会把那个文件里所有成功用例一起打红。
+
+| 断言 | 本票要求它成立的那件事 |
+|---|---|
+| ① `err` 是裸 `TypeError`、**不是** `CommandError`（`name === "TypeError"`） | 类别不失真 |
+| ② `exitCodeOfError(err) === EXIT.failure`（**1**）且 `!== EXIT.upstream`（3） | 退出码不失真 |
+| ③ `err.stack` 的**栈顶那一帧**还是原抛点（测试文件里的 `mockPureFunctionBug`），且 `mockPureFunctionBug` 那一帧**整条链还在** | **原始栈没丢**（重包之后栈顶会是 catch 那一行 `ops.ts:99x`） |
+| ④ `ledgerOfError(err)` 有 **1** 笔：`step: compile-td-game` · `target: td-config` · `attempts: 1` · `ms` 是数 | **账照带**，且是**真的那一笔**（不是一个占位的空壳） |
+
+| 变异（都验过**真的会红**） | 结果 |
+|---|---|
+| **A**：把那两行退回成交付前的 `throw new CommandError("upstream", …)`（**重包回归**） | **红** —— `expected CommandError … to be an instance of TypeError`（①） |
+| **B**：`carryOnError(e, {})`（**账本丢失**） | **红** —— `钱花了、账必须有人报回来: expected undefined to be defined`（④） |
+
+⚠️ 一处**现场更正**（写见证时量的，留着免得下一个人再撞）：我原本还想断言「栈里**不该**出现
+`ops.ts:9xx`」—— **错了**。`at compileTdGame (ops.ts:973)`（**调**那个纯函数的那一行）是**原栈的一部分**，
+它留着恰恰是「栈是原栈」的证据；重包之后消失的是**栈顶**那一帧与 `mockPureFunctionBug` 那条链。
+⇒ 判据改成 ③ 那两条（栈顶 + 原抛点函数名），两者都能把重包抓红。
+
+### 3. 邻居与派生（Q4 / Q5 点名「另开票」的两处，本票一行没碰）
+
+- **已开**：`not-sent` 那一档的两件事 —— ① F7 的**账本幻影**（`call.trip({})` 会让 `record()` 交出一笔
+  **没发出去过**的花费，与 `spentCall` 自己那句承诺相抵）；② F8 `callText` 的 `await res.json()` **不设防**
+  ⇒ 上游 200 回一份非 JSON 的 body 被报成 **`not-sent`**（「我们没把请求发出去」——**与事实相反**、
+  而钱其实花了）⇒ 见[票 51「`not-sent` 那一档两头都不准」](51-not-sent-lies-both-ways.md)。
+  ⚠️ 两处都在 `onceThrough` / `callText` 的**共同实现**里 ⇒ 按 Q4 的字面，**不在本票**。
+- **没开、记进雾里**：**细分图像链的错误类别**（`GenerationError` 今天把传输与形状一起兜成 `upstream` ⇒ 3）。
+  Q5 = ① 只说「**若要**细分，另开票」——**不是**一张被要求开的票 ⇒ 写进 map 的 `## Not yet specified`
+  （带本票的读数指针），**等有人开**。
+
+### 4. 闸门
+
+`pnpm typecheck` 绿 · `pnpm test` **1247/1247（75 文件）**（此前 1246/74，本票 **+1**，**没有一条既有测试需要改**）·
+`pnpm check` 绿（依赖图合法（9 包）· 相对链接零断裂（192 份文档 · 1092 条链接）· build 干净）。
+⚠️ **没有开任何一次付费运行**（本票的见证走注入桩，零调用）。

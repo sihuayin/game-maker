@@ -988,8 +988,22 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
   } catch (e) {
     // ⚠️ **失败时已经花掉的那几笔跟着异常一起走**（票 46 的纪律）—— 包没产出来，它们没有别的家。
     // ⚠️ `onceThrough` 自己产出的 `CommandError` 已经带着账了，**原样放行**，别再包一层。
+    //   ⚠️ 这一句**不是判类别的闸门**，它只是一条捷径：`CommandError` 的构造器**无条件**赋
+    //   `ledger`/`failureDir`（`command.ts:73-74`，**今天**的行号）⇒ `'ledger' in e` 恒真 ⇒ 下面那句 `carryOnError`
+    //   对它们本来就是个 no-op。真正的判据是**抛点**，见下。
     if (e instanceof CommandError) throw e;
-    throw new CommandError("upstream", (e as Error).message, ledgerCarrying(call.record()));
+    // ⚠️⚠️ **落到这里的，只可能是「我们的代码坏了」**（[票 49](../../../.scratch/game-maker-v2/issues/49-compiletdgame-mislabels-errors.md) 的裁定）：
+    //   · **上游失败在上面两行已经显式抛掉了**（`once.kind === "not-sent"` / `"upstream"` ⇒ 都是
+    //     `CommandError("upstream", …)`，`961-962`），而且 `onceThrough` **只返回、不抛**
+    //     （它把 `callText` 的抛在内部收成那两档）⇒ try 里剩下的抛源**只有** `tdResolveConfig`
+    //     与 `auditOf` 这两个**纯函数**。
+    //   ⇒ 它们**必须原样抛出**：重包成 `upstream` 有**三处失真** —— ① 类别：「我们的 bug」被报成
+    //   「上游的锅」，把人支去查网络、去等一会儿；② 退出码：落 **3**（上游死活）而不是 **1**
+    //   （`EXIT.failure`，`Error` 的落点）—— 而重试一万次都一样；③ **原始栈丢掉**
+    //   （`new CommandError(...)` 是另起一个 `Error`），而「哪一行判的」只有栈说得清。
+    //   ⚠️ 与「要带账」**可以同时满足**（票 48 的老路：挂在原异常上、原样抛）—— 这两件事不是二选一。
+    carryOnError(e, ledgerCarrying(call.record()));
+    throw e;
   }
   // ⚠️ **一次都没过 schema** —— 那才是真的没东西可落盘。
   if (!fallback) throw new CommandError("invalid", lastError, ledgerCarrying(call.record()));
