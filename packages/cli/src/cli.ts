@@ -463,7 +463,7 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
           outRoot, requirement, transport, cwd, ...up,
           // ⚠️ 恰好一张（票 16 的 Q4）：契约是复数、而**实现推到第一阶段之后**（票 26）——
           //   多张会被 `parseArgs` 当「同一个选项给两次」拒掉。
-          styleReferences: [{ path: styleRefOf(cwd, flags.style), role: "global" }],
+          styleReferences: [{ path: styleRefOf(cwd, flags.style) }],
           ...(typeof flags["style-id"] === "string" ? { styleId: flags["style-id"] } : {}),
           onProgress: progressTo(io),
         });

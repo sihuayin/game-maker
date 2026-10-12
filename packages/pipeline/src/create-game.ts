@@ -45,7 +45,7 @@ export type UnderstandingInput = {
   /** 原始需求文本（原样字节进 `intent.md`）。 */
   requirement: string;
   /** 风格参考图登记。第一阶段恰好 1 项（R18 的 `maxItems` 由**调用方**执行，不写进 schema）。 */
-  styleReferences: readonly { path: string; role: string }[];
+  styleReferences: readonly { path: string }[];
   /** 文本上游（理解层那五发都要它）。 */
   transport: Transport;
   /**
@@ -241,7 +241,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
 
     say("visual-world");
     const world = await analyzeReference({
-      styleReferences: input.styleReferences as { path: string; role: string }[],
+      styleReferences: input.styleReferences as { path: string }[],
       requirementText: input.requirement,
       styleId: input.styleId ?? styleIdOf(input.styleReferences[0]!.path),
       // ⚠️ 那几条相对路径**相对谁**由调用方说 —— 而 `createGame` 的那个 `cwd` 与**进程**的

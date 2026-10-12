@@ -114,11 +114,13 @@ export interface VisualWorldSpec {
   shapeLanguage: string[];            // 与 `constraints` 都**进**：它们有**今天就在跑**的消费者
   constraints: string[];              // （`prompt.ts` 的 `styleBrief` / `review.ts`），不是「将来会有」
 
-  styleReferences: { path: string; role: string }[];
+  styleReferences: { path: string }[];
   // ⚠️ 摊平（旧稿的 `references.styleImages`）。`characterImages` / `materialImages` 零消费者，不进。
   // ⚠️ **不设 `maxItems`**：第一阶段 `maxItems === 1` 由**调用方**执行（多给了报错、CLI 退出码 2）。
   //    写进 schema 就是让过渡期永久化 —— 票 26 正是来拿掉它的。
-  // ⚠️ `role` 是不是封闭枚举，推迟到票 26。
+  // ⚠️ **只存路径**（R15）。`role` 已由**票 43** 移除：它**零读者**（过不了 R7 的门），
+  //    而 R18 当初给它的那条理由（「一图一角色是合理方向」）**已被票 26 正面否掉** ——
+  //    多图＝**同一个游戏世界的多个来源**，融合落在**理解层那一次调用**。
 
   // ── 兼容载体：**不是**第二事实源 ──
   style: StyleSpec;

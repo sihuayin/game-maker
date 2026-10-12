@@ -249,8 +249,15 @@ export const VisualWorldSpecSchema = z.strictObject({
   // ⚠️ **不设 `maxItems`**（第 23 条裁决，R4-Q3）：`maxItems === 1` 是**第一阶段**的限制，
   //   不是契约形状 —— 写进 schema 就是让过渡期永久化，而票 26 的存在正说明它会消失。
   //   ⇒ 由**调用方**执行（链里报错、CLI 退出码 2）。
-  // ⚠️ `role` 保持 `z.string()`：R18 已把「是不是封闭枚举」推迟到票 26。
-  styleReferences: z.array(z.strictObject({ path: StyleReferencePath, role: z.string() })),
+  // ⚠️ **只存路径**（R15；[票 43](../../../.scratch/game-maker-v2/issues/43-r18-amendment.md) 把 `role` 拿掉了）：
+  //   那个字段**零读者**（`ops.ts:171` 只数张数、`artifacts.ts:65-73` 只改 `path`）⇒ 过不了 R7 的门。
+  //   ⇒ R18 原有的「一图一角色」理由**已被票 26 正面否掉**（多图＝**同一个世界的多个来源**，
+  //   融合在**理解层那一次调用**），R18 因此**不再自持形状**、只留指针。
+  //   ⚠️ 外壳**保留**：它今天只有 `path` 一个键、**本身零信息量**，留着是因为①票 26 的目标形状
+  //   就是 `{ path }[]`、②多图回来时给每张图加字段是**加法**而不是破坏性变更。**不是**因为外壳有读者。
+  //   ⚠️ `strictObject` 的后果**是故意的**（票 43 的 Q5）：带 `role` 的**旧产物读不进来了**
+  //   （`plan` / `pack --visual-world`）—— 不迁移、不宽容（仓库基准 fixture 一份都不带它）。
+  styleReferences: z.array(z.strictObject({ path: StyleReferencePath })),
 
   // ── 兼容载体：**不是**第二事实源 ─────────────────────────────────────────
   //

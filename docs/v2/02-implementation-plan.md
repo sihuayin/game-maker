@@ -94,14 +94,16 @@ packages/vision/
 ```ts
 type AnalyzeReferenceInput = {
   /**
-   * ⚠️ 契约现在就按**复数**写，每一项带 role —— 未来可以是
-   *   image A: palette / image B: character / image C: environment。
+   * ⚠️ 契约按**复数**写，但每一项**只存路径**（R15）—— `role` 已由**票 43** 移除。
+   * ⚠️ 多图＝**同一个游戏世界的多个来源**，融合落在**理解层这一次调用**（票 26 的裁定 (A)）；
+   *   ⚠️ **不是**「一图定色 / 一图定角色 / 一图定环境」的分工模型 —— 那条理由已被票 26 否掉
+   *   （没有材料证明那些角色都有消费者），所以它**不再是 `role` 这个字段的依据**。
    * ⚠️ 但**第一阶段 `maxItems === 1`**（R18）：多图的权重融合与冲突解决
-   *   没有任何实测，不许在这一阶段实现。见票 26。
+   *   没有任何实测 ⇒ 实现**越出本图终点**（见地图的 `## Out of scope`）。见票 26。
    * ⚠️ **由调用方注入**（R1-Q2）：模型面向的 schema 把它 `omit` 掉了 ——
    *   那个路径是**相对于 `visual-world.json`** 的，模型答不出来。
    */
-  styleReferences: { path: string; role: string }[];
+  styleReferences: { path: string }[];
   /**
    * ⚠️ **原始需求文本，必填**（R1-Q1）—— 人肉基线（`docs/stylespec-extraction.md`）说「一定要给」：
    *   `palette` 的判据是「画不画得出这个世界里的东西」，而**要画的东西有一部分压根不在参考图里**。

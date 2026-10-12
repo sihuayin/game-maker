@@ -203,11 +203,22 @@ describe("VisualWorldSpecSchema 本身的形状", () => {
   });
 
   it("`styleReferences` **不设上限** —— `maxItems === 1` 是调用方的事（R4-Q3）", () => {
-    const refs = (n: number) => Array.from({ length: n }, (_, i) => ({ path: `../refs/${i}.png`, role: "style" }));
+    const refs = (n: number) => Array.from({ length: n }, (_, i) => ({ path: `../refs/${i}.png` }));
     expect(parse({ styleReferences: refs(0) }).success).toBe(true);
     expect(parse({ styleReferences: refs(1) }).success).toBe(true);
     expect(parse({ styleReferences: refs(3) }).success).toBe(true);   // ← 契约不拦，调用方拦
-    expect(parse({ styleReferences: [{ path: "/abs.png", role: "style" }] }).success).toBe(false);
+    expect(parse({ styleReferences: [{ path: "/abs.png" }] }).success).toBe(false);
+  });
+
+  // ⚠️ 票 43 的 Q6 **阴性判据**：`role` **不许回来**。`strictObject` 本来就该拒它，但**从没被钉过** ——
+  //   而这一条正是「拿掉 `role` 是**破坏性**变更」的判据：只有它抓得住「字段偷偷回到契约里」，
+  //   阳性那条（上面）抓不到。同款先例是本文件 `materials` 那条「值封口」。
+  // ⚠️ `role: undefined` 也拒 —— `strictObject` 看的是**键在不在**，不是值是什么。
+  it("`styleReferences` 的元素**封口** —— 多一个 `role` 键就拒（票 43 把它拿掉了）", () => {
+    const withRole = (role: unknown) => parse({ styleReferences: [{ path: "../refs/0.png", role }] }).success;
+    expect(withRole("global")).toBe(false);
+    expect(withRole("style")).toBe(false);
+    expect(withRole(undefined)).toBe(false);
   });
 
   it("`style` 子树**必填**，且它的 `palette` 是**有序去重**数组", () => {

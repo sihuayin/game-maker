@@ -43,7 +43,7 @@ const stage = () => {
     lighting: {}, character: { silhouette: "矮壮方头" }, environment: { architecture: "木构小站", terrain: "碎石与枕木" },
     palette: { primary: [], secondary: [], accent: [], background: [], shadow: [], highlight: [] },
     materials: { wood: { appearance: "哑光" } }, shapeLanguage: [], constraints: [],
-    styleReferences: [{ path: path.relative(d, refPng), role: "global" }],
+    styleReferences: [{ path: path.relative(d, refPng) }],
     style: {
       id: "halt-dusk", identity: [], camera: {}, composition: {}, palette: ["#112233", "#445566"],
       lighting: {}, shapeLanguage: [], material: [], environment: [], characterStyle: [], constraints: [], confidence: 0.5

@@ -11,7 +11,7 @@ import { AnalyzeReferenceError, TOOL_NAME, analyzeReference, type AnalyzeReferen
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 /** ⚠️ 必须是**相对**路径 —— `StyleReferencePath` 就是那么定的（相对 `visual-world.json` 自身）。 */
 const IMG_REL = "fixtures/reference/halt-dusk.png";
-const REFS = [{ path: IMG_REL, role: "global" }];
+const REFS = [{ path: IMG_REL }];
 
 const modelOut = (over: Record<string, unknown> = {}) => ({
   format: "visual-world/v1",
@@ -200,17 +200,17 @@ describe("出发前的三处免费拦停（都**不**记账 —— 账只记真�
   });
 
   it("两张参考图 ⇒ 抛（R18：多图实现延后到票 26）", async () => {
-    await expect(analyzeReference(input({ styleReferences: [REFS[0]!, { path: "b.png", role: "global" }] })))
+    await expect(analyzeReference(input({ styleReferences: [REFS[0]!, { path: "b.png" }] })))
       .rejects.toThrow(/票 26/);
   });
 
   it("路径不合 `StyleReferencePath`（比如绝对路径）⇒ 抛 —— 它是**调用方**给错了", async () => {
-    await expect(analyzeReference(input({ styleReferences: [{ path: "/abs/x.png", role: "global" }] })))
+    await expect(analyzeReference(input({ styleReferences: [{ path: "/abs/x.png" }] })))
       .rejects.toThrow(/styleReferences 不合法/);
   });
 
   it("扩展名不在白名单 ⇒ 抛（我们**不解析图片内容**）", async () => {
-    await expect(analyzeReference(input({ styleReferences: [{ path: "fixtures/reference/halt-dusk.bmp", role: "global" }] })))
+    await expect(analyzeReference(input({ styleReferences: [{ path: "fixtures/reference/halt-dusk.bmp" }] })))
       .rejects.toThrow(/白名单/);
   });
 

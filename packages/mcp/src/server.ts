@@ -260,7 +260,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             const understanding = await runUnderstanding({
               outRoot: String(args.outDir ?? "out"),
               requirement: readIntent(String(args.intent)),
-              styleReferences: [{ path: String(args.stylePath), role: "global" }],
+              styleReferences: [{ path: String(args.stylePath) }],
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
               ...(args.styleId === undefined ? {} : { styleId: String(args.styleId) }),
               onProgress: (p) => tick(0.4, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),

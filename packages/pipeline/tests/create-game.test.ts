@@ -31,7 +31,7 @@ const TRANSPORT = { baseUrl: "http://up.test", apiKey: "k" };
 const understand = (h: ReturnType<typeof harness>, over: Record<string, unknown> = {}) =>
   runUnderstanding({
     outRoot: h.outRoot, requirement: "做一个废土横版寻宝游戏",
-    styleReferences: [{ path: "style.png", role: "global" }],
+    styleReferences: [{ path: "style.png" }],
     transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd, ...over,
   });
 const build = (h: ReturnType<typeof harness>, runDir: string, over: Record<string, unknown> = {}) =>
@@ -187,7 +187,7 @@ describe("§invariant 3 · recipe 磁盘真相", () => {
     let seenRecipe: string | undefined;
     const r = await createGame({
       outRoot: h.outRoot, requirement: "做一个废土横版寻宝游戏",
-      styleReferences: [{ path: "style.png", role: "global" }],
+      styleReferences: [{ path: "style.png" }],
       transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd,
       onRecipe: ({ recipePath, recipe }) => {
         seenRecipe = recipePath;

@@ -6,7 +6,7 @@
 import { describe, expect, it } from "vitest";
 import { buildVisualWorld, type VisualWorldFromModel } from "../src/index.js";
 
-const REFS = [{ path: "fixtures/reference/halt-dusk.png", role: "global" }];
+const REFS = [{ path: "fixtures/reference/halt-dusk.png" }];
 const STYLE_KEYS = ["id", "identity", "camera", "composition", "palette", "lighting", "shapeLanguage",
                     "material", "environment", "characterStyle", "constraints", "confidence"] as const;
 
@@ -40,7 +40,7 @@ describe("装配", () => {
   });
 
   it("就算模型那一份里混进了 `styleReferences`，调用方给的照样赢", () => {
-    const sneaky = { ...fromModel(), styleReferences: [{ path: "nope.png", role: "瞎编的" }] } as VisualWorldFromModel;
+    const sneaky = { ...fromModel(), styleReferences: [{ path: "nope.png" }] } as VisualWorldFromModel;
     const r = buildVisualWorld({ fromModel: sneaky, styleReferences: REFS, styleId: "s" });
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.spec.styleReferences).toEqual(REFS);

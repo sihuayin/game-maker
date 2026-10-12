@@ -74,7 +74,7 @@ describe("`plan-assets` 的账（它取代了 `derive` —— 而协议从「纯
       palette: { primary: [], secondary: [], accent: [], background: [], shadow: [], highlight: [] },
       materials: {}, shapeLanguage: [], constraints: [],
       // ⚠️ 相对**它自己**（`visual-world.json` 所在目录）—— 契约就是这么定的。
-      styleReferences: [{ path: path.relative(d, REF_PNG), role: "global" }],
+      styleReferences: [{ path: path.relative(d, REF_PNG) }],
       style: {
         id: "halt-dusk", identity: [], camera: {}, composition: {}, palette: ["#112233", "#445566"],
         lighting: {}, shapeLanguage: [], material: [], environment: [], characterStyle: [], constraints: [], confidence: 0.5
