@@ -1104,6 +1104,10 @@ function readVisualWorld(p: string): VisualWorldSpec {
  *   ⚠️ 小写化与去重**复用 `pack.ts` 的 `normalizePalette`**（同一份逻辑，不许再写第二套）。
  * ⚠️ **不扩范围**（人类这一轮的边界）：色板**整个缺席**时 schema 的 `.default([])` 会放行 ——
  *   那是契约自己的形状，本票不动它（见 Answer §边界）。
+ * ⚠️ **2026-10-12（票 44）就地更正**：上面那条边界**已被票 44 关掉**。人类在那一票裁 **Q1=(a)
+ *   「空色板的产物不该存在，一律拒」**，落点**正是这里**（原话：「在 `readStyle` 入口拒绝，
+ *   复用票 29 已建立的校验闸」）⇒ 下面多了一条**业务判据**（色板非空）。⚠️ 契约**仍然不动**
+ *   （`.default([])` 原样保留，守 R6）—— 拒的是**入口**，不是 schema。
  */
 function readStyle(p: string): StyleSpec {
   let raw: unknown;
@@ -1123,6 +1127,19 @@ function readStyle(p: string): StyleSpec {
   const s = StyleSpecSchema.safeParse(normalized);
   if (!s.success)
     throw new CommandError("invalid", `风格规格不过 schema：${formatIssues(s.error).slice(0, 4).join("；")}`);
+  // ⚠️ **票 44 的闸**（人类 2026-10-12 裁定 **Q1=(a)**「空色板的产物不该存在，一律拒」）：
+  //   **色板非空**是一条**业务**判据，不是 schema 判据 —— 契约那边 `palette` 带 `.default([])`，
+  //   所以「整个键缺席」过得了 schema（票 29 量到并钉成 characterization 测试的那个盲区）。
+  //   ⚠️ **为什么非空是硬要求**：`palette:N` 是 DrawList 里表达颜色的**唯一合法形式**，
+  //   「颜色 ∈ 色板」是一个**构造上恒真**的命题 —— 空色板让它当场塌掉；而 `assetpack.ts` 的
+  //   `palette.size` 要求 `positive()` ⇒ 一份空色板的包**本就是违反自己契约的产物**。
+  //   ⚠️ 判在**成功之后、且用规范化过的值**（`s.data.palette`）⇒ 「键缺席」与「显式空数组」
+  //   被同一句话拒掉（人类的边界原话：「**不依赖清单是否引用色板**」—— 色板是世界级风格数据，
+  //   不该由某一份清单的引用情况决定它是否合法）。
+  //   ⚠️ **不写「不过 schema」**：这一条 schema 是**故意放行**的（R6 钉死 `.default([])`），
+  //   照抄那句会让下一个读的人以为契约拒了它。出口仍与兄弟读法同款：`invalid` ⇒ 退出码 4。
+  if (s.data.palette.length === 0)
+    throw new CommandError("invalid", "风格规格不过业务判据：palette 至少要有一个色（空色板画不出任何颜色）");
   return s.data;
 }
 
