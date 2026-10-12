@@ -502,6 +502,28 @@ Generation Strategy
 
 不要只把 VisualWorldSpec 转成文本 Prompt。
 
+⚠️ **本节的范围已按[票 32](../../.scratch/game-maker-v2/issues/32-vws-in-generation-prompt.md) 收窄**（2026-10-12）。
+R17：R 表是决策记录，本文件是它的表达层，所以在这里记一笔。**上面这两段原文一字未删**，注记写在它之下。
+
+- **「生成 Prompt 必须结合 VisualWorldSpec」里的 VWS，指新视图那一半**（`styleIdentity` / `camera` /
+  六桶 `palette` / `lighting` / `materials` / `character` / `environment` / `composition` / `shapeLanguage` /
+  `constraints`），**不是整份文档** —— 内嵌的 `style: StyleSpec` 是**提示词面的载体**（R6：
+  「新视图是权威，`style` 不是第二事实源 —— 它是载体」），两者**不是同一件事**，
+  拿载体去销新视图的账会把范围混为一谈。
+- **今天活着的那两条路**：① **原图内联** —— `ops.ts` 把这一界的风格参考图拷进配方目录并设成
+  `referenceImage`，`pack.ts` 在**每一次**生图调用里带上它（那就是本节末句要的**非文本通道**）；
+  ② **`stylespec.json` 载体** —— 它**就是** `world.style`（R6 说的那个兼容载体）⇒ `styleBrief(style)`
+  与 `style.palette` 进三张模板。
+- ⚠️ **新视图今天到不了那三张模板**，它的读者全在**理解层**：票 10 设计编译（`camera.mode` 那条拒绝面）·
+  票 12 资源规划（`worldBrief` 把六桶与 `materials` 渲染成文本喂 planner）·
+  票 31 角色基因（`characterClassBrief` 同款，另给一行 `N=hex` 对照）。
+  ⇒ **本节要求的新视图接线是一件尚未做的事**，而**它要按 R17 另开一张变更票**才能动 ——
+  因为 R6 已经把两份视图的**读者分工**定死（`contracts/src/visual-world.ts` 头部那段**且带理由**：
+  「提示词要的是**原话**，而原话在封闭枚举里放不下」）。
+- ⚠️ **本节末句「不要只把 VisualWorldSpec 转成文本 Prompt」是护栏、不是闸**（票 32 的 Q1）：
+  它防的是「只把 VWS 转成文本、而**原图不参与**」那种实现，**不禁止**文本形态本身。
+  ⚠️ 而「参考图已存在」只证明**图像输入存在**，**不能单独证明 VWS 的视觉信息已被正确使用**。
+
 ---
 
 # 16. Character Master
