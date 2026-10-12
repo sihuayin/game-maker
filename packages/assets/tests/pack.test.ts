@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { parseAssetPack, type AssetSpec, type AssetRecipe, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { parseAssetPack, parseLedger, type AssetSpec, type AssetRecipe, type DrawList, type LedgerCall, type StyleSpec } from "@game-maker/contracts";
 import { decodePNG, encodePNG } from "../src/png.js";
 import {
   buildAssetPack, keyColorFor, nextPackVersion, verifyPack,
@@ -745,6 +745,79 @@ describe("失败现场：**已经付过钱的原图不许丢**（票 01）", () 
     const e = await fail(d, failingGen(1).gen);
     expect(e.failureDir).toBeUndefined();
     expect(readdirSync(path.join(d, "salvage")).filter((x) => x.startsWith("failed-") || x.startsWith(".building-"))).toEqual([]);
+  });
+});
+
+// ── 票 36：生图那本账**在失败时也要落盘** ──────────────────────────────────────
+//
+// ⚠️ 病：包内 `ledger.json` 原来只在**整包末尾**才写，而第三跑真跑付了 9 张图的钱
+//   （7 生成 + 2 母版）之后抛在一个判断上 ⇒ 失败目录里**一个 sidecar 都没有**，
+//   「生图确实发生了」能证明（原图在），「生图花了多少」**证明不了**。
+//   裁定（票 36 的 Q1 = A）：资产段一 `settle` 就先写一版进**临时包目录**，
+//   于是任何后续抛点都会把它连同失败现场一起留下；末尾那处**保留**，是成功路径的权威终值。
+describe("失败时账也落盘（票 36）", () => {
+  const twoSprites = (): AssetRecipe => ({
+    ...RECIPE, id: "ledger-salvage", referenceImage: undefined,
+    assets: ["a", "b"].map((id) => ({
+      spec: { kind: "sprite" as const, id, role: `${id} 的角色`, description: `${id} 那个东西`,
+        styleId: "style-ref", anchor: { x: 0.5, y: 0.5 }, size: { w: 16, h: 16 }, required: true },
+      source: { kind: "image" as const, background: { tolerance: 0 } },
+    })),
+  });
+  const flat = (w: number, h: number): RasterImage => {
+    const px = (hex: string) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)] as const;
+    const k = px(keyColorFor(STYLE.palette)), f = px(STYLE.palette[0]!);
+    const data = Buffer.alloc(w * h * 4);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const o = (y * w + x) * 4;
+      const inner = x >= w * 0.25 && x < w * 0.75 && y >= h * 0.25 && y < h * 0.75;
+      const c = inner ? f : k;
+      data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+    }
+    return { width: w, height: h, data };
+  };
+  /** 第 `failAt` 次调用抛。⚠️ 只与 `concurrency: {image: 1}` 合用（顺序才是确定的）。 */
+  const gen = (failAt: number): ImageGenerator => async (req) => {
+    if (failAt === 1) throw new Error("抖一下");
+    failAt -= 1;
+    return { image: flat(req.size.w, req.size.h), call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 } };
+  };
+
+  it("⚠️⚠️ 第 2 个资源挂 ⇒ **失败现场里有账**，两条都在（`ms` 缺席 = 发出去了还没回来）", async () => {
+    const d = tmp();
+    const ledger: LedgerCall[] = [];
+    const e = await buildAssetPack({
+      recipe: twoSprites(), style: STYLE, outDir: d, recipeDir: ROOT,
+      generate: stub, generateImage: gen(2), ledger, concurrency: { image: 1 }, sourceDateEpoch: EPOCH,
+    }).then(() => { throw new Error("本该失败，却出包了"); }, (x: unknown) => x as Error & { failureDir?: string });
+
+    expect(e.failureDir, "失败现场没留下来").toBeDefined();
+    const p = path.join(e.failureDir!, "ledger.json");
+    expect(existsSync(p), "失败现场里没有账 —— 钱花了、账又没了").toBe(true);
+    // ⚠️ **过 schema**：它是一份**合法的收据**，不是随便写的 JSON
+    const r = parseLedger(JSON.parse(readFileSync(p, "utf8")) as unknown);
+    if (!r.ok) throw new Error(`失败现场那份账没过 schema：${r.errors.join(" · ")}`);
+    const doc = r.value;
+    expect(doc.calls.map((c) => [c.step, c.target])).toEqual([["image", "a"], ["image", "b"]]);
+    expect(doc.calls[0]!.ms, "回来了那笔该有 ms").toBeDefined();
+    // ⚠️ 挂掉那笔**不许编一个 `ms`** —— 缺席就是那句定义「发出去了、还没回来」（票 19 Q4）
+    expect(doc.calls[1]!.ms).toBeUndefined();
+    expect(doc.run.byStep.image).toEqual({ calls: 2, attempts: 2 });
+    // ⚠️ 它仍是**失败现场不是包**：不占版本号
+    expect(nextPackVersion(d, "ledger-salvage")).toBe(1);
+  });
+
+  it("⚠️ 成功路径**一个字不变**：账仍在包里、仍在 `files[]` 里（末尾那处没被挪到 walk 之后）", async () => {
+    const d = tmp();
+    const ledger: LedgerCall[] = [];
+    const { manifest } = await buildAssetPack({
+      recipe: twoSprites(), style: STYLE, outDir: d, recipeDir: ROOT,
+      generate: stub, generateImage: gen(9), ledger, concurrency: { image: 1 }, sourceDateEpoch: EPOCH,
+    });
+    expect(manifest.files.map((f) => f.path)).toContain("ledger.json");
+    const r = parseLedger(JSON.parse(readFileSync(path.join(d, "ledger-salvage", `pack/v${manifest.version}`, "ledger.json"), "utf8")) as unknown);
+    if (!r.ok) throw new Error(`包内那份账没过 schema：${r.errors.join(" · ")}`);
+    expect(r.value.calls.map((c) => c.target)).toEqual(["a", "b"]);
   });
 });
 

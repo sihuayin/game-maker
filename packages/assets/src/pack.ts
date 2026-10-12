@@ -473,7 +473,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
               //   现场里活下来的正是这种「随步落盘」的东西。⚠️ 第六跑现场实测：那一跑死在母版上，
               //   失败目录里**只有** `authoring/`（drawlist/generated/imported/**masters**）与一个空的
               //   `delivery/` —— `manifest.json` / `ledger.json` / `coverage.json` **一个都没有**
-              //   （那三个都在 `pack` 末尾才写）。⇒ 想让「偏差仍可追溯」在失败里也成立，就得写在这儿。
+              //   （那三个当时都在 `pack` 末尾才写）。⇒ 想让「偏差仍可追溯」在失败里也成立，就得写在这儿。
+              //   ⚠️ **2026-10-12 更新（[票 36](../../../.scratch/game-maker-v2/issues/36-failure-ledger.md)）**：
+              //     `ledger.json` **已经离开这一组** —— 它现在也写两处，第一处就在资产段之后（下面），
+              //     失败时跟着现场走。今天仍是「末尾才写」的是 `manifest.json` / `coverage.json`。
               //   ⚠️ 它**自己就是一份完整的 `MasterRatios` 文档**（一条记录）⇒ 单看一个文件也读得懂、
               //     也被同一个 `parseMasterRatios` 认（与包根那份同形）。
               fs.writeFileSync(path.join(packDir, ref.replace(/\.png$/, ".ratio.json")), jstr({
@@ -494,8 +497,9 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   }
 
   // ── 母版比例的**汇总**（票 39 的 Q1 ②）────────────────────────────────────
-  // ⚠️ **写在母版段之后、资产段之前** —— 再晚一点它就会跟包根那三个 sidecar 一样
+  // ⚠️ **写在母版段之后、资产段之前** —— 再晚一点它就会跟包根那几个 sidecar 一样
   //   **只在整包成功时才存在**（第六跑现场：失败目录里一个 sidecar 都没有）。写在这儿，
+  //   ⚠️（**2026-10-12 · 票 36**：`ledger.json` 已按同一条理由挪进失败现场 —— 见下面资产段之后那处。）
   //   它是「母版段一跑完就有了」的那一份；而逐张那几份（`masters/<id>.ratio.json`）更早。
   // ⚠️ **顺序按 `authoring[]`**，不按回来的先后（并发下回来是随机的）。
   const masterRatioList = authoringEntries.flatMap((a) => {
@@ -948,6 +952,49 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       }
     })
   );
+  // ── 账（第一处）：资产段一 `settle` 就写一份进**临时包目录**（票 36 的 Q1）────────
+  //
+  // ⚠️⚠️ **同一份账写两处，这是裁定、不是顺手**（票 36 的 Q1，人类裁定 (A)）：
+  //   · **这里**：`allSettled` 之后、**任何判断抛点之前**（下面 `firstFailure` 那条就是第一个）。
+  //     此刻 `opts.ledger` 已经**冻结** —— 最后一次 `push` 就在生图段那道闸门**里面**
+  //     （`imageGate` 里的「发出即记」），更早的母版那笔在母版段。⇒ 这份账从这一刻起就是**完整的**。
+  //     而它落在**临时包目录**里 ⇒ 后面任何一步抛了，它都跟着**失败现场**活下来
+  //     （`keepFailureSite` 把整棵树**改名**留下，不删）。
+  //   · **`pack` 末尾那处**（见下）：成功路径的**权威终值**。它只比这里多算 `run.wallClockMs`
+  //     的尾段（图集 / 落盘 / 穷举 / 对账）—— `calls` 与 `byStep` 两处**完全相同**。
+  //
+  // ⚠️ **为什么不是「只提前、末尾那处删掉」**：`wallClockMs` 是 v1 票 45 真跑验过的一个数
+  //   （43.713s 里 43.4s 在调用），削掉尾段换不到任何东西，而成功路径的产物**一个字节都不该因此变**。
+  // ⚠️ **为什么在失败里它也不算「半截的账」**：账里**永远**只有**真的发出去过**的调用
+  //   （票 47 的「失败即止」让被拒的排队调用一分钱不记）⇒ 这里写下的不是一份不完整的账，
+  //   而是一份**属于一次没交付的跑**的账。
+  // ⚠️⚠️ **所以「完整 / 半截」不靠文件里的字段，靠它在哪**（票 36 的 Q2）：
+  //   `pack/v<N>/ledger.json` = 包交出去了；`…/failed-<ts>/ledger.json` = 没交出去。
+  //   ⚠️ 位置答的是「**包交出去了没有**」，**不是**「这笔记账全了没有」—— 末尾那三个点
+  //   （动态 `import` / `auditAssetSpec` / `mkdirSync`+`renameSync`）在账写完之后**仍能抛**，
+  //   那时**钱已花光、账已记全**，账是对的而包没交出去 —— 而那几处**一分钱都不花**。
+  //   ⚠️ 契约里**没有**「这次跑完了没有」这种字段，是**裁定**不是遗漏（`Ledger` 是 `.strict()`，
+  //   加字段要过 **R7** 那道门：说不出「谁读它」的字段不进契约 —— 而它唯一的读者是**人**，
+  //   人**看路径就知道**；何况那个字段在两个方向上都会说谎）。
+  //
+  // ⚠️ 构造器只此一份、**写两次**：两处**不可能**漂移（本仓库那条老教训）。
+  const ledgerDocNow = (): Ledger | undefined => (opts.ledger === undefined ? undefined : {
+    format: LEDGER_FORMAT, packId: recipe.id, packVersion: version,
+    createdAt: new Date((opts.sourceDateEpoch ?? Number(process.env.SOURCE_DATE_EPOCH ?? Math.floor(Date.now() / 1000))) * 1000).toISOString(),
+    run: { wallClockMs: Date.now() - runT0, byStep: summarizeCalls(opts.ledger) },
+    calls: opts.ledger,
+  });
+  let ledgerDoc = ledgerDocNow();
+  // ⚠️⚠️ **只在「已经有东西」时才写**（**票 01 的「有东西才留」原样保住**）：
+  //   `keepFailureSite` 那条规矩是「树里一个文件都没有 ⇒ `rmSync`、不留空目录」，
+  //   而**账是失败现场的附件，不是现场本身** —— 附件不该把现场**从无变有**
+  //   （否则「有没有现场」会取决于我们写不写账，而不是取决于**这一次真花掉过什么**）。
+  //   ⚠️ 它**不削弱本票**：真花掉钱的那些情形（生成图 / 母版 / drawlist 落过盘）树里**必然**有东西，
+  //   第三跑那 9 张已付费的图正是如此。而「一笔都没成、一个字节都没落」时，
+  //   那一笔仍然跟着异常走（票 46），两个壳当场渲染。
+  if (ledgerDoc && hasAnyFile(packDir))
+    fs.writeFileSync(path.join(packDir, "ledger.json"), jstr(ledgerDoc));
+
   // ⚠️ 逐条看过再抛**第一条**失败 —— 取**清单顺序**，与「谁先挂」无关（并发下那个不可复现）
   const firstFailure = settled.find((r): r is PromiseRejectedResult => r.status === "rejected");
   if (firstFailure) throw firstFailure.reason;
@@ -1041,26 +1088,24 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
     }),
     files: [],
   };
-  // ── 账：包根的 sidecar `ledger.json`（票 19 / 票 45）───────────────────────
+  // ── 账（第二处）：成功路径的**权威终值**（票 19 / 票 45 / **票 36 改成写两处**）──────
   //
   // ⚠️ **写在这里是全部的关键**：`files[]` 是 `walk(packDir)` **穷举**，所以 sidecar 会
   //   **自动进 files[]**、自动被 `verify` 校验 checksum —— **契约一个字不用改、不用升版**。
   //   写在 walk 之后的话它就漏在 checksum 覆盖之外了。
   //
   // ⚠️ 而且它写在**临时包目录**里（`finalDir` 搬迁之前），所以它跟着包一起搬走。
-  // ⚠️ **包内这份账与「异常上那份」是同一份数组，但读的时刻不同**（票 05）——
-  //   包内这份**只在成功时才写**，而失败时根本走不到这里 ⇒ 它天然只含**回来的**调用。
-  //   ⚠️ 而这一点从 2026-09-30 起是**构造保证**、不再是碰巧：每一条「已发出」都**记在闸门里面**
-  //   （没被放行的一分钱没花、也就不记），而每一条记下的都会在同一个 unit 里被 `Object.assign` 补成事实。
-  //   ⇒ 能走到这一行，就说明**每一条都被补过**。
-  const ledgerDoc: Ledger | undefined = opts.ledger
-    ? {
-        format: LEDGER_FORMAT, packId: recipe.id, packVersion: version,
-        createdAt: new Date((opts.sourceDateEpoch ?? Number(process.env.SOURCE_DATE_EPOCH ?? Math.floor(Date.now() / 1000))) * 1000).toISOString(),
-        run: { wallClockMs: Date.now() - runT0, byStep: summarizeCalls(opts.ledger) },
-        calls: opts.ledger,
-      }
-    : undefined;
+  // ⚠️ **与第一处（资产段之后）的关系**：**同一个构造器、同一份数组**，差别只在这里的
+  //   `run.wallClockMs` 把尾段算了进去 ⇒ **成功路径以这一份为准**。
+  //   ⚠️ **2026-10-12（票 36）：原来那句「包内这份**只在成功时才写**，而失败时根本走不到这里」
+  //     已经作废** —— 现在**失败时也写**（第一处），只是那一份落在失败现场里。
+  // ⚠️ **包内这份账与「异常上那份」是同一份数组，但读的时刻不同**（票 05）。
+  //   ⚠️ **走得这一行**（= 整包成功）⇒ 这份账里每一条都被 `Object.assign` 补过事实
+  //   —— 那是**构造保证**、不再是碰巧：每一条「已发出」都**记在闸门里面**
+  //   （没被放行的一分钱没花、也就不记），而每一条记下的都会在同一个 unit 里被补成事实。
+  //   ⚠️ **第一处那份不作这个保证**（它可能含「发出去了、还没回来」的那一笔 —— 那是
+  //     `ms` 缺席的定义，不是漏记，而失败现场里它正是**该被看见**的那一笔）。
+  ledgerDoc = ledgerDocNow();
   if (ledgerDoc) fs.writeFileSync(path.join(packDir, "ledger.json"), jstr(ledgerDoc));
 
   // ── 覆盖率：包根的 sidecar `coverage.json`（票 50）─────────────────────────

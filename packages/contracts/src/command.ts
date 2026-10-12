@@ -29,7 +29,10 @@ export const EXIT = { ok: 0, failure: 1, usage: 2, upstream: 3, invalid: 4 } as 
  * 失败**不**放进 `CommandResult.outcome` —— 它抛。这样「成功」这个类型里没有假货。
  *
  * ⚠️ **`ledger`（票 46）**：失败时**已经花掉的那几笔**跟着异常一起走。
- *   理由很直白 —— 包没产出来，所以没有 `ledger.json` 可写；
+ *   理由很直白 —— 失败时没有**包**，所以没有包内 `ledger.json` 可读；
+ *   ⚠️ **2026-10-12（[票 36](../../../.scratch/game-maker-v2/issues/36-failure-ledger.md)）**：
+ *   抛点之后的**失败现场**里现在另有一份 `ledger.json`，但那一份要**先知道现场在哪**才读得到
+ *   —— 跟着异常走的这一份是给人**当场**看见的，两者不互相顶替。
  *   而**花了钱是事实，失败不改变这个事实**（与 R3「诚实是结构性的」同一条纪律）。
  *
  * ⚠️ 它**不是 outcome**：`CommandResult` 那条「成功这个类型里没有假货」的纪律照旧。
