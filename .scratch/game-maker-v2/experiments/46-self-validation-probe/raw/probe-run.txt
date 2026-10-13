@@ -1,0 +1,49 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/Volumes/shy/some-projects/game-maker/packages/assets[39m
+
+[90mstdout[2m | tests/__t46-probe.test.ts[2m > [22m[2m探针 A：分层背景里两层同名
+[22m[39m
+=== 探针 A：分层背景里两层同名（配方闸与 readStyle 都不看层名） ===
+① parseRecipe（配方闸）: PASSES —— 放行
+
+[90mstdout[2m | tests/__t46-probe.test.ts[2m > [22m[2m探针 A：分层背景里两层同名
+[22m[39m② parseAssetPack(自己产的 manifest): REJECTED — assets[0].frames: 帧名重复："store-interior-bg.far" / assets[0].layers: 层名重复："far"
+③ 包被提交到: <out>/shift-change-assets/pack/v1
+④ 那份违约 manifest 落在盘上了吗: [33mtrue[39m
+⑤ <out>/<gameId>/ 下有什么: ["pack"]
+
+[90mstdout[2m | tests/__t46-probe.test.ts[2m > [22m[2m探针 B：色板整个缺席
+[22m[39m
+=== 探针 B：色板整个缺席 —— 直接调 buildAssetPack（绕过 readStyle 那道入口闸） ===
+① parseRecipe（配方闸）: PASSES —— 放行
+
+ [31m❯[39m tests/__t46-probe.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 56[2mms[22m[39m
+   [32m✓[39m 探针 A：分层背景里两层同名[32m 52[2mms[22m[39m
+[31m   [31m×[31m 探针 B：色板整个缺席[39m[32m 4[2mms[22m[39m
+[31m     → drawlist "player-odin" ops[0]: 颜色引用 "palette:0" 越界（色板只有 0 项）[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/__t46-probe.test.ts[2m > [22m探针 B：色板整个缺席
+[31m[1mRasterError[22m: drawlist "player-odin" ops[0]: 颜色引用 "palette:0" 越界（色板只有 0 项）[39m
+[36m [2m❯[22m rgbaOf src/raster.ts:[2m35:32[22m[39m
+    [90m 33| [39mfunction rgbaOf(ref: string, palette: readonly string[], assetId: stri…
+    [90m 34| [39m  [35mconst[39m hex [33m=[39m [34mpaletteColor[39m(ref[33m,[39m palette)[33m;[39m
+    [90m 35| [39m  if (hex === undefined) throw new RasterError(assetId, opIndex, `颜色引用…
+    [90m   | [39m                               [31m^[39m
+    [90m 36| [39m  [35mreturn[39m [34mhexToRgba[39m(hex)[33m;[39m
+    [90m 37| [39m}
+[90m [2m❯[22m src/raster.ts:[2m153:39[22m[39m
+[90m [2m❯[22m rasterize src/raster.ts:[2m135:16[22m[39m
+[90m [2m❯[22m src/pack.ts:[2m571:74[22m[39m
+[90m [2m❯[22m buildOne src/pack.ts:[2m565:14[22m[39m
+[90m [2m❯[22m src/pack.ts:[2m955:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 15:13:36
+[2m   Duration [22m 2.22s[2m (transform 1.05s, setup 0ms, collect 1.56s, tests 56ms, environment 0ms, prepare 434ms)[22m
+

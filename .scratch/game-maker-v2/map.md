@@ -516,6 +516,47 @@ Effort: game-maker-v2
 > ⚠️ **本票派生的那张「将来」的票（要不要按 R17 重开 R6 把新视图接进生图）进了 `Not yet specified`、不进前沿** ——
 > **更靠前的障碍是判据**：按 R3 今天没有任何东西判得了「加了六桶以后图有没有变好」。
 
+> ⚠️ **2026-10-13（票 46 session）：票 46 已关** —— 制造端自校验**接线落地**，
+> 而这一票最要紧的一行是**票面问的那件事被量出了答案，答案是「有」**：票 44 诚实交代过
+> 「还有没有**别的写法**能让 `buildAssetPack` 产出一份过不了自己契约的包，**今天没有人量过**」——
+> 本票去量了。**免费探针、无测试缝、走的就是生产函数本身**：拿 `shift-change.json` 那个 `background`
+> 改成**两层同名** ⇒ **过得了**配方闸 `parseRecipe`、**过得了**票 44 那道入口闸 `readStyle`（它只管色板），
+> 产出的 manifest **被 `parseAssetPack` 拒**（`帧名重复` · `层名重复`），**而那份包照样被提交进 `pack/v<N>/`**、
+> 旁边**没有**失败现场（现场存进 `experiments/46-self-validation-probe/`）；
+> ⚠️ **票 44 的窄裁定并没有错**：它堵的空色板那条**确实死了**（探针 B：直接喂 `palette: []` 会**先死在 `rasterize`**，
+> 根本到不了 manifest）—— **它没堵住的是别的写法，而别的写法一直都在**。
+> ⚠️ **根因不是「生产者没验」，是「一条规矩只住在一半」**：`Layer` 的「名字不许重复」只写在**交付侧**
+> （`AssetPackEntry.superRefine`），创作侧 `BackgroundSpec.layers`（= `Layer.extend(...)`，**同一个定义的镜像**）**没有这一条**，
+> 而 `recipe.ts` 的 `superRefine` 查了四个引用族、**唯独没查层名**；⚠️ **真实包里分层背景是常态**
+> （`bg-dusk-halt` 的 `sky/wall/ground` · `counter-siege` 的 `floor/fittings` · `last-train` 十几个版本都是三层）——
+> 今天盘上那些**恰好**层名互不相同，**是运气不是闸**。
+> ⚠️ **六问全按推荐**（人裁原话逐字进 Answer）：Q1 **(b)** 验**真字节**、位置在 `writeFileSync` 之后
+> **`renameSync` 之前**、且**在 `buildAssetPack` 内部**（「入口那两道闸恰恰漏过这一条」）· Q2 **(a)** 失败现场
+> **复用现有** `keepFailureSite`（**不删除现场、不新增目录约定、不消耗版本号**——⇒ 票 14 的「不落盘」与
+> 票 15 的「留现场」在这里**一行新约定都不需要**就并置成立了：区别只在**哪个目录**）· Q3 **(a)** `CommandError("invalid")`
+> 退 **4**、**不重采样**、且**必须点名到字段路径** · Q4 **(a)** **只验 manifest schema** —— 理由不是省事而是
+> **「(b) 在那一刻测不出东西」**（`files[]` 与 checksum 就是 `:1143` 从真目录现走出来的 ⇒ 加进来是**一条永远绿的空判据**），
+> 并顺手给「两把尺子」划了线：**`verify` 管跨进程/跨时间，自校验管离开进程之前，同一套 schema 问了两次** ·
+> Q5 **(a)** 判据**打在生产路径上**（票面点名不许拿 `pack.test.ts` 那三处**测试自己调**的回环顶替）·
+> Q6 **(a)** **本票只接线、契约收紧另开票** ⇒ 已派生**票 58**（`layer-name-uniqueness-one-sided`）。
+> ⚠️ **落地两处**：`pack.ts`（导入 + 那段自校验）· **新文件** `tests/pack-selfcheck.test.ts`（**2 条**：阳性+阴性）。
+> ⚠️ **判据**：阳性断言**拒绝 ∧ 退 4 ∧ 点名到字段 ∧ `pack/` 根本没出现 ∧ 现场里那份违约 manifest 可读**；
+> 阴性断言**照常提交 ∧ 产物字节不变**（两重：盘上那份 === 序列化的那一份 ∧ 同输入两次同字节）。
+> **变异两发**：摘掉那条闸 ⇒ 阳性红在「必须抛」；**把自校验搬到 `renameSync` 之后** ⇒ 阳性红在
+> **「`pack/` 不许出现」** ⇒ **判据钉住的是「位置」不是「在不在」**。
+> ⚠️ **判据没有钉住、也不该假装钉住的一件事**：Q1 那个「字节而非内存对象」的选择**今天观测不到差别**
+> （现有生产路径上没有会让序列化失真的字段）⇒ 那是**防御性**的选择、**不是**一条本票能证伪的性质。
+> ⚠️ **闸门全绿**：`pnpm test` **1302/1302**（78 文件；基线 1300/77，本票 **+2/−0**）· `typecheck` 9 包 ·
+> `build` · `tsc -b --force` · `check:deps` ✅ 9 包 · `check:links` ✅（207 份文档 · 1165 条链接）· **零付费跑**。
+> ⚠️ **边界**：**本票没碰任何契约文件**（`packages/contracts/` 一个字节没动 —— 票面「不预设要改哪份契约」守住了，
+> 因为**接线本身就跑得通**）· R 表没动 · `packages/qa` 一行没碰 · `game-maker.local.json` 一个字没动 ·
+> 没加重试 / 修复循环 / 自动重生成 · `experiments/` 只读（本票**新开**的探针目录除外）。
+> ⚠️ **顺带量到、本票不动**（已按「你要动就说一声」记进 `Not yet specified`）：**读侧三处抛裸 `Error`**（退 **1** 不是 4）
+> ⇒ 同一个「包不过 schema」在四道读侧拿到**两个退出码**；**票面行号已漂移**（调用点票面写 6、实际 **11**）；
+> **票面说「退出码语义边界写在 `docs/v2/01-contracts.md`」今天不成立**（那份文档里没有那一节）。
+> ✅ **前沿（逐票扫出来的，不以本节的叙述为准）：36 · 42 · 45 · 47 四张 + 新开的 58 —— 全是 `grilling`**；
+> ⚠️ **23** 仍挂在 **42** 上；⚠️ **22** 那条**陈旧认领**照旧没人接手。
+
 ## Destination
 
 仓库升级到 **V2**：一条命令
@@ -791,11 +832,17 @@ Style Image + Game Intent
 
 - [提示词说「省掉」、覆盖判据却「拒绝」—— `wasteland-bg` 一条机制**独立**杀死了一次真跑](issues/54-mechanic-omitted-vs-coverage.md)：**治上游 —— 意图层加分类散文 + 第 6 条升成 gate；R12 与 `auditIntentCoverage` 一个字没松**。⚠️ **本票最要紧的一行是「两条判据都是对的，坏的是意图层记错了东西」**：第八跑那份意图把需求那张清单整张抄进了 `mechanics[]` —— `wasteland-bg` 的真正归属是 `world.theme`/`world.setting`、`final-goal` 是 `winConditions[]`，而 `chest`/`resource`/`enemy` **同时躺在 `entities[]` 与 `mechanics[]` 里**；⚠️ 而**「不许重复」这条规矩一直写着（工具说明第 6 条），只是没有 gate 看着它** —— 盘上 **7 份真实意图 6 份违反**（一条从没被执行过的规矩等于没有）。⚠️ **第二要紧的是提示词自己跟自己打架**：设计层第 2 条说「挑不出对家就**整条省掉**」，而 `mechanics` 那条字段台账说「`id` **照抄意图层**」⇒ 合起来 = 「意图里每条机制都要出现在设计里」⇒ **只能填近似值** ⇒ 第八跑实测**唯一听话的那一条死了**（`wasteland-bg`）、拿近似值顶替的**六条活了**。⚠️ **五条裁定**（人裁 2026-10-13）：**Q1 = (a) 改上游**（写明「机制是怎么玩」，第 6 条**升成 gate**；不碰 R12 的覆盖保护、不放松设计层）· **Q2** 第 2 条明说「省掉 ⇒ `compile-design` **整份拒绝**、退出码 4、**点名**缺失的机制」，并**禁止用近似项顶替** · **Q3 = (A) 本票升 gate**，并给出**正确的拆分方式**（实体留在 `entities[]`；玩法行为另起一个准确的 id，如 `chest` vs `open-chest` —— 既不删实体、也不两边同 id）· **Q4 = (A) 另开票**做理解层四步的系统扫描（见[票 56](issues/56-prose-vs-gate-audit.md)）· **Q5 三层都钉**。⚠️ **四条补充裁定**：① 意图层新散文必须给**显式分类规则**（实体 → `entities[]` · 怎么玩 → `mechanics[]` · 世界设定 → `world` 那三格 · 最终目标 → `winConditions[]`）· ② gate 的错误信息**必须能指导修复**（点名冲突 id + 两条路径 + 出路）· ③ 真实意图回放**只证明拒绝行为正确**，不证明模型学会分类（那归票 23 的下一次完整真跑，**本票不追加付费探针**）· ④ 边界（原话进 Answer §5）。⚠️ **施工三处**：`contracts/src/game-intent.ts` 新增 gate **⑤b**（`entities[].id` 与 `mechanics[].id` **跨数组也不许撞**，文案点名冲突 id + 两条路径 + 「拆成两条、各起一个 id」+「**不许删掉实体**」）· `TOOL_DESCRIPTION` 新增「**先分家**」那段（四格显式分类 + 「一句话同时说了东西与操作就拆两条」+ ⚠️「分的是**类别**、不是**做不做得了**」，免得与第 1 条打架）+ 第 6 条改成 gate 口径 + 两条字段台账各点名一次 · `DESIGN_TOOL_DESCRIPTION` 第 2 条改口 + `DESIGN_FIELD_HINTS.mechanics` 补「**只在你能给它挑出一个对家时**才写这一条」。⚠️ **判据三层**：散文一致性（`prompts.test.ts` **+4** · `design-prompts.test.ts` ② 扩写 + **新加 1 条「台账与第 2 条不再打架」**）· gate 阳性/阴性（`game-intent-gate.test.ts` **+3**：跨数组重 id 拒 · `chest`+`open-chest` **放行** · 射程守卫 —— gate 只判「同一个 id 有没有躺在两处」，**不判语义**（R3））· **真实意图回放**（`build-design.test.ts` **新加一组 2 条**：拿第八跑盘上那份 `game-intent.json`，① 它今天过不了意图层契约、② **R12 一个字没松**，照样点名 `废土背景`）。⚠️ **变异六发**（抽 gate ⑤b / 抽「先分家」/ 第 6 条褪回旧话 / 两条台账褪回旧话 / 设计层第 2 条褪回旧话 / `mechanics` 台账褪回「照抄意图层」）**各自红在该红的那几条上**，之后逐份还原。闸门：`tsc -b --force` 干净（⚠️ game-design 的测试引 `contracts` 的 **built `dist`** ⇒ 改完契约**必须先 `pnpm build`**，本票踩过一次）· `pnpm typecheck` 9 包 · `pnpm build` · `pnpm test` **1273/1273**（76 份文件，本票 **+10**）· `check:deps` ✅ · `check:links` ✅（199 份文档 · 1142 条链接）。⚠️ 改 gate 之前扫过：**现有测试与 fixture 里没有一份**是跨数组重 id 的 ⇒ 不误伤。⚠️ **边界**：R 表没动 · **R12 语义没动** · `auditIntentCoverage` 一行没碰 · 没加重试 / 修复循环 / 自动重生成 · `packages/qa` 一行没碰 · `game-maker.local.json` 一个字没动 · **零付费跑** · 系统扫描**不在本票内**。⚠️ **免费手段只证「不误杀」**：「模型读到新散文以后是不是**真的**不再把非机制写进 `mechanics[]`」**只能真跑**（属票 23，另出报告 + 逐次明确同意）。✅ **与[票 53](issues/53-npc-clause-vs-coverage.md) 一起，`compile-design` 那两个并列的拦路石都清了 ⇒ 票 23 的 `Blocked by` 解除 —— 但解票 ≠ 可以开跑。✅ **54 关。**
 - [`provenance.style.origin` 硬编码 `"human-in-session"` —— 而契约枚举里没有「模型生成」这一档](issues/45-style-provenance-origin.md)：**Q1 = (a) 整块删掉、`assetpack/v2 → v3`；Q2 = (C) 只更正 `CONTEXT.md:268` 的过期定义，资源级枚举与 `derivePackMode` 另开[票 57](issues/57-asset-origin-fixture.md)**（人裁 2026-10-13）。⚠️ **本票最要紧的一行是票面问的问题被实测问倒了**：票面问「`origin` 该填什么才对」（加第三个值 `model-generated`？还是从入口传进来？），而**四个键没有一个该留着** —— `origin` 是**硬编码的假话**（唯一写点 `pack.ts:1061` 永远吐 `"human-in-session"`，而 V2 链上那份 `stylespec.json` 是**模型写的**）· `ref` 指向的路径在 `files[]` 里已经逐个 checksum · `stylespecId` 就是那份文件**自己的 `id`**（实测 `counter-siege/v4`：manifest 写 `"style-ref"`、盘上 `authoring/stylespec.json` 也写 `"style-ref"`，**逐字相同**）· `checksum` 同上、`files[]` 也兜着 ⇒ **一个也不携带别处拿不到的信息**。⚠️ **为什么加档 / 传参两条路都堵死**：票 29 定过 `stylespec.json` 是**产物**，而 `packAssets` **结构上无法知道**那份 stylespec 是谁写的 ⇒ 加档只是把一处假话挪到另一处，**字段仍然没有读者、也无法被独立验证**（补充裁定 4：另外三个键随整块走，**不逐字段加校验**）。⚠️ **升版是一次有意付的代价**（补充裁定 1 明说「不以规避升级为目标」）：两次升版一个价，2026-09-25 升 v2（删 `degradations`/`transport`）、2026-10-13 升 v3（删 `provenance.style`），**都是同一条 `.strict()` 规矩收的费**；**`provenance.mode` 一个字没动**（补充裁定 2 —— 它有真读者：`derivePackMode` 派生 + 两条 `superRefine` 对账）。⚠️⚠️ **票面没预料到的一件事**：§0.3 的代价清单第 ⑤ 条说「本地 `out/` 那 75 份包从此 `verify` 不过」并判**可接受**（`out/` 在 `.gitignore:10` 里、是本机垃圾场）—— **对了一半**：`out/` 确实不入库，但**有两个测试文件在读它**（`cli/tests/cli.test.ts` · `mcp/tests/server.test.ts` 各自拿 `out/shift-change-assets/pack` 下**最新那一版**当真包跑 `inspect`/`verify`）⇒ **升版当天本机实测 3 条判据变红**（按契约拒 → 退 4 / `isError` 真 / progress 不发）。✅ **那不是回归**：盘上那份是 **`assetpack/v1`**（比票面猜的 v2 还老），拒它**正是**新契约该做的事 —— 坏的是**门槛**（`skipIf(!hasPack)` 只判「有没有包」，而这一组的主题是「在一份**当前契约**的包上怎么表现」，两者一升版就分家）。**修法两条一起**：① 门槛收成「有一份当前契约的真包」② **回落到入库的 fixture 包**（`fixtures/packs/counter-siege/v4`，本票已迁 v3）—— 因为本机那份**不会自己变新**（重建 = 真跑管线 = **花钱**），只判存在的话这一组在本机**永久 skip**，而本仓的尺子是「**一条从没被执行过的规矩等于没有**」⇒ 收口后这两组**从「有本机包才跑」变成每次都跑**（清检出上也跑），**覆盖不减反增**；顺带把 `mcp` 里写死的 `"shift-change-assets"` 改成**从被选中那份包自己的 manifest 读 id**（那句话的原意是「MCP 把包的 id 原样带出来」，不是「那个包叫什么」）。⚠️ **另外捞到两处「说辞过期」**：`fixtures/style-spec.provenance.json` 的 `reproduces` 原指着已删的 `provenance.style.checksum`（改指 `files[]` 里 `authoring/stylespec.json` 那条 checksum —— **同一份事实换了新家**）· `visual-world.test.ts` 那条判据的**说辞**「manifest 的 `stylespecId` 指着它」（**判据站得住**：`id` 是 `StyleSpecSchema` 必填非空、`buildVisualWorld` 拿它**强制覆盖**模型抄来的 `style.id` ⇒ 改成**从上游那一头**说理）。⚠️ **落地 20 个文件**：契约（`assetpack.ts`）· 写入侧（`pack.ts`）· 2 份入库 manifest · 6 份测试 · 注释/文档（`visual-world.ts` 兼容载体 `style` 的**三条理由 → 两条** · `vision/src/prompts.ts` · `ledger.ts` / `coverage.ts` / `master-ratio.ts` / `asset-spec.ts` 四处不再钉死在过期的 v2 上 · `CONTEXT.md` 三处）。⚠️ **`docs/counter-siege.md:120` 一个字没动**（扫过：只**引用**那份 fixture，没对 `provenance.style` 作任何声明 ⇒ 不假）。⚠️ **票面行号已漂移**：真正的写点是 **`pack.ts:1061`**（票面写 `1004`）。闸门：`pnpm build` 干净（⚠️ 改契约**必须先 build**，consumers 读的是 built `dist`）· `tsc -b --force` 干净 · `pnpm typecheck` 9 包 · `pnpm test` **1273/1273**（76 文件）· `check:deps` ✅ 9 包 · `check:links` ✅（201 份文档 · 1156 条链接）· **零付费跑**。⚠️ **边界**：R 表没动 · 没付费真跑 · `game-maker.local.json` 一个字没动 · `packages/qa` 一行没碰 · 没加重试 / 修复循环 / 自动重生成 · **`provenance.mode` / `derivePackMode` / 资源级枚举一个字没动**。✅ **45 关。**
+- [`buildAssetPack` 从不验自己的产物 —— 要不要让写的人验一遍](issues/46-buildassetpack-self-validation.md)：**六问全按推荐：验真字节 · 验在提交之前 · 失败留现场 · 退 4 · 只验 schema · 契约收紧另开票（⇒ 派生票 58）**（人裁 2026-10-13）。⚠️ **本票最要紧的一行是票面问的那件事被量出了答案，答案是「有」**：票 44 诚实交代过「还有没有**别的写法**能让 `buildAssetPack` 产出一份过不了自己契约的包，**今天没有人量过**」—— 本票**免费探针**量了（无测试缝、走的就是生产函数）：拿 `background` 改成**两层同名** ⇒ **过得了**配方闸与票 44 那道入口闸（它只管色板）⇒ 产出的 manifest **被 `parseAssetPack` 拒**（`帧名重复` · `层名重复`）⇒ **而那份包照样被提交进 `pack/v<N>/`**、旁边**没有**失败现场。⚠️ **票 44 的窄裁定并没有错**：它堵的空色板那条**确实死了**（探针 B：直接喂空色板会**先死在 `rasterize`**、根本到不了 manifest）—— **它没堵住的是别的写法，而别的写法一直都在**。⚠️ **根因不是「生产者没验」，是「一条规矩只住在一半」**：`Layer` 的「名字不许重复」只写在**交付侧**（`AssetPackEntry.superRefine`），创作侧 `BackgroundSpec.layers`（= `Layer.extend(...)`，**同一个定义的镜像**）**没有这一条** —— ⚠️ **真实包**里分层背景是**常态**（`bg-dusk-halt` 的 `sky/wall/ground` · `counter-siege` 的 `floor/fittings` · `last-train` 十几个版本都是三层）；盘上那些**恰好**层名互不相同，**是运气不是闸**。⚠️ **两条裁定之外的落点**：① 现场**一行新约定都不需要** —— 抛出去自有 `buildAssetPack` 现成的 `catch { keepFailureSite }` 接住 ⇒ 票 14 的「不落盘」与票 15 的「留现场」**只区别在哪个目录** ② Q4 顺手给「两把尺子」划了线：**`verify` 管跨进程/跨时间，自校验管离开进程之前，同一套 schema 问了两次**（`files[]` 与 checksum 就是构建时从真目录现走出来的 ⇒ 拉 `verifyPack` 全套进来只会得到**一条永远绿的空判据**）。⚠️ **落地两处**：`pack.ts`（`writeFileSync` 之后、`renameSync` 之前）· **新文件** `tests/pack-selfcheck.test.ts`（**2 条**：阳性+阴性，**打在生产路径上** —— 票面点名不许拿 `pack.test.ts` 那三处**测试自己调**的回环顶替）。⚠️ **变异两发**：摘掉那条闸 ⇒ 阳性红在「必须抛」；**把自校验搬到 `renameSync` 之后** ⇒ 阳性红在**「`pack/` 不许出现」** ⇒ **判据钉住的是「位置」不是「在不在」**。⚠️ **诚实交代**：Q1 那个「字节而非内存对象」的选择**今天观测不到差别** ⇒ 是**防御性**的选择、**不是**本票能证伪的性质。⚠️ 闸门：`pnpm test` **1302/1302**（78 文件；基线 1300/77）· `typecheck` 9 包 · `build` · `tsc -b --force` · `check:deps` ✅ · `check:links` ✅（207 份 · 1165 条）· **零付费跑**；⚠️ 边界：**本票没碰任何契约文件**（票面「不预设要改哪份契约」守住了 —— **接线本身就跑得通**）· R 表没动 · `packages/qa` 一行没碰 · 没加重试/修复循环/自动重生成。✅ **46 关。**
 
 ## Not yet specified
 
 <!-- 通往终点的雾：在范围内，但还说不成一张票。前沿推过去时会毕业 -->
 
+- ⚠️ **同一个「包不过 schema」，四道读侧拿到两个退出码**（[票 46](issues/46-buildassetpack-self-validation.md) 顺带量到、人未裁）：
+  `ops.ts` 那四个读点是 `CommandError("invalid")`（退 **4**），而 **`pipeline/create-game.ts:444` ·
+  `qa/gameplay.ts:72` · `qa/visual.ts:87` 抛的是裸 `Error`**（`exitCodeOfError` ⇒ 退 **1**）。
+  ⚠️ 今天**说不成一张票**：**没有量过那三处可不可达**（票 46 只量到「它们存在」）——
+  先量「那三条路今天走不走得到、走得到时错的是什么」，再决定是「统一出口」还是「就这样」。
 - ⚠️ **VWS 里那两张同名 `constraints` 要不要派生 / 合并**（[票 30](issues/30-constraints-not-in-image-prompt.md) 的 Q3 判**「本票不碰」**）：
   **顶层** `VisualWorldSpec.constraints`（喂 DNA 那一发）与**内嵌** `StyleSpec.constraints`（喂 drawlist / 母版 / 观察，
   也正是 `imagePrompt` 会读的那张）—— **七份真跑逐份比过：两份都非空，且没有一次相等**。

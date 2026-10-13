@@ -12,8 +12,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  ASSET_PACK_FORMAT, COVERAGE_FORMAT, carryOnError, LEDGER_FORMAT, MASTER_RATIOS_FILE, MASTER_RATIOS_FORMAT,
-  derivePackMode, imageUnitsOf, paletteBindingOf, summarizeCalls,
+  ASSET_PACK_FORMAT, COVERAGE_FORMAT, carryOnError, CommandError, LEDGER_FORMAT, MASTER_RATIOS_FILE, MASTER_RATIOS_FORMAT,
+  derivePackMode, imageUnitsOf, paletteBindingOf, parseAssetPack, summarizeCalls,
   type AssetPackManifest, type AssetSpec, type AuthoringAsset, type CharacterDNA, type CharacterDNAFile,
   type DrawList, type ImageUnit, type Ledger, type LedgerCall, type MasterRatio, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
@@ -1145,6 +1145,23 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
     return { path: p, bytes: b.length, checksum: sha256(b) };
   });
   fs.writeFileSync(path.join(packDir, "manifest.json"), jstr(manifest));
+
+  // ── 自校验（票 46）：让**写的人**验一遍自己刚写下去的那份 ─────────────────
+  // ⚠️ **验的是刚写下去的字节，不是内存里那个对象**（人裁 Q1）：`jstr` 就是 `JSON.stringify`
+  //   —— `undefined` 会被丢掉、`NaN` 变 `null`，内存里过得了的东西写出去不一定还是那份。
+  // ⚠️ **位置在 `renameSync` 之前**：`pack/v<N>/` 一出现它就是**交付物**了，
+  //   到那里才发现正是票 44 证据④点名的「先交出去、再说它不合格」。
+  // ⚠️ **它不替代入口那两道闸**（`parseRecipe` / `readStyle`）—— 本票的探针 A 量的正是
+  //   入口闸漏掉的那一条：「层名不许重复」只写在**交付侧**（`AssetPackEntry.superRefine`），
+  //   创作侧 `BackgroundSpec.layers` 是同一个定义的镜像却**没有这一条**，
+  //   于是一路走到这里才被发现（那时钱已经花了）。入口堵的是**已知的那几条**，
+  //   这里兜的是**任何一条**。
+  // ⚠️ **失败不删现场**：抛出去自有上面那层 catch 把它改名成 `failed-<ts>/`（票 01，只改名不删）。
+  const onDisk = JSON.parse(fs.readFileSync(path.join(packDir, "manifest.json"), "utf8")) as unknown;
+  const selfCheck = parseAssetPack(onDisk);
+  if (!selfCheck.ok)
+    throw new CommandError("invalid",
+      `包不过自己的契约（${selfCheck.errors.length} 处）：${selfCheck.errors.slice(0, 6).join("；")}`);
 
   // ── 对账（票 27）：spec 说要做成什么样 vs 包里实际是什么 ─────────────────
   const { auditAssetSpec } = await import("@game-maker/contracts");

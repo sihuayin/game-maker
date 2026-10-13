@@ -1,0 +1,68 @@
+import { mkdtempSync, readFileSync, existsSync, readdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { it } from "vitest";
+import { parseAssetPack, parseRecipe, type AssetRecipe, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { buildAssetPack, type DrawListGenerator } from "../src/index.js";
+
+/**
+ * 票 46 的探针：**生产端到底能不能产出一份过不了自己契约的包？**
+ *
+ * ⚠️ **免费**：`generate` 与 `generateImage` 都是注入的端口，这里只喂桩 —— 不碰网络、不花钱。
+ * ⚠️ 它只量三件事：① 配方闸 `parseRecipe` 放不放行 ② 产出的 manifest 过不过 `parseAssetPack`
+ *    ③ 那份包有没有被**提交**到 `pack/v<N>/`。
+ * 判据**不在**这里 —— 这里只是「有没有这条路」的现场；落地判据属票 46 的 Q4。
+ */
+
+const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
+const RECIPE: AssetRecipe = JSON.parse(readFileSync(ROOT + "fixtures/recipes/shift-change.json", "utf8"));
+const STYLE: StyleSpec = JSON.parse(readFileSync(ROOT + ".scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json", "utf8"));
+
+const stubDrawLists = (spec: AssetSpec): DrawList[] => {
+  const n = spec.kind === "animation" ? spec.animations.reduce((s, a) => s + a.frames, 0)
+    : spec.kind === "background" && spec.layers ? spec.layers.length : 1;
+  return Array.from({ length: n }, (_, i) => ({
+    format: "drawlist+curve/v1", id: spec.id, frame: `f${i}`,
+    viewBox: [0, 0, spec.size.w, spec.size.h], expectedSize: [spec.size.w, spec.size.h],
+    ops: [
+      { op: "rect", x: 0, y: 0, w: spec.size.w, h: spec.size.h, fill: `palette:${i % 5}` },
+      { op: "rect", x: 1, y: 1, w: Math.max(1, spec.size.w - 2), h: 2, fill: "palette:1" },
+    ] as DrawList["ops"],
+  }));
+};
+const stub: DrawListGenerator = (spec) => stubDrawLists(spec);
+
+async function report(label: string, recipe: AssetRecipe, style: StyleSpec, only?: string) {
+  console.log(`\n=== ${label} ===`);
+  if (only) recipe = { ...recipe, assets: recipe.assets.filter((a) => a.spec.id === only) };
+
+  const pr = parseRecipe(recipe);
+  console.log("① parseRecipe（配方闸）:", pr.ok ? "PASSES —— 放行" : "拒收 — " + pr.errors.join(" / "));
+  if (!pr.ok) return;
+
+  const out = mkdtempSync(path.join(tmpdir(), "t46-"));
+  const res = await buildAssetPack({
+    recipe: pr.value, style, outDir: out, recipeDir: ROOT, generate: stub, sourceDateEpoch: 1790208000,
+  });
+
+  const parsed = parseAssetPack(res.manifest);
+  console.log("② parseAssetPack(自己产的 manifest):", parsed.ok ? "OK" : "REJECTED — " + parsed.errors.join(" / "));
+  console.log("③ 包被提交到:", res.packDir.replace(out, "<out>"));
+  console.log("④ 那份违约 manifest 落在盘上了吗:", existsSync(path.join(res.packDir, "manifest.json")));
+  console.log("⑤ <out>/<gameId>/ 下有什么:", JSON.stringify(readdirSync(path.join(out, res.manifest.id))));
+}
+
+const clone = (): AssetRecipe => JSON.parse(JSON.stringify(RECIPE));
+
+it("探针 A：分层背景里两层同名", async () => {
+  const r = clone();
+  const bg = r.assets.find((a) => a.spec.kind === "background")!;
+  (bg.spec as any).layers = [{ name: "far", parallax: 0.2 }, { name: "far", parallax: 0.5 }];
+  await report("探针 A：分层背景里两层同名（配方闸与 readStyle 都不看层名）", r, STYLE, bg.spec.id);
+}, 180_000);
+
+it("探针 B：色板整个缺席", async () => {
+  const style: StyleSpec = { ...JSON.parse(JSON.stringify(STYLE)), palette: [] };
+  await report("探针 B：色板整个缺席 —— 直接调 buildAssetPack（绕过 readStyle 那道入口闸）", clone(), style, "player-odin");
+}, 180_000);
