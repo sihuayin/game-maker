@@ -3,7 +3,8 @@
 // ⚠️ **它跟着包走，但不在 manifest 里**：manifest 是包的**自描述**（引擎要读它才能用），
 //   ledger 是包的**收据**（做这东西花了什么）—— 引擎**不需要**知道。
 //   所以它是包根的 **sidecar `ledger.json`**，而**不是** manifest 的一个字段：
-//   往 `provenance` 里加键会迫使 `assetpack/v2` 升版，而升版会让磁盘上所有 v2 包解析不过。
+//   往 `provenance` 里加键会迫使 `assetpack` 升版，而升版会让磁盘上所有**旧**包解析不过
+//   （2026-09-25 升到 v2、2026-10-13 升到 v3，两次都是这么付的）。
 //   ⚠️ 而且 `pack.ts` 的 `files[]` 是 `walk(packDir)` **穷举** ——
 //   sidecar 放包根会**自动进 `files[]`**、自动被 `verify` 校验 checksum。**契约零改动，等于白拿。**
 //

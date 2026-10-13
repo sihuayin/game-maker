@@ -1,18 +1,41 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { ASSET_PACK_FORMAT } from "@game-maker/contracts";
 import { handle } from "../src/server.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
+
+/** 一份包是不是**用当前契约构建的**。 */
+const isCurrent = (dir: string) => {
+  try { return JSON.parse(readFileSync(dir + "/manifest.json", "utf8")).format === ASSET_PACK_FORMAT; }
+  catch { return false; }
+};
+
 // ⚠️ 不写死版本号（同 cli.test.ts 的理由）
-const PACK = (() => {
+const SCRATCH = (() => {
   const base = ROOT + "out/shift-change-assets/pack";
   try {
     const vs = readdirSync(base).map((d) => /^v(\d+)$/.exec(d)).filter((m) => m !== null).map((m) => Number(m![1])).sort((a, b) => b - a);
     return vs.length > 0 ? `${base}/v${vs[0]}` : `${base}/v0`;
   } catch { return `${base}/v0`; }
 })();
-const hasPack = (() => { try { readFileSync(PACK + "/manifest.json"); return true; } catch { return false; } })();
+
+// ⚠️ **门槛与回落与 `cli.test.ts` 同一条**（2026-10-13 · 票 45）：`out/` 是本机垃圾场
+//   （`.gitignore:10`），包逐版新增、永不覆盖 ⇒ 契约一升版，本机最近那份当场变成**旧契约**的包
+//   （实测：v1 ⇒ `inspect` 按契约拒 → `isError`）。本机那份又**不会自己变新**（重建=花钱）
+//   ⇒ 回落到入库的 `fixtures/packs/counter-siege/v4`（真包、真 checksum、清检出上也在）。
+const PACK = isCurrent(SCRATCH) ? SCRATCH : ROOT + "fixtures/packs/counter-siege/v4";
+// ⚠️ 留着这层 skip 只是**兜底**（fixture 被挪走/删了）—— 正常路径下它**不再是**那扇门。
+const hasPack = isCurrent(PACK);
+// ⚠️ **期望的 id 从**被选中那份包自己**的 manifest 读**（2026-10-13 · 票 45）：
+//   原先写死 `"shift-change-assets"`（本机那一次真跑的名字），换成回落之后那句话就是**假**的。
+//   而这条判据要说的本来是「**MCP 把包的 id 原样带出来**」，不是「那个包叫什么」——
+//   从 manifest 读反而**更贴原意**，也让「本机那份 / fixture 那份」两路共存。
+const PACK_ID = (() => {
+  try { return JSON.parse(readFileSync(PACK + "/manifest.json", "utf8")).id as string; }
+  catch { return ""; }
+})();
 
 /** 收下服务端发出的所有消息。 */
 const drive = async (msgs: object[]): Promise<any[]> => {
@@ -71,9 +94,9 @@ describe.skipIf(!hasPack)("工具调用", () => {
   it("inspect 返回 content + structuredContent（与 CLI 的 --json **同源**）", async () => {
     const [r] = await drive([call("inspect_asset_pack", { packDir: PACK })]);
     expect(r.result.isError).toBe(false);
-    expect(r.result.structuredContent.data.packId).toBe("shift-change-assets");
+    expect(r.result.structuredContent.data.packId).toBe(PACK_ID);
     expect(r.result.structuredContent.command).toBe("inspect");
-    expect(r.result.content[0].text).toContain("shift-change-assets");
+    expect(r.result.content[0].text).toContain(PACK_ID);
   });
 
   it("带 progressToken 时发 notifications/progress，不带就不发", async () => {

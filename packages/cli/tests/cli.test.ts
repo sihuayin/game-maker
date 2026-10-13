@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { EXIT, exitCodeOfError, CommandError } from "@game-maker/assets";
+import { ASSET_PACK_FORMAT } from "@game-maker/contracts";
 import { parseArgs, concurrencyFromFlags, renderHuman, run, type CliIo } from "../src/cli.js";
 
 /** 收下 CLI 的所有出站，测试因此不会把 stdout 刷满。 */
@@ -14,15 +15,36 @@ const capture = (): CliIo & { lines: string[]; errors: string[] } => {
 const runC = (argv: string[]) => { const io = capture(); return run(argv, io).then((code) => ({ code, io })); };
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
+
+/** 一份包是不是**用当前契约构建的**。 */
+const isCurrent = (dir: string) => {
+  try { return JSON.parse(readFileSync(dir + "/manifest.json", "utf8")).format === ASSET_PACK_FORMAT; }
+  catch { return false; }
+};
+
 // ⚠️ 不写死版本号：包是逐版新增的（票 24 永不覆盖），写死 v5 会在下一次构建后指向一个旧契约的包。
-const PACK = (() => {
+const SCRATCH = (() => {
   const base = ROOT + "out/shift-change-assets/pack";
   try {
     const vs = readdirSync(base).map((d) => /^v(\d+)$/.exec(d)).filter((m) => m !== null).map((m) => Number(m![1])).sort((a, b) => b - a);
     return vs.length > 0 ? `${base}/v${vs[0]}` : `${base}/v0`;
   } catch { return `${base}/v0`; }
 })();
-const hasPack = (() => { try { readFileSync(PACK + "/manifest.json"); return true; } catch { return false; } })();
+
+// ⚠️ **门槛是「有一份用当前契约构建的真实包」，不只是「有一个包」**（2026-10-13 · 票 45）。
+//   `out/` 是**本机垃圾场**（`.gitignore:10`，未入库），而包**逐版新增、永不覆盖**
+//   ⇒ 契约一升版，盘上**最近那一份**当场变成**旧契约**的包。那不是回归，是**输入过期** ——
+//   而这一组的主题恰恰是「CLI 在一份**当前**的包上怎么表现」。实测（票 45）：升到
+//   `assetpack/v3` 当天，只判存在会让本机 **3 条**判据变红（`inspect` / `verify` 在 v1 包上
+//   按契约拒 → 退 4）。
+//   ⚠️ 而本机那份**不会自己变新**（重建要真跑管线 = 花钱）⇒ 只判存在的话，这一组会在本机
+//   **永久 skip**，而本仓的尺子是「**一条从没被执行过的规矩等于没有**」。所以**回落到入库的
+//   fixture 包**（`fixtures/packs/counter-siege/v4`，票 45 已迁到 v3）—— 它同样是**真包、真
+//   checksum**，且**清检出上也在** ⇒ 这一组从「有本机包才跑」变成**每次都跑**。
+//   ⚠️ 本机那份**真跑出来的**包优先（它的价值是「一次真运行的原样产物」），但**只在它是当前契约时**。
+const PACK = isCurrent(SCRATCH) ? SCRATCH : ROOT + "fixtures/packs/counter-siege/v4";
+// ⚠️ 留着这层 skip 只是**兜底**（fixture 被挪走/删了）—— 正常路径下它**不再是**那扇门。
+const hasPack = isCurrent(PACK);
 
 describe("参数解析（手写，无依赖）", () => {
   it("子命令 + 带值选项 + 布尔开关", () => {

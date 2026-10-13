@@ -1,4 +1,4 @@
-// `assetpack/v1` —— **一个资源包的自描述**（票 24 定的形状）。
+// `assetpack/v3` —— **一个资源包的自描述**（票 24 定的形状）。
 //
 // 它是包的唯一入口：产物 B 只读它，agent 只读它，人也只读它。
 // ⚠️ **与 `AssetManifestSchema`（index.ts）不是同一个东西**：
@@ -26,8 +26,21 @@ import { formatIssues, PaletteColor, PaletteRef } from "./drawlist.js";
  * 不升版的话，`verify` 一个完好的旧包会报「多了个不认识的键 degradations」——
  * 一个像是**包**有毛病的说法，而毛病在契约这边。
  * 旧包仍原样留在磁盘上（票 24：永不覆盖），只是这个版本的读码器读不了它。
+ *
+ * ⚠️ **2026-10-13 由 `v2` 升到 `v3`**（票 45）：**`provenance.style` 整块删除**。
+ * 同一条理由、同一把刀 —— `provenance` 是 `.strict()`，删键就是升版。
+ * 而删它的依据是：**那四个键没有一个携带别处拿不到的信息**：
+ * `checksum` 与 `files[]` 里 `authoring/stylespec.json` 那条**逐字节相同**（实测）；
+ * `stylespecId` 就是那份文件自己的 `id`（实测 `counter-siege/v4`：「`style-ref`」↔「`style-ref`」）；
+ * `ref` 是指向**写它自己那一行**的常量；而 `origin` 是一个**硬编码的假话** ——
+ * V2 链上那份 `stylespec.json` 是**模型写的**（`planAssets` 把 `world.style` 落盘），
+ * 而枚举里根本没有那一档。⚠️ 这与上面那次升版**不同**：那次是「声明**不再**成立」，
+ * 这次是那条声明**从来没有成立过**。它踩的也不只是 R7 那道门，还有本文件开头第 2 条原则
+ * 「不重复**可派生**的内容」。
+ * ⚠️ **`provenance.mode` 一个字没动** —— 它是**活着**的那一格：有读者（`verify` / `inspect` 都印它）、
+ * 由 `derivePackMode` 派生、且被下面的 superRefine 两头对账。
  */
-export const ASSET_PACK_FORMAT = "assetpack/v2" as const;
+export const ASSET_PACK_FORMAT = "assetpack/v3" as const;
 
 // PaletteRef 从 drawlist.ts 复用 —— 同一个概念不写两份。
 
@@ -222,7 +235,12 @@ export const AssetPackManifest = z.object({
     /** 包级身份。**由 assets[].origin 唯一派生**（见 `derivePackMode`）——
      *  「一个 fixture 包谎报自己是 generated」因此是解析不通过，而不是一条能被忽略的约定。 */
     mode: PackMode,
-    style: z.object({ origin: z.enum(["human-in-session", "fixture"]), ref: PackPath, stylespecId: z.string(), checksum: Checksum }).strict(),
+    // ⚠️ `style` 于 2026-10-13 删除（票 45）—— 理由写在上面 `ASSET_PACK_FORMAT` 那条注里。
+    //    一句话：四个键（`origin` / `ref` / `stylespecId` / `checksum`）里，一个也没有携带
+    //    别处拿不到的信息，而 `origin` 还是**硬编码的假话**。
+    // ⚠️ 「用的是哪份 `StyleSpec`」这个问题因此**没有家了** —— 它本来也没人问：
+    //    全仓 `provenance.style` 在**可执行代码里零读者**（`verify` 与 `inspect` 只读 `mode`）。
+    //    要追这份 stylespec，包里有那**文件本身**（`authoring/stylespec.json`，进 `files[]` 逐字节校验）。
     // ⚠️ `degradations` 与 `transport` 于 2026-09-25 删除 —— 降级链整个拆掉了（票 14 被推翻）。
     // 此前这里是「这条管线降级过」与「那天换过端点」的唯一落点；没有降级链之后两者都不存在。
     // 生成的失败现在**就是失败**（退出码 3），不再有「可用的降级产物」这种东西要标注。

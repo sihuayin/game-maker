@@ -78,9 +78,10 @@ describe("账：跟着包走的收据（票 45）", () => {
     const m = parseAssetPack(JSON.parse(fs.readFileSync(path.join(packDir, "manifest.json"), "utf8")));
     expect(m.ok).toBe(true);
     if (!m.ok) return;
-    // ⚠️ **契约一个字没改**：还是 v2，provenance 里没有账
-    expect(m.value.format).toBe("assetpack/v2");
-    expect(Object.keys(m.value.provenance).sort()).toEqual(["mode", "style"]);
+    // ⚠️ **契约一个字没改**：账这件事没有动过契约，provenance 里没有账
+    expect(m.value.format).toBe("assetpack/v3");
+    // ⚠️ **只剩 `mode`** —— `style` 于 2026-10-13 删除（票 45，format 因此升到 v3）
+    expect(Object.keys(m.value.provenance).sort()).toEqual(["mode"]);
     // ⚠️ 而 sidecar 靠 `files[]` 是 `walk(packDir)` 穷举**白拿**了 checksum 覆盖
     expect(m.value.files.map((f) => f.path)).toContain("ledger.json");
     expect(verifyPack({ packDir }).data.ok).toBe(true);

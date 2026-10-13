@@ -46,8 +46,8 @@ export const TOOL_DESCRIPTION = `输出一份 VisualWorldSpec —— 它描述�
  * 发出去的那一段话。⚠️ 只是**提示**，不是判据 —— 判据是「入参过 schema」（`parseToolUse`）。
  *
  * ⚠️ `style.id` 要**照着抄**（票 02 裁决 21）：它是**身份不是观察**，让模型看一张图即兴编，
- *   同一张图两次会跑出两个 `stylespecId`，而那个字段的用途恰恰是**指认**。解析后由
- *   `buildVisualWorld` **强制覆盖** —— 抄错也不影响正确性，抄对只是省一次覆盖。
+ *   同一张图两次会跑出两个 `id`，而它**就是盘上那份 `stylespec.json` 自己的身份**。
+ *   解析后由 `buildVisualWorld` **强制覆盖** —— 抄错也不影响正确性，抄对只是省一次覆盖。
  */
 export function visionPrompt(input: { requirementText: string; styleId: string }): string {
   return `这是一张游戏截图，将作为**风格参考图**。

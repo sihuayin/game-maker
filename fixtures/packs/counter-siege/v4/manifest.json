@@ -1,5 +1,5 @@
 {
-  "format": "assetpack/v2",
+  "format": "assetpack/v3",
   "id": "counter-siege",
   "version": 4,
   "createdAt": "2026-09-29T11:56:02.000Z",
@@ -8,13 +8,7 @@
     "version": "0.0.0"
   },
   "provenance": {
-    "mode": "generated",
-    "style": {
-      "origin": "human-in-session",
-      "ref": "authoring/stylespec.json",
-      "stylespecId": "style-ref",
-      "checksum": "sha256:54a98c9d99fc8650862c4437ceedfa7ad67f3c75aeb74f9b775ced5d3f7870dc"
-    }
+    "mode": "generated"
   },
   "palette": {
     "ref": "authoring/stylespec.json#/palette",

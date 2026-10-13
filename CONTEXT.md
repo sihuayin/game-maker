@@ -169,8 +169,12 @@ _避免_: 「dependencies 数组」——那听起来像一坨不带方向的东
 
 **AssetPackManifest（资源包自描述）**
 一个**资源包**的唯一入口：包里有哪些资源、各自什么种类、有哪些帧与动画、
-文件在哪、checksum 多少、用的是哪份 StyleSpec、哪些是降级来的。
-**产物 B 与 agent 都只读它**（票 24 定形状，`format: "assetpack/v2"` —— 降级链拆除后升的版）。
+文件在哪、checksum 多少。
+**产物 B 与 agent 都只读它**（票 24 定形状，`format: "assetpack/v3"` —— 拆降级链时升到 v2、
+2026-10-13 删 `provenance.style` 时升到 v3）。
+⚠️ **它**不再**回答「用的是哪份 StyleSpec」**（`provenance.style` 于 2026-10-13 删除，票 45）——
+那一格四个键**没有一个携带别处拿不到的信息**，要追那份 stylespec，包里就是**文件本身**
+（`authoring/stylespec.json`，进 `files[]` 逐个 checksum）。
 ⚠️ **与 `docs/文档.md` 第 20 节的 `AssetManifest` 不是同一个东西** ——
 那个是**输入侧**的资产集合 + 旧闭环的过程统计（`generated`/`missing`/`broken`/`unused`），
 归 Recipe；R2 之后那三个计数器没有消费者了。
@@ -265,10 +269,19 @@ style-transfer 的 `player.idle` 是静态外观，animated-player 的 `walk1` �
 
 **Provenance（来源标注）**
 一个资源/一个包**是谁造的**，必填且由 schema 强制自洽：
-资源级 `origin` ∈ `generated`（本管线从规格产出）/ `imported`（人工导入通道）/ `fixture`（仓库内置降级件）；
+资源级 `origin` ∈ `generated`（本管线从规格产出）/ `imported`（人工导入通道）/
+`fixture`（**仓库内置件** —— 直接取用仓库里已有的资产，不经这一次生成、也不是这一次的人工导入）；
 包级 `mode` ∈ `generated` / `imported` / `fixture` / `mixed`，**由 `origin` 唯一派生** ——
 所以「一个 fixture 包谎报自己是 generated」是**解析不通过**，不是一条能被忽略的约定。
 **一个不知道自己是 fixture 的包是虚假的包。**
+
+⚠️ **2026-10-13（票 45）**：`fixture` 这一格的定义此前写作「仓库内置**降级件**」，
+而降级（Degradation）**整个已出局**（见下）—— 那个说法引用着一个**已经不存在的机制**，已改。
+⚠️ 而**今天没有任何生产者产出它**（`pack.ts` 的 `Built.origin` 只有 `generated | imported`，
+`PackMode.fixture` 因此也**永远派生不出来**）—— 那是「还没有」还是「本就不该有」，
+**票 45 不裁**（**值本身一个字没动**：枚举与 `derivePackMode` 都没碰），另开一票。
+⚠️ 而 **`provenance.style.origin`（那个 `human-in-session` / `fixture` 的两值枚举）**——
+它与**本条这一格毫无关系**，且已于 **2026-10-13 整块删除**（票 45）：见 [[AssetPackManifest]]。
 
 ⚠️ **2026-09-25 补 `imported`**（跑第一个**纯导入**的包时抓到的洞）：此前 `mode` 只有
 三个值，而 `origin` 有三个 —— 于是「全部来自人工导入」的包**在结构上无法诚实**：
@@ -419,7 +432,8 @@ StyleSpec 与自描述。**它必须能被一个完全不了解本项目的引�
 回答「这东西**是什么**」—— 引擎要读它才能用；账是包的**收据**，
 回答「做这东西**花了什么**」—— 引擎**不需要**知道。
 收据因此**不进契约**：它是包根的 `ledger.json`，跟着包走，而**不是** manifest 的一个字段
-（往 `provenance` 里加键会迫使 `assetpack/v2` 升版，而升版会让磁盘上所有 v2 包解析不过）。
+（往 `provenance` 里加键会迫使 `assetpack` 升版，而升版会让磁盘上所有**旧**包解析不过 ——
+2026-09-25 升到 v2、2026-10-13 升到 v3，两次都是这么付的）。
 **账属于「包」，不属于「清单」** —— 清单可以是人直接写的（R7 两条路都开），那时根本没有推导调用。
 ⚠️ **只记事实，不折算成钱**：代理不转发定价、各家上游计价单位还不同（token vs 按张），
 而 token 数与张数是**充分统计量** —— 钱是它们的纯函数，随时能算。

@@ -2,7 +2,7 @@
 //
 // ⚠️ **它不是契约的一部分，是「可派生的观察」**（票 24 原则 2：不重复**可派生**的内容）——
 //   这个量可以从图集像素算出来。所以它是包根的 sidecar `coverage.json`，**不进 manifest**
-//   （进 manifest 要 `assetpack/v2 → v3`，而票 19 刚为躲这一刀把账本做成了 sidecar）。
+//   （进 manifest 要升一次 `assetpack` 版本，而票 19 刚为躲这一刀把账本做成了 sidecar）。
 //
 // ⚠️ **形状住在这里、算法住在 `@game-maker/assets`** —— 与账本同一个分工：
 //   装配器（`@game-maker/demo`）**只能依赖 contracts**，所以它要能读到这个形状；

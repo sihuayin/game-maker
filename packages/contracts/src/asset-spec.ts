@@ -90,7 +90,7 @@ export const AnimatedSpec = z.object({
  *   **原样拷进 manifest** ⇒ 加在那份上，**作者的散文会进交付清单**（而壳子从不读它）。
  *   这个分岔在清单里**早就有先例**：`role` 进、`description` 不进。
  *
- * ⚠️ 而**不用升 `assetpack/v2 → v3`**：清单那份 `Layer` **一个字没动**，
+ * ⚠️ 而**不用升 `assetpack` 版本**：清单那份 `Layer` **一个字没动**，
  *   磁盘上已有的包照旧解析得过（升版的判据见 `assetpack.ts` 的文件头）。
  */
 export const LayerSpec = Layer.extend({

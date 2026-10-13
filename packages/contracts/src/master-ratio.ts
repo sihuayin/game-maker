@@ -7,8 +7,8 @@
 //   ⚠️ **降的只是后果，量法一个字没改**：判「一致」仍是零容差的整数交叉相乘。
 //
 // ⚠️ **它跟着包走，但不在 manifest 里** —— 与 `ledger.json`（票 19/45）· `coverage.json`（票 50）
-//   同一条理由：`AssetPackManifest` 是 `.strict()` 的，往里加一格会迫使 `assetpack/v2 → v3`，
-//   而磁盘上那两份入库的 v2 fixture 包会**一起解析不过**。放包根则靠 `files[] = walk(packDir)`
+//   同一条理由：`AssetPackManifest` 是 `.strict()` 的，往里加一格会迫使 `assetpack` 升版，
+//   而磁盘上那两份入库的 fixture 包会**一起解析不过**。放包根则靠 `files[] = walk(packDir)`
 //   **自动进清单**、自动被 `verify` 校验 checksum —— 契约零改动，等于白拿。
 //
 // ⚠️ **形状住在这里、量法住在 `@game-maker/assets`** —— 与账本 / 覆盖率同一个分工：

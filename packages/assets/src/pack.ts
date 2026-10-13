@@ -81,8 +81,8 @@ export type BuildPackOptions = {
    * （`authoring/visual-world.json`），让包自描述到**类型化视图**那一层
    * （`StyleSpec` 只是文字转述，拿不回 `camera.mode` 这类封闭枚举）。
    *
-   * ⚠️ **不动 `provenance`**：它是 `.strict()`，加一格就是升版（`assetpack/v2 → v3`），
-   *   而升版会**判死磁盘上那份入库的 v2 包**（`fixtures/packs/…`）—— 纯**增加一个文件**
+   * ⚠️ **不动 `provenance`**：它是 `.strict()`，加一格就是升版（`assetpack/v3 → v4`），
+   *   而升版会**判死磁盘上那份入库的 v3 包**（`fixtures/packs/…`）—— 纯**增加一个文件**
    *   不需要动契约：`files[]` 是 `walk(packDir)` 穷举 ⇒ 它自动进 checksum 覆盖。
    */
   visualWorld?: VisualWorldSpec;
@@ -1058,7 +1058,14 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       // ⚠️ 派生规则只有一处（contracts 的 `derivePackMode`）—— 这里不许再写一份，
       //   否则写入侧与校验侧一漂移，合法的包会被判成「矛盾」。
       mode: derivePackMode(built.map((b) => b.origin)),
-      style: { origin: "human-in-session", ref: "authoring/stylespec.json", stylespecId: style.id, checksum: sha256(Buffer.from(styleDoc)) },
+      // ⚠️ **`style` 于 2026-10-13 删除**（票 45：`assetpack/v2 → v3`）—— 这里此前硬编码
+      //   `origin: "human-in-session"`，而 V2 链上那份 `stylespec.json` 是**模型写的**
+      //   （`ops.ts` 的 `planAssets` 把 `world.style` 落盘）⇒ 那句话**永远是假的**，
+      //   而枚举里根本没有第三档。⚠️ 删它不只是因为「那句话错了」：整块四个键
+      //   （`origin` / `ref` / `stylespecId` / `checksum`）**没有一个携带别处拿不到的信息**
+      //   —— `checksum` 与 `files[]` 里 `authoring/stylespec.json` 那条**逐字节相同**、
+      //   `stylespecId` 就是那份文件自己的 `id`、`ref` 指向的正是上面那一行写它的路径。
+      //   本文件开头第 2 条原则就是「不重复**可派生**的内容」。
     },
     palette: {
       ref: "authoring/stylespec.json#/palette", size: palette.length, values: palette,

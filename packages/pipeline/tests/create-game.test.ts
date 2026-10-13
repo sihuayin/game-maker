@@ -104,8 +104,9 @@ describe("§第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15）", 
     const packed = path.join(b.paths.packDir, "authoring", "visual-world.json");
     expect(fs.existsSync(packed)).toBe(true);
     expect(b.manifest.files.map((f) => f.path)).toContain("authoring/visual-world.json");
-    // ⚠️ **不动 `provenance`**（升版会判死磁盘上那份入库的 v2 包）—— 它只有 `mode` 与 `style`
-    expect(Object.keys(b.manifest.provenance).sort()).toEqual(["mode", "style"]);
+    // ⚠️ **不动 `provenance`**（升版会判死磁盘上那份入库的包）—— 它**只剩 `mode`**
+    //    （`style` 于 2026-10-13 删除，票 45）
+    expect(Object.keys(b.manifest.provenance).sort()).toEqual(["mode"]);
   });
 
   it("账：`run/` 那份是**链级并集**（理解段 + 构建），而包里那份只记包自己的", async () => {

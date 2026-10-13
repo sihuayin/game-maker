@@ -25,7 +25,7 @@
   ],
   "evidence": {
     "whyThisOne": "本 fixture **不是** 2026-09-25 重跑的产物，而是 2026-09-23 那次实验的产出 —— 因为它已经在**真实下游**上跑过：out/shift-change-assets/pack/v5、v6 用它生成了 8 个资源、28 个文件、14 帧同一角色的真包。重跑的产出没有下游证据。",
-    "reproduces": "在 out/shift-change-assets/pack/v8/manifest.json 里，provenance.style.checksum 指向按本文件内容算出的 sha256。",
+    "reproduces": "在 out/shift-change-assets/pack/v8/manifest.json 里，files[] 中 `authoring/stylespec.json` 那一条的 checksum 指向按本文件内容算出的 sha256（⚠️ 2026-10-13 更正：这句原先指向 `provenance.style.checksum`，而那一块随票 45 整块删除 —— 升到 assetpack/v3 之后，那份 stylespec 的校验和由 files[] 逐文件兜着，见 manifest 的 files 条目）。",
     "stability": "见 ../.scratch/game-creation-v1/experiments/stylespec-extraction/out/runs.*.json —— 5 次（thinking 关）+ 3 次（thinking 开）"
   }
 }

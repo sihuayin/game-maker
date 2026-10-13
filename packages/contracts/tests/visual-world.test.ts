@@ -130,7 +130,13 @@ describe("§4 判据：四份 fixture 的 stylespec.json 一字不改仍解析�
     expect(r.success ? [] : r.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`)).toEqual([]);
   });
 
-  it("四份 fixture 都带非空的 id —— manifest 的 stylespecId 指着它", () => {
+  // ⚠️ 这条判据**站得住，但它的说辞换过**（2026-10-13 · 票 45）：
+  //   原文是「manifest 的 `stylespecId` 指着它」—— 那一格随 `provenance.style` 整块删除，
+  //   于是**没有任何东西从 manifest 指过来**了。留下这条判据的理由改成**它自己那一头**：
+  //   `id` 是 `StyleSpecSchema` 的必填非空字段，而 `buildVisualWorld` 拿它**强制覆盖**
+  //   模型抄来的 `style.id`（见 `vision/src/prompts.ts`）—— 所以「非空」是**上游用得上**的性质，
+  //   不是为下游某个引用者服务的。
+  it("四份 fixture 都带非空的 id —— 它是 stylespec 自己的身份（`buildVisualWorld` 覆盖 `style.id` 时用它）", () => {
     for (const rel of FIXTURES) {
       const doc = JSON.parse(readFileSync(path.join(ROOT, rel), "utf8"));
       expect(typeof doc.id, `${rel} 的 id`).toBe("string");

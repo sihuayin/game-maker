@@ -1,5 +1,5 @@
 {
-  "format": "assetpack/v2",
+  "format": "assetpack/v3",
   "id": "last-train",
   "version": 2,
   "createdAt": "2026-09-26T11:39:59.000Z",
@@ -8,13 +8,7 @@
     "version": "0.0.0"
   },
   "provenance": {
-    "mode": "generated",
-    "style": {
-      "origin": "human-in-session",
-      "ref": "authoring/stylespec.json",
-      "stylespecId": "flat-pixel-side-scroller",
-      "checksum": "sha256:3793af5aa1fc83e9e2397d49ef52c30a8468955f8f34040a2cc634037c6524bf"
-    }
+    "mode": "generated"
   },
   "palette": {
     "ref": "authoring/stylespec.json#/palette",
