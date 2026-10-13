@@ -1,0 +1,12 @@
+{
+ "code": 0,
+ "ms": 69639,
+ "text": "{\n  \"command\": \"create\",\n  \"summary\": [\n    \"理解层跑完了 —— 这次运行：ruined-city-scavenger/run/v1（v1 · ruined-city-scavenger）\",\n    \"清单：26 个资源（sprite×16 · animation×5 · background×1 · ui×4）—— ⚠️ **预计 14 次生图调用**（动画 5 次 · 单帧 4 次 · 背景层 3 层 · 母版 2 张）\",\n    \"↑ 这是**清单完整派发时的上限** —— 依赖或母版失败时那几笔不会发出去，实际会更少；`game-maker build` 那一步才花钱\",\n    \"⚠️ **用户没说清的地方**：title：需求没提游戏名，暂不填\",\n    \"⚠️ **用户没说清的地方**：winConditions：需求只说了「最终目标」，没说具体是什么\",\n    \"⚠️ **用户没说清的地方**：loseConditions：需求没提失败条件（如被敌人抓住或死亡）\",\n    \"⚠️ **用户没说清的地方**：mechanics：需求没说明敌人是可选躲避还是可战斗，暂按躲避处理\",\n    \"⚠️ **用户没说清的地方**：resource：需求没说资源的具体种类与用途\",\n    \"⚠️ **用户没说清的地方**：progression：需求没提关卡推进或成长方式\",\n    \"下一步：看一眼、或直接改那份清单（ruined-city-scavenger/run/v1/asset-recipe.json），然后跑：game-maker build ruined-city-scavenger/run/v1\",\n    \"或者一开始就加 --yes —— 它会把生图、配置、站点一路做完（等于跳过这里）。\"\n  ],\n  \"data\": {\n    \"status\": \"awaiting\",\n    \"gameId\": \"ruined-city-scavenger\",\n    \"runVersion\": 1,\n    \"runDir\": \"ruined-city-scavenger/run/v1\",\n    \"recipe\": \"ruined-city-scavenger/run/v1/asset-recipe.json\",\n    \"assetCount\": 26,\n    \"imageCalls\": 14,\n    \"imageCallBreakdown\": {\n      \"animation\": 5,\n      \"single\": 4,\n      \"background\": 3,\n      \"master\": 2\n    },\n    \"kinds\": {\n      \"sprite\": 16,\n      \"animation\": 5,\n      \"background\": 1,\n      \"ui\": 4\n    },\n    \"ambiguity\": [\n      \"title：需求没提游戏名，暂不填\",\n      \"winConditions：需求只说了「最终目标」，没说具体是什么\",\n      \"loseConditions：需求没提失败条件（如被敌人抓住或死亡）\",\n      \"mechanics：需求没说明敌人是可选躲避还是可战斗，暂按躲避处理\",\n      \"resource：需求没说资源的具体种类与用途\",\n      \"progression：需求没提关卡推进或成长方式\"\n    ]\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"ruined-city-scavenger/run/v1\",\n      \"kind\": \"run\"\n    },\n    {\n      \"path\": \"ruined-city-scavenger/run/v1/asset-recipe.json\",\n      \"kind\": \"asset-recipe\"\n    }\n  ]\n}\n  · visual-world\n  · intent\n  · design\n  · character-dna\n  · recipe\n",
+ "steps": [
+  "  · visual-world\n",
+  "  · intent\n",
+  "  · design\n",
+  "  · character-dna\n",
+  "  · recipe\n"
+ ]
+}

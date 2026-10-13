@@ -13,9 +13,10 @@ import {
   formatIssues, GameDesignSpecSchema,
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
   parseAssetPack, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
+  PLAYER_ACTION_NAMES,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
-  type AssetPackManifest, type CallFailure, type CharacterDNAFile, type ConfigIssue, type LedgerCall,
+  type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
@@ -159,6 +160,71 @@ async function onceThroughTool<T>(o: {
 }
 
 /**
+ * **玩家那件资源**长什么样才编得出配置（**票 61**）—— 不合规返回一句给人读的话，合规返回 `null`。
+ *
+ * ⚠️ **为什么要有这一条**：配置契约要的是「**一件**资源同时带 `idle`/`run`/`jump` 三路动画」
+ *   （`game-config.ts` 的 `Player.anims`，外壳按三个键各播一路），而**配方层从来不知道这件事** ——
+ *   三个名字一个都不在配方提示词里。第十二次真跑就是这么死的：模型把三路拆成了三件
+ *   （`player-walk` / `player-jump` / `player-idle`，各一路），配置那一步**挑哪一件都错**。
+ *
+ * ⚠️ **它判的是清单**（`AssetRecipe`），**不是包**：这是唯一一个「**在花钱之前、又还在抽签圈里**」
+ *   的位置 —— 一份漏了的清单是**模型没生成好**（玩家一定存在，三路一定做得出来），
+ *   不是「这份设计做不出来」⇒ 与 `parseRecipe` 落**同一档**（`failure: "schema"`），重采样。
+ *   与 `compileRuntime` 那道 audit 闸门的分野正是这一条（那一档**不重采样**）。
+ *
+ * ⚠️ **认不出即失败，不许静默跳过**：清单里没有任何一件把 `characterId` 写成 `design.player.id`
+ *   就**抛**。模型漏写 `characterId` 是最常见的那种漏法，而「找不到就放行」会把它变成一个
+ *   **空守卫** —— 那正是票 61 要消灭的那一类错。
+ *
+ * ⚠️ 判的是**四条**（人裁 Q6(r2) = (c) 逐字），一条都不多：
+ *   ① 玩家名下的 `kind:"animation"` 资源**恰好一件**（0 件、2 件都算错）；
+ *   ② 那一件的 `animations[]` **同时含三个固定名**（多出来的路不管 —— 合约只要求「包含」）；
+ *   ③ 那三路**每路至少 2 帧**（1 帧是静帧，不是动画）；
+ *   ④ 三条路的**名字**逐字取自 `PLAYER_ACTION_NAMES`（全仓唯一来源，见 `game-config.ts`）。
+ *   ⇒ 「三格指同一个动画」那一半**不在这里**：那是**配置侧**的对账（人裁 Q7(r2) = (b)，两侧都守）。
+ *   ⚠️ 玩家名下若有别的种类（比如一件 `sprite`）**不报错** —— 本闸门只数 `animation` 那一种，
+ *      人裁没有把那一档判成失败，**不替人加第五条**。
+ */
+function playerAnimationGate(spec: AssetRecipe, playerId: string): string | null {
+  const mine = spec.assets.filter((e) => e.spec.characterId === playerId);
+  // ⚠️ 只留 `kind:"animation"` 那一种，**并且当场收窄**（`flatMap` 顺带把 union 收了）——
+  //   下面那几处读的都是 `AnimatedSpec` 自己的字段（`animations[]` 只长在它身上）。
+  const anims = mine.flatMap((e) => (e.spec.kind === "animation" ? [e.spec] : []));
+  const want = PLAYER_ACTION_NAMES.join(" / ");
+
+  if (anims.length === 0)
+    return `清单里没有一件 kind:"animation" 的资源写着 characterId "${playerId}"` +
+      (mine.length > 0
+        ? `（写着它的那几件是 ${mine.map((e) => `${e.spec.id}(${e.spec.kind})`).join(" · ")} —— 三路动画住在**同一件** animation 资源自己的 animations[] 里）`
+        : "（整个清单里一件都没写这个 characterId）") +
+      ` —— 外壳按 ${want} 三个键各取一路，拆成几件之后配置那一步挑哪一件都错。`;
+
+  if (anims.length > 1)
+    return `玩家 "${playerId}" 名下有 ${anims.length} 件 kind:"animation" 资源：` +
+      `${anims.map((a) => a.id).join(" · ")} —— **只许一件**：三路动画是**这一件**的三个 animations[] 条目，` +
+      "拆成多件之后配置那一步没办法确定该引用哪一件（而且会多花几笔生图的钱）。";
+
+  const only = anims[0]!;
+  const names = only.animations.map((a) => a.name);
+  const missing = PLAYER_ACTION_NAMES.filter((n) => !names.includes(n));
+  if (missing.length > 0)
+    return `玩家那件资源 "${only.id}" 的 animations[] 缺 ${missing.map((n) => `"${n}"`).join(" / ")}` +
+      `（它有的是：${names.join(" / ") || "一个都没有"}）—— 三个动作名是契约定死的字面 ${want}，` +
+      "不许改名、不许少写（配置那三格就是照着这三个键取的）。";
+
+  const thin = PLAYER_ACTION_NAMES.flatMap((n) => {
+    const a = only.animations.find((x) => x.name === n);
+    return a !== undefined && a.frames < 2 ? [a] : [];
+  });
+  if (thin.length > 0)
+    return `玩家那件资源 "${only.id}" 有 ${thin.length} 路动画只有 1 帧：` +
+      `${thin.map((a) => `"${a.name}"(${a.frames} 帧)`).join(" · ")} —— 1 帧是**静帧**、不是动画，` +
+      "三路各至少 2 帧。";
+
+  return null;
+}
+
+/**
  * 规划一份资源清单。**两阶段的第一阶段**（票 28）—— 清单落盘，人过目，再 `pack`。
  *
  * ⚠️ 清单**绝不覆盖**：每次规划写一个新的 `v<N>`（与资源包同一条规矩）。
@@ -239,6 +305,16 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     if (!truth.ok) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = `清单不过契约：${truth.errors.slice(0, 4).join("；")}`;
+      continue;
+    }
+    // ⚠️ **票 61：玩家那件资源的闸门**（紧挨 `parseRecipe`，理由见那个函数的头）。
+    //   与上一档**同一档**：过得了契约、但这份清单编不出能跑的配置 ⇒ 算**模型没生成好**、重采样。
+    //   ⚠️ 三发用尽照旧走下面那条**现成的** `CommandError("invalid")`（退 4），
+    //   不新增错误通路、不动 `CALL_FAILURES` 那个闭集。
+    const playerErr = playerAnimationGate(truth.value, design.player.id);
+    if (playerErr !== null) {
+      call.trip({ failure: "schema", spent: once.spent });
+      lastError = playerErr;
       continue;
     }
     call.trip({ spent: once.spent });
@@ -543,7 +619,9 @@ export const gameConfigExample = {
   scene: { background: { asset: "<背景资源的 id>" } },
   player: {
     asset: "<玩家资源的 id>",
-    anims: { idle: "<idle 动画名>", run: "<run 动画名>", jump: "<jump 动画名>" },
+    // ⚠️ **三个键由契约那一份派生**（票 61：这三个动作名全仓只写一遍，见 `game-config.ts`）——
+    //   骨架里手写一遍就是第四个事实源，而「示例错了，模型就会错」。值的占位符逐键生成。
+    anims: Object.fromEntries(PLAYER_ACTION_NAMES.map((n) => [n, `<${n} 动画名>`])),
     at: { x: 40, y: 250 },
   },
   terrain: [{ x: 0, y: 250, w: 1440, h: 20 }],
@@ -718,6 +796,9 @@ export async function compileRuntime(opts: CompileRuntimeOptions): Promise<Comma
    世界可以宽 1440，但屏幕只有 ${vp.w} 宽 —— HUD 写到 x > ${vp.w - 72} 就跑出屏幕了，直接拒。
 9. \`anim\` 只在资源有**多个**动画时才需要，且必须是清单里**真实存在**的动画名。
    ⚠️ **只许用下面清单里的 id 与动画名** —— 清单里没有的一律拒收。
+10. ⚠️ \`player.anims\` 那三格（${PLAYER_ACTION_NAMES.map((n) => `\`${n}\``).join(" / ")}）**三格互不相同** ——
+   必须是三个**不同**的动画名。外壳按这三个键**各取一路**播一种动作：三格填同一个名字，
+   玩家三种动作在屏幕上长得一模一样，而这份配置会被拒收。⇒ 去清单里给这三格各挑一路不同的。
 
 # 你在给哪一代外壳编
 \`${runtimeProfileRef(profile)}\` —— 它**只实现了上面那套行为原语**，别写它做不了的东西（写了也跑不动）。

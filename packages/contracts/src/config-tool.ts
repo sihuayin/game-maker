@@ -13,6 +13,7 @@
 // ⚠️ **别在这里"顺手"加坐标约束**（比如「`world.size.h` 必须等于视口高」）—— 那条要看**视口**，
 //   而视口是**调用方传进来的常量**，schema 看不见它。它住在提示词与 `auditScreenSpace` 里。
 import { z } from "zod/v4";
+import { PLAYER_ACTION_NAMES } from "./game-config.js";
 
 /** 与 `game-config.ts` 的 `Coord` 同形。 */
 const CoordShape = z.number().int().nonnegative();
@@ -46,7 +47,14 @@ const PlayerMoveShape = z.strictObject({
 
 const PlayerShape = z.strictObject({
   asset: z.string().min(1),
-  anims: z.strictObject({ idle: z.string().min(1), run: z.string().min(1), jump: z.string().min(1) }),
+  // ⚠️ **三个键由 v3 契约那一份派生**（票 61 的 Q2(r1) = (a)：这三个名称全仓只写一遍）。
+  //   跨方言 import 的**只有这个字符串数组**，不是 schema —— 两层从头到尾没有互相嵌套
+  //   （那件事的代价见文件头），所以这条 import 不违反「v3 与 v4 不许嵌套」那条边界。
+  //   ⚠️ `toJSONSchema` 出去的东西**与手写三个键时一字不差** —— 判据在
+  //   `tests/config-tool.test.ts`（那份行为漂移测试 + 那条 `toolInputSchema` 转得动的断言）。
+  anims: z.strictObject(
+    Object.fromEntries(PLAYER_ACTION_NAMES.map((n) => [n, z.string().min(1)] as const)),
+  ),
   at: PointShape,
   move: PlayerMoveShape.optional()
 });

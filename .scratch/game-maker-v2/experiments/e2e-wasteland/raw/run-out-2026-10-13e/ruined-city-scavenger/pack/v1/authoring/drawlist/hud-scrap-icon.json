@@ -1,0 +1,238 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-scrap-icon",
+  "frame": "hud-scrap-icon",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "line",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x1": 8,
+      "y1": 1,
+      "x2": 15,
+      "y2": 1
+    },
+    {
+      "op": "line",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x1": 15,
+      "y1": 1,
+      "x2": 15,
+      "y2": 15
+    },
+    {
+      "op": "line",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x1": 15,
+      "y1": 15,
+      "x2": 1,
+      "y2": 15
+    },
+    {
+      "op": "line",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x1": 1,
+      "y1": 15,
+      "x2": 1,
+      "y2": 1
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "points": [
+        [
+          5,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          12,
+          10
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          4,
+          12
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          3,
+          5
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:10",
+      "points": [
+        [
+          5,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          11,
+          9
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          5
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:9",
+      "points": [
+        [
+          5,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          5,
+          5
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:9",
+      "points": [
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          4,
+          5
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 5,
+      "y": 5,
+      "w": 5,
+      "h": 5,
+      "colors": [
+        "palette:10",
+        "palette:9"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 6,
+      "y": 6,
+      "w": 1,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 7,
+      "y": 6,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "line",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x1": 10,
+      "y1": 10,
+      "x2": 10,
+      "y2": 13
+    },
+    {
+      "op": "line",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x1": 5,
+      "y1": 12,
+      "x2": 5,
+      "y2": 14
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 3,
+      "y": 13,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 10,
+      "y": 13,
+      "w": 2,
+      "h": 1
+    }
+  ]
+}

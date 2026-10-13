@@ -121,16 +121,36 @@ export const PlayerMove = z.object({
   gravity: z.number().positive(),
 }).strict();
 
+/**
+ * 玩家那件资源要同时带的三个动作 —— **键就是契约要的字面名**（票 61）。
+ *
+ * ⚠️ **全仓这三个词只写这一遍**（票 61 的 Q2(r1) = (a)）。四处由它派生：
+ *   ① `Player.anims` 自己（`z.object(PlayerAnimsShape).strict()`）；
+ *   ② 导出的 `PLAYER_ACTION_NAMES` —— **配方提示词插值它、玩家动画闸门读它**；
+ *   ③ v4 镜像 `config-tool.ts` 的 `PlayerShape`；
+ *   ④ 给模型看的骨架 `assets/src/ops.ts` 的 `gameConfigExample`。
+ *   ⇒ 这四处**结构上不可能漂**：改这三个词只能改这里。
+ *
+ * ⚠️ 它们要的是**三路彼此不同**的动画（外壳按三个键各取一路播一种动作），
+ *    而**值**（动画叫什么名字）仍由包自己定 —— 见 `Player.anims` 那段注释。
+ */
+const PlayerAnimsShape = {
+  idle: z.string().min(1), run: z.string().min(1), jump: z.string().min(1),
+} as const;
+
+/** 玩家那三个动作的**名字**（票 61）—— 键本身就是字面名，顺序即上面那个字面量的声明序。 */
+export const PLAYER_ACTION_NAMES = Object.keys(PlayerAnimsShape) as readonly (keyof typeof PlayerAnimsShape)[];
+
 export const Player = z.object({
   asset: z.string().min(1),
   /**
    * **显式映射**，不是名字约定（票 09 裁决 10）。若外壳硬找 `idle`，那么一个把走路叫 `walk`
    * 的包就是**静默用错**；而这里每个名字都由 `resolvePackRef()` 在构建期逐个校验 ——
    * 构建期是唯一还能报出「哪个引用点引用了哪个不存在的动画」的地方。
+   *
+   * ⚠️ 三个**键**由 `PlayerAnimsShape` 派生（票 61：这三个词全仓只写一遍，在那里）。
    */
-  anims: z.object({
-    idle: z.string().min(1), run: z.string().min(1), jump: z.string().min(1),
-  }).strict(),
+  anims: z.object(PlayerAnimsShape).strict(),
   /** 出生点。锚点落在这一点上（角色的**脚**在这里）。 */
   at: Point,
   move: PlayerMove.optional(),
@@ -288,6 +308,27 @@ export function auditReferences(config: GameConfig, manifest: AssetPackManifest)
     // 三个动作名**逐个解** —— 这是票 09 裁决 10 那条「显式映射」的兑现处。
     for (const [action, anim] of Object.entries(config.player.anims))
       ref(`player.anims.${action}`, { asset: config.player.asset, anim });
+
+    // ⚠️ **票 61：三格必须解析到三个互不相同动画。** 上面那个循环**逐格**解引用，
+    //   三格填同一个名字时它**一格都不报**（每一格确实解得到）—— 而这三格是**三个动作**
+    //   （外壳按 `PLAYER_ACTION_NAMES` 那三个键**各取一路**）：指同一个名字 = 玩家在屏幕上
+    //   三种动作长得一模一样，而这份配置过得了今天所有的校验。
+    //   ⚠️ 它**不是**在收窄「显式映射」那条自由（票 09 裁决 10）：那条说的是「这一路叫什么名字」
+    //   由包自己定；它说的是「三路**不能指同一路**」。⇒ 只在**值**上对账，一次只报一条。
+    const slotsOf = new Map<string, string[]>();
+    for (const [action, anim] of Object.entries(config.player.anims))
+      slotsOf.set(anim, [...(slotsOf.get(anim) ?? []), action]);
+    const clash = [...slotsOf.entries()].find(([, actions]) => actions.length > 1);
+    if (clash !== undefined) {
+      const [anim, actions] = clash;
+      err(
+        "player.anims",
+        `${actions.map((a) => `\`${a}\``).join(" 与 ")} 指向**同一个**动画 "${anim}" —— 这三个槽位是` +
+        `三个动作（外壳按 ${PLAYER_ACTION_NAMES.map((n) => `\`${n}\``).join(" / ")} 各取一路），` +
+        "指同一个名字，玩家三种动作在屏幕上长得一模一样。⚠️ 一件资源里给它三条**不同**的动画，" +
+        "或在清单里把缺的那路补上 —— 把三格填成同一个不是解法。",
+      );
+    }
   }
   for (const e of config.entities) ref(`entity "${e.id}"`, { asset: e.asset, ...(e.anim ? { anim: e.anim } : {}) });
   ref("hud.panel", { asset: config.hud.panel.asset }, ["ui"]);

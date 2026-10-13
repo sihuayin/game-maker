@@ -1,0 +1,1295 @@
+{
+  "format": "assetpack/v3",
+  "id": "ruined-city-scavenger",
+  "version": 1,
+  "createdAt": "2026-10-13T10:46:33.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 11,
+    "values": [
+      "#6b8cae",
+      "#c98f4e",
+      "#8a5a33",
+      "#a9724a",
+      "#e8c264",
+      "#f0e2c0",
+      "#2f3a52",
+      "#455070",
+      "#3a3a3a",
+      "#4a4a4a",
+      "#6a6a6a"
+    ],
+    "coverage": {
+      "exact": 9,
+      "composited": 7,
+      "quantized": 10,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 32,
+        "h": 544
+      },
+      "frames": 17,
+      "assets": [
+        "chest-open",
+        "enemy-patrol",
+        "player-idle",
+        "player-jump",
+        "player-walk"
+      ],
+      "checksum": "sha256:6f0cac528cff4a60cb2023606d85a7a0b6d997cfe2248d62d69b363978294249"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 480,
+        "h": 810
+      },
+      "frames": 3,
+      "assets": [
+        "bg-ruined-street"
+      ],
+      "checksum": "sha256:c7fb75e6ce241edd98a29115d114a58f17e8aa19295eae171af2c69b3b830912"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 96,
+        "h": 272
+      },
+      "frames": 16,
+      "assets": [
+        "bench-seat",
+        "broken-gap-tile",
+        "building-facade",
+        "celestial-disc",
+        "chest-closed",
+        "enemy",
+        "exit-gate",
+        "ground-track",
+        "hanging-sign",
+        "low-step",
+        "panel-row",
+        "player-scavenger",
+        "pole-device",
+        "scrap",
+        "wall-panel",
+        "water"
+      ],
+      "checksum": "sha256:64d40a67a46172a131e7eedaef5990a546affcdf485f796924857f307b433e52"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 32,
+        "h": 48
+      },
+      "frames": 4,
+      "assets": [
+        "hud-bar-backdrop",
+        "hud-interact-prompt",
+        "hud-scrap-icon",
+        "hud-water-icon"
+      ],
+      "checksum": "sha256:8f6fd3a8a124253e3d97f4b07868d585bf59e3b87b7aaabf438ddc7ab9890c90"
+    }
+  ],
+  "assets": [
+    {
+      "id": "player-scavenger",
+      "kind": "sprite",
+      "role": "player",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "player-scavenger"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "player-walk",
+      "kind": "animation",
+      "role": "player",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-walk.walk1"
+        },
+        {
+          "name": "player-walk.walk2"
+        },
+        {
+          "name": "player-walk.walk3"
+        },
+        {
+          "name": "player-walk.walk4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "walk",
+          "frames": [
+            "player-walk.walk1",
+            "player-walk.walk2",
+            "player-walk.walk3",
+            "player-walk.walk4"
+          ],
+          "fps": 8,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-walk.walk.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "player-jump",
+      "kind": "animation",
+      "role": "player",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-jump.jump1"
+        },
+        {
+          "name": "player-jump.jump2"
+        },
+        {
+          "name": "player-jump.jump3"
+        }
+      ],
+      "animations": [
+        {
+          "name": "jump",
+          "frames": [
+            "player-jump.jump1",
+            "player-jump.jump2",
+            "player-jump.jump3"
+          ],
+          "fps": 10,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-jump.jump.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "player-idle",
+      "kind": "animation",
+      "role": "player",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-idle.idle1"
+        },
+        {
+          "name": "player-idle.idle2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "player-idle.idle1",
+            "player-idle.idle2"
+          ],
+          "fps": 4,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-idle.idle.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "enemy",
+      "kind": "sprite",
+      "role": "enemy",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "enemy"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "enemy-patrol",
+      "kind": "animation",
+      "role": "enemy",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-patrol.walk1"
+        },
+        {
+          "name": "enemy-patrol.walk2"
+        },
+        {
+          "name": "enemy-patrol.walk3"
+        },
+        {
+          "name": "enemy-patrol.walk4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "walk",
+          "frames": [
+            "enemy-patrol.walk1",
+            "enemy-patrol.walk2",
+            "enemy-patrol.walk3",
+            "enemy-patrol.walk4"
+          ],
+          "fps": 6,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-patrol.walk.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "chest-closed",
+      "kind": "sprite",
+      "role": "chest",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest-closed"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest-closed.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "chest-open",
+      "kind": "animation",
+      "role": "chest",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "chest-open.open1"
+        },
+        {
+          "name": "chest-open.open2"
+        },
+        {
+          "name": "chest-open.open3"
+        },
+        {
+          "name": "chest-open.open4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "open",
+          "frames": [
+            "chest-open.open1",
+            "chest-open.open2",
+            "chest-open.open3",
+            "chest-open.open4"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest-open.open.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "scrap",
+      "kind": "sprite",
+      "role": "resource-scrap",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "scrap"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/scrap.json"
+        }
+      ]
+    },
+    {
+      "id": "water",
+      "kind": "sprite",
+      "role": "resource-water",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "water"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/water.json"
+        }
+      ]
+    },
+    {
+      "id": "exit-gate",
+      "kind": "sprite",
+      "role": "exit-gate",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "exit-gate"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/exit-gate.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "ground-track",
+      "kind": "sprite",
+      "role": "terrain-ground",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "ground-track"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ground-track.json"
+        }
+      ]
+    },
+    {
+      "id": "broken-gap-tile",
+      "kind": "sprite",
+      "role": "terrain-gap",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "broken-gap-tile"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/broken-gap-tile.json"
+        }
+      ]
+    },
+    {
+      "id": "low-step",
+      "kind": "sprite",
+      "role": "terrain-step",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "low-step"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/low-step.json"
+        }
+      ]
+    },
+    {
+      "id": "building-facade",
+      "kind": "sprite",
+      "role": "environment-building",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 96
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "building-facade"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/building-facade.json"
+        }
+      ]
+    },
+    {
+      "id": "wall-panel",
+      "kind": "sprite",
+      "role": "environment-wall",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "wall-panel"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/wall-panel.json"
+        }
+      ]
+    },
+    {
+      "id": "pole-device",
+      "kind": "sprite",
+      "role": "environment-props",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 8,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "pole-device"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/pole-device.json"
+        }
+      ]
+    },
+    {
+      "id": "hanging-sign",
+      "kind": "sprite",
+      "role": "environment-props",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hanging-sign"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hanging-sign.json"
+        }
+      ]
+    },
+    {
+      "id": "panel-row",
+      "kind": "sprite",
+      "role": "environment-props",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "panel-row"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/panel-row.json"
+        }
+      ]
+    },
+    {
+      "id": "bench-seat",
+      "kind": "sprite",
+      "role": "environment-props",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "bench-seat"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/bench-seat.json"
+        }
+      ]
+    },
+    {
+      "id": "celestial-disc",
+      "kind": "sprite",
+      "role": "environment-props",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "celestial-disc"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/celestial-disc.json"
+        }
+      ]
+    },
+    {
+      "id": "bg-ruined-street",
+      "kind": "background",
+      "role": "background",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 480,
+        "h": 270
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0.1
+        },
+        {
+          "name": "distant-blocks",
+          "parallax": 0.4
+        },
+        {
+          "name": "wall",
+          "parallax": 1,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "bg-ruined-street.sky"
+        },
+        {
+          "name": "bg-ruined-street.distant-blocks"
+        },
+        {
+          "name": "bg-ruined-street.wall"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/bg-ruined-street.sky.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/bg-ruined-street.distant-blocks.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/bg-ruined-street.wall.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "hud-scrap-icon",
+      "kind": "ui",
+      "role": "ui-resource-icon",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-scrap-icon"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-scrap-icon.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-water-icon",
+      "kind": "ui",
+      "role": "ui-resource-icon",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-water-icon"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-water-icon.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-bar-backdrop",
+      "kind": "ui",
+      "role": "ui-bar",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-bar-backdrop"
+        }
+      ],
+      "scale9Borders": {
+        "x": 4,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-bar-backdrop.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-interact-prompt",
+      "kind": "ui",
+      "role": "ui-prompt",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-interact-prompt"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-interact-prompt.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/bench-seat.json",
+      "bytes": 2160,
+      "checksum": "sha256:115cb219b33870b195fea1780126fe0e53536847fa6c5f906bfba1c348792742"
+    },
+    {
+      "path": "authoring/drawlist/broken-gap-tile.json",
+      "bytes": 3943,
+      "checksum": "sha256:c1e6d8736f2ab3129cea32c987abcc3581b593c2a83ed80f7322b93e1bdc63b1"
+    },
+    {
+      "path": "authoring/drawlist/building-facade.json",
+      "bytes": 3428,
+      "checksum": "sha256:1cf3d0f907922689396136abc283b0a8ea6eb07ecdad60c280eb9c9138d21a42"
+    },
+    {
+      "path": "authoring/drawlist/celestial-disc.json",
+      "bytes": 2887,
+      "checksum": "sha256:6637380dfc3ab7d1b953ce7dd5ed2d109ff436f89793d896eb19ee3b7857c519"
+    },
+    {
+      "path": "authoring/drawlist/ground-track.json",
+      "bytes": 2666,
+      "checksum": "sha256:baee2619f5ebb0f3c28f55273a8240c397cc333194786566e3676f1217c64e67"
+    },
+    {
+      "path": "authoring/drawlist/hanging-sign.json",
+      "bytes": 2722,
+      "checksum": "sha256:dcc659f267b0ace0a60e5de60673224de65ad2b4c078af466934d0112ec7a4b7"
+    },
+    {
+      "path": "authoring/drawlist/hud-bar-backdrop.json",
+      "bytes": 2508,
+      "checksum": "sha256:7b607ec4d136ea91e39dbf226d0401a1e83ccedbad50eb0c5cfc612b645eac33"
+    },
+    {
+      "path": "authoring/drawlist/hud-interact-prompt.json",
+      "bytes": 2476,
+      "checksum": "sha256:516b36621b40707bbed7ab65090b3aae1296f953f72a65d1bc6816e2c6c89a1f"
+    },
+    {
+      "path": "authoring/drawlist/hud-scrap-icon.json",
+      "bytes": 3263,
+      "checksum": "sha256:865ac4c1287bb84cd23afb0ccca2537c37cd3e17c1decf0fc23bbbc441319e35"
+    },
+    {
+      "path": "authoring/drawlist/hud-water-icon.json",
+      "bytes": 1834,
+      "checksum": "sha256:6b222165b164f3989508c180bca3324b01fed5717c6fffaf51dad85e036cd1b4"
+    },
+    {
+      "path": "authoring/drawlist/low-step.json",
+      "bytes": 1817,
+      "checksum": "sha256:39a586ffb25f294c315c71b6ada13d661c39161e02d11f36c30adcd5cbb2e1ba"
+    },
+    {
+      "path": "authoring/drawlist/panel-row.json",
+      "bytes": 3289,
+      "checksum": "sha256:3c416e41bb69b358cdc2064764d7d48cd7b0de561d6d9dc370c163a5bf2a3e00"
+    },
+    {
+      "path": "authoring/drawlist/pole-device.json",
+      "bytes": 2444,
+      "checksum": "sha256:d24ace4857f08aa7235128aff9eb6e73613cd853ac5c529c58dd7a26c6337860"
+    },
+    {
+      "path": "authoring/drawlist/scrap.json",
+      "bytes": 2285,
+      "checksum": "sha256:c24be8725809ffc71722baefb37165b1249c7c3d34f3cd25dcd553a20658890f"
+    },
+    {
+      "path": "authoring/drawlist/wall-panel.json",
+      "bytes": 2981,
+      "checksum": "sha256:0b9a007836dc6371661b6d2d5c6b650a629fdc56f74d7bbad215cae3d39b701c"
+    },
+    {
+      "path": "authoring/drawlist/water.json",
+      "bytes": 2079,
+      "checksum": "sha256:6581b7e9c117f9ecb7d26cd1873284069de068098aef862fa40d1364a49a23df"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.distant-blocks.png",
+      "bytes": 853210,
+      "checksum": "sha256:4a571cdb1d16c1060dad216faf0bb83a0248d7bf5c978304827f25afae7abb64"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.distant-blocks.prompt.txt",
+      "bytes": 1723,
+      "checksum": "sha256:fef9cb84403949a4801ccd1678262c336691f9091745f387195fde4b549bedf4"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.sky.png",
+      "bytes": 939451,
+      "checksum": "sha256:2abe956bc7856cf0b6ce33f44897af7de53984345a3a951bef194372f6ae9a36"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.sky.prompt.txt",
+      "bytes": 1976,
+      "checksum": "sha256:ea46fb2a36f6186d6d75c5aa5000859dfbf0e8c6ec5d0499fc3245732b668d34"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.wall.png",
+      "bytes": 816743,
+      "checksum": "sha256:9089a85d829b43c51ac7ac5e72aca538fbc5c429cb82ee5239cbd2285175dbb8"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.wall.prompt.txt",
+      "bytes": 1865,
+      "checksum": "sha256:d9e04672c9e465c80eb20679f9a07f00dd5dbcb3fe1117e20045dd654f3981ae"
+    },
+    {
+      "path": "authoring/generated/chest-closed.png",
+      "bytes": 775654,
+      "checksum": "sha256:b90ab7d5e8ab8bc81c9f10a672b37a8c6d0652f14e42221adad8167dd6011405"
+    },
+    {
+      "path": "authoring/generated/chest-closed.prompt.txt",
+      "bytes": 1873,
+      "checksum": "sha256:e35cb842004710be5ced6f946878f982b87852602fa0dd3e7915c787dddbd082"
+    },
+    {
+      "path": "authoring/generated/chest-open.open.png",
+      "bytes": 836757,
+      "checksum": "sha256:6de0e7b2c65083b7086a6d902ce69622a4ee1c187b40468875c4691e00bbdfd9"
+    },
+    {
+      "path": "authoring/generated/chest-open.open.prompt.txt",
+      "bytes": 2146,
+      "checksum": "sha256:aa06d48e01ec2e7a2dec38b3701a8b105ea6a645cc44e47c677debc3432c1e13"
+    },
+    {
+      "path": "authoring/generated/enemy-patrol.walk.png",
+      "bytes": 932831,
+      "checksum": "sha256:0cd514328f715345cab982aea0d481df77da3c5979c2170b65756129f0112ffb"
+    },
+    {
+      "path": "authoring/generated/enemy-patrol.walk.prompt.txt",
+      "bytes": 3974,
+      "checksum": "sha256:e36c5f0ef32d02f2783aec65a9ce207670018b29806c33db64149d0d864763c9"
+    },
+    {
+      "path": "authoring/generated/enemy.png",
+      "bytes": 746008,
+      "checksum": "sha256:1dec2ba9f600d7c124f70d39aaac668e021ad5edef32acd5708b46ec8ee8059f"
+    },
+    {
+      "path": "authoring/generated/enemy.prompt.txt",
+      "bytes": 1903,
+      "checksum": "sha256:2bd62ac0005c04baf3a1d5446f79f51843116c816dd13913d9069ec766798488"
+    },
+    {
+      "path": "authoring/generated/exit-gate.png",
+      "bytes": 771292,
+      "checksum": "sha256:b2fb54b2fea45ace56413a2108a4407987c6d84219d0325addb0a4cfe7ee7d36"
+    },
+    {
+      "path": "authoring/generated/exit-gate.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:44f5a8862f05215536a1eeff80267ac751a33e583d227147f6087f228a472aa6"
+    },
+    {
+      "path": "authoring/generated/player-idle.idle.png",
+      "bytes": 950887,
+      "checksum": "sha256:5b556f53ece6e7358eac162e663c541e9464d275c2f9f5e60cdc148b359b94df"
+    },
+    {
+      "path": "authoring/generated/player-idle.idle.prompt.txt",
+      "bytes": 4236,
+      "checksum": "sha256:8ba719b0876b28602d9c73bf66892e43c0cf973cee01ec9da4b7107f072479ce"
+    },
+    {
+      "path": "authoring/generated/player-jump.jump.png",
+      "bytes": 961365,
+      "checksum": "sha256:da1d03645681a44a8317e91638032c89219845455aa40c529abc6575cd983075"
+    },
+    {
+      "path": "authoring/generated/player-jump.jump.prompt.txt",
+      "bytes": 4236,
+      "checksum": "sha256:25f8976f0a10e1a1892080282cb78576128ffbda1a268d0aac9482e410534cf5"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.png",
+      "bytes": 790210,
+      "checksum": "sha256:c8c0a114e87a0108cdc24e7c5a890fb8e2eb3e20a7235555991dfb2b031e7851"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.prompt.txt",
+      "bytes": 1980,
+      "checksum": "sha256:f1fafc618a2ef67002c93860147d24955aeafc25b82ecf86c4ad021d5a7308ca"
+    },
+    {
+      "path": "authoring/generated/player-walk.walk.png",
+      "bytes": 996353,
+      "checksum": "sha256:40f5efcf02972c1a1c3e1a16f40d7bfdbf009bb2dc327ee9dfb2783b4a4e2a86"
+    },
+    {
+      "path": "authoring/generated/player-walk.walk.prompt.txt",
+      "bytes": 4236,
+      "checksum": "sha256:6b3bd8d1e0bb24abce41d40fbff5730ceff6a84bc55283f0cee690bb48dab512"
+    },
+    {
+      "path": "authoring/masters/enemy-patroller-master.png",
+      "bytes": 816989,
+      "checksum": "sha256:ae1dc5df616c7cf6e605fc6332313a745b42f1f1b4007d0f8dd053ae8169b7bb"
+    },
+    {
+      "path": "authoring/masters/enemy-patroller-master.prompt.txt",
+      "bytes": 4528,
+      "checksum": "sha256:3a67c52256bff09d7cc24614489afa94d28e4a8453cdec2745e8c88722b1599f"
+    },
+    {
+      "path": "authoring/masters/enemy-patroller-master.ratio.json",
+      "bytes": 401,
+      "checksum": "sha256:1971df43b06c8bf04424ea257151d0530a30c82e1c55b4b36c72d27250e58289"
+    },
+    {
+      "path": "authoring/masters/player-scavenger-master.png",
+      "bytes": 780026,
+      "checksum": "sha256:4ec3d8ef86b01234ea972f6da1ee6748454b602063eac343493b964065527c52"
+    },
+    {
+      "path": "authoring/masters/player-scavenger-master.prompt.txt",
+      "bytes": 4842,
+      "checksum": "sha256:a686e87e705f5895ed917ef2220557fb54c05ae3b31352f81b08e6e78d42548b"
+    },
+    {
+      "path": "authoring/masters/player-scavenger-master.ratio.json",
+      "bytes": 402,
+      "checksum": "sha256:2116ad22bab14d20960ddb1364946219415b73c741422790551918d9d8fe3349"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1243,
+      "checksum": "sha256:8e0658208059c6434355b3aea410f8f955af7f0d9bd4a4df12e32e1eac977960"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 6168,
+      "checksum": "sha256:d74e717f51a3ad960ae22bd14b74976e59d92f2ea2ded03fbc56dca02a22459a"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 639,
+      "checksum": "sha256:3144e85601e720f2c5a3146ab8cc33c05e54e27d327007ae7b99e29e1350ea7f"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 7007,
+      "checksum": "sha256:499ed2d7211e1dc8bae82ff16deb199f6845307e2725feb6544c328fc9138ed7"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 6844,
+      "checksum": "sha256:6f0cac528cff4a60cb2023606d85a7a0b6d997cfe2248d62d69b363978294249"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1457,
+      "checksum": "sha256:56a40aa5ad5513955773cbb859189621deb4374e6d741d558a36efa53f507f76"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 17777,
+      "checksum": "sha256:c7fb75e6ce241edd98a29115d114a58f17e8aa19295eae171af2c69b3b830912"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 6519,
+      "checksum": "sha256:340f227978e26869755012f06504b96fb5883ee28d78ca6f0358f367fe607719"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 3633,
+      "checksum": "sha256:64d40a67a46172a131e7eedaef5990a546affcdf485f796924857f307b433e52"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1900,
+      "checksum": "sha256:f47837f8680c34cecb7f84e89b419f434d84fab4e244f4e981c90608cb09cc53"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 398,
+      "checksum": "sha256:8f6fd3a8a124253e3d97f4b07868d585bf59e3b87b7aaabf438ddc7ab9890c90"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 8324,
+      "checksum": "sha256:1b8976137c5093ec437a5d769bf4acf5a9a4f980ac5a39d2cc7ab5fb32fafb0e"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 682,
+      "checksum": "sha256:bad85b7fac30a145cd6493a71b1b8960769d7ed1188e6cdefbe64be720dccba1"
+    }
+  ]
+}

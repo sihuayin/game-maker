@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { DESIGN_ATTEMPTS_FILE, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
@@ -157,7 +157,8 @@ describe("§invariant 2 · 构建 attempt 的版本", () => {
     const res = await buildAssetPack({
       recipe: readJson(path.join(u.run.dir, "asset-recipe.json")) as unknown as AssetRecipe,
       style, outDir: out, recipeDir: u.run.dir, version: 7,
-      // ⚠️ 帧数要与 `framePlan` 对得上（`p-body` 是 3 帧）—— 给少了会当场拒
+      // ⚠️ 帧数要与 `framePlan` 对得上（`p-body` 是 6 帧：三路动画各 2 帧 —— 票 61 的 Q3(ii)
+      //   「每路至少 2 帧」把这份桩从「各 1 帧」改成了「各 2 帧」）—— 给少了会当场拒
       generate: ((spec: AssetSpec) => framePlan(spec).map((f) => ({
         format: "drawlist+curve/v1", id: spec.id, frame: f.name, viewBox: [0, 0, spec.size.w, spec.size.h],
         expectedSize: [spec.size.w, spec.size.h], ops: [{ op: "rect", x: 0, y: 0, w: spec.size.w, h: spec.size.h, fill: "palette:0" }],
@@ -644,5 +645,78 @@ describe("§两段各报自己那几步（Q6 的进度）", () => {
     const got3: string[] = [];
     await build(h, u2.run.dir, { qa: null, onProgress: (p: { step: string }) => got3.push(p.step) });
     expect(got3.filter((s, i) => s !== got3[i - 1])).toEqual(["pack", "config"]);
+  });
+});
+
+// ── 票 61 · 「玩家那件资源」这条链**端到端**走一遍 ────────────────────────────
+//
+// ⚠️ 这一节问的不是任何**单点**（那两处各有各的判据：`assets/tests/plan-assets-player-gate`
+//   管清单、`contracts/tests/game-config` 管配置），问的是**这两点之间那条链真的接上了**：
+//   清单那一头写下的三个名字，配置那一头**解得开**、而且解到**三个不同的**动画。
+//   ⚠️ 分开断「清单对」与「配置对」是**不够的** —— 两边各自成立、中间对不上的形状是存在的
+//   （配置写 `idle`/`run`/`jump`，而清单里那三路叫别的名字）。
+describe("§票 61 · 玩家那条链**端到端**（清单 ⇒ 包 ⇒ 配置引用）", () => {
+  it("阳性：`p-body` **一件**、三路齐备且各 ≥2 帧，而落盘的配置三格**互不相同**且都解得到", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const parsed = parseRecipe(readJson(runPath(h, "asset-recipe.json")));
+    expect(parsed.ok, parsed.ok ? "" : parsed.errors.join("；")).toBe(true);
+    if (!parsed.ok) return;
+    // ① 清单那一头：**恰好一件**资源写着玩家 id（「一件资源带三路」那句话的两半都钉住）
+    const mine = parsed.value.assets.filter((e) => e.spec.characterId === "p-scavenger");
+    expect(mine).toHaveLength(1);
+    const spec = mine[0]!.spec;
+    expect(spec.kind).toBe("animation");
+    if (spec.kind !== "animation") return;
+    for (const n of PLAYER_ACTION_NAMES) {
+      const a = spec.animations.find((x) => x.name === n);
+      expect(a, `缺 ${n}`).toBeDefined();
+      expect(a!.frames, `${n} 的帧数`).toBeGreaterThanOrEqual(2);
+    }
+
+    const b = await build(h, u.run.dir);
+    // ② 配置那一头：三格**互不相同**（外壳按三个键各取一路）
+    const cfg = readJson(runPath(h, "game-config.json")) as { player: { anims: Record<string, string> } };
+    const slots = PLAYER_ACTION_NAMES.map((n) => cfg.player.anims[n]!);
+    expect(new Set(slots).size, "三格必须指到三个不同的动画").toBe(PLAYER_ACTION_NAMES.length);
+    // ③ 而**中间**那一环：这三格指向的名字，**逐个都在清单那件资源里** —— 链真的接上了
+    for (const s of slots) expect(spec.animations.map((a) => a.name), `配置引用的 "${s}"`).toContain(s);
+    expect(b.config.player.anims).toEqual(cfg.player.anims);
+  });
+
+  it("阴性：清单缺一路 ⇒ 链**死在理解段**、退 4，而 `pack/` 那一步**一步都没走**", async () => {
+    const badRecipe = structuredClone(CANNED.recipe) as
+      { assets: { spec: { characterId?: string; animations?: { name: string }[] } }[] };
+    const p = badRecipe.assets.find((e) => e.spec.characterId === "p-scavenger")!;
+    p.spec.animations = p.spec.animations!.filter((a) => a.name !== "jump");
+    const h = harness({ override: { emit_asset_recipe: badRecipe } });
+    const e = await understand(h).then((): unknown => undefined, (x: unknown) => x);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect(String((e as Error).message)).toMatch(/"jump"/);
+    // ⚠️ **一笔生图的钱都没花出去**：清单没过闸 ⇒ 构建段压根没被调用过（`pack/` 不存在）
+    expect(fs.existsSync(path.join(h.outRoot, "wasteland", "pack"))).toBe(false);
+    // ⚠️ 而失败现场照旧留着（R8）—— 里面没有 `asset-recipe.json`，因为那一份从来没成立过
+    const sites = fs.readdirSync(h.outRoot).filter((d) => d.startsWith(".failed-"));
+    expect(sites).toHaveLength(1);
+    expect(fs.existsSync(path.join(h.outRoot, sites[0]!, "asset-recipe.json"))).toBe(false);
+    expect(fs.existsSync(path.join(h.outRoot, sites[0]!, "game-design.json"))).toBe(true);
+  });
+
+  it("⚠️ **配方完全正确也拦不住**的那一档：配置三格填同一个名字 ⇒ 死在配置那一步，退 4", async () => {
+    // ⚠️ 这一条是**本票的立案形状本身**：清单那一头挑不出任何毛病（三路齐备、名字正确、
+    //   帧数够），坏的是**配置怎么引用它** —— 而配置契约从前逐格解引用、三格各自都解得到，
+    //   于是一格都不报（`game-config.test.ts` 那条「三格全填同一个」的前身）。
+    //   ⇒ 这一条钉的是**分层**：清单那一层管不了这件事，配置这一层必须管。
+    const h = harness({ override: {
+      emit_game_config: { ...CANNED.gameConfig, player: { ...(CANNED.gameConfig["player"] as object), anims: { idle: "idle", run: "idle", jump: "idle" } } },
+    } });
+    const u = await understand(h);
+    // ① 先确认这一跑那份清单**本身是干净的**（不然这条判据会被上一条闸门顶掉、红得没意义）
+    expect(parseRecipe(readJson(runPath(h, "asset-recipe.json"))).ok).toBe(true);
+    const e = await build(h, u.run.dir).then((): unknown => undefined, (x: unknown) => x);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect(String((e as Error).message)).toMatch(/player\.anims/);
+    // ② 而配置**没有落盘** —— 不过验收的配置不该冒充产物（那正是「两把尺子」要避免的）
+    expect(fs.existsSync(runPath(h, "game-config.json"))).toBe(false);
   });
 });

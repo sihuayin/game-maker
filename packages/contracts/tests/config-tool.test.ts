@@ -6,7 +6,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { parseGameConfig, toolInputSchema, type GameConfig } from "../src/index.js";
+import { parseGameConfig, PLAYER_ACTION_NAMES, toolInputSchema, type GameConfig } from "../src/index.js";
 import { ConfigToolSchema } from "../src/config-tool.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -103,6 +103,18 @@ describe("§镜像存在的**全部理由**：`toolInputSchema` 转得动它", (
 
   it("⚠️ 而**v3 那份转不动** —— 这就是镜像存在的理由", () => {
     expect(() => toolInputSchema(GameConfigSchemaForTest as never)).toThrowError(/zod\/v4/);
+  });
+
+  it("⚠️ `player.anims` 那三格**是契约派生出来的**（票 61）：转出去的键序、必填、封口逐字对得上", () => {
+    // ⚠️ 上面那套漂移测试比的是**行为**（同一份输入两份过不过），而**键名**是可以行为一致、
+    //   字面不同的（比如派生时漏了一个键、又恰好被别的规则拒掉同样的输入）。这一条盯的是**字面**。
+    const json = toolInputSchema(ConfigToolSchema) as unknown as {
+      properties: { player: { properties: { anims: { properties: Record<string, unknown>; required: string[]; additionalProperties: boolean } } } };
+    };
+    const anims = json.properties.player.properties.anims;
+    expect(Object.keys(anims.properties)).toEqual([...PLAYER_ACTION_NAMES]);
+    expect(anims.required).toEqual([...PLAYER_ACTION_NAMES]);
+    expect(anims.additionalProperties).toBe(false);
   });
 });
 

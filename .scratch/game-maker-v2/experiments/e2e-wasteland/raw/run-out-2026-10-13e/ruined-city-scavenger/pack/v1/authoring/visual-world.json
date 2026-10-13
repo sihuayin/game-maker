@@ -1,0 +1,195 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "像素艺术",
+      "扁平色块",
+      "正交侧视",
+      "有限色板",
+      "无渐变",
+      "剪影化"
+    ],
+    "description": "低分辨率像素风横版侧视游戏视觉语法：严格正交侧面视角、平视，所有形体由纯色矩形与多边形硬边拼合而成，无渐变、无描边、无抗锯齿，靠有限色板的明度层级区分前后景，角色与道具均为方正几何剪影。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "正交投影，无透视收缩",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "平视侧面视角，视线垂直于画面纵深平面"
+  },
+  "composition": {
+    "foreground": "底部一条窄的深色地面与轨道类横条，作为行走层",
+    "midground": "角色与交互物所在的中景平面，元素沿水平线均匀排布",
+    "background": "上方一条水平色带作为天空，其下是大面积平整墙面或地貌色块",
+    "objectScale": "道具与建筑构件尺寸与角色同一量级，像素网格对齐",
+    "characterScale": "角色高度约占画面高度的三分之一，居中偏下站立",
+    "density": "稀疏，元素之间留大量空白色块，无细碎装饰"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1"
+    ],
+    "secondary": [
+      "palette:2",
+      "palette:3"
+    ],
+    "accent": [
+      "palette:4",
+      "palette:5"
+    ],
+    "background": [
+      "palette:6",
+      "palette:7"
+    ],
+    "shadow": [
+      "palette:8",
+      "palette:9"
+    ],
+    "highlight": [
+      "palette:5",
+      "palette:10"
+    ]
+  },
+  "lighting": {
+    "direction": "无明显方向性，靠色块明度差暗示体块",
+    "softness": "硬边，无软阴影无光晕",
+    "contrast": "中低对比，色块之间边界清晰但整体明度跨度温和",
+    "mood": "灰调、安静、略显空旷的荒废感"
+  },
+  "materials": {
+    "painted-wall": {
+      "appearance": "大面积平整墙面，哑光",
+      "texture": "无纹理，偶尔一道横向色带做分层",
+      "color": [
+        "palette:2",
+        "palette:3"
+      ]
+    },
+    "metal-plate": {
+      "appearance": "深色硬质构件，用于建筑轮廓与装置",
+      "texture": "纯色块，无高光",
+      "color": [
+        "palette:9",
+        "palette:10"
+      ]
+    },
+    "energy-glow": {
+      "appearance": "自发光或金属高亮的强调材质，用于招牌、宝箱、可拾取物",
+      "texture": "实心纯色块，靠高饱和与周围灰调拉开",
+      "color": [
+        "palette:4",
+        "palette:5"
+      ]
+    },
+    "sky-band": {
+      "appearance": "大面积无细节背景色带",
+      "texture": "完全平涂",
+      "color": [
+        "palette:6",
+        "palette:7"
+      ]
+    },
+    "ground-track": {
+      "appearance": "行走层地面与轨道构件",
+      "texture": "由明暗小方块交替排列形成节奏",
+      "color": [
+        "palette:8",
+        "palette:1"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "头身比约 1:2 的短身方头造型",
+    "silhouette": "方正紧凑，头戴小方帽，肩宽与身高等宽",
+    "poseLanguage": "站立静止，双臂垂放贴身，动作仅作水平位移与简单跳跃",
+    "clothing": "深色制服式外套，胸前一块亮色矩形徽记，腰间浅色腰带，腿部为两段深色方柱",
+    "faceAbstraction": "五官极度抽象，仅用两个深色小方块表示眼睛，无口鼻"
+  },
+  "environment": {
+    "architecture": "低矮平顶建筑，山墙为等腰三角形，矩形门窗开洞，无装饰线脚",
+    "terrain": "平整地面横贯全屏，无起伏，远处仅用色块分层示意",
+    "props": "细杆立式装置、悬挂矩形牌、成排方形小面板、方形座椅、圆形天体",
+    "textureDensity": "极低，单一色块即一面墙"
+  },
+  "shapeLanguage": [
+    "矩形与正方形为基本单元",
+    "三角形山墙与尖顶轮廓",
+    "圆形只用于天体与小徽记",
+    "所有边缘为硬直角或 45 度斜切",
+    "形状对齐到像素网格，无曲线"
+  ],
+  "constraints": [
+    "必须使用正交侧面平视视角，禁止透视与斜角",
+    "禁止渐变、软阴影、光晕、模糊与抗锯齿",
+    "禁止描边与色块间的过渡色",
+    "所有形体由纯色块拼合，边缘保持硬直角或 45 度斜切",
+    "角色五官只能抽象为少量深色方块，不得写实刻画",
+    "高饱和暖色仅用于招牌、宝箱、可拾取物等需要被识别的对象",
+    "整体保持低纹理密度与大面积平涂留白",
+    "像素尺寸统一，不允许半像素或非整数缩放"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素风横版侧视",
+      "扁平纯色块构成",
+      "有限色板明度分层",
+      "方正几何剪影"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面视角",
+      "angle": "平视",
+      "movement": "水平卷轴"
+    },
+    "composition": {
+      "layout": "水平分层：天空带 / 中景建筑与墙面 / 底部行走层",
+      "placement": "角色居中偏下，道具沿水平线排布"
+    },
+    "palette": [
+      "#6b8cae",
+      "#c98f4e",
+      "#8a5a33",
+      "#a9724a",
+      "#e8c264",
+      "#f0e2c0",
+      "#2f3a52",
+      "#455070",
+      "#3a3a3a",
+      "#4a4a4a",
+      "#6a6a6a"
+    ],
+    "lighting": {
+      "mode": "无方向平光",
+      "shading": "仅用色块明度差暗示体块"
+    },
+    "shapeLanguage": [],
+    "material": [
+      "哑光平涂",
+      "硬质深色构件",
+      "自发光强调色"
+    ],
+    "environment": [
+      "平顶与三角山墙建筑",
+      "水平地面轨道",
+      "悬挂招牌与方形面板"
+    ],
+    "characterStyle": [
+      "短身方头像素人",
+      "方块眼抽象五官",
+      "深色制服外套配亮色胸前徽记"
+    ],
+    "constraints": [
+      "禁止渐变与抗锯齿",
+      "禁止写实五官",
+      "高饱和色仅限可交互物"
+    ],
+    "confidence": 0.9
+  }
+}

@@ -1,4 +1,6 @@
-import type { GameDesignSpec, VisualWorldSpec } from "@game-maker/contracts";
+// ⚠️ `PLAYER_ACTION_NAMES` 是**值**（不是类型）：那三个动作名全仓只写一遍、住 `game-config.ts`，
+//   提示词**插值**它（票 61）—— 见 `game-config.ts` 里那段「四处由它派生」。
+import { PLAYER_ACTION_NAMES, type GameDesignSpec, type VisualWorldSpec } from "@game-maker/contracts";
 // schema-to-prompt 渲染器 —— **生成与推导共用的那一份**（票 22 问题 4 的落点）。
 //
 // 归 `assets` 而不是 `contracts`：它是 schema 的**镜像**，会随提示工程调优而改；
@@ -737,6 +739,10 @@ export function assetPlanPrompt(input: {
   echo: { styleRef: string; styleId: string; referenceImage?: string };
 }): string {
   const { design, vws, echo } = input;
+  // ⚠️ **插值出来的是字面词本身**（`idle` / `run` / `jump`），**不是 `<idle>` 那种占位符**：
+  //   占位符读起来像「这里自己填一个名字」，而契约要的正是**照字面**（票 61 的 Q12(r4) 原话：
+  //   「最终送入模型的提示词中直接呈现 idle、run、jump，不带尖括号，不允许模型改名」）。
+  const ACTIONS = PLAYER_ACTION_NAMES.map((n) => `\`${n}\``).join(" / ");
   return `你是游戏资源策划。根据下面的**设计**与**这个世界的视觉语法**，产出一份完整的资源清单。
 
 ⚠️ 清单说的是**要造什么**（有哪些资源 · 长什么样的一句话 · 多大 · 几帧 · 哪一类），
@@ -774,6 +780,16 @@ ${worldBrief(vws)}
 2. \`animation\` —— 必须有 \`animations\`，至少一个。
 3. \`background\` 是场景尺度；\`ui\` 是**屏幕空间**（世界里的招牌是 sprite，不是 ui）。
 4. \`animations[].frames\` 是**帧数**（整数），不是帧名。
+
+⚠️ **玩家那件资源还有一条硬要求**（外壳按三个固定键各播一种动作；缺一样就编不出一份能跑的配置）：
+
+1. 玩家名下 \`kind:"animation"\` 的资源**恰好一件** —— 不许 0 件，也不许 2 件。
+   ⚠️ **别把三个动作拆成三件**（一件一路动画）：配置那一步会在几件里挑错，
+   而且会多花两笔生图的钱。
+2. 这一件的 \`animations[]\` 里**必须同时有这三个名字**：${ACTIONS}
+   —— 就是这三个词**本身**，照抄、**不许改名**（不是占位符，不许写成 \`walk\` / \`idle-down\` 之类）。
+3. 这三路**每路至少 2 帧** —— 1 帧是静帧，不是动画。
+4. 这一件**必须写 \`characterId\`**，值就是 \`${design.player.id}\`（上面设计层那个玩家的 id，一个字不许改）。
 
 ⚠️ 四个槽的 \`id\` **沿用上面设计层给的那些 id**（一个字都不许改）；设计层没点名、但**设计说得出**
 的东西可以新加，给它们起新 id。

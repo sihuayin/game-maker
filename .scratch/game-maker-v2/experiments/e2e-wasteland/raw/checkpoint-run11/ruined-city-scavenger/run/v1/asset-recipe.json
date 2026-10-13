@@ -1,0 +1,660 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruined-city-scavenger",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "player-scavenger",
+        "role": "player",
+        "description": "短身方头像素剪影拾荒者：头顶小方帽、方形头部、深色制服式外套胸前一块亮色矩形徽记、腰间浅色腰带、两条深色方柱腿，双臂垂放贴身；方正紧凑、肩宽与身高等宽，头身比约 1:2",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "player"
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-walk",
+        "role": "player",
+        "description": "拾荒者横向行走：两段方柱腿交替前后交叉，躯干保持竖直不倾斜，头部与帽子水平不摇晃，手臂随步伐小幅摆动",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "player",
+        "masterAsset": "player-scavenger-master",
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-jump",
+        "role": "player",
+        "description": "拾荒者原地起跳：屈膝下蹲一帧、离地上升时双腿并拢下伸、下落时轻微展开，整体轮廓始终方正",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "player",
+        "masterAsset": "player-scavenger-master",
+        "animations": [
+          {
+            "name": "jump",
+            "frames": 3,
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-idle",
+        "role": "player",
+        "description": "拾荒者站立待机：双臂垂放贴身、几乎静止，仅有极轻的呼吸式整体位移，剪影不散架",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "player",
+        "masterAsset": "player-scavenger-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "enemy",
+        "role": "enemy",
+        "description": "巡逻敌人：与拾荒者同一套方正几何体例但更宽更压低的剪影，深色制服式身躯、小方帽、胸前徽记，双臂垂放；气质沉默危险",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "enemy"
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-patrol",
+        "role": "enemy",
+        "description": "巡逻敌人在固定路段左右匀速行走：双腿交替迈步、躯干不倾斜、随身徽记位置固定，折返时整体水平翻转即可",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "enemy",
+        "masterAsset": "enemy-patroller-master",
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-closed",
+        "role": "chest",
+        "description": "闭合的宝箱：方正箱体加一块平盖，构成为硬边矩形拼合，表面带自发光高亮材质条，尺寸与角色同量级",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "chest-open",
+        "role": "chest",
+        "description": "宝箱开启：箱盖向上弹开成竖直或后仰角度并停住，箱口露出内腔，最后带一次极小的回弹",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-closed"
+        ],
+        "animations": [
+          {
+            "name": "open",
+            "frames": 4,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "scrap",
+        "role": "resource-scrap",
+        "description": "废料拾取物：一小块方正硬边多边形金属残片，带自发光高亮边缘，落地后轻微晃动，尺寸远小于角色",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "water",
+        "role": "resource-water",
+        "description": "净水拾取物：一只方正小容器，内里一块亮色矩形表示净水，带自发光高亮，落地后轻微晃动，尺寸与废料一致",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "exit-gate",
+        "role": "exit-gate",
+        "description": "街区尽头的撤离闸门：竖直矩形门框加两扇对开硬边门板，门框顶部一条自发光高亮横条作为可用指示，整体高于角色半个身位",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-track",
+        "role": "terrain-ground",
+        "description": "行走层地面与轨道构件：一条窄的深色横条加横向轨枕式硬边分段，平整无起伏，可无限水平平铺",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "broken-gap-tile",
+        "role": "terrain-gap",
+        "description": "塌陷缺口的边缘构件：地面在两侧断成带缺口的硬边断面，断面下坠一段深色竖块，用于拼接断裂路面",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "low-step",
+        "role": "terrain-step",
+        "description": "低矮台阶：一级方正硬边矩形台块，高度不足角色半身，供玩家起跳翻越",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "building-facade",
+        "role": "environment-building",
+        "description": "低矮平顶建筑立面：大面积平整哑光墙面，矩形门窗开洞，屋顶为等腰三角形山墙，无装饰线脚，硬边多边形拼合",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 96,
+          "h": 96
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wall-panel",
+        "role": "environment-wall",
+        "description": "大面积平整墙面色块：单一明度层级的哑光墙面，可水平与垂直平铺，作为中景建筑之间的背景填充",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "pole-device",
+        "role": "environment-props",
+        "description": "细杆立式装置：一根竖直细长杆加顶部一小块方形构件，硬边矩形拼合，立在街边与角色同量级",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 8,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hanging-sign",
+        "role": "environment-props",
+        "description": "悬挂矩形牌：一块方正硬边矩形牌面，带自发光强调材质边缘，上方以短竖杆挂在墙面上",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "panel-row",
+        "role": "environment-props",
+        "description": "成排方形小面板：一列等距排列的方形小色块，嵌在建筑立面上作为窗户或广告位替代，无细节图案",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "bench-seat",
+        "role": "environment-props",
+        "description": "方形座椅：一块水平座板加两条竖直短腿的方正硬边剪影，与角色同量级偏小，沿街零星摆放",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "celestial-disc",
+        "role": "environment-props",
+        "description": "圆形天体：一枚无描边的纯色圆盘，悬于天空色带中，是画面里唯一的圆形元素",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-ruined-street",
+        "role": "background",
+        "description": "废城街区的三层远景：顶部水平天空色带、中层大面积平整墙面与远处色块分层示意、底部深色行走层横条",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0.1
+          },
+          {
+            "name": "distant-blocks",
+            "parallax": 0.4
+          },
+          {
+            "name": "wall",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-scrap-icon",
+        "role": "ui-resource-icon",
+        "description": "背包废料计数图标：与拾取物同形的小方正金属残片剪影，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-water-icon",
+        "role": "ui-resource-icon",
+        "description": "背包净水计数图标：与拾取物同形的小方正容器剪影，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-bar-backdrop",
+        "role": "ui-bar",
+        "description": "顶部状态栏底板：一条会被拉伸到任意屏宽的纯色硬边长条，中央区平坦无图案，四边等宽",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-interact-prompt",
+        "role": "ui-prompt",
+        "description": "交互提示符：一枚按原尺寸绘制的小方块提示件，出现在宝箱与撤离闸门上方，不做拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "player-scavenger-master",
+      "role": "player",
+      "description": "拾荒者创作态母版：正交侧视全身像，短身方头、小方帽、深色制服式外套胸前亮色矩形徽记、浅色腰带、两段深色方柱腿，双臂垂放贴身，站立静止",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "player",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    {
+      "id": "enemy-patroller-master",
+      "role": "enemy",
+      "description": "巡逻敌人创作态母版：同一套方正几何体例，剪影更宽更压低，小方帽、深色制服式身躯、胸前徽记，站立静止",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

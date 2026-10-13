@@ -325,19 +325,19 @@
           "animations": [
             {
               "name": "idle",
-              "frames": 1,
+              "frames": 2,
               "fps": 1,
               "loop": true
             },
             {
               "name": "run",
-              "frames": 1,
+              "frames": 2,
               "fps": 1,
               "loop": true
             },
             {
               "name": "jump",
-              "frames": 1,
+              "frames": 2,
               "fps": 1,
               "loop": false
             }

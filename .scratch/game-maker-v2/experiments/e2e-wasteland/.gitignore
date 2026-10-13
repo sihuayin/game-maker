@@ -6,8 +6,14 @@
 # 每张图同名的那份 `*.prompt.txt`（提示词是**发出去的东西**，重跑不一定复原）。
 # 「生图确实发生了」这条判据的证据是**票 23 里记下的读数**（1344×768 RGBA · 魔数 · 字节数），
 # 而位图本身**重跑一次就有**（那要花钱，但不必进 git 的历史）。
-raw/run-out/*/*/authoring/generated/*.png
-raw/run-out/*/*/authoring/masters/*.png
+# ⚠️ **2026-10-13（票 61 收口时）更正：下面那两条旧式样一条都没生效过。**
+# 它们写的是 `raw/run-out/<run>/<gameId>/authoring/...` —— 而**盘上的落点是**
+# `raw/run-out-<日期><字母>/<gameId>/pack/v<N>/authoring/...`（多一层 `pack/v<N>`，
+# 而且目录名是 `run-out-<日期>` 而不是 `run-out/<日期>`）。
+# ⇒ 第十三跑那一批（20 张位图）差点被 `git add -A` 顺手收进去，与本节第一句**正相反**。
+# 改成 `**` 之后两种落点都盖得住（今天没有第三种）。
+raw/run-out*/**/authoring/generated/*.png
+raw/run-out*/**/authoring/masters/*.png
 
 # ⚠️ **2026-10-09 深夜，[票 37](../../../issues/37-key-colour-not-delivered.md)：上面那句「照旧不入库」
 # 对下面这一批**不再够用** —— 这一批的**像素就是读数本身**。**

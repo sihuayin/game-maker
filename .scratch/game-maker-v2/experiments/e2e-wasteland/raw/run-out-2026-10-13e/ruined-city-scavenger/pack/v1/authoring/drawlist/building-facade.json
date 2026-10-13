@@ -1,0 +1,228 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "building-facade",
+  "frame": "building-facade",
+  "viewBox": [
+    0,
+    0,
+    96,
+    96
+  ],
+  "expectedSize": [
+    96,
+    96
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 8,
+      "y": 40,
+      "w": 80,
+      "h": 56
+    },
+    {
+      "op": "dither",
+      "x": 8,
+      "y": 40,
+      "w": 80,
+      "h": 56,
+      "colors": [
+        "palette:5",
+        "palette:4"
+      ],
+      "ratio": 0.18,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 8,
+      "y": 40,
+      "w": 80,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 8,
+      "y": 92,
+      "w": 80,
+      "h": 4
+    },
+    {
+      "op": "poly",
+      "fill": "palette:1",
+      "stroke": "palette:2",
+      "strokeWidth": 1,
+      "points": [
+        [
+          4,
+          44
+        ],
+        [
+          48,
+          16
+        ],
+        [
+          92,
+          44
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 12,
+      "y": 36,
+      "w": 72,
+      "h": 8,
+      "colors": [
+        "palette:1",
+        "palette:2"
+      ],
+      "ratio": 0.3,
+      "pattern": "checker"
+    },
+    {
+      "op": "poly",
+      "fill": "palette:4",
+      "points": [
+        [
+          44,
+          20
+        ],
+        [
+          48,
+          16
+        ],
+        [
+          52,
+          20
+        ],
+        [
+          48,
+          22
+        ]
+      ]
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 38,
+      "y": 48,
+      "w": 20,
+      "h": 20
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 40,
+      "y": 50,
+      "w": 14,
+      "h": 12
+    },
+    {
+      "op": "line",
+      "stroke": "palette:7",
+      "strokeWidth": 1,
+      "x1": 40,
+      "y1": 56,
+      "x2": 54,
+      "y2": 56
+    },
+    {
+      "op": "line",
+      "stroke": "palette:7",
+      "strokeWidth": 1,
+      "x1": 47,
+      "y1": 50,
+      "x2": 47,
+      "y2": 62
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 62,
+      "y": 52,
+      "w": 14,
+      "h": 16
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 64,
+      "y": 54,
+      "w": 10,
+      "h": 12
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 20,
+      "y": 52,
+      "w": 12,
+      "h": 14
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 22,
+      "y": 54,
+      "w": 8,
+      "h": 9
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "stroke": "palette:8",
+      "strokeWidth": 1,
+      "x": 40,
+      "y": 72,
+      "w": 16,
+      "h": 24
+    },
+    {
+      "op": "dither",
+      "x": 42,
+      "y": 74,
+      "w": 12,
+      "h": 20,
+      "colors": [
+        "palette:2",
+        "palette:9"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 46,
+      "y": 80,
+      "w": 4,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 8,
+      "y": 40,
+      "w": 4,
+      "h": 56
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 84,
+      "y": 40,
+      "w": 4,
+      "h": 56
+    }
+  ]
+}

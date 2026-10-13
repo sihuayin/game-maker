@@ -1,0 +1,31 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "ruined-city-scavenger",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "bg-ruined-street",
+      "frame": "bg-ruined-street.sky",
+      "w": 480,
+      "h": 270,
+      "opaque": 129600,
+      "ratio": 1
+    },
+    {
+      "asset": "bg-ruined-street",
+      "frame": "bg-ruined-street.distant-blocks",
+      "w": 480,
+      "h": 270,
+      "opaque": 76566,
+      "ratio": 0.590787037037037
+    },
+    {
+      "asset": "bg-ruined-street",
+      "frame": "bg-ruined-street.wall",
+      "w": 480,
+      "h": 270,
+      "opaque": 105824,
+      "ratio": 0.8165432098765432
+    }
+  ]
+}

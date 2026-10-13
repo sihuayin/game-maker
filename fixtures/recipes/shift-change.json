@@ -39,7 +39,8 @@
             "fps": 12,
             "loop": false
           }
-        ]
+        ],
+        "characterId": "p-scavenger"
       },
       "source": {
         "kind": "drawlist"

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  DEFAULT_PLAYER_MOVE, GameConfigSchema, auditGameConfig, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
+  DEFAULT_PLAYER_MOVE, GameConfigSchema, PLAYER_ACTION_NAMES, Player as PlayerSchema, auditGameConfig, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
   parseAssetPack, type AssetPackManifest, type GameConfig, type ConfigIssue,
 } from "../src/index.js";
 
@@ -145,6 +145,71 @@ describe("引用族（硬失败）", () => {
     const c = base();
     c.entities = c.entities.filter((e) => e.kind !== "pickup");
     expect(errs(c).map((i) => i.message).join()).toMatch(/一个 pickup 都没有/);
+  });
+});
+
+// ── 票 61 · 那一半「清单完全正确也拦不住」的形状 ────────────────────────────────
+//
+// ⚠️ 上面那条「动作名逐个解」**逐格**解引用：三格填**同一个**名字时它一格都不报
+//   （每一格确实解得到）—— 而外壳按三个键**各取一路**播一种动作。⇒ 那是本票补的那个洞
+//   （人裁 Q7(r2) = (b)：配方侧保证三路齐备，**配置侧**保证三格解析到三个不同的动画名）。
+/** 只报在 `player.anims` **本格**上的（不含逐格那几条 `player.anims.<动作>`）。 */
+const animsIssues = (c: unknown) => errs(c).filter((i) => i.where === "player.anims");
+
+describe("票 61 · 三格必须指到三个**不同**的动画", () => {
+  it("阳性：三格互不相同 ⇒ `player.anims` 上一条都不报", () => {
+    expect(animsIssues(base())).toEqual([]);
+  });
+
+  it("阴性：三格**全填同一个** ⇒ **恰好一条** error，且 `where` 是 `player.anims`", () => {
+    const c = base();
+    c.player = { ...c.player, anims: { idle: "idle", run: "idle", jump: "idle" } };
+    const hit = animsIssues(c);
+    expect(hit, "三格全同也只报一条（同一个事实说一遍）").toHaveLength(1);
+    expect(hit[0]!.message).toMatch(/同一个/);
+    // ⚠️ **而逐格那几条照旧一条都不报** —— 三格各自都解得到，本票补的正是这个洞
+    expect(errs(c).filter((i) => i.where.startsWith("player.anims."))).toEqual([]);
+  });
+
+  it("阴性 · 只有**两格**撞在一起 ⇒ 也报，且点名是**哪两格**", () => {
+    const c = base();
+    c.player = { ...c.player, anims: { idle: "idle", run: "run", jump: "idle" } };
+    const hit = animsIssues(c);
+    expect(hit).toHaveLength(1);
+    expect(hit[0]!.message).toContain("`idle` 与 `jump`");
+  });
+
+  it("⚠️ 它**不**在收窄「显式映射」那条自由：三格指**三个不同的、别名叫法**的动画 ⇒ 本格一条不报", () => {
+    // 票 09 裁决 10 说的是「这一路叫什么名字由包自己定」—— 所以「名字必须是 idle/run/jump」
+    // **不是**配置层的要求（那是**配方层**那条闸门的事，票 61 的 Q5/Q6）。
+    const c = base();
+    c.player = { ...c.player, anims: { idle: "stand", run: "sprint", jump: "leap" } };
+    expect(animsIssues(c)).toEqual([]);                       // 本格的对账不开口
+    expect(errs(c).filter((i) => i.where.startsWith("player.anims.")), "逐格照旧解引用")
+      .toHaveLength(3);                                      // 那个包没有这三个名字 —— 该报的是那三条
+  });
+
+  it("⚠️ **不削弱契约**（人裁验收第 5 条）：三格**仍必填、仍封口** —— 本票一个字没放宽", () => {
+    const drop = (k: string) => {
+      const c = base() as unknown as { player: { anims: Record<string, unknown> } };
+      delete c.player.anims[k];
+      return c;
+    };
+    for (const k of ["idle", "run", "jump"]) expect(parseGameConfig(drop(k)).ok, `缺 ${k}`).toBe(false);
+    const extra = base() as unknown as { player: { anims: Record<string, unknown> } };
+    extra.player.anims["walk"] = "walk";
+    expect(parseGameConfig(extra).ok, "多一格").toBe(false);
+    const empty = base() as unknown as { player: { asset: string } };
+    empty.player.asset = "";
+    expect(parseGameConfig(empty).ok, "`player.asset` 仍是非空串").toBe(false);
+  });
+
+  it("⚠️ **那三个词全仓只写一遍**：`PLAYER_ACTION_NAMES` 就是契约的键，且字面上仍是外壳播的那三个", () => {
+    // ⚠️ 这一条是**故意重复**的：外壳（`demo/src/shell/scene.ts`）按定义就播 idle/run/jump，
+    //   而 contracts 够不着它 ⇒ 只有这里那一条字面能把两边钉在一起。
+    expect([...PLAYER_ACTION_NAMES]).toEqual(["idle", "run", "jump"]);
+    // ⚠️ 走 `Player` 而不是顶层那份 —— 顶层带 `superRefine`（是 `ZodEffects`，没有 `.shape`）。
+    expect(Object.keys(PlayerSchema.shape.anims.shape)).toEqual([...PLAYER_ACTION_NAMES]);
   });
 });
 

@@ -1,0 +1,125 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-water-icon",
+  "frame": "hud-water-icon",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:6",
+      "strokeWidth": 1,
+      "x": 3,
+      "y": 4,
+      "w": 10,
+      "h": 10
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "opacity": 0.55,
+      "x": 4,
+      "y": 5,
+      "w": 8,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 4,
+      "y": 7,
+      "w": 8,
+      "h": 6
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 7,
+      "w": 8,
+      "h": 6,
+      "colors": [
+        "palette:0",
+        "palette:6"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "opacity": 0.25,
+      "x": 4,
+      "y": 9,
+      "w": 8,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "opacity": 0.5,
+      "x": 4,
+      "y": 11,
+      "w": 8,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 6,
+      "y": 2,
+      "w": 4,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 7,
+      "y": 1,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "opacity": 0.4,
+      "x": 6,
+      "y": 3,
+      "w": 4,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 4,
+      "y": 12,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 4,
+      "y": 13,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "opacity": 0,
+      "x": 5,
+      "y": 4,
+      "w": 6,
+      "h": 1
+    }
+  ]
+}
