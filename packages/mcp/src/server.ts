@@ -239,6 +239,13 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             result = await packAssets({
               recipePath: String(args.recipePath), outRoot: String(args.outDir ?? "out"),
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              // ⚠️ **生图凭据**（票 66）：`packAssets` 拿不到它，遇到任何 `source.kind:"image"` 的清单
+              //   就**在发出第一发之前**退 2（`ops.ts:1375` 的 `needsImage && !opts.imageTransport`）
+              //   —— 也就是说这个工具对「真生图」那一类清单**彻底不可用**，而真生图正是你会去调它的原因。
+              //   ⚠️ 与 `create_game`（下面那一处）**逐字同形**：同一个 `imageTransportOf()`，
+              //   不新写一份解析、不把它挪进 core（票 66 的 Q1 = (a) 原话：「不抽取 MCP 共用助手，
+              //   不把凭据解析移进 core」）。
+              ...(imageTransportOf() === undefined ? {} : { imageTransport: imageTransportOf()! }),
               onProgress: (done, total, assetId) => tick(done / total, `正在生成 ${assetId}（${done + 1}/${total}）`),
             });
             break;

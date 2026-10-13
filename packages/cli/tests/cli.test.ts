@@ -1,9 +1,10 @@
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
-import { EXIT, exitCodeOfError, CommandError } from "@game-maker/assets";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { EXIT, encodePNG, exitCodeOfError, CommandError } from "@game-maker/assets";
 import { ASSET_PACK_FORMAT } from "@game-maker/contracts";
 import { parseArgs, concurrencyFromFlags, renderHuman, run, type CliIo } from "../src/cli.js";
 
@@ -186,5 +187,102 @@ describe("⚠️ 失败现场：CLI 要把它说给人（票 01）", () => {
     expect(doc.exitCode).toBe(EXIT.upstream);
     expect(doc.failureDir).toMatch(/failed-/);
     expect(doc.ledger, "账也要在（票 46）").toBeDefined();
+  });
+});
+
+describe("⚠️ **判断失败**：壳也要把账与现场说全（票 50）", () => {
+  // 为什么要有这一组（票 48 的 Q2 = B 把它明确延期到这里）：
+  //   上面那一组喂的是**死端口**（撞**上游**），读到的是 `CommandError` 构造时带着的那一份。
+  //   而票 48 让两个壳改成**按能力读**（`ledgerOfError` / `failureDirOfError`）——
+  //   那一条改的是「**挂在裸 `Error` 上**」那一份，也就是 `pack.ts` 判「这张图不能用」时抛的那一份。
+  //   ⇒ **今天没有任何东西看着它**：谁把 `cli.ts` 那行改回 `e instanceof CommandError`，全绿。
+  //
+  // 这一组喂的是**判断失败**：上游**活着**（200 · 一张**完全合法**的 PNG），只是那张图
+  //   **一个不透明像素都没有** ⇒ 撞 `pack.ts` 那条判断 → **裸 `Error`** + 退出码 **1**（不是 3）。
+  //
+  // ⚠️ **为什么要起桩**（票 50 量出来的：那 11 处抛点里只有这一档**非花钱不可达**）：
+  //   要撞上判断失败就得**真发出去一次**（没有那一发就没有账），而 `deps.fetchImpl` 只管**文字**那一路
+  //   —— 生图那一路吃的是 `imageTransport`（baseUrl），只认环境（`resolveImageTransport`）。
+  //   ⇒ 起一个**本地** HTTP 桩，用 `deps.env` 指过去。
+  //   ⚠️ 与上面那组不同：那条不得不**改进程全局**（`withDeadUpstream`），**这一条不必** ——
+  //   `env` 正是票 16 开给壳的那道口子，而它今天就是为了这件事存在的。
+  const D = mkdtempSync(path.join(tmpdir(), "gm-cli-50-"));
+
+  /** 一张**合法**的 16×16 PNG，全透明（`Buffer.alloc` 填 0 ⇒ alpha 也是 0）。 */
+  const TRANSPARENT = encodePNG({ width: 16, height: 16, data: Buffer.alloc(16 * 16 * 4) }).toString("base64");
+
+  let server: ReturnType<typeof createServer>;
+  let port = 0;
+  let hits = 0;
+
+  beforeAll(async () => {
+    // ⚠️ 它**不是**在演「上游坏了」：它 200、给的是**合法** PNG。撞的就是「图能用不能用」这条判断。
+    server = createServer((_req, res) => {
+      hits += 1;
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ data: [{ b64_json: TRANSPARENT }] }));
+    });
+    await new Promise<void>((r) => server.listen(0, "127.0.0.1", () => r()));
+    port = (server.address() as { port: number }).port;
+  });
+  afterAll(async () => { await new Promise<void>((r) => server.close(() => r())); });
+
+  // 一件**必须真生图**的资源（与上面那组的 import/drawlist 不同 —— 那两件都不到生图那一步）。
+  const spec = { kind: "sprite", id: "crate", role: "箱子", description: "一个木箱。",
+    styleId: "style-ref", anchor: { x: 0.5, y: 0.5 }, size: { w: 16, h: 16 }, required: true };
+  writeFileSync(path.join(D, "stylespec.json"),
+    readFileSync(ROOT + ".scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json"));
+  const recipePath = path.join(D, "recipe.json");
+  writeFileSync(recipePath, JSON.stringify({ format: "asset-recipe/v1", id: "cli-50",
+    styleRef: "stylespec.json", assets: [{ spec, source: { kind: "image" } }] }));
+
+  /** 生图上游 → 那个**活着的**桩；文字上游 → 死端口。 */
+  const runStubbed = (argv: string[]) => {
+    const io = capture();
+    return run(argv, io, { env: { ...process.env,
+      GAME_MAKER_IMAGE_PROTOCOL: "openai",
+      GAME_MAKER_IMAGE_BASE_URL: `http://127.0.0.1:${port}/v1`,
+      GAME_MAKER_IMAGE_API_KEY: "k",
+      GAME_MAKER_IMAGE_MODEL: "m",
+      // ⚠️ 死端口**不是凑数**：这条链一处文字调用都不该有 —— 真有的话，这一组会以 **3** 而不是 1 红，
+      //   而那一红正是要看见的（「撞的是判断失败」这条主张当场自己拆穿自己）。
+      ANTHROPIC_BASE_URL: "http://127.0.0.1:9",
+      ANTHROPIC_AUTH_TOKEN: "x" } }).then((code) => ({ code, io }));
+  };
+
+  it("人看的那一份：账与现场都印出来了，而且**退的是 1**", async () => {
+    const before = hits;
+    const { code, io } = await runStubbed(["pack", "--recipe", recipePath, "--out", path.join(D, "out1")]);
+    expect(hits, "桩一次都没被打到 ⇒ 这一条根本没撞上判断失败").toBeGreaterThan(before);
+    // ⚠️ 1 与 3 是这一组的**全部重点**：1 = 判断失败，3 = 上游死。
+    //   印出账与现场**这两种时刻都得印**，所以两条路各要一条判据。
+    expect(code).toBe(EXIT.failure);
+    expect(code).not.toBe(EXIT.upstream);
+    const text = io.errors.join("");
+    expect(text).toMatch(/一个不透明像素都没有/);          // 撞的是那条判断
+    expect(text).toMatch(/已经花掉的/);                     // ← 账
+    expect(text).toMatch(/image crate/);                    // ← 账上**那一笔**（不是「有个账」）
+    expect(text).toMatch(/已经付过钱的那几张原图留着/);       // ← 现场
+    // ⚠️ 现场**真的在盘上**，不是只有一句好话（与上面票 01 那条同一招）。
+    const dir = /原图留着（[^）]*）：(\S+)/.exec(text.replace(/\*\*/g, ""))?.[1];
+    expect(dir, "那一行里没给出路径").toBeDefined();
+    expect(existsSync(dir!)).toBe(true);
+  });
+
+  it("机器看的那一份：`--json` 里 `ledger` 与 `failureDir` 各自都在", async () => {
+    const { code, io } = await runStubbed(["pack", "--recipe", recipePath, "--out", path.join(D, "out2"), "--json"]);
+    expect(code).toBe(EXIT.failure);
+    const doc = JSON.parse(io.lines.join("")) as {
+      exitCode: number; error: string;
+      ledger?: { step: string; target: string; attempts: number; ms?: number }[];
+      failureDir?: string;
+    };
+    expect(doc.exitCode).toBe(EXIT.failure);
+    expect(doc.error).toMatch(/一个不透明像素都没有/);
+    // ⚠️ 钉的是**那一笔的内容**，不是「有个数组」—— 否则一个空账也能过。
+    expect(doc.ledger?.map((c) => [c.step, c.target])).toEqual([["image", "crate"]]);
+    expect(doc.ledger?.[0]?.ms, "那一笔的时长是这次真跑出来的").toBeTypeOf("number");
+    expect(doc.failureDir, "现场指针（票 48 给 MCP 补的就是这一格）").toMatch(/failed-/);
+    expect(existsSync(doc.failureDir!), "指针指过去得真有个地方").toBe(true);
   });
 });
