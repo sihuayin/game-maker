@@ -1478,13 +1478,25 @@ const walk = (dir: string, base = ""): string[] => fs.readdirSync(dir, { withFil
  *   而一个黄昏世界的最暗色占大头可能正是对的。所以这里**只报数**，不打分、不阻断。
  *   ⚠️ 这也是为什么它不该留在 `out/`（gitignore）里当一次性脚本 —— 人眼判
  *   「像不像同一个视觉世界」时，手上多这组数比没有强。
+ *
+ * ⚠️ **票 47 加的那一半：色板外像素**（人裁 2026-10-13）。以前这一处**静默丢掉**它们
+ *   （`if (i >= 0)` 那个 if 没有 else）⇒ 「交付图和色板对不上」这件事**没有任何地方报得出来**。
+ *   ⚠️ 它是**诊断观察**，**不是失败条件、不是阈值、不是验收判据** —— 实测那堆色板外的颜色
+ *   来自 drawlist 里**手写的** `opacity < 1`（半透明混合，`raster.ts` 的 `blend`），
+ *   也就是说**它可以是设计**。⇒ 只报数。
+ *   ⚠️ 它是「交付图里有没有纯黑 / 纯白」唯一可能的观测面（纯黑纯白必然是色板外的，除非色板里就有），
+ *   而票 47 量到的那两条约束今天在交付态成立靠的是**实现副产物**（量化 / 二值 alpha），
+ *   **不是**一条针对它们的契约声明 ⇒ 这条观察就是把那个「没人看着的输入」摆到人眼前。
  */
 function paletteUsage(packDir: string, m: AssetPackManifest) {
   const hex = (r: number, g: number, b: number) =>
     "#" + [r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("");
   const perColor = m.palette.values.map((c) => ({ color: c, pixels: 0, assets: [] as string[] }));
   const atlasCache = new Map<string, ReturnType<typeof decodePNG>>();
-  const perAsset: { id: string; usedColors: number; opacityPixels: number; top: { color: string; share: number }[] }[] = [];
+  const perAsset: { id: string; usedColors: number; opacityPixels: number; offPalettePixels: number; top: { color: string; share: number }[] }[] = [];
+  // 色板外像素（票 47）：逐色计数，只留前几名 —— 它是观察，不是判据，所以**不进任何分母**。
+  const offPalette = new Map<string, number>();
+  let opaqueAll = 0;
 
   for (const a of m.assets) {
     const atlas = m.atlases.find((x) => x.id === a.atlasId);
@@ -1495,6 +1507,7 @@ function paletteUsage(packDir: string, m: AssetPackManifest) {
     if (!img) { img = decodePNG(fs.readFileSync(path.join(packDir, atlas.image))); atlasCache.set(atlas.id, img); }
     const count = new Array(m.palette.values.length).fill(0);
     let opaque = 0;
+    let offAsset = 0;
     for (const f of a.frames) {
       const fr = aj.frames[f.name];
       if (!fr) continue;
@@ -1502,23 +1515,37 @@ function paletteUsage(packDir: string, m: AssetPackManifest) {
         const o = ((fr.frame.y + y) * img.width + fr.frame.x + x) * 4;
         if (img.data[o + 3] === 0) continue;
         opaque++;
-        const i = m.palette.values.indexOf(hex(img.data[o]!, img.data[o + 1]!, img.data[o + 2]!));
+        const c = hex(img.data[o]!, img.data[o + 1]!, img.data[o + 2]!);
+        const i = m.palette.values.indexOf(c);
         if (i >= 0) { count[i]++; perColor[i]!.pixels++; }
+        // ⚠️ 色板外 **只报数**（票 47）：不进 `count`、不进 `perColor`、不进任何分母。
+        else { offAsset++; offPalette.set(c, (offPalette.get(c) ?? 0) + 1); }
       }
     }
+    opaqueAll += opaque;
     const used = count.filter((c) => c > 0).length;
     for (const [i, c] of count.entries()) if (c > 0) perColor[i]!.assets.push(a.id);
     perAsset.push({
-      id: a.id, usedColors: used, opacityPixels: opaque,
+      id: a.id, usedColors: used, opacityPixels: opaque, offPalettePixels: offAsset,
       top: count.map((c, i) => ({ color: m.palette.values[i]!, share: opaque === 0 ? 0 : c / opaque }))
         .sort((x, y) => y.share - x.share).slice(0, 3).filter((x) => x.share > 0),
     });
   }
   const total = perColor.reduce((n, c) => n + c.pixels, 0);
+  const offPalettePixels = opaqueAll - total;
   return {
     perAsset,
     perColor: perColor.map((c) => ({ color: c.color, assets: c.assets.length, share: total === 0 ? 0 : c.pixels / total })),
     totalPixels: total,
+    opaquePixels: opaqueAll,
+    // ⚠️ 观察，不是判据（票 47）—— `share` 的分母是**全部不透明像素**，与 `perColor[].share` 的分母
+    //   （只在色板内的那些）**故意不同** ⇒ 别把两组数放一起比。
+    offPalette: {
+      pixels: offPalettePixels,
+      share: opaqueAll === 0 ? 0 : offPalettePixels / opaqueAll,
+      colors: [...offPalette.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8)
+        .map(([color, pixels]) => ({ color, pixels })),
+    },
   };
 }
 
@@ -1536,7 +1563,10 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
     const anim = a.animations?.length ? ` · 动画 ${a.animations.map((x) => `${x.name}(${x.frames.length})`).join(" ")}` : "";
     const u = byId.get(a.id);
     const uses = u ? ` · 用色 ${u.usedColors}/${m.palette.values.length}` : "";
-    lines.push(`  ${a.id} · ${a.kind} · ${a.size.w}×${a.size.h} · ${a.origin}/${a.paletteBinding} · ${a.frames.length} 帧${anim}${uses}`);
+    // ⚠️ 色板外像素（票 47）：**只在不为 0 时**多挂一截 —— 没有它就是没有，
+    //   不必让每一行都拖着「色板外 0」这个噪声。
+    const offA = u && u.offPalettePixels > 0 ? ` · 色板外 ${u.offPalettePixels}` : "";
+    lines.push(`  ${a.id} · ${a.kind} · ${a.size.w}×${a.size.h} · ${a.origin}/${a.paletteBinding} · ${a.frames.length} 帧${anim}${uses}${offA}`);
   }
   // ⚠️ 这一块是**观察**不是判据（票 39）—— 不打分、不阻断，只是把人眼判「像不像同一个世界」时要看的事实摆出来
   // 每一层背景画得有多满（票 50）—— ⚠️ 这个量**是判据**（层覆盖），但它**判在 QA 那边**
@@ -1550,6 +1580,15 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
   lines.push(`色板 ${m.palette.values.length} 色 · 交付态实际用到的像素分布（**观察，不是判据**）：`);
   for (const c of usage.perColor)
     lines.push(`  ${c.color} · ${c.assets}/${m.assets.length} 个资源用到 · 占全部不透明像素 ${(100 * c.share).toFixed(1)}%`);
+  // ⚠️ 票 47 加的这一行：色板外像素。以前它被**静默丢掉** ⇒ 「交付图与色板对不上」**没有落点**。
+  //   ⚠️ 它是**诊断观察**，**不是失败条件、不是阈值、不是验收判据** —— 实测那些色板外的颜色来自
+  //   drawlist 里手写的 `opacity < 1`（半透明混合）⇒ **它可以是设计**。
+  const off = usage.offPalette;
+  lines.push(
+    `色板外像素 ${off.pixels} 个 · 占全部不透明像素 ${(100 * off.share).toFixed(2)}%` +
+    (off.colors.length > 0 ? ` · 前几色 ${off.colors.map((c) => `${c.color}(${c.pixels})`).join(" ")}` : "") +
+    `（**观察，不是判据** —— 对不上可以是设计）`
+  );
 
   return {
     command: "inspect", summary: lines,
