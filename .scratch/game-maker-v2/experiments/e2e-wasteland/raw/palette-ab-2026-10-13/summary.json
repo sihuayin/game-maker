@@ -1,0 +1,313 @@
+{
+ "format": "票 64 探针 · A/B 两臂 · 逐发读数（不是判据，只是读数）",
+ "when": "2026-10-13T12:47:37.137Z",
+ "upstream": "http://127.0.0.1:15721",
+ "input": {
+  "style": "fixtures/e2e/wasteland-platformer/style.png",
+  "intent": "fixtures/e2e/wasteland-platformer/intent.md"
+ },
+ "design": {
+  "perArm": 6,
+  "order": "交错 A1 B1 A2 B2 …",
+  "wallLimitMs": 900000,
+  "deltaBytes": 445,
+  "changed": [
+   {
+    "where": "tools[0].description",
+    "removed": 161,
+    "added": 541
+   },
+   {
+    "where": "messages[0].text",
+    "removed": 44,
+    "added": 102
+   }
+  ]
+ },
+ "modelsSeen": [
+  "deepseek-flash"
+ ],
+ "stopped": {
+  "wall": false,
+  "upstream": null
+ },
+ "arms": {
+  "A": {
+   "ok": 1,
+   "n": 6,
+   "顶层palette形状": {
+    "array": 5,
+    "object": 1
+   },
+   "style_palette形状": {
+    "array": 6
+   },
+   "两处逐字节相同": 5
+  },
+  "B": {
+   "ok": 4,
+   "n": 6,
+   "顶层palette形状": {
+    "object": 6
+   },
+   "style_palette形状": {
+    "array": 6
+   },
+   "两处逐字节相同": 0
+  }
+ },
+ "shots": [
+  {
+   "id": "A1",
+   "arm": "A",
+   "round": 1,
+   "at": "2026-10-13T12:45:20.091Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 230,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1641,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "两处逐字节相同": true,
+   "过schema": false,
+   "detail": "palette: Invalid input: expected object, received array"
+  },
+  {
+   "id": "B1",
+   "arm": "B",
+   "round": 1,
+   "at": "2026-10-13T12:45:31.279Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 2248,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 256,
+    "output_tokens": 1827,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": true,
+   "detail": ""
+  },
+  {
+   "id": "A2",
+   "arm": "A",
+   "round": 2,
+   "at": "2026-10-13T12:45:43.199Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 230,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1484,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": true,
+   "detail": ""
+  },
+  {
+   "id": "B2",
+   "arm": "B",
+   "round": 2,
+   "at": "2026-10-13T12:45:53.048Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 200,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2304,
+    "output_tokens": 1517,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": true,
+   "detail": ""
+  },
+  {
+   "id": "A3",
+   "arm": "A",
+   "round": 3,
+   "at": "2026-10-13T12:46:03.243Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 230,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1745,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "两处逐字节相同": true,
+   "过schema": false,
+   "detail": "palette: Invalid input: expected object, received array"
+  },
+  {
+   "id": "B3",
+   "arm": "B",
+   "round": 3,
+   "at": "2026-10-13T12:46:14.558Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 200,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2304,
+    "output_tokens": 1726,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": false,
+   "detail": "format: Invalid input: expected \"visual-world/v1\"；styleIdentity: Invalid input: expected object, received undefined"
+  },
+  {
+   "id": "A4",
+   "arm": "A",
+   "round": 4,
+   "at": "2026-10-13T12:46:27.037Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 230,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1780,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "两处逐字节相同": true,
+   "过schema": false,
+   "detail": "palette: Invalid input: expected object, received array"
+  },
+  {
+   "id": "B4",
+   "arm": "B",
+   "round": 4,
+   "at": "2026-10-13T12:46:38.880Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 200,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2304,
+    "output_tokens": 1713,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": false,
+   "detail": "format: Invalid input: expected \"visual-world/v1\"；styleIdentity: Invalid input: expected object, received undefined"
+  },
+  {
+   "id": "A5",
+   "arm": "A",
+   "round": 5,
+   "at": "2026-10-13T12:46:51.015Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 230,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1761,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "两处逐字节相同": true,
+   "过schema": false,
+   "detail": "palette: Invalid input: expected object, received array"
+  },
+  {
+   "id": "B5",
+   "arm": "B",
+   "round": 5,
+   "at": "2026-10-13T12:47:02.723Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 200,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2304,
+    "output_tokens": 1725,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": true,
+   "detail": ""
+  },
+  {
+   "id": "A6",
+   "arm": "A",
+   "round": 6,
+   "at": "2026-10-13T12:47:14.508Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 230,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2048,
+    "output_tokens": 1776,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "array",
+   "style_palette": "array",
+   "两处逐字节相同": true,
+   "过schema": false,
+   "detail": "palette: Invalid input: expected object, received array"
+  },
+  {
+   "id": "B6",
+   "arm": "B",
+   "round": 6,
+   "at": "2026-10-13T12:47:27.200Z",
+   "model": "deepseek-flash",
+   "stopReason": "tool_use",
+   "usage": {
+    "input_tokens": 200,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2304,
+    "output_tokens": 1615,
+    "service_tier": "standard"
+   },
+   "toolUse": true,
+   "顶层palette": "object",
+   "style_palette": "array",
+   "两处逐字节相同": false,
+   "过schema": true,
+   "detail": ""
+  }
+ ]
+}

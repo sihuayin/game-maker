@@ -202,9 +202,15 @@ VisualWorldSpec
 
 ⚠️ **2026-10-03（[票 08](../../.scratch/game-maker-v2/issues/08-vision-analyze-reference.md) 的 R1-Q1）：
 输入**不止**参考图，还要一份**原始需求文本**。**
-`palette` 是[[绘制词汇]]、**不是画面分布的摘要** —— 它的判据是「画不画得出这个世界里的东西」，
+**`style.palette`** 是[[绘制词汇]]、**不是画面分布的摘要** —— 它的判据是「画不画得出这个世界里的东西」，
 而**要画的东西有一部分压根不在参考图里**（`fixtures/reference/halt-dusk.png` 的 provenance 白纸黑字：
 它「故意不包含牛/拖拉机/谷仓」，而 Destination 验收第 2 条要考的正是这个）。
+⚠️ **2026-10-13 补限定**（[票 64](../../.scratch/game-maker-v2/issues/64-palette-two-shapes-same-name.md)）：
+这一句上面写的是**色值数组**那一格（`VisualWorldSpec` 里嵌着的 `style.palette`）。
+⚠️ **同一份 spec 的顶层还有一个同名的 `palette`**，形状完全不同（六个**桶** primary/secondary/accent/
+background/shadow/highlight，桶里装的是 `palette:<下标>` **引用**）—— 两者**不是同一个东西**。
+⇒ 「`palette` 是绘制词汇」这句话**只对 `style.palette` 成立**；冠名不写清，读的人会以为说的是顶层那一格
+（模型就是这么错的：把整个色值数组搬到了顶层 `palette` 上）。
 ⇒ 喂的是**原始需求文本**、**不是** `GameIntentSpec` 的产物 —— 于是 vision 与 intent 两步**并列**，
 `GameIntentSpec` 之后才轮到它。见 `00-overview.md` §3 / §6。
 

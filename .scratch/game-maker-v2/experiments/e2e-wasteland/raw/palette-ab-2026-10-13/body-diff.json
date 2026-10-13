@@ -1,0 +1,15 @@
+{
+ "changed": [
+  {
+   "where": "tools[0].description",
+   "removed": 161,
+   "added": 541
+  },
+  {
+   "where": "messages[0].text",
+   "removed": 44,
+   "added": 102
+  }
+ ],
+ "deltaBytes": 445
+}
