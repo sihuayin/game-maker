@@ -1,0 +1,224 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "Flat Pixel Side-Scroller",
+    "keywords": [
+      "像素",
+      "扁平",
+      "硬边",
+      "无描边",
+      "方正剪影",
+      "大色块",
+      "正交侧面"
+    ],
+    "description": "极简扁平像素风格的横版侧面世界：所有形状由正交矩形与三角构成，无渐变、无描边、无抗锯齿；物件以实心色块表达体积，阴影仅靠同色系深浅色阶区分；背景分层为远景色带，前景为深色地面带。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "正交",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "无视差的纯侧面视角，深度完全靠分层色带而非透视表达"
+  },
+  "composition": {
+    "foreground": "底部为灰色站台带与深棕深灰的水平轨道条带",
+    "midground": "棕褐色建筑立面横贯全幅，矩形窗、招牌、壁挂物沿同一水平线排列",
+    "background": "上部为深色天空色带与中层土黄色横条远景，构成两层水平色带",
+    "objectScale": "建筑与轨道尺度远大于角色，窗户大于角色身体",
+    "characterScale": "角色高度约占画面高度的三分之一，站在中前景地面带上",
+    "density": "低密度，元素间距均匀，留出大面积纯色墙面"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1",
+      "palette:2"
+    ],
+    "secondary": [
+      "palette:4",
+      "palette:5",
+      "palette:11"
+    ],
+    "accent": [
+      "palette:6",
+      "palette:7",
+      "palette:8"
+    ],
+    "background": [
+      "palette:10",
+      "palette:3"
+    ],
+    "shadow": [
+      "palette:9",
+      "palette:12"
+    ],
+    "highlight": [
+      "palette:7",
+      "palette:13"
+    ]
+  },
+  "lighting": {
+    "direction": "无明确光源，靠色阶明暗区分受光面与背光面",
+    "softness": "硬边，无渐变过渡、无光晕",
+    "contrast": "中低对比，同色系相邻色阶之间的微弱跳跃",
+    "mood": "黄昏后、沉闷、安静的废土感"
+  },
+  "materials": {
+    "sky_mat": {
+      "appearance": "深色平滑天空，无云无纹理",
+      "texture": "纯平色块",
+      "color": [
+        "palette:10"
+      ]
+    },
+    "wall_mat": {
+      "appearance": "棕褐色墙面/墙体，微暗的哑光漆面",
+      "texture": "纯平色块，偶有更深色矩形凹陷",
+      "color": [
+        "palette:0",
+        "palette:1"
+      ]
+    },
+    "trim_mat": {
+      "appearance": "土黄色横条装饰与边框，代表屋顶檐口与建筑横带",
+      "texture": "纯平色块",
+      "color": [
+        "palette:2",
+        "palette:9"
+      ]
+    },
+    "metal_mat": {
+      "appearance": "深灰蓝的金属箱体、机械外壳与箱身部件",
+      "texture": "纯平色块，边缘直角",
+      "color": [
+        "palette:11",
+        "palette:3"
+      ]
+    },
+    "screen_mat": {
+      "appearance": "亮金色发光面/招牌/宝箱表面，是世界中唯一的暖亮点",
+      "texture": "纯平色块，无高光渐变",
+      "color": [
+        "palette:6",
+        "palette:7",
+        "palette:8"
+      ]
+    },
+    "ground_mat": {
+      "appearance": "灰蓝色地面带与深棕深灰轨道条带",
+      "texture": "水平重复的短矩形块，形成枕木节奏",
+      "color": [
+        "palette:4",
+        "palette:5",
+        "palette:12"
+      ]
+    },
+    "glow_mat": {
+      "appearance": "暖白色高亮，用于箱体高光与零星亮点",
+      "texture": "小面积纯平色块",
+      "color": [
+        "palette:13"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "头大身短，约三头身，站姿高度约为一个建筑窗格",
+    "silhouette": "方正短粗的像素小人，帽子与身体同宽，短腿短臂，剪影几乎全由矩形构成",
+    "poseLanguage": "直立站立，双臂贴身，动作仅靠整体水平位移与整体上跳表达",
+    "clothing": "深蓝制服外套、深色裤子、深色帽檐与帽顶、亮色帽徽与胸前小方块",
+    "faceAbstraction": "面部为白色矩形面板加两个黑色方形眼孔，无五官细节"
+  },
+  "environment": {
+    "architecture": "平顶与三角坡顶的简易砖混建筑立面，矩形窗户，横向檐口线条",
+    "terrain": "水平色带构成的地面：灰色站台带、深色轨道带、深棕枕木条",
+    "props": "木质长凳、壁挂金属箱、矩形招牌、立式细杆路灯、悬挂小灯",
+    "textureDensity": "极低，无噪点，仅在轨道与枕木处出现重复短矩形"
+  },
+  "shapeLanguage": [
+    "正交矩形为基本单位",
+    "三角形坡屋顶是唯一的斜边形状",
+    "同一元素的重复排列形成节奏（窗、枕木、小方块）",
+    "形状不旋转、不透视、不叠半透明",
+    "边缘完全硬直，无抗锯齿与圆角"
+  ],
+  "constraints": [
+    "色板中的每个色都必须来自参考图实际存在的像素，不得引入未出现的新色相（尤其是高饱和绿、紫、荧光色）",
+    "所有图形使用直角与整数像素对齐，禁止渐变、描边、抗锯齿与半透明叠加",
+    "明暗仅用同色系深浅色阶表达，不使用投影滤镜或模糊",
+    "背景一律用水平分层的纯色色带表示，禁止透视网格与地平线透视",
+    "角色必须保持正面直立、三头身、纯矩形剪影的一致形象",
+    "金色与暖高亮色仅用于可交互物、发光面与奖励物，使其在任何背景色带上都能被一眼识别",
+    "轨道与地面靠重复短矩形构成，不使用连续曲线纹理",
+    "同一场景中所有物件共享同一水平基准线，禁止任意倾斜"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "极简扁平像素风",
+      "横版侧面正交视图",
+      "大色块硬边构成",
+      "两层或三层水平色带背景",
+      "无渐变无描边",
+      "低密度构图"
+    ],
+    "camera": {
+      "mode": "正交侧面",
+      "angle": 0,
+      "note": "深度以分层色带表达，不做透视缩放"
+    },
+    "composition": {
+      "layout": "上天空、中建筑、下地面轨道三层水平分割",
+      "anchoring": "所有物件贴同一水平基准线",
+      "negativeSpace": "大面积纯色墙面留白"
+    },
+    "palette": [
+      "#6b4a2a",
+      "#7d5730",
+      "#d9a86a",
+      "#3f4a5a",
+      "#8f8f96",
+      "#5c5c63",
+      "#e0a83c",
+      "#f2c85c",
+      "#f7e08a",
+      "#8a5a2e",
+      "#2b2f38",
+      "#2f3a4e",
+      "#4a3520",
+      "#e8e4d8"
+    ],
+    "lighting": {
+      "type": "无光源平面着色",
+      "shadeMethod": "色阶替换"
+    },
+    "shapeLanguage": [],
+    "material": [
+      "哑光漆面墙",
+      "铸铁深色金属",
+      "暖金发光涂层",
+      "石质地面"
+    ],
+    "environment": [
+      "废弃城市建筑立面",
+      "站台与轨道",
+      "极简街道道具"
+    ],
+    "characterStyle": [
+      "像素三头身",
+      "矩形剪影",
+      "白面方眼"
+    ],
+    "constraints": [
+      "禁止渐变模糊",
+      "禁止透视",
+      "禁止色相外扩",
+      "万物直角对齐"
+    ],
+    "confidence": 0.9
+  }
+}
