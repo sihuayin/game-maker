@@ -114,6 +114,36 @@ describe("`parseToolUse` 的其余四档", () => {
   });
 });
 
+describe("§两个分支都回 `raw`（票 55 的 Q1）—— 存证据的调用方存的永远是**模型写下的那几个字节**", () => {
+  it("成功那一支：`value` 是解析后的值，而 `raw` 是**原样**那一份（今天两者同内容，将来未必）", () => {
+    const r = parseToolUse(body([toolBlock(GOOD)]), "emit_spec", Spec);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.value).toEqual(GOOD);
+      expect(r.raw).toEqual(GOOD);
+    }
+  });
+
+  it("⚠️ 失败那一支**照样回** —— 那正是被拒时唯一读得到的原话（`schema`）", () => {
+    const junk = { schemaVersion: "1" };
+    const r = parseToolUse(body([toolBlock(junk)]), "emit_spec", Spec);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.raw).toEqual(junk);
+  });
+
+  it("⚠️ `empty-input`：`raw` 是模型写的那个 `{}`（**不伪造成缺席**）；`no-tool-use` 才是真的没有 ⇒ 缺席", () => {
+    const empty = parseToolUse(body([toolBlock({})]), "emit_spec", Spec);
+    expect(empty.ok).toBe(false);
+    // ⚠️ 票 27 那一发：`stop_reason` 也对、块也在，而入参是 `{}` —— 这几个字节本身就是证据
+    if (!empty.ok) expect(empty.raw).toEqual({});
+
+    const missing = parseToolUse(body([{ type: "text", text: "抱歉" }], "end_turn"), "emit_spec", Spec);
+    expect(missing.ok).toBe(false);
+    // ⚠️ **键不出现**，而不是「键在、值是 undefined」—— 缺席就是缺席
+    if (!missing.ok) expect("raw" in missing).toBe(false);
+  });
+});
+
 describe("`toolInputSchema`：Zod → tool 的 `input_schema`", () => {
   it("产出**真 Anthropic 的 `strict` 要的形状**：每个对象都 `additionalProperties: false`", () => {
     const js = toolInputSchema(Spec);

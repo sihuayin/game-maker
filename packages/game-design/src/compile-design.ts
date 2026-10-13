@@ -16,10 +16,12 @@
 //   （账照记、`failures[]` 不留痕），只是这份设计**做不出来**。所以调用方**不重采样** ——
 //   重抽同一份意图，抽一百次也还是做不出来。
 import {
+  carryOnError, DESIGN_ATTEMPTS_FORMAT,
   GameDesignSpecSchema, GameIntentSpecSchema, PLATFORMER_V1, STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS,
   VisualWorldSpecSchema, forcedTool, parseToolUse, resolveRuntimeProfile, runtimeProfileRef,
-  type CallFailure, type GameDesignSpec, type GameIntentSpec, type LedgerCall, type LedgerStep,
-  type LedgerUsage, type RuntimeProfile, type RuntimeProfileRef, type VisualWorldSpec,
+  type CallFailure, type DesignAttempt, type DesignAttempts,
+  type GameDesignSpec, type GameIntentSpec, type LedgerCall, type LedgerStep,
+  type LedgerUsage, type RuntimeProfile, type RuntimeProfileRef, type ToolUseFailure, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildDesign, type Rejection } from "./build-design.js";
 import { DESIGN_TOOL_DESCRIPTION, DESIGN_TOOL_NAME, designPrompt } from "./prompts.js";
@@ -97,10 +99,14 @@ function spentCall(step: LedgerStep, target: string) {
   };
 }
 
+/** ⚠️ 后两支多带一枚 `raw`（票 55）：**模型自己写下的那份入参**，原样。
+ *  它不参与任何判断，只为了**活过失败**（挂到异常上 ⇒ 现场里的 `design-attempts.json`）。
+ *  ⚠️ `bad` 的 `failure` 收成 `ToolUseFailure`（四个值 ⟺ `DESIGN_ATTEMPT_OUTCOMES` 的前四个），
+ *  于是「这一发是什么下场」不需要一次转型。 */
 type Trip =
   | { kind: "ok"; spec: GameDesignSpec; spent: Spent }
-  | { kind: "bad"; failure: CallFailure; detail: string; spent: Spent }
-  | { kind: "rejected"; rejections: Rejection[]; detail: string; spent: Spent }
+  | { kind: "bad"; failure: ToolUseFailure; detail: string; spent: Spent; raw?: unknown }
+  | { kind: "rejected"; rejections: Rejection[]; detail: string; spent: Spent; raw: unknown }
   | { kind: "upstream"; failure: Extract<CallFailure, "http" | "timeout">; detail: string };
 
 function spentOf(body: unknown): Spent {
@@ -187,13 +193,36 @@ async function onceThrough(o: {
   const spent = spentOf(body);
   // ⚠️ **唯一算数的判据**：入参过 Zod。`stop_reason === "tool_use"` **不是**成功信号。
   const parsed = parseToolUse(body, DESIGN_TOOL_NAME, GameDesignSpecSchema);
-  if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
+  if (!parsed.ok)
+    return {
+      kind: "bad", failure: parsed.failure, detail: parsed.detail, spent,
+      // ⚠️ 票 55：**模型写下的那一份跟着走** —— 哪怕它不过契约（那一份原话正是被拒时唯一读得到的）。
+      ...(parsed.raw === undefined ? {} : { raw: parsed.raw }),
+    };
 
   // 注入三个照抄值 → 过契约（gate 在这里响）→ 跑 R12 的拒绝。
   const built = buildDesign({ fromModel: parsed.value, intent: o.intent, vws: o.vws, profile: o.profile });
   if (built.ok) return { kind: "ok", spec: built.spec, spent };
-  if (built.kind === "schema") return { kind: "bad", failure: "schema", detail: `装配后不过契约：${built.detail}`, spent };
-  return { kind: "rejected", rejections: built.rejections, detail: built.detail, spent };
+  if (built.kind === "schema")
+    return { kind: "bad", failure: "schema", detail: `装配后不过契约：${built.detail}`, spent, raw: parsed.raw };
+  return { kind: "rejected", rejections: built.rejections, detail: built.detail, spent, raw: parsed.raw };
+}
+
+/**
+ * 这一圈的入参**要不要带走**、带走什么（票 55 的 Q5）。
+ *
+ * ⚠️ **判据不是「抛的是哪个类」**：`http` / `timeout` 抛在**第 2 发**时，第 1 发那份入参
+ *   就在手上 —— 按错误类分流（「只有 R12 那一档才写」）会把它**连同现场一起丢掉**。
+ *   判据是**这一圈有没有拿到过模型入参**：拿到过就带，一个都没拿到就什么都不带
+ *   （`carryOnError` 的空场合 ⇒ 连键都不加，也就不会有「写一个什么都没有的容器」那一档）。
+ * ⚠️ 「拿到过」= **至少一发有 `raw`**，而且是**按字节**算的：模型真写了一个 `{}` 也算拿到过
+ *   （那是票 27 实测的那个形状，最值钱的一条证据）。真正「一个都没有」的只有 `no-tool-use`
+ *   —— 那一档连块都不在，压根没有入参可言。
+ */
+function carriedAttempts(attempts: DesignAttempt[]): { designAttempts?: DesignAttempts } {
+  return attempts.some((a) => a.raw !== undefined)
+    ? { designAttempts: { format: DESIGN_ATTEMPTS_FORMAT, attempts } }
+    : {};
 }
 
 /**
@@ -231,6 +260,17 @@ export async function compileDesign(input: CompileDesignInput): Promise<CompileD
   });
 
   const call = spentCall("compile-design", LEDGER_TARGET);
+  // ⚠️ **票 55**：这一圈里模型写下的入参 —— 只有它会被带到失败现场去。
+  //   ⚠️ **「重采样之后成功」那一跑留不下来**，这是**有意的取舍**（票 55 的第一轮推论，写在明处）：
+  //   只有**抛出来**才有写入点（阴性判据要求「成功路径一个字节不变」），而成功的那一跑本来就走过去了。
+  const attempts: DesignAttempt[] = [];
+  /** 挂上这一圈再抛 —— **抛点只有这一个**，免得三处各写一遍挂载（`carryOnError` 没东西可带时是空操作）。
+   *  ⚠️ 写成**函数声明**（不是 `const` 箭头）：只有这种形状，TS 才认它「永不返回」
+   *  ⇒ 上面那三个 `if` 之后的收窄与「函数有终」才成立。 */
+  function raise(e: unknown): never {
+    carryOnError(e, carriedAttempts(attempts));
+    throw e;
+  }
   let lastFailure: CallFailure = "schema";
   let lastDetail = "";
   for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++) {
@@ -239,36 +279,43 @@ export async function compileDesign(input: CompileDesignInput): Promise<CompileD
       intent, vws, profile,
     });
     if (once.kind === "upstream") {
+      // ⚠️ **上游失败不记进 `attempts`**：它发生在取到 body 之前，压根没有模型入参
+      //   （`DESIGN_ATTEMPT_OUTCOMES` 里没有它那一格）—— 它在**账**的 `failures[]` 里。
       call.trip({ failure: once.failure });
       const ledger = call.record();
-      throw new CompileDesignError(once.failure, once.detail, ledger ? [ledger] : undefined);
+      raise(new CompileDesignError(once.failure, once.detail, ledger ? [ledger] : undefined));
     }
     if (once.kind === "rejected") {
+      attempts.push({ attempt, outcome: "rejected", detail: once.detail, rejections: once.rejections, raw: once.raw });
       // ⚠️ **这一发成功了**：`trip` 只带 `spent`，**不带 failure** —— 账上因此没有失败痕迹。
       call.trip({ spent: once.spent });
       const ledger = call.record();
-      throw new DesignRejectedError(
+      raise(new DesignRejectedError(
         once.rejections,
         `这份设计做不出来（R12）。${once.rejections.length} 条理由：\n` +
           once.rejections.map((r) => `  · [${r.reason}] ${r.detail}`).join("\n"),
         ledger ? [ledger] : undefined,
-      );
+      ));
     }
     if (once.kind === "ok") {
       call.trip({ spent: once.spent });
       const ledger = call.record();
       return { spec: once.spec, ...(ledger ? { ledger: [ledger] } : {}) };
     }
+    attempts.push({
+      attempt, outcome: once.failure, detail: once.detail,
+      ...(once.raw === undefined ? {} : { raw: once.raw }),
+    });
     call.trip({ failure: once.failure, spent: once.spent });
     lastFailure = once.failure;
     lastDetail = once.detail;
   }
 
   const ledger = call.record();
-  throw new CompileDesignError(
+  raise(new CompileDesignError(
     lastFailure,
     `重采样 ${STRUCTURED_CALL_ATTEMPTS} 次都没有拿到一份过契约的 GameDesignSpec（最后一次：${lastFailure}）。` +
     `最后一次的病因：${lastDetail}`,
     ledger ? [ledger] : undefined,
-  );
+  ));
 }

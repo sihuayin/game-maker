@@ -15,7 +15,7 @@
 //     **身上有没有这个字段**，不是 `instanceof CommandError` —— 因为 `carryOnError`
 //     挂上去的异常**不是** `CommandError`，用 `instanceof` 读就等于对它们集体失明。
 import { describe, expect, it } from "vitest";
-import { carryOnError, CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError } from "../src/command.js";
+import { carryOnError, CommandError, designAttemptsOfError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError } from "../src/command.js";
 import type { LedgerCall } from "../src/ledger.js";
 
 const call = (target: string): LedgerCall => ({ step: "image", target, attempts: 1 });
@@ -102,5 +102,45 @@ describe("§只加不改 —— 下层挂的更接近现场", () => {
     expect(failureDirOfError(e)).toBe("pack/v3/failed-真现场");
     // ⚠️ 「只加不改」是**逐键**的：被让位的那一项不许连累**另一项**一起丢。
     expect(ledgerOfError(e)).toHaveLength(1);
+  });
+});
+
+// ── 票 55 加进来的**第三项** ────────────────────────────────────────────────
+describe("§第三个读者：被拒的设计那几发原始入参（票 55）", () => {
+  const attempts = {
+    format: "run-design-attempts/v1" as const,
+    attempts: [{ attempt: 1, outcome: "rejected" as const, detail: "做不出来", raw: { format: "game-design/v1" } }],
+  };
+
+  it("挂得上去、读得回来 —— 而它**与另两项各自独立**（只有它时不发明账、也不发明现场）", () => {
+    const e = new Error("这份设计做不出来（R12）");
+    carryOnError(e, { designAttempts: attempts });
+    expect(designAttemptsOfError(e)?.attempts[0]!.outcome).toBe("rejected");
+    expect(ledgerOfError(e)).toBeUndefined();
+    expect("ledger" in e).toBe(false);
+    expect(failureDirOfError(e)).toBeUndefined();
+    expect("failureDir" in e).toBe(false);
+  });
+
+  it("读的那一侧**按能力、不按类**：不是 `CommandError` 也读得动（挂上去的本来就不是它）", () => {
+    const e = new Error("裸的");
+    carryOnError(e, { designAttempts: attempts });
+    expect(e).not.toBeInstanceOf(CommandError);
+    expect(designAttemptsOfError(e)).toBeDefined();
+    // ⚠️ 挂在 `CommandError` 上的也读得动 —— 判据是**身上有没有**那一格，不是它的类
+    const cmd = new CommandError("invalid", "被拒");
+    carryOnError(cmd, { designAttempts: attempts });
+    expect(designAttemptsOfError(cmd)).toBeDefined();
+    expect(exitCodeOfError(cmd)).toBe(EXIT.invalid);
+  });
+
+  it("只做**类型闸**：形状不对的（不是对象 / 没有数组 `attempts`）当作「没读到」，而不是把垃圾带出去", () => {
+    const junk: unknown[] = ["不是对象", null, 42, {}, { attempts: "不是数组" }];
+    for (const v of junk) {
+      const e = new Error("x");
+      carryOnError(e, { designAttempts: v as never });
+      expect(designAttemptsOfError(e), JSON.stringify(v)).toBeUndefined();
+    }
+    expect(designAttemptsOfError(undefined)).toBeUndefined();
   });
 });

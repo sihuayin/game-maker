@@ -8,6 +8,7 @@
 //
 // ⚠️ 它是**纯形状 + 两个小工具**，不含任何业务：退出码语义、失败的载体。
 import type { LedgerCall } from "./ledger.js";
+import type { DesignAttempts } from "./design-attempts.js";
 export type CommandResult = {
   command: string;
   /** 人类可读的几行。CLI 直接打印，MCP 放进 content。 */
@@ -96,8 +97,13 @@ export const exitCodeOfError = (e: unknown): number => (e instanceof CommandErro
  *   （全 `import` / 全 drawlist 的包一分钱没花），按行号贴类标签会在那些行上**说谎**。
  *   ⇒ 于是**不重包成 `CommandError`**（那会**丢栈**，而丢栈正是票 46 §5 唯一的反对理由），
  *   改成**挂在原异常上、原样抛出** ⇒ 栈、错误类、`cause` 链**一样不丢**。
+ *
+ * ⚠️ **2026-10-13（[票 55](../../../.scratch/game-maker-v2/issues/55-rejected-design-not-persisted.md)）加了第三项**：
+ *   `designAttempts` —— `compile-design` 那一圈里模型写下的入参（被拒的设计**一个字都不落盘**那条）。
+ *   加在一个**已有**的载体上、而不是给两个 error 类各加一个构造参数（票 55 的 Q7）：三条边界从这里
+ *   原样继承，不必在另一个文件里**重新发明一遍**。
  */
-export type Carried = { ledger?: LedgerCall[]; failureDir?: string };
+export type Carried = { ledger?: LedgerCall[]; failureDir?: string; designAttempts?: DesignAttempts };
 
 /**
  * **把 `carried` 挂到异常上**（票 48 的 Q2 = A）。
@@ -129,4 +135,18 @@ export const ledgerOfError = (e: unknown): LedgerCall[] | undefined => {
 export const failureDirOfError = (e: unknown): string | undefined => {
   const v = (e as Carried | null | undefined)?.failureDir;
   return typeof v === "string" ? v : undefined;
+};
+
+/**
+ * 异常上带的那一圈设计入参（票 55）。
+ *
+ * ⚠️ **只做类型闸、不在这里重验 schema**：写的那一头是 `compile-design`，而「写得对不对」
+ *   由 `create-game.test.ts` 那一对判据盯着（阳性要它**读得回来**、阴性要成功路径**一个字节不变**）。
+ *   在这里再验一遍，只会把「形状漂了」从**一条会红的判据**变成一次**静默的丢弃** ——
+ *   而丢掉一份证据，恰恰是本票要消灭的那件事。
+ * ⚠️ 与另两项**各自独立**：只有它时不发明账、也不发明现场。
+ */
+export const designAttemptsOfError = (e: unknown): DesignAttempts | undefined => {
+  const v = (e as Carried | null | undefined)?.designAttempts;
+  return v !== null && typeof v === "object" && Array.isArray(v.attempts) ? v : undefined;
 };

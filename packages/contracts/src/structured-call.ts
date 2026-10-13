@@ -94,12 +94,24 @@ const describe = (u: unknown): string =>
 /** `parseToolUse` 只能产出这几种 —— 另三种（http / timeout / invalid-json）发生在**取 body 之前**。 */
 export type ToolUseFailure = Extract<CallFailure, "truncated" | "no-tool-use" | "empty-input" | "schema">;
 
+/**
+ * ⚠️ **两个分支都交回 `raw`**（票 55 的 Q1）—— 模型**自己写下的**那一枚 `input`，原样。
+ *
+ * ⚠️ **为什么 `ok: true` 那一支也要它**（那里 `value` 看起来就够了）：今天 `value === raw`
+ *   （V2 那几份契约**不做任何改写**：`.default(` / `.transform(` / `.catch(` / `.pipe(` 的命中数是 0）。
+ *   **但那不是契约**。将来谁加一个 `.default()`，只回 `value` 的那条路就会让「同一份容器里
+ *   两种口径」（被拒那一发存原话、成功那一发存改写过的值）**且看不出来**
+ *   ⇒ 一条规矩：**要留证据的调用方，存的永远是模型写下的那几个字节。**
+ *
+ * ⚠️ **`raw` 缺席 ⟺ 没有那个 `tool_use` 块**（`input` 是 `undefined` 时键不出现）——
+ *   不伪造成 `{}`（见 `design-attempts.ts` 的 `raw` 那一格）。
+ */
 export type ToolUseOutcome<T> =
-  | { ok: true; value: T }
-  | { ok: false; failure: ToolUseFailure; detail: string };
+  | { ok: true; value: T; raw: unknown }
+  | { ok: false; failure: ToolUseFailure; detail: string; raw?: unknown };
 
-const fail = (failure: ToolUseFailure, detail: string): { ok: false; failure: ToolUseFailure; detail: string } =>
-  ({ ok: false, failure, detail });
+const fail = (failure: ToolUseFailure, detail: string, raw?: unknown): { ok: false; failure: ToolUseFailure; detail: string; raw?: unknown } =>
+  ({ ok: false, failure, detail, ...(raw === undefined ? {} : { raw }) });
 
 /**
  * 从一次 `/v1/messages` 的**已解析 body** 里取出工具入参，**并验证它**。
@@ -132,13 +144,13 @@ export function parseToolUse<T>(body: unknown, toolName: string, schema: Structu
 
   if (isRecord(input) && Object.keys(input).length > 0) {
     const r = schema.safeParse(input);
-    if (r.success) return { ok: true, value: r.data };        // ← 唯一算数的判据
+    if (r.success) return { ok: true, value: r.data, raw: input };   // ← 唯一算数的判据
     return fail(truncated ? "truncated" : "schema",
-      why(`工具入参不过契约：${formatIssues(r.error).slice(0, 4).join("；")}`));
+      why(`工具入参不过契约：${formatIssues(r.error).slice(0, 4).join("；")}`), input);
   }
 
   if (truncated)
-    return fail("truncated", "输出撞上了 max_tokens 被截断，而且没留下可用的入参（加大 max_tokens 再来）");
+    return fail("truncated", "输出撞上了 max_tokens 被截断，而且没留下可用的入参（加大 max_tokens 再来）", input);
 
   if (block === undefined) {
     const seen = blocks.map((b) => (isRecord(b) ? String(b["type"]) : describe(b))).join(", ") || "（空）";
@@ -152,7 +164,7 @@ export function parseToolUse<T>(body: unknown, toolName: string, schema: Structu
   //   上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。
   return fail("empty-input",
     `工具被调了，但入参是空的或用不了（拿到 ${describe(input)}）—— ⚠️ 票 27 第 1 发实测过这一档：` +
-    "上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。");
+    "上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。", input);
 }
 
 // ── schema → tool 的 `input_schema` ──────────────────────────────────────────

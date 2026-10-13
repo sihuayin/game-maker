@@ -15,7 +15,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  carryOnError, CommandError, formatIssues, parseAssetPack, parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
+  carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, parseAssetPack,
+  parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
   RUN_LEDGER_FORMAT, summarizeCalls,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
   type GameIntentSpec, type LedgerCall, type MasterRatio, type QAReport, type QaRunner, type RunLedger,
@@ -330,6 +331,16 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
       ledger,
     };
   } catch (e) {
+    // ⚠️ **被拒的设计也要留现场**（票 55「被拒的设计一个字都不落盘」）：`compile-design` 那一圈
+    //   每一发**模型自己写下的入参**挂在异常上带到这儿，先落进暂存目录 —— 再靠下面那次 `rename`
+    //   跟着进失败现场。⚠️ **位置有讲究**：必须在 `abandonRun` **之前**（那一刻它还在 `run.tmpDir` 里），
+    //   而**成功路径结构性碰不到它**（不抛就没有那一份东西 ⇒ 阴性判据是**结构性**成立，不是靠测试守出来的）。
+    //   ⚠️ **best-effort**：写盘失败就吞掉 —— 诊断产物**不许**把诊断对象弄丢（同 `carryOnError`
+    //   挂不上时的处置：那是本末倒置）。
+    const designAttempts = designAttemptsOfError(e);
+    if (designAttempts !== undefined) {
+      try { writeJson(path.join(run.tmpDir, DESIGN_ATTEMPTS_FILE), designAttempts); } catch { /* 写不下就算了 */ }
+    }
     // ⚠️ **失败留现场**（image-route-v1 的 ①）：改名、不删；现场路径挂在异常上（与 `pack` 同款，
     //   两个壳各自渲染）—— 里面是**已经跑完那几步**的产物，看一眼就知道断在哪一步。
     const site = abandonRun(run, { why: why(e), ...(gameId !== undefined ? { gameId } : {}) });

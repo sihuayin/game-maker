@@ -108,6 +108,9 @@ export * from "./coverage.js";
 // ⚠️ **母版比例的读数**（票 39）—— 与上面两份同一个形状：**跟着包走的 sidecar，不进 manifest**。
 //   它是**观察**那一侧的东西（上游守不守住 `aspectRatio` 不是设计能控的）。
 export * from "./master-ratio.js";
+// ⚠️ **被拒的设计那几发原始入参**（票 55）—— 同一条「不进 manifest、不给包升版」的理由，
+//   但**落点不同**：它进的是**失败现场**（`.failed-<ts>/`），不是包根。
+export * from "./design-attempts.js";
 
 // ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────
 export * from "./command.js";

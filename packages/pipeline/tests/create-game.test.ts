@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { RUN_LEDGER_FORMAT, parseRecipe, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { DESIGN_ATTEMPTS_FILE, RUN_LEDGER_FORMAT, parseDesignAttempts, parseRecipe, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
@@ -257,6 +257,132 @@ describe("§invariant 5 · 失败现场保留", () => {
     // ⚠️ 失败**没消耗**版本号：接下来这一趟还是 v1
     const ok = await understand(h);
     expect(ok.run.version).toBe(1);
+  });
+});
+
+// ── 票 55「被拒的设计一个字都不落盘」的判据 ───────────────────────────────────
+describe("§票 55 · 被拒的设计**也**留现场（`design-attempts.json`）", () => {
+  /** 那一次失败留下的**唯一**现场目录（`.failed-<ts>/`）。 */
+  const site = (h: ReturnType<typeof harness>) => {
+    const sites = fs.readdirSync(h.outRoot).filter((d) => d.startsWith(".failed-"));
+    expect(sites).toHaveLength(1);
+    return path.join(h.outRoot, sites[0]!);
+  };
+  /** 跑一趟、把抛出来的东西**取出来看**（`rejects` 只给得出「抛没抛」）。 */
+  const thrown = <T,>(p: Promise<T>) => p.then((): unknown => undefined, (e: unknown) => e);
+
+  it("阳性 · schema 档：**三发各自的原始入参**都在现场里，而且读得回来", async () => {
+    const h = harness({ designFails: 3 });
+    const err = (await thrown(understand(h))) as Error;
+    expect(String(err.message)).toMatch(/重采样/);
+    // ⚠️ **报错里不点名这个文件**（票 55 的 Q4）：失败现场的通行做法是**目录即索引**
+    expect(String(err.message)).not.toContain(DESIGN_ATTEMPTS_FILE);
+
+    const parsed = parseDesignAttempts(readJson(path.join(site(h), DESIGN_ATTEMPTS_FILE)));
+    expect(parsed.ok, parsed.ok ? "" : parsed.errors.join("；")).toBe(true);
+    if (!parsed.ok) return;
+    // ⚠️ **每一次往返**（票 55 的 Q1）：三发都在、按 `attempt` 升序 ——
+    //   只留最后一发，就会把「系统性毛病 vs 手气差」这条判断**重新变回推理**
+    expect(parsed.value.attempts.map((a) => a.attempt)).toEqual([1, 2, 3]);
+    expect(parsed.value.attempts.map((a) => a.outcome)).toEqual(["schema", "schema", "schema"]);
+    // ⚠️ 而 `raw` 是**模型那一发写下的整份入参**（不是一个摘要、也不是装配后那份 —— 那一份没落盘）
+    const raw0 = parsed.value.attempts[0]!.raw as { world: { theme: string } };
+    expect(raw0.world.theme).toBe("");     // ← 夹具里那份过不了 gate 的设计，原样
+  });
+
+  it("阳性 · R12 档：那一发**照样**留原话，且 `rejections` 与抛出去那份**同一份事实**", async () => {
+    // 参考图的视角这一代做不了（`top-down` ⇒ `camera-unsupported`）：
+    // 一份**过了 schema**、却被 R12 否掉的设计 —— 正是第八跑那一档
+    const h = harness({ override: { emit_visual_world: { ...CANNED.visualWorld, camera: { mode: "top-down" } } } });
+    const err = (await thrown(understand(h))) as { rejections?: { reason: string }[] };
+    expect(err.rejections?.[0]?.reason).toBe("camera-unsupported");
+
+    const parsed = parseDesignAttempts(readJson(path.join(site(h), DESIGN_ATTEMPTS_FILE)));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    // ⚠️ **R12 那一档只走一趟**（不重采样）⇒ 恒 1 份
+    expect(parsed.value.attempts).toHaveLength(1);
+    const only = parsed.value.attempts[0]!;
+    expect(only.outcome).toBe("rejected");
+    expect(only.raw).toBeDefined();          // ← 「模型把 `player.id` 改成了什么」那个读点，就靠它
+    // ⚠️ 与 `DesignRejectedError` 里那份**逐字相同**：不复用同一份，就会有两份**会分叉**的事实
+    expect(only.rejections).toEqual(err.rejections);
+  });
+
+  it("⚠️ 密钥钉子：落下来的东西里**不含**密钥（不许只靠「它今天恰好只在请求头里」）", async () => {
+    const SECRET = "sk-ant-THIS-MUST-NEVER-REACH-THE-FAILURE-SITE-5757";
+    const h = harness({ designFails: 3 });
+    await expect(understand(h, { transport: { baseUrl: "http://up.test", apiKey: SECRET } }))
+      .rejects.toThrowError(/重采样/);
+    // 现场里**所有**落盘的文本一起看 —— 本票往这里新塞了一类内容，就该在这里钉一次（同 `image-gen.test.ts`）
+    const dir = site(h);
+    const dump = fs.readdirSync(dir).filter((f) => /\.(json|md)$/.test(f))
+      .map((f) => fs.readFileSync(path.join(dir, f), "utf8")).join("\n");
+    expect(dump).toContain("design-attempts");   // 钉子先自证：那个文件**确实**在
+    expect(dump).not.toContain(SECRET);
+  });
+
+  it("⚠️ 上游死在**第 2 发** ⇒ 第 1 发那份入参**不跟着丢**（判据不是「抛的是哪个类」）", async () => {
+    // ⚠️ 票 55 的 Q5 关掉的那个边：按错误类分流（「只有 R12 那一档才写」/「只有重采样打满才写」）
+    //   会把这一份**连同第 1 发的现场**一起丢掉。判据是**这一圈有没有拿到过模型入参**。
+    const h = harness({ designFails: 1 });          // 第 1 发：过不了契约（`schema`）
+    const inner = h.fetchImpl;
+    let designTrips = 0;
+    const fetchImpl = (async (url: string, init: RequestInit) => {
+      const body = JSON.parse(String(init.body)) as { tool_choice?: { name?: string } };
+      if (body.tool_choice?.name === "emit_game_design" && ++designTrips === 2)
+        return new Response("boom", { status: 500 });
+      return inner(url, init);
+    }) as typeof fetch;
+
+    await expect(understand(h, { fetchImpl })).rejects.toThrowError(/HTTP 500/);
+    const parsed = parseDesignAttempts(readJson(path.join(site(h), DESIGN_ATTEMPTS_FILE)));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    // ⚠️ **缺号**：上游失败那一发不在容器里（它发生在取到 body 之前，压根没有入参）——
+    //   它的事实在**账**那一侧记着（本票一个字没动账）
+    expect(parsed.value.attempts.map((a) => a.attempt)).toEqual([1]);
+    expect(parsed.value.attempts[0]!.outcome).toBe("schema");
+    expect(parsed.value.attempts[0]!.raw).toBeDefined();
+  });
+
+  it("阴性 · **一个入参都没拿到** ⇒ 不写（连一个空容器都不留）", async () => {
+    // ⚠️ 判据**不是「抛的是哪个类」**（票 55 的 Q5）：这里第 **1** 发就撞上上游 500 ——
+    //   这一圈压根没有模型入参可留 ⇒ 一份**什么都不含**的容器不该被写出来。
+    const h = harness();
+    const inner = h.fetchImpl;
+    const fetchImpl = (async (url: string, init: RequestInit) => {
+      const body = JSON.parse(String(init.body)) as { tool_choice?: { name?: string } };
+      if (body.tool_choice?.name === "emit_game_design") return new Response("boom", { status: 500 });
+      return inner(url, init);
+    }) as typeof fetch;
+
+    await expect(understand(h, { fetchImpl })).rejects.toThrowError(/HTTP 500/);
+    // 现场照旧在（改名、不删）—— 只是里面**没有**这个东西
+    expect(fs.existsSync(path.join(site(h), DESIGN_ATTEMPTS_FILE))).toBe(false);
+  });
+
+  it("阴性 · 成功路径一个字节不变 —— 哪怕这一跑**重采样过**、内存里真有过一份原始入参", async () => {
+    const clean = harness();
+    await understand(clean);
+    const retried = harness({ designFails: 1 });   // 第 1 发不过契约、第 2 发才成
+    await understand(retried);
+
+    const listing = (h: ReturnType<typeof harness>) =>
+      fs.readdirSync(path.join(h.outRoot, "wasteland", "run", "v1")).sort();
+    expect(listing(retried)).toEqual(listing(clean));
+    // ⚠️ 本票的阴性判据里最要紧的一格：那份原始入参**不进成功产物**
+    expect(listing(retried)).not.toContain(DESIGN_ATTEMPTS_FILE);
+    for (const f of listing(clean)) {
+      // ⚠️ `ledger.json` 除外：它的 `ms` 是**时钟读数**，而重采样那一跑本来就该多记一发
+      //   （账一个字没动 —— 票 55 的 Q7）
+      if (f === "ledger.json") continue;
+      const read = (h: ReturnType<typeof harness>) =>
+        fs.readFileSync(path.join(h.outRoot, "wasteland", "run", "v1", f));
+      expect(read(clean).equals(read(retried)), f).toBe(true);
+    }
+    // ⚠️ 而成功那一跑连失败现场都不该有 —— 不抛就**没有那个写入点**（这条判据是**结构性**成立的）
+    expect(fs.readdirSync(retried.outRoot).filter((d) => d.startsWith(".failed-"))).toEqual([]);
   });
 });
 
