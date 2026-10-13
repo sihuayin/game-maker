@@ -15,7 +15,7 @@
 //     **身上有没有这个字段**，不是 `instanceof CommandError` —— 因为 `carryOnError`
 //     挂上去的异常**不是** `CommandError`，用 `instanceof` 读就等于对它们集体失明。
 import { describe, expect, it } from "vitest";
-import { carryOnError, CommandError, designAttemptsOfError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError } from "../src/command.js";
+import { carryOnError, CommandError, designAttemptsOfError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, visualWorldAttemptsOfError } from "../src/command.js";
 import type { LedgerCall } from "../src/ledger.js";
 
 const call = (target: string): LedgerCall => ({ step: "image", target, attempts: 1 });
@@ -142,5 +142,51 @@ describe("§第三个读者：被拒的设计那几发原始入参（票 55）",
       expect(designAttemptsOfError(e), JSON.stringify(v)).toBeUndefined();
     }
     expect(designAttemptsOfError(undefined)).toBeUndefined();
+  });
+});
+
+// ── 票 60 加进来的**第四项** ────────────────────────────────────────────────
+describe("§第四个读者：理解层第一步那几发原始入参（票 60）", () => {
+  const attempts = {
+    format: "run-visual-world-attempts/v1" as const,
+    attempts: [{
+      attempt: 1, outcome: "schema" as const, detail: "工具入参不过契约：palette: expected object, received array",
+      raw: { format: "visual-world/v1", palette: ["#2e3b4e"] },
+      response: { stopReason: "tool_use", usage: { outputTokens: 2100 } },
+    }],
+  };
+
+  it("挂得上去、读得回来 —— 而它**与另三项各自独立**（只有它时不发明账、不发明现场、也不发明设计入参）", () => {
+    const e = new Error("重采样 3 次都没有拿到一份过契约的 VisualWorldSpec");
+    carryOnError(e, { visualWorldAttempts: attempts });
+    expect(visualWorldAttemptsOfError(e)?.attempts[0]!.outcome).toBe("schema");
+    expect(ledgerOfError(e)).toBeUndefined();
+    expect("ledger" in e).toBe(false);
+    expect(failureDirOfError(e)).toBeUndefined();
+    expect("failureDir" in e).toBe(false);
+    expect(designAttemptsOfError(e)).toBeUndefined();
+    expect("designAttempts" in e).toBe(false);
+  });
+
+  it("⚠️ 读的那一侧**按能力、不按类** —— 第十跑死的是 `AnalyzeReferenceError`，按类读会在那一档恰好失明", () => {
+    const e = new Error("裸的");
+    carryOnError(e, { visualWorldAttempts: attempts });
+    expect(e).not.toBeInstanceOf(CommandError);
+    expect(visualWorldAttemptsOfError(e)).toBeDefined();
+    // 挂在 `CommandError` 上的也读得动 —— 判据是**身上有没有**那一格，不是它的类
+    const cmd = new CommandError("upstream", "上游 500");
+    carryOnError(cmd, { visualWorldAttempts: attempts });
+    expect(visualWorldAttemptsOfError(cmd)).toBeDefined();
+    expect(exitCodeOfError(cmd)).toBe(EXIT.upstream);
+  });
+
+  it("只做**类型闸**：形状不对的当作「没读到」，而不是把垃圾带出去（也不在这里重验 schema）", () => {
+    const junk: unknown[] = ["不是对象", null, 42, {}, { attempts: "不是数组" }];
+    for (const v of junk) {
+      const e = new Error("x");
+      carryOnError(e, { visualWorldAttempts: v as never });
+      expect(visualWorldAttemptsOfError(e), JSON.stringify(v)).toBeUndefined();
+    }
+    expect(visualWorldAttemptsOfError(undefined)).toBeUndefined();
   });
 });

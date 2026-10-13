@@ -1,0 +1,135 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "从废弃城市街区左端出发，按住方向键沿横向轨状地面持续向右移动探索",
+    "沿途拾取散落在等距小方块地面上的废料资源，靠近并打开嵌在横向墙面中的宝箱",
+    "发现游荡的废土敌人或危险区块时立即后撤、跳跃越障或贴地绕过，避免接触",
+    "带着已搜刮到的资源继续深入更深一层的城市街区，直到抵达本区最深处的终点光柱"
+  ],
+  "player": {
+    "id": "player-scavenger",
+    "role": "一名在废弃城市中横向推进的拾荒者，不主动攻击，只靠走位、跳跃与撤离规避威胁",
+    "abilities": [
+      "横向奔跑移动：沿等距方块构成的地面轨带走走停停，可随时加速或急停",
+      "跳跃：翻越矩形残墙、缺口与低矮箱体，落回地面继续推进",
+      "开箱：贴近宝箱正面站定后交互开启，取出其中的宝藏补给",
+      "拾取：走过废料资源所在的矩形块即自动收集入口袋",
+      "规避：识别敌人巡逻范围与危险区块，用后退、跳跃或绕行避开接触"
+    ],
+    "goals": [
+      "在废弃城市中横向探索并找到尽可能多的资源与宝箱",
+      "躲避废土敌人与危险区块，避免被击败",
+      "一路深入城市腹地，抵达最终目标点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在所属街区段内沿地面轨带左右匀速巡逻，碰到矩形墙体或边界即原路折返，不做追击",
+      "threat": "与玩家接触即造成伤害，把玩家从安全路线上逼开，迫使玩家等待或跳跃绕过"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "可开启容器",
+      "behavior": "玩家从正面贴近并按下交互键后箱盖打开，掉落其中的宝藏与补给资源，同一宝箱只能开启一次"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scrap-resource",
+      "purpose": "废土中可拾取收集的基础废料，作为本局搜刮进度的计分与目标物，收集数量决定最终目标是否达成"
+    }
+  ],
+  "world": {
+    "theme": "flat / blocky pixel / hard-edged / limited palette / retro platformer 的末日废土",
+    "setting": "一座被遗弃的横向城市废墟：厚重的横向墙体与预制的矩形开口、面板、门洞，平坦横向地面由等距小方块拼成轨状条带，无起伏；矩形面板、悬挂小灯、立杆圆头灯、条状长凳与塔状三角屋顶轮廓沿街排布",
+    "structure": "侧视三层平行结构：背景为深色顶带与中性宽带的水平分层色带，层层平行于画面下缘；中景为横向延展的墙面与箱体，其上挂矩形面板、门形与条状物件，构成可穿行的街区与障碍；前景为底部深色轨状条带，由等距小方块间隔重复形成节律，作为玩家与敌人的唯一活动地面。物件与角色同量级、均为数百像素内的直角矩形块，低密度排布，大片留白由纯色块填充，物件之间间隔明显"
+  },
+  "levels": [
+    {
+      "id": "level-city-edge",
+      "purpose": "教学与热身：让玩家在没有致命压力的情况下熟悉横向移动、跳跃、拾取与开箱",
+      "layout": "从屏幕最左侧的平坦方块轨带起步，向右依次经过三段无威胁的地面，中间用小方块缺口与低矮矩形残墙要求跳跃；中段放两到三个散落的废料资源与一个嵌在墙面里的宝箱；右侧尽头是一小段巡逻中的敌人活动区，玩家可选择等待其折返后通过，抵达最右端的一块高亮方块区完成本区",
+      "entities": [
+        "player-scavenger",
+        "scrap-resource",
+        "chest",
+        "enemy-wasteland"
+      ]
+    },
+    {
+      "id": "level-ruined-block",
+      "purpose": "正式搜刮：把资源、宝箱与敌人巡逻编织在同一段横向路线里，考验拾取与规避之间的取舍",
+      "layout": "起点在左侧街角，向右是一段被两个敌人分区巡逻的长街，玩家需要观察折返节奏，在巡逻间隙拾取夹在两者之间的废料资源；中段有一处矩形墙体缺口需要跳跃越过，缺口后方墙面挂着宝箱；后段地面由小方块间距拉大，踩点跳跃前进，最右侧是一段无敌人但需要连续跳跃才能抵达的终点光柱",
+      "entities": [
+        "player-scavenger",
+        "scrap-resource",
+        "chest",
+        "enemy-wasteland"
+      ]
+    },
+    {
+      "id": "level-city-core",
+      "purpose": "深入城市腹地的终局路线：集中考验规避这一核心紧张感，并把搜刮成果带到最终目标前",
+      "layout": "从左侧狭窄通道进入，向右进入敌人密集的中心街区，三只敌人之间有重叠的巡逻窗口，玩家只能靠贴边、跳跃与后退等待逐个穿过；穿过之后是一段笔直的长地面，少量废料资源点缀其间；街道尽头是嵌在墙面最深处的宝箱与终点高亮方块，抵达即完成本局",
+      "entities": [
+        "player-scavenger",
+        "scrap-resource",
+        "chest",
+        "enemy-wasteland"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "linear-level-chain-with-collection-gating",
+    "description": "以关卡为单位的线性推进：玩家在每一关内沿横向路线向右深入，拾取的废料资源与开启的宝箱累积为本局搜刮成果；上一关右侧终点即下一关左侧起点，城市废墟的敌人密度与地形缺口随之增大，最终在第三关的城市腹地终点达成目标，通篇不引入战斗或角色成长，难度只来自敌人巡逻与地形间距"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "dodge-danger",
+      "mechanic": "hazard-contact"
+    }
+  ],
+  "winConditions": [
+    "在废弃城市各关卡中收集到足量废料资源并开启宝箱后，抵达最后一关最右端的终点高亮方块"
+  ],
+  "loseConditions": [
+    "玩家与游荡的废土敌人接触并耗尽其承受上限，本局失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

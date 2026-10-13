@@ -1,0 +1,128 @@
+{
+  "ticket": "59-plan-assets-empty-input",
+  "ranAt": "2026-10-13T09:38:19.885Z",
+  "input": {
+    "designPath": "/Volumes/shy/some-projects/game-maker/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13b/.failed-2026-10-13T09-22-52-685Z/game-design.json",
+    "visualWorldPath": "/Volumes/shy/some-projects/game-maker/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13b/.failed-2026-10-13T09-22-52-685Z/visual-world.json"
+  },
+  "upstream": "http://127.0.0.1:15721",
+  "request": {
+    "model": "deepseek-v4-pro",
+    "maxTokens": 16000,
+    "tool": "emit_asset_recipe",
+    "promptChars": 5654,
+    "bodySha256Short": "00ef7a272a64d07c"
+  },
+  "sampling": {
+    "maxShots": 6,
+    "firstBatch": 3,
+    "rule": "先 3 发；1 发成功即停；3 发全空才补到 6"
+  },
+  "n": 4,
+  "emptyInputCount": 3,
+  "stoppedBy": "第 4 发是 schema（非 empty-input）⇒ 按约束 ⑤ 停止",
+  "wallMs": 61272,
+  "shots": [
+    {
+      "n": 1,
+      "ms": 18911,
+      "httpStatus": 200,
+      "shape": {
+        "stop_reason": "tool_use",
+        "blockCount": 1,
+        "blocks": [
+          {
+            "type": "tool_use",
+            "name": "emit_asset_recipe",
+            "inputKind": "空对象",
+            "inputKeys": 0,
+            "inputChars": 2
+          }
+        ],
+        "usage": {
+          "inputTokens": 197,
+          "outputTokens": 4430
+        },
+        "model": "deepseek-flash"
+      },
+      "outcome": "empty-input",
+      "detail": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。"
+    },
+    {
+      "n": 2,
+      "ms": 13410,
+      "httpStatus": 200,
+      "shape": {
+        "stop_reason": "tool_use",
+        "blockCount": 1,
+        "blocks": [
+          {
+            "type": "tool_use",
+            "name": "emit_asset_recipe",
+            "inputKind": "空对象",
+            "inputKeys": 0,
+            "inputChars": 2
+          }
+        ],
+        "usage": {
+          "inputTokens": 197,
+          "outputTokens": 3198
+        },
+        "model": "deepseek-flash"
+      },
+      "outcome": "empty-input",
+      "detail": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。"
+    },
+    {
+      "n": 3,
+      "ms": 15815,
+      "httpStatus": 200,
+      "shape": {
+        "stop_reason": "tool_use",
+        "blockCount": 1,
+        "blocks": [
+          {
+            "type": "tool_use",
+            "name": "emit_asset_recipe",
+            "inputKind": "空对象",
+            "inputKeys": 0,
+            "inputChars": 2
+          }
+        ],
+        "usage": {
+          "inputTokens": 197,
+          "outputTokens": 3512
+        },
+        "model": "deepseek-flash"
+      },
+      "outcome": "empty-input",
+      "detail": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。"
+    },
+    {
+      "n": 4,
+      "ms": 12954,
+      "httpStatus": 200,
+      "shape": {
+        "stop_reason": "tool_use",
+        "blockCount": 1,
+        "blocks": [
+          {
+            "type": "tool_use",
+            "name": "emit_asset_recipe",
+            "inputKind": "对象",
+            "inputKeys": 7,
+            "inputChars": 6808
+          }
+        ],
+        "usage": {
+          "inputTokens": 197,
+          "outputTokens": 3319
+        },
+        "model": "deepseek-flash"
+      },
+      "outcome": "schema",
+      "detail": "入参过线形状、但不过配方契约：assets[0].spec.size: 资产 \"player-scavenger\" 的尺寸 48×64 与母版 \"player-scavenger-master\" 的画布 64×64 **宽高比不一致** —— ⚠️ 母版的画布决定它的头身比，而动画的比例由这里的尺寸定；两套比例 = 同一个角色两种长相；assets[1].spec.size: 资产 \"enemy-wasteland\" 的尺寸 48×64 与母版 \"enemy-wasteland-master\" 的画布 64×64 **宽高比不一致** —— ⚠️ 母版的画布决定它的头身比，而动画的比例由这里的尺寸定；两套比例 = 同一个角色两种长相"
+    }
+  ],
+  "keyLeaks": []
+}

@@ -111,6 +111,9 @@ export * from "./master-ratio.js";
 // ⚠️ **被拒的设计那几发原始入参**（票 55）—— 同一条「不进 manifest、不给包升版」的理由，
 //   但**落点不同**：它进的是**失败现场**（`.failed-<ts>/`），不是包根。
 export * from "./design-attempts.js";
+// ⚠️ **理解层第一步的同一份东西**（票 60）—— 同一处病、住另一步、**各自一份 format**
+//   （人裁 Q1b：不做通用容器，`rejected` 那一档是设计层专有的、这一步到不了）。
+export * from "./visual-world-attempts.js";
 
 // ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────
 export * from "./command.js";

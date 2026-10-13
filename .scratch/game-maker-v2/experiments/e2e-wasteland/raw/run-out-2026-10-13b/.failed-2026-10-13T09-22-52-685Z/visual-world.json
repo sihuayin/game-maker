@@ -1,0 +1,210 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "Flat Pixel Blocky Vector",
+    "keywords": [
+      "flat",
+      "blocky pixel",
+      "hard-edged",
+      "limited palette",
+      "retro platformer"
+    ],
+    "description": "完全由纯色矩形块拼成的扁平像素风：无渐变、无描边的硬边色块，斜边用逐级阶梯模拟，所有形体都是直角矩形与三角块的组合，靠极窄的中性色阶拉开空间层次。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "纯正交侧视，无透视收缩，远近同尺寸"
+  },
+  "composition": {
+    "foreground": "底部一条横向轨状条带，间隔重复的小方块形成节律",
+    "midground": "横向延展的墙面/箱体，其上挂有矩形面板、门形与条状物件",
+    "background": "水平分层色带：深色顶带 + 中性宽带 + 底部深带，层层平行于画面下缘",
+    "objectScale": "道具与角色同量级，均为数百像素内的矩形块",
+    "characterScale": "角色高度约占画面高度的四分之一，居中偏下，站在轨道条带之上",
+    "density": "低密度，大片留白由纯色块填充，物件之间间隔明显"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1",
+      "palette:2"
+    ],
+    "secondary": [
+      "palette:3",
+      "palette:4",
+      "palette:5"
+    ],
+    "accent": [
+      "palette:6",
+      "palette:7",
+      "palette:8"
+    ],
+    "background": [
+      "palette:9",
+      "palette:10"
+    ],
+    "shadow": [
+      "palette:11",
+      "palette:12"
+    ],
+    "highlight": [
+      "palette:13"
+    ]
+  },
+  "lighting": {
+    "direction": "无方向性硬光，纯平面均匀打亮",
+    "softness": "零柔和度，无阴影过渡、无高光渐变",
+    "contrast": "中低对比，仅靠色值层级区分前后",
+    "mood": "冷清、明亮而干燥的日间荒芜感"
+  },
+  "materials": {
+    "wall": {
+      "appearance": "大面积扁平纯色墙体，无纹理",
+      "texture": "无，纯色块",
+      "color": [
+        "palette:3",
+        "palette:4"
+      ]
+    },
+    "ground": {
+      "appearance": "横向条带与规则小方块阵列",
+      "texture": "重复等距方形节奏",
+      "color": [
+        "palette:5",
+        "palette:12"
+      ]
+    },
+    "metal": {
+      "appearance": "设备外壳、箱体、牌面等硬表面",
+      "texture": "纯色块，边缘锐利",
+      "color": [
+        "palette:2",
+        "palette:6"
+      ]
+    },
+    "glow": {
+      "appearance": "屏幕、标识、发光点等自亮面",
+      "texture": "无渐变，单一亮色",
+      "color": [
+        "palette:8",
+        "palette:7"
+      ]
+    },
+    "cloth": {
+      "appearance": "角色衣物、布面物件",
+      "texture": "纯色块",
+      "color": [
+        "palette:7",
+        "palette:11"
+      ]
+    },
+    "sky": {
+      "appearance": "顶部与底部深色天空带",
+      "texture": "纯净无噪",
+      "color": [
+        "palette:10",
+        "palette:9"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "矮壮方块身形，头大身短，约三头身",
+    "silhouette": "矩形躯干 + 矩形头部 + 短矩形四肢，顶部一个小方块帽冠，轮廓全部由直角构成",
+    "poseLanguage": "正侧面站立，四肢垂直静止，无动态夸张，可读出跳跃与行走的两三帧姿态",
+    "clothing": "深色上装与深色下装，中间一道亮色腰带/中缝，顶部亮色帽冠",
+    "faceAbstraction": "五官极度抽象，仅用两个小方块作眼、一个方块作口/鼻，无表情细节"
+  },
+  "environment": {
+    "architecture": "厚重的横向墙体与预制的矩形开口、面板、门洞",
+    "terrain": "平坦横向地面层，由等距小方块构成的轨状条带，无起伏",
+    "props": "矩形面板、悬挂小灯、立杆圆头灯、条状长凳、塔状三角屋顶轮廓",
+    "textureDensity": "极低，几乎全部为无纹理纯色块"
+  },
+  "shapeLanguage": [
+    "直角矩形为主",
+    "三角与斜块表现屋顶和山形",
+    "阶梯状斜线替代抗锯齿斜边",
+    "等距重复的小方块阵列",
+    "无圆角、无描边、无渐变的硬边界",
+    "图形层级靠色块并置，不靠轮廓线"
+  ],
+  "constraints": [
+    "所有形体必须由轴对齐矩形或三角块拼成，禁止圆角、曲线与抗锯齿斜边",
+    "禁止渐变、噪点、纹理贴图与任何形式的柔和阴影",
+    "禁止使用轮廓描边区分形体，仅靠色块并置与色值差分层",
+    "色彩必须取自同一份受限制的扁平色板，不得引入色板外的色相",
+    "光源不产生方向性阴影，物件明度不随位置变化",
+    "角色与道具保持正侧面正交视角，不做透视缩短",
+    "物件大小与角色保持同一量级，不出现写实比例细节"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "扁平像素方块风",
+      "限色硬边色块拼贴",
+      "正交侧视横版平台",
+      "无渐变无描边的计算机图形感"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面平视",
+      "angle": "0 度平视",
+      "elevation": "0",
+      "perspective": "无透视"
+    },
+    "composition": {
+      "layout": "水平分层，顶带-中带-底带",
+      "主体位置": "角色居中偏下",
+      "留白": "大面积纯色留白"
+    },
+    "palette": [
+      "#2d5a73",
+      "#3f5f7a",
+      "#c8d8e0",
+      "#a9906b",
+      "#c9a97e",
+      "#6d6e75",
+      "#8f9aa3",
+      "#f2c14e",
+      "#e8a13c",
+      "#1a2b3c",
+      "#0f1c2b",
+      "#5c4630",
+      "#3a3a3f",
+      "#f7e08a"
+    ],
+    "lighting": {
+      "type": "全局均匀硬光",
+      "shadow": "无"
+    },
+    "shapeLanguage": [],
+    "material": [
+      "纯色块",
+      "无纹理硬表面"
+    ],
+    "environment": [
+      "横向废土墙体",
+      "预制矩形开口",
+      "地面轨状条带"
+    ],
+    "characterStyle": [
+      "方块三头身",
+      "极简五官",
+      "直角剪影"
+    ],
+    "constraints": [
+      "不使用渐变",
+      "不使用描边",
+      "不使用圆角",
+      "不使用纹理贴图"
+    ],
+    "confidence": 0.86
+  }
+}

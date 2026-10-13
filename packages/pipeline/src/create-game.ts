@@ -17,7 +17,7 @@ import path from "node:path";
 import {
   carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, parseAssetPack,
   parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
-  RUN_LEDGER_FORMAT, summarizeCalls,
+  RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
   type GameIntentSpec, type LedgerCall, type MasterRatio, type QAReport, type QaRunner, type RunLedger,
   type RuntimeProfileRef, type VisualWorldSpec,
@@ -340,6 +340,16 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     const designAttempts = designAttemptsOfError(e);
     if (designAttempts !== undefined) {
       try { writeJson(path.join(run.tmpDir, DESIGN_ATTEMPTS_FILE), designAttempts); } catch { /* 写不下就算了 */ }
+    }
+    // ⚠️ **理解层第一步也一样**（票 60「`analyze-reference` 失败时模型写的东西一个字都不留」）：
+    //   同一处病、住另一步 —— 同一套机制、**另一个键**（读法照旧**按能力、不按类**）。
+    //   ⚠️ 这一条**必须**在这里，因为第十次真跑正是**死在第一步**：`try` 从 `analyzeReference`
+    //   之前就开始 ⇒ 那条路确确实实走得到（现场里那份 `intent.md` 就是证据）。
+    //   ⚠️ **不写空容器**：`visualWorldAttemptsOfError` 只在一圈里**至少拿到过一份入参**时才回东西
+    //   （`carriedAttempts` 的空场合 ⇒ 连键都不加）—— 与 `attempts` 的 `.min(1)` 是同一件事的两侧。
+    const visualWorldAttempts = visualWorldAttemptsOfError(e);
+    if (visualWorldAttempts !== undefined) {
+      try { writeJson(path.join(run.tmpDir, VISUAL_WORLD_ATTEMPTS_FILE), visualWorldAttempts); } catch { /* 写不下就算了 */ }
     }
     // ⚠️ **失败留现场**（image-route-v1 的 ①）：改名、不删；现场路径挂在异常上（与 `pack` 同款，
     //   两个壳各自渲染）—— 里面是**已经跑完那几步**的产物，看一眼就知道断在哪一步。

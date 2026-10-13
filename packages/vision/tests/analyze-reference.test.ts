@@ -5,7 +5,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS } from "@game-maker/contracts";
+import { STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, VISUAL_WORLD_ATTEMPTS_FORMAT, visualWorldAttemptsOfError } from "@game-maker/contracts";
 import { AnalyzeReferenceError, TOOL_NAME, analyzeReference, type AnalyzeReferenceInput } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -31,6 +31,9 @@ const modelOut = (over: Record<string, unknown> = {}) => ({
 const reply = (input: unknown, stopReason = "tool_use") =>
   ({ content: [{ type: "tool_use", name: TOOL_NAME, input }], stop_reason: stopReason,
      model: "deepseek-flash", usage: { input_tokens: 1500, output_tokens: 1900 } });
+
+/** ⚠️ 顶层 `palette` 写成**数组**那一档 —— 第十跑实测的那件事（契约要的是六桶对象）。 */
+const paletteArr = (p: unknown) => modelOut({ palette: p });
 const res = (body: unknown, status = 200): Response =>
   ({ ok: status < 400, status, json: async () => body, text: async () => JSON.stringify(body) }) as Response;
 
@@ -164,6 +167,100 @@ describe("重采样（R16）", () => {
     expect(err.ledger![0]!.attempts).toBe(STRUCTURED_CALL_ATTEMPTS);
     expect(err.ledger![0]!.failures).toHaveLength(STRUCTURED_CALL_ATTEMPTS);
     expect(err.message).toContain(`重采样 ${STRUCTURED_CALL_ATTEMPTS} 次`);
+  });
+});
+
+// ── 票 60「理解层第一步失败时，模型写的东西一个字都不留」的判据 ────────────────
+describe("§票 60 · 逐发证据**跟着异常一起出来**（`run-visual-world-attempts/v1`）", () => {
+  const docOf = (e: unknown) => visualWorldAttemptsOfError(e);
+
+  it("阳性 · 三发全败：**每一发**的原始入参都在（不是只留最后一发）—— 而三发的写法**各不相同**", async () => {
+    // ⚠️ 这一份夹具**就是第十跑那件事**：顶层 `palette` 被写成了**数组**
+    //   （`VisualWorldSpecSchema` 要的是六桶对象）—— 而 `raw` 留下的正是「它写的**是哪种数组**」。
+    const s = stage([
+      res(reply(paletteArr(["#2e3b4e"]))), res(reply(paletteArr([{ palette: 0 }]))), res(reply(paletteArr([]))),
+    ]);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
+
+    const doc = docOf(err);
+    expect(doc?.format).toBe(VISUAL_WORLD_ATTEMPTS_FORMAT);
+    expect(doc?.attempts.map((a) => a.attempt)).toEqual([1, 2, 3]);
+    expect(doc?.attempts.map((a) => a.outcome)).toEqual(["schema", "schema", "schema"]);
+    // ⚠️ **模型自己写下的那几个字节**（不是装配后那一份、也不是一个摘要）——
+    //   「它抄的是 `style.palette` 的 hex 列表，还是 `palette:N` 引用列表」只能从这儿读
+    expect((doc?.attempts[0]!.raw as { palette: unknown }).palette).toEqual(["#2e3b4e"]);
+    expect((doc?.attempts[1]!.raw as { palette: unknown }).palette).toEqual([{ palette: 0 }]);
+    expect((doc?.attempts[2]!.raw as { palette: unknown }).palette).toEqual([]);
+  });
+
+  it("阳性 · **响应摘要**逐发都在（`stop_reason` + `usage`）—— 判「连续三发坏是不是有状态」靠它", async () => {
+    const s = stage([res(reply({})), res(reply({})), res(reply({}))]);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
+    const doc = docOf(err);
+    // ⚠️ 票 59 那条最锋利的证据就是这个形状：三发空各自烧了几千个**输出 token**
+    //   ⇒「一个 `{}` 不可能值三千多」—— 它**只能**从 `usage` 读出来
+    expect(doc?.attempts.map((a) => a.response.usage?.outputTokens)).toEqual([1900, 1900, 1900]);
+    expect(doc?.attempts.every((a) => a.response.stopReason === "tool_use")).toBe(true);
+    // ⚠️ 而 `raw` 照旧是**模型真写的那个 `{}`**（`empty-input` ≠ 「没有入参」）
+    expect(doc?.attempts.every((a) => a.raw !== undefined && Object.keys(a.raw as object).length === 0)).toBe(true);
+  });
+
+  it("⚠️ 同一份容器里「`{}`」与「键缺席」**分得开** —— 第 1 发模型真写了 `{}`，后两发连块都没有", async () => {
+    // ⚠️ 这一档**必须混着来**才观测得到：一圈里**全是** `no-tool-use` 时，
+    //   `carriedAttempts` 的判据（「至少一发有 `raw`」）就关掉了整份容器 —— 那是**对的**
+    //   （一个入参都没拿到 ⇒ 不写空容器），但也意味着「键缺席」只在**混合**的一圈里看得见。
+    const noBlock = { content: [{ type: "text", text: "我说了算" }], stop_reason: "tool_use", usage: { input_tokens: 10, output_tokens: 7 } };
+    const s = stage([res(reply({})), res(noBlock), res(noBlock)]);
+    const doc = docOf(await thrown(analyzeReference(input({ fetchImpl: s.f }))));
+
+    expect(doc?.attempts.map((a) => a.outcome)).toEqual(["empty-input", "no-tool-use", "no-tool-use"]);
+    // 第 1 发：**模型真写的那个 `{}`** 原样存着（票 27 那一发是最值钱的证据，不许被「空」吞掉）
+    expect(doc?.attempts[0]!.raw).toEqual({});
+    // 后两发：**键根本不在** —— 伪造一个 `{}` 就等于伪造「模型写了个空对象」这条证据
+    expect("raw" in doc!.attempts[1]!).toBe(false);
+    expect("raw" in doc!.attempts[2]!).toBe(false);
+    // ⚠️ 而摘要**每一发都有**（四个下场都发生在取到 body 之后）：`stop_reason` 是
+    //   「被截断」与「上游不认 tools」两种死因的分水岭，`usage` 是票 59 那条证据的来源
+    expect(doc?.attempts.every((a) => a.response.stopReason === "tool_use")).toBe(true);
+    expect(doc?.attempts.map((a) => a.response.usage?.outputTokens)).toEqual([1900, 7, 7]);
+  });
+
+  it("⚠️ 上游死在**第 2 发** ⇒ 第 1 发那份入参**不跟着丢**（判据不是「抛的是哪个类」）", async () => {
+    const s = stage([res(reply({})), res({ error: "boom" }, 500)]);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
+    expect(err.failure).toBe("http");
+    const doc = docOf(err);
+    // ⚠️ **缺号**：上游失败那一发不在容器里（它发生在取到 body 之前，压根没有入参）——
+    //   它的事实在**账**那一侧记着（本票一个字没动账）
+    expect(doc?.attempts.map((a) => a.attempt)).toEqual([1]);
+    expect(doc?.attempts[0]!.outcome).toBe("empty-input");
+    expect(doc?.attempts[0]!.raw).toEqual({});   // ← 模型真写的 `{}`，原样
+  });
+
+  it("⚠️ **越界**那一档（装配后不过契约）也留原话 —— 它与「模型写坏了形状」**同名** `schema`，靠 `detail` 分开读", async () => {
+    const outOfRange = modelOut({ palette: { primary: [], secondary: [], accent: [], background: [], shadow: [], highlight: ["palette:7"] } });
+    const s = stage([res(reply(outOfRange))]);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
+    const doc = docOf(err);
+    expect(doc?.attempts[0]!.outcome).toBe("schema");
+    expect(doc?.attempts[0]!.detail).toContain("装配后不过契约");
+    expect(doc?.attempts[0]!.raw).toBeDefined();
+  });
+
+  it("阴性 · 上游**第一发**就死 ⇒ 一个入参都没拿到 ⇒ **连键都不挂**（不写空容器）", async () => {
+    const s = stage([res({ error: "boom" }, 500)]);
+    const err = await thrown(analyzeReference(input({ fetchImpl: s.f })));
+    expect(docOf(err)).toBeUndefined();
+    expect("visualWorldAttempts" in err).toBe(false);
+  });
+
+  it("阴性 · 成功那一跑**形状里没有这一格** —— 哪怕它重采样过、内存里真有过一份原始入参", async () => {
+    const s = stage([res(reply(paletteArr)), res(reply(modelOut()))]);
+    const r = await analyzeReference(input({ fetchImpl: s.f }));
+    expect(s.calls()).toBe(2);
+    // ⚠️ 有意的取舍（写在明处）：**只有抛出来才有写入点** —— 重采样之后成功的那一跑，
+    //   第 1 发那份入参留不下来；而这是阴性判据「成功路径一个字节不变」的代价。
+    expect(Object.keys(r)).toEqual(["spec", "ledger"]);
   });
 });
 

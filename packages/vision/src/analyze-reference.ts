@@ -17,8 +17,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, VisualWorldSpecSchema, forcedTool, parseToolUse,
-  type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleReference, type VisualWorldSpec,
+  STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, VISUAL_WORLD_ATTEMPTS_FORMAT, VisualWorldSpecSchema,
+  carryOnError, forcedTool, parseToolUse,
+  type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleReference,
+  type ToolUseFailure,
+  type VisualWorldAttempt, type VisualWorldAttempts, type VisualWorldResponseSummary, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildVisualWorld } from "./build-visual-world.js";
 import { TOOL_DESCRIPTION, TOOL_NAME, visionPrompt } from "./prompts.js";
@@ -110,9 +113,12 @@ function spentCall(step: LedgerStep, target: string) {
   };
 }
 
+/** ⚠️ `bad` 多带两枚（票 60）：模型自己写下的那份 `raw`（不参与任何判断，只为了**活过失败**）
+ *  与 `response`（这一发换回来什么）。⚠️ `failure` 收成 `ToolUseFailure`（四个值 ⟺
+ *  `VisualWorldAttemptOutcome` 那四个）⇒「这一发是什么下场」**不需要一次转型**。 */
 type Trip =
   | { kind: "ok"; value: VisualWorldSpec; spent: Spent }
-  | { kind: "bad"; failure: CallFailure; detail: string; spent: Spent }
+  | { kind: "bad"; failure: ToolUseFailure; detail: string; spent: Spent; raw?: unknown; response: VisualWorldResponseSummary }
   | { kind: "upstream"; failure: Extract<CallFailure, "http" | "timeout">; detail: string };
 
 /** 上游自己报的那两样 —— **拿不到就缺席，不许编一个**。 */
@@ -133,6 +139,25 @@ function spentOf(body: unknown): Spent {
     ...(j?.model ? { model: j.model } : {}),
     // ⚠️ 上游没给就**整个键缺席** —— 不许填 0 冒充「测到了 0」。
     ...(Object.keys(usage).length > 0 ? { usage } : {}),
+  };
+}
+
+/**
+ * **这一发换回来什么**（票 60 的 Q1c 那一格，判 H2 用的）。
+ *
+ * ⚠️ **它只是摘要，不是响应体** —— 票 55 的 Q6(r1) 明令「不落请求体 / 响应体 / headers」，
+ *   而人裁这一轮要的是「区分每次实际返回的内容」。两句同时成立的那个最小集合就是这两格：
+ *   · `stopReason`：上游自己写的 —— 「被截断」与「上游不认 tools」两种死因的分水岭；
+ *   · `usage`：**票 59 那条最锋利的证据就是从这里读出来的**（三发空各自烧了 4430 / 3198 / 3512
+ *     个输出 token ⇒「一个 `{}` 不可能值三千多」）。
+ *   ⚠️ 两格都**拿不到就缺席**，绝不编一个（与 `spentOf` 同一条纪律）。
+ *   ⚠️ `usage` 直接**复用** `spentOf` 已经解析好的那一份，不另抄一遍取数逻辑。
+ */
+function responseOf(body: unknown, spent: Spent): VisualWorldResponseSummary {
+  const sr = (body as { stop_reason?: unknown } | null)?.stop_reason;
+  return {
+    ...(typeof sr === "string" && sr !== "" ? { stopReason: sr } : {}),
+    ...(spent.usage === undefined ? {} : { usage: spent.usage }),
   };
 }
 
@@ -208,14 +233,40 @@ async function onceThrough(o: {
   catch (e) { return { kind: "upstream", failure: "http", detail: `上游回的不是 JSON：${(e as Error).message}` }; }
 
   const spent = spentOf(body);
+  const response = responseOf(body, spent);
   // ⚠️ **唯一算数的判据**：入参过 Zod。`stop_reason === "tool_use"` **不是**成功信号（票 27 第 1 发：`input = {}`）。
   const parsed = parseToolUse(body, TOOL_NAME, ModelFacingSpec);
-  if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
+  // ⚠️ **`raw` 原样往外带**（票 60）：`parseToolUse` 自票 55 起**两个分支都回它**，
+  //   这里只是**不让它在半路掉下去** —— 「模型把顶层 `palette` 写成了哪一种数组」全靠它。
+  if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent, raw: parsed.raw, response };
 
   // 注入两件调用方才知道的东西，并**重新过一次契约** —— 越界 gate 正是在这里响。
   const built = buildVisualWorld({ fromModel: parsed.value, styleReferences: o.styleReferences, styleId: o.styleId });
-  if (!built.ok) return { kind: "bad", failure: "schema", detail: `装配后不过契约：${built.detail}`, spent };
+  // ⚠️ **同名不同病**：这一档与「模型自己写坏了形状」都记 `schema`（形状里没有第五格，
+  //   发明一个到不了的值是 R7 的门）；分开读**靠 `detail`** —— 与票 55 的 Q2(r3) 同一条分工。
+  //   ⚠️ 而 `raw` 仍然带模型那一份原话（它**过了** `ModelFacingSpec`，只是装配之后越了界）。
+  if (!built.ok) return { kind: "bad", failure: "schema", detail: `装配后不过契约：${built.detail}`, spent, raw: parsed.raw, response };
   return { kind: "ok", value: built.spec, spent };
+}
+
+/**
+ * 这一圈的入参**要不要带走**、带走什么（票 60 Q2 = (a)+(c)，照票 55 的 Q5 同款）。
+ *
+ * ⚠️ **判据不是「抛的是哪个类」**：`http` / `timeout` 抛在**第 2 发**时，第 1 发那份入参
+ *   就在手上 —— 按错误类分流会把它**连同现场一起丢掉**。
+ *   判据是**这一圈有没有拿到过模型入参**：拿到过就带，一个都没拿到就什么都不带
+ *   （`carryOnError` 的空场合 ⇒ 连键都不加 ⇒ **不会有「写一个空容器」那一档**，
+ *   而 `VisualWorldAttempts.attempts` 那条 `.min(1)` 是**同一件事的结构侧**）。
+ * ⚠️ 「拿到过」= **至少一发有 `raw`**，而且是**按字节**算的：模型真写了一个 `{}` 也算拿到过
+ *   （票 27 实测的那个形状，最值钱的一条证据）。真正「一个都没有」的只有 `no-tool-use`
+ *   —— 那一档连块都不在，压根没有入参可言。
+ * ⚠️ **上游失败那一发（`http` / `timeout`）压根不进 `attempts`** —— 它发生在取到 body 之前、
+ *   没有模型入参可留 ⇒ 它是**伪造证据**，而账的 `failures[]` 才是它的家。
+ */
+function carriedAttempts(attempts: VisualWorldAttempt[]): { visualWorldAttempts?: VisualWorldAttempts } {
+  return attempts.some((a) => a.raw !== undefined)
+    ? { visualWorldAttempts: { format: VISUAL_WORLD_ATTEMPTS_FORMAT, attempts } }
+    : {};
 }
 
 /**
@@ -244,6 +295,17 @@ export async function analyzeReference(input: AnalyzeReferenceInput): Promise<An
   });
 
   const call = spentCall("analyze-reference", input.styleId);
+  // ⚠️ **票 60**：这一圈里模型写下的入参 —— 只有它会被带到失败现场去。
+  //   ⚠️ **「重采样之后成功」那一跑留不下来**，这是**有意的取舍**（票 55 的第一轮推论，写在明处）：
+  //   只有**抛出来**才有写入点（阴性判据要求「成功路径一个字节不变」），而成功的那一跑本来就走过去了。
+  const attempts: VisualWorldAttempt[] = [];
+  /** 挂上这一圈再抛 —— **抛点只有这一个**，免得三处各写一遍挂载（`carryOnError` 没东西可带时是空操作）。
+   *  ⚠️ 写成**函数声明**（不是 `const` 箭头）：只有这种形状，TS 才认它「永不返回」
+   *  ⇒ 上面那三个 `if` 之后的收窄与「函数有终」才成立。 */
+  function raise(e: unknown): never {
+    carryOnError(e, carriedAttempts(attempts));
+    throw e;
+  }
   let lastFailure: CallFailure = "schema";
   let lastDetail = "";
   for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++) {
@@ -252,25 +314,31 @@ export async function analyzeReference(input: AnalyzeReferenceInput): Promise<An
       styleReferences, styleId: input.styleId,
     });
     if (once.kind === "upstream") {
+      // ⚠️ **上游失败不记进 `attempts`**：它发生在取到 body 之前，压根没有模型入参
+      //   （`VisualWorldAttemptOutcome` 里没有它那一格）—— 它在**账**的 `failures[]` 里。
       call.trip({ failure: once.failure });
       const ledger = call.record();
-      throw new AnalyzeReferenceError(once.failure, once.detail, ledger ? [ledger] : undefined);
+      raise(new AnalyzeReferenceError(once.failure, once.detail, ledger ? [ledger] : undefined));
     }
     if (once.kind === "ok") {
       call.trip({ spent: once.spent });
       const ledger = call.record();
       return { spec: once.value, ...(ledger ? { ledger: [ledger] } : {}) };
     }
+    attempts.push({
+      attempt, outcome: once.failure, detail: once.detail, response: once.response,
+      ...(once.raw === undefined ? {} : { raw: once.raw }),
+    });
     call.trip({ failure: once.failure, spent: once.spent });
     lastFailure = once.failure;
     lastDetail = once.detail;
   }
 
   const ledger = call.record();
-  throw new AnalyzeReferenceError(
+  raise(new AnalyzeReferenceError(
     lastFailure,
     `重采样 ${STRUCTURED_CALL_ATTEMPTS} 次都没有拿到一份过契约的 VisualWorldSpec（最后一次：${lastFailure}）。` +
     `最后一次的病因：${lastDetail}`,
     ledger ? [ledger] : undefined,
-  );
+  ));
 }

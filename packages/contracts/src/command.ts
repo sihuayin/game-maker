@@ -9,6 +9,7 @@
 // ⚠️ 它是**纯形状 + 两个小工具**，不含任何业务：退出码语义、失败的载体。
 import type { LedgerCall } from "./ledger.js";
 import type { DesignAttempts } from "./design-attempts.js";
+import type { VisualWorldAttempts } from "./visual-world-attempts.js";
 export type CommandResult = {
   command: string;
   /** 人类可读的几行。CLI 直接打印，MCP 放进 content。 */
@@ -102,8 +103,20 @@ export const exitCodeOfError = (e: unknown): number => (e instanceof CommandErro
  *   `designAttempts` —— `compile-design` 那一圈里模型写下的入参（被拒的设计**一个字都不落盘**那条）。
  *   加在一个**已有**的载体上、而不是给两个 error 类各加一个构造参数（票 55 的 Q7）：三条边界从这里
  *   原样继承，不必在另一个文件里**重新发明一遍**。
+ *
+ * ⚠️ **2026-10-13（[票 60](../../../.scratch/game-maker-v2/issues/60-analyze-reference-attempts-not-persisted.md)）加了第四项**：
+ *   `visualWorldAttempts` —— **同一处病、住另一步**：`analyze-reference`（理解层**第一步**）抛出时
+ *   模型那几发写下的东西一个字都不留，于是「它把顶层 `palette` 写成了哪一种数组」读不出来
+ *   （票 23 第十次真跑现场里**只有 `intent.md`** —— 那还是 fixture 拷进去的**输入**）。
+ *   ⚠️ 同一条纪律再走一遍：**加键、不加构造参数**（票 60 的 Q1b 裁的「每步独立 format」，
+ *   而承载机制**照旧共用这一个**——那是两件事）。
  */
-export type Carried = { ledger?: LedgerCall[]; failureDir?: string; designAttempts?: DesignAttempts };
+export type Carried = {
+  ledger?: LedgerCall[];
+  failureDir?: string;
+  designAttempts?: DesignAttempts;
+  visualWorldAttempts?: VisualWorldAttempts;
+};
 
 /**
  * **把 `carried` 挂到异常上**（票 48 的 Q2 = A）。
@@ -148,5 +161,22 @@ export const failureDirOfError = (e: unknown): string | undefined => {
  */
 export const designAttemptsOfError = (e: unknown): DesignAttempts | undefined => {
   const v = (e as Carried | null | undefined)?.designAttempts;
+  return v !== null && typeof v === "object" && Array.isArray(v.attempts) ? v : undefined;
+};
+
+/**
+ * 异常上带的那一圈 `analyze-reference` 逐发入参（票 60）。
+ *
+ * ⚠️ **判据是「身上有没有」，不是 `instanceof`** —— 与上面三个 reader 同一条（票 48）：
+ *   挂在哪个类的异常上**不由写入者决定**（`carryOnError` 挂在**原异常**上，不改它的类）。
+ *   ⚠️ 票 23 第十次真跑死在**第一步**，而那个异常是 `AnalyzeReferenceError`；
+ *   按类读就会在这一档上**恰好读不到** —— 那正是本票要消灭的那件事。
+ *
+ * ⚠️ **只做类型闸、不在这里重验 schema**（照 `designAttemptsOfError` 那段）：
+ *   在这里再验一遍，只会把「形状漂了」从**一条会红的判据**变成一次**静默的丢弃**。
+ * ⚠️ 与另三项**各自独立**：只有它时不发明账、不发明现场、也不发明设计入参。
+ */
+export const visualWorldAttemptsOfError = (e: unknown): VisualWorldAttempts | undefined => {
+  const v = (e as Carried | null | undefined)?.visualWorldAttempts;
   return v !== null && typeof v === "object" && Array.isArray(v.attempts) ? v : undefined;
 };

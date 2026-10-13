@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { DESIGN_ATTEMPTS_FILE, RUN_LEDGER_FORMAT, parseDesignAttempts, parseRecipe, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { DESIGN_ATTEMPTS_FILE, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
@@ -376,6 +376,146 @@ describe("§票 55 · 被拒的设计**也**留现场（`design-attempts.json`�
     for (const f of listing(clean)) {
       // ⚠️ `ledger.json` 除外：它的 `ms` 是**时钟读数**，而重采样那一跑本来就该多记一发
       //   （账一个字没动 —— 票 55 的 Q7）
+      if (f === "ledger.json") continue;
+      const read = (h: ReturnType<typeof harness>) =>
+        fs.readFileSync(path.join(h.outRoot, "wasteland", "run", "v1", f));
+      expect(read(clean).equals(read(retried)), f).toBe(true);
+    }
+    // ⚠️ 而成功那一跑连失败现场都不该有 —— 不抛就**没有那个写入点**（这条判据是**结构性**成立的）
+    expect(fs.readdirSync(retried.outRoot).filter((d) => d.startsWith(".failed-"))).toEqual([]);
+  });
+});
+
+// ── 票 60「理解层**第一步**失败时，模型写的东西一个字都不留」的判据 ──────────────
+//
+// ⚠️ 这一组与票 55 那一组的**判据形状是同款**，但**必须专门钉「死在第一步」这一档**：
+//   票 55 的阳性桩喂的是**设计层**，而票 23 第十次真跑的新证据是**第一步就抛**
+//   （现场里只有 `intent.md`）—— 不专门钉它，「换了一个键」这件事的判据会**看着它但不打中它**。
+describe("§票 60 · 死在第一步也留现场（`visual-world-attempts.json`）", () => {
+  /** 那一次失败留下的**唯一**现场目录（`.failed-<ts>/`）。 */
+  const site = (h: ReturnType<typeof harness>) => {
+    const sites = fs.readdirSync(h.outRoot).filter((d) => d.startsWith(".failed-"));
+    expect(sites).toHaveLength(1);
+    return path.join(h.outRoot, sites[0]!);
+  };
+  const thrown = <T,>(p: Promise<T>) => p.then((): unknown => undefined, (e: unknown) => e);
+
+  /** 拦下某一支工具，按给定形状答话（其余照旧走假上游）。 */
+  const intercept = (
+    h: ReturnType<typeof harness>, tool: string,
+    answer: (name: string) => Record<string, unknown> | Response,
+  ): typeof fetch => {
+    const inner = h.fetchImpl;
+    return (async (url: string, init: RequestInit) => {
+      const body = JSON.parse(String(init.body)) as { tool_choice?: { name?: string } };
+      const name = body.tool_choice?.name;
+      if (name !== undefined && name === tool) {
+        const a = answer(name);
+        return a instanceof Response ? a : jsonResponse(a);
+      }
+      return inner(url, init);
+    }) as typeof fetch;
+  };
+  const jsonResponse = (body: unknown): Response =>
+    new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  /** 一份**过了 `ModelFacingSpec`、但顶层 `palette` 是数组**的入参 —— 第十跑实测的那个形状。 */
+  const badWorld = (p: unknown) => ({
+    content: [{ type: "tool_use", name: "emit_visual_world", input: { ...CANNED.visualWorld, palette: p } }],
+    stop_reason: "tool_use", model: "deepseek-flash", usage: { input_tokens: 1500, output_tokens: 2100 },
+  });
+
+  it("阳性 · **死在第一步**：现场里有 `intent.md`（那一步真走到了）与三发各自的原始入参", async () => {
+    const h = harness();
+    const fetchImpl = intercept(h, "emit_visual_world", () => badWorld(["#2e3b4e"]));
+    const err = (await thrown(understand(h, { fetchImpl }))) as Error;
+    expect(String(err.message)).toMatch(/重采样/);
+    expect(String(err.message)).toContain("VisualWorldSpec");
+    // ⚠️ **报错里不点名这个文件**（与票 55 的 Q4 同款）：失败现场的通行做法是**目录即索引**
+    expect(String(err.message)).not.toContain(VISUAL_WORLD_ATTEMPTS_FILE);
+
+    const dir = site(h);
+    // ⚠️ 死在第一步 ⇒ **上游一格产物都没有**，`intent.md` 是 fixture 拷进去的**输入**
+    //   （它同时是「那个写入点真的走得到」的旁证 —— 第十跑现场就是长这样）
+    expect(fs.readdirSync(dir)).toContain("intent.md");
+    expect(fs.existsSync(path.join(dir, "visual-world.json"))).toBe(false);
+
+    const parsed = parseVisualWorldAttempts(readJson(path.join(dir, VISUAL_WORLD_ATTEMPTS_FILE)));
+    expect(parsed.ok, parsed.ok ? "" : parsed.errors.join("；")).toBe(true);
+    if (!parsed.ok) return;
+    // ⚠️ **每一次往返**：三发都在、按 `attempt` 升序 —— 只留最后一发，
+    //   就会把「系统性毛病 vs 手气差」这条判断**重新变回推理**（票 23 的 H2 要的正是这个）
+    expect(parsed.value.attempts.map((a) => a.attempt)).toEqual([1, 2, 3]);
+    expect(parsed.value.attempts.map((a) => a.outcome)).toEqual(["schema", "schema", "schema"]);
+    // ⚠️ 而 `raw` 是**模型那一发写下的整份入参**（不是装配后那份 —— 那一份没落盘）
+    const raw0 = parsed.value.attempts[0]!.raw as { palette: unknown };
+    expect(raw0.palette).toEqual(["#2e3b4e"]);
+    // ⚠️ 响应摘要也在（判「三发是不是同一段时间的坏状态」的输入之一）
+    expect(parsed.value.attempts[0]!.response.usage).toEqual({ inputTokens: 1500, outputTokens: 2100 });
+  });
+
+  it("阴性 · **第一步成了、第二步才死** ⇒ 第一发那份容器**不出现**（它只属于抛出来的那一圈）", async () => {
+    // ⚠️ 这是**有意的取舍**、不是漏掉的边：`analyze-reference` 成功那一跑**不抛**
+    //   ⇒ 没有写入点（成功路径一个字节不变的代价）。`visual-world.json` 在，容器不在。
+    const h = harness();
+    const fetchImpl = intercept(h, "emit_game_intent", () => ({
+      content: [{ type: "tool_use", name: "emit_game_intent", input: { format: "game-intent/v1" } }],
+      stop_reason: "tool_use", model: "deepseek-flash", usage: { output_tokens: 800 },
+    }));
+    await expect(understand(h, { fetchImpl })).rejects.toThrowError(/重采样/);
+    const dir = site(h);
+    expect(fs.existsSync(path.join(dir, "visual-world.json"))).toBe(true);
+    expect(fs.existsSync(path.join(dir, VISUAL_WORLD_ATTEMPTS_FILE))).toBe(false);
+  });
+
+  it("⚠️ 密钥钉子：落下来的东西里**不含**密钥（不许只靠「它今天恰好只在请求头里」）", async () => {
+    const SECRET = "sk-ant-THIS-MUST-NEVER-REACH-THE-FAILURE-SITE-6060";
+    const h = harness();
+    const fetchImpl = intercept(h, "emit_visual_world", () => badWorld([]));
+    await expect(understand(h, { fetchImpl, transport: { baseUrl: "http://up.test", apiKey: SECRET } }))
+      .rejects.toThrowError(/重采样/);
+    // 现场里**所有**落盘的文本一起看 —— 本票往这里新塞了一类内容，就该在这里钉一次（同票 55）
+    const dir = site(h);
+    const dump = fs.readdirSync(dir).filter((f) => /\.(json|md)$/.test(f))
+      .map((f) => fs.readFileSync(path.join(dir, f), "utf8")).join("\n");
+    expect(dump).toContain("visual-world-attempts");   // 钉子先自证：那个文件**确实**在
+    expect(dump).not.toContain(SECRET);
+  });
+
+  it("阴性 · **一个入参都没拿到**（连工具块都没有）⇒ 不写（连一个空容器都不留）", async () => {
+    // ⚠️ 判据是**这一圈有没有拿到过模型入参**，不是「抛的是哪个类」——
+    //   这一档三发全 `no-tool-use`，压根没有入参可留 ⇒ 一份什么都不含的容器不该被写出来
+    const h = harness();
+    const fetchImpl = intercept(h, "emit_visual_world", () => ({
+      content: [{ type: "text", text: "我说了算" }], stop_reason: "tool_use", usage: { output_tokens: 4430 },
+    }));
+    await expect(understand(h, { fetchImpl })).rejects.toThrowError(/重采样/);
+    // 现场照旧在（改名、不删）—— 只是里面**没有**这个东西
+    const dir = site(h);
+    expect(fs.readdirSync(dir)).toContain("intent.md");
+    expect(fs.existsSync(path.join(dir, VISUAL_WORLD_ATTEMPTS_FILE))).toBe(false);
+  });
+
+  it("阴性 · 成功路径一个字节不变 —— 哪怕这一跑在**第一步**重采样过、内存里真有过一份原始入参", async () => {
+    const clean = harness();
+    await understand(clean);
+    // 第 1 发不过契约、第 2 发才成（**在第一步重采样**，票 55 那一档没覆盖到）
+    const retried = harness();
+    let trips = 0;
+    const fetchImpl = intercept(retried, "emit_visual_world", () =>
+      (++trips === 1 ? badWorld(["#2e3b4e"]) : jsonResponse({
+        content: [{ type: "tool_use", name: "emit_visual_world", input: CANNED.visualWorld }],
+        stop_reason: "tool_use", model: "deepseek-flash", usage: { input_tokens: 1200, output_tokens: 900 },
+      })));
+    await understand(retried, { fetchImpl });
+
+    const listing = (h: ReturnType<typeof harness>) =>
+      fs.readdirSync(path.join(h.outRoot, "wasteland", "run", "v1")).sort();
+    expect(listing(retried)).toEqual(listing(clean));
+    // ⚠️ 本票的阴性判据里最要紧的一格：那份原始入参**不进成功产物**（更不进 `run/v<N>/`）
+    expect(listing(retried)).not.toContain(VISUAL_WORLD_ATTEMPTS_FILE);
+    for (const f of listing(clean)) {
+      // ⚠️ `ledger.json` 除外：它的 `ms` 是**时钟读数**，而重采样那一跑本来就该多记一发
+      //   （账一个字没动 —— 票 55 的 Q7 照旧）
       if (f === "ledger.json") continue;
       const read = (h: ReturnType<typeof harness>) =>
         fs.readFileSync(path.join(h.outRoot, "wasteland", "run", "v1", f));
