@@ -70,6 +70,16 @@ describe("提示词骨架", () => {
     expect(p).toContain("不许改、不许删、不许换桶");
   });
 
+  it("⚠️ **三条「玩家 / 桶」的散文口径一致**（票 53：三处一起改口，别只改一处）", () => {
+    const p = prompt();
+    // ⚠️ 票 42 一次加了**三处**说同一件事的地方（工具说明第 4 条 + `npcs` / `levels` 两条字段台账），
+    //   票 53 因此**三处一起**改口。⚠️ 只锚工具说明那一处的话，另外两处**漂回旧口径也不会红** ——
+    //   而「漂回去」正是第八次真跑段 A 那种死法（`auditIntentCoverage` 拒「缺了 `scavenger`」）。
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("不是「把桶里那条删掉」");   // ① 工具说明第 4 条
+    expect(p).toContain("意图层已经登记过的那条要留着");                    // ② `npcs` 台账
+    expect(p).toContain("意图层登记过的那条**留着**");                     // ③ `levels` 台账
+  });
+
   it("⚠️ **「覆盖 + 补全」写进了提示词**（R2-Q1 的裁定：这一层可以多，不可以少、不可以改）", () => {
     const p = prompt();
     expect(p).toContain("意图覆盖 + 需求补全");
@@ -138,7 +148,13 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
     //   两条都盯住：只锚「玩家」的话，「不许复制」那半句被删掉也不会红 ——
     //   而它正是 6/6 份真实设计撞出来的那个形状（NPC 桶里躺着「玩家控制的拾荒者本人」）。
     expect(DESIGN_TOOL_DESCRIPTION).toContain("玩家或上面四个桶里");
-    expect(DESIGN_TOOL_DESCRIPTION).toContain("别在 `npcs[]` 里再写一条「玩家本人」");
+    // ⚠️ **2026-10-13 稍晚（票 53）**：上面那半句的**表述换过** —— 票 42 原本写的是
+    //   「别在 `npcs[]` 里再写一条「玩家本人」」，而第八次真跑段 A 量到模型把它读成了
+    //   「**把意图层那条删掉**」⇒ 撞上第 3 条（不许删）⇒ 7/7 跑死在 `intent-entity-missing`。
+    //   锚跟着搬到新表述上：要钉的是**「改的是 `player.id`、不是删掉桶里那条」**这半句 ——
+    //   只锚前一半不够（那接近旧话的意思），必须锚住**「不是删掉」**那一半。
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("要**另起**的是 `player.id`");
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("不是「把桶里那条删掉」");
   });
 
   it("工具名与提示词尾句对得上", () => {

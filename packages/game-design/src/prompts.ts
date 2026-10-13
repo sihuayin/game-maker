@@ -113,6 +113,13 @@ export const DESIGN_TOOL_NAME = "emit_game_design";
  *
  * ⚠️ 下面第 1 条同时是**唯一**告诉模型「契约带一条 gate」的地方 ——
  *   `toJSONSchema` 把 `superRefine` 静默丢掉（08 实测），所以模型**看不见**那条规矩。
+ *
+ * ⚠️ **2026-10-13（票 53）：第 4 条那半句改过口 —— 只改散文，判据一条没动。**
+ *   票 42 加的那句原文是「**别在 `npcs[]` 里再写一条「玩家本人」**」，它**只说了「不许复制」**，
+ *   而模型把它读成了「**把意图层那条删掉**」——于是撞上第 3 条（「意图里已有的 `id` **不许删**」，
+ *   由 `auditIntentCoverage` 执行）⇒ 第八次真跑段 A **7/7 跑**都死在 `intent-entity-missing`、退 4。
+ *   ⚠️ 坏的不是那两条判据（第 3 条保覆盖、gate ⑤ 保唯一，两条都**对**），是**散文没说清要改哪一个**：
+ *   `player.id` 才是那个必须另起的，而意图层登记过的那条 npc **要原样留着**。
  */
 export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把「用户要什么」**做成一个具体的设计**。
 ⚠️ 与上一步不同：这一层是**我们做成的**，所以**每个字段都必须完整**（没有「不知道」这个选项）。
@@ -142,8 +149,11 @@ export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把�
 4. \`levels[].entities\` 是**引用**：每一项都必须是**玩家或上面四个桶里**真的存在的 \`id\` ——
    这一关里有玩家，就写 \`player.id\`（\`layout\` 本来就在说玩家怎么走）。
    ⚠️ 写到不存在的 id 会被判失败、当场重来。
-   ⚠️ **也**不许把玩家**复制**进任何一个桶：\`player.id\` 与桶里某个 id 相同会被判失败、当场重来
-   —— 玩家**不是一条 NPC**，他住在 \`player\` 那一格，**别在 \`npcs[]\` 里再写一条「玩家本人」**。
+   ⚠️ **也**不许把玩家**复制**进任何一个桶：\`player.id\` 与桶里某个 id 相同会被判失败、当场重来 ——
+   要**另起**的是 \`player.id\`（给它一个不与任何桶重名的 id）。
+   ⚠️ **这句说的是 \`player.id\`，不是「把桶里那条删掉」**：若意图层**就是**把主角登记成了某个桶里的
+   一条（\`role\` 写着「玩家控制的…」），那条**留着**、\`id\` 按第 3 条**原样沿用** ——
+   它是意图层登记过的实体，删了它，下游就**再也说不出「用户要的那个东西做成了没有」**。
 
 只调这个工具，不要解释。`;
 
@@ -157,12 +167,12 @@ const DESIGN_FIELD_HINTS: Record<keyof GameDesignSpec, string> = {
   player: "`{ id, role, abilities, goals }` —— ⚠️ `player.role` 与 `player.abilities` 是**具名生产**的字段：能力一条一句（至少要有一条），`goals` 也至少一条",
   enemies: "`{ id, behavior, threat }[]` —— ⚠️ `enemies[].behavior` 与 `enemies[].threat` 是**具名生产**的：它怎么动、它怎么威胁" + BUCKET_ID_RULE,
   npcs: "`{ id, role, interaction }[]` —— ⚠️ `npcs[].role` 与 `npcs[].interaction` 是**具名生产**的：他是谁、能跟他做什么" +
-    "（⚠️ **玩家不在这里**：他住在 `player` 那一格 —— 别在 `npcs[]` 里再写一条「玩家本人」；" +
-    "要让关卡点名玩家，直接在 `levels[].entities` 里写 `player.id`）" + BUCKET_ID_RULE,
+    "（⚠️ **玩家的身份在 `player.id` 那一格**：**别为它新写一条** —— 要让关卡点名玩家，直接在 `levels[].entities` 里写 `player.id`；" +
+    "⚠️ 而**意图层已经登记过的那条要留着**、`id` 原样沿用 —— 要另起的是 `player.id`，不是删掉它）" + BUCKET_ID_RULE,
   interactables: "`{ id, type, behavior }[]` —— ⚠️ `interactables[].type` 与 `interactables[].behavior` 是**具名生产**的：它是什么类、碰它会怎样" + BUCKET_ID_RULE,
   resources: "`{ id, purpose }[]` —— 每个可拾取之物**拿来干嘛**（可以是空数组：这一关没有可拾之物）" + BUCKET_ID_RULE,
   world: "`{ theme, setting, structure }` —— ⚠️ `world.theme` / `world.setting` / `world.structure` **三个都具名生产**；`structure` 说的是**空间怎么分层**（前景/中景/背景、纵向几段），**照参考图那个世界的结构写**",
-  levels: "`{ id, purpose, layout, entities }[]` —— ⚠️ `levels[].purpose` 具名生产；`layout` 说清**从左到右怎么走**、`entities` 只填**玩家或上面四个桶里真有的 id**（玩家写 `player.id`，**不要**为它单开一条 NPC）。**至少一关**",
+  levels: "`{ id, purpose, layout, entities }[]` —— ⚠️ `levels[].purpose` 具名生产；`layout` 说清**从左到右怎么走**、`entities` 只填**玩家或上面四个桶里真有的 id**（玩家写 `player.id`，**不要**为它**新开**一条 NPC —— ⚠️ 而意图层登记过的那条**留着**）。**至少一关**",
   progression: "`{ model, description }` —— 进阶是怎么发生的",
   difficulty: "`{ model, description }` —— **可选**，需求里没提就整个省掉",
   mechanics: "`{ id, mechanic }[]` —— `id` **照抄意图层**，`mechanic` 从下面那 8 个值里挑；**至少一条**",
