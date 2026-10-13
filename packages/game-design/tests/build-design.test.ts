@@ -4,8 +4,10 @@
 //   ① **三个照抄值真的被强制覆盖**（模型写了什么都不算）；
 //   ② **R12 的拒绝判得对**（尤其「相机」那条 —— 它最容易被写成一句笼统的 `startsWith("camera:")`，
 //      那样俯视的参考图会**静默通过**）。
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { PLATFORMER_V1, type GameDesignSpec, type GameIntentSpec, type RuntimeProfile, type VisualWorldSpec } from "@game-maker/contracts";
+import { GameIntentSpecSchema, PLATFORMER_V1, type GameDesignSpec, type GameIntentSpec, type RuntimeProfile, type VisualWorldSpec } from "@game-maker/contracts";
 import { CAMERA_MODE_NEEDS, buildDesign } from "../src/index.js";
 
 const profile = (over: Partial<RuntimeProfile> = {}): RuntimeProfile => ({ ...PLATFORMER_V1, ...over });
@@ -195,5 +197,63 @@ describe("拒绝是给人改需求用的 —— **一次把所有理由都算出
     expect(r.rejections.map((x) => x.reason).sort()).toEqual(
       ["camera-unsupported", "capability-unsupported", "intent-mechanic-missing"].sort()
     );
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 票 54：拿**第八次真跑盘上那份意图**回放（本票唯一一份**不是编的**输入）
+// ═════════════════════════════════════════════════════════════════════════════
+// 那一跑死在 `compile-design`：`wasteland-bg` 这条「机制」在设计层的封闭枚举里没有对家。
+// ⚠️ 这份回放要证的是**两件事分开的两件事**（人类裁定的补充裁定 3）：
+//   ①（本票改的那一半）这种意图**今天生成不出来了** —— 它在意图层契约就被拦下、重采样；
+//   ②（本票**没改**的那一半）R12 一条没松 —— 就算放它过去，拒绝照样点名 `wasteland-bg`。
+// ⚠️ 它**不**证明「模型学会了分类」—— 那件事只能在票 23 的下一次完整真跑里看（本票不追加付费探针）。
+describe("票 54：第八次真跑那份 `game-intent.json` 回放", () => {
+  /** ⚠️ **只读**的真读数（盘上那份失败目录里的产物，git 里跟着走）—— 别改它。 */
+  const RAW: GameIntentSpec = JSON.parse(readFileSync(
+    fileURLToPath(new URL(
+      "../../../.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13a/" +
+      ".failed-2026-10-13T02-21-58-177Z/game-intent.json", import.meta.url)), "utf8"));
+
+  /** 那一跑模型**实际交出去**的设计（盘上没有：它死在拒绝那一发）—— 照第七跑的活法**拿近似顶上**：
+   *  `chest`/`resource` → `collect-pickup`、`enemy` → `hazard-contact`、`final-goal` → `reach-goal`，
+   *  唯独 `wasteland-bg` **没有近似可用** ⇒ 全篇只它一条落空（这正是「省掉之后由 `compile-design` 判」）。 */
+  const run8Design = (): GameDesignSpec => ({
+    ...design(),
+    enemies: [{ id: "enemy", behavior: "在废墟里巡逻", threat: "接触即伤" }],
+    npcs: [{ id: "scavenger", role: "玩家控制的拾荒者", interaction: "（没有可做的）" }],
+    interactables: [{ id: "chest", type: "宝箱", behavior: "可开启" }],
+    resources: [{ id: "resource", purpose: "补给与废料" }],
+    levels: [{ id: "l-1", purpose: "穿过废弃城市", layout: "左到右", entities: ["p", "scavenger", "enemy", "chest", "resource"] }],
+    mechanics: [
+      { id: "side-scroll-move", mechanic: "run" },
+      { id: "jump", mechanic: "jump" },
+      { id: "chest", mechanic: "collect-pickup" },
+      { id: "resource", mechanic: "collect-pickup" },
+      { id: "enemy", mechanic: "hazard-contact" },
+      { id: "final-goal", mechanic: "reach-goal" }
+    ]
+  });
+
+  it("① 它今天**过不了意图层契约**（票 54 加的 ⑤b）：三条跨数组重 id 逐条点名，两条路径都在", () => {
+    const r = GameIntentSpecSchema.safeParse(RAW);
+    expect(r.success).toBe(false);
+    if (r.success) return;
+    // `chest` / `resource` / `enemy` 三条同时躺在两个数组里 ⇒ 三条 issue，各指自己那条机制
+    expect(r.error.issues.map((x) => x.path.join("."))).toEqual(["mechanics.2.id", "mechanics.3.id", "mechanics.4.id"]);
+    expect(r.error.issues[0]!.message).toContain("`chest`");
+    expect(r.error.issues[0]!.message).toContain("`entities[2].id`");
+    // ⚠️ 而 `wasteland-bg` / `final-goal` **不在这三条里** —— 它们是**语义**上的错格（世界设定 / 胜利条件），
+    //   没有 gate 判得了那个（R3：判据只收「精确可算」）。它们靠提示词里那段「先分家」拦。
+    expect(r.error.issues.every((x) => !x.message.includes("wasteland-bg"))).toBe(true);
+  });
+
+  it("② 设计层那条 R12 **一个字没松**：放它过去，拒绝照样点名 `废土背景`、且**只它一条**", () => {
+    const r = buildDesign({ fromModel: run8Design(), intent: RAW, vws: VWS, profile: profile() });
+    expect(r.ok).toBe(false);
+    if (r.ok || r.kind !== "rejected") return;
+    expect(r.rejections.map((x) => x.reason)).toEqual(["intent-mechanic-missing"]);
+    expect(r.rejections[0]!.detail).toContain("废土背景");       // 意图层的 `name` 原话
+    expect(r.rejections[0]!.detail).toContain("`wasteland-bg`");
   });
 });

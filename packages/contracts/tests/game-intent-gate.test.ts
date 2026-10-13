@@ -88,6 +88,41 @@ describe("⚠️ 结构性空值 gate（票 09 的 R2-Q1）", () => {
     if (!rMech.success) expect(rMech.error.issues[0]!.path).toEqual(["mechanics", 1, "id"]);
   });
 
+  it("⚠️ **跨数组**相撞也拒 —— 同一个 id 不能既是实体、又是机制（2026-10-13 票 54 加的 ⑤b）", () => {
+    // 第八次真跑那份意图的形状：`chest` / `resource` / `enemy` 同时躺在两个数组里
+    // （盘上 7 份真实意图 **6 份**都这么写 —— 工具说明第 6 条一直禁着它，只是没有 gate 看着）。
+    const r = parse({
+      entities: [{ id: "chest", type: "interactable", role: "可开启的宝箱" }],
+      mechanics: [{ id: "jump", name: "跳跃" }, { id: "chest", name: "宝箱" }]
+    });
+    expect(r.success).toBe(false);
+    if (r.success) return;
+    const iss = r.error.issues.find((x) => x.path.join(".") === "mechanics.1.id");
+    expect(iss).toBeDefined();
+    // ⚠️ 报错**不能只说「重复」**（人类裁定的补充裁定 2）：要点名冲突的那个 id、**两条路径都给**，
+    //   并给出路 —— 不说出路的话，模型最省事的做法是**把实体删掉**，而那是真的丢内容。
+    expect(iss!.message).toContain("`chest`");
+    expect(iss!.message).toContain("`entities[0].id`");
+    expect(iss!.message).toContain("拆成两条");
+    expect(iss!.message).toContain("不许删掉实体");
+  });
+
+  it("⚠️ 负判据：`chest` 与 `open-chest` 是两个 id ⇒ **放行**（拆开正是那条出路，不许误伤）", () => {
+    // 先例：第五跑那份意图零重复，`chest` 与 `open-chest` 各记一条 —— 那是对的形状。
+    const r = parse({
+      entities: [{ id: "chest", type: "interactable", role: "可开启的宝箱" }],
+      mechanics: [{ id: "jump", name: "跳跃" }, { id: "open-chest", name: "开箱" }]
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it("⚠️ 它**只管这两张表之间** —— 机制与 `winConditions[]` 那种**没有 id** 的东西撞不上（别扩射程）", () => {
+    // 「最终目标」在意图层该进 `winConditions[]`（那是散文，没有 id），而它是 `mechanics[]` 里
+    // 合法的一条机制名 —— 这条 gate **不**、也**不该**去判「这条机制是不是真的机制」：
+    // 那是**语义**（R3：判据只收「精确可算 + 错了一定不是设计」），它只判**同一个 id 有没有躺在两处**。
+    expect(parse({ mechanics: [{ id: "final-goal", name: "最终目标" }] }).success).toBe(true);
+  });
+
   it("⚠️ 它**同时管从磁盘上读回来的文档** —— 一份空壳的 `game-intent.json` 解析时就会被拒", () => {
     const fromDisk = JSON.parse(JSON.stringify(parse({ genre: "" }) && { ...INTENT, genre: "" }));
     expect(GameIntentSpecSchema.safeParse(fromDisk).success).toBe(false);

@@ -3,9 +3,15 @@
 Type: task
 Status: open
 Owner: claude
-Blocked by: 53, 54
+Blocked by: —
 Map: ../map.md
-> ⚠️ **2026-10-13 · 第八次真跑（段 A）跑完 ⇒ 本票重新被挡：`Blocked by: 53, 54`。**
+> ⚠️ **2026-10-13 稍晚 · `Blocked by` 已解除** —— 那两个并列的拦路石都收了口：
+> [票 53](53-npc-clause-vs-coverage.md)（提示词第 3 条 vs 第 4 条：三处一起改口）与
+> [票 54](54-mechanic-omitted-vs-coverage.md)（意图层分类散文 + 第 6 条升成 gate；R12 一个字没松）。
+> ⚠️ **解票 ≠ 可以开跑**：下一跑仍**先出付费运行报告**（预算 / 最大调用次数 / 停止条件 / 验收条件）
+> 并拿到人**逐次明确同意**。
+> ⚠️ 顺带：[票 56](56-prose-vs-gate-audit.md)（理解层四步散文审计）**不挡本票**。
+> ⚠️ **2026-10-13 · 第八次真跑（段 A）跑完 ⇒ 当时本票被挡：`Blocked by: 53, 54`。**
 > 它死在新的一处（**不是**第七跑那个 id 碰撞）：`compile-design` 一次报了**两条** R12 理由 ——
 > 一条是[票 53](53-npc-clause-vs-coverage.md)（提示词第 3 条「不许删」 vs 第 4 条「别在 `npcs[]` 里写玩家」），
 > 一条是[票 54](54-mechanic-omitted-vs-coverage.md)（提示词说「省掉」、覆盖判据却「拒绝」）。

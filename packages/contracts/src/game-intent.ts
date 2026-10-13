@@ -92,7 +92,8 @@ export const GameIntentMechanicSchema = z.strictObject({
 //     凡「空了就说明**这一趟没说出一件事**」的 ⇒ 进 gate（这一发算 `schema` 失败、重采样）；
 //     凡「空了**本身是一句设计陈述**」的 ⇒ **不进**。
 //   进：必填字符串非空 · 数组元素非空 · `coreLoopSteps` / `player.goals` / `mechanics` ≥ 1 ·
-//       可选对象出现时不得是空壳 · id 不得重复。
+//       可选对象出现时不得是空壳 · id 不得重复（**各自数组内**、**以及 `entities` 与 `mechanics`
+//       之间** —— 后者是 2026-10-13 票 54 加的，见下面 ⑤）。
 //   不进（**逐条写下来，免得下一个人往里加**）：
 //     · `winConditions: []` / `loseConditions: []` —— 「不会死 / 没有终点」是真设计
 //       （仓库里就有原话：「没有血量条，也不会死」，`out/__probe-derive/vague.md`）；
@@ -234,6 +235,44 @@ export const GameIntentSpecSchema = z.strictObject({
   };
   dupIds(v.entities, "entities");
   dupIds(v.mechanics, "mechanics");
+
+  // ⑤b **跨数组**：`entities[].id` 与 `mechanics[].id` 也不许撞（**2026-10-13 票 54 加的**）
+  //
+  //   ⚠️ **这条规矩本来就写着，只是没有 gate 看着**：意图层工具说明第 6 条逐字写着
+  //     「`entities[].id` 与 `mechanics[].id` **不许重复**」，而 ⑤ 一直只查**各自数组内部**。
+  //     盘上 7 份真实意图里 **6 份**都违反它（票 54 量的）。
+  //
+  //   ⚠️ **为什么它是病、而不只是一条口味**：一个 id 撞在两处，说明**同一个东西被记了两遍**
+  //     —— 而下游**按 id 认东西**（设计层的 `mechanics[]` 与四个桶各认一份，票 03 Q2(b) 的
+  //     「id 延续」）。第八次真跑那份意图就是这么来的：需求里那份「游戏需要有：…」的清单
+  //     被逐条抄进了 `mechanics[]`，于是 `chest` / `resource` / `enemy` 同时躺在两个数组里；
+  //     其中 `chest` / `resource` / `enemy` 的**正经家是 `entities[]`**，而
+  //     `wasteland-bg` / `final-goal` 的**正经家是 `world.*` 与 `winConditions`**
+  //     —— 它们挂在 `mechanics[]` 上，最后**独立杀死了一次真跑**（票 54 §2）。
+  //
+  //   ⚠️ **拦住它的地方必须是这里**：设计层的覆盖判据按 id 比，而一条**根本没有枚举对家的
+  //     机制**（`wasteland-bg`）只能靠「挑一个近似的顶上去」活下来 —— 那正是 R12 最不想要的
+  //     静默丢东西。⇒ 在本层（**免费、任何钱花出去之前**）拒掉并重采样，比拖到设计层
+  //     撞一条**不重采样**的拒绝便宜得多。
+  //
+  //   ⚠️ **它逼模型二选一，所以文案必须给出出路**（人类裁定 2026-10-13）：报错要点名
+  //     **冲突的 id 与它所在的两条路径**，并说清**实体那条留在 `entities[]`、玩法那条拆成
+  //     一个独立的新 id**（先例：第五跑那份意图零重复，`chest` 与 `open-chest` 各记一条）。
+  //     **删掉实体**不是出路 —— 那会真的丢内容。
+  const entityAt = new Map<string, number>();
+  v.entities.forEach((e, i) => { if (!entityAt.has(e.id)) entityAt.set(e.id, i); });
+  v.mechanics.forEach((m, i) => {
+    const j = entityAt.get(m.id);
+    if (j === undefined) return;
+    issue(
+      ["mechanics", i, "id"],
+      `\`mechanics[${i}].id\` 与 \`entities[${j}].id\` **撞了同一个 id**（\`${m.id}\`）—— ` +
+      "同一个 id 不能既是一个**实体**、又是一条**机制**：下游按 id 认东西，重了就说不出是哪一个。" +
+      "⚠️ 若需求同时说了**这个东西**与**对它的操作**（如「宝箱」与「开箱」），" +
+      "**拆成两条、各起一个 id**：实体那条归 `entities[]`（**留着它**）、玩法那条换一个说法" +
+      "（如 `open-chest` / `pickup-resource`）。**不许删掉实体**、也不许两边用同一个 id。"
+    );
+  });
 
   // ⚠️ 被砍掉的，连同理由（票 03 的三轮）：
   //   `confidence`   —— 零消费者 + 长得像分数，与 Destination 的「不带分数」正面冲突。

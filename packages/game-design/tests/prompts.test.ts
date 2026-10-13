@@ -67,6 +67,44 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
     expect(TOOL_DESCRIPTION).toContain("不许重复");
   });
 
+  it("⑥ **先分家**：一句话先判它归哪一格，四格逐个点名（票 54）", () => {
+    // ⚠️ 病根（第八次真跑）：需求里「游戏需要有：…」那张清单被**逐条抄进了 `mechanics[]`** ⇒
+    //   `chest`/`resource`/`enemy` 同时躺在两个数组里（第 6 条一直禁着、只是没有 gate 看着），
+    //   而 `wasteland-bg`/`final-goal` 更是**根本不属于** `mechanics[]`（它们的家是 `world` 与
+    //   `winConditions`）⇒ `wasteland-bg` 在设计层找不到枚举对家，**独立**拒掉了一跑。
+    expect(TOOL_DESCRIPTION).toContain("先分家");
+    for (const home of ["entities[]", "mechanics[]", "winConditions[]"])
+      expect(TOOL_DESCRIPTION).toContain(`记进 \`${home}\``);
+    expect(TOOL_DESCRIPTION).toContain("`world` 那三格");
+  });
+
+  it("⑥ **拆两条**是那条出路，连例子一起给（只禁不给路 ⇒ 模型会去删实体）", () => {
+    // ⚠️ 人类裁定的补充裁定 1/2：要给「拆成两条、各起一个 id」的**具体写法**，并明说
+    //   **删掉实体不是出路** —— 不说的话，模型躲开冲突最省事的做法就是删，而那是真的丢内容。
+    expect(TOOL_DESCRIPTION).toContain("拆成两条、各起一个 id");
+    expect(TOOL_DESCRIPTION).toContain("open-chest");
+    expect(TOOL_DESCRIPTION).toContain("为了躲开冲突把实体删掉");
+  });
+
+  it("⑥ 而「分家」分的是**类别**，不是**做不做得了** —— 不然它跟第 1 条打架", () => {
+    // ⚠️ 第 1 条说「照原话记，别按外壳能力筛」，第 6 条说「别把非机制写进 `mechanics[]`」——
+    //   两句挨着放会被读成「做不了的也别记」⇒ 外壳做不了的真机制（二段跳 / Boss 战）会被丢掉，
+    //   而那正是 R12 **唯一**能说出口的东西。这半句就是那条分界线。
+    expect(TOOL_DESCRIPTION).toContain("不是「做不做得了」");
+    expect(TOOL_DESCRIPTION).toContain("「二段跳」是机制");
+  });
+
+  it("⑥ 第 6 条**升成 gate**：跨数组也不许撞，且出路是拆、不是删（票 54）", () => {
+    expect(TOOL_DESCRIPTION).toContain("两张表之间");
+    expect(TOOL_DESCRIPTION).toContain("别删实体");
+  });
+
+  it("⑥ 字段台账里也各点了一次名（`mechanics` 的边界 / `entities` 不许撞）", () => {
+    const p = intentPrompt({ requirementText: "x" });
+    expect(p).toContain("都不是机制");                 // `mechanics` 那一条
+    expect(p).toContain("与 `mechanics[].id` **不许撞**"); // `entities` 那一条
+  });
+
   it("⚠️ 反例：说明里**一个 `resources` 都没有** —— Q5 之后它不该在模型眼前出现", () => {
     expect(TOOL_DESCRIPTION).not.toContain("resources");
   });

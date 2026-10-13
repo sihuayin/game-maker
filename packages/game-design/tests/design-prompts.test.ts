@@ -130,6 +130,24 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
     //   （票 10 的变异第 22 发就是这么漏的 —— 变异瞄准的句子没有判据看着）。
     expect(DESIGN_TOOL_DESCRIPTION).toContain("不许");
     expect(DESIGN_TOOL_DESCRIPTION).toContain("挑一个「近似的」顶上去");
+    // ⚠️ **2026-10-13（票 54）**：上面那几句的**后半截换过口**。原文「省掉之后由 `compile-design` 判：
+    //   那正是『外壳做不了它』被说出来的一刻」读起来像「判 = 一个中性的观察」，而实际是
+    //   **整份拒绝、退 4、链断在这儿** ⇒ 第八次真跑量到的正是这个后果的形状：
+    //   **听话的那一条死了（`wasteland-bg`）、拿近似值顶替的六条活了**。
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("整份拒绝");
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("退出码 4");
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("点名");
+    // ⚠️ 而「顶替」那半句**反过来**也要说清：省掉至少当场叫停，顶替是没人看见的丢东西。
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("没人看见的丢东西");
+  });
+
+  it("⚠️ 「`id` 照抄意图层」（字段台账）与「挑不出对家就省掉」（第 2 条）**不再打架**（票 54）", () => {
+    // ⚠️ 上面那条 pin 的是工具说明，而**真正把模型推上「近似顶替」那条路的是字段台账**：
+    //   第八跑那份提示词里，`mechanics` 台账写着「`id` **照抄意图层**」，第 2 条却写着「整条省掉」——
+    //   合起来等于「意图里**每一条**机制的 `id` 都要出现在设计里」⇒ 挑不出对家的那些**只能**填近似值
+    //   （盘上 3 份 + 第七跑全是这么过的）。⇒ 两句必须说清是同一条规矩的两个方向。
+    expect(prompt()).toContain("只在你能给它挑出一个对家时");
+    expect(prompt()).toContain("整条省掉");
   });
 
   it("③ id 分两种：意图已有的**原样沿用**（不许改/删/换桶）· 这一层新加的**允许**但**依据必须是需求**", () => {
