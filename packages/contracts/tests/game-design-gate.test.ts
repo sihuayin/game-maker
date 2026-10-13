@@ -2,7 +2,9 @@
 //
 // ⚠️ 它与 `game-intent-gate.test.ts` 是同一款东西的两面（那张票起的分界线：
 //   「空了就说明这一趟没说出一件事」进、「空了本身是一句设计陈述」不进），
-//   外加两条**层内可算**的引用族规矩（id 跨桶唯一 · `levels[].entities` 解得到）。
+//   外加两条**层内可算**的引用族规矩（id 在「`player` + 四桶」上唯一 · `levels[].entities` 解得到）。
+// ⚠️ **2026-10-13（票 42）**：那两条规矩的作用域都从「四个桶」扩到了「`player` + 四桶」——
+//   ⑤ 并入 `player`（桶里出现玩家的 id = 重复）· ⑥ 放宽到能点名玩家。新增的四条断言在下面。
 import { describe, expect, it } from "vitest";
 import { GAME_DESIGN_FORMAT, GameDesignSpecSchema, PLATFORMER_V1, toolInputSchema } from "../src/index.js";
 
@@ -86,6 +88,28 @@ describe("⚠️ 结构性空值 + 层内引用族 gate（票 10 的 Q4）", () 
     expect(parse({ levels: [{ ...DESIGN.levels[0], entities: [] }] }).success).toBe(true); // 这一关没有实体
   });
 
+  // ── 票 42（2026-10-13）：`player` 并进 ⑤、⑥ 放宽到玩家 ────────────────────────────────
+  //   ⚠️ 这两条**必须成对存在**：⑤ 单独成立就是坏药（它逼着模型去撞 ⑤）——
+  //   见 `game-design.ts` 里 ⑤/⑥ 那两段注释（病因是模型**没有合法写法**说出「这一关里有玩家」）。
+  describe("票 42：`player` 与「id 唯一 / 关卡引用」", () => {
+    it("⚠️ **阳性**：`player.id` 与桶里某个 id 重复 ⇒ 拒（Q7）—— 下游靠 id 命中，重了就说不出这条 DNA 是谁", () => {
+      const r = parse({ npcs: [{ id: "p-scavenger", role: "r", interaction: "i" }] });
+      expect(r.success).toBe(false);
+      if (!r.success) expect(r.error.issues[0]!.path).toEqual(["npcs", 0, "id"]);
+    });
+
+    it("⚠️ **阳性**：`levels[].entities[]` 点名玩家 ⇒ 放行（Q6）—— 玩家也是这一关里的一个实体", () => {
+      const r = parse({ levels: [{ ...DESIGN.levels[0], entities: ["p-scavenger", "e-drone"] }] });
+      expect(r.success).toBe(true);
+    });
+
+    it("⚠️ **阴性**：不重复时**不得误拒**（判据不许误杀 —— 本仓库反复栽过的那种）", () => {
+      expect(parse().success).toBe(true);                                                            // 玩家独住 `player`
+      expect(parse({ levels: [{ ...DESIGN.levels[0], entities: ["p-scavenger"] }] }).success).toBe(true); // 只点名玩家
+      expect(parse({ npcs: [{ id: "n-wanderer", role: "r", interaction: "i" }] }).success).toBe(true);    // 另一个 id 的 NPC
+    });
+  });
+
   it("⚠️ 它**同时管从磁盘上读回来的** `game-design.json`", () => {
     const fromDisk = JSON.parse(JSON.stringify({ ...DESIGN, levels: [{ ...DESIGN.levels[0], entities: ["没有这个"] }] }));
     expect(GameDesignSpecSchema.safeParse(fromDisk).success).toBe(false);
@@ -125,5 +149,6 @@ describe("gate 的「看不见」性质", () => {
     expect(json).not.toContain("悬空引用");
     expect(json).not.toContain("superRefine");
     expect(json).not.toContain("文书自己跟自己矛盾");
+    expect(json).not.toContain("同一个 id 只能指向一个实体"); // 票 42 新并入 `player` 的那条（⑤）
   });
 });

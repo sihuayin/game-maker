@@ -62,7 +62,13 @@ type CharacterDNALike = { silhouette: string; clothing: string; face: string };
  *  ⚠️ `interactables[]` / `resources[]` **不在**：木条箱与补给**没有基因**。
  *  ⚠️ `player` 是**必填**的 ⇒ 这一族**永远不会空** —— 于是上面那条集合相等永远有内容可查
  *  （反过来，若这一族可能为空，那条 gate 就会在「没有角色」时**恒真**，那是条永远绿的判据）。
- *  ⚠️ 名字里的 `where` 是给**人**看的：报错要说得出「设计层哪一格里的那个实体没拿到 DNA」。 */
+ *  ⚠️ 名字里的 `where` 是给**人**看的：报错要说得出「设计层哪一格里的那个实体没拿到 DNA」。
+ *  ⚠️ **2026-10-13（票 42）**：下面的 `characterSetGate` 拿 **`Set`** 比较 —— 于是
+ *   **重 id 会静默塌成一条**，「`player` 与某个 npc 同名」在这一层**看不见**
+ *   （它只在 `character-dna.ts` 那道重复 gate 上现形，那才是两次真跑死掉的地方）。
+ *   票 42 把这个形状堵在**设计层**（`game-design.ts` 的 ⑤：`player.id` 与桶 id 重复 = 拒绝）
+ *   ⇒ 今天走不到这里。⚠️ 留这条注是因为**缺陷仍在文书里**：
+ *   将来若有**别的**路把重 id 送进来，这一层**仍然会静默放行**（那是另一条病，不属票 42）。 */
 export function characterEntities(design: GameDesignSpec): { id: string; where: string }[] {
   return [
     { id: design.player.id, where: "player" },

@@ -134,6 +134,11 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
   it("④ `levels[].entities` 是引用、必须解得开", () => {
     expect(DESIGN_TOOL_DESCRIPTION).toContain("引用");
     expect(DESIGN_TOOL_DESCRIPTION).toContain("真的存在");
+    // ⚠️ **票 42（2026-10-13）**：引用面扩到**玩家**（Q6），并明说**不许把玩家复制进桶**（Q7 的提示词那一半）。
+    //   两条都盯住：只锚「玩家」的话，「不许复制」那半句被删掉也不会红 ——
+    //   而它正是 6/6 份真实设计撞出来的那个形状（NPC 桶里躺着「玩家控制的拾荒者本人」）。
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("玩家或上面四个桶里");
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("别在 `npcs[]` 里再写一条「玩家本人」");
   });
 
   it("工具名与提示词尾句对得上", () => {

@@ -139,8 +139,11 @@ export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把�
    「一个游戏总该有 X」的 —— **别加**。（先例：意图层的 \`coreLoopSteps\` 说了「收集废料与净水」，
    而 \`entities[]\` 里只有废料 ⇒ 补一个净水是**对的**；凭空加一个 Boss 是**错的**。）
 
-4. \`levels[].entities\` 是**引用**：每一项都必须是上面四个桶里**真的存在**的 \`id\`。
+4. \`levels[].entities\` 是**引用**：每一项都必须是**玩家或上面四个桶里**真的存在的 \`id\` ——
+   这一关里有玩家，就写 \`player.id\`（\`layout\` 本来就在说玩家怎么走）。
    ⚠️ 写到不存在的 id 会被判失败、当场重来。
+   ⚠️ **也**不许把玩家**复制**进任何一个桶：\`player.id\` 与桶里某个 id 相同会被判失败、当场重来
+   —— 玩家**不是一条 NPC**，他住在 \`player\` 那一格，**别在 \`npcs[]\` 里再写一条「玩家本人」**。
 
 只调这个工具，不要解释。`;
 
@@ -153,11 +156,13 @@ const DESIGN_FIELD_HINTS: Record<keyof GameDesignSpec, string> = {
   coreLoopSteps: "核心循环，**一条一句**，**至少一条**（对着意图层那条写，可以改写得更具体）",
   player: "`{ id, role, abilities, goals }` —— ⚠️ `player.role` 与 `player.abilities` 是**具名生产**的字段：能力一条一句（至少要有一条），`goals` 也至少一条",
   enemies: "`{ id, behavior, threat }[]` —— ⚠️ `enemies[].behavior` 与 `enemies[].threat` 是**具名生产**的：它怎么动、它怎么威胁" + BUCKET_ID_RULE,
-  npcs: "`{ id, role, interaction }[]` —— ⚠️ `npcs[].role` 与 `npcs[].interaction` 是**具名生产**的：他是谁、能跟他做什么" + BUCKET_ID_RULE,
+  npcs: "`{ id, role, interaction }[]` —— ⚠️ `npcs[].role` 与 `npcs[].interaction` 是**具名生产**的：他是谁、能跟他做什么" +
+    "（⚠️ **玩家不在这里**：他住在 `player` 那一格 —— 别在 `npcs[]` 里再写一条「玩家本人」；" +
+    "要让关卡点名玩家，直接在 `levels[].entities` 里写 `player.id`）" + BUCKET_ID_RULE,
   interactables: "`{ id, type, behavior }[]` —— ⚠️ `interactables[].type` 与 `interactables[].behavior` 是**具名生产**的：它是什么类、碰它会怎样" + BUCKET_ID_RULE,
   resources: "`{ id, purpose }[]` —— 每个可拾取之物**拿来干嘛**（可以是空数组：这一关没有可拾之物）" + BUCKET_ID_RULE,
   world: "`{ theme, setting, structure }` —— ⚠️ `world.theme` / `world.setting` / `world.structure` **三个都具名生产**；`structure` 说的是**空间怎么分层**（前景/中景/背景、纵向几段），**照参考图那个世界的结构写**",
-  levels: "`{ id, purpose, layout, entities }[]` —— ⚠️ `levels[].purpose` 具名生产；`layout` 说清**从左到右怎么走**、`entities` 只填上面四个桶里**真有的 id**。**至少一关**",
+  levels: "`{ id, purpose, layout, entities }[]` —— ⚠️ `levels[].purpose` 具名生产；`layout` 说清**从左到右怎么走**、`entities` 只填**玩家或上面四个桶里真有的 id**（玩家写 `player.id`，**不要**为它单开一条 NPC）。**至少一关**",
   progression: "`{ model, description }` —— 进阶是怎么发生的",
   difficulty: "`{ model, description }` —— **可选**，需求里没提就整个省掉",
   mechanics: "`{ id, mechanic }[]` —— `id` **照抄意图层**，`mechanic` 从下面那 8 个值里挑；**至少一条**",
@@ -314,6 +319,21 @@ const DNA_FIELD_HINTS: Record<keyof CharacterDNA, string> = {
  *
  * ⚠️ 设计层**没有**外观字段（票 31 的 F3）—— 所以「这个世界 + 它的行为」是**唯一**的输入，
  *   而 `identity` 那一格没有别的地方能出（世界语法里根本没有「谁」）。
+ *
+ * ⚠️ **2026-10-13（票 42 Q8）：这里曾有一处自相矛盾 —— 现在够不着了，所以不改字，只留注。**
+ *   下面的 `characterIndividualBrief` 把 `player`（`id` = …）与 `npcs[i]`（`id` = …）**逐条并列**列出，
+ *   而紧接的那句写着这一族的 `id` 要「**恰好**覆盖这些实体」。若 `player.id === npcs[0].id`
+ *   （票 42 量到的形状：6/6 份真实设计的 `npcs[]` 里都躺着一条「玩家控制的拾荒者本人」），
+ *   这两句合起来就是**要求模型吐出两条同 id**，而 `CharacterDNA` 契约**禁重复**
+ *   （`character-dna.ts` 的重复 gate）⇒ 模型无解：要么违约（第五跑 10-10b / 第七跑 10-11a：撞契约、
+ *   3 次重采样全灭），要么自行合并（第六跑 10-10c：attempts=1 过）。
+ *   ⇒ 票 42 **把引子堵在设计层**：`game-design.ts` 的 ⑤ 现在把 `player.id` 与桶 id 重复判成
+ *   **设计层拒绝**，而 ⑥ 同时让 `levels[].entities[]` 能**点名玩家** —— 于是模型再没有
+ *   「把玩家复制成一条 NPC」的理由，重 id 从来到不了这一发 ⇒ **这段文字今天够不着**。
+ *   ⚠️ 按仓库对「够不着的判据」的惯例（不删字、只加带日期的注）：**删了它反而看不出这处矛盾存在过**。
+ *   ⚠️ 但**缺陷仍在文书里**：`characterEntities` 与 `characterSetGate` 拿 `Set` 比较，
+ *   **重 id 会静默塌成一条**（`build-character-dna.ts`）—— 若将来**别的**路把重 id 送进来，
+ *   这两句话会**原样复活**。那是**另一条病**（「提示词要求模型违反自家契约」），不属票 42 的射程。
  */
 export function characterDnaPrompt(input: { design: GameDesignSpec; vws: VisualWorldSpec }): string {
   const { design, vws } = input;

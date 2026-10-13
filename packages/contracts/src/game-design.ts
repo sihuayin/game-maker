@@ -93,8 +93,13 @@ export const GameDesignMechanicSchema = z.strictObject({
 //     · 数组**元素**非空（`coreLoopSteps[]` · `player.abilities[]` · `player.goals[]` ·
 //       `winConditions[]` · `loseConditions[]` · `runtimeRequirements[]` · `levels[].entities[]`）
 //     · 数组**本身 ≥ 1**：`levels` · `player.abilities` · `mechanics` · `coreLoopSteps` · `player.goals`
-//     · **id 跨四桶唯一** —— 一个实体只有一种 `type`（票 03 Q3），跨桶重了就说不出是哪一个
-//     · **`levels[].entities[]` 解得到** —— 引用族：每一项都要在四桶里有家。
+//     · **id 在「`player` + 四桶」上唯一** —— 一个 id 只能指向一个实体。
+//       ⚠️ **2026-10-13（票 42 Q7）把 `player` 并了进来**：原先只查四个桶，于是
+//       `player.id === npcs[0].id` 在设计层畅通无阻、一路走到 `character-dna` 才被拒
+//       （而那一拒白烧 3 次重采样）。因果与三处下游依据见下面 ⑤ 那一段注释。
+//     · **`levels[].entities[]` 解得到** —— 引用族：每一项都要在 `player` 或四桶里有家
+//       （⚠️ **票 42 Q6**：`player` 从此可被点名 —— 它的动机**不是**顺手放宽，是拆掉
+//       「逼模型把玩家复制成一条 NPC」那个引子，见下面 ⑥ 那一段注释）。
 //       ⚠️ 与票 08 的 `palette:N` 越界**同形**：都是「**文书自己跟自己对不对**」，
 //       而不是「模型懂不懂设计」。
 //
@@ -172,7 +177,9 @@ export const GameDesignSpecSchema = z.strictObject({
       /** ③ 档：票 14 拿它出 `GameConfig` 的 `scene` / `terrain`（关卡属于 Game Config，
        *  不是一种 Asset —— `CONTEXT.md:223-225`）。 */
       layout: z.string(),
-      /** ③ 档：**引用族**，指向实体 id。 */
+      /** ③ 档：**引用族**，指向 `player.id` 或四桶里某个实体的 id。
+       *  ⚠️ **2026-10-13（票 42 Q6）：`player` 从此可被点名** —— `layout` 本来就在叙述玩家怎么走，
+       *  没有合法写法时模型只能把玩家**复制成一条 `npcs[]`** 来指它。见下面 gate ⑥ 的注释。 */
       entities: z.array(z.string())
     })
   ),
@@ -251,22 +258,44 @@ export const GameDesignSpecSchema = z.strictObject({
   for (const [label, n] of nonEmpty)
     if (n === 0) issue(label.split("."), `\`${label}\` 是空数组 —— 这一层说的就是「我们做成了什么」，做成了零条就是没干活`);
 
-  // ⑤ id 跨四桶唯一（一个实体只有一种 `type`：票 03 Q3）
+  // ⑤ id 在「`player` + 四桶」上唯一（一个实体只有一种身份：票 03 Q3 · **票 42 Q7 并入 `player`**）
+  //
+  //   ⚠️ **2026-10-13（票 42）：`player` 原本不在这个集合里。** 它是个独立的 `strictObject`
+  //     （上面 `:147`），从没进过 `seen` ⇒ `player.id === npcs[0].id` 在设计层**畅通无阻**，
+  //     一路走到 `character-dna` 才被那道重复闸拒掉。⚠️ 而那一拒是 **`schema` 失败 ⇒ 重采样**，
+  //     于是白烧 3 次（第五跑 `10-10b` 与第七跑 `10-11a` 死在 `characters[2].id`；
+  //     探针⑥ 同一份输入重放 6 次全灭 ⇒ 重采样在这份输入上**没有活路**）。
+  //   ⚠️ **这不是「收紧口味」，是补上设计层本来就欠下游的一条规矩** —— 下游三处都假定它唯一：
+  //     ① `character-dna.ts` 的重复 gate（`characterId` **靠 id 命中**）；
+  //     ② `build-character-dna.ts` 的 `characterSetGate`（`player` + `enemies` + `npcs` 装进**同一个集合**）；
+  //     ③ 那条一对一链 `GameDesignSpec.player.id = character-dna[].id = AssetSpec.characterId`（票 04 Q3）。
   const seen = new Map<string, string>();
+  // ⚠️ **先放 `player`** —— 这一格**同时喂 ⑤ 与 ⑥**（票 42 的 Q7 与 Q6 是同一处改动）：
+  //   喂 ⑤ ⇒ 桶里出现玩家的 id 就是重复；喂 ⑥ ⇒ `levels[].entities[]` 点得到玩家。缺任何一半都是坏药。
+  seen.set(v.player.id, "player");
   for (const bucket of ["enemies", "npcs", "interactables", "resources"] as const)
     v[bucket].forEach((item, i) => {
       const where = `${bucket}[${i}]`;
       const first = seen.get(item.id);
       if (first !== undefined)
-        issue([bucket, i, "id"], `\`${where}.id\` 与 \`${first}\` 重复 —— 同一个 id 落在两个桶里，设计层就**说不出它是什么**（意图层按 \`type\` 只认一个桶）`);
+        issue([bucket, i, "id"], `\`${where}.id\` 与 \`${first}\` 重复 —— 同一个 id 只能指向一个实体（意图层按 \`type\` 只认一个桶，而 \`player\` 与四桶里的东西在下游是**同一族角色实体**：DNA 与 \`characterId\` 一律靠 id 命中）`);
       else seen.set(item.id, where);
     });
 
   // ⑥ `levels[].entities[]` 解得到（引用族 —— 与票 08 的越界 gate 同形）
+  //
+  //   ⚠️ **2026-10-13（票 42 Q6）：上面那个 `player` 同时把本 gate 的解析范围放宽到玩家。**
+  //     于是「**这一关里有玩家**」从此**写得出来**。
+  //   ⚠️ **这不是顺带放宽，是有意的** —— 放宽之前四桶里没有玩家，而工具说明要求
+  //     「`levels[].entities` 只能填桶里真有的 id」⇒ 模型想让关卡点名玩家，
+  //     **唯一的合法写法就是把玩家复制成一条 `npcs[]`**。6/6 份真实设计的 NPC 桶里
+  //     都躺着一条「玩家控制的拾荒者本人」（票 42 量到的现场）。
+  //   ⇒ **只堵 ⑤ 不放宽 ⑥，就是逼着模型去撞 ⑤**：每一跑都死在设计层（拒绝 ⇒ 退 4 ⇒ 不重采样）。
+  //     两条一起动才是修好，这就是为什么它们共用这一处改动。
   v.levels.forEach((level, i) =>
     level.entities.forEach((ref, j) => {
       if (!seen.has(ref))
-        issue(["levels", i, "entities", j], `\`levels[${i}].entities[${j}]\` 指向 \`${ref}\`，而四桶里没有这个 id —— ⚠️ 悬空引用：关卡与实体是同一次调用里写出来的，对不上就是**文书自己跟自己矛盾**`);
+        issue(["levels", i, "entities", j], `\`levels[${i}].entities[${j}]\` 指向 \`${ref}\`，而 \`player\` 与四桶里都没有这个 id —— ⚠️ 悬空引用：关卡与实体是同一次调用里写出来的，对不上就是**文书自己跟自己矛盾**`);
     })
   );
 });
