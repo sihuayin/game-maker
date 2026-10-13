@@ -14,7 +14,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, auditGameConfig, auditScreenSpace, gameHudScreenItems, parseAssetPack, parseCoverage, parseGameConfig,
+  CommandError, auditGameConfig, auditLayerCoverage, auditScreenSpace, gameHudScreenItems, parseAssetPack, parseCoverage, parseGameConfig,
   FILLED,
   type AssetPackManifest, type CommandResult, type ConfigIssue, type GameConfig, type LayerCoverage,
 } from "@game-maker/contracts";
@@ -23,40 +23,29 @@ import { failWith, laySite } from "./layout.js";
 
 // ── 第四族 · 几何可行性 ─────────────────────────────────────────────────────
 //
-// ⚠️ **这一族只能落在装配期** —— 它要同时知道**世界多宽**（只有 game-config 知道）
-//   与**视口多大**（只有外壳知道，票 32 裁决 1 的常量）。
-//
-// ⚠️ 它跑在 `buildWorld` 的产物上，**不是**另算一遍 —— 于是「校验过的」与
+// ⚠️ **它跑在 `buildWorld` 的产物上，不是另算一遍** —— 于是「校验过的」与
 //   「外壳要画的」是同一份描述，不可能漂移。
-
-/** 镜头走到尽头时，这一层在屏幕上还剩多长（**算出来的，不是拍的**）。 */
-function coveredExtent(drawn: number, parallax: number, travel: number): number {
-  // 镜头走 `travel` 像素时，跟着走 `parallax` 的层在屏幕上退掉 `parallax × travel`。
-  // 最坏情况（镜头在尽头）剩下这么多，它必须还够铺满一屏。
-  return drawn - parallax * travel;
-}
+//
+// ⚠️⚠️ **2026-10-13 · 票 65 改了这条的位置，但没改它的语义**：
+//   「层盖不住世界」那条判据**本来也知道世界多宽**（`game-config` 就在手边）⇒ 它
+//   **提前到了 `config` 步**（`ops.ts` 那个 `issues` 数组）—— 而**判据与规则本身**
+//   都搬进了 `contracts`（`layer-coverage.ts`），**两个调用者调的是同一个函数**
+//   ⇒ 一侧改了另一侧不会不跟着改，两侧对同一份输入产生的 message **逐字相等**。
+//   ⚠️ 这一族另外那两条 coverage 判据（最远层必须满 / 非最远层不准满）**没动**：
+//   它们吃 `coverage.json` 的**像素比例**，是另一件事（票 38 / 50）。
 
 export function auditGeometry(world: WorldDescription, coverage?: readonly LayerCoverage[]): ConfigIssue[] {
   const out: ConfigIssue[] = [];
   const err = (where: string, message: string) => out.push({ severity: "error", where, message });
   const warn = (where: string, message: string) => out.push({ severity: "warning", where, message });
-  const V = world.viewport;
-  const W = world.worldSize;
-  const travelX = Math.max(0, W.w - V.w);
-  const travelY = Math.max(0, W.h - V.h);
 
-  // ── 背景层：盖得住世界吗 ────────────────────────────────────────────────
-  world.background.forEach((l, i) => {
-    const where = `scene.background[${i}]`;
-    const name = l.draw.missing ? "(解不到的层)" : l.draw.frame;
-    const coverX = coveredExtent(l.box.w, l.parallax, travelX);
-    const coverY = coveredExtent(l.box.h, l.parallax, travelY);
-    if (coverX < V.w || coverY < V.h)
-      err(where, `层 "${name}" 盖不住世界：画出来 ${l.box.w}×${l.box.h}px，视差 ${l.parallax} 会跟着镜头退掉 ` +
-        `${Math.round(l.parallax * travelX)}×${Math.round(l.parallax * travelY)}px，最坏时屏幕上只剩 ` +
-        `${Math.round(coverX)}×${Math.round(coverY)}px，而视口要 ${V.w}×${V.h}px。` +
-        `—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）`);
-  });
+  // ── 背景层：盖得住世界吗（**与 config 步同一份判据**，票 65）──────────────
+  out.push(...auditLayerCoverage(world.viewport, world.worldSize, world.background.map((l, i) => ({
+    where: `scene.background[${i}]`,
+    name: l.draw.missing ? "(解不到的层)" : l.draw.frame,
+    parallax: l.parallax,
+    drawn: { w: l.box.w, h: l.box.h },
+  }))));
 
   // ── 最远的那一层必须画满（票 50）────────────────────────────────────────
   //

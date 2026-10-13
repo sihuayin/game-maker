@@ -250,3 +250,77 @@ describe("背景的两条：最远层**必须满**、其余层**不许满**（�
     expect(issues.filter((i) => i.severity === "error")).toEqual([]);
   });
 });
+
+/**
+ * ⭐ 票 65：**层盖不住世界**这条判据**提前到了 `config` 步**，而判据与规则本身都搬进了
+ *   `contracts`（`layer-coverage.ts`）—— 两侧调的是**同一个函数**。
+ *
+ * ⚠️ 这里钉的是**站点侧那一半**：
+ *   · 阳性（立案现场那三条层的几何：三层里恰好错两层）；
+ *   · ⭐ 那条 message 的**字面** —— `packages/contracts/tests/layer-coverage.test.ts` 与
+ *     `packages/assets/tests/compile-runtime.test.ts` 钉着**同一个字符串**。三份合起来才是
+ *     「两侧 message 逐字相等」这条验收条件（`assets` 与 `demo` 之间没有依赖边，
+ *     一个测试里同时调两边**做不到** —— 那是 `check-deps.mjs` 立的纪律）。
+ *   · 阴性（今天绿着的那条链一条都不报，且 `draw.ts` 的盒子**语义逐字不变**）。
+ */
+describe("⭐ 票 65：层盖不住世界 —— 与 config 步**同一份判据**", () => {
+  /**
+   * 立案现场（第十五跑 · 段 B）的几何，落在 last-train 那件**本来就三层**的背景上：
+   * `sky` 视差 0.1 不平铺（剩 384）· `wall` 改成不平铺视差 0.4（剩 96）·
+   * `ground` 保持 `tileable.x` 视差 1（铺满世界 ⇒ **恒成立，一条都不报**）。
+   */
+  function site65() {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "gm-site65-"));
+    const dir = path.join(tmp, "pack");
+    fs.cpSync(PACK, dir, { recursive: true });
+    const manifest = readJson(path.join(PACK, "manifest.json"));
+    const bg = (manifest.assets as Record<string, unknown>[]).find((a) => a.id === "bg-dusk-halt")!;
+    const layers = bg.layers as Record<string, unknown>[];
+    layers[0]!.parallax = 0.1;
+    layers[1]!.parallax = 0.4;
+    delete layers[1]!.tileable;
+    fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
+    return { dir, world: buildWorld(manifest, readJson(CONFIG), { packBase: "" }) };
+  }
+
+  it("阳性：**恰好两条** error，`where` 是 [0] / [1]，点名 `sky` 与 `wall`，而可平铺那层不报", () => {
+    const { world } = site65();
+    const e = auditGeometry(world, undefined).filter((i) => i.severity === "error");
+    expect(e.map((i) => i.where)).toEqual(["scene.background[0]", "scene.background[1]"]);
+    expect(e[0]!.message).toMatch(/bg-dusk-halt\.sky/);
+    expect(e[1]!.message).toMatch(/bg-dusk-halt\.wall/);
+    expect(e.map((i) => i.message).join("\n")).not.toMatch(/bg-dusk-halt\.ground/);
+    expect(e[0]!.message).toMatch(/最坏时屏幕上只剩 384×270px/);
+    expect(e[1]!.message).toMatch(/最坏时屏幕上只剩 96×270px/);
+  });
+
+  it("⭐ 那条 message 的**字面**：与 config 侧（`assets` 的测试）钉的是**同一个字符串**", () => {
+    const { world } = site65();
+    const e = auditGeometry(world, undefined).filter((i) => i.severity === "error");
+    expect(e[0]!.message).toBe(
+      `层 "bg-dusk-halt.sky" 盖不住世界：世界 1440×270px、视口 480×270px（镜头横向最多走 960px、纵向 0px），` +
+      `它画出来 480×270px，视差 0.1 会跟着镜头退掉 96×0px，最坏时屏幕上只剩 384×270px，` +
+      `而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）`);
+  });
+
+  it("装配级：这份包照样**硬失败、不产出站点**（判据提前了，站点这条也照旧）", () => {
+    const h = harness();
+    const { dir } = site65();
+    let caught: unknown;
+    try { assembleSite({ ...h.opts, packDir: dir }); } catch (e) { caught = e; }
+    expect(caught).toBeInstanceOf(CommandError);
+    expect((caught as CommandError).kind).toBe("invalid");
+    expect((caught as CommandError).message).toMatch(/盖不住世界/);
+    expect(fs.existsSync(path.join(h.outRoot, "last-train", "site"))).toBe(false);
+  });
+
+  it("⚠️ 阴性 · 今天绿着的那条链**一条都不报**，而 `draw.ts` 的盒子**语义逐字不变**", () => {
+    // ⚠️ 它今天稳，**不是「世界不宽」**（世界 1440，比视口宽）—— 是**唯一不平铺的那层视差恰好是 0**。
+    const world = buildWorld(readJson(path.join(PACK, "manifest.json")), readJson(CONFIG), { packBase: "" });
+    expect(auditGeometry(world, undefined).filter((i) => i.severity === "error")).toEqual([]);
+    // 票 65 把 `draw.ts:221` 那条规则换成了 `contracts` 的 `layerDrawnSize` ——
+    // 这条判据钉住**换完之后的盒子与换之前逐个相同**（可平铺的铺满世界、不平铺的用标称尺寸）。
+    expect(world.background.map((l) => [l.box.w, l.box.h, l.parallax]))
+      .toEqual([[480, 270, 0], [1440, 270, 0.6], [1440, 270, 1]]);
+  });
+});

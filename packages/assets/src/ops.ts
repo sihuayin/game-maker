@@ -16,7 +16,7 @@ import {
   PLAYER_ACTION_NAMES,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
-  type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type LedgerCall,
+  type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
@@ -32,7 +32,7 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, carryOnError, failureDirOfError, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, auditTdConfig, carryOnError, failureDirOfError, gameHudScreenItems, layerDrawnSize, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -719,12 +719,33 @@ const DEFAULT_JUMP_SPAN = jumpSpan(DEFAULT_PLAYER_MOVE);   // ⚠️ 同高落�
  * ⚠️ **两类失败要分开**（票 14 的 Q5 裁定，人类原话：「后者不应该默认重采样，否则会把**确定性的
  *   编译/设计错误**伪装成**模型生成失败**」）：
  *     · **入参/结构不过**（线形状不过 · v3 契约不过）⇒ 那是**模型没生成好** ⇒ **重采样**，3 次用尽才抛；
- *     · **过得了契约、过不了业务校验**（引用族 · 自洽族 · 屏幕空间）⇒ 那是**确定性的编译错误** ⇒
+ *     · **过得了契约、过不了业务校验**（引用族 · 自洽族 · 屏幕空间 · 层覆盖）⇒ 那是**确定性的编译错误** ⇒
  *       **不重采样、直接抛**，而且**不落盘**。
  *    ⚠️ 「不落盘」是**与旧行为相反**的一处：`compileGame` 当年 audit 不过也照落（理由是票 09 裁决 2
  *    「人过目」）—— 而 **R9 把人工点收成了唯一一个、且在清单处**，config 那里**已经没有读者**了
  *    ⇒ 「坏配置比没配置更坏」（旧代码自己的注释）这一条终于说了算。
  */
+/**
+ * 这份 config 的背景层，拼成 `auditLayerCoverage` 要吃的那几样 primitive（票 65）。
+ *
+ * ⚠️ **解不到那件资源时一条都不给** —— 「这份 config 指着一个不存在的背景」由
+ *   `auditGameConfig` 的**引用族**报（它就在上面那批里）。本判据只回答**几何**那一问
+ *   （盖不盖得住世界），不重复回答「这个 id 存不存在」。
+ * ⚠️ 而层的名字这里拼成 `${背景 id}.${层名}` —— 契约把帧名**逐字钉死**就是这个形状
+ *   （`assetpack.ts` 的 superRefine）⇒ 与站点装配侧读到的 `draw.frame` 是**同一个字符串**，
+ *   这正是「两侧 message 逐字相等」那条判据（验收条件 4）站得住的原因。
+ */
+function backgroundLayerEntries(config: GameConfig, manifest: AssetPackManifest): LayerCoverageEntry[] {
+  const a = manifest.assets.find((x) => x.id === config.scene.background.asset);
+  if (a === undefined) return [];
+  return (a.layers ?? []).map((l, i) => ({
+    where: `scene.background[${i}]`,
+    name: `${a.id}.${l.name}`,
+    parallax: l.parallax,
+    drawn: layerDrawnSize({ tileable: l.tileable, nominal: a.size }, config.world.size),
+  }));
+}
+
 export async function compileRuntime(opts: CompileRuntimeOptions): Promise<CommandResult> {
   const readJson = (p: string, what: string): unknown => {
     try { return JSON.parse(fs.readFileSync(p, "utf8")); }
@@ -879,12 +900,22 @@ ${JSON.stringify(gameConfigExample, null, 2)}
 
   // ── ⚠️ **业务校验：确定性失败，不重采样、不落盘**（票 14 的 Q5 裁定）────────────
   //
-  // ⚠️ 这里跑的是 `site` 要跑的同一批校验（**减去第四族** —— 几何族要世界描述与视口常量，
-  //   而它们住 `demo`；见 `ops.ts` 里塔防那一段的注释）。**同一份实现，不抄第二份**。
+  // ⚠️ 这里跑的是 `site` 要跑的同一批校验（**减去第四族里那些要世界描述的** —— 见下）。
+  //   **同一份实现，不抄第二份**。
+  // ⚠️ **「层盖不住世界」这一条 2026-10-13 从装配期提前到了这里**（票 65）：
+  //   第十五跑的段 B 花了 11 张图、跑完全链，最后**死在站点装配期**才发现世界宽 1440 而
+  //   两层不平铺的背景**盖不住**（各剩 384 / 96px）。⚠️ **它一分钱也省不下**（`config` 在
+  //   `pack` 之后，图已经买完）—— 提前的价值是**失败点前移**（从最后一步到第二段的第一步）、
+  //   **判据与真实渲染语义同源**、**失败账目分得开**（几何不成立 ⇒ `failures: []` · `attempts: 1`，
+  //   不像契约没过那样被记成 `schema`）。
+  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**
+  //   ⇒ 两侧不会再各说各话。⚠️ 而这一批里**只多这一条** —— 第四族另外那两条 coverage 判据
+  //   吃 `coverage.json` 的像素比例（那要 PNG 解码器），**仍然只有装配期能跑**。
   const issues: ConfigIssue[] = [
     ...auditGameConfig(config, manifest),
     ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
-      { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT }))
+      { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
+    ...auditLayerCoverage(vp, config.world.size, backgroundLayerEntries(config, manifest))
   ];
   const hard = issues.filter((i) => i.severity === "error");
   if (hard.length > 0)

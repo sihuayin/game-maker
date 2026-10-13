@@ -134,6 +134,13 @@ export * from "./reachability.js";
 // ── 屏幕空间：两种玩法共用的那条判据与各自的 HUD 项清单（票 03 · 09）────
 export * from "./screen-space.js";
 
+// ── 层覆盖：**世界空间**的那条几何判据（票 65）────────────────────────────
+// ⚠️ 与 `coverage.ts`（交付态**像素比例**）和 `qa.ts` 的 `layer-coverage` 判决名**都不是一回事**，
+//   三个名字各自守着一条缝，别再合并。
+// ⚠️ 它住这儿是因为**同一份判据要在 `assets`（config 步）与 `demo`（站点装配）各跑一次**，
+//   而那两个包之间没有依赖边（`check-deps.mjs`）⇒ 共同祖先只有 contracts。
+export * from "./layer-coverage.js";
+
 // ── 资源规格（四类）与确定性校验 ──────────────────────────────────────────
 export * from "./asset-spec.js";
 export * from "./audit.js";

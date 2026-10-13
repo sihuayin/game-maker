@@ -8,7 +8,7 @@
 // ⚠️ **这里零 Phaser、零 DOM**（与 `world.ts` 同一条纪律）—— 它是纯层的一部分。
 //   渲染层与入口在 `src/shell/`，由 esbuild 单独打成 `dist/shell.js`。
 import type { AssetPackManifest } from "@game-maker/contracts";
-import { entityBox, resolvePackRef, FALLBACK_ANCHOR } from "@game-maker/contracts";
+import { entityBox, layerDrawnSize, resolvePackRef, FALLBACK_ANCHOR } from "@game-maker/contracts";
 export { FALLBACK_ANCHOR };
 
 /** 视口 = **外壳常量**（票 32 裁决 1）。于是 1 交付像素 = 1 屏幕像素字面成立。 */
@@ -216,9 +216,11 @@ export function buildBackground(
     const parallax = layer?.parallax ?? 0;
     const tileX = layer?.tileable?.x ?? false, tileY = layer?.tileable?.y ?? false;
     const anchor = anchorOf(pack, assetId);
-    // ⚠️ **可平铺的层铺满整个世界**：视差 p 的层要盖住宽 W 的世界，铺到 W 就恒成立
+    // ⚠️ **可平铺的层铺满整个世界**：视差 p 的层要盖住宽 W 的世界，铺到 W 就恒成立。
+    //   ⇒ 这条规则**只住一处**（`layerDrawnSize` 在 `contracts`）—— 站点装配与 `config` 步
+    //   都调它（票 65）。各抄一份的下场是「校验过的尺寸」与「外壳要画的尺寸」不是同一个数。
     const nom = res.asset.size;
-    const w = tileX ? W : nom.w, h = tileY ? H : nom.h;
+    const { w, h } = layerDrawnSize({ tileable: layer?.tileable, nominal: nom }, { w: W, h: H });
     out.push({
       draw: { missing: false, atlas: image, frame: frame.name, at: { x: 0, y: 0 }, anchor, w: nom.w, h: nom.h },
       parallax, tileX, tileY, box: boxAt({ x: 0, y: 0 }, { w, h }, anchor),

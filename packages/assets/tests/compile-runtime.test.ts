@@ -299,3 +299,91 @@ describe("§哪一关 / 哪一代外壳", () => {
     expect(called).toBe(0);
   });
 });
+
+/**
+ * ⭐ 票 65：**层盖不住世界**这条判据**提前到了这里**（`config` 步）。
+ *
+ * ⚠️ 立案依据是第十五跑 · 段 B：那一跑 `pack` ✅ · `config` ✅ · `qa` ✅，11 张图已经买完，
+ *   最后**死在站点装配期** —— 世界宽 1440，而两层不平铺的背景各剩 384 / 96px。
+ *   提前判的价值是**失败点前移**（注意：**一分钱也省不下**，图早就买了）、
+ *   **判据与真实渲染语义同源**、**失败账目分得开**。
+ * ⚠️ 而「同源」那一条在**两侧的测试里各钉一遍同一个字面**（这里 + `demo/tests/site.test.ts`
+ *   + `contracts/tests/layer-coverage.test.ts`）—— `assets` 与 `demo` 之间没有依赖边，
+ *   一个测试里同时调两边做不到（`check-deps.mjs` 立的纪律）。
+ */
+describe("⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 `world.size`）", () => {
+  /**
+   * 立案现场那三条层的几何，落在 last-train 那件**本来就三层**的背景上
+   * （与 `packages/demo/tests/site.test.ts` 的那份改造**逐项相同**）：
+   * `sky` 视差 0.1 不平铺（剩 384）· `wall` 改成不平铺视差 0.4（剩 96）·
+   * `ground` 保持 `tileable.x`（铺满世界 ⇒ 恒成立）。
+   */
+  function pack65(): string {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), "gm-rt65-"));
+    const dir = path.join(d, "pack");
+    fs.cpSync(PACK, dir, { recursive: true });
+    const manifest = JSON.parse(fs.readFileSync(path.join(PACK, "manifest.json"), "utf8"));
+    const bg = manifest.assets.find((a: { id: string }) => a.id === "bg-dusk-halt");
+    bg.layers[0].parallax = 0.1;
+    bg.layers[1].parallax = 0.4;
+    delete bg.layers[1].tileable;
+    fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
+    return dir;
+  }
+  /** ⚠️ **三个包各钉一份的同一个字符串**（见这个 describe 的头）。 */
+  const SKY_MSG =
+    `层 "bg-dusk-halt.sky" 盖不住世界：世界 1440×270px、视口 480×270px（镜头横向最多走 960px、纵向 0px），` +
+    `它画出来 480×270px，视差 0.1 会跟着镜头退掉 96×0px，最坏时屏幕上只剩 384×270px，` +
+    `而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）`;
+
+  it("阳性：**恰好两条**硬失败、不落盘、账上是 `attempts: 1` 且**不出现 `schema`**", async () => {
+    const d = tmp();
+    const e = await run(d, GOOD, { packDir: pack65() }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    const m = (e as CommandError).message;
+    expect(m).toMatch(/盖不住世界/);
+    // `where` 逐条点出来 —— 三层里**只错两层**，可平铺那层一条都不报。
+    expect([...m.matchAll(/· (scene\.background\[\d+\]):/g)].map((x) => x[1]))
+      .toEqual(["scene.background[0]", "scene.background[1]"]);
+    expect(m).not.toMatch(/bg-dusk-halt\.ground/);
+    expect(m).toMatch(/只剩 384×270px/);
+    expect(m).toMatch(/只剩 96×270px/);
+    expect(fs.existsSync(path.join(d, "out")), "坏配置比没配置更坏").toBe(false);
+    // ⚠️ **§4② 那张表**：几何不成立 ⇒ 那一趟**是成功的**（`attempts: 1` · 账上没有 `schema`），
+    //   与「契约没过」（`failures: ["schema"]` · 可能重采样）**分得开**。
+    const ledger = (e as CommandError).ledger as { attempts: number; failures?: string[] }[];
+    expect(ledger[0]!.attempts, "只发了一趟 —— 几何不成立不是重采样能救的事").toBe(1);
+    expect(ledger[0]!.failures ?? [], "账上**不出现 `schema`**").toEqual([]);
+  });
+
+  it("⭐ 那条 message **逐字**就是站点侧钉的那一个（同一个函数）+ 四样数一个不少", async () => {
+    const d = tmp();
+    const e = await run(d, GOOD, { packDir: pack65() }).catch((x: unknown) => x);
+    const m = (e as CommandError).message;
+    expect(m, "与 `demo/tests/site.test.ts` 里 `toBe(...)` 的是同一个字符串").toContain(SKY_MSG);
+    // ⚠️ 为什么非要这四样：config 抛 ⇒ **不落那份坏配置** ⇒ 失败现场里没有 `game-config.json` 可读
+    //   （第十五跑**正是靠它**读出 `world.size = 1440×270`）⇒ 世界尺寸只能从这句话里读。
+    expect(m).toMatch(/世界 1440×270px/);
+    expect(m).toMatch(/视口 480×270px/);
+    expect(m).toMatch(/视差 0\.1/);
+  });
+
+  it("⚠️ **不误伤**（(乙) 与 (甲) 的分界）：世界不比视口宽 ⇒ 不平铺 + 非零视差**照常放行**", async () => {
+    // ⚠️ 这一条钉的是「判据吃的是**真实几何**，不是『非平铺层的视差必须为 0』那条代理规则」：
+    //   世界与视口同宽 ⇒ 镜头一步都不走 ⇒ 退掉的自然也是 0 ⇒ **恒成立**。
+    //   ⚠️ 而 (甲) 那条更严的规则在这里**会误伤**（视差 0.1 ≠ 0 就拒）—— 这正是第二轮否掉它的理由。
+    // ⚠️ 构造：真实外壳的视口恒为 480 ⇒ 要让 `travelX = 0` 只能把**世界收窄**（把这一关挤进一屏，
+    //   连带把地形与实体的 x 挪进来）——**不能反过来把视口拉宽**：那会同时把「画出来 480 得盖住
+    //   一屏」这个前提也改掉（`cover < viewport` 当场为真，报的还是同一条），量到的就不是这件事了。
+    const d = tmp();
+    const one = structuredClone(GOOD);
+    one.world.size.w = 480;
+    (one.terrain as Record<string, number>[])[0]!.w = 480;
+    const xs = [120, 200, 280, 320, 360, 440];
+    (one.entities as Record<string, unknown>[]).forEach((e, i) => { (e.at as { x: number }).x = xs[i]!; });
+    const r = await run(d, one, { packDir: pack65() });
+    expect(r.data.ok).toBe(true);
+    expect(fs.existsSync(fileOf(d)), "过了就得照常落盘").toBe(true);
+  });
+});
