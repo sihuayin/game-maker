@@ -148,6 +148,50 @@ describe("⚠️ 明确**不进** gate 的那几格 —— 空是设计陈述，
   });
 });
 
+describe("⚠️ 票 52 加的 ⑤c —— `entities[].id` 不许写成「这一类」的名字", () => {
+  it("阳性（单数）：`id` 等于自己的 `type` ⇒ 拒，`path` 指得到那一格，文案给出路", () => {
+    const r = parse({ entities: [{ id: "enemy", type: "enemy", role: "在废墟里巡逻" }] });
+    expect(r.success).toBe(false);
+    if (r.success) return;
+    expect(r.error.issues[0]!.path).toEqual(["entities", 0, "id"]);
+    expect(r.error.issues[0]!.message).toContain("不是「这一个」");
+    expect(r.error.issues[0]!.message).toContain("不许删掉这条实体");
+  });
+
+  it("阳性（复数）：`id` 等于那个**桶名** ⇒ 也拒（第七跑那种形状）", () => {
+    // ⚠️ 桶名四个都测 —— 尤其 `enemies`：它**不规则**（`enemy + "s"` = `enemys`），
+    //   所以这一档必须从 `ENTITY_BUCKETS` 取，拼后缀拼不出来。
+    for (const [id, type] of [
+      ["enemies", "enemy"],
+      ["resources", "resource"],
+      ["npcs", "npc"],
+      ["interactables", "interactable"]
+    ] as const) {
+      const r = parse({ entities: [{ id, type, role: "在废墟里巡逻" }] });
+      expect(r.success).toBe(false);
+      if (!r.success) expect(r.error.issues[0]!.path).toEqual(["entities", 0, "id"]);
+    }
+  });
+
+  it("阴性：真产物里那四个**说得出是哪一个**的 id 一个都不许误拒", () => {
+    // 前两条逐字来自 13b 那份意图**自己写出来**的产物、第三条来自 13g、第四条是常规形状 —— 都不是编的。
+    for (const e of [
+      { id: "enemy-wasteland", type: "enemy", role: "在废墟里巡逻" },
+      { id: "scrap-resource", type: "resource", role: "可拾取之物" },
+      { id: "resource-node", type: "resource", role: "可拾取之物" },
+      { id: "scavenger", type: "npc", role: "会说话的角色" }
+    ]) expect(parse({ entities: [e] }).success).toBe(true);
+  });
+
+  it("⚠️ 射程边界：`chest`（`type` 是 `interactable`）**照样过** —— 它治的不是「id 像类名」那件事", () => {
+    expect(parse({ entities: [{ id: "chest", type: "interactable", role: "可开启的宝箱" }] }).success).toBe(true);
+  });
+
+  it("⚠️ 射程边界：它只管 `entities[]` —— `mechanics[]` 没有 `type`，别把这半拉进来", () => {
+    expect(parse({ mechanics: [{ id: "enemies", name: "成群出现" }] }).success).toBe(true);
+  });
+});
+
 describe("gate 的「看不见」性质 —— 它解释了这段代码为什么长这样", () => {
   it("⚠️ 工具 schema 里**一点痕迹都没有**（`toJSONSchema` 丢 `superRefine`）⇒ 模型看不见它", () => {
     const json = JSON.stringify(toolInputSchema(GameIntentSpecSchema));

@@ -51,7 +51,7 @@
 //     而那就是 `GameSpec` 重演的方式（`CONTEXT.md:64-69`：一个零消费者的空壳，
 //     会让下一个读代码的人以为它是活的）。
 import { z } from "zod/v4";
-import { IntentEntityTypeSchema } from "./vocabulary.js";
+import { ENTITY_BUCKETS, IntentEntityTypeSchema } from "./vocabulary.js";
 
 /** 判别式。⚠️ **用 `format` 而不是 doc 里的自由字符串 `schemaVersion`**（票 02 的 R1-Q7 判例，
  *  票 03 Q4 沿用）：自由字符串**判别式写不出来**。仓里四处（drawlist / recipe / assetpack /
@@ -93,7 +93,8 @@ export const GameIntentMechanicSchema = z.strictObject({
 //     凡「空了**本身是一句设计陈述**」的 ⇒ **不进**。
 //   进：必填字符串非空 · 数组元素非空 · `coreLoopSteps` / `player.goals` / `mechanics` ≥ 1 ·
 //       可选对象出现时不得是空壳 · id 不得重复（**各自数组内**、**以及 `entities` 与 `mechanics`
-//       之间** —— 后者是 2026-10-13 票 54 加的，见下面 ⑤）。
+//       之间** —— 后者是 2026-10-13 票 54 加的，见下面 ⑤）·
+//       `entities[].id` 不许写成它自己的 `type`、也不许写成那个**桶名**（2026-10-13 票 52 加的，见下面 ⑤c）。
 //   不进（**逐条写下来，免得下一个人往里加**）：
 //     · `winConditions: []` / `loseConditions: []` —— 「不会死 / 没有终点」是真设计
 //       （仓库里就有原话：「没有血量条，也不会死」，`out/__probe-derive/vague.md`）；
@@ -271,6 +272,42 @@ export const GameIntentSpecSchema = z.strictObject({
       "⚠️ 若需求同时说了**这个东西**与**对它的操作**（如「宝箱」与「开箱」），" +
       "**拆成两条、各起一个 id**：实体那条归 `entities[]`（**留着它**）、玩法那条换一个说法" +
       "（如 `open-chest` / `pickup-resource`）。**不许删掉实体**、也不许两边用同一个 id。"
+    );
+  });
+
+  // ⑤c **`entities[].id` 不许写成「这一类」的名字**（**2026-10-13 票 52 加的**）
+  //
+  //   ⚠️ **射程就是这两种形状，不多一寸**（人类裁的边界，逐字见票 52 的 `## Answer`）：
+  //     `id === type`（`{id:"enemy",type:"enemy"}`）与 `id === ENTITY_BUCKETS[type]`（`{id:"enemies",type:"enemy"}`）。
+  //     ⚠️ **它不宣称治好了「id 像类名」这件事** —— `{id:"chest",type:"interactable"}` 今天**照样过**
+  //        （「这是个类名」在本层**没有可计算的定义**，R3 的门不收写不出判据的东西）。
+  //        别把这条 check 当那件事的判据，也别顺手把 `mechanics[]` 拉进来。
+  //
+  //   ⚠️ **复数那一档必须取 `ENTITY_BUCKETS`，不能拿 `type + "s"` 硬拼**：
+  //     第七跑那份真意图写的是 `enemies`，而 `"enemy" + "s"` = `"enemys"` —— **拼不出它**。
+  //     （四个类型里只有 `enemy` 不规则；`vocabulary.ts` 那张 `ENTITY_BUCKETS` 就是桶名的家，
+  //      在别处再写一遍那四个字面量正是它文件头点名要躲的那条老病。）
+  //
+  //   ⚠️ **为什么它是病**：`id` 在本仓的职责是**跨阶段稳定的身份**（`game-design.ts` 的 `Id`：
+  //     「不是给人读的标签，是**集合差的键**」），而设计层按票 03 Q2(b) **原样沿用、不许改名**
+  //     ⇒ 一个写成类名的 id **当场冻住**，下游再也改不回来。
+  //
+  //   ⚠️ **它今天零尸体**（没有任何一跑因此死过）—— 先例是 08 的「色板不得重色」：
+  //     同样是**形状口味被判据化**。盘上九份真实意图里 **7 份**踩中
+  //     （单数 7/9 · 复数 1/9 · 干净 1/9，票 52 量的）。
+  //
+  //   ⚠️ **逼模型换名字，所以文案必须给出路**：点名那个 id、说清它指的是**这一类**，
+  //     并要它换一个说得出**是哪一个**的名字（先例：13b 那份意图自己写出过 `enemy-wasteland` /
+  //     `scrap-resource`）。**不许把这条实体删掉** —— 那是真的丢东西。
+  v.entities.forEach((e, i) => {
+    if (e.id !== e.type && e.id !== ENTITY_BUCKETS[e.type]) return;
+    issue(
+      ["entities", i, "id"],
+      `\`entities[${i}].id\` 是 \`${e.id}\`，而它等于自己的 \`type\`（\`${e.type}\`）或那个桶名` +
+      " —— **这个 id 说的是「这一类」，不是「这一个」**。" +
+      "⚠️ 设计层按 **id 延续**（票 03 Q2(b)）**原样沿用、不许改名** ⇒ 这个名字写下去就冻住了。" +
+      "请换一个**说得出是哪一个**的名字（如 `enemy-wasteland` / `scrap-resource`）；" +
+      "**不许删掉这条实体** —— 那是真的丢东西。"
     );
   });
 

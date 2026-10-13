@@ -235,15 +235,21 @@ describe("票 54：第八次真跑那份 `game-intent.json` 回放", () => {
     ]
   });
 
-  it("① 它今天**过不了意图层契约**（票 54 加的 ⑤b）：三条跨数组重 id 逐条点名，两条路径都在", () => {
+  it("① 它今天**过不了意图层契约**：⑤b 的三条跨数组重 id + ⑤c 的两条类名 id，逐条点名，两条路径都在", () => {
     const r = GameIntentSpecSchema.safeParse(RAW);
     expect(r.success).toBe(false);
     if (r.success) return;
-    // `chest` / `resource` / `enemy` 三条同时躺在两个数组里 ⇒ 三条 issue，各指自己那条机制
-    expect(r.error.issues.map((x) => x.path.join("."))).toEqual(["mechanics.2.id", "mechanics.3.id", "mechanics.4.id"]);
+    // `chest` / `resource` / `enemy` 三条同时躺在两个数组里 ⇒ 三条 issue，各指自己那条机制。
+    // ⚠️ 而 ⑤c（**2026-10-13 票 52 加的**）在**同一份真意图**上又多报两条：`enemy` 与 `resource`
+    //   这两个 `id` **就是它们自己的 `type`** ⇒ 第八跑那份意图**同时**踩中两条规矩来。
+    //   （不是巧合：把「这一类」抄成 id 与把清单整张抄进 `mechanics[]`，是同一种手感。）
+    expect(r.error.issues.map((x) => x.path.join("."))).toEqual([
+      "mechanics.2.id", "mechanics.3.id", "mechanics.4.id", // ⑤b —— 跨数组重 id
+      "entities.1.id", "entities.3.id"                      // ⑤c —— `enemy` / `resource` 写成了类名
+    ]);
     expect(r.error.issues[0]!.message).toContain("`chest`");
     expect(r.error.issues[0]!.message).toContain("`entities[2].id`");
-    // ⚠️ 而 `wasteland-bg` / `final-goal` **不在这三条里** —— 它们是**语义**上的错格（世界设定 / 胜利条件），
+    // ⚠️ 而 `wasteland-bg` / `final-goal` **不在这五条里** —— 它们是**语义**上的错格（世界设定 / 胜利条件），
     //   没有 gate 判得了那个（R3：判据只收「精确可算」）。它们靠提示词里那段「先分家」拦。
     expect(r.error.issues.every((x) => !x.message.includes("wasteland-bg"))).toBe(true);
   });
