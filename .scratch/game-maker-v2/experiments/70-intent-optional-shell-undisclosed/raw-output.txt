@@ -1,0 +1,360 @@
+=== ⓪ 两处原话：gate ④ 与契约那句自白 ===
+  gate  packages/contracts/src/game-intent.ts:221-226
+      // ④ 可选对象**若出现**，不得是空壳（整个省掉合法，`{}` 不合法）
+      for (const label of ["progression", "challenge"] as const) {
+      const o = v[label];
+      if (o !== undefined && blank(o.type) && blank(o.description))
+      issue([label], `\`${label}\` 出现了但 \`type\` 与 \`description\` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种`);
+      }
+      
+  字段  game-intent.ts:163-165
+      progression: z
+      .strictObject({ type: z.string().optional(), description: z.string().optional() })
+      .optional(),
+      
+  ⇒ ⚠️ `type` 与 `description` **都是 `optional`**，而那个对象**自己也是 `optional`** ⇒ `{}` 过 Zod、被 gate 拒。
+
+  自白  game-intent.ts:118-120
+      //   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 会静默丢掉 `superRefine`（票 08 探针实测）。
+      //     这正是它该有的样子（它是 gate，不是提示）—— 而「让模型知道有这条规矩」那件事，
+      //     由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+
+=== ① ⭐ 七组 gate 逐组去散文里找对家 ===
+  组 | 规矩 | 工具说明里 | 骨架台账里 | 命中的那几句
+  ①  | 必填**字符串**非空 | ✅ | ❌ 没有 | "必填的字符串字段都得有内容"
+  ②  | 数组元素 / `entities[].role` 非空串 | ✅ | ❌ 没有 | "数组里也不许留空串占位"
+  ③  | `coreLoopSteps`/`player.goals`/`mechanics` **至少一条** | ✅ | ✅ | "至少一条"
+  ④  | **`progression`/`challenge` 出现即不得两端皆空** | ❌ 没有 | ❌ 没有 | ——
+  ⑤  | 各数组**内部** id 不重复 | ✅ | ❌ 没有 | "不许重复"
+  ⑤b | **跨数组** id 不重复 | ✅ | ❌ 没有 | "两张表之间"
+  ⑤c | `entities[].id` 不得写成「这一类」 | ✅ | ❌ 没有 | "不是「这一类」"
+  ⇒ ⚠️ **七组里只有 ④ 是两栏全 ❌** —— 票面「那句自白对 ① ② ③ ⑤ ⑤b ⑤c 成立、对 ④ 不成立」**成立**。
+  ⇒ 而且 `progression` / `challenge` **这两个词在工具说明里一次都不出现**：确认 ✅
+
+  ── 这两格在**台账**（骨架）里长什么样 —— 票 54 的教训是「台账才把模型推上错路」
+      prompts.ts:147  progression: "`{ type, description }`：进阶。需求提了才填，给一句就够；**推不出就整个省掉**",
+      prompts.ts:148  challenge: "`{ type, description }`：难度来源。同上",
+  ⇒ 「需求提了才填，给一句就够；**推不出就整个省掉**」—— 它说的是**什么时候填**、**填多少**，
+     而 gate ④ 判的是**填了就必须有内容**（`{type:"",description:""}` 与 `{}` 同罪）⇒ 两件事不是一句。
+
+=== ② gate ④ 的射程：各种写法各喂一次真契约 ===
+  ⚠️ 底稿必须是一份**今天过得了 gate 的**真意图 —— 盘上 13 份里只有 **1** 份过得了
+     （其余 12 份撞的是**别的**组：票 52 / 54 那两条 gate 是后加的，旧产物没跟着变）
+       · experiments/e2e-wasteland/raw/checkpoint-run11/ruined-city-scavenger/run/v1/game-intent.json ⇒ entities.0.id
+       · experiments/e2e-wasteland/raw/id-collision-run7/game-intent.json ⇒ mechanics.2.id
+       · experiments/e2e-wasteland/raw/run-out/wasteland-scavenger-assets/run/v1/game-intent.json ⇒ mechanics.2.id
+       · experiments/e2e-wasteland/raw/run-out/wasteland-scavenger-run/run/v1/game-intent.json ⇒ mechanics.2.id
+  底稿 = experiments/e2e-wasteland/raw/run-out-2026-10-13b/.failed-2026-10-13T09-22-52-685Z/game-intent.json
+     ⚠️ 它住在一个 `.failed-…` 目录里 —— 那是**整跑**都被挪进去的目录（里面 game-design / vws / dna 全在，
+        只少了样式那一格之外的后续），⇒ 它过得了今天的 gate，只是因为**它那一跑的理解层写得干净**，
+        与「这一跑后来失败了」无关。
+     它的 `progression` / `challenge` = undefined / undefined
+  ✅ 放行 整个省掉                      
+  ✅ 放行 填满                        
+  ✅ 放行 只给 type                   
+  ✅ 放行 只给 description            
+  ❌ 拒   空对象 `{}`                    path=["progression"]  `progression` 出现了但 `type` 与 `description` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种
+  ❌ 拒   `type: ""`                  path=["progression"]  `progression` 出现了但 `type` 与 `description` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种
+  ❌ 拒   `description: ""`           path=["progression"]  `progression` 出现了但 `type` 与 `description` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种
+  ❌ 拒   `description: "  "`（全空白）    path=["progression"]  `progression` 出现了但 `type` 与 `description` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种
+  ❌ 拒   两头都是空串                      path=["progression"]  `progression` 出现了但 `type` 与 `description` 都是空的 —— 要么**整个省掉**、要么给一句；空壳是第三种东西，没人分得出它是哪一种
+  ⇒ ⚠️ 边界很清楚：**整个省掉合法**、**只给一半合法**、**两端皆空（含全空白）不合法**。
+     而这三种里，散文今天只说清了**前两种**（「推不出就整个省掉」/「给一句就够」）。
+
+=== ③ ⭐ 模型那一侧到底看得见什么 ===
+  ── (a) 工具 schema（`toolInputSchema` 吐出来的那份）里 `progression` 那一段：
+      {"type":"object","properties":{"type":{"type":"string"},"description":{"type":"string"}},"additionalProperties":false}
+  ⇒ 有没有「两端皆空不许」的任何痕迹？
+       · 含 `minProperties`：false
+       · 含 `required`：false
+       · 含 `anyOf`：false
+       · 含 `allOf`：false
+       · 含 `最小`：false
+  ⇒ 整份模型面向的 schema 里出现「空壳 / 两个都空 / 省掉」的字样：**一次都没有** ⚠️
+  ⇒ 这正是文件头那句「`toJSONSchema` 会**静默丢掉** `superRefine`」的**当场复现**：
+     一条真的判据（② 里 ❌ 拒过）在模型面向的那份 schema 里**一个字都没留下**。
+
+  ── (b) 七组里，**哪几组本来能用 JSON Schema 表达**（表达得出来的不必靠散文）：
+       · `coreLoopSteps` 的字段定义：`coreLoopSteps: z.array(z.string()),`
+         ⇒ **没有 `.min(1)`** ⇒ ③ 也表达不出来（它同样只住在 `superRefine` 里）
+       · `progression` / `challenge` 的 schema：`progression: z .strictObject({ type: z.string().optional(), description: z.string().optional() }) .optional(), challenge: z`
+         ⇒ 没有任何一个字段是 `required` ⇒ ④ 也表达不出来
+  ⇒ ⭐ **七组全都表达不出来** ⇒ 它们**全都**只能靠 `TOOL_DESCRIPTION` 那一句 ——
+     除了 ④ **一个字都没有**。
+
+=== ④ 链上的后果：撞上 ④ 会怎样 ===
+  analyze-intent.ts:209  for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++) {
+      const once = await onceThrough({
+      baseUrl: input.transport.baseUrl, apiKey: input.transport.apiKey, body, timeoutMs, doFetch,
+      });
+      if (once.kind === "upstream") {
+      call.trip({ failure: once.failure });
+
+  ⚠️ 而文件自己写着（:189）：
+      * ⚠️ **重采样是重抽同一个分布** —— 对「输入本身触发的系统性失败」它救不了
+      *   （票 09 探针：一句话输入两发全灭于 `empty-input`，而那是**代理把入参丢了**）。
+  ⇒ 撞上 ④ 的后果与别组一样：**3 发盲重采样**（同一个 body、不喂回理由）⇒ 全败 ⇒
+     抛 `failure: "schema"` ⇒ **退 4**；而这一步**没有拒绝面**（不存在「R12 那种拒绝」）。
+  ⚠️ 于是 ④ 与别组唯一的区别是：**别组至少有一句话告诉模型有这条规矩**（① 那一列 ✅），④ **没有**。
+
+=== ⑤ 盘上真意图的普查：④ 撞过没有 ===
+    · experiments/e2e-wasteland/raw/checkpoint-run11/ruined-city-scavenger/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/id-collision-run7/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out/wasteland-scavenger-assets/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out/wasteland-scavenger-run/run/v1/game-intent.json  progression=填满 · challenge=填满   ⚠️ 唯一那份两份都填满的：{"type":"未知","description":"需求只提到有最终目标，未说明资源或宝箱如何影响推进"} / {"type":"敌人与危险","description":"探索途中需躲避危险和敌人"}
+    · experiments/e2e-wasteland/raw/run-out-2026-10-10b/.failed-2026-10-10T10-36-45-891Z/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-10c/wasteland-scavenger-assets/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-11a/.failed-2026-10-11T05-13-03-917Z/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-13a/.failed-2026-10-13T02-21-58-177Z/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-13b/.failed-2026-10-13T09-22-52-685Z/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-13d/ruined-city-scavenger/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-13e/ruined-city-scavenger/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-13g/ruined-city-scavenger/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+    · experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-intent.json  progression=缺席 · challenge=缺席
+  ⇒ 13 份意图 · 24 处缺席 · 2 处填满 · 0 处半个 · **0 处空壳**
+  ⇒ ⭐ 模型实测的行为是「**要么全给、要么全省**」—— 正是 gate ④ 要的那个二选一；
+     ⚠️ 而「半个」（只给 `type` 或只给 `description`）也是**合法**的（② 里 ✅ 放行），盘上 0 处 —— 没人走过那条路。
+  ⇒ ⚠️ 这份普查**可比**：这两格的台账文字自**票 08**（`efc9511`）写下之后**一个字没改过**
+     （`git log -L 147,148:packages/game-design/src/prompts.ts` 只有那一个提交）
+     ⇒ 13 份产物是**在同一句提示词下**写出来的 ⇒ 0 处空壳这个读数没有版本错位。
+  ⇒ ⚠️ 但 13 份里只有 1 份过得了**今天**的 schema（②）—— 那 12 份撞的是**后加**的 ⑤b/⑤c
+     ⇒ 「0 处空壳」这句成立，而「13 份都还是今天的合法产物」**不成立**（别拿它当反例库）。
+
+=== ⑥ 代价：那句话住哪、改了要动什么 ===
+  · 工具说明有**一条一测**（`prompts.test.ts` 里 15 条 `it`，每条钉一句原话）⇒ 加一句 = 加一条测（且**旧测一条都不用改**）
+  · 骨架（台账）那边有一条**结构判据**（`prompts.test.ts:24` 起：契约每个键都要点名、且不许多个名字）⇒ 改台账文字**不影响**它
+  · ⚠️ 先例：⑤b（票 54）落成**两个面都写**（工具说明第 6 条 + 台账 `entities` 那句「这里的 `id` 与 `mechanics[].id` 不许撞」）；
+     而 ⑤c（票 52）只落在**工具说明第 7 条**（台账 `entities` 那句里没有它）。
+     ⇒ 两个先例**不统一** ⇒ 「④ 该写哪」是一个**真问题**，不是照抄惯例就够了。
+
+=== ⑦ Q3：`"  "`（全空白）那一档，三层判据 / 三层散文各写了没有 ===
+  · 三层的 `blank()` **都是同一个写法**（`(s ?? "").trim() === ""`）：
+     · 意图层  contracts/src/game-intent.ts:186  ⇒ **trim ⇒ 全空白串 = 空串**
+     · 设计层  contracts/src/game-design.ts:208  ⇒ **trim ⇒ 全空白串 = 空串**
+     · DNA 层  contracts/src/character-dna.ts:158  ⇒ **trim ⇒ 全空白串 = 空串**
+  ⇒ ⚠️ 三层的**判据**都拦 `"  "`；那么三层的**散文**说了没有？
+  · 全 `prompts.ts` 里出现 `"  "`（全空白串）的**行号**：[347,442]
+     · :347  省掉的那一格会被重新自由发挥。⚠️ 也**不许拿空串占位**（\`""\` 或 \`"  "\`）：那是第二个隐形缺省。
+     · :442  ⚠️ 空串（\`""\` 或 \`"  "\`）**不算写出来**，它只是第二个隐形缺省。
+  ⇒ ⭐ 三层的**判据都拦**，而三层的**散文里只有 DNA 层**把这档写出来了（那两行都在 DNA 层的工具说明 / 台账里）；
+     **意图层与设计层一个字都没提** —— 而它们的 `blank()` 一样是 trim 的。
+  · 意图层那一条（:88）：5. **不许有空串**：必填的字符串字段都得有内容，数组里也不许留空串占位。
+     ⇒ 它说的是「不许有**空串**」—— 读者推不出「全空白也算空」这一层。
+
+  ── ⑦′ ⭐ 同一个词 `progression`，**隔壁设计层**是另一个人设：
+     · 字段  game-design.ts:187  `progression: z.strictObject({ model: z.string(), description: z.string() }),`
+       ⇒ **两个键都必填**（没有 `.optional()`）—— 而意图层那两个键**都是 `optional`**（⓪）
+     · 判据  game-design.ts:219  `["progression.model", v.progression.model],` / `["progression.description", v.progression.description]`  ⇒ 走的是 ①（**必填字符串非空**）
+     · 散文  设计层工具说明第 1 条**点名了 `progression.*`**：
+         :189  1. **不许有空串、也不许有空的必填数组**。必填字符串（\`game.genre\` · \`game.camera\` · \`player.role\` ·
+         :190  \`world.*\` · \`progression.*\` · 四个桶与 \`levels\` 里每一条的每一项）都得有内容；
+     ⇒ ⭐⭐ 一句话：**设计层的 `progression` 是必填、必非空、判据 + 散文两半都在；
+        意图层的 `progression` 是可选、只禁「两头皆空」、散文说零句。**
+        ⚠️ 而模型在**同一条链上前后两次调用**里都会看到这个名字 —— 两个规矩，只有一边写了出来。
+
+=== ⑧ 先例（票 54 的 Q2）：同一类「把后果说清」当时落成的形状 ===
+  ① 会发生什么（**整份判失败**）· ② 退出码（**4**）· ③ 链停在哪（**断在理解层、买图之前**）· ④ **点名**是谁的问题
+  ⇒ 本票若照它写，那句话的形状是现成的；⚠️ 而 ④ 的主语与别组不同：
+     别组的主语是「你写了一个空值」，④ 的主语是「**你决定了这个系统存在，却没说它是什么**」。
+
+=== ⑨ 这一轮量到的六件票面没写的事 ===
+  ① **七组逐组对完账**（①）：只有 ④ 两栏全 ❌ —— 票面那句判断**成立**，
+     而且 `progression` / `challenge` **这两个词在工具说明里一次都不出现**；
+  ② **七组**本来就都表达不出来（③b）⇒ 散文不是「补充」，是**它们唯一的家** ⇒ ④ 等于**没有家**；
+  ③ gate ④ 的射程比散文宽一格（②）：**`{type:""}` / `{description:"  "}` 也拒**，
+     而散文只说了「省掉合法 / 给一句就够」——**唯独没说「给了就不能空」**；
+  ④ **两个先例不统一**（⑥）：⑤b 落在两个面、⑤c 只落工具说明 ⇒ 「写哪」是真问题；
+  ⑤ **那份 13 份的普查，底料是旧的**（②⑤）：只有 **1/13** 过得了**今天**的 schema（其余撞的是后加的 ⑤b/⑤c）
+     —— ⭐ 但「0 处空壳」这句**仍然可比**：这两格的台账文字自票 08 起一个字没改过；
+  ⑥ ⭐⭐ **同名不同命**（⑦′）：设计层也有一个 `progression`，那边是**必填 + 判据 + 散文点名**；
+     意图层的 `progression` 是**可选 + 只禁两头皆空 + 散文零句** —— 而模型前后两次调用都会看到这个词。
+
+=== ⑨ ⭐ 价签：撞上 gate ④ 今天值几发（假 fetch 驱动**真的** analyzeIntent）===
+  对照（原样）                         ⇒ **1 发** · **过了**（`ok`）—— 链往下走  `attempts=1`
+  「半个」（只给 `type`）                ⇒ **1 发** · **过了**（`ok`）—— 链往下走  `attempts=1`
+  **空壳 `{}`**（gate ④）            ⇒ **3 发** · 抛 `AnalyzeIntentError` · `failure="schema"`  `attempts=3` · `failures=["schema","schema","schema"]`
+  别组失败（必填串写成空）                   ⇒ **3 发** · 抛 `AnalyzeIntentError` · `failure="schema"`  `attempts=3` · `failures=["schema","schema","schema"]`
+  ⚠️ 三发 body **逐字节相同**？**是**（盲重采样，不喂回理由）
+  ⇒ ⭐⭐ **价签**：撞上 gate ④ **今天就是 3 发**（它是一条**已经在收费**的判据）——
+     而「半个」那样**合法**的写法是 **1 发**。⇒ 补那句散文 = 把 3 发那一支**降回 1 发**的**唯一**手段
+     （这一层**没有拒绝面**（④ 的读数）：三发全败 ⇒ `failure: "schema"` ⇒ 退 4）——
+     ⭐ **方向与票 67 那个角相同**（把贵的那一支变便宜），**与票 69 正好相反**（那边是「花钱买一声响」）。
+     ⚠️ 而「补上之后模型会不会就不写空壳了」这一问**免费证不了**（见 README「证明不了什么」）。
+  ⚠️ 而**真发出去的那份 body** 里：「工具说明」区（2152 字）含 `progression`：**没有** · 含 `challenge`：**没有**
+     而 `messages` 区（提示词骨架 / 台账）含 `progression`：**有**
+     ⇒ ⭐ 模型**只在那本台账里见过这个词**（台账正是把它推去写这两个字段的那一份，①′）——
+        而**规矩那一区（工具说明）里，这两个词一次都没出现过**。
+
+=== ⑩ 口径：gate ④ 的射程里，哪一半是**模型看不见**的 ===
+  模型面向的那份 schema：顶层 `required` = ["format","genre","targetExperience","coreLoopSteps","player","world","mechanics","entities","winConditions","loseConditions","ambiguity"]
+     ⚠️ `progression` / `challenge` **都不在里面**（它们是可选的，与 ⓪ 一致）
+     而 `progression` 那一段逐字：`{"type":"object","properties":{"type":{"type":"string"},"description":{"type":"string"}},"additionalProperties":false}`
+     ⇒ 它**只说得出**「是个对象、两个键都是字符串、不许多键」——**说不出**「两端皆空不许」
+  ✅ **放行**            整个省掉
+  ✅ **放行**            填满
+  ✅ **放行**            只给 `type`
+  ✅ **放行**            只给 `description`
+  ❌ **gate 拒**（⚠️ 不可见）  空对象 `{}`                           `code=custom` `path=["progression"]`
+  ❌ **gate 拒**（⚠️ 不可见）  `type: ""`                         `code=custom` `path=["progression"]`
+  ❌ **gate 拒**（⚠️ 不可见）  `description: ""`                  `code=custom` `path=["progression"]`
+  ❌ **gate 拒**（⚠️ 不可见）  `description: "  "`                `code=custom` `path=["progression"]`
+  ❌ **gate 拒**（⚠️ 不可见）  两端都是 `"  "`                        `code=custom` `path=["progression"]`
+  ❌ Zod 拒（可见）    ⚠️ `type: 123`（类型错）                `code=invalid_type` `path=["progression","type"]`
+  ❌ Zod 拒（可见）    ⚠️ 多一个键 `{type,description,extra}` `code=unrecognized_keys` `path=["progression"]`
+  · 两格**同时**空壳 ⇒ 报 **2 条**（各带自己的 `path`）：["progression"] · ["challenge"]
+  · `challenge` 单侧空壳 ⇒ ❌ 拒 · `path=["challenge"]` ⇒ **与 `progression` 完全对称**（换的只是主语）
+  ⇒ ⭐ **口径是「可见 / 不可见」两级，不是「松 / 紧」两级**：
+     射程里凡是**能用 JSON Schema 表达**的（类型错、多键）都由 **Zod** 拒，而那份 schema
+     **就在模型眼前**（`"type":"string"` / `"additionalProperties":false`）⇒ 模型**读得到**；
+     而**空壳那一整族**（五种写法）**全都**落在 `superRefine` 里 ⇒ 模型面向的 schema 里**一个字都没有**。
+     ⚠️ 所以 ④ 的射程**整段**都在看不见的那一半 —— 这一格没有一个「Zod 自己会说」的替身。
+
+=== ⑪ 规格实物：`prompts.test.ts` 长什么样、谁看着那句话 ===
+  `packages/game-design/tests/prompts.test.ts` 共 **15 条 `it`**（= ⑥ 说的「一条一测」的那个规格）：
+     :13  it("需求原文原样递进去（并 trim）", () => {
+     :18  it("⚠️ **契约的每一个键都在骨架里被点名**（① 档欠条要的「逐个点名」）", () => {
+     :27  it("⚠️ 骨架里**没有** `resources` 这个名字了（Q5：它已经出局，别再把它引回来）", () => {
+     :33  it("工具名出现在提示词里（模型要按名字调它）", () => {
+     :40  it("① `mechanics[].name` 是自由文本、**不许**按外壳能力筛（票 03 播给本票的第一条）", () => {
+     :46  it("② 四个 `entities[].type` 的值**逐个点名**，且说清 `resource` 是资源唯一的地方", () => {
+     :51  it("③ `title` 可空、别为填满而编", () => {
+     :56  it("④ `ambiguity` 必须**以字段名开头**，且不许写成缺项或设计细节（R2-Q2 的 (c)）", () => {
+     :63  it("⑤ 那条 gate 的规矩写在这里（因为 `toJSONSchema` 把 `superRefine` 丢了，模型看不见它）", () => {
+     :70  it("⑥ **先分家**：一句话先判它归哪一格，四格逐个点名（票 54）", () => {
+     :81  it("⑥ **拆两条**是那条出路，连例子一起给（只禁不给路 ⇒ 模型会去删实体）", () => {
+     :89  it("⑥ 而「分家」分的是**类别**，不是**做不做得了** —— 不然它跟第 1 条打架", () => {
+     :97  it("⑥ 第 6 条**升成 gate**：跨数组也不许撞，且出路是拆、不是删（票 54）", () => {
+     :102  it("⑥ 字段台账里也各点了一次名（`mechanics` 的边界 / `entities` 不许撞）", () => {
+     :108  it("⚠️ 反例：说明里**一个 `resources` 都没有** —— Q5 之后它不该在模型眼前出现", () => {
+  ⚠️ 读的时候注意：测试标题里的 `①②③④⑤⑥` 是**工具说明第几条**（票 03/09 的编号），
+     **不是**本票说的「gate 第几组」—— 例如 `it("④ `ambiguity` …")` 讲的是 `ambiguity`，与 gate ④ 无关。
+  ── 逐组：那句话在不在工具说明里 × 有没有 `it` 钉着它：
+     ①   | 工具说明 ✅ | 测试 ✅
+     ②   | 工具说明 ✅ | 测试 ❌（没有一条 `it` 钉着这句）
+     ③   | 工具说明 ✅ | 测试 ✅
+     ④   | 工具说明 ❌ | 测试 ❌（没有一条 `it` 钉着这句）
+     ⑤   | 工具说明 ✅ | 测试 ✅
+     ⑤b  | 工具说明 ✅ | 测试 ✅
+     ⑤c  | 工具说明 ✅ | 测试 ❌（没有一条 `it` 钉着这句）
+  ⇒ ⭐ 唯一一条管着「gate 的规矩写在这里」的 `it` 是 **:63** ——
+     它里面钉着四句（「不许有空串」/「至少一条」/「可以是空数组」/「不许重复」），**没有一句是 ④ 的**。
+     ⇒ 若 Q1 裁 (a)：那句话的落点/回归防线**就长这样** —— 在它里面加一行 `expect(TOOL_DESCRIPTION).toContain(…)`，
+        ⚠️ 而**今天没有任何判据会因为那句话被删掉而变红**（⑤ 那一列：④ 是唯一「工具说明 ❌」的组）。
+  ── ⚠️ 那条**结构性判据**（`:18-25`）今天在管什么：
+     `KEYS = Object.keys(GameIntentSpecSchema.shape)` ⇒ **16 个键**；`missing = []`；骨架里以 `- ` 开头的条目 **16 条**
+     ⇒ ⭐ 它**今天过得了** —— 因为 `progression` / `challenge` 这两个**名字**确实出现在台账里。
+     ⇒ 它看的是**名字在不在**，**不是规矩在不在** ⇒ ④ 的规矩**一个字没写**，这条判据**照样绿**。
+
+=== ⑫ 那句自白在仓库里有几份（Q1 的 (b) 要改的是一处还是一族）===
+  packages/contracts/src/game-intent.ts:119  //   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 会静默丢掉 `superRefine`（票 08 探针实测）。
+  packages/contracts/src/game-design.ts:116  //   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 静默丢掉 `superRefine`。
+  packages/contracts/src/character-dna.ts:149  //   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 静默丢掉 `superRefine`（票 08 实测）。
+  packages/contracts/src/visual-world.ts:133  // ⚠️ **这条 check 模型看不见。** `toJSONSchema` 会把 `superRefine` **静默丢掉**（票 08 探针实测），
+  ── 而每一份各自点名**由谁来补**：
+     game-intent.ts    :121  //     由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+     game-design.ts    :117  //     ⇒ 规矩由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+     character-dna.ts  :150  //     ⇒ 规矩由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+     visual-world.ts   :135  //   但**模型不知道有这条规矩** ⇒ 由 `vision` 在工具 `description` 里补一句（票 08 的 R2-Q5）。
+  ⚠️ 另有一处**回声**（不是契约、是散文自己）：`packages/game-design/src/prompts.ts:8`  //     （`toJSONSchema` 静默丢掉 `superRefine`，模型看不见 gate）。
+  ⇒ 这句自白是 **4 份**（四份契约各一份 + 一处散文回声），措辞同族、都点名「由谁在工具 `description` 里补」。
+     本票要动的是其中**一份**（`game-intent.ts`）—— ⚠️ 另三份**各自是否成立不在本票射程**（那是票 56 那类系统性审计）；
+     这里只登记一条对 Q1(b) 有用的读数：**「改注释」改的是四份里的一份，不是全仓唯一一处**。
+
+=== ⑬ ⭐⭐ 候选那句话真换进去（只在内存里）—— 仓库里既有断言会红几条 ===
+  · 全 `prompts.test.ts` 里的 `toContain` / `not.toContain` **字面量**断言 **28** 条
+     按主语：`p` 4 条 · `TOOL_DESCRIPTION` 24 条
+     其中**反向**断言 **2** 条：
+       :29  `p` **not**.toContain("`resources`")
+       :109  `TOOL_DESCRIPTION` **not**.toContain("resources")
+  · ⚠️ 台子诚实吗（拿**今天**的两个面各跑一遍，应为 0 / 0）：
+     工具说明面红 **0** 条 · 台账面（`p`）红 **0** 条
+  · 宿主锚（工具说明第 5 条最后一行）在说明里命中 **1** 次 ⇒ 落点唯一
+  · ⭐ 真换进去（工具说明 **2152 字 → 2239 字** · Δ **+87**）：
+     工具说明面红 **0** 条 · 台账面红 **0** 条（台账没动，照旧）
+  · ⚠️ **对照跑**（把两个面各自的禁词塞进新句，验台子不是空转）：
+     工具说明面塞 `resources` ⇒ 红 **1** 条 · 台账面塞 ``resources`` ⇒ 红 **1** 条
+  ⇒ ⭐ 一条**结构性**读数：这 28 条断言里**只有 2 条是反向的**，其余全是正向 `toContain` ⇒
+     **往散文里加字不可能弄红任何一条正向断言**（文字只增不减、正向只会更容易满足）；
+     唯一能弄红的动作是「**新句里带上了既有的禁词**」—— 而两个面各有一个（上面两条）。
+     ⇒ ⭐ 所以 Q1/Q2 的「落地会不会撞红一片」答案是：**不会** —— 加一句话在**断言这一侧是免费的**。
+
+=== ⑭ ⭐ 候选那句话的宿主：第 5 条的实物与它的限定词 ===
+  · 组头 :39  另外三条硬规矩（违反了这一发会被判失败、当场重来）：
+  · 这一份工具说明：**57 行 · 2152 字** · 编号条目 **7** 条（:6 · :10 · :15 · :17 · :41 · :46 · :51）
+  · 第 5 条 = 工具说明 :41-44 —— **逐字**：
+      :41  5. **不许有空串**：必填的字符串字段都得有内容，数组里也不许留空串占位。
+      :42  「用户没说」走 `ambiguity[]`，**不是**空串 —— 空串与「用户要的就是这样」在文件里长得一样。
+      :43  `coreLoopSteps` / `player.goals` / `mechanics` **至少一条**；
+      :44  `entities` / `winConditions` / `loseConditions` / `ambiguity` **可以是空数组**（空就说「没有」）。
+  · ⭐ 它的**限定词**：「必填的字符串字段」在不在 —— **是**
+     ⚠️ 而 `progression` / `challenge` 在契约里**都是 `optional`**（⓪ 已量）⇒ **按字面读，第 5 条够不着它俩**。
+  · 第 5 条里出现 `progression` 吗：**否** · 出现「可选」吗：**否** · 出现「空壳」吗：**否**
+  · 全份工具说明里带「空」字的行 **4** 行（:15 · :41 · :42 · :44）—— 其中 **3** 行在第 5 条里
+     ⚠️ 落在第 5 条**之外**的那 1 行 :15  3. `title` **可空**：用户没起名就整个省掉。**别为了填满而编一个名字。**
+     ⇒ ⭐ 那条题外的（第 3 条 `title` **可空**）讲的是「**整个省掉**」，**不是**「空壳」；
+        而整份工具说明里**没有任何一条**把「可选字段的『空』」单列成规矩 ⇒ ④ 今天**零承载**。
+
+=== ⑮ ⭐⭐ 「照先例办」的实物：⑤b / ⑤c 各落在几个面、几条断言 ===
+     （封边：意图那一份工具说明 = prompts.ts:48-104，下面两条的范围不越此界）
+  · ⑤b（跨数组 id 不许撞 · 票 54）——
+     面 1 · 工具说明  prompts.ts:93-96（第 6 条）
+     面 2 · 台账      prompts.ts:146  "⚠️ 这里的 `id` 与 `mechanics[].id` **不许撞**：一句话同时说了「东西」与「对它的操作」就拆成两条",
+     断言 · 工具说明面  :67  `toContain("不许重复")`
+     断言 · 台账面      :105  `p` `toContain("与 \`mechanics[].id\` **不许撞**")`
+     ⇒ **两个面各写一句（措辞不同）+ 两个面各一条断言** —— 这就是「照 ⑤b 办」的实物
+  · ⑤c（id 不得写成「这一类」· 票 52）——
+     面 1 · 工具说明  prompts.ts:98-104（第 7 条）
+     面 2 · 台账      `FIELD_HINTS`（prompts.ts:129-153）里「这一类」命中 **0** 处 ⇒ ⚠️ **这一面没有它**
+     断言 · 全 `prompts.test.ts` 里「这一类」命中 **0** 处 ⇒ ⚠️ **⑤c 今天一条断言都没有**
+     （对照：⑤b 在测试里有 **4** 行命中：「不许重复」在 :67、「不许撞」在 :105）
+  ⇒ ⭐⭐ 一句话：**两个先例不统一** —— ⑤b 是「两面 + 两断言」，⑤c 是「一面 + 零断言」；
+     而 ⑥ 早就量过这一条（那是**票 54 特意升格**的结果，票 52 没有）。⇒ Q2 不是照抄惯例，是**选一档**。
+
+=== ⑯ ⭐ 若 Q2 裁「写进台账」：那一面今天写着什么 ===
+  · `FIELD_HINTS.progression`  prompts.ts:147  —— **逐字**：
+      progression: "`{ type, description }`：进阶。需求提了才填，给一句就够；**推不出就整个省掉**",
+  · `FIELD_HINTS.challenge`   prompts.ts:148  —— **逐字**：
+      challenge: "`{ type, description }`：难度来源。同上",
+  · ⭐ 两行相隔 **1** 行、同一个字面量对象（`FIELD_HINTS` :129-153）
+  · ⭐⭐ 台账里**已经有「省掉」那半**：「整个省掉」命中 progression 行 = **是**
+     而「出现了就不能空」那半（「空壳」/「两端都空」）：progression 行 **否** · challenge 行 **否**
+  · ⚠️ 而 `challenge` 那一行的正文是一个**指针**：「同上」命中 = **是**
+     ⇒ ⭐ 只补 `progression` 那行 ⇒ `challenge` **因「同上」自动继承**（这正是它想要的）；
+        而**只补 challenge 那行是补不进去的**（它的正文不是一个独立句子）。
+  · 真台账里那两行长什么样（`intentPrompt` 实拼）：
+      - `progression` —— `{ type, description }`：进阶。需求提了才填，给一句就够；**推不出就整个省掉**
+      - `challenge` —— `{ type, description }`：难度来源。同上
+  · ⚠️ 另一条对 Q2 有用的：⑤b 的**两个面措辞不同** ——
+     工具说明 :93 写的是「**不许重复**」· 台账 :146 写的是「**不许撞**」
+     交叉命中：工具说明第 6 条里有「不许撞」吗 **否** · 台账那行里有「不许重复」吗 **否**
+     ⇒ ⭐ 「两个面都写」**不是复制粘贴**，是**两个面各自措辞**（这也正是两条断言用两个不同字面量的原因）。
+
+=== ⑰ ⭐ 本票与 68/69 住同一份 `prompts.ts`：会不会打架 ===
+  · 70 的格子  prompts.ts:88（工具说明第 5 条 · 宿主 `TOOL_DESCRIPTION` :48）
+     68/69 的格子  prompts.ts:378（`DNA_FIELD_HINTS.palette` · 宿主 `DNA_FIELD_HINTS` :367）
+     ⇒ 相隔 **290** 行 · **两个字面量对象**
+  · ⭐ 它们是**两次不同的请求**（这一点比「同一个文件」要紧）：
+     `TOOL_DESCRIPTION` 进的是**意图那一发**的 `tools[0].description` ⇒ 命中于 `intentPrompt` 那一份 body = **否**
+     `DNA_FIELD_HINTS` 进的是**基因那一发**的 messages ⇒ 命中于 `characterDnaPrompt` 那一份 body = **是**
+     交叉：DNA 提示词里有「不许有空串」吗 **否** · 意图提示词/工具说明里有「`palette:<下标>`」吗 **否**
+  · 真产物拼一遍：DNA 提示词 **3468 字** · 意图提示词 **1361 字** · 工具说明 **2152 字**
+  ⇒ ⭐⭐ 三个锚**两两不相交、而且分居两次请求** ⇒ 三票**可以同批落地、顺序无关**；
+     ⚠️ 但「验」是**两次不同的真跑**（意图一发 / 基因一发）—— 两边都进**票 23**，各自出报告 + **逐次明确同意**。
+
+=== 小结 · 这一轮量到的五件事（**不编号** —— ⑱ 起留给下一轮读数）===
+  ① ⭐⭐ **加一句话在「断言」这一侧是免费的**（⑬）：全 `prompts.test.ts` 的 28 条字面量断言里
+     **27 条是正向 `toContain`** ⇒ 往散文里加字**不可能**弄红它们（正向只会更容易满足）；
+     唯一的红线是「**新句里带上了既有的禁词**」—— 而两个面各有一个（:109 `resources` · :29 `` `resources` ``）。
+  ② ⭐ **候选那句话的宿主，自己把射程写窄了**（⑭）：第 5 条逐字写着「**必填的**字符串字段」，
+     而 `progression` / `challenge` **都是 `optional`** ⇒ 按字面读，这一条**够不着它俩**；
+     整份工具说明里带「空」的 4 行有 3 行在第 5 条里，第 4 行（第 3 条 `title` **可空**）讲的是
+     「**整个省掉**」、不是「空壳」⇒ ⭐ **④ 今天零承载**这件事，是**逐行数出来的**，不是推断。
+  ③ ⭐⭐ **「照先例办」有两个先例、两个形状**（⑮）：⑤b（票 54）是「**两面 + 两断言**」、
+     ⑤c（票 52）是「**一面 + 零断言**」（台账零命中 · 测试零命中）⇒ Q2 不是照抄惯例，是**选一档**。
+  ④ ⭐ **台账那一面今天已经有一半了**（⑯）：`FIELD_HINTS.progression` 行末那句「**推不出就整个省掉**」
+     正是 ④ 要的「要么省掉」那半，缺的只是「出现了就不能两端都空」；而 `challenge` 那行正文是「**同上**」
+     ⇒ 只补 `progression` 那行就**自动带上** `challenge`（而**只补 challenge 那行补不进去**）。
+  ⑤ ⭐⭐ **三票同住一份文件，但分居两次请求**（⑰）：70 的格子 `prompts.ts:88` / 68·69 的 `:378`
+     （相隔 290 行 · 两个字面量对象），宿主一个是 `TOOL_DESCRIPTION`（意图那一发的 `tools[0].description`）、
+     一个是 `DNA_FIELD_HINTS`（基因那一发的 messages）⇒ 三个锚两两不相交 ⇒ **可以同批落地、顺序无关**；
+     ⚠️ 而「验」是**两次不同的真跑**，两边都进**票 23**。

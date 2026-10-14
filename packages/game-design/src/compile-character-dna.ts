@@ -165,7 +165,7 @@ async function onceThrough(o: {
   const parsed = parseToolUse(body, CHARACTER_DNA_TOOL_NAME, CharacterDNAFileSchema);
   if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
 
-  // 重过契约（gate 在这里响）→ 跑两条检查（集合 gate + 守门人）。
+  // 重过契约（gate 在这里响）→ 跑三条检查（集合 gate + 守门人 + 跨文书引用 · 票 69）。
   const built = buildCharacterDna({ fromModel: parsed.value, design: o.design, vws: o.vws });
   if (built.ok) return { kind: "ok", file: built.file, spent };
   return { kind: "bad", failure: "schema", detail: built.detail, spent };

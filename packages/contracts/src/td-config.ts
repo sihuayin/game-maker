@@ -28,7 +28,7 @@
 //   `Coord` / `Point` / `Size` **从 `game-config.ts` 借**，不在这里重写一遍。
 import { z } from "zod";
 import { resolvePackRef, type AssetPackManifest } from "./assetpack.js";
-import { Coord, Point, Size, entityBox, FALLBACK_ANCHOR, type ConfigIssue } from "./game-config.js";
+import { Coord, Point, Size, auditPanelSize, entityBox, FALLBACK_ANCHOR, type ConfigIssue } from "./game-config.js";
 
 export const TD_CONFIG_FORMAT = "td-config/v1" as const;
 
@@ -540,6 +540,20 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   if (coreA && coreAt) inWorld("core", entityBox(coreAt, coreA.size, coreA.anchor));
   const hudPanel = assetOf(config.hud.panel.asset);
   if (hudPanel) inWorld("hud.panel", entityBox(config.hud.panel.at, config.hud.panel.size, hudPanel.anchor));
+
+  // ⚠️ **票 63**：塔防的 HUD 声明尺寸有三格（`panel` / `buttons` / `start`）——
+  //   与横版的 `hud.panel` 是**同一类字段**，所以由**同一条**判据约束
+  //   （Q6：不能只修横版、而让塔防保留无条件例外）。
+  //   ⚠️ **不误伤任何真产物**：盘上塔防真配置里「声明 ≠ 包」的那些格子**全部指向九宫格**
+  //   （`hud.panel` 480×30 ← 包 96×26、`hud.start` 28×22 ← 包 44×22）⇒ 一处都不报。
+  for (const [where, cell] of [
+    ["hud.panel", config.hud.panel],
+    ["hud.buttons", config.hud.buttons],
+    ["hud.start", config.hud.start],
+  ] as const) {
+    const bad = auditPanelSize(`${where}.size`, cell.size, assetOf(cell.asset));
+    if (bad) out.push(bad);
+  }
 
   // ── 可通关族 ─────────────────────────────────────────────────────────────
   //

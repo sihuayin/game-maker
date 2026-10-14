@@ -90,3 +90,66 @@ describe("工具说明：schema 说不清的那五条", () => {
     expect(prompt()).toContain(`只调 ${CHARACTER_DNA_TOOL_NAME} 工具`);
   });
 });
+
+// ── 票 68 · 「写 hex 会怎样」那半句，今天说反了（人裁 Q1(a) + Q4(a)）────────────────────
+//
+// ⚠️ 旧文案（两处**都**是它）：工具说明第 4 条**不提后果**，而字段台账写「写了下游会被量化掉，
+//   **等于没写**」—— 那句把因果**接到了一个碰不到这个字段的模块上**（`quantize` 吃的是**位图**，
+//   唯一调用点 `import.ts:383` 走的是导入那条路；`dna.palette` 到不了它眼前）。
+//   真实后果是：那一格是**正则** ⇒ 过不了 `CharacterDNAFileSchema` ⇒ 整份判失败、退 4。
+// ⚠️ **反向断言今天必红**（探针 ⑯）⇒ 它不能单独加 —— 花的代价就是把 Q1 与 Q4 绑成一次施工。
+describe("⚠️ 票 68：`palette` 的后果**照实说**，而那句错因果不许再回来", () => {
+  it("两处（工具说明 + 字段台账）都写清真实后果：整份判失败 · 退出码 4 · 下游换不回来", () => {
+    for (const [face, s] of [
+      ["工具说明", CHARACTER_DNA_TOOL_DESCRIPTION],
+      ["字段台账", prompt()],
+    ] as const) {
+      expect(s, `${face}：说得出「整份判失败」`).toContain("判失败");
+      expect(s, `${face}：说得出退出码`).toContain("退出码 4");
+      expect(s, `${face}：说得出下游那个模块碰不到这一格`).toContain("碰不到这一格");
+      expect(s, `${face}：规矩那半句照旧（本票不动它）`).toContain("palette:<下标>");
+    }
+  });
+
+  it("⚠️ **反向**：旧的「会被量化掉 / 等于没写」一个字都不许留 —— 那是把后果接到了错的模块上", () => {
+    for (const s of [CHARACTER_DNA_TOOL_DESCRIPTION, prompt()]) {
+      expect(s).not.toContain("等于没写");
+      expect(s, "「量化掉」只许出现在**否定**它的句子里").not.toMatch(/会被量化掉/);
+    }
+  });
+});
+
+// ── 票 69 · `palette:N` 的**下标范围**也要写出来（人裁 Q3(a)：两处都补，与票 68 同一格）──────
+//
+// ⚠️ 正则是只管**形状**的（`palette:<下标>`）：`palette:9` 在一份 2 色世界里**形状完全合法**，
+//   契约那一层收得下 —— 拦住它的是装配步那只**跨文书**的引用判据（`paletteRefBounds`）。
+//   ⇒ 模型得**先知道**范围，才谈得上不去撞它；而「范围」这件事**只有散文说得出**（schema 说不出）。
+describe("⚠️ 票 69：下标范围（从 0 起 · 严格小于色板长度）两处都要写，且色板在提示词里**数得出来**", () => {
+  it("工具说明与字段台账**都**写着「从 0 起」与「严格小于色板长度」", () => {
+    for (const [face, s] of [
+      ["工具说明", CHARACTER_DNA_TOOL_DESCRIPTION],
+      ["字段台账", prompt()],
+    ] as const) {
+      expect(s, `${face}：从 0 起`).toContain("从 0 起");
+      expect(s, `${face}：严格小于色板长度`).toContain("严格小于色板长度");
+    }
+  });
+
+  it("⚠️ 而**色板本身在提示词里是逐项摊开的** —— 不然「小于色板长度」这句话无从计算", () => {
+    const p = prompt();
+    // ⚠️ 这两项就是 `VWS.style.palette` 的两项（探针 ⑮：这一行是模型唯一看得见色板长度的地方）
+    expect(p).toContain("0=#2e3b4e");
+    expect(p).toContain("1=#4a6076");
+    // ⚠️ 与 VWS 那条**同一条色板**（读了同一个字段 ⇒ 两处不可能漂）
+    for (const [i, hex] of VWS_CLASS.style.palette.entries()) expect(p).toContain(`${i}=${hex}`);
+  });
+
+  it("⚠️ 两处**不许打架**：都既说「不许写 hex」又说「下标有范围」（票 68 与票 69 落在同一格）", () => {
+    for (const s of [CHARACTER_DNA_TOOL_DESCRIPTION, prompt()]) {
+      expect(s).toContain("不许");
+      expect(s).toContain("palette:<下标>");
+      expect(s, "票 69 那半句在").toContain("严格小于色板长度");
+      expect(s, "票 68 那半句也在").toContain("退出码 4");
+    }
+  });
+});

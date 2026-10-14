@@ -1,0 +1,303 @@
+{
+  "frames": {
+    "prop-goal-marker": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "prop-pole-light": {
+      "frame": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 8,
+        "h": 28
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "prop-crate": {
+      "frame": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 24
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 24
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "prop-debris-block": {
+      "frame": {
+        "x": 0,
+        "y": 56,
+        "w": 24,
+        "h": 24
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 24
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "chest-open-empty": {
+      "frame": {
+        "x": 0,
+        "y": 80,
+        "w": 20,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "hazard-current-debris": {
+      "frame": {
+        "x": 0,
+        "y": 100,
+        "w": 20,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chest-closed": {
+      "frame": {
+        "x": 0,
+        "y": 120,
+        "w": 20,
+        "h": 18
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 18
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 18
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "resource-node-water": {
+      "frame": {
+        "x": 0,
+        "y": 138,
+        "w": 10,
+        "h": 14
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 14
+      },
+      "sourceSize": {
+        "w": 10,
+        "h": 14
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "hazard-spikes": {
+      "frame": {
+        "x": 0,
+        "y": 152,
+        "w": 24,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "prop-signboard": {
+      "frame": {
+        "x": 0,
+        "y": 164,
+        "w": 18,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 18,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 18,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "prop-wall-lamp": {
+      "frame": {
+        "x": 0,
+        "y": 176,
+        "w": 12,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "resource-node-scrap": {
+      "frame": {
+        "x": 12,
+        "y": 176,
+        "w": 12,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 10
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.sprites.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 24,
+      "h": 188
+    },
+    "scale": 1
+  }
+}

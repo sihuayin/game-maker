@@ -1,0 +1,161 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废城拾荒录",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的横版街区间向右移动，沿墙面与地面探索",
+    "翻找墙边的方形箱体与废墟角落，寻找资源与宝箱",
+    "打开宝箱取得其中的宝物，拾取散落在地面与轨道带上的资源",
+    "躲避巡检敌人的来回巡行，绕开地面尖刺与残骸等危险区域",
+    "带着收集到的资源继续深入，走向下一段街区"
+  ],
+  "player": {
+    "id": "player-scavenger",
+    "role": "在废弃城市中独自搜刮物资的拾荒者，矮壮方块身形，靠谨慎而非武力活下去",
+    "abilities": [
+      "横向奔跑移动，可在地面与轨道带之间穿行",
+      "单次跳跃，可越过高出地面一格的残骸与箱体",
+      "被地形阻挡会被挡住，不会穿墙坠落",
+      "触碰可拾取物即收入背包",
+      "靠近宝箱并按下交互即可开启",
+      "接触危险物与敌人会立刻损失状态"
+    ],
+    "goals": [
+      "在废弃城市中横向探索尽可能远的街区",
+      "搜刮资源与宝箱中的宝物",
+      "避开敌人与危险，活着把东西带出去"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy",
+      "behavior": "在地面横带上一段固定区间内左右匀速巡行，到达区间端点即折返，不追出区间",
+      "threat": "接触即让拾荒者损失状态，被迫中断搜刮；它的巡行区间正好卡在宝箱与资源之间，逼玩家等它走开再前进"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "宝箱",
+      "behavior": "靠近后按下交互键开启，箱盖弹开并从中弹出宝物，随后变为已开启的空箱"
+    },
+    {
+      "id": "hazard",
+      "type": "危险物",
+      "behavior": "固定在墙面或地面上的尖刺与裸露电流残骸，接触即让拾荒者损失状态，不可被破坏"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-node",
+      "purpose": "散落在地面与轨道带上的废料与净水，拾取后计入本关的收集数，是宝箱之外的主要战利品"
+    }
+  ],
+  "world": {
+    "theme": "废土 · 废弃城市：像素极简几何、扁平色块、低分辨率",
+    "setting": "低矮长条形建筑外墙夹出的横向街道，屋顶为三角楔形、墙面开矩形窗洞；地面平坦并铺着平行轨道带，远处是低矮山体剪影；墙上挂着圆形发光体与矩形招牌板，竖杆上点着小圆灯，墙边堆着方形箱体状的箱子",
+    "structure": "纵向分三层：上方大面积暗色天幕占三分之一画面，其下是低矮山体与建筑轮廓的地貌剪影带，最下方是主视面墙体与地面轨道带 —— 玩家的活动完全发生在这条贯穿画面的水平主带上；前景只保留少量箱体与招牌的扁平剪影，中景是角色与道具所在的行走层，背景只有色带、不发生任何交互"
+  },
+  "levels": [
+    {
+      "id": "level-01-ruined-street",
+      "purpose": "教会玩家横版移动、跳跃与拾取：在没有任何威胁的初始街区熟悉操作并捡到第一批废料",
+      "layout": "从画面最左端出生，向右是一段平坦轨道带；地面拾取物断续分布，中途有一处高出一格的残骸需要跳过去；再向右是一个敞开的箱体，里面弹出宝物；最后是关卡右端的终点标记",
+      "entities": [
+        "player-scavenger",
+        "resource-node",
+        "chest"
+      ]
+    },
+    {
+      "id": "level-02-patrolled-block",
+      "purpose": "引入敌人：学会读巡行节奏并等待时机通过，同时第一次面对不能碰的危险物",
+      "layout": "开局是一段没有威胁的直道，随后出现一名在固定区间来回巡行的敌人；它的巡行区间两侧各有一个拾取物，逼玩家在它转身时择机穿过；中段地面嵌入一排尖刺，需跳跃越过；右段摆一个箱子作为奖励，终点在队伍最右端",
+      "entities": [
+        "player-scavenger",
+        "resource-node",
+        "chest",
+        "enemy",
+        "hazard"
+      ]
+    },
+    {
+      "id": "level-03-last-haul",
+      "purpose": "综合考验：把巡行敌人与危险物交错排布，要求玩家在有限落脚点上边躲边搜刮并抵达终点",
+      "layout": "左段是一段轨道带长廊，连续两次跳跃越过间隔的尖刺；中段敌人与拾取物交替出现，必须等巡行空档才可取物；右段墙体上挂着一个需要靠近开箱的宝箱，旁边紧贴一处危险物，开启后立刻向右跑向终点标记完成本次搜刮",
+      "entities": [
+        "player-scavenger",
+        "resource-node",
+        "chest",
+        "enemy",
+        "hazard"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "linear-level",
+    "description": "线性三关依次推进：关卡编号递增，敌人巡行区间变密、危险物间隔变窄、拾取物与宝箱之间的安全空档变短；玩家自身能力不增长，成长体现在对巡行节奏与跳跃落点的掌握上"
+  },
+  "difficulty": {
+    "model": "enemy-density-and-gap-timing",
+    "description": "难度来自压力而非数值：敌人巡行区间随关卡收窄、危险物之间的落脚点变窄，玩家必须在移动中被追击的时机约束下选择何时取物、何时等敌人走开"
+  },
+  "mechanics": [
+    {
+      "id": "sidescroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "gravity",
+      "mechanic": "gravity"
+    },
+    {
+      "id": "collide-terrain",
+      "mechanic": "collide-terrain"
+    },
+    {
+      "id": "reach-exit",
+      "mechanic": "reach-goal"
+    }
+  ],
+  "winConditions": [
+    "抵达关卡最右端的终点标记即完成本关",
+    "完成三关连续搜刮，把资源与宝箱中的宝物全部带回"
+  ],
+  "loseConditions": [
+    "接触敌人或危险物损失状态，状态耗尽则本次搜刮失败，从本关起点重来"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

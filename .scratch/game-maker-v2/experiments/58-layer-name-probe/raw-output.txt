@@ -1,0 +1,24 @@
+=== ① 创作侧：AssetSpecSchema 收不收同名层 ===
+  两层都叫 "far" ⇒ ✅ 放行 —— 创作侧零判据
+  对照（层名不同）⇒ ✅ 过
+
+=== ② 那条规矩**物理上**能放进哪一层（zod v3 结构约束）===
+  放在 `Layer` 上再 `.extend()` ⇒ ❌ TypeError: L2.extend is not a function
+  放在 `BackgroundSpec`（union 成员）上 ⇒ ❌ TypeError: Cannot read properties of undefined (reading 'kind')
+  放在 union（`AssetSpecSchema`）这一层 ⇒ ✅ 可以 —— 与九宫格那条同一个落点
+
+=== ③ 交付侧：AssetPackEntry 拒不拒同名层（复核票 46）===
+  ⇒ ❌ 拒（帧名重复："bg-a.far" · 层名重复："far"）
+
+=== ④ 对照规矩：「九宫格中央区」是不是**反向**的单侧规矩 ===
+  创作侧 AssetSpecSchema ⇒ ❌ 拒（九宫格左右内缩之和 40 ≥ 宽度 32 —— 中央区会空）
+  交付侧「中央区宽 = 0」⇒ ❌ 拒（形状自己挡住）
+  交付侧「中央矩形越出资源」（x+w=40 > size.w=32）⇒ ✅ 放行 —— ⚠️ 交付侧不拿它跟 size 对账
+
+=== ⑤ 真配方过不过闸（fixtures/recipes/last-train.json 改一处层名）===
+  原样 ⇒ ✅ 过
+  背景资产 "bg-dusk-halt" 层名：sky / wall / ground
+  改成同名（sky / wall / sky）⇒ ✅ **还是过闸** —— 配方层零判据（票 46 的读数复现）
+
+=== ⑥ 模型看得见吗（recipe-tool 的 v4 镜像）===
+  模型面向的 AssetSpecShape（= recipe-tool 里那份）⇒ ✅ **放行** —— 镜像里一个 refine 都没有，模型看不见这条规矩

@@ -1,8 +1,8 @@
 # 58. 「层名不许重复」只住在交付侧 —— 创作侧那份镜像漏了它，于是走到**花完钱之后**才被拒
 
 Type: grilling
-Status: open
-Owner: —
+Status: claimed
+Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 46「`buildAssetPack` 从不验自己的产物」](46-buildassetpack-self-validation.md)的 **Q6**。

@@ -1,8 +1,8 @@
 # 62. `hud.panel` 被**两把坐标语义不同的尺子**各判一次 —— 世界尺与视口尺，而后者自己的报文写着「尺子是视口」
 
 Type: grilling
-Status: open
-Owner: —
+Status: claimed
+Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 23「E2E fixture + 真跑一次」](23-e2e-fixture-wasteland.md)的**第十二次真跑 · 段 B**。

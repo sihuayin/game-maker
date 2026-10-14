@@ -1,0 +1,401 @@
+=== ⓪ 同一条不变量（`palette:N` 的下标必须 < 色板长度），三个落点各是什么待遇 ===
+  （底下那份真 VWS 的 `style.palette` 有 **6** 个色 ⇒ 合法下标 0..5）
+
+  ── 落点 A · `VisualWorldSpec`（六桶 + `materials.*.color`）
+     gate  visual-world.ts:287-300（顶层 `superRefine`）
+           "—— ⚠️ 悬空引用：色板与引用是同一次调用里写出来的，对不上就是**文书自己跟自己矛盾**",
+     散文  vision/src/prompts.ts:63  …下标从 0 起、**严格小于**色板长度。色板里**不许有重复色**，色值一律**小写** \`#rrggbb\`。
+     ⇒ **gate + 散文都有**（散文那一句是**补**出来的，理由见 ⑦）
+
+  ── 落点 B · drawlist 的 `fill` / `stroke` / `colors`
+     判据  raster.ts:35  if (hex === undefined) throw new RasterError(assetId, opIndex, `颜色引用 "${ref}" 越界（色板只有 ${palette.length} 项）`);
+           ⇒ **抛 `RasterError`**（光栅化当场停）
+     散文  assets/src/prompt.ts:26  fill / stroke / colors 里的颜色**只能是 "palette:N"**，硬编码 hex 会被 schema 直接拒绝。
+     ⇒ **判据 + 散文都有**
+
+  ── 落点 C · `CharacterDNA.palette`（**本票**）
+     判据  **没有**。character-dna.ts:111 只有 `palette: z.array(PaletteRefShape),`
+           `PaletteRefShape`（visual-world.ts:63）是**只认形状**的正则 `/^palette:\d+$/`
+           ⇒ `palette:99` 只要色板不是 100 项就**合法通过**
+     散文  只说了**形状**（prompts.ts:358 与 :378）——
+            「只能写 `palette:<下标>`（从上面那份色板里**选**）」
+     ⚠️ 而**没有**一句「下标必须**小于**色板长度」（A 那一侧的散文有，这一侧没有）
+     ⇒ **判据与散文，这一半都没有**
+
+=== ① 越界的那一份，整条链走一遍（看是不是**全绿**）===
+  把 13h 那份真 DNA 的**第一个元素**改成 `palette:11`（越界 5 格），其余一个字不动
+
+  ① 契约（`CharacterDNAFileSchema`）：success = true  ⇒ **放行**
+  ② 链上那一层（`parseToolUse`）：ok = true  ⇒ **放行**
+  ③ 装配步（`buildCharacterDna`，**它手上有 vws**）：ok = true  ⇒ **放行**（两条检查都不看 palette）
+  ④ 唯一那个读者（`dnaBrief`）：- `palette`（它身上的颜色）：palette:11
+     ⇒ ⚠️ 越界取到 `undefined` ⇒ 落回 `?? ref` ⇒ **字面量 `palette:11` 原样进了生图提示词**
+     ⚠️ 而 assets/src/prompt.ts:72 逐字写着「**模型不认 `palette:3` 这个说法**，它认颜色」
+     —— 那一行**正是**这个翻译存在的理由，而它失败时**没有任何东西会红**。
+
+  ⇒ **四个环节全绿**：契约过 · `parseToolUse` 过 · 装配过 · `dnaBrief` 不抛。
+
+=== ② 模型那一侧看得见什么：色板是印出来的，但「小于」那句话不在 ===
+  提示词里那一行：- **色板**（`palette:<下标>` 指的就是它）：0=#22283e · 1=#5b4230 · 2=#a08a6b · 3=#f2c14e · 4=#c98a5e · 5=#3a3d4a
+  ⇒ 下标 0..N-1 **是印出来的** ⇒ 越界需要模型**数错或者凭印象编**
+  ⚠️ 而整份 DNA 提示词里有没有一句「下标必须小于色板长度」？**false**
+  ⚠️ 工具说明（`CHARACTER_DNA_TOOL_DESCRIPTION`）里呢？**false**
+  ⇒ 对照 A 那一侧：`vision` 的工具说明**有**那句（因为它的 gate 模型看不见，见 ⑦）
+
+=== ②′ 那句字面量**真的**进了交给模型的提示词（`masterPrompt` 真的拼一遍）===
+  拼出来的母版提示词 **1999 字**；其中含 `palette:11` 的行 1 行：
+      - `palette`（它身上的颜色）：palette:11
+  ⇒ ✅ **字面量原样落进了最终提示词** —— 恰恰是 `assets/src/prompt.ts:72` 说「模型不认」的那种写法。
+     而它旁边那一行是合法下标印出来的色值（②），所以模型会看到**两种写法混在一段里**。
+  ⚠️ 对照：把同一份 DNA 的 `palette` 换回合法值，这一行会变成 `#22...` 之类的**色值** ——
+     合法值时那一行：- `palette`（它身上的颜色）：#3a3d4a
+
+=== ③ 盘上 9 份真 DNA：越界过没有 ===
+  · 9 份 · 20 个角色 · 96 个元素 · 逐份色板长度：11 / 12 / 11 / 12 / 14 / 11 / 11 / 6 / 6
+  · ⚠️ **越界 0 个** ⇒ 票面「零尸体（n=9）」**成立**
+
+=== ④ ⚠️ 落点不只决定失败语义，还决定它响在**钱线的哪一侧** ===
+  · create-game.ts:229  `runUnderstanding`（理解层：**到 `asset-recipe.json` 为止**）
+  · create-game.ts:280  `compileCharacterDna` —— **在这里面**（⇒ 钱线**之前**）
+  · create-game.ts:372  `runBuild`（构建层：**从磁盘读回清单往下走**）
+  · create-game.ts:405  `say("pack")` —— **买图从这里开始**
+  ⇒ 四个候选落点：
+     ⓐ `contracts` 的 schema 级（`CharacterDNAFileSchema` 的 superRefine）⇒ 理解层 · **钱线之前**
+     ⓑ `build-character-dna.ts` 的装配级 ⇒ 同一个函数里 · **钱线之前**（⚠️ **它手上有 `vws`**）
+     ⓒ `assets` 的入口级（`readCharacterRef` / `readStyle` 那种）⇒ **构建层 · 钱线之后**
+     ⓓ `dnaBrief` 级 ⇒ `pack` 里、**正在买图的时候** ⇒ 钱线**之后**
+  ⚠️ 换句话说：ⓒⓓ 就算补上了，也是**在钱花出去之后**才知道这份 DNA 有悬空引用。
+
+=== ⑤ 失败语义：票面那句「schema 会重采样、装配级不重采样」够准确吗 ===
+  compile-character-dna.ts:169  const built = buildCharacterDna({ fromModel: parsed.value, design: o.design, vws: o.vws });
+  compile-character-dna.ts:170  if (built.ok) return { kind: "ok", file: built.file, spent };
+  ⇒ ⚠️ **装配级失败也走 `failure: "schema"`** ⇒ 调用方**照样重采样**（R16 三发）
+     ⇒ 票面 Q2 那句「`schema` 会重采样、装配级不重采样」**在本步不成立**
+        （那句话对**设计层**成立：R12 是 `rejected` ⇒ 不重采样 —— 两层的「拒绝面」不一样）
+  ⚠️ 而这一步**没有拒绝面**（文件头逐字：*  ⚠️ **本步只有这一档错**：DNA 那一侧没有 R12 那种「拒绝」（拒绝面在票 10 与票 15）。 */）
+  ⇒ 所以 ⓐ 与 ⓑ 的**失败语义今天是一样的**（都是 3 发盲重采样 + 退 4）——
+     真正把 ⓐ 与 ⓑ 分开的是**别的**东西（能不能拿到 `vws`、要不要动契约的输入形状）。
+
+=== ⑥ 代价 ===
+  · A 那一侧的 gate 本体：visual-world.ts:287-299（约 13 行，含报文）
+    —— 它跑在**顶层 superRefine** 里，所以**同一份文档**里的引用都能跟 `style.palette` 对账
+  · ⚠️ 而 `CharacterDNAFileSchema` 今天**不吃 `vws`**（character-dna.ts:153 —— 它是**文件形状**）
+    ⇒ ⓐ 要**改契约的输入形状**（把色板长度塞进这份 schema 的入参）
+  · ⓑ 那一侧**什么都不用改形状**：`buildCharacterDna` 的入参里已经有 `design` 与 `vws`
+    （build-character-dna.ts:87），而且那里**已经有两只手**：`characterSetGate` 与 `verbatimCopyGuard`
+
+=== ⑦ ⚠️ 任何 superRefine 都**模型看不见** —— 这条自白本文件自己写着 ===
+  character-dna.ts:148-150
+      //
+      //   ⚠️ **这条 check 模型看不见**：`toJSONSchema` 静默丢掉 `superRefine`（票 08 实测）。
+      //     ⇒ 规矩由 `game-design/src/prompts.ts` 在工具 `description` 里补（票 08 的 R2-Q5 那个杠杆）。
+  ⇒ 若走 ⓐ：那条 gate 会**静默丢掉**（`toJSONSchema`），模型照旧不知道有这条规矩
+     ⇒ 按 A 那一侧的先例（`vision` 的工具说明补了「严格小于色板长度」那一句），
+        **散文必须跟着走** —— 而散文那半句**今天不存在**（②）
+     ⇒ 这就把它接回了**票 68 那一句话**（票面 §Q3 已经点过：两票住同一句话）。
+
+=== ⑧ 先例：票 44 裁过「在入口拒、契约仍然不动」（这就是 ⓒ 那条路）===
+      ops.ts:1327  * ⚠️ **2026-10-12（票 44）就地更正**：上面那条边界**已被票 44 关掉**。人类在那一票裁 **Q1=(a)
+      ops.ts:1328  *   「空色板的产物不该存在，一律拒」**，落点**正是这里**（原话：「在 `readStyle` 入口拒绝，
+      ops.ts:1329  *   复用票 29 已建立的校验闸」）⇒ 下面多了一条**业务判据**（色板非空）。⚠️ 契约**仍然不动**
+      ops.ts:1330  *   （`.default([])` 原样保留，守 R6）—— 拒的是**入口**，不是 schema。
+      ops.ts:1350  // ⚠️ **票 44 的闸**（人类 2026-10-12 裁定 **Q1=(a)**「空色板的产物不该存在，一律拒」）：
+  ⇒ 那个先例的形状：**判据加在入口**、**schema 一动不动**（守 R6）。
+     ⚠️ 而它今天也在**构建层**（`pack` 那条路上）⇒ 走 ⓒ 会继承同一个「钱线之后」的性质（④）
+
+=== ⑨ 教义：`PaletteRefShape` 只有两个宿主，而「越界」只在一个宿主里定义 ===
+  全仓 `PaletteRefShape` 的宿主（`grep` 逐处列出）：
+     · visual-world.ts:200-205  六桶（primary/secondary/accent/background/shadow/highlight）
+     · visual-world.ts:225      materials.*.color
+     · character-dna.ts:111     `palette: z.array(PaletteRefShape)`  ← **本票**
+  ⇒ **一个形状 · 两个宿主 · 一个宿主有 gate**。
+  ⚠️ 而 visual-world.ts:286 的注释逐字写着「**只此一处的「越界」定义**」——
+     这句话在**它的射程内**是对的，而它的射程是**按文书划的**（`VisualWorldSpecSchema.superRefine`）。
+
+  那条 gate 自己写下的四条教义（逐字）：
+     // ⚠️ **一条顶层的 `superRefine`：所有 `palette:N` 的落点必须落在 `style.palette` 之内**（票 08 的 R1-Q6 / R2-Q4）。
+     //   **它管什么**：六桶**与** `materials.*.color` —— 一个世界只有一个颜色来源，
+     //   **为什么只提前管这一条**：判据是 **「就地 gate 只管「一次调用内部自相矛盾」」** ——
+     //     模型自己写下一份 9 个色的 `style.palette`、又引用 `palette:9`，那是**自己跟自己打架**。
+     //     它归票 17 的判据。**别把这条 check 当垃圾桶往里加。**
+     // ⚠️ **一个必须点名的连带后果：这条 check 同时也管从磁盘上读回来的 `visual-world.json`。**
+     //   **永远不再触发** —— config / drawlist 那一侧的那条还在，别以为它坏了。
+
+  ⇒ ⭐ 把它读成一句话：**「引用越界」在这个仓库里的定义 = 「同一份文书自己跟自己矛盾」**，
+     而 DNA 引用的是**同一份** `style.palette`（同一个颜色来源，`character-dna.ts` 的字段说明也是这么说的），
+     只是住在**另一份文书**里 ⇒ **现有 gate 结构上够不着**（不是忘了写）。
+  ⚠️ 于是 Q1 的真正分岔不在于「要不要补」，在于**那一发算不算「自己跟自己矛盾」**：
+     DNA 那一发的色板是**印在提示词里**的（②），模型是**对着印出来的 6 个色**写下 `palette:11` 的
+     ⇒ 若「提示词里印了色板」算文书的一部分 ⇒ 是自相矛盾 ⇒ 该就地 gate；
+       若「文书」只指**写出来的那份 JSON** ⇒ 色板不在里面 ⇒ 它是**跨文书的不一致**
+       ⇒ 按上面那条教义，跨文书的不一致**正是那条 gate 明说自己不管的那一类**。
+  ⭐⭐ 而 DNA 那一侧的**字段注释引的是同一条判决** —— character-dna.ts:106-110 逐字：
+      /** 这个角色的颜色。⚠️ **`PaletteRef[]`，不是自由 hex**（票 04 Q4）。
+      *  票 02 的裁决 25 已经判过一模一样的形状（`materials.*.color`）：
+      *  「否则这个世界就有了**第二套颜色来源**，而 `palette:N` 的一元性正是整票最硬的那条原则」。
+      *  票 39 的那句话在这里同样成立：**选**色对、**排**色错 —— 所以这是**从世界色板里选**。
+      *  ⚠️ 写成自由 hex 会**静默失效**：下游 `quantize.ts` 会把色板外的颜色量化掉。 */
+     ⇒ 「**第二套颜色来源**」/「`palette:N` 的**一元性**」正是 VWS 那条 gate 引的**同一条**（票 02 裁决 25）。
+     ⇒ 也就是说：**「一元性」这条原则本身就是跨文书的**（它要治的恰恰是「DNA 自己另搞一套」）——
+       按原则，DNA 越界**就是**「同一条违规」；按 gate 的实现，它够不着。
+  ⚠️ 另：那条教义末句「**别把这条 check 当垃圾桶往里加**」也在射程内 ——
+     走 ⓐ 时要写清它是**另一份文书上的另一条 check**，不是往 VWS 那条里塞。
+
+=== ⑩ ⚠️ 比哪个色板：`dnaBrief` 索引的是 `StyleSpec.palette`，而 gate 手上的是 `vws.style.palette` ===
+  · `dnaBrief(dna, style)` 的第二参是 **`StyleSpec`**（`prompt.ts:75`）⇒ 它索引的是 **`stylespec.json` 的 `palette`**
+  · 而 ⓪ 那条 gate（以及任何要加的 DNA gate）比的是 **`vws.style.palette`**
+  ⇒ 于是「两个数字今天一样吗」不是文风问题，是**这条 gate 管不管得着读者**的问题。
+
+  ⭐ 结论是**构造上一样**：ops.ts:329 逐字 ——
+      fs.writeFileSync(path.join(dir, STYLE_FILE), JSON.stringify(world.style, null, 2) + "\n");
+      const out: Record<string, unknown> = { ...checked.value, styleRef: STYLE_FILE };
+     ⇒ `stylespec.json` 是 `world.style` 的**逐字节 JSON 转储**（R6 那个「兼容载体」）
+       ⇒ **`stylespec.palette` ≡ `vws.style.palette`，顺序都保得住** —— 不是「碰巧相等」。
+
+  盘上核对（9 份 DNA 的目录，逐个把两份色板比一遍）：
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/checkpoint-run11/ruined-city-scavenger/run/v1：vws=11 · stylespec=11 · 同色序=true
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out/wasteland-scavenger-assets/run/v1：vws=12 · stylespec=12 · 同色序=true
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out/wasteland-scavenger-run/run/v1：vws=11 · stylespec=11 · 同色序=true
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-10c/wasteland-scavenger-assets/run/v1：vws=12 · stylespec=12 · 同色序=true
+    ⚠️ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13b/.failed-2026-10-13T09-22-52-685Z：vws=14 · **没有 stylespec.json**
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13d/ruined-city-scavenger/run/v1：vws=11 · stylespec=11 · 同色序=true
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13e/ruined-city-scavenger/run/v1：vws=11 · stylespec=11 · 同色序=true
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13g/ruined-city-scavenger/run/v1：vws=6 · stylespec=6 · 同色序=true
+    ✅ .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1：vws=6 · stylespec=6 · 同色序=true
+  ⇒ 8 份两份都在、**8/8 逐字节同色序**；另有 1 份只有 VWS（`.failed` 那一跑）
+     ⇒ 所以**比哪一份都一样** —— 而这一点必须量出来，不能假定：ⓐⓑ 手上只有 `vws`。
+
+=== ⑪ ⭐⭐ 已有的两条悬空引用 gate：**同一份文书**归契约、**跨文书**归装配 ===
+  全仓「悬空引用」四条（`grep` 逐处）：
+     · visual-world.ts:287-300   `palette:N` 越界 —— 六桶 + `materials.*.color` vs `style.palette`
+     · game-design.ts:297-299    `levels[].entities[]` 解不到 —— vs `player` + 四桶的 id
+     · game-design-gate.test.ts:77 那条测试逐字：「**与票 08 的「色板下标越界」同形**」
+     · ops.ts（票 44 的空色板闸）—— 是「空的」，不是「悬空」，另一类
+
+     game-design.ts:298 逐字：
+       issue(["levels", i, "entities", j], `\`levels[${i}].entities[${j}]\` 指向 \`${ref}\`，而 \`player\` 与四桶里都没有这个 id —— ⚠️ 悬空引用：关卡与实体是同一次调用里写出来的，对不上就是**文书自己跟自己矛盾**`);
+   ⇒ 两条 gate 的报文**形状一模一样**，末尾都是「⚠️ 悬空引用：…是**同一次调用里写出来的**，对不上就是**文书自己跟自己矛盾**」
+   ⭐ 而两条都满足同一件事：**被引的那一侧与引用，是同一次模型调用写出来的**（都在同一份 JSON 里）。
+   ⚠️ DNA 那一侧**不满足**：`characters[].palette` 指的是**另一次调用（vision）**写的 `style.palette`。
+
+  ⭐⭐ 而跨文书的引用检查在这个仓库里**已经有家** —— `buildCharacterDna` 那两只手：
+     · `characterSetGate(design, file)`（build-character-dna.ts:105）—— DNA 的 id ↔ **设计层**（另一份文书）
+     · `verbatimCopyGuard(file, vws)`（:143）—— DNA 的 7 个字段 ↔ **世界层**（另一份文书）
+   ⇒ **两条都是跨文书**，而且**两条都住在装配级、都收外来文书当入参**。
+
+  ⇒ 于是仓库现有的分工是一句话：
+     **同一份文书内部的引用 ⇒ 契约 schema 级 gate**（VWS 六桶 · design levels）
+     **跨文书的引用 ⇒ 装配级 gate，收那份外来文书当入参**（`buildCharacterDna`）
+     ⚠️ DNA 的 `palette[]` 指向**另一份文书**的色板 ⇒ **按已有分工，它的家就是 ⓑ**。
+
+=== ⑫ 这一轮量到的五件票面没写的事 ===
+  ① **不变量在三个落点上的待遇是三档，不是两档**：
+     VWS（gate + 散文）· drawlist（抛错 + 散文）· **DNA（两样都没有）**
+     ⇒ 更准确的说法不是「隔壁有、这里没有」，而是「**别处都是两半一起来，这里两半都缺**」
+  ② **越界在这条链上是全绿的**（①②③④ 四个环节没有一个会红），
+     而它走到的那一格恰恰是**翻译失败**那一格（`?? ref` 把 `palette:11` 原样交给模型）；
+  ③ **四个候选落点分居钱线两侧**：ⓐⓑ 在买图之前、ⓒⓓ 在买图之后 ⇒
+     而 ⓑ **什么形状都不用改**（`buildCharacterDna` 手上有 `vws`，且已挂着两只手）。
+  ④ **「比哪一份色板」有确定答案**（⑩）：`dnaBrief` 索引 `StyleSpec.palette`，
+     而 `stylespec.json` 是 `world.style` 的逐字节转储 ⇒ 两份色板**构造上**同色序（盘上 8/8 印证）
+     ⇒ 手上那份 `vws` 就够用，**不需要**再给 gate 递第二个色板。
+  ⑤ ⭐⭐ **落点的答案不在「不变量」里，在「文书」里**（⑪）：现有两条悬空引用 gate
+     **都是同一份文书内部的**（VWS 六桶 vs `style.palette` · design levels vs 四桶），
+     而跨文书的引用检查**已有家**：`buildCharacterDna` 那两只手（`characterSetGate` 对 design、
+     `verbatimCopyGuard` 对 vws）—— 都住在装配级、都收外来文书当入参。
+     ⇒ DNA 的 `palette[]` 指向**另一份文书** ⇒ 按已有分工，家就是 ⓑ。
+
+=== ⑫ ⭐ 价签：拿假 `fetch` 驱动**真的** `compileCharacterDna`，数往返次数 ===
+  （走的是**真代码**：真循环、真 `parseToolUse`、真 `buildCharacterDna`、真账；`fetch` 由探针自己顶）
+
+  【对照 · 盘上原样的 DNA】
+     往返 **1** 次 · body 去重后 **1** 种 · attempts=1 · failures=null
+     判决：**过了**（`ok`）—— 链往下走
+     ⇒ 台子诚实（第一轮 ① 用的是同一份）
+
+  【越界 · characters[0].palette[0] = palette:11（其余一个字不动）】
+     往返 **1** 次 · body 去重后 **1** 种 · attempts=1 · failures=null
+     判决：**过了**（`ok`）—— 链往下走
+     ⚠️ 这就是第一轮 ① 那份「全绿」的文书 —— 它在**真 `compileCharacterDna`** 里也全绿
+
+  【装配级失败（今天真存在的那两只手之一）· 抽掉一个角色的 id】
+     往返 **3** 次 · body 去重后 **1** 种 · attempts=3 · failures=["schema","schema","schema"]
+     判决：抛 `CompileCharacterDnaError`（`failure: schema`）
+     落到人眼前的那句话：重采样 3 次都没有拿到一份过契约的 CharacterDNA（最后一次：schema）。最后一次的病因：【构造性 · 每个角色实体恰好一条 DNA】设计层的 `player`（`player-scavenger`）**没有 DNA** —— 每一个角色实体**恰好一条**，少一条就是**把用户见过…（共 217 字）
+     ⇒ 这就是**在 ⓑ 补第三只手之后**，越界会走的同一条路：同一个 `kind: "schema"`、同一个重采样
+
+  【契约级失败 · palette 写成 hex】
+     往返 **3** 次 · body 去重后 **1** 种 · attempts=3 · failures=["schema","schema","schema"]
+     判决：抛 `CompileCharacterDnaError`（`failure: schema`）
+     落到人眼前的那句话：重采样 3 次都没有拿到一份过契约的 CharacterDNA（最后一次：schema）。最后一次的病因：工具入参不过契约：characters[0].palette[0]: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema
+     ⇒ 与 ⓐ 补上之后同一条路（票 68 那句话的后果，在这里做对照）
+
+  ⇒ ⭐⭐ 读数：**越界今天值 1 发，而且那 1 发是「过」** —— 它**没有**花掉重采样的钱，
+     因为**今天没有东西会红**；而装配级那两只手拦下的失败值 **3 发**、契约级的值 **3 发**。
+     ⇒ **加判据不是省钱，是花钱买一声响**：越界那一支从「1 发 · 静默通过」
+       变成「3 发 · 响亮失败 + 一句能定位的话」。
+     ⚠️ 而这一层**没有拒绝面**（第一轮 ⑤）⇒ ⓐⓑⓒⓓ **没有一个**能把那 3 发降回 1 发 ——
+        这和票 67 那个角的方向**正好相反**（那边是「把贵的那一支变便宜」）。
+     ⚠️ 另外：这 3 发的 **body 逐字节相同**（同一个常量盲发三次），模型看不到理由。
+     而今天那份越界文书走完这一发，④ 那一格拿到的是：
+       - `palette`（它身上的颜色）：palette:11
+
+=== ⑬ ⚠️ 口径：`/^palette:\d+$/` 允许**前导零**，所以「补 `< n`」补的是值级、不是形级 ===
+  先看 DNA 这一侧（拿盘上**色板 11 项**的那一跑去试，因为 7 在里面）：
+     （.scratch/game-maker-v2/experiments/e2e-wasteland/raw/checkpoint-run11/ruined-city-scavenger/run/v1/ · 色板 11 项）
+     palette:7     契约=**过**  ⇒  - `palette`（它身上的颜色）：#455070
+     palette:07    契约=**过**  ⇒  - `palette`（它身上的颜色）：#455070
+     palette:007   契约=**过**  ⇒  - `palette`（它身上的颜色）：#455070
+     ⇒ ⚠️ **三个不同的字符串、同一个色**（`Number("07") === Number("7")`）—— 都合法、都翻得出色值。
+  再看 VWS 那一侧（同一条正则的另一个宿主，色板 3 项的最小文档）：
+     VWS 六桶 palette:2     ⇒ success=true  ⚠️ **也放行**
+     VWS 六桶 palette:02    ⇒ success=true  ⚠️ **也放行**
+     VWS 六桶 palette:002   ⇒ success=true  ⚠️ **也放行**
+     VWS 六桶 palette:04    ⇒ success=false  palette.primary[0] 指向 palette:04，而这份文档的 style.palette 只有 3 个…（共 118 字）
+     ⇒ ⚠️ **VWS 那条 gate 也只查 `idx >= n`**，前导零在同一侧同样溜得过 ⇒
+        「给 DNA 补一条 `< n`」= 与 VWS **对齐**，**不是**补一个 DNA 独有的洞、
+        也**不会**顺带治「同一个色有无数种合法写法」——⚠️ 那是**另一件事**（形级 / 规范化），
+        本票不裁它，这里只登记：**四处（VWS 六桶 · materials.color · drawlist · DNA）没有一处管它**。
+
+=== ⑭ Q5 的模板实物：`visual-world-gate.test.ts` 到底几条断言 ===
+  packages/contracts/tests/visual-world-gate.test.ts —— **81 行** · `it(` **8 条**（第一轮的 Q5 写的是「4 条断言」⇒ **这里纠正**）
+     :23  "六桶里越界 ⇒ 拒，且 `path` 指得到**那一格**（报错要能定位）"
+     :32  "`materials.*.color` 里越界 ⇒ 同样拒（六桶与它同一条规矩：一个世界只有一个颜色来源）"
+     :40  "一处越界只报一条 —— 别把同一份文档报成一堵墙"
+     :46  "边界内（最后一个下标）⇒ 放行 —— gate **不许**把合法的也拦下"
+     :50  "空色板 + 任何引用 ⇒ 拒（下标 0 也越界）"
+     :56  "⚠️ 它**同时管从磁盘上读回来的文档** —— 一份人手写的、引用越界的会被拒"
+     :65  "⚠️ 它**在工具 schema 里一点痕迹都没有**（`toJSONSchema` 丢 `superRefine`）⇒ 模型看不见它"
+     :73  "`.omit()` 会把 gate **摘掉** ⇒ `vision` 靠装配后的重校验接住它，而不是靠模型那一份"
+  分 **2 个 `describe`**：前一组是 gate 本身（越界 / 定位 / 一处一条 / 边界放行 / 空色板 / 读盘也管），
+     后一组两条讲的是「**gate 模型看不见**」（`toJSONSchema` 丢 `superRefine` · `.omit()` 会摘掉它）——
+     ⇒ 若给 DNA 补 gate，**前一组那几条可以逐条换字段照抄**，后一组两条讲的是同一条性质、也照旧成立。
+
+=== ⑮ ⭐ ⓑ 的模板：那两只手的**返回形状**决定了第三只手怎么写 ===
+  · :105  export function characterSetGate(design: GameDesignSpec, file: CharacterDNAFile): string[] {
+  · :143  export function verbatimCopyGuard(file: CharacterDNAFile, vws: VisualWorldSpec): string[] {
+    ⇒ ⚠️ **两只手都返回 `string[]`**（一串**给人读的问题**，不是 `boolean`、不是抛错）——
+       第三只手照这个形状写就行：**纯函数 · 收 `(file, vws)` · 返回问题清单**，不需要新类型、不抛。
+    :187  const problems = [
+    :188  ...characterSetGate(input.design, file),
+    :189  ...verbatimCopyGuard(file, input.vws)
+    :190  ];
+    ⇒ 折叠点**只有一处**（`problems.length > 0` ⇒ `kind: "schema"`）⇒ 补一只手**不改这里一个字**。
+  · ⚠️ 而这一格在**全仓只有一个读者** —— 扫遍 `packages/` 整棵树（含 tests、含 `src/` 的子目录，
+     只排掉 `dist` 与 `node_modules`），找所有读 `dna.palette` 的地方：
+      packages/assets/src/prompt.ts:80  dna.palette.length === 0
+      packages/assets/src/prompt.ts:82  : dna.palette
+    ⇒ 命中 **2 行**，但**是同一个读者**（`dnaBrief` 那一句拆成了两行）⇒ 「这一格只有一只手在拿」成立。
+       补上第三只手之后，**那唯一一个读者就再也拿不到悬空值** —— 这正是 ⑫ 里
+       「加判据买到的是**一声响**、不是省钱」这句话的落点：它买的是一格**本来会静默翻译失败**的东西。
+
+=== ⑯ 补量这一段量到的四件事（一句话各一条）===
+  ① ⭐ 价签：越界今天 **1 发且「过」**，加判据后 **3 发且抛** ⇒ **不是省钱，是花钱买一声响**；
+     而这一层没有拒绝面 ⇒ ⓐⓑⓒⓓ 没一个能把 3 发降回来（与票 67 方向相反）。
+  ② ⚠️ 口径：正则允许前导零 ⇒ 「补 `< n`」是**值级**、与 VWS 对齐，不治「同色多写」（四处都没管）。
+  ③ Q5 的模板实物：`visual-world-gate.test.ts` **81 行 · 8 条 `it`**（第一轮说 4 条 ⇒ 纠正）。
+  ④ ⓑ 的模板：两只手都返回 `string[]`、折叠点只有一处、而这一格**只有一个读者** ⇒ 第三只手是纯函数、零新类型。
+
+=== ⑰ ⭐ ⓒ/ⓓ 手上到底有没有色板：`style` 是必填，`visualWorld` 是可选 ===
+  · pack.ts:52   style: StyleSpec;      ← **必填**（没有 `?`）
+  · pack.ts:88   visualWorld?: VisualWorldSpec;   ← **可选**
+  · 而读者索引的是**哪一份**：prompt.ts:75 `dnaBrief(dna, style)` → :83
+      .map((ref) => style.palette[Number(ref.slice("palette:".length))] ?? ref)
+  ⇒ ⭐ 读数：在 assets 那一侧，所谓「色板」**就是 `style.palette`** —— 而 `style` 是 `buildAssetPack` 的**必填入参**，
+     与**可选**的 `opts.visualWorld` 无关。
+  ⇒ ⚠️ 这一条纠正了一个默认假设：ⓒ/ⓓ 不是「拿不到色板」，而是**手上那一份就是读者用的那一份**。
+     ⇒ ⑩ 那条「`stylespec.json` 是 `world.style` 的逐字节转储」的桥，在 ⓒ/ⓓ **根本不用搭**：
+        一个跨文书的假设都不需要 —— 而 ⓑ 需要（它比的是 `vws.style.palette`）。
+
+=== ⑱ ⭐⭐ 票 44 那条入口闸，与 Q4 的落点住在**同一个函数体**里 ===
+  · ops.ts:1372   const style = readStyle(styleAbs);
+  · ops.ts:1402   const characterDna = readCharacterRef(r.value, path.dirname(path.resolve(opts.recipePath)));
+  ⇒ 两者相隔 **30 行**、**同一个函数体**（`packAssets`）。
+  · 而票 44 那条闸本体就长在 readStyle 里（ops.ts:1332 起）—— 它的注释逐字给了做法：
+      :1351  //   **色板非空**是一条**业务**判据，不是 schema 判据 —— 契约那边 `palette` 带 `.default([])`，
+      :1357  //   被同一句话拒掉（人类的边界原话：「**不依赖清单是否引用色板**」—— 色板是世界级风格数据，
+  ⇒ ⭐ 所以 Q4(a)「入口也拒」**不是**「要 plumbing」：色板在 :1372 就已经在手上，
+     只差把 `style`（或 `style.palette`）多传一个参数进 :1402。
+  · 而今天的 readCharacterRef **签名里没有它**（:1283）：
+      function readCharacterRef(recipe: { assets: readonly { spec: { id: string; characterId?: string } }[]; characterRef?: string }, recipeDir: string): Ch…（共 178 字）
+
+=== ⑲ ⚠️ 落地价签：补上这条判据之后，**仓库里有没有既有 fixture / 测试会红** ===
+  ⚠️ 第一轮 ③ 量的是**盘上真产物**（9 份 · 96 元素 · 越界 0）；这一格量的是**仓库自己的 fixture**。
+  · `dnaRecord()`（**全 game-design 套件都用它**）
+      packages/game-design/tests/fixtures.ts   下标 palette:0   ⇒  ✅ **全在界内**（最大 0 < 2）
+      配对的是同文件 `VWS.style.palette`（**2 个色**；`VWS_CLASS` 由它 spread，色板同一份）
+  · `DNA`（`dnaBrief` 那条测试的输入）
+      packages/assets/tests/master.test.ts   下标 palette:1 / palette:3   ⇒  ✅ **全在界内**（最大 3 < 4）
+      配对的是同文件 `STYLE.palette`（**4 个色**，:14）
+  · `DNA`（pack 那条测试的输入）
+      packages/assets/tests/pack-master.test.ts   下标 palette:0   ⇒  （不配色板 ⇒ 由**落点**决定谁碰得到它）
+      色板来自配方 fixture 的 `styleRef`；`palette:0` 对**任何非空**色板都在界内（非空由票 44 的闸保证）
+  · `characterDna.characters[*].palette`（E2E 的假上游回话）
+      fixtures/upstream/canned.json   下标 palette:0 / palette:1   ⇒  ✅ **全在界内**（最大 1 < 2）
+      配对的是同文件 `visualWorld.style.palette`（**2 个色**）
+  · `ODIN.palette`（**纯 schema 测试**，不配色板）
+      packages/contracts/tests/character-dna.test.ts   下标 palette:0 / palette:3 / palette:2   ⇒  （不配色板 ⇒ 由**落点**决定谁碰得到它）
+      ⚠️ 它过的是 `CharacterDNAFileSchema` —— **手上没有色板** ⇒ ⓑ 那道手**碰不到它**
+  ⇒ ⭐ 读数：**仓库里没有一份 DNA fixture 带越界引用** —— 最大下标是 `master.test.ts` 的 **3**，而它配的色板是 **4** 个。
+     ⇒ 「补上这道手」在**既有测试**这一侧是**免费的**：game-design 全套件用的是 `dnaRecord`（只有 `palette:0`）、
+       assets 那两份也在界内 ⇒ **改造不会先撞红一片**。
+     ⚠️ 而 `contracts/tests/character-dna.test.ts` 的 `palette:3` 提醒了 ⑥ 那件事：**它压根不配色板** ⇒
+        若 Q2 裁 ⓐ（schema 级），那一份 fixture 的**入参形状要跟着变**；裁 ⓑ/ⓒ/ⓓ 则一个字不用动。
+
+=== ⑳ ⭐⭐ 第三只手照那两只手的形状**真写一遍**（只在内存里），喂真文书 ===
+  模板（⑮ 已量过签名）：
+     :105  export function characterSetGate(design: GameDesignSpec, file: CharacterDNAFile): string[] {
+     :143  export function verbatimCopyGuard(file: CharacterDNAFile, vws: VisualWorldSpec): string[] {
+  · 第三只手（**6 行**、返回 `string[]`、不抛、零新类型）：
+      const idx = Number(ref.slice("palette:".length));
+      if (idx >= paletteLen) out.push(`characters.${ci}.palette.${ri}：…`);
+  ⚠️ 下面喂的是**盘上真产物**（不是构的）：
+      0 条 · 色板 11 项 ·  2 角色 · 10 元素   checkpoint-run11/ruined-city-scavenger/run/v1/character-dna.json
+      0 条 · 色板 12 项 ·  4 角色 · 17 元素   run-out-2026-10-10c/wasteland-scavenger-assets/run/v1/character-dna.json
+      0 条 · 色板 14 项 ·  2 角色 · 11 元素   run-out-2026-10-13b/.failed-2026-10-13T09-22-52-685Z/character-dna.json
+      0 条 · 色板 11 项 ·  2 角色 · 10 元素   run-out-2026-10-13d/ruined-city-scavenger/run/v1/character-dna.json
+      0 条 · 色板 11 项 ·  2 角色 · 10 元素   run-out-2026-10-13e/ruined-city-scavenger/run/v1/character-dna.json
+      0 条 · 色板  6 项 ·  2 角色 ·  9 元素   run-out-2026-10-13g/ruined-city-scavenger/run/v1/character-dna.json
+      0 条 · 色板  6 项 ·  2 角色 ·  9 元素   run-out-2026-10-13h/ruined-city-scavenger/run/v1/character-dna.json
+      0 条 · 色板 12 项 ·  2 角色 · 10 元素   run-out/wasteland-scavenger-assets/run/v1/character-dna.json
+      0 条 · 色板 11 项 ·  2 角色 · 10 元素   run-out/wasteland-scavenger-run/run/v1/character-dna.json
+  ⇒ 盘上合计 **20 个角色 · 96 个元素**（另 0 份缺同跑的 VWS，跳过）⇒ 第三只手报 **0 条问题**
+     ⇒ ⭐ 这是对 ③「n=9 · 越界 0」在**手这一层**的复核（不是重述票面，是把那只手跑起来）：**它一条都不报**。
+  · 再喂**构造的**四份（看它报不报、报文长什么样）：
+     越界 · palette:11                          ⇒ **1** 条：「characters.0.palette.0：悬空引用 —— 色板只有 6 项，而这里指的是 palette:11」
+     边界外一格 · palette:6                        ⇒ **1** 条：「characters.0.palette.0：悬空引用 —— 色板只有 6 项，而这里指的是 palette:6」
+     边界内最大 · palette:5                        ⇒ **0** 条
+     前导零 · palette:04（色板 6 项 ⇒ 值 = 4）         ⇒ **0** 条
+  ⇒ ⭐ 读数：那只手是**按值判**的（`Number(ref.slice(8))`）—— 所以前导零那行报 **0** 条**不是漏洞**：
+     它只是同一个值的另一种拼法（值 4 < 色板 6 项 ⇒ 在界内），与 `palette:4` 同判。
+     ⇒ 而 ⑬ 量到的 VWS 那条 gate 口径**一致**：`palette:04` 配 **3 项**色板时**照样拒**（值 4 ≥ 3）
+       ⇒ 两条 gate 判的都是**值**、不是**形** ⇒ ⑫ 那句「口径对齐」在这一格**实测成立**。
+     ⇒ ⑮ 那句「照这个形状写」**实测成立**：零新类型、不抛、报文与 VWS 那条同形（`path：悬空引用 …`）。
+     ⚠️ 但这一格**证不了**「补上之后模型会更小心」—— 它只证「那只手写得出、且对真文书沉默」。
+
+=== ㉑ ⭐ 票 68 与票 69 住**同一格**：两票的候选措辞合起来会不会打架 ===
+  · 同一格现话：prompts.ts:378-379（`DNA_FIELD_HINTS.palette`）
+      palette: "这个角色身上的颜色，从世界色板里**选**：只能写 `palette:<下标>`（如 `palette:0`）。" +
+      "⚠️ 不许写 hex 或颜色名（写了下游会被量化掉，等于没写）",
+  · 另一处「规矩」：prompts.ts:358（工具说明第 4 条 —— 票 68 的 ⑬ 量过：它与这一格在**同一发 body** 里）
+      4. \`palette\` 只能写 \`palette:<下标>\`（从上面那份色板里**选**），**不许**写 hex 或颜色名。
+  · 两个「锚」在**同一格**里各命中几次（这才是「同格」的真正风险 —— 换句会不会互相覆盖）：
+     · 票 68 的锚（后果那半）⇒ 命中 **1** 次
+     · 票 69 的锚（规矩那半）⇒ 命中 **1** 次
+  ⇒ ⭐ 读数：**两个锚不相交**（68 动「后果」、69 动「规矩」）⇒ **换句顺序无关、不会互相覆盖**。
+  · 拿**真**的一对拼出来的提示词：**3468 字** · 两票都换过之后：**3575 字**（Δ 107）
+     · 68 的旧句仍在吗 **false**（应为 false） · 69 的新半句在吗 **true**（应为 true）
+     · 一条既有的、盯这一格的断言还在吗（`dna-prompts.test.ts` 那条 `toContain("\`palette:<下标>\`")`）：
+       **true**
+  ⇒ ⭐ 读数：两票可以**同一次落地**、互不踩 —— 但顺序仍是「第二票落地时先读第一票改完的那句话」（Q3 已写）。
+     ⚠️ 这一格量的是**字符串层面**的相容性，**不是**「那句话读起来通顺」（后者只有人裁能说）。
+
+=== 小结 · 这一轮量到的五件事（**不编号** —— ㉒ 起留给下一轮读数）===
+  ① ⭐ ⓒ/ⓓ 手上**有色板**（`style` 必填 · `visualWorld` 可选 · 而读者索引的就是 `style.palette`）
+     ⇒ 「钱线之后那两支拿不到色板」这个默认假设**不成立**；且它们比的是**读者自己那一份**（连 ⑩ 的桥都不用搭）。
+  ② ⭐⭐ 票 44 那条入口闸与 Q4 的落点**相隔 30 行、同一个函数体**（ops.ts:1372 / :1402）
+     ⇒ Q4(a) 的代价不是「要 plumbing」，是「多传一个参数」。
+  ③ ⚠️ 落地价签：**仓库里没有一份 DNA fixture 带越界引用**（最大下标 3，配 4 项色板）
+     ⇒ 补上这只手，既有测试这一侧是**免费的**；⚠️ 唯一要动入参的是 ⓐ 那条路（`contracts` 那份 fixture 不配色板）。
+  ④ ⭐ 第三只手（6 行纯函数）真跑：盘上 20 角色 / 96 元素报 **0** 条 · 构造的越界报 1 条 · 前导零按**值**判（与 VWS 同口径）。
+  ⑤ ⭐ 与票 68 **同格不相交**：两个锚各命中 1 次 ⇒ 换句顺序无关、可同一次落地。

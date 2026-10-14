@@ -1,0 +1,581 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruined-city-scavenger",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-scavenger",
+        "role": "玩家 · 拾荒者",
+        "description": "矮壮方块拾荒者，矩形躯干加方头、短粗四肢、深色外套配浅色内衬与带徽章方帽；idle 为直立微呼吸，run 为短腿交替迈步，jump 为屈腿腾起的单帧姿态",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "player-scavenger",
+        "masterAsset": "master-scavenger",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "fps": 12,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-patroller",
+        "role": "敌人 · 巡检巡行者",
+        "description": "在地面横带固定区间左右匀速巡行的方块敌人，深色剪影外壳加一枚发光警示块，walk 为左右挪步、turn 为到达端点时的转身顿挫",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "enemy",
+        "masterAsset": "master-patroller",
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "turn",
+            "frames": 2,
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-node-scrap",
+        "role": "可拾取物 · 废料",
+        "description": "散落在地面与轨道带上的小块金属废料堆，由两三个矩形与一个三角拼成的扁平几何剪影，小面積亮块提示可拾取",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 12,
+          "h": 10
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-node-water",
+        "role": "可拾取物 · 净水",
+        "description": "立在轨道带边的小型净水容器，矩形瓶体加一个短矩形瓶盖，扁平纯色块，瓶身留一处亮色高光块",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 10,
+          "h": 14
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-closed",
+        "role": "宝箱 · 闭合态",
+        "description": "墙边方形箱体状的宝箱，闭盖，矩形箱身加一条水平盖缝和一枚小方形锁扣，纯色平涂无描边",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 20,
+          "h": 18
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "chest-opening",
+        "role": "宝箱 · 开启过程",
+        "description": "宝箱开启：箱盖向上弹开的翻转分帧，末帧为已开启的空箱并从中浮出一枚宝物剪影，之后停留在空箱姿态",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 20,
+          "h": 24
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-closed"
+        ],
+        "animations": [
+          {
+            "name": "open",
+            "frames": 5,
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-open-empty",
+        "role": "宝箱 · 已开启空箱",
+        "description": "开启后的空箱，箱盖向后掀开，内部为暗色阴影块，箱体保持原来的方形木箱轮廓",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-closed"
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-spikes",
+        "role": "危险物 · 地面尖刺",
+        "description": "嵌在地面与轨道带上的等距三角尖刺排，深色剪影三角形并排，底部贴一条细矩形基座带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-current-debris",
+        "role": "危险物 · 裸露电流残骸",
+        "description": "固定在墙面或地面的破损管线残骸，几段折角矩形管体加一处裸露发光节点，几何剪影、扁平色块",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-debris-block",
+        "role": "地形障碍 · 高出一格的残骸",
+        "description": "横亘在地面轨道带上的断裂混凝土残骸，一个方形主体块加一个斜切三角断面，需要跳跃越过",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-crate",
+        "role": "环境道具 · 墙边方形箱体",
+        "description": "堆在墙边的方形木条箱，矩形箱身加两条交叉短矩形加固条，扁平纯色块、无描边",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-signboard",
+        "role": "环境道具 · 墙面矩形招牌板",
+        "description": "挂在墙上的矩形招牌板，板面为亮色扁平块，可留一小块暗色矩形作为磨损，几何极简",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 18,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-wall-lamp",
+        "role": "环境道具 · 墙面圆形发光体",
+        "description": "挂在墙上的圆形发光体，圆形亮块外套一圈细矩形灯座，四周为干净色块",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-pole-light",
+        "role": "环境道具 · 竖杆小圆灯",
+        "description": "立于地面的细长矩形竖杆，顶端点一枚小圆灯亮块，杆身纯色无装饰",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 8,
+          "h": 28
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-goal-marker",
+        "role": "关卡终点标记",
+        "description": "立在街道右端的终点标记，一根竖矩形柱加顶部一个三角楔形旗面，底部一小段矩形基座",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-ruined-street",
+        "role": "关卡背景 · 废弃城市街道",
+        "description": "由远到近三层水平色带：大面积暗色天幕、低矮山体与建筑三角楔形屋顶的地貌剪影带、主视面墙体与地面平行轨道带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0.1
+          },
+          {
+            "name": "silhouette",
+            "parallax": 0.4
+          },
+          {
+            "name": "facade",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-pickup-counter",
+        "role": "HUD · 收集数计数条",
+        "description": "屏幕左上角的收集进度底板：一条被拉伸到任意宽度的细长面板，左端留一小格图标位，右端为数字区，中央平坦可重复",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 64,
+          "h": 16
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 6,
+          "right": 6,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-icon-scrap",
+        "role": "HUD 图标 · 废料",
+        "description": "按原尺寸绘制的废料计数图标，两三个矩形加一个三角拼成的小块金属剪影，不拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-icon-water",
+        "role": "HUD 图标 · 净水",
+        "description": "按原尺寸绘制的净水计数图标，矩形瓶体加短矩形瓶盖的小容器剪影，不拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-hp-pips",
+        "role": "HUD · 状态指示格",
+        "description": "按原尺寸绘制的一排等距状态格，每格为一个空心方形色块，用于表示拾荒者剩余状态",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 48,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-prompt-interact",
+        "role": "HUD · 交互提示",
+        "description": "靠近宝箱时出现在其上方的小提示胶囊，矩形底板加一个朝下的三角指针，按原尺寸绘制不拉伸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-panel-result",
+        "role": "UI · 关卡结算面板",
+        "description": "通关后显示收集统计的面板底板，圆角矩形外框、中央为完全平坦的纯色区可任意重复拉伸，四边等宽",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 96,
+          "h": 64
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-scavenger",
+      "role": "玩家角色母版（直立基准）",
+      "description": "矮壮方块拾荒者：矩形躯干加方头，四肢为短粗矩形，深色外套配浅色内衬，一顶带徽章的方帽；静止直立，无描边无渐变的扁平色块，作为行走与跳跃分帧的共同基准",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "player-scavenger",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    {
+      "id": "master-patroller",
+      "role": "巡行敌人母版",
+      "description": "同世界几何语法的方块巡检敌人：与拾荒者同一头身比的矮壮方块身形，深色外壳、方头、短粗四肢，带一枚发光警示块，直立姿态作为巡行分帧基准",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

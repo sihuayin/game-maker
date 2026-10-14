@@ -1,0 +1,32 @@
+{
+ "code": 4,
+ "ms": 424021,
+ "text": "{\n  \"command\": \"build\",\n  \"error\": \"装配期校验不过 —— 硬失败，不产出站点（2 条）：\\n  · scene.background[0]: 层 \\\"bg-ruined-street.sky\\\" 盖不住世界：画出来 480×270px，视差 0.1 会跟着镜头退掉 96×0px，最坏时屏幕上只剩 384×270px，而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）\\n  · scene.background[1]: 层 \\\"bg-ruined-street.silhouette\\\" 盖不住世界：画出来 480×270px，视差 0.4 会跟着镜头退掉 384×0px，最坏时屏幕上只剩 96×270px，而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）\",\n  \"exitCode\": 4\n}\n  · pack\n  · pack：player-scavenger（0/22）\n  · pack：enemy-patroller（1/22）\n  · pack：resource-node-scrap（2/22）\n  · pack：resource-node-water（3/22）\n  · pack：chest-closed（4/22）\n  · pack：hazard-spikes（7/22）\n  · pack：hazard-current-debris（8/22）\n  · pack：prop-debris-block（9/22）\n  · pack：prop-crate（10/22）\n  · pack：prop-signboard（11/22）\n  · pack：prop-wall-lamp（12/22）\n  · pack：prop-pole-light（13/22）\n  · pack：prop-goal-marker（14/22）\n  · pack：bg-ruined-street（15/22）\n  · pack：ui-pickup-counter（16/22）\n  · pack：ui-icon-scrap（17/22）\n  · pack：ui-icon-water（18/22）\n  · pack：ui-hp-pips（19/22）\n  · pack：ui-prompt-interact（20/22）\n  · pack：ui-panel-result（21/22）\n  · pack：chest-opening（5/22）\n  · pack：chest-open-empty（6/22）\n  · config\n  · qa\n",
+ "steps": [
+  "  · pack\n",
+  "  · pack：player-scavenger（0/22）\n",
+  "  · pack：enemy-patroller（1/22）\n",
+  "  · pack：resource-node-scrap（2/22）\n",
+  "  · pack：resource-node-water（3/22）\n",
+  "  · pack：chest-closed（4/22）\n",
+  "  · pack：hazard-spikes（7/22）\n",
+  "  · pack：hazard-current-debris（8/22）\n",
+  "  · pack：prop-debris-block（9/22）\n",
+  "  · pack：prop-crate（10/22）\n",
+  "  · pack：prop-signboard（11/22）\n",
+  "  · pack：prop-wall-lamp（12/22）\n",
+  "  · pack：prop-pole-light（13/22）\n",
+  "  · pack：prop-goal-marker（14/22）\n",
+  "  · pack：bg-ruined-street（15/22）\n",
+  "  · pack：ui-pickup-counter（16/22）\n",
+  "  · pack：ui-icon-scrap（17/22）\n",
+  "  · pack：ui-icon-water（18/22）\n",
+  "  · pack：ui-hp-pips（19/22）\n",
+  "  · pack：ui-prompt-interact（20/22）\n",
+  "  · pack：ui-panel-result（21/22）\n",
+  "  · pack：chest-opening（5/22）\n",
+  "  · pack：chest-open-empty（6/22）\n",
+  "  · config\n",
+  "  · qa\n"
+ ]
+}

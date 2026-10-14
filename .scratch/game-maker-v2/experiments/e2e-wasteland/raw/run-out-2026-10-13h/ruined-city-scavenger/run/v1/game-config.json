@@ -1,0 +1,290 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 1440,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "bg-ruined-street"
+    }
+  },
+  "player": {
+    "asset": "player-scavenger",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 250
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 250,
+      "w": 1440,
+      "h": 20
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 270
+    },
+    {
+      "x": 1439,
+      "y": 0,
+      "w": 1,
+      "h": 270
+    }
+  ],
+  "entities": [
+    {
+      "id": "pickup-scrap-1",
+      "kind": "pickup",
+      "at": {
+        "x": 160,
+        "y": 250
+      },
+      "asset": "resource-node-scrap"
+    },
+    {
+      "id": "pickup-water-1",
+      "kind": "pickup",
+      "at": {
+        "x": 250,
+        "y": 250
+      },
+      "asset": "resource-node-water"
+    },
+    {
+      "id": "pickup-scrap-2",
+      "kind": "pickup",
+      "at": {
+        "x": 340,
+        "y": 250
+      },
+      "asset": "resource-node-scrap"
+    },
+    {
+      "id": "debris-block-1",
+      "kind": "solid",
+      "at": {
+        "x": 410,
+        "y": 250
+      },
+      "asset": "prop-debris-block"
+    },
+    {
+      "id": "pickup-water-2",
+      "kind": "pickup",
+      "at": {
+        "x": 470,
+        "y": 250
+      },
+      "asset": "resource-node-water"
+    },
+    {
+      "id": "chest-1",
+      "kind": "solid",
+      "at": {
+        "x": 560,
+        "y": 250
+      },
+      "asset": "chest-closed"
+    },
+    {
+      "id": "pickup-scrap-3",
+      "kind": "pickup",
+      "at": {
+        "x": 620,
+        "y": 250
+      },
+      "asset": "resource-node-scrap"
+    },
+    {
+      "id": "crate-1",
+      "kind": "solid",
+      "at": {
+        "x": 690,
+        "y": 250
+      },
+      "asset": "prop-crate"
+    },
+    {
+      "id": "goal-1",
+      "kind": "goal",
+      "at": {
+        "x": 1390,
+        "y": 250
+      },
+      "asset": "prop-goal-marker"
+    },
+    {
+      "id": "pickup-scrap-4",
+      "kind": "pickup",
+      "at": {
+        "x": 760,
+        "y": 250
+      },
+      "asset": "resource-node-scrap"
+    },
+    {
+      "id": "pickup-water-3",
+      "kind": "pickup",
+      "at": {
+        "x": 1060,
+        "y": 250
+      },
+      "asset": "resource-node-water"
+    },
+    {
+      "id": "pickup-scrap-5",
+      "kind": "pickup",
+      "at": {
+        "x": 1180,
+        "y": 250
+      },
+      "asset": "resource-node-scrap"
+    },
+    {
+      "id": "crate-2",
+      "kind": "solid",
+      "at": {
+        "x": 1240,
+        "y": 250
+      },
+      "asset": "prop-crate"
+    },
+    {
+      "id": "pickup-water-4",
+      "kind": "pickup",
+      "at": {
+        "x": 1310,
+        "y": 250
+      },
+      "asset": "resource-node-water"
+    },
+    {
+      "id": "hazard-spikes-1",
+      "kind": "hazard",
+      "at": {
+        "x": 880,
+        "y": 250
+      },
+      "asset": "hazard-spikes"
+    },
+    {
+      "id": "enemy-patrol-1",
+      "kind": "hazard",
+      "at": {
+        "x": 960,
+        "y": 250
+      },
+      "asset": "enemy-patroller",
+      "anim": "walk",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 120,
+        "periodMs": 3000
+      }
+    },
+    {
+      "id": "hazard-spikes-2",
+      "kind": "hazard",
+      "at": {
+        "x": 1020,
+        "y": 250
+      },
+      "asset": "hazard-spikes"
+    },
+    {
+      "id": "hazard-current-1",
+      "kind": "hazard",
+      "at": {
+        "x": 1180,
+        "y": 238
+      },
+      "asset": "hazard-current-debris"
+    },
+    {
+      "id": "hazard-spikes-3",
+      "kind": "hazard",
+      "at": {
+        "x": 1200,
+        "y": 250
+      },
+      "asset": "hazard-spikes"
+    },
+    {
+      "id": "chest-2",
+      "kind": "solid",
+      "at": {
+        "x": 1360,
+        "y": 250
+      },
+      "asset": "chest-closed"
+    },
+    {
+      "id": "sign-1",
+      "kind": "decor",
+      "at": {
+        "x": 600,
+        "y": 180
+      },
+      "asset": "prop-signboard"
+    },
+    {
+      "id": "lamp-1",
+      "kind": "decor",
+      "at": {
+        "x": 300,
+        "y": 150
+      },
+      "asset": "prop-wall-lamp"
+    },
+    {
+      "id": "pole-1",
+      "kind": "decor",
+      "at": {
+        "x": 1000,
+        "y": 250
+      },
+      "asset": "prop-pole-light"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "ui-pickup-counter",
+      "at": {
+        "x": 8,
+        "y": 8
+      },
+      "size": {
+        "w": 64,
+        "h": 16
+      }
+    },
+    "pip": {
+      "asset": "ui-icon-scrap",
+      "at": {
+        "x": 16,
+        "y": 16
+      },
+      "step": {
+        "x": 20,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "goal-1"
+  }
+}

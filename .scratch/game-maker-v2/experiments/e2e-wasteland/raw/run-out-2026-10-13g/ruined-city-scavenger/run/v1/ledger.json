@@ -1,0 +1,103 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "ruined-city-scavenger",
+  "runVersion": 1,
+  "createdAt": "2026-10-13T13:01:40.010Z",
+  "run": {
+    "wallClockMs": 71800,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 2
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 2
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 20624,
+      "attempts": 2,
+      "failures": [
+        "schema"
+      ],
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 200,
+        "outputTokens": 1446
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 3223,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 169,
+        "outputTokens": 649
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 11173,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2138,
+        "outputTokens": 1730
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 8878,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2153,
+        "outputTokens": 980
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 27428,
+      "attempts": 2,
+      "failures": [
+        "schema"
+      ],
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 145,
+        "outputTokens": 3398
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-// 票 31 的**纯**那一半：装配 + 两条检查。I/O 在 `compile-character-dna.ts`。
+// 票 31 的**纯**那一半：装配 + 三条检查（票 69 加了跨文书那条引用检查）。I/O 在 `compile-character-dna.ts`。
 //
 // 拆开的理由与票 08 的 `build-visual-world.ts`、票 10 的 `build-design.ts` 一样：
 // 这一半**不碰网络**，所以「集合对不对」「守门人响不响」可以**不用假 `fetch` 直接测**。
@@ -10,11 +10,13 @@
 //   ⚠️ 与票 09（`GameIntentSpec`，也没有装配步）是**同一种干净**，只是理由相反：
 //   那里是「模型全知」，这里是「**身份由设计层给，不由模型观察**」（票 02 裁决 21 的原则，
 //   形状从「标量覆盖」换成了「键集校验」—— 见本文件 `CHARACTER_SET_GATE`）。
-//   ⇒ **装配步仍然要**：两条检查（下面那两条）与契约的重过都住在那里。
+//   ⇒ **装配步仍然要**：三条检查（下面那三条）与契约的重过都住在那里。
+//   ⚠️ 而票 69 那条**只能**住在这里：它要比的是**两份文书之间**的引用，契约看不见 `vws`。
 //
-// ⚠️ **两条检查的档位是同一档**（票 31 第 1 轮 Q5 的人类裁定：「**两条都阻断，但称谓分明**」）：
+// ⚠️ **三条检查的档位是同一档**（票 31 第 1 轮 Q5 的人类裁定：「**两条都阻断，但称谓分明**」；票 69 那条并入同一档）：
 //   都算 `schema` 失败 ⇒ 调用方**重采样**。但**名字、错误消息、注释一律分得清清楚楚** ——
-//   因为一条是**构造性 gate**，另一条只是**守门人**（必要不充分）。混着叫就是让后者冒充前者。
+//   因为一条是**构造性 gate**、一条只是**守门人**（必要不充分）、第三条是**引用族**（跨文书）。
+//   三条混着叫，就是让守门人冒充构造性 gate，或让引用族冒充语义判据。
 import {
   CHARACTER_DNA_FORMAT, CharacterDNAFileSchema,
   type CharacterDNAFile, type GameDesignSpec, type VisualWorldSpec
@@ -54,6 +56,18 @@ export const COPY_GUARD_PAIRS: readonly { dna: keyof CharacterDNALike; vws: keyo
   { dna: "face", vws: "faceAbstraction" }
 ];
 
+/**
+ * ⚠️ **引用族（跨文书）** 的称谓（票 69）。
+ *
+ *  ⚠️ 与上面两条**不是同一族**：集合相等是**构造性**（文书自己内部的键集关系）·
+ *  逐字那条是**守门人**（文书自己内部的三对）；本条比的是**两份文书之间**的引用 ——
+ *  `characters[].palette[]` 指的是 `vws.style.palette` 的第几项。
+ *  ⚠️ 它只能落在**装配级**（票 69 的 Q2(b)）：`CharacterDNAFileSchema` **看不见 `vws`**，
+ *  而「越界」这个判断**正需要**另一个输入 ⇒ 它就是那条「契约结构上表达不了、只能由装配步守」的规矩。
+ *  ⚠️ 档位与前两条**同一档**（`schema` ⇒ 调用方重采样）：人裁明写**接受这一代价** ——
+ *  换来的是「悬空引用**不再无声地**流进最终生图提示词」。 */
+export const PALETTE_REF_GATE = "引用族 · palette 下标越出世界色板";
+
 /** 只为了给上面那张表一个**够窄**的类型 —— 「能被比的三格」就是这三个。 */
 type CharacterDNALike = { silhouette: string; clothing: string; face: string };
 
@@ -88,9 +102,9 @@ export type BuildCharacterDnaInput = {
 };
 
 export type BuildCharacterDnaOutcome =
-  /** 过完契约（含顶层那条空值 gate）与**两条检查**的成品。 */
+  /** 过完契约（含顶层那条空值 gate）与**三条检查**的成品。 */
   | { ok: true; file: CharacterDNAFile }
-  /** 模型没干好 ⇒ 调用方**重采样**（⚠️ 两条检查**都在这一档**，Q5 的裁定）。 */
+  /** 模型没干好 ⇒ 调用方**重采样**（⚠️ 三条检查**都在这一档**，Q5 的裁定）。 */
   | { ok: false; kind: "schema"; detail: string };
 
 /**
@@ -161,7 +175,41 @@ export function verbatimCopyGuard(file: CharacterDNAFile, vws: VisualWorldSpec):
 }
 
 /**
- * 重过契约 → **核心构造性 gate** → 守门人 → 交成品。
+ * ⚠️ **跨文书的引用检查**：每个 `characters[].palette[]` 的下标必须 `< vws.style.palette.length`（票 69）。
+ *
+ * ⚠️ **为什么需要它**：`PaletteRefShape` 的正则只管**形状**（`palette:<数字>`），
+ *  **管不到范围** —— `palette:9` 在一份 6 色世界里**形状完全合法**、契约照收。
+ *  ⚠️ 而下游 `dnaBrief`（`prompt.ts:83`）那个 `?? ref` 兜底会把越界引用**原样**写进生图提示词
+ *  （票 69 的探针 ③′ 量过：`["palette:9"]` ⇒ 悬空引用照原样进提示词）
+ *  ⇒ 也就是说今天它是**花钱之后**才可能被看出来的。本条把它提前到**免费**的那一步 ——
+ *  与票 44 的「生图之前、免费地拒」同一个道理。
+ *
+ * ⚠️ **口径只有 `< n` 这一个**（票 69 的 Q2 明写）：**不**顺手加「色值不许重复」这类新规矩。
+ * ⚠️ 世界色板为空 ⇒ **一个合法下标都没有**，于是每一个引用都报 —— 那是**诚实**的读法、不是误伤
+ *  （而空色板在 `readStyle` 那一步就已经被拒了，票 44）。
+ */
+export function paletteRefBounds(design: GameDesignSpec, file: CharacterDNAFile, vws: VisualWorldSpec): string[] {
+  const n = vws.style.palette.length;
+  const legal = n === 0 ? "（色板是空的：**一个合法下标都没有**）" : `（合法下标 0…${n - 1}）`;
+  const where = new Map(characterEntities(design).map((e) => [e.id, e.where]));
+  const out: string[] = [];
+  for (const [i, c] of file.characters.entries())
+    for (const [j, ref] of c.palette.entries()) {
+      if (Number(ref.slice("palette:".length)) < n) continue;
+      const of = where.get(c.id);
+      out.push(
+        `【${PALETTE_REF_GATE}】\`characters[${i}].palette[${j}]\` 是 \`${ref}\`` +
+        `${of === undefined ? "" : `（设计层的 \`${of}\`）`}，而**世界色板只有 ${n} 项**${legal}。` +
+        "⚠️ 这个引用**形状上完全合法**（正则只认 `palette:<下标>`）⇒ 它一路过得了契约、" +
+        "却**指不到任何一个颜色**。这一格的用途是「**从世界色板里选**」—— 选一个不存在的色，" +
+        `就是**没有选出颜色**。⇒ 改成一个 ${n === 0 ? "合法" : `0…${n - 1}`} 的下标。`
+      );
+    }
+  return out;
+}
+
+/**
+ * 重过契约 → **核心构造性 gate** → 守门人 → **跨文书引用** → 交成品。
  *
  * ⚠️ **顺序是有意的**：契约先过（连契约都不过的文书，谈「集合对不对」没有意义）——
  *   与票 10 的 `buildDesign` 同一条理由。
@@ -186,7 +234,10 @@ export function buildCharacterDna(input: BuildCharacterDnaInput): BuildCharacter
   const file = parsed.data;
   const problems = [
     ...characterSetGate(input.design, file),
-    ...verbatimCopyGuard(file, input.vws)
+    ...verbatimCopyGuard(file, input.vws),
+    // ⚠️ **票 69**：跨文书那条放在**最后** —— 「只加不改」：前两条报出来的话与**它们的先后**
+    //   一个字都没动（多打一条不重排既有那两行）。
+    ...paletteRefBounds(input.design, file, input.vws)
   ];
   if (problems.length > 0)
     return { ok: false, kind: "schema", detail: problems.join("\n") };

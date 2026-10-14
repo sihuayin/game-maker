@@ -1,0 +1,1202 @@
+{
+  "format": "assetpack/v3",
+  "id": "ruined-city-scavenger",
+  "version": 1,
+  "createdAt": "2026-10-13T13:21:07.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 6,
+    "values": [
+      "#22283e",
+      "#5b4230",
+      "#a08a6b",
+      "#f2c14e",
+      "#c98a5e",
+      "#3a3d4a"
+    ],
+    "coverage": {
+      "exact": 12,
+      "composited": 6,
+      "quantized": 4,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 64,
+        "h": 336
+      },
+      "frames": 23,
+      "assets": [
+        "chest-opening",
+        "enemy-patroller",
+        "player-scavenger"
+      ],
+      "checksum": "sha256:bfcb1f32a6f66d238d3359274e2d9939ecc080bb352ea2c673b4471248f6d35e"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 480,
+        "h": 810
+      },
+      "frames": 3,
+      "assets": [
+        "bg-ruined-street"
+      ],
+      "checksum": "sha256:1b61207d0c2a669c8a61d06637b430685e30c080d5eeaa574a76cc2f62769bc1"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 24,
+        "h": 188
+      },
+      "frames": 12,
+      "assets": [
+        "chest-closed",
+        "chest-open-empty",
+        "hazard-current-debris",
+        "hazard-spikes",
+        "prop-crate",
+        "prop-debris-block",
+        "prop-goal-marker",
+        "prop-pole-light",
+        "prop-signboard",
+        "prop-wall-lamp",
+        "resource-node-scrap",
+        "resource-node-water"
+      ],
+      "checksum": "sha256:d6974293959b526d985261343a462ab8f4c73d27498932a70f27afdb7fa20530"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 96,
+        "h": 96
+      },
+      "frames": 6,
+      "assets": [
+        "ui-hp-pips",
+        "ui-icon-scrap",
+        "ui-icon-water",
+        "ui-panel-result",
+        "ui-pickup-counter",
+        "ui-prompt-interact"
+      ],
+      "checksum": "sha256:edf85cc9a374219dbc67c864971c931b56ef82303ec032141b818ef9bf657232"
+    }
+  ],
+  "assets": [
+    {
+      "id": "player-scavenger",
+      "kind": "animation",
+      "role": "玩家 · 拾荒者",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-scavenger.idle1"
+        },
+        {
+          "name": "player-scavenger.idle2"
+        },
+        {
+          "name": "player-scavenger.idle3"
+        },
+        {
+          "name": "player-scavenger.idle4"
+        },
+        {
+          "name": "player-scavenger.run1"
+        },
+        {
+          "name": "player-scavenger.run2"
+        },
+        {
+          "name": "player-scavenger.run3"
+        },
+        {
+          "name": "player-scavenger.run4"
+        },
+        {
+          "name": "player-scavenger.run5"
+        },
+        {
+          "name": "player-scavenger.run6"
+        },
+        {
+          "name": "player-scavenger.jump1"
+        },
+        {
+          "name": "player-scavenger.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "player-scavenger.idle1",
+            "player-scavenger.idle2",
+            "player-scavenger.idle3",
+            "player-scavenger.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "player-scavenger.run1",
+            "player-scavenger.run2",
+            "player-scavenger.run3",
+            "player-scavenger.run4",
+            "player-scavenger.run5",
+            "player-scavenger.run6"
+          ],
+          "fps": 12,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "player-scavenger.jump1",
+            "player-scavenger.jump2"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "enemy-patroller",
+      "kind": "animation",
+      "role": "敌人 · 巡检巡行者",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-patroller.walk1"
+        },
+        {
+          "name": "enemy-patroller.walk2"
+        },
+        {
+          "name": "enemy-patroller.walk3"
+        },
+        {
+          "name": "enemy-patroller.walk4"
+        },
+        {
+          "name": "enemy-patroller.turn1"
+        },
+        {
+          "name": "enemy-patroller.turn2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "walk",
+          "frames": [
+            "enemy-patroller.walk1",
+            "enemy-patroller.walk2",
+            "enemy-patroller.walk3",
+            "enemy-patroller.walk4"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "turn",
+          "frames": [
+            "enemy-patroller.turn1",
+            "enemy-patroller.turn2"
+          ],
+          "fps": 6,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-patroller.walk.png",
+          "original": "生图 · 2 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-patroller.turn.png",
+          "original": "生图 · 2 次调用"
+        }
+      ]
+    },
+    {
+      "id": "resource-node-scrap",
+      "kind": "sprite",
+      "role": "可拾取物 · 废料",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 10
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "resource-node-scrap"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/resource-node-scrap.json"
+        }
+      ]
+    },
+    {
+      "id": "resource-node-water",
+      "kind": "sprite",
+      "role": "可拾取物 · 净水",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 10,
+        "h": 14
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "resource-node-water"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/resource-node-water.json"
+        }
+      ]
+    },
+    {
+      "id": "chest-closed",
+      "kind": "sprite",
+      "role": "宝箱 · 闭合态",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 18
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest-closed"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/chest-closed.json"
+        }
+      ]
+    },
+    {
+      "id": "chest-opening",
+      "kind": "animation",
+      "role": "宝箱 · 开启过程",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "chest-opening.open1"
+        },
+        {
+          "name": "chest-opening.open2"
+        },
+        {
+          "name": "chest-opening.open3"
+        },
+        {
+          "name": "chest-opening.open4"
+        },
+        {
+          "name": "chest-opening.open5"
+        }
+      ],
+      "animations": [
+        {
+          "name": "open",
+          "frames": [
+            "chest-opening.open1",
+            "chest-opening.open2",
+            "chest-opening.open3",
+            "chest-opening.open4",
+            "chest-opening.open5"
+          ],
+          "fps": 10,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest-opening.open.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "chest-open-empty",
+      "kind": "sprite",
+      "role": "宝箱 · 已开启空箱",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest-open-empty"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/chest-open-empty.json"
+        }
+      ]
+    },
+    {
+      "id": "hazard-spikes",
+      "kind": "sprite",
+      "role": "危险物 · 地面尖刺",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hazard-spikes"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hazard-spikes.json"
+        }
+      ]
+    },
+    {
+      "id": "hazard-current-debris",
+      "kind": "sprite",
+      "role": "危险物 · 裸露电流残骸",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hazard-current-debris"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hazard-current-debris.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-debris-block",
+      "kind": "sprite",
+      "role": "地形障碍 · 高出一格的残骸",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-debris-block"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-debris-block.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-crate",
+      "kind": "sprite",
+      "role": "环境道具 · 墙边方形箱体",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-crate"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-crate.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-signboard",
+      "kind": "sprite",
+      "role": "环境道具 · 墙面矩形招牌板",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 18,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-signboard"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-signboard.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-wall-lamp",
+      "kind": "sprite",
+      "role": "环境道具 · 墙面圆形发光体",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-wall-lamp"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-wall-lamp.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-pole-light",
+      "kind": "sprite",
+      "role": "环境道具 · 竖杆小圆灯",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 8,
+        "h": 28
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-pole-light"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-pole-light.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-goal-marker",
+      "kind": "sprite",
+      "role": "关卡终点标记",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-goal-marker"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-goal-marker.json"
+        }
+      ]
+    },
+    {
+      "id": "bg-ruined-street",
+      "kind": "background",
+      "role": "关卡背景 · 废弃城市街道",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 480,
+        "h": 270
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0.1
+        },
+        {
+          "name": "silhouette",
+          "parallax": 0.4
+        },
+        {
+          "name": "facade",
+          "parallax": 1,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "bg-ruined-street.sky"
+        },
+        {
+          "name": "bg-ruined-street.silhouette"
+        },
+        {
+          "name": "bg-ruined-street.facade"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/bg-ruined-street.sky.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/bg-ruined-street.silhouette.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/bg-ruined-street.facade.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "ui-pickup-counter",
+      "kind": "ui",
+      "role": "HUD · 收集数计数条",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-pickup-counter"
+        }
+      ],
+      "scale9Borders": {
+        "x": 6,
+        "y": 4,
+        "w": 52,
+        "h": 8
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-pickup-counter.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-icon-scrap",
+      "kind": "ui",
+      "role": "HUD 图标 · 废料",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-icon-scrap"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-icon-scrap.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-icon-water",
+      "kind": "ui",
+      "role": "HUD 图标 · 净水",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-icon-water"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-icon-water.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-hp-pips",
+      "kind": "ui",
+      "role": "HUD · 状态指示格",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-hp-pips"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-hp-pips.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-prompt-interact",
+      "kind": "ui",
+      "role": "HUD · 交互提示",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-prompt-interact"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-prompt-interact.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-panel-result",
+      "kind": "ui",
+      "role": "UI · 关卡结算面板",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-panel-result"
+        }
+      ],
+      "scale9Borders": {
+        "x": 8,
+        "y": 8,
+        "w": 80,
+        "h": 48
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-panel-result.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/chest-closed.json",
+      "bytes": 2184,
+      "checksum": "sha256:b7d2dbd6c922fb10d5047d7287e0413972fdf7bace958ade0be8b0e14f0139d7"
+    },
+    {
+      "path": "authoring/drawlist/chest-open-empty.json",
+      "bytes": 2441,
+      "checksum": "sha256:eeede294c9ba0a7f164039d3c5a5c8b56a7fac26907395b1f53dc68a385dc0c8"
+    },
+    {
+      "path": "authoring/drawlist/hazard-current-debris.json",
+      "bytes": 2825,
+      "checksum": "sha256:a628cb4e83c42240ab101311a2ad9c63e6cad19f804c5e4337bb766aaab1c7cd"
+    },
+    {
+      "path": "authoring/drawlist/hazard-spikes.json",
+      "bytes": 3657,
+      "checksum": "sha256:d366719e9519535ce541d054d3b237bcc7dc7817119921f0607c59e501013517"
+    },
+    {
+      "path": "authoring/drawlist/prop-crate.json",
+      "bytes": 2440,
+      "checksum": "sha256:77474cf939adc95836a0aa8ac32a31d4a96b0890f85c3cad4c33a36a0f8ddf60"
+    },
+    {
+      "path": "authoring/drawlist/prop-debris-block.json",
+      "bytes": 2742,
+      "checksum": "sha256:105076f3fb8aad252d90960165834b63de2f9d1725b8dae9f8217214da60ee56"
+    },
+    {
+      "path": "authoring/drawlist/prop-goal-marker.json",
+      "bytes": 2179,
+      "checksum": "sha256:6025eefbeed53420940551c2388d79ce59e164c52768182dc2d994e49e90233b"
+    },
+    {
+      "path": "authoring/drawlist/prop-pole-light.json",
+      "bytes": 1695,
+      "checksum": "sha256:d3fe4cd4072b57bc1ba9bebb6ce96186c7cc63012aac29a21bd291503eec5263"
+    },
+    {
+      "path": "authoring/drawlist/prop-signboard.json",
+      "bytes": 2114,
+      "checksum": "sha256:8fd61201c4d7a03aea697fdccda643b1cc2b2970063119fc9c8cd67bba4f2512"
+    },
+    {
+      "path": "authoring/drawlist/prop-wall-lamp.json",
+      "bytes": 2141,
+      "checksum": "sha256:50250a291eddc4014cc05841ae64f974e2ec8b1ea77b227e4bd0323baaade218"
+    },
+    {
+      "path": "authoring/drawlist/resource-node-scrap.json",
+      "bytes": 1946,
+      "checksum": "sha256:122dbab7e4d3e6755611455ebfe9db2784ada1a5be94cd447c71eadca563789e"
+    },
+    {
+      "path": "authoring/drawlist/resource-node-water.json",
+      "bytes": 1701,
+      "checksum": "sha256:7aa04c04c91fe9c785cda1f5eadca44df4993c5e4482d87dd5a2afd93d7be65e"
+    },
+    {
+      "path": "authoring/drawlist/ui-hp-pips.json",
+      "bytes": 6796,
+      "checksum": "sha256:30cd78a9fe64e9d1cb33aee0f4b0a2cfb9e1eba7143a413f62d2bbfa37f7a3e7"
+    },
+    {
+      "path": "authoring/drawlist/ui-icon-scrap.json",
+      "bytes": 2201,
+      "checksum": "sha256:47e56927ed3c20cb07add6141e5479d9e39e3db6a9d38711f9d96e135621adaf"
+    },
+    {
+      "path": "authoring/drawlist/ui-icon-water.json",
+      "bytes": 2213,
+      "checksum": "sha256:e39f19d06620a31ac58925b5d22f58eba60971f12792f3579df1f9a34a2770c5"
+    },
+    {
+      "path": "authoring/drawlist/ui-panel-result.json",
+      "bytes": 2971,
+      "checksum": "sha256:c82780a96ed0b5c5175994cc4573ed29a5e011f44b5de3f3c7d41b8c4bc89b67"
+    },
+    {
+      "path": "authoring/drawlist/ui-pickup-counter.json",
+      "bytes": 4283,
+      "checksum": "sha256:3ff6e52a06071926789212f36eade804b606103b9288dc4bb8ecd37c18d30ef2"
+    },
+    {
+      "path": "authoring/drawlist/ui-prompt-interact.json",
+      "bytes": 2033,
+      "checksum": "sha256:6be64c4d47b908ca1bfcec8be6eee8297552ad67f8e3a1ba9113b515426326d3"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.facade.png",
+      "bytes": 929673,
+      "checksum": "sha256:2b1e714bb25f68e8de9c96ed9968878c06bfee9fa52b80d08d734cd387d5a027"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.facade.prompt.txt",
+      "bytes": 1843,
+      "checksum": "sha256:67c4e3dc62453aab2a8afe506aa685ef3970f2e360a58fdacb4fe295cbe7fe23"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.silhouette.png",
+      "bytes": 842854,
+      "checksum": "sha256:a03b68463c12b80e99c8713206d2c34452dfc77fa8768fa73dd266015bc03c34"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.silhouette.prompt.txt",
+      "bytes": 1695,
+      "checksum": "sha256:ff3f7f1a6b4cd2f746b186b87d5a3dcc78faa40c455c0cc3a8730494ee216135"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.sky.png",
+      "bytes": 777276,
+      "checksum": "sha256:6c7030839255891086b7b42825a696ffed9b5c6ecbf9fd43f394a28f05bd0e8c"
+    },
+    {
+      "path": "authoring/generated/bg-ruined-street.sky.prompt.txt",
+      "bytes": 1952,
+      "checksum": "sha256:111b7bd992c0348d070b0ee608ca20a156b5f47808b2ddbb6614c1888981f6dc"
+    },
+    {
+      "path": "authoring/generated/chest-opening.open.png",
+      "bytes": 809152,
+      "checksum": "sha256:63974b79db6a0a21218e9daab63423f288e32aecac9c510afa1c2e97eccb0c28"
+    },
+    {
+      "path": "authoring/generated/chest-opening.open.prompt.txt",
+      "bytes": 2121,
+      "checksum": "sha256:29abcb49ae282051d20896f45e43defefe7ab95e72b2204846d558dafd929b3b"
+    },
+    {
+      "path": "authoring/generated/enemy-patroller.turn.png",
+      "bytes": 904910,
+      "checksum": "sha256:aecbe022551036f99ea45768d5cf3a6c69119033746f501dbed10b5f0859c457"
+    },
+    {
+      "path": "authoring/generated/enemy-patroller.turn.prompt.txt",
+      "bytes": 3980,
+      "checksum": "sha256:247324ad718fc9be5e10a40b5e890900919731fca66ddb8fdc767661b513c59b"
+    },
+    {
+      "path": "authoring/generated/enemy-patroller.walk.png",
+      "bytes": 1011133,
+      "checksum": "sha256:7795c1ba2144fd2795b42593cf9eba41f37d296017defc69fe4006707e7ed34b"
+    },
+    {
+      "path": "authoring/generated/enemy-patroller.walk.prompt.txt",
+      "bytes": 3980,
+      "checksum": "sha256:95c1688b78f0dc62dd9db6932df11bf374c4d47cbe3be56c6a48790ca34f3e51"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.idle.png",
+      "bytes": 1108441,
+      "checksum": "sha256:15863378e37a5510fb3b8d73f14631e19c26a2ee6d510006909b75ece146f33e"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.idle.prompt.txt",
+      "bytes": 4611,
+      "checksum": "sha256:5fbc8699532b3eee7e5a69be332c5537b85218866bd78582431f47cb43c88b4d"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.jump.png",
+      "bytes": 873604,
+      "checksum": "sha256:10ea3d3ad6ff1a09fdaf9c2f9611b1b9d6b33af29e52d3503720c6b158751e59"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.jump.prompt.txt",
+      "bytes": 4611,
+      "checksum": "sha256:8be6ca81a5a68b8a2ea81cd7c90f2370796d9b33e44d44cf0af44ad10d6f9bc2"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.run.png",
+      "bytes": 889491,
+      "checksum": "sha256:5f9220f7eabfd0651ad8bad20bd01886b48e6f397c9451d2938162408bab4afa"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.run.prompt.txt",
+      "bytes": 4609,
+      "checksum": "sha256:a82f87fc4b6a4dd20006059eed5bd5dd0b3a9178b93d41631d9abfe58c952c19"
+    },
+    {
+      "path": "authoring/masters/master-patroller.png",
+      "bytes": 814155,
+      "checksum": "sha256:2fafc58e8634a9d0efcb645e7b5c12eb1ebe1c503f7580d9caff3088237df1af"
+    },
+    {
+      "path": "authoring/masters/master-patroller.prompt.txt",
+      "bytes": 4560,
+      "checksum": "sha256:acafa8d168cd36532dd21656e5a939ba4bcf6abd6d09dcc9c3047bbaa0f6c8ce"
+    },
+    {
+      "path": "authoring/masters/master-patroller.ratio.json",
+      "bytes": 395,
+      "checksum": "sha256:b35f6c9234a0775fd20578b207434ae68a63999d591d6179e6d5bbf70dc9fc26"
+    },
+    {
+      "path": "authoring/masters/master-scavenger.png",
+      "bytes": 814258,
+      "checksum": "sha256:52e13f92954ba883fa52c060908c7af7559348dcfe846359b5d0c9e39db8f807"
+    },
+    {
+      "path": "authoring/masters/master-scavenger.prompt.txt",
+      "bytes": 5232,
+      "checksum": "sha256:55ce82807354d6eee72b4a5b055cab490693203b43704ac76b65e1813e405443"
+    },
+    {
+      "path": "authoring/masters/master-scavenger.ratio.json",
+      "bytes": 395,
+      "checksum": "sha256:80d5000c8281ca901540e846b4e59572f6e0c37ad8357de9e02dae1f74743d68"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1287,
+      "checksum": "sha256:2293e431f776ed05b7f80017aa462886dc4adac83f6537772e1f51c735139dd7"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 5480,
+      "checksum": "sha256:8ec72e1dbe984f4bdd873614d538b30fb83059a0ab098f730b62c33ff1a97108"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 638,
+      "checksum": "sha256:11a3e03310dac4cd49a8dc6a5f4b8961fb60c0aee8581c0002d82cd7fc439c4a"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 9502,
+      "checksum": "sha256:aaf65b0746d753fe0d810ab5d727644d6394541fa8064e9346f19cdff4e2f2d7"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 8782,
+      "checksum": "sha256:bfcb1f32a6f66d238d3359274e2d9939ecc080bb352ea2c673b4471248f6d35e"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1449,
+      "checksum": "sha256:063b7755ce5ca4bed4649ff1bce7bcaddd574485f38a523d7ec170a2e2f5bd55"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 11856,
+      "checksum": "sha256:1b61207d0c2a669c8a61d06637b430685e30c080d5eeaa574a76cc2f62769bc1"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 4989,
+      "checksum": "sha256:d620c1539f15fbafc787141e95b74051546d9da98436ce53719d681a9bfa0256"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 886,
+      "checksum": "sha256:d6974293959b526d985261343a462ab8f4c73d27498932a70f27afdb7fa20530"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 2784,
+      "checksum": "sha256:650feb1ef1e6b313aaafbfb6e317ce7b68418e2669cd1409a3c0f4033b0864ea"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 859,
+      "checksum": "sha256:edf85cc9a374219dbc67c864971c931b56ef82303ec032141b818ef9bf657232"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 8330,
+      "checksum": "sha256:eca32b83d0105f334cb77f0b41815cc717a6dfeaf4737f7b40b08efe93240e93"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 669,
+      "checksum": "sha256:493603410665ea25cd60ee2dc58b065c7c75269559bc19dc1b5dae5ef3db68f4"
+    }
+  ]
+}

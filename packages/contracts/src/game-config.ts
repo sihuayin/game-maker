@@ -24,7 +24,7 @@
 //     四边不拉伸、中央拉伸，所以拉伸**不会**破坏像素网格）。
 //     ⚠️ **票 14 给这条禁令补了一条判据**（`tests/game-config.test.ts`）—— 在那之前它**只有**结构性保证。
 import { z } from "zod";
-import { resolvePackRef, type AssetPackManifest } from "./assetpack.js";
+import { resolvePackRef, type AssetPackEntry, type AssetPackManifest } from "./assetpack.js";
 
 export const GAME_CONFIG_FORMAT = "game-config/v1" as const;
 
@@ -344,6 +344,47 @@ export function auditReferences(config: GameConfig, manifest: AssetPackManifest)
   return out;
 }
 
+/**
+ * **一只面板：配置声明的那个盒子 vs 包里那件资源的真实尺寸**（票 63）。
+ *
+ * ⚠️ `Hud.panel.size` 是票 09 那条「**资源自身的性质归包**」的**唯一例外**，
+ *   而例外的理由是**九宫格**：四边不拉伸、中央拉伸 ⇒ 声明值是个**被拉伸的目标**，
+ *   与资源像素尺寸**本来就不该相等**（塔防 `hud.panel` 就声明 480×30、包里是 96×26）。
+ * ⚠️ 可契约**不要求** `panel.asset` 指向九宫格（那一格只是 `z.string().min(1)`）——
+ *   例外**借九宫格说理，却不检查九宫格在不在** ⇒ 那半个条件由**本函数**守。
+ *
+ * ⇒ 判据的形状：**声明 ≠ 包 且 这件资源不是九宫格** = error。
+ *   · 九宫格 + 声明 ≠ 包 → **放行**（那是这个字段的正当用法）；
+ *   · 非九宫格 + 声明 ≠ 包 → **报错**（理由没了，两个数就得一致）。
+ *
+ * ⚠️ **不误伤任何真产物**：盘上 31 份真配置 + 两份夹具，65 个声明尺寸的格子里
+ *   「声明 ≠ 包 **且** 非九宫格」= **0 处**（自证的口径照票 07 那条砖的判据）。
+ * ⚠️ **横版与塔防共用这一份实现**（票 63 的 Q6：同类字段必须由**同一条**判据约束）——
+ *   所以它不长在 `auditGameConfig` 里，而是抽出来给两个审计各调一次。
+ */
+export function auditPanelSize(
+  where: string,
+  declared: { w: number; h: number },
+  asset: AssetPackEntry | undefined,
+): ConfigIssue | null {
+  // 引用族已经报过「包里没有这件 / 种类不对」—— 这里不抢它的活
+  if (!asset) return null;
+  // 九宫格：声明值就是被拉伸的目标，与资源真实尺寸**本来就不该相等**
+  if (asset.scale9Borders !== undefined) return null;
+  if (declared.w === asset.size.w && declared.h === asset.size.h) return null;
+  return {
+    severity: "error",
+    where,
+    message:
+      `声明的是 ${declared.w}×${declared.h}，而包里的 "${asset.id}" 是 ${asset.size.w}×${asset.size.h} —— ` +
+      `而这件资源**不是九宫格**（包里没有 \`scale9Borders\`）。` +
+      `「配置里声明尺寸」这一格是「资源自身性质归包」的唯一例外，而例外的理由**是九宫格**：` +
+      `四边不拉伸、中央拉伸，所以声明值是个**被拉伸的目标**、与资源像素尺寸本来就不该相等；` +
+      `非九宫格上没有这个机制，两个数就得一致 —— ` +
+      `要么把声明改成 ${asset.size.w}×${asset.size.h}，要么把这件资源做成九宫格。`,
+  };
+}
+
 export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest): ConfigIssue[] {
   const out: ConfigIssue[] = [];
   const err = (where: string, message: string) => out.push({ severity: "error", where, message });
@@ -387,6 +428,13 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
   for (const e of config.entities) inWorld(`entity "${e.id}"`, boxOf(e.at, e.body ?? sizeOf(e.asset), e.asset));
   inWorld("player.at", boxOf(config.player.at, sizeOf(config.player.asset), config.player.asset));
   inWorld("hud.panel", boxOf(config.hud.panel.at, config.hud.panel.size, config.hud.panel.asset));
+
+  // ⚠️ **票 63**：「声明尺寸」这一格是「资源自身性质归包」的唯一例外，而例外的理由**是九宫格** ——
+  //   收窄成「以九宫格为条件」之后，那半个条件**由这条判据守着**（`auditPanelSize`，与塔防共用一份）。
+  //   ⚠️ 它落在这里而不是 `parseGameConfig` 的 refine：**这一步拿得到 `manifest`**（包与 config
+  //   同时可见的只有这里），而且它走的是**额外请求次数为零**的 config 审计路径。
+  const panelSize = auditPanelSize("hud.panel.size", config.hud.panel.size, manifest.assets.find((a) => a.id === config.hud.panel.asset));
+  if (panelSize) out.push(panelSize);
 
   // 出生点不能卡在墙里 —— 点在某个 solid 的**盒子**里就是硬失败。
   const solids = config.entities.filter((e) => e.kind === "solid");

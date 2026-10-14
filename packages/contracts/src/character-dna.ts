@@ -107,7 +107,16 @@ export const CharacterDNASchema = z.strictObject({
    *  票 02 的裁决 25 已经判过一模一样的形状（`materials.*.color`）：
    *  「否则这个世界就有了**第二套颜色来源**，而 `palette:N` 的一元性正是整票最硬的那条原则」。
    *  票 39 的那句话在这里同样成立：**选**色对、**排**色错 —— 所以这是**从世界色板里选**。
-   *  ⚠️ 写成自由 hex 会**静默失效**：下游 `quantize.ts` 会把色板外的颜色量化掉。 */
+   *  ⚠️ **写自由 hex 的后果**（⚠️ 2026-10-14 · 票 68 把这句改对了：它以前写的是「**静默失效** ——
+   *  下游 `quantize.ts` 会把它量化掉」，**那是错的，而且错在因果**）：
+   *  那一格是 `PaletteRefShape` 的**正则**（`visual-world.ts:79`，只认 `palette:<下标>`）⇒
+   *  非法写法**过不了 `CharacterDNAFileSchema`**，`compile-character-dna.ts:165` 的 `parseToolUse`
+   *  判 `failure: "schema"` ⇒ 那一档**重采样三发**（`STRUCTURED_CALL_ATTEMPTS`，且三发**同一个 body**）
+   *  ⇒ 整份 `character-dna` **判失败**、`asCommandError` 落 `"invalid"` ⇒ **退出码 4**、链断在这儿。
+   *  ⚠️ **而 `quantize.ts` 从来碰不到这一格**：它吃的是**位图**（全仓唯一调用点 `import.ts:383`，
+   *  走的是导入那条路），`dna.palette` 到不了它眼前 —— 那句老注释把一个**真的事实**
+   *  （量化确实在跑）搬到了一个**碰不到它的字段**上，于是读起来可信。
+   *  ⚠️ 真正读 `dna.palette` 的是 `dnaBrief`（`prompt.ts:83`）—— 而契约**不会**让非法值走到那儿。 */
   palette: z.array(PaletteRefShape),
 
   /** 角色**特有**的追加约束。

@@ -3,7 +3,9 @@
 //   每条断言背后都有一个**被裁决过**的字段，不是顺手加的覆盖率。最要紧的三条：
 //     §全必填、没有 optional —— R13 的「重生成一字不变」全靠它；
 //       一个可选字段会让「这个角色确实没有脸」与「模型忘了填」在文件里长得一模一样。
-//     §palette 是 PaletteRef —— 自由 hex 会**静默失效**（下游 quantize 把它量化掉）。
+//     §palette 是 PaletteRef —— 自由 hex **过不了 schema**（那一格是 `palette:<下标>` 的正则）⇒
+//       整份判失败、重采样三发、**退 4**。⚠️ 不是「静默失效被下游量化掉」：那个 `quantize` 吃的是
+//       **位图**、碰不到这一格（票 68 改对了这句因果，判据本身一条没动）。
 //     §bodyProportions 被拒 —— 它是**可派生的副本**（headCount(size.h)），不是零消费者。
 import { describe, expect, it } from "vitest";
 import { CHARACTER_DNA_FORMAT, CharacterDNAFileSchema, toolInputSchema } from "../src/index.js";

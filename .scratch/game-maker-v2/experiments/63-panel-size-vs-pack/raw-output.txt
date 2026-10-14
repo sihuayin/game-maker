@@ -1,0 +1,215 @@
+=== ⓪ 盘上四份真包的 ui 资源：几件带九宫格 ===
+  12th-wasteland: ui 4 件，其中带 scale9Borders 的 1 件
+      hud-scrap-icon         16×16            —
+      hud-water-icon         16×16            —
+      hud-bar-backdrop       32×16            九宫格 {"x":4,"y":4,"w":24,"h":8}
+      hud-interact-prompt    16×16            —
+  13th-wasteland: ui 6 件，其中带 scale9Borders 的 2 件
+      ui-pickup-counter      64×16            九宫格 {"x":6,"y":4,"w":52,"h":8}
+      ui-icon-scrap          16×16            —
+      ui-icon-water          16×16            —
+      ui-hp-pips             48×16            —
+      ui-prompt-interact     32×16            —
+      ui-panel-result        96×64            九宫格 {"x":8,"y":8,"w":80,"h":48}
+  last-train/v2: ui 2 件，其中带 scale9Borders 的 1 件
+      hud-lost-slots         72×32            九宫格 {"x":4,"y":4,"w":64,"h":24}
+      hud-pip                12×12            —
+  counter-siege/v4: ui 4 件，其中带 scale9Borders 的 2 件
+      ui-hud-bar             96×26            九宫格 {"x":4,"y":4,"w":88,"h":18}
+      ui-btn                 44×22            九宫格 {"x":3,"y":3,"w":38,"h":16}
+      ui-icon-scrap          10×10            —
+      ui-icon-life           10×10            —
+
+=== ①② 同一份 config，只换面板那一格，今天的闸分得出来吗 ===
+  底子：out/last-train/site/v4/game-config.json（面板 = hud-lost-slots / 72×32 / at {8,262}）
+  包：fixtures/packs/last-train/v2 —— hud-lost-slots **72×32 是九宫格**，hud-pip **12×12 没有九宫格**
+
+  hud-lost-slots  包 72×32 九宫格 · 声明 72×32
+     全部硬判据：auditGameConfig 0 条 · auditScreenSpace 0 条
+
+  hud-lost-slots  包 72×32 九宫格 · 声明 120×32
+     全部硬判据：auditGameConfig 0 条 · auditScreenSpace 0 条
+
+  hud-pip         包 12×12   —    · 声明 12×12
+     全部硬判据：auditGameConfig 0 条 · auditScreenSpace 0 条
+
+  hud-pip         包 12×12   —    · 声明 72×32
+     全部硬判据：auditGameConfig 0 条 · auditScreenSpace 0 条
+
+  ⇒ 四格**没有一格的差别**来自「声明值与包里的值一致不一致」或「这件资源是不是九宫格」——
+     前两格（九宫格、一致/拉开）与后两格（非九宫格、一致/不一致）在今天**完全同罪同罚**。
+
+=== ③ 盘上所有真 config：**每一个由配置声明的 UI 尺寸** vs 包里的尺寸 vs 九宫格 ===
+  盘上由配置声明尺寸的 UI 格：**67** 处，其中配得上包的 **55** 处
+    声明 == 包里尺寸：**25** 处    声明 ≠ 包里尺寸：**30** 处
+    ≠ 的分布：
+      · 塔防 hud.panel → ui-hud-bar：声明 480×30 / 包 96×26
+      · 塔防 hud.start → ui-btn：声明 28×22 / 包 44×22
+    塔防：45 格 · 声明≠包 30 处 · 九宫格 45 处
+    横版：10 格 · 声明≠包 0 处 · 九宫格 10 处
+
+=== ④ 那条例外的前置条件，在盘上被违反过几次 ===
+    配置声明的尺寸所指的**都是九宫格**：55 / 55
+    不是九宫格的：0 处  ⇒ 零例
+    「声明 ≠ 包」**且**「不是九宫格」：**0** 处  ← 要治的那一格
+    「声明 ≠ 包」**且**「是九宫格」（例外的正当用法）：**30** 处
+    对照：**不由配置声明**（尺寸取自包）的那些格 —— 如 hud.pip / hud.icons.* —— 包的资源**恰好都不是九宫格**
+      （12th-wasteland 的 hud-scrap-icon/hud-water-icon/hud-interact-prompt 16×16 全无 scale9Borders；
+        塔防 ui-icon-scrap/life 10×10 同理）—— 两族的资源与用法**对得上**
+
+=== ⑧ 若把规则写成「声明必须 == 包」，今天要付多少代价 ===
+    会被报的既有格：**30** 处（全是九宫格被拉伸的正当用法）
+    ⇒ 「无条件要求一致」这条在**盘上人口里**就已经被证伪
+
+=== ⑨ 若把规则写成「声明 ≠ 包 ⇒ 必须是九宫格」，今天要付多少代价 ===
+    会被报的既有格：**0** 处  ← 零
+    ⇒ 它一处既有格都不伤，而它把例外的**理由**变成**结构上为真**
+
+=== ⑤⑥ 那个数字的消费者（源码落点）＋ 两代外壳给它的权力不一样 ===
+    packages/contracts/src/game-config.ts:389  auditGameConfig 的世界尺（票面写的 :348 已漂） → 盒子
+    packages/contracts/src/screen-space.ts:94   横版 HUD 项的盒子（票面写的 :58 已漂） → auditScreenSpace 的视口尺
+    packages/contracts/src/td-config.ts:542     塔防世界尺 → 盒子（且锚点取自包）
+    packages/demo/src/world.ts:170-172          resolveDraw(…, panelSize) ⇒ 画出来的 w/h **就是声明值**
+    packages/demo/src/shell/scene.ts:214-215   九宫格那一路把它当 nineslice 的宽高；
+                                               ⚠️ 非九宫格那一路是 add.image(**不设 displaySize**) ⇒ 画的是原生像素
+    packages/demo/src/shell/td/scene.ts:161-166 ⚠️ 塔防**两路都给**：fallback 补一句 setDisplaySize
+                                               ⇒ 同一个字段，横版「九宫格才作数」、塔防「永远作数」
+    实测：横版 scene.ts 里 setDisplaySize 出现 **0** 次；塔防 scene.ts 里 **2** 次
+    实测：横版 addHud 那一段用的是 `this.add.image(p.at.x, p.at.y, p.atlas, p.frame)`
+    实测：塔防 drawHud 那一段末尾有 `setDisplaySize(panel.box.w, panel.box.h)`
+
+=== ⑦ 骨架示例那一格 72×32 是「谁家包里的数」 ===
+  fixtures/packs/last-train/v2 的 hud-lost-slots = 72×32  ⇒ **与骨架示例逐字节相同**
+  12th-wasteland 的 hud-bar-backdrop     = 32×16  ⇒ 同一个骨架，这一包里是**另一件东西的尺寸**
+  而 ops.ts:817 那句算术 `x > ${vp.w - 72}` 把 72 **写死在提示词的规则里**
+
+=== ⑩ ⭐ 那条例外在代码里是**看得见**的 —— 三条相邻行 ===
+  game-config.ts:387  for (const e of config.entities) inWorld(`entity "${e.id}"`, boxOf(e.at, e.body ?? sizeOf(e.asset), e.asset));
+                    ⇒ 从**包**取尺寸（`entity.body` 优先，否则 `sizeOf(asset)`）
+  game-config.ts:388  inWorld("player.at", boxOf(config.player.at, sizeOf(config.player.asset), config.player.asset));
+                    ⇒ 从**包**取尺寸
+  game-config.ts:389  inWorld("hud.panel", boxOf(config.hud.panel.at, config.hud.panel.size, config.hud.panel.asset));
+                    ⇒ ⚠️ **从 config 取尺寸** —— 那条例外
+  ⚠️ 而 `sizeOf` 的定义就在 **同一条函数的第 361 行**（上面 26 行处），**在这个作用域里**。
+  ⇒ 量出来的一句话：**同一个函数里，隔一行就有一个「从包取尺寸」的反例。**
+
+=== ⑪ 同一个例外在**视口尺**那一侧原样重演 ===
+  screen-space.ts:93  where: "hud.panel", at: panel.at,
+  screen-space.ts:94  box: entityBox(panel.at, panel.size, anchorOf(manifest, panel.asset)),   ⇒ ⚠️ 尺寸取 **config**
+  screen-space.ts:96  const pipSize = sizeOf(manifest, config.hud.pip.asset);   ⇒ 下一格（`hud.pip`）取 **包**
+  塔防视口尺 screen-space.ts:115  items.push({ where: "hud.panel", at: hud.panel.at, box: entityBox(hud.panel.at, hud.panel.size, anchorOf(manifest, hud.panel.asset)) });
+  ⇒ ⭐ 两代的两个消费者**都是这个形状**：面板取 config、隔壁的 pip 取包。
+
+=== ⑫ 每一处消费者手里，**两份输入都在**吗 ===
+  · `export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest): ConfigIssue[] {`  game-config.ts:347  ⇒ **manifest 是入参**
+     调用点：
+       packages/assets/src/ops.ts:915  ...auditGameConfig(config, manifest),
+       packages/demo/src/site.ts:191  const audit = auditGameConfig(config, manifest);
+  · `export function gameHudScreenItems(`  screen-space.ts:86  ⇒ **manifest 是入参**
+     而它下面第 96 行就是 `const pipSize = sizeOf(manifest, config.hud.pip.asset);`
+  · `const hudPanel = assetOf(config.hud.panel.asset);`  td-config.ts:541  ⇒ 它**已经**在查包（取锚点），只是尺寸仍取 config
+     下一行：if (hudPanel) inWorld("hud.panel", entityBox(config.hud.panel.at, config.hud.panel.size, hudPanel.anchor));
+  ⇒ ⭐ 判据要的两份东西（config 声明值 + 包里真实尺寸）在**每一处消费者手里都是现成的**。
+
+=== ⑬ ⭐⭐ 仓库里**已经有一条**「配置声明 vs 包里尺寸」的判据（票 07）===
+  td-config.ts:408  // ⚠️ **砖的尺寸与锚点**（票 07）：上面那条只要求引用解得开 —— 于是**一张声明成 sprite 的
+  td-config.ts:409  //   480×270 大图照样解得开**。而外壳按「格心 + 锚点」摆精灵，576 格会各画一张大图叠在一起，
+  td-config.ts:410  //   **没有任何东西会报错**。三个真包的砖都是 `cell×cell`、锚点正中 ⇒ 这条判据不误伤任何真产物。
+  td-config.ts:411  const a = assetOf(r.asset)!;
+  td-config.ts:412  if (a.size.w !== config.arena.cell || a.size.h !== config.arena.cell)
+  td-config.ts:413  err(`arena.tiles["${ch}"]`, `砖 "${r.asset}" 是 ${a.size.w}×${a.size.h}，而格子是 ${config.arena.cell}×${config.arena.cell} —— ` +
+  td-config.ts:414  `比格子大就会**盖住邻居**（每一格都画一张），比格子小就会**留缝、透出外壳底色**。` +
+  td-config.ts:415  `砖的尺寸必须**正好等于** arena.cell`);
+  ⇒ 它比对的就是**包里的尺寸**（`a.size`）与**配置声明的一个数**（`config.arena.cell`）——
+     而它的理由句式与本票要写的那句**同款**：「上面那条只要求引用解得开 —— 于是…；而…，**没有任何东西会报错**」。
+  ⚠️ 它自己还留了一句自证：**「三个真包的砖都是 cell×cell ⇒ 这条判据不误伤任何真产物」**。
+  ⇒ ⭐ 「声明 vs 包」这条路**在这个仓库里已经走过一次**，形状、层级（err）、措辞都是现成的。
+
+=== ⑭ ⚠️ 与票 62 的接缝：62 若删掉 389，63 会不会无家可归 ===
+  票 62 的推荐是**删掉 game-config.ts:389 那一行**（「HUD 该由哪把尺子判」）。
+  ⇒ 幸存的那把尺子 = `export function gameHudScreenItems(`（screen-space.ts:86）
+     它的第二个入参**就是 manifest**，而第 96 行就在用 `sizeOf(manifest, …)`。
+  ⇒ ⭐ 「62 删行 ⇒ 63 的判据无家可归」**不成立**：两处候选（config 审计 / 视口尺清单）**各自都有 manifest**。
+
+=== ⑮ 两代 · 四个家 ===
+  横版：game-config.ts:389（世界尺·config 审计）· screen-space.ts:94（视口尺·HUD 清单）
+  塔防：td-config.ts:542（世界尺·config 审计）· screen-space.ts:115（视口尺·HUD 清单）
+  ⇒ 四个家**都在 contracts 包里**，四处**都拿得到包**，而四处今天**都从 config 取尺寸**。
+
+=== ⑯ ⭐⭐ 价签 A/B：同一条形状的判据，落在两处 ===
+  ⚠️ 口径：拿**假 `fetch`** 驱动**真的** `compileRuntime` / `compileTdGame` —— 走真代码（真循环、
+     真契约、真账、真落盘），由探针**替上游**回话 ⇒ 量的是**链数了几发**，不是模型会怎么写。
+     不发一个网络请求、不花一分钱。
+
+  A) config 侧 · 把 entities[0].at.x 挪到世界外（99999）
+     过得了契约？ parseGameConfig ⇒ **放行**
+     业务校验的意见：**1 条** —— entity "suitcase-1": 落在世界之外（世界 1440×270；这个盒子是 (99991,234) 16×…
+     ⇒ **1 发** · 抛 `CommandError` · 报文首行「编译出来的配置**过不了校验**（1 条硬失败）：…」 · 退 **4** · 落盘：**一个字节都没落**
+
+  B) TD 侧 · 把 arena.tiles["="] 指到另一件砖（20×20 vs cell 15）
+     过得了契约？ parseTdConfig ⇒ **放行**
+     **⑬ 那条判据**（票 07 砖尺寸）的意见：**1 条**
+       · arena.tiles["="]: 砖 "slot-ring" 是 20×20，而格子是 15×15 —— 比格子大就会**盖住邻居**（每一格都画…
+     ⇒ **3 发** · **返回了**（ok=false）· 报文里 ❌ 1 条 · 账上 `attempts=3` · 这一格有的键 = [attempts, model, ms, step, target, upstream, usage]
+     ⇒ 落盘：**落了 v1.json（7183 字节）**
+     ⇒ 三发 body 逐字节相同？ **true**
+     ⚠️ 而这一格的键里**没有 `failures`** —— 三发全白花，账上只看得见 `attempts=3`（票 27 的那条纪律：
+       「上游没交出可用的东西」与「这一份关卡设计得差」**不是同一个数**，这里留的是后者）。
+  ⇒ ⭐⭐ **同一条形状的判据（「配置声明的数 vs 包里的数」），落在两处差 2 发、失败语义还相反**：
+     config 侧 = **1 发 · 抛 · 不落盘 · 退 4**（拒绝面，票 14 的 Q5）；
+     TD 侧   = **3 发盲重采样 · 不抛 · 照常落盘 · 退 0**（票 06/09：人过目之前提是他看得到哪儿不对）。
+  ⚠️ 而 **⑬ 那条先例（票 07 砖尺寸）落在贵的那一支** —— 而它的两份输入都是**确定性的**
+     （`a.size` vs `arena.cell`）⇒ 重抽一次**救不了**它 ⇒ 那 2 发是纯浪费。
+     ⚠️ 登记，**不在本票射程**（要动的是既有判据的行为）。
+
+=== ⑰ ⭐ 模型那一侧：尺寸在看，九宫格不在看 ===
+  真发出去的那份 body 里，「# 资源包清单」那一节里**每一件 ui** 都逐行写着真实尺寸：
+    - `hud-lost-slots` · ui · 72×32px · 锚点 {x:0, y:1} · 动画：（无动画，引用时不必给 anim）
+    - `hud-pip` · ui · 12×12px · 锚点 {x:0, y:0} · 动画：（无动画，引用时不必给 anim）
+  而 `resourceBrief`（ops.ts:643）那一行的模板逐字：
+    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · 锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · 动画：${animText}`);
+  ⇒ 真 body 里含 `scale9Borders`？ **false** · 含 `九宫格`？ **false** · 含 `ninePatch`？ **false**
+  ⇒ 而它含**真实尺寸**？ **true**（清单里每一件都写着 W×Hpx）
+  ⇒ ⭐ **config 那一步的模型看得到「包里的真实尺寸」，看不到「这件是不是九宫格」** ——
+     而 `manifest` 里**有** `scale9Borders`（`contracts/src/assetpack.ts:155`）⇒ **判据拿得到，模型拿不到**。
+     ⚠️ 所以 Q2 若收窄成条件，那半个条件**不在这一发调用的视野里**：它得靠**配方那一步**（另一发）的记忆。
+
+=== ⑱ 那条例外的载体：哪一步的哪一段散文，谁看着它 ===
+  · 载体 = `export const recipeShapeSpec = (): string => `每个 spec 只许有这些键…`（prompt.ts:491）
+    那句判据化的散文在 **prompt.ts:501**：
+      ⚠️ **「九宫格」是可选的，而且只有「会被拉伸到任意尺寸」的那种 ui 才写它。**
+      写的形状是：\`"ninePatch":{"left":4,"right":4,"top":4,"bottom":4}\` ——
+      四边按原样保留，**只有中央区被拉伸**。
+      ✅ **该写**：面板、按钮底板、状态栏那一类 —— 它们会被拉伸到任意尺寸（宽高由关卡定）。
+      ❌ **不该写**：**图标、指示符、指针、装饰框**这一类 —— 它们**按原尺寸画**，不会被拉伸。
+      ⚠️ 而且它不是「渲染时才生效的元数据」：**写了它，这张图就会按九宫格的规矩来画** ——
+  · 它被填进 `assetPlanPrompt`（prompt.ts:798）—— 而 `assetPlanPrompt` 是
+    **配方那一步**（`planAssets`）的提示词 ⇒ ⚠️ **载体在那一步的模型手里，而这一格是 config 那一步写的**。
+  · 谁看着它：`packages/assets/tests/prompt.test.ts` 里**两条** `it` 钉着它（describe 「清单的形状说明：**同时钉住两边**（票 08）」）：
+      :20  it("**面板那头必须保留**「该写它」的说法 —— 免得下一次「统一措辞」把它一起抹平", () => {…  ⇒ 钉 `✅ 该写：面板` / `❌ 不该写：图标`
+      :27  it("说了**害处** —— 写了它，这张图会按九宫格的规矩画，中央不许画东西", () => {…  ⇒ 钉 `中央区必须平坦且可任意重复` / `一圈空心框`
+  ⇒ ⭐ **与票 70 正好相反**：那句话**有人看着**（两道判据）—— 但它住的是**另一次调用**
+     与**另一个包**（`assets/tests`），而本票要加的东西在 **config 侧**（`contracts`）。
+
+=== ⑲ ⚠️ 反向证据：今天有一条测试正把「例外**无条件**」钉成规格 ===
+  game-config.test.ts:332  it("⚠️ 而唯一的例外**照样合法**：`Hud.panel.size`（九宫格的定义）", () => {
+  game-config.test.ts:333  const c = base();
+  game-config.test.ts:334  expect(c.hud.panel.size.w).toBeGreaterThan(0);
+  ⚠️ 而它的样本（`base()` 的 panel，:38）是 `hud-lost-slots / 72×32` ——
+     包里的那一件 = **72×32**（九宫格 {"x":4,"y":4,"w":64,"h":24}）⇒ **声明 == 包**。
+  ⇒ ⭐ 若 Q2 = (a)（收窄成「声明 ≠ 包 ⇒ 必须是九宫格」），这条测试**不会变红** ——
+     它钉的那一格**恰好落进新判据射程之外**（声明 == 包，新判据根本不看它）⇒
+     ⚠️ **它的名字（「唯一的例外照样合法」）会被架空**：它不再证明「例外无条件」这件事。
+     而它上下两条邻测（`scale` 进不来 / 实体不许自声明 `size`）正是 Q3 要的**负例族**的现成形状。
+
+=== ⑳ ⭐ 量纲：声明的那个数不是资源尺寸 ===
+  export const DEFAULT_VIEWPORT = { w: 480, h: 270 } as const;   （ops.ts:607 —— config 与 td 两条路都用它：`opts.viewport ?? DEFAULT_VIEWPORT`）
+  盘上塔防 `hud.panel` 声明 **480×30** / 包 96×26 ⇒ 声明的宽 **480 = `DEFAULT_VIEWPORT.w`**（整屏宽）。
+  那 30 处「声明 ≠ 包」的形状：**放大 15 处 · 缩小 15 处 · 一维大一维小 0 处**
+    （放大：hud.panel 480×30 ← 包 96×26）
+    （缩小：hud.start 28×22 ← 包 44×22）
+  ⇒ ⭐ 这个字段声明的量纲是**屏幕空间的盒子**，与包里的**像素资源**不是同一件事 ——
+     所以「声明必须 == 包」不只被 30 处反例证伪，它**在量纲上就不成立**。
+  ⚠️ 而 ⑱ 那句散文给的判据是「这件东西**会不会被拉伸**到任意尺寸？会，才写」——
+     盘上却有 **15 处是缩小**（声明比包小：hud.start 28×22 ← 包 44×22），
+     那句话的字面（「拉伸」）盖不住它们；九宫格那个机制盖得住（中央被压），**只是没人这么说**。

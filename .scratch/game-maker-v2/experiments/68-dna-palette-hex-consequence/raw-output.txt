@@ -1,0 +1,286 @@
+=== ⓪ 两侧的原话：散文说「有损」，gate 说「过不了」 ===
+  散文  prompts.ts:378-379（DNA_FIELD_HINTS.palette）：
+      palette: "这个角色身上的颜色，从世界色板里**选**：只能写 `palette:<下标>`（如 `palette:0`）。" +
+      "⚠️ 不许写 hex 或颜色名（写了下游会被量化掉，等于没写）",
+  gate  visual-world.ts:79-81（PaletteRefShape）：
+      *  两个模块解析同一个概念用两种写法，正是票 39 拆过的那个坑。 */
+      export const PaletteRefShape = z
+      .string()
+      .regex(/^palette:\d+$/, "必须是 palette:<下标> 引用；硬编码色值无法通过 schema");
+  复用  character-dna.ts:111  palette: z.array(PaletteRefShape),  ← DNA 那一侧**原样复用**同一个形状
+  ⇒ 那一格的类型是 `PaletteRef[]`（`z.array(PaletteRefShape)`）—— **不是**自由字符串
+
+=== ① 三种写法各喂一次**真的**契约（`CharacterDNAFileSchema`，即模型要过的那个）===
+
+  ── 合法写法   palette = ["palette:0","palette:3"]
+     散文要求的那一种
+     ⇒ **过了**（ok:true）—— 契约放行
+
+  ── ⚠️ 自由 hex   palette = ["#ff0000"]
+     散文说「下游会被量化掉，等于没写」——**听起来像走得通**
+     ⇒ 拒：path=[characters.0.palette.0]  报文逐字：「必须是 palette:<下标> 引用；硬编码色值无法通过 schema」
+
+  ── ⚠️ 颜色名   palette = ["red"]
+     同上，散文把这两者写成同一种后果
+     ⇒ 拒：path=[characters.0.palette.0]  报文逐字：「必须是 palette:<下标> 引用；硬编码色值无法通过 schema」
+
+  ── 走**链上真正的那一层**：`parseToolUse(body, CHARACTER_DNA_TOOL_NAME, CharacterDNAFileSchema)`
+     ok = false · failure = "schema"
+     detail 逐字：「工具入参不过契约：characters[0].palette[0]: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema」
+     ⇒ 落到 `compile-character-dna.ts` 里就是 `kind: "bad"`（failure 原样带走）⇒ **重采样那一档**
+
+  ── 装配步 `buildCharacterDna`（契约会被**再过一遍**，gate 在那里响）
+     ok = false · detail 逐字：「characters.0.palette.0: 必须是 palette:<下标> 引用；硬编码色值无法通过 schema」
+
+=== ② 「后果」的主语是谁：从那一格到那一整份 ===
+  · compile-character-dna.ts:186  `const body = JSON.stringify({…})`  ← **循环之外，算一次**
+  · compile-character-dna.ts:195  `for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++)`
+    ⇒ 三发**用的都是同一个 `body`** ⇒ schema 那一档**不喂回去理由** ⇒ 3 发盲发
+    STRUCTURED_CALL_ATTEMPTS = 3
+  · compile-character-dna.ts:217  三发全灭之后抛的那句：
+      「最后一次的病因：${lastDetail}…」
+  · 这一步**没有 R12 那种「拒绝」**（文件头逐字：「DNA 那一侧没有拒绝面」）⇒ 只有 `schema` 这一档
+  · 调用方 `create-game.ts:280` 在链上且**不 catch** ⇒ 抛出即断链（不理解成「这一格白填」）
+
+=== ②′ 落到人眼前的是什么（报文 · 退出码 · 花掉几发）===
+  · cli.ts:199  `asCommandError`：按**形状**认 —— 带 `failure` 的 ⇒ `CommandError("invalid")`
+  · cli.ts:206  只有 `http` / `timeout` 走 `"upstream"`(3)，**其余都落在 `"invalid"`(4)**
+  · ⇒ `schema` 这一档退 **4**，与设计层那一档同一个码（文案不同）
+  · ⚠️ 报文里**看得见病因**（② 那句拼的模板：『最后一次的病因：…』）——
+    所以这一档**不是**「悄悄白填」，是「**3 次真调用全丢**、整份判失败、链断在这儿、退 4」
+    ⚠️ 「3 次真调用」不是修辞：循环体每发都 `await onceThrough`（真的发请求）——
+       前两发**成功发出、只是被契约拒**，第三发同样。三发的 token 照付。
+
+=== ③ 散文点名的 `quantize.ts`：它吃的是什么 ===
+  quantize.ts:1  // 最近邻色量化：把任意位图吸附到 StyleSpec.palette。
+  quantize.ts:19  export function quantizeToPalette(img: RasterImage, palette: readonly string[]): QuantizeResult {
+  ⇒ 入参类型是 `RasterImage`（**位图**：`data` 是像素字节），配色板 —— **它压根不认 DNA 的字段**
+  真正的调用点：1 处
+      packages/assets/src/import.ts:383  const quantized = quantizeToPalette(grid, opts.palette);
+  ⇒ ⚠️ **只有导入那条路**（人画的位图 → 吸附到世界色板）。生图那条路**从不**过它 ——
+     pack.ts:1076  // **恒为 0**：这条管线只有两条路 —— drawlist（exact / composited）与导入（quantized）。
+     ⇒ 生图产物的 `paletteBinding` 只有 `exact` / `composited`，`quantized` 那一档**恒为 0**
+  ⇒ 也就是说：**DNA 的 `palette` 从来流不到 `quantize.ts` 眼前**。
+     它流到的是**另一个**地方（见下），而那句话把因果接到了前者身上。
+
+=== ③′ 真正读 `dna.palette` 的那一处（`dnaBrief`）：拿到 hex 会怎样 ===
+  prompt.ts:75  `export function dnaBrief(dna, style)`
+  prompt.ts:83  .map((ref) => style.palette[Number(ref.slice("palette:".length))] ?? ref)
+  ⇒ 它是**唯一的读者**（`master.ts:86` / `prompt.ts:404` / `prompt.ts:455` 都经它）—— 「DNA 的 palette」唯一的出口
+  ⚠️ `ref.slice(8)` 那一步**不做任何检查**：非 `palette:N` 的形状落进去是**未定义的算术**。
+     下面这一格**契约不会让它发生**（① 已经证明它过不了 schema）—— 这里问的是「假如没有那道正则」：
+     （`style` 只在 `palette` 那一格上被用到 —— 探针给一份 3 色的：`["#2e3b4e", "#4a6076", "#f0c95c"]`）
+     · ["palette:1"] → #4a6076
+     · ["#ff0000"] → #2e3b4e
+     · ["red"] → #2e3b4e
+     · ["#ff0000ff"] → #ff0000ff
+     · ["palette:9"] → palette:9
+     ⇒ ⚠️ **`#ff0000` 不是「被量化掉」，也不是「原样送到模型眼前」—— 它变成了 `palette:0` 那个颜色**
+        （`"#ff0000".slice(8)` = `""` ⇒ `Number("")` = `0` ⇒ 色板第 0 项）。
+     ⇒ 而 `palette:9`（越界）走的是另一个分支：`?? ref` ⇒ **悬空的引用原样进了生图提示词**（那一半归**票 69**）。
+     ⇒ 结论：散文那句「下游会被量化掉」**不仅后果说反了，机制也指错了模块**。
+
+=== ④ 盘上 9 份真 `character-dna.json`：那句话今天有没有被撞过 ===
+  · 盘上真 DNA 文件：**9** 份
+  · 共 **20** 个角色（每份 2/4 条）
+  · `palette` 元素合计 **96** 个
+  · ⚠️ **不是** `palette:<下标>` 的：**0** 个 ⇒ 票面那句「一次 hex 都没写过」**成立**
+  · ⚠️ `palette` 为空数组的角色：**0** 个（契约放行 `[]`，散文也写了「没有就写 `[]`」）
+  · ⚠️ 下标**越界**的：**0** 个（这一半归**票 69**，此处只登记读数）
+
+=== ⑤ `PaletteRefShape` 这条判据在盘上的真跑账里响过没有 ===
+  · 盘上 run-*.json：**14** 份；带 `failures` 的记录 **7** 条
+  · 出现过的 failure 档：`schema` · `empty-input`
+  · 报错文本里出现过 `PaletteRefShape` 那句 message 的：**0** 份 ⇒ 票面「一次没拒过」**成立**
+
+=== ⑥ ⚠️ 那句错话在仓库里抄了**几份**（票面知道两份）===
+  · packages/contracts/src/character-dna.ts:110
+      *  ⚠️ 写成自由 hex 会**静默失效**：下游 `quantize.ts` 会把色板外的颜色量化掉。 */
+  · packages/contracts/tests/character-dna.test.ts:6
+      //     §palette 是 PaletteRef —— 自由 hex 会**静默失效**（下游 quantize 把它量化掉）。
+  · packages/game-design/src/prompts.ts:379
+      "⚠️ 不许写 hex 或颜色名（写了下游会被量化掉，等于没写）",
+  · docs/v2/01-contracts.md:482
+      | `palette: string[]` | → **`PaletteRef[]`**。票 02 的裁决 25 判过一模一样的形状：否则这个世界就有了**第二套颜色来源**，而写成自由 hex 会**静默失效**（下游 `quantize.ts` 把它量化掉） |
+  ⇒ 共 **4** 处（票面点名的两处 + 另两处：一份**测试文件头**、一份**文档表格**）
+
+=== ⑦ 代价：改那句话要动几处、有没有测试盯着它 ===
+  dna-prompts.test.ts:72  it("颜色是从世界色板里**选** —— 明说只能写 `palette:<下标>`", () => {
+  ⇒ 那份测试断言的是「**只能写 `palette:<下标>`**」这半句（断言的是 `toContain("`palette:<下标>`")` 这个子串）——
+  ⇒ ⚠️ **没有任何一条**断言「后果」那半句（扫过整份文件：false）
+  ⇒ 契约测试里提到那句旧因果的：2 处（`packages/contracts/tests/character-dna.test.ts:6` · `packages/contracts/tests/game-config.test.ts:309`）—— 都是**注释**，不是断言
+  ⇒ 所以「改那句话」是**改字符串**，不是改判据：不动 schema、不动 gate、不动 R 表（票面第 6 节同此）。
+
+=== ⑧ 先例（票 54 的 Q2）：同一类改口，当时改成了什么形状 ===
+  票 54 的 Q2 裁定逐字：
+      | Q2 | 第 2 条那句散文怎么改口 | 采纳推荐措辞的方向：明说「省掉 ⇒ `compile-design` **整份拒绝**、退出码 4、流程停在这儿、**点名**缺失的机制」，并明说**禁止用近似项顶替** |
+  落地那一段逐字（该票 §『落地 · 三处』的 ③）：
+      拒绝理由里**点名**少了哪条机制、连用户原话一起报出来），并**反过来**说清
+      「**更不许**填一个近似的值 —— 省掉至少**当场叫停**，顶替则是把一次叫停换成一次**没人看见的丢东西**」。
+      `DESIGN_FIELD_HINTS.mechanics` 那句「`id` **照抄意图层**」补上限定：
+  ⇒ 那个形状是**四件套**：① 会发生什么（整份拒绝）· ② 退出码 · ③ 链停在哪 · ④ **点名**是谁的问题。
+     ⚠️ 而本票那句散文比 54 更靠近**用户**侧的话术：它写的是「等于没写」——**听起来像没代价**。
+
+=== ⑨ 那 4 处**各自的原话**，以及每一处是谁在读 ===
+
+  ── packages/game-design/src/prompts.ts:379   （谁在读它：**模型**（每一发都读））
+     "⚠️ 不许写 hex 或颜色名（写了下游会被量化掉，等于没写）",
+
+  ── packages/contracts/src/character-dna.ts:110   （谁在读它：**下一个改契约的人**）
+     *  ⚠️ 写成自由 hex 会**静默失效**：下游 `quantize.ts` 会把色板外的颜色量化掉。 */
+
+  ── packages/contracts/tests/character-dna.test.ts:6   （谁在读它：**下一个改这条判据的人**）
+     //     §palette 是 PaletteRef —— 自由 hex 会**静默失效**（下游 quantize 把它量化掉）。
+
+  ── docs/v2/01-contracts.md:482   （谁在读它：**人读的文档**）
+     | `palette: string[]` | → **`PaletteRef[]`**。票 02 的裁决 25 判过一模一样的形状：否则这个世界就有了**第二套颜色来源**，而写成自由 hex 会**静默失效**（下游 `quantize.ts` 把它量化掉） |
+
+  ⚠️ 四处**用的是同一句因果**（「色板外的颜色会在下游被量化掉」），但**措辞分两族**：
+     · 只有一处是**给模型的**（`prompts.ts`）：它**不点模块名**，只说「下游」，且落点是「**等于没写**」；
+     · 另外三处（全是**给人读的**）：措辞**逐字同族** —— 「**静默失效**」＋点名 `quantize.ts`。
+     · 点名 `quantize` 的：**3 / 4**（character-dna.ts · character-dna.test.ts · 01-contracts.md）
+     · 用「**静默失效**」这四个字的：**3 / 4**（character-dna.ts · character-dna.test.ts · 01-contracts.md）
+     ⇒ 「静默」与真实的「**当场判失败、整份拒绝**」是**反的** —— 而这个反的方向在四处**完全一致**
+
+=== ⑩ Q2 的授权粒度：四处各住在哪 · 动它要碰几个包 · 有没有东西盯着它 ===
+
+  ── packages/game-design/src/prompts.ts
+     住的包：packages/game-design · 行 379 · 读它的人：**模型**（每一发都读）
+
+  ── packages/contracts/src/character-dna.ts
+     住的包：packages/contracts · 行 110 · 读它的人：**下一个改契约的人**
+
+  ── packages/contracts/tests/character-dna.test.ts
+     住的包：packages/contracts · 行 6 · 读它的人：**下一个改这条判据的人**
+
+  ── docs/v2/01-contracts.md
+     住的包：（不在任何包里） · 行 482 · 读它的人：**人读的文档**
+
+  ⇒ `scripts/` 里只有：check-deps.mjs · check-links.mjs
+     （`check:links` 只查**链接**、`check:deps` 只查**依赖** —— **没有任何文档生成器**）
+  ⇒ `docs/v2/01-contracts.md` 是**手写的** ⇒ ④ 那处**没有生成器会覆盖它**，也没有判据读它
+  ⇒ 四处里**只有一处（`prompts.ts`）是给模型的**，另外三处**全是给人读的** ——
+     而三处「给人读的」里，**没有任何一处有测试或工具在盯那句话的内容**（⑦ 已量过 prompts 那处也没有）
+
+=== ⑪ ⚠️ 对第一轮 ③ 的一处收窄：`quantize.ts` 的调用点唯一，但**它被两条路走到** ===
+  `quantizeToPalette(` 在 `packages/assets/src` 里的**调用点**：assets/src/import.ts:383
+  ✅ 第一轮 ③ 说的「调用点唯一」**成立**（就是导入管线里那一处）。
+  ⚠️ **但**：`pack.ts:23` 从同一个模块拿了 ` dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box ` ——
+     `pack.ts:580` 逐字：「// 生图产物**同样过那条重建管线**（抠背景 → 裁框 → 降采样 → 二值化 → 量化），」
+     `pack.ts:582`  `binding = "quantized";`
+  ⇒ ⚠️ **量化是真的在跑**：生图那条路也走 `importFrames` ⇒ `import.ts:383` ⇒ `quantizeToPalette`。
+     它吃的是**位图**、用的是**世界色板**（`StyleSpec.palette`）。
+  ⇒ ⭐ 所以那句假话的**真形状**是：**一个真的事实，被搬到了一个碰不到它的字段上** ——
+     `dna.palette` 这一格**从不变成位图**（它只被 `dnaBrief` 当**文本**读进生图提示词，③′），
+     而「被量化掉」是**像素**那一侧的事。这才是它读起来可信的原因。
+  ⇒ ⚠️ 而它的**结论**也不对（③′）：没有那道正则时，`"#ff0000"` 不是「被量化掉」，
+     是 `Number("".slice(8))` ⇒ **静默变成 `palette:0`**（色板**第 0 项**）。
+
+=== ⑫ Q4 若要补判据：它住在哪 · 反向断言有没有先例 ===
+  今天那条 `it`（只断言**规矩那半句**）：
+     dna-prompts.test.ts:72  it("颜色是从世界色板里**选** —— 明说只能写 `palette:<下标>`", () => {
+     dna-prompts.test.ts:73  expect(prompt()).toContain("`palette:<下标>`");
+     dna-prompts.test.ts:74  });
+  ⭐ **同一个文件里已经有一条反向断言**（而且防的正是「把后果说错」）：
+     dna-prompts.test.ts:82  
+     dna-prompts.test.ts:83  it("⚠️ 守门人那条说的是**语义规矩**，不是「我们查得出来」（说成天网只会教会模型绕）", () => {
+     dna-prompts.test.ts:84  expect(CHARACTER_DNA_TOOL_DESCRIPTION).toContain("把共有的画法**落到这一个身上**");
+     dna-prompts.test.ts:85  expect(CHARACTER_DNA_TOOL_DESCRIPTION).not.toContain("逐字");
+  ⇒ 全仓 `.not.toContain` / `.not.toMatch` 先例：**102 处**，散在 **38** 份测试文件里
+     ⇒ Q4(a) 的**形状是现成的**（反向断言在这个仓库里是常态，且在**同一个文件**里就有一条）；
+       落点也现成：`dna-prompts.test.ts:73` 那条 `it` 里补两句即可（**不动 schema / gate / R 表**）。
+
+=== ⑬ 模型每一发读到几处「规矩」、几处「后果」===
+  · 工具说明 第 4 条（prompts.ts:358）—— 读它的人：**模型**
+      4. \`palette\` 只能写 \`palette:<下标>\`（从上面那份色板里**选**），**不许**写 hex 或颜色名。
+  · 逐字段台账 DNA_FIELD_HINTS.palette（prompts.ts:378-379）—— 读它的人：**模型**
+      palette: "这个角色身上的颜色，从世界色板里**选**：只能写 `palette:<下标>`（如 `palette:0`）。" +
+      "⚠️ 不许写 hex 或颜色名（写了下游会被量化掉，等于没写）",
+  · 两者在**同一发 body** 里：compile-character-dna.ts:188 与 :189
+      :188  ...forcedTool(CHARACTER_DNA_TOOL_NAME, CHARACTER_DNA_TOOL_DESCRIPTION, CharacterDNAFileSchema),
+      :189  messages: [{ role: "user", content: [{ type: "text", text: characterDnaPrompt({ design, vws }) }] }],
+  · 同一份 body 的两半：工具说明含「规矩」= **true** · 含「后果」= **false**
+  ⇒ 量出来：模型**每一发同时读到两处「规矩」**（工具说明第 4 条 + 字段台账），
+     而「后果」只在**一处**出现（台账）—— 且那一处是假的 ⇒ 票面说的「给模型那处」其实是**两处**。
+  ⚠️ 而票 54 的先例恰好把后果**写在工具说明里**（⑭）—— 这一票的对应处（工具说明第 4 条）
+     今天**一个字后果都没有** ⇒ 若 Q1 只改台账，模型读到的两处会一处在说后果、一处不说。
+
+=== ⑭ 票 54 那次改口**落在哪一处**（读的，不是推的）===
+  · 它当时配的判据就长在 design-prompts.test.ts:126 那条 it 里（逐条抄）：
+      :127  expect(DESIGN_TOOL_DESCRIPTION).toContain("整条省掉");
+      :128  expect(DESIGN_TOOL_DESCRIPTION).toContain("静默丢东西");
+      :137  expect(DESIGN_TOOL_DESCRIPTION).toContain("整份拒绝");
+      :138  expect(DESIGN_TOOL_DESCRIPTION).toContain("退出码 4");
+      :139  expect(DESIGN_TOOL_DESCRIPTION).toContain("点名");
+      :141  expect(DESIGN_TOOL_DESCRIPTION).toContain("没人看见的丢东西");
+  ⇒ ⭐ 后果那半句**钉在 `DESIGN_TOOL_DESCRIPTION`（工具说明）上**，不是钉在字段台账上。
+  ⇒ 而它**另配了一条 it**（:144）专门钉「工具说明与字段台账**不再打架**」：
+      it 标题逐字：「⚠️ 「`id` 照抄意图层」（字段台账）与「挑不出对家就省掉」（第 2 条）**不再打架**（票 54）」
+  · ⭐ 那句**今天实际长在 prompts.ts:197**（逐字；反引号在 TS 模板串里写作 `\``，即 Q1(a) 要照的形状）：
+      ⚠️ **省掉之后会发生什么，说清楚**：这一份会被 \`compile-design\` **整份拒绝** —— 退出码 4、
+      这条链**就停在这儿**，而且拒绝的理由里会**点名**少了哪条机制（连用户的原话一起报出来）。
+      那不是惩罚，是「**外壳做不了它**」被**说出口**的那一刻：把它交回给上游，比悄悄糊过去强。
+      ⇒ 所以**更不许**为了让这一份「能过」去填一个近似的值 —— 省掉至少会**当场叫停**，
+  ⇒ 票 54 的先例**同时**动了两处：**工具说明**（补后果）＋ **字段台账**（删掉与它打架的那半句）。
+     ⚠️ 而 68 的台账那处**今天正放着那句假后果**（⑬）⇒ 按先例办 = 工具说明补一句、台账换一句。
+
+=== ⑮ 那句假话**为什么可信**：同一份提示词里 hex 到处都是 ===
+  · prompts.ts:470 把色板**摊开**给模型 —— 下面是**真拼出来的那一行**：
+      - **色板**（`palette:<下标>` 指的就是它）：0=#22283e · 1=#5b4230 · 2=#a08a6b · 3=#f2c14e · 4=#c98a5e · 5=#3a3d4a
+  · ⚠️ 这一发提示词里 #rrggbb 形状出现 **6** 次 —— 而同一份提示词里写着「不许写 hex」
+  · 而契约里这两个形状相隔 **16** 行：
+      visual-world.ts:63  PaletteColorShape（**色板本身**那一格）：export const PaletteColorShape = z.string().regex(/^#[0-9a-f]{6}$/, "色值必须是规范化的小写 #rrggbb");
+      visual-world.ts:79  PaletteRefShape （**引用色板**那一格）：.regex(/^palette:\d+$/, "必须是 palette:<下标> 引用；硬编码色值无法通过 schema");
+  ⇒ 也就是说：**色板那一格写的就是 hex，引用色板那一格不许写 hex** —— 同一个文件里相隔十几行。
+     ⇒ 模型在这一发里看到一串 hex，同时被告知「不许写 hex，写了会被量化掉」
+     ⇒ 「下游会把 hex 换回色板里的一个」在这份上下文里读起来是**顺的** —— 这是那句假话可信的来源。
+
+=== ⑯ Q4(a) 的价签：候选断言拿**今天**的字符串跑，红还是绿 ===
+     · 台账 · 正向「整份拒绝」 ⇒ 今天**不在** ⇒ 这条断言今天 ⚠️ **红**
+     · 台账 · 正向「退出码 4」 ⇒ 今天**不在** ⇒ 这条断言今天 ⚠️ **红**
+     · 台账 · 正向「重采样」 ⇒ 今天**不在** ⇒ 这条断言今天 ⚠️ **红**
+     · 台账 · 正向「停在这儿」 ⇒ 今天**不在** ⇒ 这条断言今天 ⚠️ **红**
+     · 台账 · 反向「量化掉」 ⇒ 今天**在** ⇒ 这条断言今天 ⚠️ **红**
+     · 台账 · 反向「等于没写」 ⇒ 今天**在** ⇒ 这条断言今天 ⚠️ **红**
+     · 工具说明 · 正向「整份拒绝」 ⇒ 今天**不在** ⇒ 这条断言今天 ⚠️ **红**
+     · 工具说明 · 正向「退出码 4」 ⇒ 今天**不在** ⇒ 这条断言今天 ⚠️ **红**
+     · 工具说明 · 反向「量化掉」 ⇒ 今天**不在** ⇒ 这条断言今天 ✅ **绿**
+  ⇒ ⚠️ **反向那几条今天就是红的**（假话还在）⇒ 它**不能单独加**：必须与 Q1 同一次落地。
+  ⇒ 它花的是 **0 发**（纯字符串断言；形状与落点 ⑫ 已量过是现成的）——
+     它的代价不是钱，是**把 Q1 与 Q4 绑成一次施工**。
+
+=== ⑰ Q1(a) 的落地价签：候选新句**原地换进去**（只在内存里），今天那些断言逐条还绿吗 ===
+  · 拿盘上**真**的一对（ruined-city-scavenger/run/v1）拼一次：design 16 键 · vws 13 键
+  · 今天拼出来的提示词：**3468** 字 · 49 行
+  · 那句假话在提示词里：**true**
+  · 候选新句（89 字）换进去之后：**3526** 字（Δ 58）
+  · 候选新句逐字（**只是探针里的草稿，供 Q1 措辞用，不是落地**）：
+      ⚠️ 不许写 hex 或颜色名：写了这一份**过不了 `palette:<下标>` 的 schema**（整份判失败、退 4）—— **不是**「等于没写」，是**当场退回来**
+  ⚠️ 下面这 13 条 = dna-prompts.test.ts 里**全部**盯提示词字符串的断言，逐条在**改后的**串上跑：
+     · ① 契约每个键被点名（:19） ⇒ ✅ 绿
+     · ① 逐字段行数 == 键数（:21） ⇒ ✅ 绿
+     · ② 世界五格逐个具名（:27） ⇒ ✅ 绿
+     · ② 世界那两格的原值插进去了（:28-29） ⇒ ✅ 绿
+     · ③ 色板原值仍在（:34-35） ⇒ ✅ 绿
+     · ③ 六桶名仍在（:36-37） ⇒ ✅ 绿
+     · ③ materials 原话仍在（:38） ⇒ ✅ 绿
+     · ④ 个体那一半仍在（:43-48） ⇒ ✅ 绿
+     · ⑤ 没有基因的那些仍被点名（:53-55） ⇒ ✅ 绿
+     · ⑥ 类/个体那条语义说法仍在（:60-62） ⇒ ✅ 绿
+     · ⑦ 非人形那段仍在（:67-69） ⇒ ✅ 绿
+     · ⑧ 规矩那半句（`palette:<下标>`）仍在（:73） ⇒ ✅ 绿
+     · ⑨ 收在工具名上（:90） ⇒ ✅ 绿
+  ⇒ 红 **0** 条 / 共 13 条 ⇒ Q1(a) 的候选措辞**不踩任何一条既有断言**
+     （⑦ 已量过：那句假话今天没有任何断言钉着它）。
+  · 工具说明那一侧：964 字 · 含「整份拒绝」= **false** · 含「退出码 4」= **false**
+     ⇒ 把候选后果**接在**工具说明第 4 条后面，唯一盯它的断言（:79-80 的 toContain）不受影响（那是**加**，不是换）。
+  ⇒ ⭐ 于是 Q1 与 Q4 的分工量清了：**Q1 = 换一句（不踩断言）**、**Q4 = 加一条今天必红的判据（把它锁住）**。
+
+=== 小结 · 前两轮量到的（**不编号** —— ⑬ 起留给下一轮读数）===
+  票面成立：散文说「有损」，实际是「当场 schema 失败 + 3 发盲重采样 + 整份判失败」。
+  ⚠️ 本轮**多量到两件**：
+     ① 那句错话在仓库里是 **4 处**（票面知道 2 处）；
+     ② 散文点名的 `quantize.ts` **见不到 DNA 的字段**（它吃位图；调用点确实唯一，但补量 ⑪ 收到：
+        **它被导入与生图两条路走到** ⇒ 「被量化掉」是**像素**那一侧的真事，只是**搬到了碰不到它的字段上**），
+        而真正读 `dna.palette` 的 `dnaBrief` 拿到 `"#ff0000"` 会把它算成 `palette:0` ——
+        ⇒ 那句假陈述**不只是把后果说轻了，它还把因果接到了错的模块上**。

@@ -68,6 +68,36 @@ describe("⚠️ 结构性空值 + 层内引用族 gate（票 10 的 Q4）", () 
     }
   });
 
+  // ── 票 67 · gate ④ 的报文分不出「没干活」与「照散文省掉了」（人裁 Q1 = (b)）────────────
+  //
+  // ⚠️ 这个 gate **只看长度**：`mechanics: []` 既可能是模型没完成工作，也可能是模型**遵守了
+  //   提示词第 2 条**（「挑不出对家就整条省掉」）。旧报文把后一种读法**说死了** ⇒ 下面两条钉住：
+  //   ① `mechanics` 那一格**两种都摆、一种都不断言**；② **另外四格照旧**（那条许可只对它说话）。
+  it("⚠️ `mechanics` 空了：报文**把两种读法都摆出来、一种都不当结论**", () => {
+    const r = parse({ mechanics: [] });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      const msg = r.error.issues[0]!.message;
+      expect(msg, "① 可能是偷懒").toContain("没干这个活");
+      expect(msg, "② 也可能是守了散文").toContain("挑不出对家");
+      expect(msg).toContain("整条省掉");
+      expect(msg, "且点得到那条规矩住在哪").toContain("提示词第 2 条");
+      expect(msg, "⚠️ 明说分不出，不是换个说法断言另一半").toMatch(/分不出/);
+      expect(msg, "旧那句把两种读法压成一种的断言没了").not.toContain("就是没干活");
+    }
+  });
+
+  it("⚠️ 另外四格**照旧** —— 那条「整条省掉」的许可只对 `mechanics` 说话", () => {
+    for (const over of [{ coreLoopSteps: [] }, { player: { ...DESIGN.player, goals: [] } }, { levels: [] }]) {
+      const r = parse(over as Record<string, unknown>);
+      expect(r.success).toBe(false);
+      if (!r.success) {
+        expect(r.error.issues[0]!.message).toMatch(/就是没干活/);
+        expect(r.error.issues[0]!.message, "别替它们编一条不存在的许可").not.toMatch(/整条省掉/);
+      }
+    }
+  });
+
   it("⚠️ id **跨四桶**重复 ⇒ 拒 —— 一个实体只有一种 `type`，跨桶重了就说不出是哪一个", () => {
     const r = parse({ npcs: [{ id: "e-drone", role: "r", interaction: "i" }] });
     expect(r.success).toBe(false);

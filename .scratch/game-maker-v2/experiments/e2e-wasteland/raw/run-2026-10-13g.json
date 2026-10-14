@@ -1,0 +1,12 @@
+{
+ "code": 0,
+ "ms": 71824,
+ "text": "{\n  \"command\": \"create\",\n  \"summary\": [\n    \"理解层跑完了 —— 这次运行：ruined-city-scavenger/run/v1（v1 · ruined-city-scavenger）\",\n    \"清单：22 个资源（animation×3 · sprite×12 · background×1 · ui×6）—— ⚠️ **预计 11 次生图调用**（动画 6 次 · 单帧 0 次 · 背景层 3 层 · 母版 2 张）\",\n    \"↑ 这是**清单完整派发时的上限** —— 依赖或母版失败时那几笔不会发出去，实际会更少；`game-maker build` 那一步才花钱\",\n    \"⚠️ **用户没说清的地方**：winConditions：需求只说「最终目标」，没说具体是什么目标\",\n    \"⚠️ **用户没说清的地方**：loseConditions：需求没提失败条件\",\n    \"⚠️ **用户没说清的地方**：entities：需求没提是否会说话的 NPC\",\n    \"⚠️ **用户没说清的地方**：mechanics：需求没提攻击或战斗方式，只说躲避敌人\",\n    \"⚠️ **用户没说清的地方**：resource：需求没提资源的具体用途\",\n    \"⚠️ **用户没说清的地方**：progression：需求没提任何进阶或成长机制\",\n    \"⚠️ **用户没说清的地方**：challenge：需求没提难度来源\",\n    \"⚠️ **用户没说清的地方**：title：需求没给游戏名\",\n    \"下一步：看一眼、或直接改那份清单（ruined-city-scavenger/run/v1/asset-recipe.json），然后跑：game-maker build ruined-city-scavenger/run/v1\",\n    \"或者一开始就加 --yes —— 它会把生图、配置、站点一路做完（等于跳过这里）。\"\n  ],\n  \"data\": {\n    \"status\": \"awaiting\",\n    \"gameId\": \"ruined-city-scavenger\",\n    \"runVersion\": 1,\n    \"runDir\": \"ruined-city-scavenger/run/v1\",\n    \"recipe\": \"ruined-city-scavenger/run/v1/asset-recipe.json\",\n    \"assetCount\": 22,\n    \"imageCalls\": 11,\n    \"imageCallBreakdown\": {\n      \"animation\": 6,\n      \"single\": 0,\n      \"background\": 3,\n      \"master\": 2\n    },\n    \"kinds\": {\n      \"animation\": 3,\n      \"sprite\": 12,\n      \"background\": 1,\n      \"ui\": 6\n    },\n    \"ambiguity\": [\n      \"winConditions：需求只说「最终目标」，没说具体是什么目标\",\n      \"loseConditions：需求没提失败条件\",\n      \"entities：需求没提是否会说话的 NPC\",\n      \"mechanics：需求没提攻击或战斗方式，只说躲避敌人\",\n      \"resource：需求没提资源的具体用途\",\n      \"progression：需求没提任何进阶或成长机制\",\n      \"challenge：需求没提难度来源\",\n      \"title：需求没给游戏名\"\n    ]\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"ruined-city-scavenger/run/v1\",\n      \"kind\": \"run\"\n    },\n    {\n      \"path\": \"ruined-city-scavenger/run/v1/asset-recipe.json\",\n      \"kind\": \"asset-recipe\"\n    }\n  ]\n}\n  · visual-world\n  · intent\n  · design\n  · character-dna\n  · recipe\n",
+ "steps": [
+  "  · visual-world\n",
+  "  · intent\n",
+  "  · design\n",
+  "  · character-dna\n",
+  "  · recipe\n"
+ ]
+}

@@ -329,7 +329,7 @@ describe("⚠️ 禁 `scale`（票 09 裁决 5）+「资源自身的性质归包
     expect(ok(withKey((c) => (c["entities"] as Record<string, unknown>[])[0]!, "anchor")), "实体自己声明 anchor").toBe(false);
   });
 
-  it("⚠️ 而唯一的例外**照样合法**：`Hud.panel.size`（九宫格的定义）", () => {
+  it("⚠️ **形状上**唯一的例外照样合法：`Hud.panel.size` 进得了 schema（运行时放不放行由 `auditPanelSize` 按九宫格判 · 票 63）", () => {
     const c = base();
     expect(c.hud.panel.size.w).toBeGreaterThan(0);
     expect(ok(c)).toBe(true);
@@ -339,5 +339,32 @@ describe("⚠️ 禁 `scale`（票 09 裁决 5）+「资源自身的性质归包
     const c = base();
     (c.player as { move?: unknown }).move = { speed: 90.5, jumpVelocity: 330.25, gravity: 900.125 };
     expect(ok(c), "浮点速度不该被拒").toBe(true);
+  });
+});
+
+// ── 票 63 补的那条判据 ─────────────────────────────────────────────────────────
+//
+// ⚠️ 它守的是「资源自身性质归包」那条例外的**射程**：例外**以九宫格为条件** ——
+//   九宫格上声明值是个**被拉伸的目标**（「声明 ≠ 包」是正当用法）；非九宫格上两个数就得一致。
+// ⚠️ 这也是上面那条老测试（`Hud.panel.size` 那条）**名字被架空**的原因：它证的是**形状**，
+//   运行时放不放行从此归这里。（盘上 65 个声明尺寸的格子里，「声明 ≠ 包 且 非九宫格」= 0 处）
+describe("⚠️ `hud.panel.size` 的例外**以九宫格为条件**（票 63）", () => {
+  const withPanel = (panel: GameConfig["hud"]["panel"]) => base({ hud: { ...base().hud, panel } });
+  /** 只挑**这条判据**报的那一条 —— 几何那几条不参与本组断言。 */
+  const panelErrs = (panel: GameConfig["hud"]["panel"]) =>
+    errs(withPanel(panel)).map(line).filter((l) => l.startsWith("hud.panel.size:"));
+
+  it("正例：九宫格 + 声明 ≠ 包 ⇒ **放行**（`hud-lost-slots` 是九宫格，声明 144×40 是拉伸的目标）", () => {
+    expect(panelErrs({ asset: "hud-lost-slots", at: { x: 8, y: 262 }, size: { w: 144, h: 40 } })).toEqual([]);
+  });
+
+  it("负例：非九宫格 + 声明 ≠ 包 ⇒ **报错**（`hud-pip` 包里那一件没有 `scale9Borders`）", () => {
+    const msgs = panelErrs({ asset: "hud-pip", at: { x: 8, y: 262 }, size: { w: 72, h: 32 } });
+    expect(msgs.join("\n")).toMatch(/不是九宫格/);
+    expect(msgs.join("\n")).toMatch(/12×12/);
+  });
+
+  it("非九宫格 + 声明 == 包 ⇒ **也不报**（这条判据只在两个数打架时说话）", () => {
+    expect(panelErrs({ asset: "hud-pip", at: { x: 8, y: 262 }, size: { w: 12, h: 12 } })).toEqual([]);
   });
 });

@@ -1,0 +1,137 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "prop-wall-lamp",
+  "frame": "prop-wall-lamp",
+  "viewBox": [
+    0,
+    0,
+    12,
+    12
+  ],
+  "expectedSize": [
+    12,
+    12
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 1,
+      "y": 1,
+      "w": 10,
+      "h": 10
+    },
+    {
+      "op": "dither",
+      "x": 1,
+      "y": 1,
+      "w": 10,
+      "h": 10,
+      "colors": [
+        "palette:5",
+        "palette:0"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 2,
+      "y": 2,
+      "w": 8,
+      "h": 8
+    },
+    {
+      "op": "circle",
+      "fill": "palette:4",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "cx": 6,
+      "cy": 6,
+      "r": 3
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 3,
+      "w": 6,
+      "h": 6,
+      "colors": [
+        "palette:4",
+        "palette:2"
+      ],
+      "ratio": 0.4,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "circle",
+      "fill": "palette:3",
+      "cx": 6,
+      "cy": 6,
+      "r": 2
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 4,
+      "w": 4,
+      "h": 4,
+      "colors": [
+        "palette:3",
+        "palette:2"
+      ],
+      "ratio": 0.3,
+      "pattern": "checker"
+    },
+    {
+      "op": "circle",
+      "fill": "palette:2",
+      "cx": 6,
+      "cy": 6,
+      "r": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 5,
+      "y": 0,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 5,
+      "y": 10,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 0,
+      "y": 5,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 10,
+      "y": 5,
+      "w": 2,
+      "h": 2
+    }
+  ]
+}

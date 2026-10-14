@@ -321,3 +321,28 @@ describe("td-config/v1：派生量与几何助手（**只此一处算**）", () 
     ] })).toBe(250);
   });
 });
+
+// ── 票 63 的 Q6：**同类字段同一条判据**（不能只修横版、把塔防留成无条件例外）──────────
+describe("⚠️ 塔防 HUD 的声明尺寸：与横版**同一条**判据（票 63 的 Q6）", () => {
+  /** 只挑这条判据报的那一条（`panel` / `buttons` / `start` 三格共用一份实现）。 */
+  const sizeErrs = (c: TdConfig, p: string) => errorsOf(c).filter((l) => l.startsWith(`${p}.size:`));
+
+  it("正例：九宫格 + 声明 ≠ 包 ⇒ **放行**（真关卡 `ui-hud-bar` 480×30 ← 包 96×26 就是这种）", () => {
+    expect(sizeErrs(valid(), "hud.panel")).toEqual([]);
+    expect(sizeErrs(valid(), "hud.start")).toEqual([]);
+  });
+
+  it("负例：非九宫格 + 声明 ≠ 包 ⇒ **报错**（`ui-icon-scrap` 没有 `scale9Borders`）", () => {
+    const c = valid();
+    c.hud.panel.asset = "ui-icon-scrap";
+    const msgs = sizeErrs(c, "hud.panel");
+    expect(msgs.join("\n")).toMatch(/不是九宫格/);
+    expect(msgs.join("\n")).toMatch(/10×10/);
+  });
+
+  it("`buttons` / `start` **不是漏网的那两格** —— 它们走的是同一条判据", () => {
+    const c = valid();
+    c.hud.start.asset = "ui-icon-life";
+    expect(sizeErrs(c, "hud.start").join("\n")).toMatch(/不是九宫格/);
+  });
+});

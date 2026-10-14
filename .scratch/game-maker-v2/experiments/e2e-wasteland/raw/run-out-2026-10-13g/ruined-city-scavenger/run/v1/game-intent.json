@@ -1,0 +1,85 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版废土寻宝游戏",
+  "subgenre": "横版探索寻宝",
+  "camera": "横版视角（侧视）",
+  "targetExperience": "在荒废城市中小心探索、四处翻找的废土求生感",
+  "coreLoopSteps": [
+    "在废弃城市中横版移动探索",
+    "寻找资源与宝箱",
+    "躲开危险与敌人",
+    "收集到资源与宝箱中的东西"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "在废弃城市中探索",
+      "寻找资源",
+      "寻找宝箱",
+      "躲避危险和敌人"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒废、危险、需要谨慎探索"
+  },
+  "mechanics": [
+    {
+      "id": "sidescroll-move",
+      "name": "横版移动"
+    },
+    {
+      "id": "jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "open-chest",
+      "name": "打开宝箱"
+    },
+    {
+      "id": "collect-resource",
+      "name": "收集资源"
+    },
+    {
+      "id": "avoid-danger",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "chest",
+      "type": "interactable",
+      "role": "可打开的宝箱，内有宝物"
+    },
+    {
+      "id": "resource-node",
+      "type": "resource",
+      "role": "可拾取的资源"
+    },
+    {
+      "id": "enemy",
+      "type": "enemy",
+      "role": "需要躲避的敌人"
+    },
+    {
+      "id": "hazard",
+      "type": "interactable",
+      "role": "需要躲避的危险"
+    }
+  ],
+  "winConditions": [
+    "达成最终目标（需求只说要有最终目标，未说明具体内容）"
+  ],
+  "loseConditions": [],
+  "ambiguity": [
+    "winConditions：需求只说「最终目标」，没说具体是什么目标",
+    "loseConditions：需求没提失败条件",
+    "entities：需求没提是否会说话的 NPC",
+    "mechanics：需求没提攻击或战斗方式，只说躲避敌人",
+    "resource：需求没提资源的具体用途",
+    "progression：需求没提任何进阶或成长机制",
+    "challenge：需求没提难度来源",
+    "title：需求没给游戏名"
+  ]
+}

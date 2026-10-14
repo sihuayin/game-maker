@@ -3,6 +3,12 @@
 // ⚠️ 这里有一条**结构性的判据**：提示词骨架必须把契约的**每一个键**都点名一遍 ——
 //   那就是票 03 的「① 档欠条」要的「逐个点名」。少了哪个键，它在提示词里就不存在，
 //   而「不在模板里露脸的字段**当场出局**」。
+//
+// ⚠️ **票 70（2026-10-14）**：契约 `game-intent.ts:119-121` 自己写着「gate 那条规矩由本文件
+//   在工具 `description` 里补」—— 那句自白对 ① ② ③ ⑤ ⑤b ⑤c 六组成立、**对 ④（可选对象的空壳）
+//   不成立**。⚠️ 而 `:18-25` 那条**结构性判据今天过得了**，因为**它看的是「名字在不在」、
+//   不是「规矩在不在」**（`KEYS` 16 个、`missing=[]`）⇒ ④ 的回归防线只能是一条**新断言**。
+//   （⚠️ 陷阱：下面 `it` 标题里的 `①②③④⑤⑥` 是**工具说明第几条**，不是 gate 的组号。）
 import { describe, expect, it } from "vitest";
 import { GameIntentSpecSchema } from "@game-maker/contracts";
 import { TOOL_DESCRIPTION, TOOL_NAME, intentPrompt } from "../src/index.js";
@@ -107,5 +113,36 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
 
   it("⚠️ 反例：说明里**一个 `resources` 都没有** —— Q5 之后它不该在模型眼前出现", () => {
     expect(TOOL_DESCRIPTION).not.toContain("resources");
+  });
+
+  // ── 票 70 · ⑦：gate ④（可选对象出现了但两端皆空）的散文（人裁 Q1(a) + Q2(c) + Q3(a)）──
+  //
+  // ⚠️ 病根：**④ 是七组里唯一一组两个面都没有的**。契约 `game-intent.ts:119-121` 逐字写着
+  //   「这条规矩由 `prompts.ts` 在工具 `description` 里补」—— ① ② ③ ⑤ ⑤b ⑤c 六组**每个字都在**，
+  //   而**没有一行**说得到 ④（第 3 条 `title` 可空讲的是「整个省掉」，不是「空壳」）。
+  // ⚠️ 它**没有 Zod 的替身**：`{}` 过得了 Zod（那两个对象 `optional`、两格也 `optional`），
+  //   被 `superRefine` 拒 ⇒ 射程**整段**落在 `toJSONSchema` 丢掉的那一半里 ⇒ 散文是它**唯一的家**。
+  // ⚠️ 它**有价签**：空壳今天值 3 发（三发 body 逐字节相同 · 抛 · 退 4），合法写法值 1 发。
+  it("⑦ 工具说明：可选对象出现了就不能**两端皆空**，且三种情形分得清（票 70）", () => {
+    expect(TOOL_DESCRIPTION, "接着第 5 条那句说的，不是另起一条").toContain("可以是空数组");
+    expect(TOOL_DESCRIPTION).toContain("两端都空");
+    // ⚠️ 人裁的补充边界明写**不许把三种情形混成一种** ⇒ 三条各有一条断言
+    expect(TOOL_DESCRIPTION, "① 整个省掉合法").toContain("整个省掉");
+    expect(TOOL_DESCRIPTION, "② 只给一格有内容的也合法").toContain("也合法");
+    expect(TOOL_DESCRIPTION, "③ 空壳不合法").toContain("判失败");
+    // ⚠️ Q3(a)：`""` 与 `"  "` 都要点到，且说得出来「空白按 trim 之后算」
+    expect(TOOL_DESCRIPTION).toContain('{description:"  "}');
+    expect(TOOL_DESCRIPTION).toContain("trim()");
+  });
+
+  it("⑦ 字段台账里也补足了 —— `progression` 那行写全，`challenge` 依「同上」**自动继承**", () => {
+    // ⚠️ 为什么只补 `progression`：`challenge` 那行的正文**本来就是一个指针**（「同上」）⇒
+    //   补 `challenge` 那行补不进这条规矩，补 `progression` 那行它自动继承（人裁 Q2(c) 的原话）。
+    const p = intentPrompt({ requirementText: "x" });
+    expect(p, "旧的那半句一个字没动").toContain("推不出就整个省掉");
+    expect(p).toContain("写了就不能两端都空");
+    expect(p).toContain("合法");                              // ② 那一档
+    expect(p).toContain("判失败、当场重来");                    // ③ 那一档
+    expect(p, "`challenge` 仍是指针 ⇒ 它继承的是同一条规矩").toContain("难度来源。同上");
   });
 });

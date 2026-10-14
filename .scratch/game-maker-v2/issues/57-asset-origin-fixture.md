@@ -1,8 +1,8 @@
 # 57. 资源级的 `AssetOrigin.fixture` 零生产者 —— 留、删、还是等一个生产者？
 
 Type: grilling
-Status: open
-Owner: —
+Status: claimed
+Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 45](45-style-provenance-origin.md)。人类在那一票**Q2 的裁定**里把它切出来，原话：

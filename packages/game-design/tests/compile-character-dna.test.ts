@@ -133,6 +133,28 @@ describe("重采样：只有「模型没干好」那一档才重来（R16）", (
     expect(s.calls()).toBe(STRUCTURED_CALL_ATTEMPTS);
     expect(err.message).toContain(CHARACTER_SET_GATE);
   });
+
+  // ── 票 68 · `palette` 写 hex 的**真实**后果（人裁 Q4(a)：断言要覆盖真实失败后果）──────────
+  //
+  // ⚠️ 散文旧说：「写了下游会被量化掉，**等于没写**」。**两半都错**：
+  //   ① 不是「等于没写」，是**这份过不了契约**（那一格是 `palette:<下标>` 的正则）；
+  //   ② 下游那个 `quantize` **碰不到这一格**（它吃位图，唯一调用点 `import.ts:383`）。
+  //   ⇒ 这条把它**真的**喂进去，钉住后果的每一段。
+  it("⚠️ `palette` 写了 hex ⇒ 过不了 schema ⇒ **三发盲重采样后整份判失败**（不是「下游会换回来」）", async () => {
+    const hexed = dnaFile(dnaFile().characters.map((c) =>
+      c.id === "p-scavenger" ? { ...c, palette: ["#ff0000"] } : c));
+    const s = stage([res(reply(hexed))]);
+    const err = await compileCharacterDna(input({ fetchImpl: s.f })).catch((e) => e);
+    expect(err).toBeInstanceOf(CompileCharacterDnaError);
+    // 这一档是 `schema` ⇒ 壳那边落 "invalid" ⇒ **退 4**（不是上游那两档的 3）
+    expect(err.failure).toBe("schema");
+    expect(err.ledger![0]!.failures).toEqual(Array(STRUCTURED_CALL_ATTEMPTS).fill("schema"));
+    expect(s.calls(), "三发都是**真调用**，token 照付").toBe(STRUCTURED_CALL_ATTEMPTS);
+    expect(err.message, "病因说得出是哪一条正则").toMatch(/palette:<下标>/);
+    // ⚠️ **盲重采样**：三发是**同一个 body**（`compile-character-dna.ts` 在循环外算一次）——
+    //   hex 不会因为被拒一次就消失，所以「多试几次」救不了这一格
+    expect(new Set(s.seen.map((b) => JSON.stringify(b))).size).toBe(1);
+  });
 });
 
 describe("传输层的失败 **不重采样**", () => {

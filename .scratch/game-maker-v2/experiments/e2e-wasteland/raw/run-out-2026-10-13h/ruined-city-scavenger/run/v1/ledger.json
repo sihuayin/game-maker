@@ -1,0 +1,464 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "ruined-city-scavenger",
+  "runVersion": 1,
+  "createdAt": "2026-10-13T13:21:14.105Z",
+  "run": {
+    "wallClockMs": 424000,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 2
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 2
+      },
+      "master": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "image": {
+        "calls": 9,
+        "attempts": 10
+      },
+      "drawlist": {
+        "calls": 18,
+        "attempts": 19
+      },
+      "compile-runtime": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 20624,
+      "attempts": 2,
+      "failures": [
+        "schema"
+      ],
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 200,
+        "outputTokens": 1446
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 3223,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 169,
+        "outputTokens": 649
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 11173,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2138,
+        "outputTokens": 1730
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 8878,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2153,
+        "outputTokens": 980
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 27428,
+      "attempts": 2,
+      "failures": [
+        "schema"
+      ],
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 145,
+        "outputTokens": 3398
+      }
+    },
+    {
+      "step": "master",
+      "target": "master-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 32136,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "master",
+      "target": "master-patroller",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 67163,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 94155,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "enemy-patroller",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 47701,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "resource-node-scrap",
+      "upstream": "messages",
+      "ms": 2995,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1249,
+        "outputTokens": 408
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "chest-closed",
+      "upstream": "messages",
+      "ms": 3304,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1245,
+        "outputTokens": 489
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "resource-node-water",
+      "upstream": "messages",
+      "ms": 3338,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1247,
+        "outputTokens": 388
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hazard-spikes",
+      "upstream": "messages",
+      "ms": 3576,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1242,
+        "outputTokens": 531
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-crate",
+      "upstream": "messages",
+      "ms": 2123,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 602,
+        "outputTokens": 549
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-signboard",
+      "upstream": "messages",
+      "ms": 2174,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 603,
+        "outputTokens": 475
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hazard-current-debris",
+      "upstream": "messages",
+      "ms": 2889,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 604,
+        "outputTokens": 636
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-wall-lamp",
+      "upstream": "messages",
+      "ms": 1963,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 597,
+        "outputTokens": 483
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-pole-light",
+      "upstream": "messages",
+      "ms": 1880,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 597,
+        "outputTokens": 374
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-goal-marker",
+      "upstream": "messages",
+      "ms": 2179,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 594,
+        "outputTokens": 431
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-debris-block",
+      "upstream": "messages",
+      "ms": 5016,
+      "attempts": 2,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 216,
+        "outputTokens": 573
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-icon-scrap",
+      "upstream": "messages",
+      "ms": 2252,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 601,
+        "outputTokens": 460
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-icon-water",
+      "upstream": "messages",
+      "ms": 2408,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 600,
+        "outputTokens": 497
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-prompt-interact",
+      "upstream": "messages",
+      "ms": 1921,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 599,
+        "outputTokens": 422
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-pickup-counter",
+      "upstream": "messages",
+      "ms": 4389,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 713,
+        "outputTokens": 1403
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-panel-result",
+      "upstream": "messages",
+      "ms": 2308,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 583,
+        "outputTokens": 566
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-hp-pips",
+      "upstream": "messages",
+      "ms": 5190,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 596,
+        "outputTokens": 1610
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "chest-open-empty",
+      "upstream": "messages",
+      "ms": 2299,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 471,
+        "outputTokens": 502
+      }
+    },
+    {
+      "step": "image",
+      "target": "bg-ruined-street",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 33770,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "chest-opening",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 88280,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "enemy-patroller",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 95431,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "bg-ruined-street",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 41436,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 62487,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "bg-ruined-street",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 49419,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 94712,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "compile-runtime",
+      "target": "game-config",
+      "upstream": "messages",
+      "ms": 5866,
+      "attempts": 1,
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 3685,
+        "outputTokens": 1378
+      }
+    }
+  ]
+}

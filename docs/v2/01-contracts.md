@@ -479,7 +479,7 @@ export interface CharacterDNA {
 |---|---|
 | `bodyProportions` | **可派生**（`headCount(size.h) = clamp(round(h/12),2,5)`，`prompt.ts:58-68`）。它不是「零消费者」，是**更糟的一种：一个会与事实分叉的副本**。票 22 实测：自由文本的比例指令模型**不执行**，真正的约束是画布尺寸 |
 | `equipment` + `accessories` | **合并成 `gear`** —— 两者之间是**假**边界：消费者都是 ①（同一段提示词），差别只在标签 |
-| `palette: string[]` | → **`PaletteRef[]`**。票 02 的裁决 25 判过一模一样的形状：否则这个世界就有了**第二套颜色来源**，而写成自由 hex 会**静默失效**（下游 `quantize.ts` 把它量化掉） |
+| `palette: string[]` | → **`PaletteRef[]`**。票 02 的裁决 25 判过一模一样的形状：否则这个世界就有了**第二套颜色来源**，而写成自由 hex **过不了 schema**（那一格是 `palette:<下标>` 的正则）⇒ 整份判失败、重采样三发、**退 4**。⚠️ 不是「下游 `quantize.ts` 把它量化掉」—— 那个吃的是**位图**、碰不到这一格（票 68 改对了这句因果） |
 
 ⚠️ **哪些实体配有 DNA**：`player` + `enemies[]` + `npcs[]`。
 `interactables[]` / `resources[]` **默认没有**（木条箱没有基因）。
