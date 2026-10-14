@@ -656,7 +656,7 @@ export const PLAN_TOOL_NAME = "emit_asset_recipe";
 export const PLAN_TOOL_DESCRIPTION = `输出一份 AssetRecipe（asset-recipe/v1）—— **要造哪些资源**的完整清单。
 ⚠️ 清单说的是**要什么**，不是**怎么画**：没有颜色、没有像素、没有画面。
 
-五条线形状表达不出来的规矩：
+六条线形状表达不出来的规矩：
 
 1. **策略只有三个值**：\`drawlist\`（画出来的）· \`image\`（生成出来的）· \`import\`（人给的位图）。
    ⚠️ \`character-reference\` / \`image-edit\` / \`procedural\` **不是值**：
@@ -679,6 +679,10 @@ export const PLAN_TOOL_DESCRIPTION = `输出一份 AssetRecipe（asset-recipe/v1
 
 5. \`dependsOn\` 是**资产 → 资产**的顺序边：写**别的资产的 \`id\`**。
    ⚠️ 不许指向母版（那一类边由 \`masterAsset\` 表达）· 不许指向自己 · **整张图不许有环**。
+
+6. **分层背景的层名两两不同**（\`spec.layers[].name\`；帧名是 \`<资源 id>.<层名>\`）。
+   ⚠️ **这一条不是防线** —— 契约里本来就有这条判据（重复层名会被**拒**，票 58 补的），
+   写在这里**只为少一次返工**。\`sky / ground / wall\` 这种说得清远近的名字是好的，两个 \`far\` 不是。
 
 只调这个工具，不要解释。`;
 

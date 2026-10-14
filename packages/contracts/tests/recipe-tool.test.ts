@@ -102,7 +102,7 @@ describe("§镜像与契约**行为一致**（漂移测试）", () => {
 describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像放行 —— 那几条 gate 模型看不见", () => {
   // `toJSONSchema` 静默丢掉 `superRefine`（票 08 实测）⇒ 镜像里有没有它们，**模型看见的一样**；
   // 而把同一批判据在两种方言里各写一遍，就是 `derivePackMode` 那种漂移。⇒ 它们的落点是**装配后**那次
-  // `parseRecipe`。⚠️ 所以这四条**不是**漂移，是**分工**：镜像管线形状，契约判成立与否。
+  // `parseRecipe`。⚠️ 所以这五条**不是**漂移，是**分工**：镜像管线形状，契约判成立与否。
   it("① 路径的字符检查（绝对路径）—— 镜像只到 `min(1)`", () => {
     const r = clone("last-train.json") as unknown as Record<string, unknown>;
     r["styleRef"] = "/绝对路径.json";
@@ -144,6 +144,18 @@ describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像�
     expect(v3(r)).toBe(false);
     expect(v4(r)).toBe(true);
   });
+
+  it("⑤ 分层背景的**层名重复**（票 58 补的那条 · 与上面四条同款）", () => {
+    // ⚠️ 这一条与那四条**有一处不同**：它是**新加的一条判据**，不是「本来就有的判据没镜像」。
+    //   票 46 量到它只住在**交付侧**（`AssetPackEntry.superRefine`），创作侧放它过去 ⇒
+    //   一份产不出合法包的配方，**走到花完钱之后**才被拒。票 58 把它补在了
+    //   `AssetSpecSchema.superRefine` 的 union 层 —— 于是**明示例外从四条变成五条**。
+    const r = clone("last-train.json");
+    const spec = r.assets.find((a) => a.spec.kind === "background")!.spec as { layers?: { name: string }[] };
+    spec.layers![0]!.name = spec.layers![1]!.name; // 两层同名
+    expect(v3(r)).toBe(false);
+    expect(v4(r)).toBe(true);
+  });
 });
 
 describe("§镜像存在的**全部理由**：`toolInputSchema` 转得动它", () => {
@@ -156,6 +168,7 @@ describe("§镜像存在的**全部理由**：`toolInputSchema` 转得动它", (
     expect(text).not.toContain("有环");        // 依赖图那条 gate
     expect(text).not.toContain("宽高比");      // 母版比例那条
     expect(text).not.toContain("中央区");      // 九宫格那条
+    expect(text).not.toContain("层名");        // 层名重复那条（票 58 补的）
   });
 
   it("⚠️ 而**v3 那份转不动** —— 这就是镜像存在的理由（v3 的 `ZodObject` 没有 `_zod`）", () => {

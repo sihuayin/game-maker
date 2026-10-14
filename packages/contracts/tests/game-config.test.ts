@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  DEFAULT_PLAYER_MOVE, GameConfigSchema, PLAYER_ACTION_NAMES, Player as PlayerSchema, auditGameConfig, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
+  DEFAULT_HUD_LINE_HEIGHT, DEFAULT_PLAYER_MOVE, GameConfigSchema, PLAYER_ACTION_NAMES, Player as PlayerSchema,
+  auditGameConfig, auditScreenSpace, gameHudScreenItems, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
   parseAssetPack, type AssetPackManifest, type GameConfig, type ConfigIssue,
 } from "../src/index.js";
 
@@ -49,6 +50,17 @@ const issues = (c: unknown) => auditGameConfig(c as GameConfig, MANIFEST);
 const line = (i: ConfigIssue) => `${i.where}: ${i.message}`;
 const errs = (c: unknown) => issues(c).filter((i) => i.severity === "error");
 const warns = (c: unknown) => issues(c).filter((i) => i.severity === "warning");
+
+/** ⚠️ **契约层没有视口常量**（票 80 施工时量的）：两份具名的住在别处 ——
+ *  `assets/src/ops.ts` 的 `DEFAULT_VIEWPORT`、`demo/src/draw.ts` 的 `VIEWPORT`，
+ *  而契约**依赖不到**它们（`check:deps` 会当场拒）。⇒ 这里就地写一份，
+ *  值取那两份的一致值（480×270 = 票 32 裁决 1 的外壳常量）。 */
+const VIEWPORT = { w: 480, h: 270 } as const;
+
+/** **视口尺**那一族 —— 票 80 之后它是 `hud.*` **唯一**的尺子（世界尺那一条已从 `auditGameConfig` 删掉）。 */
+const vpErrs = (c: GameConfig) =>
+  auditScreenSpace(VIEWPORT, gameHudScreenItems(c, MANIFEST, { lineHeight: DEFAULT_HUD_LINE_HEIGHT }))
+    .filter((i) => i.severity === "error");
 
 describe("形状：一份真配置能过，逃生舱全被堵死", () => {
   it("last-train 的配置通过，且三族校验一条意见都没有", () => {
@@ -249,20 +261,28 @@ describe("自洽族（硬失败）", () => {
   it("**锚点决定盒子从哪边长** —— 换个 `at`，判决跟着盒子走（这条是锚点语义的守门人）", () => {
     // ⚠️ 没有这一条，这个 bug 可以一直悄悄活着：**没有一条测试问过「盒子是从哪儿算的」**。
     // `hud-lost-slots` 锚点 `{x:0,y:1}`（左下角）、尺寸 72×32：
-    //   `at = (8,262)` ⇒ 盒子 (8, 230, 72, 32)，底边正好压在 262（离世界底 8px）✅
+    //   `at = (8,262)` ⇒ 盒子 (8, 230, 72, 32)，底边正好压在 262 ✅
+    // ⚠️ **票 80 之后量它的是视口尺，不是世界尺** —— 而算盒子的是**同一个** `entityBox`
+    //   （`gameHudScreenItems` 调的就是它）⇒ 这条性质**照样被算到同一步**，不是换了条判据就没人守。
+    //   世界高 270 与视口高 270 在这一轴上恰好相等，所以两个 `at` 的判决逐字不变。
     const ok = base();
     ok.hud = { ...ok.hud, panel: { ...ok.hud.panel, at: { x: 8, y: 262 } } };
-    expect(errs(ok)).toEqual([]);
-    // 同一个 `at`，把面板再往下推 9px ⇒ 底边 271 > 270，真的出去了 ❌
+    expect(vpErrs(ok)).toEqual([]);
+    expect(errs(ok)).toEqual([]);          // 世界那一族照旧一个字没有（它今天管不着 HUD）
+    // 同一个 `at`，把面板再往下推 9px ⇒ 盒子底边 271 > 270，真的出去了 ❌
     const bad = base();
     bad.hud = { ...bad.hud, panel: { ...bad.hud.panel, at: { x: 8, y: 271 } } };
-    expect(errs(bad).map(line).join()).toMatch(/hud\.panel.*世界之外/);
+    expect(vpErrs(bad).map(line).join()).toMatch(/hud\.panel.*屏幕空间/);
   });
 
-  it("HUD 面板自己也要落在世界内", () => {
+  it("HUD 面板自己也要落在**视口**内（票 80：世界尺那一条已删）", () => {
     const c = base();
     c.hud = { ...c.hud, panel: { ...c.hud.panel, at: { x: 1440, y: 262 } } };
-    expect(errs(c).map(line).join()).toMatch(/hud\.panel.*世界之外/);
+    expect(vpErrs(c).map(line).join()).toMatch(/hud\.panel.*屏幕空间/);
+    // ⚠️ 而**世界尺今天对 HUD 一个字都不说** —— 票 80 删的就是那一行（`game-config.ts:430`）。
+    //   这一句是**证伪性**的：谁把那一行加回来，它会当场红。⚠️ 断的是「HUD 不在里面」，
+    //   不是「一条都没有」—— 后者会因为**别的原因**变红，把这条的意思带偏。
+    expect(errs(c).map(line).join()).not.toMatch(/hud\.panel/);
   });
 });
 

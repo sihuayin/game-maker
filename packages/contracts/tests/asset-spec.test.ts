@@ -114,6 +114,16 @@ describe("按类的硬要求", () => {
     expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ parallax: 0 }] }).success).toBe(false);
     expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ name: "", parallax: 0 }] }).success).toBe(false);
   });
+
+  it("⚠️ 层名重复被拒（票 58）—— 交付侧那条规矩的**镜像**，补上之前它只住在一半", () => {
+    // 补上之前：创作侧放 `[far, far]` 过去 ⇒ 那份配方**产不出合法的包**（不可满足），
+    // 而它被拒的位置在**花完钱之后**（先买图，最后被 `buildAssetPack` 的自校验拦下）。
+    const r = AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ name: "far", parallax: 0 }, { name: "far", parallax: 1 }] });
+    expect(r.success).toBe(false);
+    if (!r.success) expect(r.error.issues.map((i) => i.message).join()).toMatch(/层名重复/);
+    // ⚠️ 名字**两两不同**就过 —— 这条不是「不许有近义词」，是「不许有两个同名的」
+    expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ name: "far", parallax: 0 }, { name: "near", parallax: 1 }] }).success).toBe(true);
+  });
 });
 
 describe("UI 九宫格：中央区不能空", () => {

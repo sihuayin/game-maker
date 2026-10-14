@@ -145,28 +145,81 @@ describe("塔防站点的装配：**校验不过 = 硬失败，不产出站点**
 });
 
 describe("几何族：**只能落在装配期**的那几条", () => {
-  it("HUD 摆到屏幕外 → 硬失败（世界可以比视口宽，而 HUD 活在屏幕空间）", () => {
+  /** 真包 + 真关卡构建出来的那一份场景描述 —— 下面几条都在它上面**只改一处**。 */
+  const realWorld = () =>
+    buildTdWorld(readJson(path.join(PACK, "manifest.json")), readJson(CONFIG), { packBase: "" });
+
+  it("阳性：真包 + 真关卡构建出来的那份描述**零 issue** —— 本族判据没有误伤生产配置", () => {
+    // ⚠️ 这一条是**票 83** 补的（原先这一族一条判据都没有 —— 见下面那段注释）。
+    //   没有它，「新加的判据把生产配置误杀」这件事也没人看得见。
+    expect(auditTdGeometry(realWorld())).toEqual([]);
+  });
+
+  it("HUD 摆到屏幕外 → 硬失败（HUD 活在**屏幕空间**，而塔防世界已被钉死等于视口）", () => {
     const h = harness((c) => {
       const cfg = c as unknown as { world: { size: { w: number } }; arena: { rows: string[] }; hud: { panel: { at: { x: number } } } };
-      // 把世界加宽一倍（场地跟着补满），再把面板摆到只有世界放得下、屏幕放不下的地方
+      // 把世界加宽一倍（场地跟着补满），再把面板摆到那个多出来的右半边
       cfg.world.size.w = 960;
       cfg.arena.rows = cfg.arena.rows.map((r) => r.slice(0, -1) + "#".repeat(32) + "#");
-      cfg.hud.panel.at.x = 470;                       // 470+480 = 950 ≤ 960（世界过得了）
+      cfg.hud.panel.at.x = 470;                       // 470+480 = 950 ≤ 960（世界放得下）
     });
     let caught: unknown;
     try { assembleTdSite(h.opts); } catch (e) { caught = e; }
     const e = caught as CommandError;
-    // ⚠️ 世界那一族放它过去了，**几何族**才拦得住 —— 这正是几何族存在的理由
+    // ⚠️ **票 83 起这份夹具自己就错了**：世界 960 ≠ 视口 480 ⇒ 世界尺寸那条当场硬失败
+    //   —— 这两条断言是本票加的，它们也是那条判据的**装配期**判据。
+    expect(e.message).toMatch(/world\.size/);
+    expect(e.message).toMatch(/正好等于视口/);
+    // ⚠️ 而屏幕空间那条尺子**照样报** —— HUD 的尺子是**视口**，与「世界声明多大」无关。
     expect(e.message).toMatch(/hud\.panel/);
     expect(e.message).toMatch(/屏幕空间/);
     expect(e.message).toMatch(/尺子是\*\*视口\*\*不是 world\.size/);
+    // ⚠️⚠️ 这条 `it` 原先的注释写着「世界那一族放它过去了，**几何族**才拦得住 —— 这正是几何族
+    //   存在的理由」，**票 83 之后那句话不再是实的**：塔防世界被钉死等于视口 ⇒ 两条尺子量的
+    //   是**同一个盒子**（票 62 量过），在塔防**再也分不开**。两族的分离只在**横版**还看得见
+    //   （那边世界 1440 > 视口 480）—— 见 `packages/contracts/tests/game-config.test.ts` 的
+    //   HUD 视口判据那两条。⚠️ 留着这条是因为它仍证着一件真事：HUD 跑出屏幕**不会**被放过去。
   });
 
   it("**场地铺不满世界** → 硬失败（铺不满的地方会透出外壳底色）", () => {
-    const w = buildTdWorld(readJson(path.join(PACK, "manifest.json")), readJson(CONFIG), { packBase: "" });
+    const w = realWorld();
     const broken = { ...w, arena: { ...w.arena, cols: w.arena.cols - 1, tiles: w.arena.tiles.slice(0, -1) } };
     const issues = auditTdGeometry(broken);
     expect(issues.some((i) => i.severity === "error" && /铺不满世界/.test(i.message))).toBe(true);
+  });
+
+  // ── 下面三条是**票 83 补的判据** ─────────────────────────────────────────
+  // ⚠️ **为什么必须另写**（票 81 §2.1 的探针 + 票 83 §3.2 的探针）：这一族原先**一条判据都没有**
+  //   —— 禁用 `arena.tiles` 那一行、甚至新插一条硬判据，全仓都是一片绿。
+  //   「一条从没被执行过的规矩等于没有」⇒ 拆参数之前先把三条判决**钉死**。
+
+  it("⭐ 远端越界 → **硬失败**（近端/远端那条分界 · 票 81 的 Q3(乙)）", () => {
+    const w = realWorld();
+    const broken = { ...w, core: { ...w.core, box: { ...w.core.box, x: w.core.box.x + 1000 } } };
+    const issues = auditTdGeometry(broken);
+    expect(issues.some((i) => i.severity === "error" && i.where === "core" && /落在世界之外/.test(i.message)))
+      .toBe(true);
+  });
+
+  it("⭐ 近端探出 → **警告**（不是硬失败）—— 塔防这一半今天永远轮不到，但**判决本身要钉住**", () => {
+    // ⚠️ 「永远轮不到」是票 81 §2.2 量到的：能让它响的盒子在 config 那一层已被同一条四边判据
+    //   硬失败判过。而**判决本身**仍要钉住 —— Q3 的回退方案 (甲) 就是把它变成生效的那一半。
+    const w = realWorld();
+    const slots = w.slots.map((s, i) => (i === 0 ? { ...s, box: { ...s.box, x: -3 } } : s));
+    const issues = auditTdGeometry({ ...w, slots });
+    const near = issues.find((i) => /探出了世界的左边\/上边/.test(i.message));
+    expect(near?.severity).toBe("warning");
+    expect(issues.some((i) => i.severity === "error")).toBe(false);   // 近端**不**硬失败
+  });
+
+  it("⭐ 砖那一行的检查**还在**（票 83 拆了 `allowPokeOut` 参数、留了这条哨兵）", () => {
+    // ⚠️ 砖盒子由构造保证恒在世界里（票 81 §2.7 的结构证明）⇒ 这条检查今天**恒真**，
+    //   所以只能**手工造一块探出去的砖**来证明它还活着。没有这一条，删掉它就不会有人发现。
+    const w = realWorld();
+    const tiles = w.arena.tiles.map((t, i) => (i === 0 ? { ...t, box: { ...t.box, x: -5 } } : t));
+    const issues = auditTdGeometry({ ...w, arena: { ...w.arena, tiles } });
+    expect(issues.some((i) => i.severity === "warning" && i.where === "arena.tiles[0]" &&
+      /探出了世界的左边\/上边/.test(i.message))).toBe(true);
   });
 });
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  AssetPackManifest, AssetPackRef, derivePackMode, parseAssetPack, resolvePackRef,
+  AssetOrigin, AssetPackManifest, AssetPackRef, derivePackMode, parseAssetPack, resolvePackRef,
   StyleSpecSchema, PaletteSchema,
   type AssetPackManifest as Manifest,
 } from "../src/index.js";
@@ -10,7 +10,7 @@ const SHA = (c: string) => "sha256:" + c.repeat(64);
 /** 一个最小的、合法的包。**每一处 mutation 都从它深拷一份** —— 反例才有意义。 */
 function validManifest(): Manifest {
   return {
-    format: "assetpack/v3",
+    format: "assetpack/v4",
     id: "dystopian-shop",
     version: 1,
     createdAt: new Date(1790208000_000).toISOString(),
@@ -20,6 +20,7 @@ function validManifest(): Manifest {
       // ⚠️ 这里曾有 `degradations: []` —— 随降级链于 2026-09-25 删除（format 因此升到 v2）
       // ⚠️ 这里也曾有 `style: { origin, ref, stylespecId, checksum }` —— 于 2026-10-13 删除
       //    （票 45，format 因此升到 v3：四个键没有一个携带别处拿不到的信息，而 `origin` 是假话）
+      // ⚠️ 枚举里的 `fixture` 于 2026-10-14 删除（票 57，format 因此升到 v4：零生产者 + 磁盘零人口）
     },
     palette: {
       ref: "authoring/stylespec.json#/palette", size: 3, values: ["#7c968e", "#55685f", "#ead8a6"],
@@ -79,7 +80,7 @@ describe("AssetPackManifest —— 合法包必须通过", () => {
     expect(r.ok, r.ok ? "" : r.errors.join(" / ")).toBe(true);
   });
 
-  it("provenance.mode 与来源一致时通过（全 generated / 全 fixture）", () => {
+  it("provenance.mode 与来源一致时通过（全 generated）", () => {
     expect(parseAssetPack(mutate((m) => {
       m.assets = m.assets.filter((a) => a.origin === "generated");
       m.provenance.mode = "generated";
@@ -94,14 +95,18 @@ describe("derivePackMode —— 包级身份的**唯一**派生处", () => {
   it("单一来源各自映射到自己", () => {
     expect(derivePackMode(["generated", "generated"])).toBe("generated");
     expect(derivePackMode(["imported"])).toBe("imported");
-    expect(derivePackMode(["fixture", "fixture"])).toBe("fixture");
   });
   it("混了才是 mixed", () => {
     expect(derivePackMode(["generated", "imported"])).toBe("mixed");
-    expect(derivePackMode(["fixture", "imported"])).toBe("mixed");
   });
-  it("空数组不落在 fixture 上（旧写法 `every` 对空集恒真，会把它判成 fixture 包）", () => {
+  it("空数组不落在任何单一来源上（旧写法 `every` 对空集恒真，会把它判成某一档）", () => {
     expect(derivePackMode([])).toBe("mixed");
+  });
+  it("⚠️ `\"fixture\"` 已不在枚举里（票 57）—— 写着它的包解析不过", () => {
+    // 这条是**删除的钉子**：派生函数不再有那一支，枚举也不再收那个值。
+    // 两处一起收窄才不会自相矛盾（见 assetpack.ts 里 `PackMode` 的注）。
+    expect(AssetOrigin.safeParse("fixture").success).toBe(false);
+    expect(AssetOrigin.safeParse("generated").success).toBe(true);
   });
 });
 

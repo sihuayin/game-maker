@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, auditScreenSpace, auditTdConfig, parseAssetPack, parseTdConfig, tdHudScreenItems, tdResolveConfig, TD_CONFIG_FORMAT,
+  CommandError, auditScreenSpace, auditTdConfig, auditTdWorldSize, parseAssetPack, parseTdConfig, tdHudScreenItems, tdResolveConfig, TD_CONFIG_FORMAT,
   type AssetPackManifest, type CommandResult, type ConfigIssue, type TdConfig,
 } from "@game-maker/contracts";
 import { buildTdWorld, type TdWorldDescription } from "./world.js";
@@ -26,7 +26,10 @@ export function auditTdGeometry(world: TdWorldDescription): ConfigIssue[] {
   const out: ConfigIssue[] = [];
   const err = (where: string, message: string) => out.push({ severity: "error", where, message });
   const warn = (where: string, message: string) => out.push({ severity: "warning", where, message });
-  const V = world.viewport;
+  // ⚠️ **视口那一半不在这条函数里**（票 83）：`world.viewport` 曾在这里声明过、而**从没被用过**
+  //   （死代码 —— `grep -n '\bV\b'` 只有那一行）。「世界必须与视口一样大」那条判据今天住在
+  //   **契约层**的 `auditTdWorldSize`：它**吃视口参数**，所以**编译期也判得上**
+  //   （几何族只有装配期看得见 —— 见下面 `all` 那一行的分工）。
   const W = world.worldSize;
 
   // ── 场地：铺满了吗 ──────────────────────────────────────────────────────
@@ -37,13 +40,29 @@ export function auditTdGeometry(world: TdWorldDescription): ConfigIssue[] {
   if (tiles.length !== cols * rows)
     err("arena", `场地有 ${cols * rows} 格，却只画得出 ${tiles.length} 块砖 —— 少掉的格子会透出外壳底色`);
 
-  const inWorld = (where: string, b: Box, allowPokeOut = false) => {
+  // ⚠️ **近端（负数）警告、远端硬失败** —— 与横版的 `pokeOut` 同一个形状、同一条理由
+  //   （「精确的硬失败、有解释余地的报警告」，票 27）。⚠️ 而这条**近端警告**在塔防**永远轮不到**：
+  //   能让它响的盒子（`slot` / `core`）在 config 那一层已被同一条四边判据**硬失败**判过
+  //   （`td-config.ts` 的 `inWorld`），而两者在**同一个列表**里（下面 `all` 那一行），
+  //   有 error 就当场失败。⇒ 它是**哨兵**，不是判决 —— 留着是因为塔防那条四边语义将来若改成
+  //   「近端警告」（Q3 的回退方案 (甲)），它就是现成的那一半。
+  const inWorld = (where: string, b: Box) => {
     if (b.x + b.w > W.w || b.y + b.h > W.h)
       err(where, `落在世界之外（世界 ${W.w}×${W.h}；这个盒子是 (${b.x},${b.y}) ${b.w}×${b.h}）`);
-    else if (!allowPokeOut && (b.x < 0 || b.y < 0))
+    else if (b.x < 0 || b.y < 0)
       warn(where, `盒子探出了世界的左边/上边（(${b.x},${b.y})）—— 会被裁掉一角。若这是有意的，忽略本条`);
   };
-  for (const [i, t] of tiles.entries()) inWorld(`arena.tiles[${i}]`, t.box, true);
+  // ⚠️ **砖这一行的检查今天两个分支都恒真**（票 81 量的；探针：禁用整行 ⇒ 全仓 1426 条测试全绿）。
+  //   三条既有判据把它夹死了：砖按「格心 + 锚点」摆（`td/world.ts:156-171`），而砖的尺寸**必须**
+  //   等于 `arena.cell`（`td-config.ts:412`）、锚点**必须**是 `{0.5,0.5}`（`:416`）、
+  //   且 `cols·cell == W`、`rows·cell == H`（`:470`）⇒ 每块砖的盒子**恒等于**一个格
+  //   `(ci·cell, ri·cell, cell, cell)` ⊂ 世界。
+  //   ⚠️ **检查留着** —— 票 81 的 Q5(a) 逐字「不删除检查哨兵」：上面那三条前提**将来会被放松**
+  //     （格子尺寸 / 锚点 / 铺满世界，而锚点那条正归**票 82**），松掉之后这行就是**唯一**会说话的地方。
+  //   ⚠️ 而原先那个「允许探出」的豁免**参数**已按 Q5(a) 删掉：那是全仓独一份的机制
+  //     （「写的人预先声明」；另两处都是「读的人自己判」），而它豁免的检查恒真
+  //     ⇒ 留着一个**不执行的豁免**等于留一个没人会发现的洞。删参数**不改任何判决**（恒真就是恒真）。
+  for (const [i, t] of tiles.entries()) inWorld(`arena.tiles[${i}]`, t.box);
 
   // ── 走道与插槽 ──────────────────────────────────────────────────────────
   for (const [i, p] of world.path.points.entries())
@@ -102,7 +121,7 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   const outRoot = path.resolve(opts.outRoot);
   const gameDir = path.join(outRoot, gameId);
 
-  // ── 校验：三族（契约层）+ 第四族（几何）+ 第五族（屏幕空间）+ 第六族（可通关）──
+  // ── 校验：三族 + **世界尺寸**（都在契约层）+ 第四族（几何）+ 第五族（屏幕空间）+ 第六族（可通关）──
   // ⚠️ 场景描述**只构建一次**：几何族校验的那份，就是下面写进 warning 汇总、以及
   //   外壳将要画的那一份。构建两次 = 给了它们漂移的机会，而漂移是静默的。
   const world = buildTdWorld(manifest, config, { packBase: `../../pack/${packVersion}/` });
@@ -113,7 +132,19 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   //   与**几何族**是同一个处境（同样够不着 `contracts`），所以落在同一处。
   //   `compileGame` 自己的注释写着这条分工：「这里跑的是 `site` 要跑的同一批校验（**减去第四族**）」。
   const winnable = auditWinnable(playReference(world), world);
-  const all = [...auditTdConfig(config, manifest), ...screenIssues, ...auditTdGeometry(world), ...winnable];
+  // ⚠️ **世界尺寸那条判据与三族同住契约层**（票 83 · 票 81 的 Q3(乙) 的前提判据）：
+  //   塔防对负盒子判**硬失败**，而那条判决的全部理由是「**世界就是这一屏**」——
+  //   世界比视口大，那个理由就不成立了，而判决还硬着。⇒ 先把它钉住。
+  //   ⚠️ **它与屏幕空间族同形**：视口**由调用方传**（契约里没有视口常量，`check:deps` 不让引），
+  //   所以编译期也调了一次（`assets/src/ops.ts` 的 `auditOf`）。这里**再调一次不是重复**：
+  //   `site` 可以对着盘上**手写**的一份配置直接跑，根本不经过编译那一遍。
+  const all = [
+    ...auditTdConfig(config, manifest),
+    ...auditTdWorldSize(VIEWPORT, config),
+    ...screenIssues,
+    ...auditTdGeometry(world),
+    ...winnable,
+  ];
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);
 

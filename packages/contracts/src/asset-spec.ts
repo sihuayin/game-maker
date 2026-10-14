@@ -157,9 +157,28 @@ export const UiSpec = z.object({
 
 // ⚠️ 九宫格那条检查必须放在 **union 这一层**：`.superRefine()` 会把成员变成 `ZodEffects`，
 // 而 `discriminatedUnion` 只接受 `ZodObject`。放在这里反而更清楚 —— 它是**类级**的规则。
+// ⚠️ **票 58 的层名唯一性也放在这一层**（同一条理由：它是 `background` 这一类的规则，
+//   而 `BackgroundSpec` 自己不可能是 `ZodEffects`）。
 export const AssetSpecSchema = z
   .discriminatedUnion("kind", [SpriteSpec, AnimatedSpec, BackgroundSpec, UiSpec])
   .superRefine((s, ctx) => {
+    // ── 票 58：**层名不许重复** ────────────────────────────────────────────────
+    // ⚠️ 这是**交付侧**那条规矩的镜像（`AssetPackEntry.superRefine` 里那条「层名重复」），
+    //   而在此之前它**只住在交付侧的一半**：创作侧放 `[far, far]` 过去，
+    //   于是那份配方**产不出合法的包**（不可满足）—— 而它被拒的位置在**花完钱之后**
+    //   （票 46 量到的进路：先买图，最后被 `buildAssetPack` 的自校验拦下）。
+    // ⚠️ **为什么重复不是无害的**：帧名 = `<资源 id>.<层名>`，两层同名 ⇒ 两帧同名 ⇒
+    //   交付侧的第一条（帧名重复）本来也会拒它；而那时包已经生成完了。
+    // ⚠️ 与上面那条「层名重复」**逐字同一句话**（同名同判据），不另立措辞 —— 它们说的是一件事。
+    if (s.kind === "background" && s.layers) {
+      const seen = new Set<string>();
+      for (const l of s.layers) {
+        if (seen.has(l.name))
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: `层名重复："${l.name}"`, path: ["layers"] });
+        seen.add(l.name);
+      }
+    }
+
     if (s.kind !== "ui" || !s.ninePatch) return;
     const { left, right, top, bottom } = s.ninePatch;
     // 中央区为空的话，拉伸时九宫格要么算出负宽高，要么把边框本身拉长 —— 两种都不是想要的

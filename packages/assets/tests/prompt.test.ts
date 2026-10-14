@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { TD_REFERENCE_SCALE, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
+import { PLAN_TOOL_DESCRIPTION, TD_REFERENCE_SCALE, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
 import type { AssetSpec, StyleSpec } from "@game-maker/contracts";
 
 describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
@@ -192,5 +192,23 @@ describe("三张资产生图模板**不收** `style.constraints`（票 30 的裁
     const t = renderPrompt(SPRITE, STYLE);
     expect(t).toContain(CONSTRAINT_BLOB);
     for (const c of STYLE.constraints) expect(t).toContain(c);
+  });
+});
+
+describe("规划工具的描述：层名那条**明说是辅助**（票 58 Q5(b)）", () => {
+  // ⚠️ 裁定原话：「增加一句辅助散文，并**明确它不是防线**。工具描述中的散文**仅用于降低模型
+  //   产生非法输入的概率，不替代 schema 校验**。」⇒ 这一段就是那两句话的钉子。
+  it("它在（第 6 条），且**逐字声明自己不是防线** —— 免得下一次「统一措辞」把它读成一条保证", () => {
+    expect(PLAN_TOOL_DESCRIPTION).toMatch(/六条线形状表达不出来的规矩/);
+    expect(PLAN_TOOL_DESCRIPTION).toMatch(/层名两两不同/);
+    expect(PLAN_TOOL_DESCRIPTION).toMatch(/这一条不是防线/);
+    // ⚠️ 而**防线在哪**也必须说得出：是契约那道判据（重复会被**拒**），不是这句话。
+    expect(PLAN_TOOL_DESCRIPTION).toMatch(/重复层名会被\*\*拒\*\*/);
+  });
+
+  it("⚠️ 散文与判据**分家**：散文在工具描述里，判据在契约那层（线形状里没有它）", () => {
+    // 另一半的钉子（「镜像里不许有这条」）在 `contracts/tests/recipe-tool.test.ts` 那个
+    // 「顶层 7 键」的用例里 —— 这句只说明**为什么它在那里、这句在这里**。
+    expect(PLAN_TOOL_DESCRIPTION).toMatch(/只为少一次返工/);
   });
 });

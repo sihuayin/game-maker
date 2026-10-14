@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { exitCodeOfError, type AssetRecipe, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
+import { exitCodeOfError, parseRecipe, type AssetRecipe, type AssetSpec, type DrawList, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, type DrawListGenerator } from "../src/index.js";
 
 /**
@@ -15,6 +15,8 @@ import { buildAssetPack, type DrawListGenerator } from "../src/index.js";
  *
  * ⚠️ **不需要测试缝**：那条路本来就通（票 46 的探针 A，现场在
  *   `experiments/46-self-validation-probe/`）—— 一个分层背景、两层同名即可。
+ *   ⚠️ **2026-10-14（票 58）之后手工构造它成了必需**：`parseRecipe` 已经会拒这份配方，
+ *   所以要撞的**只能**是生产函数里那道自校验 —— 于是这份输入由测试**直接**喂进去。
  */
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -41,8 +43,12 @@ const stub: DrawListGenerator = (spec: AssetSpec) => {
 
 /**
  * 票 46 探针 A 的那份配方：分层背景里**两层同名**。
- * ⚠️ 它**过得了**入口那两道闸（`parseRecipe` 不查层名、`readStyle` 只管色板），
- *   所以这是一条走到生产函数里才被拦下的输入。
+ * ⚠️ **2026-10-14（票 58）之后它的意义变了**：创作侧那条判据
+ *   （`AssetSpecSchema.superRefine` 的 union 层）已经补上，所以 **`parseRecipe` 现在会拒它**。
+ *   ⇒ 本文件**故意不走** `parseRecipe`：它把这份配方**直接喂给生产函数**，
+ *   问的是「**票 46 那道交付侧自校验还在不在**」。
+ *   ⚠️ 两者治的**不是同一层**（票 46 的 Q6 原话）：契约收紧是在**花费之前**拒绝已知非法输入，
+ *   自校验是**离开进程之前**的最后一道、兜的是**任何一条**。⇒ 前者补上**不等于**后者多余。
  */
 const dupLayerRecipe = (): AssetRecipe => {
   const r: AssetRecipe = JSON.parse(JSON.stringify(RECIPE));
@@ -60,6 +66,13 @@ describe("票 46 · 非法产物不许被当作成功产物交付", () => {
   it("阳性：分层背景两层同名 ⇒ 生产函数抛，且**不提交**成包；失败现场留着那份违约 manifest", async () => {
     const out = tmp();
     const recipe = dupLayerRecipe();
+
+    // ⚠️ **两道闸的层次**（票 58 补上前一道之后，这一句才为真）：
+    const front = parseRecipe(recipe);
+    expect(front.ok, "入口那道**现在也**拒它（票 58 补的创作侧判据）").toBe(false);
+    if (!front.ok) expect(front.errors.join()).toMatch(/层名重复/);
+    // 而下面故意**绕过**入口 —— 撞的是**生产函数里**那道自校验（这才是本文件问的问题）。
+
     let err: unknown;
     try {
       await buildAssetPack({ recipe, style: STYLE, outDir: out, recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });

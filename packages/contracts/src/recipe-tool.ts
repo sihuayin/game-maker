@@ -12,7 +12,7 @@
 //   ⇒ 于是**权威是 v3 那一份**，本文件只是**线形状**。两段的分工写死在调用方：
 //     `parseToolUse(..., RecipeToolSchema)` 判「**入参过没过线**」，
 //     紧接着 `parseRecipe(...)`（v3）判「**这份清单成不成立**」（依赖图 · 母版比例 · 九宫格中央区 ·
-//     路径字符）。v3 那一步不过 ⇒ 同样算 `schema` 失败、重采样。
+//     路径字符 · **层名重复**〔票 58 补的那一条〕）。v3 那一步不过 ⇒ 同样算 `schema` 失败、重采样。
 //
 // ⚠️ **默认值必须逐字跟上**（`required` / `loop` / `tileable.{x,y}`）：`io: "input"` 下带 `.default()`
 //   的字段对模型是**可选**的，漏一个默认值，镜像与原件在「省略该键的输入」上就会分叉。
@@ -91,7 +91,15 @@ const UiSpecShape = z.strictObject({
     .optional()
 });
 
-/** ⚠️ 判别式在 **union 这一层**（与原件同款：`.superRefine()` 会把成员变成非 `ZodObject`）。 */
+/**
+ * ⚠️ 判别式在 **union 这一层**（与原件同款：`.superRefine()` 会把成员变成非 `ZodObject`）。
+ *
+ * ⚠️ **票 58（2026-10-14）在这里原样加了一条 gate：层名不许重复**（原件侧加在
+ *   `AssetSpecSchema.superRefine` 的 union 层）。⇐ 于是**明示例外从四条变成五条**
+ *   （见 `tests/recipe-tool.test.ts` 那个 describe）—— 与其余四条同款：**镜像不写它**，
+ *   因为 `toJSONSchema` 静默丢掉 `superRefine`（模型看见的一样），把它在两种方言里各写一遍
+ *   就是漂移。**权威仍然只有 v3 那一份。**
+ */
 export const AssetSpecShape = z.discriminatedUnion("kind", [
   SpriteSpecShape, AnimatedSpecShape, BackgroundSpecShape, UiSpecShape
 ]);

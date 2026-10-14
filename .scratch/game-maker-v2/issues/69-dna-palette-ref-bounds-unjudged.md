@@ -1,8 +1,8 @@
 # 69. `CharacterDNA.palette` 的 `palette:N` **没有越界判据** —— 而 VWS 的六桶有同款 gate，且 `dnaBrief` 把悬空引用**原样**写进生图提示词
 
 Type: grilling
-Status: claimed
-Owner: claude (2026-10-14)
+Status: resolved
+Owner: claude (2026-10-14 · 立案 + 裁定 + 施工；**收口与提交是同一次** —— commit `701cb3a`。⚠️ 本条**不是**人裁原话的抄录：本 session 手上**只有那次提交的标题**（逐字「按票 63/67/68/69/70 收口：五票的码 + 判据 + 逐条复核」），**没有**那一轮问答的原文 ⇒ 收口那一句话的逐字出处**不在本票面上**；见 Answer 末尾「收口与提交」)
 Blocked by: —
 Map: ../map.md
 > ⏳ **第一轮已出（2026-10-14 · 只量不裁 · 零付费 · 源码一个字节没动）**：
@@ -199,3 +199,12 @@ Map: ../map.md
   `compile-character-dna.test.ts` 那条 `new Set(seen).size === 1` 钉着（那是票 68 的账，本票不动它）。
 - **不加磁盘 / pack 入口校验**（Q4(b)）· **不改契约语义** · **不动 R 表** · **不加重试/修复循环**（R13）。
 - **不跑真模型**（Q5(a)：免费探针到此为止，真实越界发生率与修复效果归**票 23**）。
+
+---
+
+### 收口与提交（2026-10-14 · 补账 session —— **事后补记**）
+
+⚠️ 上面那句「**未提交**」**在写下时是真的** ⇒ 本 session **不改写它**。**收口与提交是同一次**：
+commit `701cb3a`（标题逐字「按票 63/67/68/69/70 收口…」，**五票同一次**）⇒ 票头 `Status` 因此由
+`claimed` 翻成 `resolved`（先例[票 65](65-layer-coverage-at-config.md) `d3c95b8`）。
+⚠️ **逐字出处缺一截**（只有提交标题、没有人裁原话）—— 详见[票 63](63-hud-panel-size-not-reconciled.md) `## Answer` 末尾那一节。

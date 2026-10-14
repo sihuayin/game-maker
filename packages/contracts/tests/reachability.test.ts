@@ -182,7 +182,7 @@ describe("§⚠️ `auditReferences` 与 `auditGameConfig` 的分工（票 18 �
   it("`auditGameConfig` 以 `auditReferences` 开头 —— **同一份实现，不是抄的第二份**", () => {
     const c = withConfig((cfg) => {
       cfg.hud.panel.asset = "查无此资源";
-      cfg.hud.panel.at = { x: 9999, y: 262 };      // 同时踩**自洽族**那一条（HUD 落在世界外）
+      cfg.terrain[0] = { ...cfg.terrain[0]!, x: 9999 };   // 同时踩**自洽族**那一条（地形落到世界外）
     });
     const refs = auditReferences(c, MANIFEST).map((i) => i.where + i.message);
     const all = auditGameConfig(c, MANIFEST);
@@ -191,7 +191,11 @@ describe("§⚠️ `auditReferences` 与 `auditGameConfig` 的分工（票 18 �
   });
 
   it("⚠️ 而**自洽族不进 `auditReferences`** —— 它是 `auditGameConfig` 自己的那两条判据", () => {
-    const c = withConfig((cfg) => { cfg.hud.panel.at = { x: 9999, y: 262 }; });
+    // ⚠️ 证人从 `hud.panel` 换成了 `terrain`（票 80）：HUD 的世界尺那一条**已经删了**
+    //   （`game-config.ts` 里那一行），所以它当不了自洽族的证人了。
+    //   ⚠️ 换成地形**不是随便挑的**：地形**一个资源都不引用**（提示词里逐字「它不引用任何资源」）
+    //   ⇒ 下面「引用族一声不响」那一句在这格成了**必然**，不是「碰巧」。
+    const c = withConfig((cfg) => { cfg.terrain[0] = { ...cfg.terrain[0]!, x: 9999 }; });
     expect(auditReferences(c, MANIFEST)).toEqual([]);                       // 引用族：没有话
     expect(auditGameConfig(c, MANIFEST).some((i) => /世界之外/.test(i.message))).toBe(true);  // 自洽族：有
   });

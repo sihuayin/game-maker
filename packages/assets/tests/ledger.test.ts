@@ -79,7 +79,8 @@ describe("账：跟着包走的收据（票 45）", () => {
     expect(m.ok).toBe(true);
     if (!m.ok) return;
     // ⚠️ **契约一个字没改**：账这件事没有动过契约，provenance 里没有账
-    expect(m.value.format).toBe("assetpack/v3");
+    //    （`v3 → v4` 那次是**枚举收窄**，与账无关 —— 票 57）
+    expect(m.value.format).toBe("assetpack/v4");
     // ⚠️ **只剩 `mode`** —— `style` 于 2026-10-13 删除（票 45，format 因此升到 v3）
     expect(Object.keys(m.value.provenance).sort()).toEqual(["mode"]);
     // ⚠️ 而 sidecar 靠 `files[]` 是 `walk(packDir)` 穷举**白拿**了 checksum 覆盖

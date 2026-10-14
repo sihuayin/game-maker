@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  auditTdConfig, parseAssetPack, parseTdConfig, tdDerivePath, tdDistanceToPath, tdPathCells,
+  auditTdConfig, auditTdWorldSize, parseAssetPack, parseTdConfig, tdDerivePath, tdDistanceToPath, tdPathCells,
   tdPathLength, tdResolveConfig, waveCount, towerButtonCount, tdTotalEnemyHp, tdWaveDurationMs,
   type AssetPackManifest, type TdConfig,
 } from "../src/index.js";
@@ -186,6 +186,56 @@ describe("td-config/v1：三族校验（真包 + 真关卡）", () => {
     for (const t of c.towers) for (const l of t.levels) l.damage = 1;
     for (const e of c.enemies) e.armor = 5;
     expect(warningsOf(c).join("\n")).toMatch(/数值刻度多半写反了量级/);
+  });
+});
+
+describe("td-config/v1：**塔防世界必须与视口一样大**（票 83 · 票 81 的 Q3(乙) 裁出的前提判据）", () => {
+  // ⚠️ **这一族今天只有下面这几条判据看着**（票 83 §3.2 的探针实测：把 `auditTdWorldSize`
+  //   从两个调用点删掉，全仓没有别的东西会红）—— 所以阳性与阴性都必须写在这里。
+  // ⚠️ 视口**由调用方传**（契约层没有视口常量：具名的两份住在 `assets` 与 `demo`，`check:deps`
+  //   不让引）。这里就地写一份 —— 与 `game-config.test.ts` 里那份同值、同出处。
+  const VP = { w: 480, h: 270 };
+
+  it("阳性：盘上那份真关卡（480×270）与视口一致 ⇒ 一声不响", () => {
+    // ⚠️ 「真关卡原样通过」那条最重的证据在这一族上也成立 —— 本判据**没有**误伤生产配置。
+    expect(auditTdWorldSize(VP, valid())).toEqual([]);
+  });
+
+  it("阴性：世界声明成 960×270 ⇒ **硬失败**，且报文把两个数都摆出来", () => {
+    const iss = auditTdWorldSize(VP, { ...valid(), world: { size: { w: 960, h: 270 } } });
+    expect(iss).toHaveLength(1);
+    expect(iss[0]!.severity).toBe("error");     // 裁定逐字「**必须**等于视口」⇒ 不是警告
+    expect(iss[0]!.where).toBe("world.size");
+    expect(iss[0]!.message).toMatch(/正好等于视口/);
+    expect(iss[0]!.message).toMatch(/480×270/);  // 视口
+    expect(iss[0]!.message).toMatch(/960×270/);  // 世界
+  });
+
+  it("⚠️ 高度那一半也判 —— 只有宽度对上**不算过**", () => {
+    expect(auditTdWorldSize(VP, { ...valid(), world: { size: { w: 480, h: 540 } } })).toHaveLength(1);
+  });
+
+  it("⭐⭐ **那个洞本身**：世界 960、场地跟着铺满 ⇒ 三族一声不响，**只有这一族拦得住**", () => {
+    // ⚠️ 这条是票 81 §2.4 量到的现场，也是本判据**存在的全部理由**：
+    //   「塔防世界 == 视口」在此之前**只是惯例**（骨架教的与夹具恰好都是 480×270），
+    //   没有任何判据绑着它 ⇒ 一份声明 960×270 的配置**过得了全部校验**，
+    //   而右边那 480px（塔防外壳没有相机，相机钉在左上角）**永远画不到、也没有任何东西会报错**。
+    const raw = readJson(CONFIG);
+    const cfg = raw as { world: { size: { w: number } }; arena: { rows: string[] }; hud: { panel: { at: { x: number } } } };
+    cfg.world.size.w = 960;
+    // 场地跟着铺满：行尾再补 32 格（32+32 = 64 列 × 15px = 960 ✓）—— 否则 `:470` 那条先报
+    cfg.arena.rows = cfg.arena.rows.map((r) => r.slice(0, -1) + "#".repeat(32) + "#");
+    cfg.hud.panel.at.x = 470;                       // 470+480 = 950 ≤ 960（世界放得下）
+    const r = parseTdConfig(raw);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+
+    // 三族：**过**（场地铺满了那个 960 宽的世界、面板也在世界内）
+    expect(auditTdConfig(r.value, manifestOf()).filter((i) => i.severity === "error")).toEqual([]);
+    // 而世界仍比视口宽一倍 —— 直到这条判据才有人说话
+    const iss = auditTdWorldSize(VP, r.value);
+    expect(iss).toHaveLength(1);
+    expect(iss[0]!.message).toMatch(/960×270/);
   });
 });
 

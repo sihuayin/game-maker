@@ -427,7 +427,11 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
   for (const [i, t] of config.terrain.entries()) inWorld(`terrain[${i}]`, t);
   for (const e of config.entities) inWorld(`entity "${e.id}"`, boxOf(e.at, e.body ?? sizeOf(e.asset), e.asset));
   inWorld("player.at", boxOf(config.player.at, sizeOf(config.player.asset), config.player.asset));
-  inWorld("hud.panel", boxOf(config.hud.panel.at, config.hud.panel.size, config.hud.panel.asset));
+  // ⚠️ **`hud.panel` 不在这里**（票 80 · 票 62 的 Q3）。理由：它的尺子是**视口**不是 `world.size`
+  //   —— 那一族是 `auditScreenSpace`（`screen-space.ts`），而视口要**调用方传进来**，
+  //   所以它住在编译/装配那一层（`ops.ts` / `site.ts`）。两条尺子量的是**同一个盒子**
+  //   （都走 `boxOf` / `entityBox`），在这里再判一次 = 同一个事实说两遍，而视口那条**更严**
+  //   （它查四条边，含负数）。⇒ 谁要把这一行加回来，`game-config.test.ts` 里那条**证伪性**断言会当场红。
 
   // ⚠️ **票 63**：「声明尺寸」这一格是「资源自身性质归包」的唯一例外，而例外的理由**是九宫格** ——
   //   收窄成「以九宫格为条件」之后，那半个条件**由这条判据守着**（`auditPanelSize`，与塔防共用一份）。

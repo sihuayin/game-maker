@@ -100,9 +100,12 @@ describe("§引用族：**真的会响**（哪怕链上它恒绿 —— 见 `gam
 });
 
 describe("§⚠️ 引用族**只吃引用族** —— 自洽族不进这一条（票 18 的 Q1(b)）", () => {
-  it("把 HUD 面板扔到世界外 ⇒ `reference-resolution` **一声不响**，而 `auditGameConfig` 会响", async () => {
+  it("把**地形**扔到世界外 ⇒ `reference-resolution` **一声不响**，而 `auditGameConfig` 会响", async () => {
     const ctx = stage();
-    patchConfig(ctx, (c) => { c.hud.panel.at = { x: 9999, y: 262 }; });
+    // ⚠️ 证人从 `hud.panel` 换成了 `terrain`（票 80）：HUD 的世界尺那一条**已经删了**。
+    //   ⚠️ 地形**一个资源都不引用** ⇒ 「引用族一声不响」是**必然**，不是「碰巧」——
+    //   也就是说换证人之后这条断言**更硬**，不是更软。
+    patchConfig(ctx, (c) => { c.terrain[0].x = 9999; });
     const r = await run(ctx);
     expect(r.judgements["reference-resolution"]).toEqual({ ran: true, findings: [] });
 

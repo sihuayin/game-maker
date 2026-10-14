@@ -32,7 +32,7 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, auditTdConfig, carryOnError, failureDirOfError, gameHudScreenItems, layerDrawnSize, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, layerDrawnSize, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -1105,10 +1105,16 @@ export async function compileTdGame(opts: CompileTdGameOptions): Promise<Command
   const vp = opts.viewport ?? DEFAULT_VIEWPORT;
   const prompt = tdConfigPrompt(requirement, tdResourceBrief(manifest), tdConfigExample);
 
-  // ⚠️ **校验（三族 + 屏幕空间）**抽成一个内部函数 —— 循环里要用它决定**要不要重采样**。
+  // ⚠️ **校验（三族 + 世界尺寸 + 屏幕空间）**抽成一个内部函数 —— 循环里要用它决定**要不要重采样**。
+  //   ⚠️ 「世界尺寸」那条是**票 83** 补的（票 81 的 Q3(乙) 的前提判据）：它与屏幕空间**同形**
+  //     —— 视口由调用方传进来，所以编译期就判得上。⚠️ 加在这里不是顺手：**装配期那条几何族
+  //     编译期跑不到**（`compileTdGame` 不跑 `auditTdGeometry`），不加这一条，一份声明了
+  //     960×270 的配置要**烧完整条资源管线、死在装配期**才被告知世界比视口大。
   const auditOf = (c: TdConfig): string[] => {
     const out: string[] = [];
     for (const i of auditTdConfig(c, manifest))
+      out.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
+    for (const i of auditTdWorldSize(vp, c))
       out.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);
     for (const i of auditScreenSpace(vp, tdHudScreenItems(c, manifest, { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })))
       out.push(`${i.severity === "error" ? "❌" : "⚠️"} ${i.where}: ${i.message}`);

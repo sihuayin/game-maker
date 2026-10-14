@@ -1,8 +1,8 @@
 # 70. 意图层 gate ④（`progression` / `challenge` **出现了但两个字段都空**）散文一个字没说 —— 而契约文件头正声称「这条规矩由 `prompts.ts` 补」
 
 Type: grilling
-Status: claimed
-Owner: claude (2026-10-14)
+Status: resolved
+Owner: claude (2026-10-14 · 立案 + 裁定 + 施工；**收口与提交是同一次** —— commit `701cb3a`。⚠️ 本条**不是**人裁原话的抄录：本 session 手上**只有那次提交的标题**（逐字「按票 63/67/68/69/70 收口：五票的码 + 判据 + 逐条复核」），**没有**那一轮问答的原文 ⇒ 收口那一句话的逐字出处**不在本票面上**；见 Answer 末尾「收口与提交」)
 Blocked by: —
 Map: ../map.md
 > ⏳ **第一轮已出（2026-10-14 · 只量不裁 · 零付费 · 源码一个字节没动）**：
@@ -255,3 +255,12 @@ for (const label of ["progression", "challenge"] as const) {
   两件都进**票 23**、都要**逐次取得明确同意**。
 - **不重述**三票同住 `prompts.ts` 那件事：**70** 的格子在这儿（第 5 条）、68/69 的格子在那儿（`DNA_FIELD_HINTS`），
   相隔 290 行、分居两次请求 ⇒ 已按「可同批、顺序无关」落地；⚠️ **验**是两次真跑，同样归票 23。
+
+---
+
+### 收口与提交（2026-10-14 · 补账 session —— **事后补记**）
+
+⚠️ 上面那句「**未提交**」**在写下时是真的** ⇒ 本 session **不改写它**。**收口与提交是同一次**：
+commit `701cb3a`（标题逐字「按票 63/67/68/69/70 收口…」，**五票同一次**）⇒ 票头 `Status` 因此由
+`claimed` 翻成 `resolved`（先例[票 65](65-layer-coverage-at-config.md) `d3c95b8`）。
+⚠️ **逐字出处缺一截**（只有提交标题、没有人裁原话）—— 详见[票 63](63-hud-panel-size-not-reconciled.md) `## Answer` 末尾那一节。

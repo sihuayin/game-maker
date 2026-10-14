@@ -110,6 +110,30 @@ describe("编译：一次调用 → 一份落盘的关卡", () => {
     expect(r.summary.join("\n")).toMatch(/派生不出路径/);
   });
 
+  it("⭐ **世界比视口大** → **编译期**就拦下（票 83 · 不烧完管线才死在装配期）", async () => {
+    // ⚠️ 这条是**票 83** 补的，而它守的是**那一行接线**：`auditTdWorldSize` 在编译期那个调用。
+    //   ⚠️ 探针实测（票 83 的施工记录）：**把 `ops.ts` 里那个调用删掉，全仓一条测试都不红** ——
+    //   于是这一条就是那条接线的**唯一**判据。没有它，新判据只活在装配期，
+    //   而一份声明 960×270 的配置要**烧完整条资源管线**才被告知世界比视口大。
+    //   ⚠️ 夹具刻意**只动世界那一处**（面板留在 `{0,0}`）：这样失败的**只有这一族**，
+    //   断言才不会沾上屏幕空间那条尺子的光 —— 否则删掉接线这条测试照样可能绿。
+    //   ⚠️ 加宽地图用**追加**（`r + "#".repeat(32)`），**不是** `slice(0,-1) + …`：
+    //   后者会吃掉第 4 行**最后一格**那个入口 `"+"`，而编译这条路**一律从地图派生路径**
+    //   （`{fromMap: true}`）⇒ 派生不出起点，最终报的是「没有入口」而不是我们想验的那一条。
+    //   （装配期那条路上同一个写法的夹具没事，是因为它**尊重**配置里写下的 `path`、不派生。）
+    const d = tmp();
+    const over = structuredClone(GOOD) as Record<string, unknown>;
+    (over.world as { size: { w: number } }).size.w = 960;
+    const a = over.arena as { rows: string[] };
+    a.rows = a.rows.map((r) => r + "#".repeat(32));      // 32+32 = 64 列 × 15px = 960 ✓
+    const r = await run(d, over, { attempts: 1 });
+    const said = r.summary.join("\n");
+    // 三族是干净的（场地铺满了、面板也在世界内）—— 说话的是世界尺寸那一族
+    expect(said, said).toMatch(/world\.size/);
+    expect(said).toMatch(/正好等于视口/);
+    expect(r.data.ok).toBe(false);
+  });
+
   it("**绝不覆盖**：再编译一次就是 v2，v1 原样还在", async () => {
     const d = tmp();
     await run(d, GOOD);

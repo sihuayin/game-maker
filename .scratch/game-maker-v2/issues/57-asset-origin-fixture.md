@@ -54,4 +54,76 @@ export function derivePackMode(...) { ...; if (allOf("fixture")) return "fixture
 
 ## Answer
 
-（待解）
+### ✅ 裁定回来了（2026-10-14 · **设计裁定** —— 原话逐字，未删改）
+
+> ⚠️ **这一节只是裁定的抄录。** 它**不是施工授权** · **不代表**已修改源码 / 测试 / 文档或地图 ·
+> **不授权**真跑 / 付费调用 / 提交代码 · **也不等于关票**（`Status` 仍为 `claimed`）。
+
+| 题 | 你的裁定 |
+| --- | --- |
+| Q1 是否存在明确落点 | (b) 删除。当前材料没有指出 L1–L5 之外可成立的生产落点；L1 已由 `imported` 正确表达。 |
+| Q2 与 `recipe.ts` 的分工 | 不适用，仅在 Q1 选 (a) 且落点属于 L2 时回答。 |
+| Q3 若保留，如何处理文档与扫描 | 不适用，仅在 Q1 选 (a) 时回答。 |
+| Q4 删除的代价 | (a) 按清单升级 `assetpack/v3 → v4`。 |
+| Q5 `PackMode.fixture` 是否同步删除 | (a) 与 `AssetOrigin.fixture` 一起删除；同步清理 `derivePackMode` 对应分支。 |
+
+#### 补充裁定与边界（原话逐字）
+
+- 删除 `AssetOrigin.fixture` 与 `PackMode.fixture`，并按附件清单处理契约、测试、文档和两份入库包的 `format` 字段；不修改 `assets/src/pack.ts` 写入侧。
+- `CONTEXT.md` 的 `Fixture Asset Pack` 词条中，依赖已出局的「降级标注」机制的理由必须重写。无论 Q1 选哪一支，都要处理这处过期理由；理由应改为产物 B 的验收需要一份不依赖生图的输入。
+- 不在本票增加全仓「零生产者」扫描；如需防止类似问题再出现，另立票。
+- 不动 R 表、提示词、`packages/qa` 或 `game-maker.local.json`；本裁定不授权实施。
+
+⚠️ **一条读票时容易漏的（本 session 的读法，不是裁定原文）**：Q3 那一行标着「不适用」，
+而补充裁定第 2 条把 **`CONTEXT.md` 的 `Fixture Asset Pack` 词条重写**独立于 Q1 的分叉**要求了**
+⇒ **施工时那一处不能因为「Q3 不适用」而跳过**。
+⚠️ **派生票**：补充裁定第 3 条说「零生产者扫描……如需……**另立票**」—— 那是**有条件的**，
+本 session **没有**据此开票。**没有施工、没有提交、没有关票。**
+
+---
+
+### ✅ 施工放行 + 落地记录（2026-10-14 · 第二轮）
+
+> ⚠️ **本节新增的只有两样**：**施工授权**与**它落地成了什么**。上面那张裁定表**一字未动**。
+> ⚠️ **不关票** —— 人裁原话：「本轮批准的是决策与有限施工范围，**不是**付费运行许可、
+> **提交许可**或**关票许可**。」⇒ `Status` 仍为 `claimed`。
+
+#### 授权原话（逐字）
+
+| 题 | 你的裁定 | 理由与边界 |
+| --- | --- | --- |
+| A3：放行施工 | **(a) 57 与 58 放行；62 与 22 先开票** | 57、58 按既定裁定范围施工；22 的接线和 62 的改动必须先经各自派生票裁定。 |
+
+补充边界第 5 条原话逐字：
+
+> 票 57： 按既定范围删除 `AssetOrigin.fixture`、`PackMode.fixture`，升级 `assetpack/v3 → v4`，
+> 更新相关契约、测试、文档及两份入库包的 `format` 字段，并重写 `CONTEXT.md` 的 `Fixture Asset Pack` 理由；
+> 不改写入侧、不加全仓零生产者扫描。
+
+#### 落地了什么（逐处 · 全部盘上可查）
+
+| 处 | 文件 | 改了什么 |
+| --- | --- | --- |
+| 契约 | `packages/contracts/src/assetpack.ts` | `AssetOrigin` 去掉 `"fixture"` · `PackMode` 去掉 `"fixture"` · `derivePackMode` 里 `allOf("fixture")` 那一行删 · `ASSET_PACK_FORMAT` `v3 → v4` · 文件头加一段带日期的理由（含**为什么是删、不是留**：零生产者 **+ 磁盘人口为零**，对比 `LedgerStep."derive"` 留着的那条理由——它**有磁盘人口**） |
+| 契约注释 | 同上 · `provenance.mode` | 「谎报」举的例子从 `fixture` 换成 `imported`（原例子已不在枚举里） |
+| 测试 | `packages/contracts/tests/assetpack.test.ts` | `format` 改 v4 · 删两条 `derivePackMode(["fixture", …])` 断言 · **换成一条「枚举不收 `fixture`」的钉子** · 两处过期测试名 + 版本注释改 |
+| 测试 | `packages/contracts/tests/recipe.test.ts` | 一处样例字面 `assetpack/v3 → v4` |
+| 测试 | `packages/assets/tests/ledger.test.ts` | 一处 `format` 断言改 v4，并加一句注释说明这次升版与账无关 |
+| 入库包 | `fixtures/packs/counter-siege/v4/manifest.json` · `fixtures/packs/last-train/v2/manifest.json` | 第 2 行 `format` 改 `assetpack/v4`（**只动这一行**） |
+| 词条 | `CONTEXT.md` | [[AssetPackManifest]] 版本沿革补 v4 · [[Provenance]] 两处枚举去掉 `fixture`，并记下「票 45 当年没裁这一格、那一票就是本票」 · **[[Fixture Asset Pack]] 的理由整段重写**（原话**两半都过期**：降级链 2026-09-25 已出局、`fixture` 档位 2026-10-14 已删） |
+
+#### ✅ 闸门（2026-10-14 · 零付费）
+
+`pnpm build` 干净 · `pnpm typecheck` 9 包干净 · `pnpm check:deps` ✅ 9 包 ·
+`pnpm check:links` ✅（262 份文档 · 1446 条链接）· `pnpm test` **83 文件 / 1426 测试全绿**。
+
+#### 边界（照实记）
+
+- ✅ **`packages/assets/src/pack.ts` 最终 diff 里零改动** —— 写入侧那条边界守住了。
+  ⚠️ 但要照实说一句：施工中曾为**一句过期的版本号注释**（`pack.ts:84` 写着
+  「加一格就是升版（`assetpack/v3 → v4`）」）改过一行又**撤回**。那句话今天确实过期了
+  （**v4 就是今天**），但它在**写入侧**，而边界原话是「不改写入侧」⇒ 撤回，只在此记一笔。
+  **动那一行要另一次授权**（它不是行为改动，是一句注释）。
+- ✅ **没加全仓零生产者扫描**（补充裁定第 3 条：如需，**另立票**）—— 本轮**没有**据此开票。
+- ✅ 不动 R 表 · 不动提示词 · `packages/qa` 一行没碰 · `game-maker.local.json` 一个字没动 · **零付费**。
+- ⚠️ **提交与关票都没做**（人裁原话）。

@@ -1,4 +1,4 @@
-// `assetpack/v3` —— **一个资源包的自描述**（票 24 定的形状）。
+// `assetpack/v4` —— **一个资源包的自描述**（票 24 定的形状）。
 //
 // 它是包的唯一入口：产物 B 只读它，agent 只读它，人也只读它。
 // ⚠️ **与 `AssetManifestSchema`（index.ts）不是同一个东西**：
@@ -37,10 +37,24 @@ import { formatIssues, PaletteColor, PaletteRef } from "./drawlist.js";
  * 而枚举里根本没有那一档。⚠️ 这与上面那次升版**不同**：那次是「声明**不再**成立」，
  * 这次是那条声明**从来没有成立过**。它踩的也不只是 R7 那道门，还有本文件开头第 2 条原则
  * 「不重复**可派生**的内容」。
- * ⚠️ **`provenance.mode` 一个字没动** —— 它是**活着**的那一格：有读者（`verify` / `inspect` 都印它）、
+ *
+ * ⚠️ **2026-10-14 由 `v3` 升到 `v4`**（票 57）：**`fixture` 这一个枚举值删除** ——
+ * 资源级 `AssetOrigin.fixture` 与包级 `PackMode.fixture` **一起删**，`derivePackMode` 里那条分支跟着走。
+ * ⚠️ **为什么是删、不是留**：它是**闭枚举收窄**，而**磁盘上没有一份包用着这一档**
+ * （两份入库包的全部 `origin` 都是 `generated`，`mode` 都是 `"generated"`）⇒
+ * **没有任何已产出的文件靠它才能解析** —— 连「为旧文件留着」这条理由都对它一个字不成立。
+ * （那是 `LedgerStep` 里 `"derive"` / `"compile-game"` 留着的那条理由：**它们有磁盘人口**
+ * —— 盘上已有的 `ledger.json` 要照旧解析得过。`fixture` 没有。）
+ * ⚠️ **升版的依据照旧是 `.strict()`**：`provenance` 不收不认识的键，而**枚举收窄**会让
+ * 「写着 `"fixture"` 的旧包」解析不过 —— 那同样不是「旧包坏了」，是**契约变了**。
+ *
+ * ⚠️ **`provenance.mode` 仍是活着的那一格**：有读者（`verify` / `inspect` 都印它）、
  * 由 `derivePackMode` 派生、且被下面的 superRefine 两头对账。
+ * ⚠️ **2026-10-14 更正一句**：上面 v2→v3 那一段写的「`provenance.mode` **一个字没动**」
+ * 说的是**那一次**；这一次它**跟着收窄了一档**（`fixture` 从枚举里走了）——
+ * 而「由 `derivePackMode` 派生 + superRefine 两头对账」那套**结构原样保留**，一个字没动。
  */
-export const ASSET_PACK_FORMAT = "assetpack/v3" as const;
+export const ASSET_PACK_FORMAT = "assetpack/v4" as const;
 
 // PaletteRef 从 drawlist.ts 复用 —— 同一个概念不写两份。
 
@@ -98,21 +112,29 @@ export const AssetKind = z.enum(["sprite", "animation", "background", "ui"]);
  *  删掉它就等于让这类包在结构上无法诚实，正是 9-25 修掉的 `imported` 那类 bug 的重演。 */
 export const PaletteBinding = z.enum(["exact", "composited", "quantized", "unbound"]);
 
-/** 谁造的。一个包里的资源可以来源不同，所以这一项是**逐资源**的。 */
-export const AssetOrigin = z.enum(["generated", "imported", "fixture"]);
+/** 谁造的。一个包里的资源可以来源不同，所以这一项是**逐资源**的。
+ *  ⚠️ **2026-10-14（票 57）删掉 `fixture`**：它是**零生产者** —— 全仓没有一处产出它
+ *  （`pack.ts` 的 `Built.origin` 只有 `generated | imported`，那份类型**比这里窄**），
+ *  磁盘上也没有一份包用着这一档。「仓库内置件」那条路在 V2 链上**落不到一个具体的地方** ⇒ 删。
+ *  依据与代价记在文件头那段（升 `v4`）。 */
+export const AssetOrigin = z.enum(["generated", "imported"]);
 
 /**
  * 包级身份。**由 `assets[].origin` 唯一派生** —— 它是 `origin` 的像，不是另一个独立声明。
  *
  * ⚠️ **2026-09-25 补 `"imported"`**：此前只有 `generated / fixture / mixed` 三个值，
  * 而 `origin` 有三个值 —— 于是「全部来自人工导入」的包**在结构上无法诚实**：
- * 它既不是 generated 也不是 fixture，唯一的合法写法是 `"mixed"`，可包里根本没有
+ * 它既不是 `generated` 也不是当时那一档 `fixture`，唯一的合法写法是 `"mixed"`，可包里根本没有
  * 「混」这回事。这不是措辞问题：`mixed` 是给「两批来源不同、风格上看得出来」的包用的，
  * 而一个纯导入的包恰恰是**单一来源**。
  * 这个洞是「纯导入的包」第一次被真跑出来时才暴露的 —— 在此之前仓库里的包
  * 要么全是 generated，要么是真混的。
+ *
+ * ⚠️ **2026-10-14（票 57）删掉 `fixture`** —— 与 `origin` 那一档是**同一个值、同一把刀**，
+ * 两处必须**一起**收窄：它们由 `derivePackMode` 绑着，动一处不动另一处会立刻自相矛盾。
+ * 依据与代价记在文件头那段（升 `v4`）。
  */
-export const PackMode = z.enum(["generated", "imported", "fixture", "mixed"]);
+export const PackMode = z.enum(["generated", "imported", "mixed"]);
 
 /**
  * `mode` 的**唯一**派生处。写入侧（`pack.ts`）与校验侧（本文件的 superRefine）
@@ -120,7 +142,6 @@ export const PackMode = z.enum(["generated", "imported", "fixture", "mixed"]);
  */
 export function derivePackMode(origins: readonly z.infer<typeof AssetOrigin>[]): z.infer<typeof PackMode> {
   const allOf = (v: string): boolean => origins.length > 0 && origins.every((o) => o === v);
-  if (allOf("fixture")) return "fixture";
   if (allOf("generated")) return "generated";
   if (allOf("imported")) return "imported";
   return "mixed";
@@ -233,7 +254,9 @@ export const AssetPackManifest = z.object({
   generator: z.object({ name: z.string(), version: z.string(), run: z.string().optional(), deterministic: z.string().optional() }).strict(),
   provenance: z.object({
     /** 包级身份。**由 assets[].origin 唯一派生**（见 `derivePackMode`）——
-     *  「一个 fixture 包谎报自己是 generated」因此是解析不通过，而不是一条能被忽略的约定。 */
+     *  「一批 `imported` 的包谎报自己是 `generated`」因此是**解析不通过**，而不是一条能被忽略的约定。
+     *  ⚠️ 例子在 2026-10-14（票 57）从 `fixture` 改成了 `imported` —— 前者已不在枚举里，
+     *  而这条**结构性诚实**本身一个字没动：`mode` 仍然只能等于 `derivePackMode(origins)`。 */
     mode: PackMode,
     // ⚠️ `style` 于 2026-10-13 删除（票 45）—— 理由写在上面 `ASSET_PACK_FORMAT` 那条注里。
     //    一句话：四个键（`origin` / `ref` / `stylespecId` / `checksum`）里，一个也没有携带

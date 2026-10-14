@@ -591,6 +591,57 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
   return out;
 }
 
+// ── 塔防世界必须与视口一样大（票 83 · 票 81 的 Q3(乙) 裁出的**前提判据**）──────────
+//
+// ⚠️ **它守的不是一条形状，是一条「为什么可以硬失败」的理由。**
+//   塔防对「盒子探出**左边/上边**」（负盒子）判的是**硬失败**（上面 `:445` 那段四边 `inWorld`），
+//   而横版对同一件事判的是**警告**（`packages/demo/src/site.ts` 的 `pokeOut`）。
+//   两种判决并存**不是口味问题** —— 塔防那一头的**全部理由**是「**世界就是这一屏**」：
+//   - 塔防外壳**一颗相机设置都没有**（`shell/td/scene.ts` 里没有 `setBounds`、也从没读过 `worldSize`）
+//     ⇒ 相机钉在左上角、只显示视口那么大 ⇒ 越出视口的东西**永远画不到**，而「画不到」不可能是设计；
+//   - 反过来**横版**的世界 1440 宽于视口 480（`ops.ts` 的骨架逐字如此）、相机**水平跟随**
+//     ⇒ 探出去的东西**被裁掉一角但确实画得出来**，那才留了「可能是有意的」这个余地。
+//   ⇒ ⭐ 世界比视口大，塔防那条理由就**不成立**了 —— 而判决还硬着。这就是本判据存在的原因。
+//
+// ⚠️ **而在这条判据之前，「塔防世界 == 视口」只是惯例、不是判据**：
+//   骨架教的（`assets/src/ops.ts` 的 `tdConfigExample`）与盘上唯一那份配置**恰好**都是 480×270，
+//   可这个文件里**没有任何一条**把 `world.size` 与视口绑起来（`:184` 只有 schema、`:435` 只是解构）
+//   ⇒ 一份声明 960×270 的塔防配置**过得了全部校验，而右半边永远画不到、没有任何东西会报错**。
+//   票 81 因此把「补上这条」写成了 (乙) 的**实质要求**：不补，就退回「统一为警告」。
+//
+// ⚠️ **为什么它不并进 `auditTdConfig`**：契约层**拿不到视口** —— 视口是外壳常量，具名的两份住在
+//   `assets/src/ops.ts`（`DEFAULT_VIEWPORT`）与 `demo/src/draw.ts`（`VIEWPORT`），
+//   而契约**依赖不到**它们（`check:deps` 会当场拒）。⇒ 与 `auditScreenSpace(viewport, …)`
+//   **同一个形状**：**视口由调用方传进来** ⇒ 编译期（`ops.ts`）与装配期（`td/site.ts`）各传各的，
+//   两层都判得上（票 65 的「判据越早越好」—— 编译期看不见它，坏配置就要烧完整条管线才死）。
+//
+// ⚠️ **免费证不了的那一件**：盘上塔防**一个真跑产物都没有**（票 81 量的）⇒ 这份判据今天没有
+//   任何**真产物**印过它。它的判据在 `packages/contracts/tests/td-config.test.ts`（阳性 + 阴性两条）。
+
+/**
+ * **塔防世界必须与视口一样大** —— 装配期「几何族」之外的**第七族**，而它住在契约层。
+ *
+ * 视口**由调用方传**（契约里没有视口常量，见上面那段注释）。不相等就是 `error`：
+ * 裁定逐字「**必须**等于视口」。
+ */
+export function auditTdWorldSize(
+  viewport: { w: number; h: number },
+  config: TdConfig,
+): ConfigIssue[] {
+  const { w: W, h: H } = config.world.size;
+  if (W === viewport.w && H === viewport.h) return [];
+  return [{
+    severity: "error",
+    where: "world.size",
+    message: `塔防世界必须**正好等于视口**：视口是 ${viewport.w}×${viewport.h}，而世界声明的是 ${W}×${H}。` +
+      ` ⚠️ 理由是塔防外壳**没有相机**（相机钉在左上角、只显示视口那么大）——` +
+      `越出视口的那部分**永远画不到**；而塔防对「盒子探出世界的左边/上边」判的是**硬失败**，` +
+      `那条判决的**全部理由**正是「世界就是这一屏」。世界比视口大，那个理由就不成立了。` +
+      ` ⇒ 把 world.size 改成 ${viewport.w}×${viewport.h}（**场地与走道要跟着铺满** —— ` +
+      `见「场地与世界的尺寸对不上」那条）`,
+  }];
+}
+
 /** 解析 + 校验一步到位：schema 不过就返回那件事本身，不去谈别的。 */
 export function parseTdConfig(input: unknown): { ok: true; value: TdConfig } | { ok: false; errors: string[] } {
   const r = TdConfigSchema.safeParse(input);
