@@ -531,15 +531,22 @@ export function auditTdConfig(config: TdConfig, manifest: AssetPackManifest): Co
           `（建了永远不开火）。要么把 L1 射程放大到够得着最近的那个插槽，要么把它从这一关的机关表里去掉`);
     }
 
-  // 柜台与 HUD 落在世界里 / 视口里
+  // 柜台落在世界里
   // ⚠️ **`coreAt` 是派生的，而派生的那份可能根本没有**（路径缺席 + 走道画得不合法）。
   //   这里原来写着 `pts[pts.length - 1]!` —— 那个 `!` 是**假的**：空数组会给出 `undefined`，
   //   而 `entityBox(undefined)` 当场抛 ⇒ **校验器把一个「说得出哪儿不对」的失败变成了崩溃**。
   const coreA = assetOf(config.core.asset);
   const coreAt = pts[pts.length - 1];
   if (coreA && coreAt) inWorld("core", entityBox(coreAt, coreA.size, coreA.anchor));
-  const hudPanel = assetOf(config.hud.panel.asset);
-  if (hudPanel) inWorld("hud.panel", entityBox(config.hud.panel.at, config.hud.panel.size, hudPanel.anchor));
+  // ⚠️ **`hud.panel` 不在这里**（票 84 · 票 63 的 Q6 对票 80 的**对称适用**）。理由与横版那一条
+  //   **同款**（`game-config.ts:430`）：HUD 的尺子是**视口**不是 `world.size` —— 那一族是
+  //   `auditScreenSpace`（`screen-space.ts`），而视口要**调用方传进来**，所以它住在编译/装配那一层
+  //   （`ops.ts` / `td/site.ts`）。两条尺子量的是**同一个盒子**（都走 `entityBox`）、查的是**同一组边界**，
+  //   在这里再判一次 = 同一个事实说两遍。
+  //   ⚠️ **塔防这一侧还多一层**：`auditTdWorldSize`（本文件下面）判硬失败除非 `world.size` **逐字等于**
+  //   视口 ⇒ 在**活着的**配置上，世界尺与视口尺**是同一个谓词**（留着它，只能靠「资源解不到就整条跳过」
+  //   少说话 —— 而那一格已被上面 `ref("hud.panel", …)` 判死了）。
+  //   ⇒ 谁要把这一行加回来，`td-config.test.ts` 里那条**证伪性**断言会当场红。
 
   // ⚠️ **票 63**：塔防的 HUD 声明尺寸有三格（`panel` / `buttons` / `start`）——
   //   与横版的 `hud.panel` 是**同一类字段**，所以由**同一条**判据约束

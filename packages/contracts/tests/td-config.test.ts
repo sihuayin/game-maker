@@ -3,8 +3,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  auditTdConfig, auditTdWorldSize, parseAssetPack, parseTdConfig, tdDerivePath, tdDistanceToPath, tdPathCells,
-  tdPathLength, tdResolveConfig, waveCount, towerButtonCount, tdTotalEnemyHp, tdWaveDurationMs,
+  auditScreenSpace, auditTdConfig, auditTdWorldSize, parseAssetPack, parseTdConfig, tdDerivePath, tdDistanceToPath,
+  tdHudScreenItems, tdPathCells, tdPathLength, tdResolveConfig, waveCount, towerButtonCount, tdTotalEnemyHp,
+  tdWaveDurationMs, DEFAULT_HUD_LINE_HEIGHT,
   type AssetPackManifest, type TdConfig,
 } from "../src/index.js";
 
@@ -236,6 +237,42 @@ describe("td-config/v1：**塔防世界必须与视口一样大**（票 83 · �
     const iss = auditTdWorldSize(VP, r.value);
     expect(iss).toHaveLength(1);
     expect(iss[0]!.message).toMatch(/960×270/);
+  });
+});
+
+// ── 票 84：塔防 HUD 的落位**只由视口尺一家管**（票 63 的 Q6 对称适用于票 80）──────────
+describe("td-config/v1：塔防 `hud.panel` 的落位归**视口尺**（票 84 —— 世界尺那一条已删）", () => {
+  // ⚠️ **票 84 施工前这两条都不存在**，而当时全仓**没有任何一条**测试是
+  //   「世界 == 视口、而 `hud.panel` 跑出视口」（票 84 §2.2 量的；现存那两条都是搭车的：
+  //   `demo/tests/td-site.test.ts:158` 把世界也改成 960 让 `auditTdWorldSize` 先响，
+  //   `demo/tests/td-world.test.ts:154` 判的是 `hud.readout` —— 唯一**没有盒子**的那一项）。
+  // ⇒ 删掉 `td-config.ts:542` 那一行**不会红任何东西** ⇒ 先补这两条，再拆。
+  // ⚠️ 视口**由调用方传**（契约层没有视口常量）—— 与上面那一族同值、同出处。
+  const VP = { w: 480, h: 270 };
+  /** 视口尺在**真包 + 真关卡**上的读数（`tdHudScreenItems` 给的五项，一个不漏）。 */
+  const screenIssues = (c: TdConfig) =>
+    auditScreenSpace(VP, tdHudScreenItems(c, manifestOf(), { lineHeight: DEFAULT_HUD_LINE_HEIGHT }));
+
+  it("⭐ 正向：世界 480×270（== 视口）、面板推到视口外 ⇒ 视口尺**报 error**（拆完之后唯一的那家得真的会说话）", () => {
+    // 前置：真关卡原样 ⇒ 一声不响（免得下面那句「报错」其实是**别的原因**造成的）
+    const c = valid();
+    expect(screenIssues(c)).toEqual([]);
+    c.hud.panel.at.x = 470;                     // 盒子 (470,0) 480×30 ⇒ 470+480 = 950 > 480（视口宽）
+    const iss = screenIssues(c);
+    expect(iss).toHaveLength(1);
+    expect(iss[0]!.where).toBe("hud.panel");
+    expect(iss[0]!.severity).toBe("error");     // 硬失败 —— HUD 摆到看不见的地方没有「另一条路」
+    expect(iss[0]!.message).toMatch(/屏幕空间/);
+    expect(iss[0]!.message).toMatch(/尺子是\*\*视口\*\*不是 world\.size/);
+  });
+
+  it("⭐ 证伪性：`auditTdConfig` 对 `hud.panel` **一个字都不说**（谁把那一行加回来，这条当场红）", () => {
+    // ⚠️ 与上面同一个输入：面板越出世界（== 视口）的右边 —— 票 84 删掉的那一行量的正是它。
+    const c = valid();
+    c.hud.panel.at.x = 470;
+    // ⚠️ 断的是「**HUD 不在里面**」，**不是**「一条都没有」—— 后者会因为**别的原因**变红，
+    //   把这条的意思带偏（形状与纪律逐字照 `game-config.test.ts:281`，票 80 立的那条）。
+    expect(errorsOf(c).join("\n")).not.toMatch(/hud\.panel/);
   });
 });
 
