@@ -488,13 +488,49 @@ material: ${JSON.stringify(style.material)}
  *   ⇒ 修法要**同时钉住两边**（ui 那头不许再当必填、面板那头必须保留「该写它」的说法），
  *   而**能被测试钉住的前提是它是数据、不是一段埋在模板串里的散文** —— 所以它搬到了这里。
  */
+/** 样板里的一层背景。⚠️ 与 `contracts` 的 `LayerDrawInput` 同形（`tileable` 缺省 = 不平铺）。 */
+export type RecipeSampleLayer = {
+  name: string;
+  parallax: number;
+  tileable?: { x: boolean; y: boolean };
+};
+
+/**
+ * 样板那份**背景层** —— ⚠️ **它是数据，不是散在字符串里的散文**（[票 88](.scratch/game-maker-v2/issues/88-recipe-shape-sample-as-data.md) 的 Q2 逐字：
+ *   「样板应从模板字符串中提取为**可直接测试的数据**，再将组合输入 `auditLayerCoverage`，验证其形状合法」）。
+ *
+ * ⚠️ **为什么它必须是数据**：同一条理由，票 08 已经在**上一层**用过一次 ——
+ *   上面那段注释逐字写着「能被测试钉住的前提是它是数据、不是一段埋在模板串里的散文」。
+ *   今天差的正是这一层：`recipeShapeSpec()` 本身是数据驱动的，而**它里面那三层还是散文**
+ *   ⇒ **没有任何东西看着它与段 B 那个世界合起来成不成立**（[票 76](.scratch/game-maker-v2/issues/76-cross-stage-sample-conflict.md) 量到的那个形状就是这么漏出去的：
+ *   全仓四份带层的背景，**唯一不合规的就是这段样板**，而两份真产物**独立地**都抄了它）。
+ *
+ * ⭐ **这份形状与唯一通过整条链的那份手写夹具逐格同形**
+ *   （`fixtures/packs/last-train/v2` 的 `bg-dusk-halt`：`sky p0` · `wall p0.6 铺x` · `ground p1 铺x`）。
+ * ⚠️ **它是三层，而层数并不强制** —— 那份提示词另一处逐字写着「层数按画面需要定」。
+ *   这里给三层，是因为**中间那一格正是两份真产物翻车的地方**（票 76 读数 ④：`parallax: 0.4` 且不铺、各剩 96px）
+ *   ⇒ 只把最远那层改成 `0` 会**留下一个宽泛示范**，而那是人裁明令要避免的
+ *   （票 76 Q1 逐字：「不能只把 `sky.parallax` 从 `0.3` 改为 `0`，却留下「天空不平铺」的宽泛示范」）。
+ */
+export const RECIPE_SAMPLE_BACKGROUND: readonly RecipeSampleLayer[] = [
+  { name: "sky", parallax: 0 },
+  { name: "wall", parallax: 0.6, tileable: { x: true, y: false } },
+  { name: "ground", parallax: 1, tileable: { x: true, y: false } }
+];
+
+/** 把样板那三层渲染成提示词里那一行 —— 换行后的缩进与 `background → "layers":[` 结尾**对齐（25 列）**。
+ *  ⚠️ **改列宽要连着改渲染**：那是**模型读到的字**，不是排版。 */
+const renderSampleLayers = (): string =>
+  RECIPE_SAMPLE_BACKGROUND.map((l) => JSON.stringify(l)).join(",\n" + " ".repeat(25));
+
 export const recipeShapeSpec = (): string => `每个 spec 只许有这些键：kind / id / role / description / styleId / anchor / size / required。
 按类可以另加，且**形状必须逐字如下**：
   animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
-  background → "layers":[{"name":"sky","parallax":0.3},
-                         {"name":"ground","parallax":1,"tileable":{"x":true,"y":false}}]
+  background → "layers":[${renderSampleLayers()}]
                ← **数组**，每项是对象，**从远到近**排序；层名会拼成帧名 \`<资源 id>.<层名>\`
-               ← 不平铺的层**别写 tileable**（三层里通常只有墙与地平铺，天空不平铺）
+               ← ⚠️ **视差与平铺必须配对**：**不平铺的层，\`parallax\` 必须是 \`0\`**；
+                 要正视差（跟着镜头动）的层**必须写 \`tileable\`**，或把**这件资源**画得足够宽
+                 —— 世界比屏幕宽，不平铺又不铺满的层，镜头走到头就会露白，配置会被拒收。
   ui         → **没有必须加的键**（见下面那段）
 **多余一个键、或形状不对，就会被拒收。**
 

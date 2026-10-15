@@ -1,0 +1,75 @@
+视口 480×270 · 世界 1440×270 · 每层标称 480×270（与真产物同）
+
+① 三处实物逐层裁一遍（真的 auditLayerCoverage）
+
+❌ 段 A 样板 recipeShapeSpec() (prompt.ts:494-496)
+     ✗ sky             parallax 0.3  不铺  画 480 ⇒ 最坏剩 192px (<480 ✗)
+     · ground          parallax 1    铺 x  画 1440 ⇒ 最坏剩 480px (≥480 ✓)
+❌ 真产物 13e（第十二跑）
+     ✗ sky             parallax 0.1  不铺  画 480 ⇒ 最坏剩 384px (<480 ✗)
+     ✗ distant-blocks  parallax 0.4  不铺  画 480 ⇒ 最坏剩 96px (<480 ✗)
+     · wall            parallax 1    铺 x  画 1440 ⇒ 最坏剩 480px (≥480 ✓)
+❌ 真产物 13h（第十五跑）
+     ✗ sky             parallax 0.1  不铺  画 480 ⇒ 最坏剩 384px (<480 ✗)
+     ✗ silhouette      parallax 0.4  不铺  画 480 ⇒ 最坏剩 96px (<480 ✗)
+     · facade          parallax 1    铺 x  画 1440 ⇒ 最坏剩 480px (≥480 ✓)
+✅ 手写夹具 fixtures/packs/last-train/v2
+     · sky             parallax 0    不铺  画 480 ⇒ 最坏剩 480px (≥480 ✓)
+     · wall            parallax 0.6  铺 x  画 1440 ⇒ 最坏剩 864px (≥480 ✓)
+     · ground          parallax 1    铺 x  画 1440 ⇒ 最坏剩 480px (≥480 ✓)
+
+② 样板要改成什么才**在任何世界宽下都过**（逐支试）
+
+   (a1) sky parallax 改成 0
+      世界480:过  世界960:过  世界1440:过  世界2880:过
+   (a2) sky 加 tileable.x（铺满世界）
+      世界480:过  世界960:过  世界1440:过  世界2880:过
+   (a3) sky 照原样，但把这一层**画宽到 1440**
+      世界480:过  世界960:过  世界1440:过  世界2880:过
+   (现状) sky parallax 0.3 不铺、标称 480
+      世界480:过  世界960:拒  世界1440:拒  世界2880:拒
+
+③ 样板那个形状（sky p0.3 · 标称 480）**在多宽的世界里才刚好过**
+
+   世界宽  408 ⇒ 最坏剩   480px ✓ 过
+   世界宽  480 ⇒ 最坏剩   480px ✓ 过
+   世界宽  481 ⇒ 最坏剩 479.7px ✗ 拒
+   世界宽  600 ⇒ 最坏剩   444px ✗ 拒
+   世界宽  960 ⇒ 最坏剩   336px ✗ 拒
+   世界宽 1440 ⇒ 最坏剩   192px ✗ 拒
+   ⇒ ⚠️ 判决：它**只在世界不比视口宽时**才成立 —— 也就是「**不滚动的单屏游戏**」。
+
+④ 仓库测试语料里 sky 的 parallax（「样板是不是唯一的异类」）
+
+   assets/tests/generate.test.ts              parallax 0
+   assets/tests/generate.test.ts              parallax 0
+   assets/tests/ledger.test.ts                parallax 0
+   assets/tests/model-paint-layers.test.ts    parallax 0
+   assets/tests/model-paint-layers.test.ts    parallax 0
+   assets/tests/pack.test.ts                  parallax 0
+   assets/tests/pack.test.ts                  parallax 0
+   assets/tests/pack.test.ts                  parallax 0
+   assets/tests/pack.test.ts                  parallax 0
+   assets/tests/pack.test.ts                  parallax 0
+   assets/tests/pack.test.ts                  parallax 0
+   assets/tests/prompt.test.ts                parallax 0
+   assets/tests/prompt.test.ts                parallax 0
+   assets/tests/prompt.test.ts                parallax ?
+   cli/tests/cli-create.test.ts               parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/asset-spec.test.ts         parallax 0.9
+   contracts/tests/asset-spec.test.ts         parallax 0
+   contracts/tests/image-units.test.ts        parallax 0
+   contracts/tests/image-units.test.ts        parallax ?
+   contracts/tests/image-units.test.ts        parallax 0
+   contracts/tests/image-units.test.ts        parallax 0
+   assets/src/prompt.ts                       parallax 0.3
+
+   分布：p0 ×26 · p? ×2 · p0.9 ×1 · p0.3 ×1
