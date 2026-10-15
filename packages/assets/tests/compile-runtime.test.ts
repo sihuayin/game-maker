@@ -269,6 +269,51 @@ describe("§问话面：发出去的那一发", () => {
     expect(text).toContain("l-1");                              // 编的是哪一关
     expect(text).toContain("platformer/v1");                    // 给哪一代编
   });
+
+  // ── 票 85：清单上「这件是不是九宫格」那一截 ──────────────────────────────────
+  //
+  // ⚠️ **它补的是一个判据拿得到、模型拿不到的事实**：`auditPanelSize` 靠包里的 `scale9Borders`
+  //   判「声明 = 包」合不合法，而真发出去的 body 里那个词**三个都零命中**（票 71 §1 量过）。
+  //   ⇒ 那条例据在模型眼里是**事后复核**：它写的时候不知道自己指的那件是不是九宫格。
+  //
+  // ⚠️ **断的是「那一行里在不在」**，不是「整份提示词里一条都没有」——
+  //   后者会因为**别的原因**变红，把这条判据的意思带偏（票 80 / 票 84 立的纪律）。
+  const lineOf = (text: string, id: string) =>
+    text.split("\n").find((l) => l.startsWith(`- \`${id}\``)) ?? "";
+
+  it("清单里**带 `scale9Borders` 的那件标着「九宫格」**，并写明声明尺寸可不同（票 85 · 正向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    // ⚠️ 夹具里这一件是真带九宫格的（`fixtures/packs/last-train/v2`：72×32 · `{x:4,y:4,w:64,h:24}`），
+    //   而它**正是** `hud.panel.asset` 指的那一件。
+    const line = lineOf(sp.seen[0]!.messages[0].content[0].text, "hud-lost-slots");
+    // ⚠️ 两条一起断：**只有标记词而没有半句后果**＝模型读不出该拿它干什么 ——
+    //   那正是票 08 的教训逐字：「光是标『可选』不够：模型会把『可选』读成『写上更保险』」。
+    expect(line).toContain("**九宫格**");
+    expect(line).toContain("声明尺寸可与包内尺寸不同");
+  });
+
+  it("清单里**没有 `scale9Borders` 的那件标着「非九宫格」**，并写明声明尺寸必须一致（票 85 · 反向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const line = lineOf(sp.seen[0]!.messages[0].content[0].text, "hud-pip");
+    // ⚠️ 非九宫格那一侧**不许沉默**（票 71 的边界 1）：沉默会被读成「这件**没有**这个属性」，
+    //   而它真正的意思是「这件**不许**改尺寸」。
+    expect(line).toContain("**非九宫格**");
+    expect(line).toContain("声明尺寸必须与包内尺寸一致");
+    // ⚠️ 反面这一半**必须**在：一条只断「印了」的判据，在**所有** ui 都印「九宫格」的世界里照样绿，
+    //   而那个世界是错的。
+    // ⚠️ 找的是**加粗的那个标记词** ——「非九宫格」这五个字**本身含着「九宫格」三个字**，
+    //   直接断 `not.toContain("九宫格")` 会把这行判据自己写成**永假**。
+    expect(line).not.toContain("**九宫格**");
+    // ⚠️ 而那一截**只印在 ui 上**（2026-10-15 人裁）：非 ui 的资产没有「声明尺寸」这个落点，
+    //   半句后果印在它身上是空话 —— 顺带钉住这一点，免得有人顺手推广到全部资产。
+    const sprite = lineOf(sp.seen[0]!.messages[0].content[0].text, "prop-luggage-pile");
+    expect(sprite).toContain("锚点");
+    expect(sprite).not.toContain("九宫格");
+  });
 });
 
 describe("§哪一关 / 哪一代外壳", () => {

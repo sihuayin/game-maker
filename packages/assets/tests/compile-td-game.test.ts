@@ -295,3 +295,71 @@ describe("失败的路", () => {
     expect((e as CommandError).message).toMatch(/超时|没回应/);
   });
 });
+
+// ── 票 85：塔防那一侧的清单也要**看得见** ──────────────────────────────────────
+//
+// ⚠️ **这个文件此前没有任何 spy**（票 71 §2⑦ 量过）：它只断言产物与错误码 ⇒
+//   「塔防清单里印没印」这件事**写不出判据**。票 71 的 Q4 裁的是：
+//   **补一个 spy，而不要为了测试把 `tdResourceBrief` 导出去** ——
+//   所以下面抓的是**真发出去的那个请求体**，不是某个内部函数的返回值。
+describe("§问话面：发出去的那一发（票 85：清单里「是不是九宫格」）", () => {
+  /** 抓住请求体，并回一份合法关卡。⚠️ 塔防这一发走 `callText` ⇒ `content` 是**字符串**（横版那一发是数组）。 */
+  const spy = (payload: unknown = GOOD) => {
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({ content: [{ type: "text", text: JSON.stringify(payload) }] }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    return { f, seen };
+  };
+  const promptOf = (seen: Record<string, any>[]) => String(seen[0]!.messages[0].content);
+  const lineOf = (text: string, id: string) =>
+    text.split("\n").find((l) => l.startsWith(`- \`${id}\``)) ?? "";
+
+  it("清单里**带 `scale9Borders` 的那件标着「九宫格」**，并写明声明尺寸可不同（票 85 · 正向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    // ⚠️ 夹具 `fixtures/packs/counter-siege/v4` 里 `ui-hud-bar`（96×26 · `{x:4,y:4,w:88,h:18}`）
+    //   真带九宫格，而它**正是** `hud.panel.asset` 指的那一件（`ui-btn` 同款）。
+    const line = lineOf(promptOf(sp.seen), "ui-hud-bar");
+    // ⚠️ 两条一起断：只有标记词而没有半句后果 ＝ 模型读不出该拿它干什么（票 08 的教训逐字：
+    //   「光是标『可选』不够：模型会把『可选』读成『写上更保险』」）。
+    expect(line).toContain("**九宫格**");
+    expect(line).toContain("声明尺寸可与包内尺寸不同");
+  });
+
+  it("清单里**没有 `scale9Borders` 的那件标着「非九宫格」**，并写明声明尺寸必须一致（票 85 · 反向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const line = lineOf(promptOf(sp.seen), "ui-icon-scrap");
+    // ⚠️ 非九宫格那一侧**不许沉默**（票 71 的边界 1）：沉默会被读成「这件**没有**这个属性」，
+    //   而它真正的意思是「这件**不许**改尺寸」。
+    expect(line).toContain("**非九宫格**");
+    expect(line).toContain("声明尺寸必须与包内尺寸一致");
+    // ⚠️ 「非九宫格」这五个字**本身含着「九宫格」三个字** ⇒ 只断词根会把这行判据写成**永假**；
+    //   这里断的是**加粗的那个标记词**。
+    expect(line).not.toContain("**九宫格**");
+    // ⚠️ 那一截**只印在 ui 上**（2026-10-15 人裁）：塔防这份包 21 件里 17 件是 sprite/animation，
+    //   它们**没有「声明尺寸」这个落点**，半句后果印在它们身上是空话。
+    const tile = lineOf(promptOf(sp.seen), "tile-floor");
+    expect(tile).toContain("锚点");
+    expect(tile).not.toContain("九宫格");
+  });
+
+  it("⭐ 那一截**与横版清单逐字同形**（票 71 的 Q3 = (b)：它只有一份）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    // ⚠️ 下面这两串**与 `compile-runtime.test.ts` 里那两条判据断的是同一串字**，逐字。
+    //   它钉的是「两份清单说同一句话」这件事：谁把那一截就地抄进 `tdResourceBrief` 里另改一个词，
+    //   两条断言里必有一条当场红。⚠️ 真正保证它不漂的是**实现只有一份**，
+    //   这条判据只是让「有人把它抄开」这件事**立刻可见**。
+    for (const s of ["**九宫格**（声明尺寸可与包内尺寸不同）", "**非九宫格**（声明尺寸必须与包内尺寸一致）"])
+      expect(promptOf(sp.seen)).toContain(s);
+  });
+});

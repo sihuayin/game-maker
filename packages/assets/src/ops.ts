@@ -16,7 +16,7 @@ import {
   PLAYER_ACTION_NAMES,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
-  type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
+  type AssetPackEntry, type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
@@ -639,6 +639,46 @@ export const gameConfigExample = {
   objective: { kind: "collect-then-reach", gate: "gate" },
 } as const;
 
+/**
+ * 「这件资源**是不是九宫格**」那一截 —— **两份清单共用同一份**（票 85 · 票 71 的 Q3 = (b)）。
+ *
+ * ⚠️ **为什么是共用函数，而不是两份清单各写一遍**：要防的是**词**的漂，不是行的漂 ——
+ *   各写一遍，就没有任何东西保证两处**永远**说同一句话。
+ *   ⛔ **它只负责这一截**（票 71 的边界 2 逐字）：不合并两份清单的整体实现、不碰 `role`、
+ *   不统一背景层的换行位置、不改清单的其他内容。
+ *
+ * ⚠️ **措辞是票 71 的 Q1 = (乙)：标记词 + 半句后果** —— 而那半句是**分情况**的：
+ *   九宫格那侧「声明尺寸**可**与包内尺寸不同」，非九宫格那侧「**必须**一致」。
+ *   ⚠️ **非九宫格那一侧不许沉默**（票 71 的边界 1 逐字：「不能只给九宫格资源加标记
+ *   而让非九宫格资源保持沉默」）：沉默会被读成「这件**没有**这个属性」，
+ *   而它真正的意思是「这件**不许**改尺寸」—— 正是[票 08] 吃过的那个形状。
+ *
+ * ⚠️ **词只用「九宫格」**（Q2 = (a)）：判据报错（`auditPanelSize`）与 `CONTEXT.md` 的术语表正名
+ *   **都是这个词** ⇒ 模型被拒之后能把清单与报错**对上**。
+ *   · ⛔ `ninePatch` —— config 这一发的模型**从没见过它**（它只活在配方那一发的散文里）；
+ *   · ⛔ `scale9Borders` —— 那是**包内部**的字段名，而这里要传的是**事实**、不是字段。
+ *
+ * ⚠️ **为什么清单上要有这一截**：config 那一步的模型要在 `hud.panel.size` 这类格子里**声明尺寸**，
+ *   而「声明 ≠ 包」**只有九宫格才合法**（`auditPanelSize`）—— 而那个事实住在包里，
+ *   **判据拿得到、模型拿不到**（票 71 §1 量过真发出去的 body：`scale9Borders` / `九宫格` /
+ *   `ninePatch` **三个词都零命中**）。⇒ 这一截就是把那个事实**印出来**。
+ *
+ * ⚠️ **只印在 `ui` 上**（2026-10-15 人裁）：声明尺寸的那几个格子**全部**由 `ref(…, ["ui"])` 锁着
+ *   （横版 `game-config.ts:334`；塔防 `td-config.ts:428-429`）—— 非 ui 的资产**根本没有那个落点**，
+ *   那半句后果印在它身上是**一句空话**（而塔防那份包 21 件里 17 件是 sprite/animation）。
+ *   ⇒ 不适用的资产返回**空串**。
+ *
+ * ⚠️ **返回值带着它后面那个 `· ` 分隔符**（不适用时返回空串）——
+ *   这样两份清单的调用点**逐字相同**（`… · ${nineSliceNote(a)} · 锚点 …`），
+ *   接缝只剩这一处；分隔符若由调用方各接一次，两处就能漂。
+ */
+const nineSliceNote = (a: AssetPackEntry): string =>
+  a.kind !== "ui"
+    ? ""
+    : a.scale9Borders !== undefined
+      ? "**九宫格**（声明尺寸可与包内尺寸不同） · "
+      : "**非九宫格**（声明尺寸必须与包内尺寸一致） · ";
+
 /** 把资源包渲染成模型能读的一张清单：id / 种类 / 尺寸 / **锚点落点** / 动画名 / 背景层。 */
 function resourceBrief(manifest: AssetPackManifest): string {
   const lines: string[] = [];
@@ -647,7 +687,7 @@ function resourceBrief(manifest: AssetPackManifest): string {
     const animText = anims.length === 0
       ? "（无动画，引用时不必给 anim）"
       : anims.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ");
-    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · 锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · 动画：${animText}`);
+    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · 动画：${animText}`);
     if (a.layers && a.layers.length > 0)
       lines.push(`    背景层（远→近）：${a.layers.map((l) => `${l.name}(parallax ${l.parallax}${l.tileable?.x ? " 可平铺" : ""})`).join(" · ")}`);
   }
@@ -1054,12 +1094,16 @@ export const tdConfigExample = {
  *   ⚠️ 锚点那一项是补上的：第一版只写了 kind/size/role/animation，把锚点**悄悄丢了** ——
  *   而那正是「两份实现必然漂」的样子（横版那份是带锚点的）。
  *   塔防这边尤其不能丢：**砖的锚点必须正中**（票 07），而模型得看得到它才能照做。
+ *
+ * ⚠️ **「是不是九宫格」那一截不在这里写**（票 85）：它由 `nineSliceNote` 出，**两份清单共用同一份**
+ *   —— 要防的正是上面那种「两份实现必然漂」，而那次漂的恰好就是**同一个形状**。
+ *   ⛔ 别就地把那句话抄进来：词一漂，模型会读到两句不一样的话，**而没有任何判据会红**。
  */
 function tdResourceBrief(m: AssetPackManifest): string {
   return m.assets.map((a) => {
     const anim = a.animations?.length ? `动画：${a.animations.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ")}` : "（无动画）";
     const layers = a.layers?.length ? ` · 背景层（远→近）：${a.layers.map((l) => l.name).join(" → ")}` : "";
-    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · 锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${a.role} · ${anim}${layers}`;
+    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${a.role} · ${anim}${layers}`;
   }).join("\n");
 }
 
