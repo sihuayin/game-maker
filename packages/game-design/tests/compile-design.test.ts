@@ -107,6 +107,28 @@ describe("⚠️ R12 的拒绝：**不重采样、不进 `failures[]`**（Q3c）
     expect(err.ledger![0]!.failures).toBeUndefined();  // ⚠️ 那一发上游调用是**成功**的
   });
 
+  // ── 票 74 · 空 `mechanics` 从 gate ④ 移出之后，**它落在这里**（人裁 Q1 = (a)）──────────
+  //
+  // ⚠️ 移出**之前**：`mechanics: []` 连 `parse` 都过不了 ⇒ 走 `schema` 那一档 ⇒ **同一个 body 盲发三发**
+  //   （模型看不到理由）⇒ 抛 `CompileDesignError`、账 `failures: ["schema","schema","schema"]`。
+  //   而散文偏偏要求模型「挑不出对家就整条省掉」（票 54 亲手加的）⇒ **散文叫模型做一件机器会拒的事**。
+  // ⚠️ 移出**之后**：当场 parse 得过 ⇒ 撞 R12 那句**逐条点名**（带用户原话）· **只走一趟** · 账上无失败痕迹。
+  //   ⇒ 下面这条钉的正是**那三样**，与契约那一侧（`contracts/tests/game-design-gate.test.ts` 的
+  //   「`mechanics: []` 不再是这条 gate 的事」）**各看各的一半**。
+  it("⚠️ 空 `mechanics` ⇒ `DesignRejectedError`、**逐条**点名意图里每一条机制、**只走一趟**、账上无失败痕迹", async () => {
+    const s = stage([res(reply(designFromModel({ mechanics: [] })))]);
+    const err = await compileDesign(input({ fetchImpl: s.f })).catch((e) => e);
+    expect(err).toBeInstanceOf(DesignRejectedError);
+    // 逐条：意图里**每一条**机制各一条拒绝，次序与 `auditIntentCoverage` 一致
+    expect(err.rejections.map((x: { reason: string }) => x.reason))
+      .toEqual(INTENT.mechanics.map(() => "intent-mechanic-missing"));
+    // 点名：每一条的**用户原话**都要报出来（那是给人改需求用的）
+    for (const m of INTENT.mechanics) expect(err.message).toContain(m.name);
+    expect(s.calls(), "移出之前是 `STRUCTURED_CALL_ATTEMPTS` 发盲重采样").toBe(1);
+    expect(err.ledger![0]!.attempts).toBe(1);
+    expect(err.ledger![0]!.failures, "那一发上游调用是成功的，账上不许留失败痕迹").toBeUndefined();
+  });
+
   it("相机承载不了 ⇒ 也是拒绝那一档（不是 `CompileDesignError`）", async () => {
     const s = stage([res(reply(designFromModel()))]);
     const err = await compileDesign(input({ fetchImpl: s.f, vws: { ...VWS, camera: { mode: "top-down" } } })).catch((e) => e);

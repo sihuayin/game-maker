@@ -306,8 +306,11 @@ export interface GameDesignSpec {
 **说的是同一件事**，而那两个在场上。
 
 ⚠️ **契约带一条顶层 gate**（[票 10](../../.scratch/game-maker-v2/issues/10-design-compiler.md) 的 Q4）：
-必填字符串为空串 · `coreLoopSteps` / `player.abilities` / `player.goals` / `mechanics` / `levels` 为空数组 ·
+必填字符串为空串 · `coreLoopSteps` / `player.abilities` / `player.goals` / `levels` 为空数组 ·
 **id 跨四桶重复** · **`levels[].entities[]` 解不到** ⇒ 这一发算 `schema` 失败、重采样。
+⚠️ **`mechanics` 为空数组**自 2026-10-15 起**不在这一条里**（[票 74](../../.scratch/game-maker-v2/issues/74-r17-split-gate-rejection-order.md)）：
+「一条机制都对不上」不是**文书自己**自相矛盾，而是**文书与意图**对不上 ⇒ 归 R12 的覆盖判据管辖。
+⇒ 空 `mechanics` **当场过契约**，撞的是那句**逐条点名**（带用户原话）的拒绝：**1 发** · 账上**无失败痕迹**。
 ⚠️ **四个桶本身可以为空**（障碍跑式关卡是真的，与意图层把 `entities: []` 划出去同一条理由）；
 `winConditions` / `loseConditions` 可空；`difficulty` 可缺席。逐条理由在 `game-design.ts` 的注释里。
 

@@ -4,7 +4,7 @@
 //      「Design 12 个必须在本票 prompt 中明确生产，但业务消费者在下游」）。
 import { describe, expect, it } from "vitest";
 import { GameDesignSpecSchema } from "@game-maker/contracts";
-import { DESIGN_TOOL_DESCRIPTION, DESIGN_TOOL_NAME, designPrompt } from "../src/index.js";
+import { DESIGN_TOOL_DESCRIPTION, DESIGN_TOOL_NAME, designPrompt, intentPrompt } from "../src/index.js";
 import { INTENT, VWS } from "./fixtures.js";
 
 const ECHO = { runtimeProfile: "platformer/v1", genre: "platformer", camera: "side" };
@@ -148,6 +148,34 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
     //   （盘上 3 份 + 第七跑全是这么过的）。⇒ 两句必须说清是同一条规矩的两个方向。
     expect(prompt()).toContain("只在你能给它挑出一个对家时");
     expect(prompt()).toContain("整条省掉");
+  });
+
+  // ── 票 74 · 上面那条的**下一半**：散文 vs **机器** ─────────────────────────────────────
+  //
+  // ⚠️ 上面那条修的是**散文内部**的打架（台账「`id` 照抄意图层」vs 第 2 条「整条省掉」）；
+  //   而「**散文 vs 机器**」那处它修不了 —— gate ④ 只数长度，却明写着「`mechanics` 至少一条」
+  //   ⇒ 散文叫模型做一件机器会拒的事，而模型**读不到拒绝的理由**（盲重采样三发）。
+  //   票 74 把 gate ④ 那一格移了出去（人裁 Q1 = (a)，判据归 R12）⇒ 两处**这才**同步。
+  // ⚠️ 下面一条钉两半：**工具说明**那句并列清单里不再有 `mechanics`（且不是删了、是说清了为什么），
+  //   **字段台账**那一格不再要求「至少一条」（而票 54 那两句**留着** —— 原则不变）。
+  it("⚠️ 票 74：散文两处**不再要求 `mechanics`「至少一条」**（gate ④ 已把它交给 R12）", () => {
+    // ① 工具说明：那句「至少一条」的并列清单里**不再有 `mechanics`**……
+    const line = DESIGN_TOOL_DESCRIPTION.split("\n").find((l) => l.includes("至少一条"))!;
+    expect(line, "其余那些格子照旧").toContain("coreLoopSteps");
+    expect(line, "⚠️ 而 `mechanics` 不在这一句里了").not.toContain("mechanics");
+    // ……而它**不是被删掉**：紧接着要说清「它不在这一句里」以及它什么时候可以是空的
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("**不在这一句里**");
+    expect(DESIGN_TOOL_DESCRIPTION).toContain("可以整个是空数组");
+    // ② 字段台账那一格：末尾那句「至少一条」没了，而**票 54 那两句留着**
+    const cell = prompt().split("\n").find((l) => l.startsWith("- `mechanics`"))!;
+    expect(cell, "票 54 的原则不变").toContain("只在你能给它挑出一个对家时");
+    expect(cell, "票 54 的原则不变").toContain("整条省掉");
+    expect(cell, "⚠️ 这一格不再要求「至少一条」").not.toContain("至少一条");
+    expect(cell, "要说清「一条都挑不出时可以是空的」").toContain("可以是空的");
+    // ③ ⚠️ **意图层那一侧照旧** —— 它那条 gate（`game-intent.ts` 的 `mechanics` ≥ 1）**还在**，
+    //   而两处散文住在**同一份文件**里 ⇒ 这条就是「别把两个面一起改了」的那道闸。
+    const intentCell = intentPrompt({ requirementText: "x" }).split("\n").find((l) => l.startsWith("- `mechanics`"))!;
+    expect(intentCell, "意图层的 `mechanics` 仍要求至少一条 —— 它那条 gate 没跟着动").toContain("至少一条");
   });
 
   it("③ id 分两种：意图已有的**原样沿用**（不许改/删/换桶）· 这一层新加的**允许**但**依据必须是需求**", () => {

@@ -214,7 +214,8 @@ export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把�
 
 1. **不许有空串、也不许有空的必填数组**。必填字符串（\`game.genre\` · \`game.camera\` · \`player.role\` ·
    \`world.*\` · \`progression.*\` · 四个桶与 \`levels\` 里每一条的每一项）都得有内容；
-   \`coreLoopSteps\` · \`player.abilities\` · \`player.goals\` · \`mechanics\` · \`levels\` **至少一条**。
+   \`coreLoopSteps\` · \`player.abilities\` · \`player.goals\` · \`levels\` **至少一条**。
+   ⚠️ \`mechanics\` **不在这一句里** —— 它**可以整个是空数组**（什么时候该这样，第 2 条说了）。
    ⚠️ 但**四个桶本身可以是空的**：只有平台、没有敌人/拾取物/交互物的关卡是真的。
 
 2. \`mechanics[].mechanic\` 是**封闭枚举**（下面给了全部 8 个值）。⚠️
@@ -266,7 +267,9 @@ const DESIGN_FIELD_HINTS: Record<keyof GameDesignSpec, string> = {
   progression: "`{ model, description }` —— 进阶是怎么发生的",
   difficulty: "`{ model, description }` —— **可选**，需求里没提就整个省掉",
   mechanics: "`{ id, mechanic }[]` —— `id` **照抄意图层**（⚠️ **只在你能给它挑出一个对家时**才写这一条；" +
-    "挑不出对家就**整条省掉**，见第 2 条 —— **不许**拿近似的值占位），`mechanic` 从下面那 8 个值里挑；**至少一条**",
+    "挑不出对家就**整条省掉**，见第 2 条 —— **不许**拿近似的值占位），`mechanic` 从下面那 8 个值里挑。" +
+    "⚠️ 挑得出对家的**都要写上**；**一条都挑不出时，这个数组可以是空的** —— " +
+    "那时整份会被 `compile-design` **逐条点名**（退出码 4）：那不是「这一层没干活」，是「**外壳做不了它**」被说出口",
   winConditions: "胜利条件，**一条一句**（可以是空数组：「没有终点」）",
   loseConditions: "失败条件，**一条一句**（可以是空数组：「不会死」）",
   runtimeRequirements: "这一关**用得上**的外壳能力，从下面 8 个能力名里挑（没有就留空数组）",

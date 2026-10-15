@@ -92,7 +92,8 @@ export const GameDesignMechanicSchema = z.strictObject({
 //       `levels[].purpose` / `levels[].layout`）
 //     · 数组**元素**非空（`coreLoopSteps[]` · `player.abilities[]` · `player.goals[]` ·
 //       `winConditions[]` · `loseConditions[]` · `runtimeRequirements[]` · `levels[].entities[]`）
-//     · 数组**本身 ≥ 1**：`levels` · `player.abilities` · `mechanics` · `coreLoopSteps` · `player.goals`
+//     · 数组**本身 ≥ 1**：`levels` · `player.abilities` · `coreLoopSteps` · `player.goals`
+//       ⚠️ **2026-10-15（票 74 · 人裁 Q1 = (a)）：`mechanics` 已从这一档移出** —— 见下面 ④ 那一段的完整理由。
 //     · **id 在「`player` + 四桶」上唯一** —— 一个 id 只能指向一个实体。
 //       ⚠️ **2026-10-13（票 42 Q7）把 `player` 并了进来**：原先只查四个桶，于是
 //       `player.id === npcs[0].id` 在设计层畅通无阻、一路走到 `character-dna` 才被拒
@@ -108,6 +109,8 @@ export const GameDesignMechanicSchema = z.strictObject({
 //       与票 09 把 `entities: []` 从意图层 gate 里划出去**同一条理由**
 //     · `winConditions: []` / `loseConditions: []` —— 「不会死 / 没有终点」是真设计
 //     · `difficulty` 整个缺席 —— 它是本契约**唯一**的可选字段
+//     · `mechanics` **本身可空**（⚠️ **2026-10-15 · 票 74**）—— 「一条机制都对不上」不是
+//       文书自相矛盾，是**文书与意图对不上** ⇒ 归 R12（`intentCoverage`）。见下面 ④ 那一段。
 //     · **`levels` 只要求 ≥ 1，不要求恰好 1**（票 10 的 Q4 子裁）—— 「一次 `create` 出一个关卡」
 //       是**今天的产品形状**，不是契约形状；多关索引那团雾还在地图上，别在契约里假装支持它。
 //
@@ -249,38 +252,35 @@ export const GameDesignSpecSchema = z.strictObject({
 
   // ④ 「一条都说不出」的数组 —— ⚠️ 四桶**不在**这一档（障碍跑式关卡是对的）
   //
-  //   ⚠️ **2026-10-14（票 67 · 人裁 Q1 = (b)）：`mechanics` 那一格的报文单独写。**
-  //     这个 gate **只看长度**，于是它**分不出**两件事：模型**没干这个活** / 模型**照散文做了** ——
-  //     提示词第 2 条（`prompts.ts` 的工具说明第 2 条 + `DESIGN_FIELD_HINTS.mechanics`）明写
-  //     「意图里哪条机制在这个表里挑不出对家，就**整条省掉**」，照那句话做的产物**就长这样**。
-  //     旧文案把后一种读法**说死了**（「做成了零条就是没干活」）⇒ **守规矩的那一份**
-  //     在人眼前被报成偷懒。⇒ 那一格**把两种可能都摆出来、哪一种都不断言**。
+  //   ⚠️ **2026-10-15（票 74 · 人裁 Q1 = (a)）：`mechanics` 那一格已从这里移出。**
+  //     移出去的理由是**归属**：这一档其余四格问的是「**文书自己说不说得出的内容**」——
+  //     而「一条机制都对不上」不是文书自相矛盾，它的合法性**只由「意图里有什么」决定**，
+  //     那是**文书与意图对不对得上**，是 R12 的管辖（`build-design.ts` 的 `intentCoverage`）。
+  //     把覆盖塞进自洽闸门，是**借别人的尺子量自己的事**。
+  //   ⚠️ **它移走之前长什么样**（别以为只是「少一格」）：空 `mechanics` ⇒ `schema` 失败 ⇒
+  //     走 R16 的**同一个 body 盲发三发** ⇒ 抛、退 4。而散文那头恰恰**要求**模型这么做 ——
+  //     「意图里哪条机制在这个表里挑不出对家，就**整条省掉**」是[票 54] 亲手加的、
+  //     还有一条测试 pin 着（`design-prompts.test.ts`）⇒ **散文叫模型做一件机器会拒的事**，
+  //     而模型**读不到拒绝的理由**（盲重采样）。
+  //     ⚠️ 那句「整条省掉」**不能删**：删了之后挑不出对家的那些只剩「顶替」，而顶替是
+  //     **没人看见的丢东西**、R12 还抓不住（见 `intent-coverage.ts` 头一）⇒ **两条路只剩拆这一格**。
+  //   ⚠️ **拆了之后它去哪**：空 `mechanics` 当场 parse 得过 ⇒ 撞 R12 那句**逐条点名**（带用户原话）。
+  //     ⚠️ **它到不了下游**：`game-intent.ts` 自己那条 gate 要求意图的 `mechanics` 至少一条
+  //     ⇒ 覆盖判据**必然**有话可说（每一份过契约的意图都至少会被点名一次）。
+  //     票 74 的探针量到的价签：这一档 **3 发 → 1 发** · 账 `["schema","schema","schema"]` → `null`。
   //   ⚠️ **另外四格一个字没改**：那条「整条省掉」的许可**只对 `mechanics` 说话**
   //     （票 56 的对照表量过：打架的只有第 2 条，而第 2 条只对这一个字段说话）
   //     ⇒ 给它们也补一句「可能是在守规矩」，就是**替它们编一条任何散文里都没有的许可**。
-  //   ⚠️ 这句话的读者是**人**，不是模型：`schema` 那一档走的是**同一个 body 盲发三发**
-  //     （票 67 的 ⑨′ 量到 `attempts: 3`）⇒ 模型读不到它，它在账与失败报告里给人看。
-  //     ⇒ 所以这里**不许**替模型做主（「你该去补一条」），只许**把分不出的那件事说成分不出**。
+  //   ⚠️ **散文那一侧的字面**在 `game-design/src/prompts.ts`（工具说明第 1 条 + 字段台账 `mechanics` 那格），
+  //     与这里必须**同源** —— [票 87] 改的就是这两处，一起改。
   const nonEmpty: [string, number][] = [
     ["coreLoopSteps", v.coreLoopSteps.length],
     ["player.abilities", v.player.abilities.length],
     ["player.goals", v.player.goals.length],
-    ["mechanics", v.mechanics.length],
     ["levels", v.levels.length]
   ];
-  for (const [label, n] of nonEmpty) {
-    if (n !== 0) continue;
-    if (label === "mechanics") {
-      issue(
-        ["mechanics"],
-        "`mechanics` 是空数组 —— ⚠️ **这一条报文分不出**下面两种，别把其中任何一种当成结论：" +
-        "① 模型**没干这个活**；② 模型**照提示词第 2 条做了** —— 那句写着「意图里哪条机制在这个表里" +
-        "挑不出对家，就**整条省掉**」，照它做的产物**就长这样**。gate 只数长度、分辨不了这两件事。",
-      );
-      continue;
-    }
-    issue(label.split("."), `\`${label}\` 是空数组 —— 这一层说的就是「我们做成了什么」，做成了零条就是没干活`);
-  }
+  for (const [label, n] of nonEmpty)
+    if (n === 0) issue(label.split("."), `\`${label}\` 是空数组 —— 这一层说的就是「我们做成了什么」，做成了零条就是没干活`);
 
   // ⑤ id 在「`player` + 四桶」上唯一（一个实体只有一种身份：票 03 Q3 · **票 42 Q7 并入 `player`**）
   //

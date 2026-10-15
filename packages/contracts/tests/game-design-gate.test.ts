@@ -54,12 +54,11 @@ describe("⚠️ 结构性空值 + 层内引用族 gate（票 10 的 Q4）", () 
     if (!r.success) expect(r.error.issues[0]!.path).toEqual(["coreLoopSteps", 1]);
   });
 
-  it("`coreLoopSteps` / `player.abilities` / `player.goals` / `mechanics` / `levels` 是**空数组** ⇒ 拒", () => {
+  it("`coreLoopSteps` / `player.abilities` / `player.goals` / `levels` 是**空数组** ⇒ 拒", () => {
     for (const [over, path] of [
       [{ coreLoopSteps: [] }, ["coreLoopSteps"]],
       [{ player: { ...DESIGN.player, abilities: [] } }, ["player", "abilities"]],
       [{ player: { ...DESIGN.player, goals: [] } }, ["player", "goals"]],
-      [{ mechanics: [] }, ["mechanics"]],
       [{ levels: [] }, ["levels"]]
     ] as const) {
       const r = parse(over as Record<string, unknown>);
@@ -68,26 +67,20 @@ describe("⚠️ 结构性空值 + 层内引用族 gate（票 10 的 Q4）", () 
     }
   });
 
-  // ── 票 67 · gate ④ 的报文分不出「没干活」与「照散文省掉了」（人裁 Q1 = (b)）────────────
+  // ── 票 74 · `mechanics` 已从 gate ④ **移出**（人裁 Q1 = (a)），那一条判据归 R12 ───────────
   //
-  // ⚠️ 这个 gate **只看长度**：`mechanics: []` 既可能是模型没完成工作，也可能是模型**遵守了
-  //   提示词第 2 条**（「挑不出对家就整条省掉」）。旧报文把后一种读法**说死了** ⇒ 下面两条钉住：
-  //   ① `mechanics` 那一格**两种都摆、一种都不断言**；② **另外四格照旧**（那条许可只对它说话）。
-  it("⚠️ `mechanics` 空了：报文**把两种读法都摆出来、一种都不当结论**", () => {
-    const r = parse({ mechanics: [] });
-    expect(r.success).toBe(false);
-    if (!r.success) {
-      const msg = r.error.issues[0]!.message;
-      expect(msg, "① 可能是偷懒").toContain("没干这个活");
-      expect(msg, "② 也可能是守了散文").toContain("挑不出对家");
-      expect(msg).toContain("整条省掉");
-      expect(msg, "且点得到那条规矩住在哪").toContain("提示词第 2 条");
-      expect(msg, "⚠️ 明说分不出，不是换个说法断言另一半").toMatch(/分不出/);
-      expect(msg, "旧那句把两种读法压成一种的断言没了").not.toContain("就是没干活");
-    }
+  // ⚠️ 移出去的理由是**归属**：「一条机制都对不上」不是**文书自己**自相矛盾，而是**文书与意图**对不上
+  //   —— 那是 R12 的管辖（`build-design.ts` 的 `intentCoverage`），不是这条自洽闸门的。
+  // ⚠️ 移出去**之前**：空 `mechanics` ⇒ `schema` 失败 ⇒ **同一个 body 盲发三发**（模型读不到理由），
+  //   而散文偏偏要求模型「挑不出对家就整条省掉」（票 54 亲手加的）⇒ **散文叫模型做一件机器会拒的事**。
+  // ⚠️ 下面两条钉的是**契约这一侧**：那一格不再拒，而**其余四格一格没松**（别把删行删错一行）。
+  //   R12 那一侧（空 `mechanics` ⇒ 逐条点名 · 只走一趟 · 账上无失败痕迹）在
+  //   `game-design/tests/compile-design.test.ts`，两处**各看各的一半**。
+  it("⚠️ `mechanics: []` **不再**是这条 gate 的事 —— 它当场 parse 得过（票 74）", () => {
+    expect(parse({ mechanics: [] }).success, "票 74 把这一格交给了 R12").toBe(true);
   });
 
-  it("⚠️ 另外四格**照旧** —— 那条「整条省掉」的许可只对 `mechanics` 说话", () => {
+  it("⚠️ 其余四格**一格没松**，且报文里**没有**那条只对 `mechanics` 说过的许可", () => {
     for (const over of [{ coreLoopSteps: [] }, { player: { ...DESIGN.player, goals: [] } }, { levels: [] }]) {
       const r = parse(over as Record<string, unknown>);
       expect(r.success).toBe(false);
