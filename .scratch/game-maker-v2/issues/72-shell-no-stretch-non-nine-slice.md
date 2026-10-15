@@ -1,8 +1,9 @@
 # 72. 同一个 `hud.*.size` 字段在**两代外壳**里不是同一条规矩 —— 横版**只有九宫格才作数**、塔防**永远作数**，而两代都没有任何判据看着它
 
 Type: grilling
-Status: open
-Owner: —
+Status: claimed
+Owner: claude (2026-10-15 · 已认领；本轮**只出第一轮问答** —— 见 [`clarifications/72-round-1.md`](../clarifications/72-round-1.md)。
+⚠️ 认领 ≠ 解出，更 ≠ 施工：票面 §3 的 Q1–Q3 未裁之前，`packages/demo` 一个字节不动)
 Blocked by: —
 Map: ../map.md
 > 派生自[票 63](63-hud-panel-size-not-reconciled.md) 的 **Q4 = (a)「另开一票」**。人裁（2026-10-14）原话逐字：
@@ -68,3 +69,144 @@ Map: ../map.md
 - **不顺手修**票 63 的 Q2 与 Q5（[票 71](71-scale9-into-model-brief.md) / [票 73](73-skeleton-example-72x32-arithmetic.md)）。
 - **不改 TD 现有的重采样行为**（票 63 补充边界原话）。
 - `packages/qa` 一行不碰 · `game-maker.local.json` 一个字不动 · **不执行任何付费真跑**。
+
+## 裁定记录（2026-10-15 · **六问逐条照录** · 完整材料在 [`clarifications/72-round-1.md`](../clarifications/72-round-1.md)）
+
+> ⚠️ **本节只录裁定**。上面 §1–§4 **一字未动**；`packages/demo` / `packages/contracts` / `packages/qa`
+> / 提示词 / 契约 / R 表 **一个字节没动**。
+> ⚠️ **本轮临到裁定前，材料里更正了票面 §1 的一处读数**（见 `clarifications/72-round-1.md` §2.1）：
+
+| # | 问题 | 裁定 |
+| --- | --- | --- |
+| **Q1** | 横版 `hud.panel` 如何处置 | **(a) 两代对齐：声明尺寸作数。** 在横版 `scene.ts:215` 的**普通图片分支**补 `setDisplaySize(p.w, p.h)`，使声明尺寸与外壳实际绘制尺寸一致。 |
+| **Q1′** | 是否修改 `game-config.ts:380-384` 的报错理由 | **不动。** 保留现有理由，继续说明非九宫格尺寸不匹配时的拒绝规则；**不因外壳实现变化而修改这段文案**。 |
+| **Q2** | 塔防 `hud.buttons` / `hud.start` 是否纳入本票 | **(甲) 纳入本票。** 将横版与塔防**四格一起**按「声明尺寸作数」的目标裁定，**避免只修一侧、另一侧继续存在实际尺寸与声明尺寸不一致的问题**。 |
+| **Q2′** | 塔防改动落点 | **改在 `img()` 内部。** 对**真实图片分支**补 `setDisplaySize(w, h)`，**不在 `hud.buttons` 和 `hud.start` 两个调用点分别重复实现**。按材料中的调用链分析，其余调用者传入的尺寸来自包内尺寸，**预期为尺寸不变的操作**。 |
+| **Q3** | 是否运行本机无头 Chrome 验证 | **(a) 两项都跑。** 验证当前环境下 `canNine` 的实际值，并验证塔防 `hud.start` 的实际渲染宽度。**代码阅读可以说明潜在问题，但不能替代浏览器中的实际渲染证据。** |
+| **Q3′** | 验证产物放在哪里 | **`experiments/72-two-shell-size/`，不进入 git 索引。** 保存**截图及相应探针读数**，便于复核；**不因此授权其他实验或付费调用**。 |
+
+### 授权状态（**逐字**）
+
+> **Q3 / Q3′ 这一条是执行授权** —— 它逐字写着「**两项都跑**」与产物落点，且逐字附了边界
+> 「**不因此授权其他实验或付费调用**」。
+
+> ⚠️ **Q1 / Q1′ / Q2 / Q2′ 这四条是「怎么判」，不是「去改」。**
+> 本轮材料 §6 逐字写着「**本轮批的是「怎么判」，不是「去改」** —— 施工要**另一次独立点头**」，
+> 而人裁**没有撤销那句话**、也没有给出施工许可。
+> ⇒ **改外壳（`packages/demo`）仍要另一次独立点头**（本仓先例逐字：「立票 ≠ 批准施工」·
+> 「施工 / 提交 / 收口 是三次独立的点头」）。
+
+### 本票没做的（照实记）
+
+- ⚠️ **没施工** —— `packages/demo` / `packages/contracts` / `packages/qa` **一个字节没动**。
+- ⚠️ **没提交 · 没关票** —— `Status` 停在 `claimed`（wayfinder 的默认动作是「解出即关票」，
+  而上面的授权状态没有覆盖关票 ⇒ **以授权状态为准**；先例逐字：票 62 / 71 / 81 裁定落定后**停 `claimed`**）。
+- ⚠️ **没开施工票** —— 人裁没有说「另立施工票」，本 session **没开**，**不是漏了**。
+- ⚠️ **没动 `map.md` 的 `Decisions so far`** —— 索引的规矩是「一行一张**已关**的票」，而本票**未关**。
+- ✅ **做了 Q3 / Q3′ 授权的那件事**：本机无头 Chrome 探针（**零上游调用**）·
+  产物落 `experiments/72-two-shell-size/`（**不进 git 索引**）。
+- ⚠️ **未动 R 表 / 提示词 / `game-maker.local.json` / `7890` / `9098`** · **零付费真跑**。
+
+### Q3 / Q3′ 的验证结果（2026-10-15 · **已跑** · 零上游 · 产物 `experiments/72-two-shell-size/`）
+
+> 探针：`.scratch/game-maker-v2/experiments/72-two-shell-size/probe.mjs`（照 Q3′ 落点）。
+> 方法：**本机无头 Chrome** 打开**装配器产出的真站点**（横版 last-train/v2 · 塔防 counter-siege/v4），
+> 在**外壳之前**注入钩子，记下每一次 `CanvasRenderingContext2D.drawImage` 的
+> **目标 canvas · 变换矩阵 · 源矩形 · 局部目标矩形**。⚠️ **零张图、零笔上游调用**。
+
+**① `canNine` 今天 = `false`（Canvas 回退）** —— ⚠️ 两个壳**自己报了那句话**（条件是 `s9 && !canNine`）：
+
+```text
+横版： [warning] hud.panel: 这个渲染器不支持九宫格（Phaser 的 nineslice 仅 WebGL）—— 面板退回普通拉伸
+塔防： [warning] hud.panel: 这个渲染器不支持九宫格（Canvas 回退）—— 面板退回普通拉伸
+```
+
+⚠️ **`getContext` 的类型列表不是判据**（实测 `["webgl","experimental-webgl","2d"]`：Phaser 的设备探测
+会**试探** webgl，与最终选哪个渲染器无关）—— 权威信号是外壳自己那句话。
+
+**② 塔防 `hud.start` 画出来 = `44.5` 宽，而它声明的是 `28`**（Phaser 的 Canvas 渲染器是
+`translate` + `scale` 落位、再在 `(0,0)` 画 ⇒ **渲染尺寸 = 局部宽 × scaleX**）：
+
+```text
+[at(0,0)   scale(5, 1.1538)] src (0,0) 96×26  ⇒ 画出来 482.50×30.58   ← hud.panel：声明 480×30 **作数**（对照）
+[at(300,4) scale(1, 1)     ] src (0,26) 44×22 ⇒ 画出来 44.50×22.50   ← hud.buttons[0]（声明 44 == 包 44）
+[at(444,4) scale(1, 1)     ] src (0,26) 44×22 ⇒ 画出来 44.50×22.50   ← ⚠️ **hud.start：声明 28×22**
+```
+
+⇒ ⭐ **同一帧里四格画法完全一样、没有任何拉伸** —— 从 `x=444` 画到 `488.5`，而**视口只有 480 宽**。
+⚠️ **对照组是同一帧的 `hud.panel`**：`scale(5, 1.1538)` 正是 `setDisplaySize(480, 30)` 打在 96×26 上
+⇒ **塔防那条拉伸路本身是好的**，坏的是 `hud.buttons` / `hud.start` 走的那条（`img()`）。
+
+**③ 顺带量到的横版那一格**：`[at(8,262) scale(1,1)] src (0,0) 72×32 ⇒ 画出来 72.00×32.00`
+—— `hud-lost-slots` 声明 72×32、包里也是 72×32 ⇒ **横版那条路今天一处也看不出错**（§2.3 的潜伏性，坐实）。
+
+⚠️ **探针自己的两条坑照实记**（README 里也写了）：`--virtual-time-budget` 下 rAF 跑几帧**是飘的**
+（同一页面，一跑 605 条 `drawImage`、另一跑 2 条）⇒ 改成**持续快照取最富的一帧 + 最多重试 6 次**
+（⚠️ **重试是为了拿到「一帧真渲染」，不是「重试到绿」**）；以及 `drawImage` 的 9 参形式是
+`(img, sx, sy, sw, sh, dx, dy, dw, dh)`，**去重键必须带上变换矩阵**，否则四个按钮塌成一条。
+
+### 施工落地（2026-10-15 · 人裁「现在施工（票 72，改外壳）」）
+
+> ⚠️ 这一句是**独立于裁定的施工许可** —— 它的选项文字逐字写着「改两处 · 改完留在工作树 ·
+> 跑闸 · **不提交不关票**」。范围就是裁定的那两处，**一个字不多**。
+
+**落地两处**（R5：本图把执行带进来）：
+
+| # | 文件 | 改了什么 |
+| --- | --- | --- |
+| ① | `packages/demo/src/shell/scene.ts` | 横版 HUD 面板：`else` 那一支补 `if (!(s9 && canNine)) go.setDisplaySize(p.w, p.h);` |
+| ② | `packages/demo/src/shell/td/scene.ts` | `img()` 真图那一支补 `.setDisplaySize(w, h)`（`hud.buttons` / `hud.start` 都走它） |
+
+两处都带一段注释写明**为什么**，并写明「非九宫格 / 其余四个调用者上这是空操作」。
+
+**验收（五闸 + 一次真浏览器复量）**：
+
+- `pnpm test` ✅ **83 files / 1442 tests** · `pnpm typecheck` ✅ · `pnpm build` ✅ ·
+  `pnpm check:deps` ✅（9 个包）· `pnpm check:links` ✅（275 份文档 · 1567 条链接）。
+- ⭐ **探针复跑**（`experiments/72-two-shell-size/` · 零上游）：`hud.start` 从
+  `scale(1,1) ⇒ 画出来 44.50` 变成 `scale(0.6364,1) ⇒ 画出来 **28.32**`
+  （目标 28；多出的 0.32 是像素对齐的半像素外扩 × 0.6364）。
+- ⭐ **`node diff-before-after.mjs`：塔防 605 → 605 条，只变了那一行**（消失 1 / 新增 1，
+  两条就是同一格的 before/after）⇒ **Q2′ 里那句「其余调用者预期为空操作」是量出来的、不是预期的**。
+  横版那一侧 `hud.panel` 前后都是 `scale(1,1) ⇒ 72.00×32.00`（同样空操作），**消失 0**。
+- 截图 `zoom-td-start.png`（施工后重拍）：`开波` 收在 **472**（= 444 + 28），右边是面板底色，**不再出屏**。
+
+**没做的（照实记）**：**没提交 · 没关票**（`Status` 停在 `claimed`）· 契约 / 判据 / R 表 /
+`game-config.ts:380-384` 那段报错理由 / 提示词 / `packages/qa` / `game-maker.local.json` **一概没碰** ·
+零付费真跑。
+
+⚠️ **仍然悬着的一格**：票面 §3 的 **Q2（「判据的家在哪」）第二轮没裁** ——
+`shell-capability-witness.test.ts` 那种「读源码文本」的台子是既有先例（剥注释 + 行为串），
+而**渲染**只有不进 CI 的 `probe/smoke*.mjs`。⇒ 这两行改动今天**没有任何自动判据看着它**。
+
+### 判据落地（2026-10-15 · 人裁「加读源码文本的见证判据」）
+
+> 票面 §3 的 **Q2「判据的家在哪」** 本轮裁定：**落读源码文本的见证判据**。
+
+**新增** `packages/demo/tests/shell-hud-declared-size.test.ts`（**8 条**）—— 四个格子一张表：
+
+| 格子 | 行为串（`needle`） | 文件 |
+| --- | --- | --- |
+| 横版 `hud.panel` · 九宫格那一支 | `nineslice(p.at.x, p.at.y, p.atlas, p.frame, p.w, p.h)` | `src/shell/scene.ts` |
+| 横版 `hud.panel` · 普通 image 那一支 | `if (!(s9 && canNine)) go.setDisplaySize(p.w, p.h);` | `src/shell/scene.ts` |
+| 塔防 `hud.panel` | `if (!(s9 && canNine)) go.setDisplaySize(panel.box.w, panel.box.h);` | `src/shell/td/scene.ts` |
+| 塔防 `hud.buttons` / `hud.start`（`img()`） | `.setDisplaySize(w, h);` | `src/shell/td/scene.ts` |
+
+⚠️ **这一条证什么、不证什么**（写在文件头，别拿它当渲染的正确性证明）：
+✅ 证「那四句话还在**活代码**里」（删掉、或挪进注释，当场红）；
+❌ **不证**「画出来的确实对」—— 那只有浏览器能证（读数在 `experiments/72-two-shell-size/`，**不进 CI**）。
+**两层合起来才是完整证据链。**
+
+**纪律照抄 `shell-capability-witness.test.ts`**：`needle` 必须是**行为串**（守它的是 `stripComments`）·
+并**额外钉住靶子唯一**（票 14 的教训"变异没打中靶"）：`setDisplaySize` 在塔防那份里**共 3 处**、
+判据指的那一处**只出现 1 次**。
+
+⚠️ **文本见证的代价照实记**：它钉的是**文本**，所以一次**语义等价的重写**也会红
+（变异 4 就是这种：把 `w` 写成 `d.width ?? w`，行为一模一样，判据照红）。
+这是这类判据的**已知代价**，与 `shell-capability-witness.test.ts` 同款。
+
+**证伪实测（4 发全红 · 逐发还原后 `md5` 逐字节相同）**：**M1** 删掉横版那一句 ⇒ 红 **2** ·
+**M2** 删掉塔防 `img()` 那一句（退回单行）⇒ 红 **3** · **M3** 把横版那一句**挪进注释** ⇒ 红 **3**
+（`stripComments` 那一层挡住了「实现删了、注释留着」）· **M4** 语义等价重写 ⇒ 红 **3**（见上）。
+
+**套件：84 files / 1450 tests 全绿**（此前 83 / 1442）。

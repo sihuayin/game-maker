@@ -214,6 +214,11 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
           ? this.add.nineslice(p.at.x, p.at.y, p.atlas, p.frame, p.w, p.h)
           : this.add.image(p.at.x, p.at.y, p.atlas, p.frame);
         go.setOrigin(p.anchor.x, p.anchor.y).setDepth(DEPTH_HUD).setScrollFactor(0);
+        // ⚠️ **声明尺寸就是画出来的尺寸**（票 72 · 两代对齐）。九宫格那一支 `nineslice(…, p.w, p.h)`
+        //   已经吃了声明宽高，而这一支画的是**包里原生像素** —— 不补这一句，「声明 ≠ 包」就画错了。
+        //   ⚠️ **非九宫格上补它是空操作**：`auditPanelSize` 把那一支钉成「声明 == 包」且装配期硬失败，
+        //   所以进得来浏览器的配置里两个数本来就相等（票 63 Q3 的射程不动）。
+        if (!(s9 && canNine)) go.setDisplaySize(p.w, p.h);
       }
       for (const pip of world.hud.pips) {
         const d = pip.draw;

@@ -104,7 +104,13 @@ export function createTdScene(world: TdWorldDescription): new () => Phaser.Scene
     private img(d: { missing: boolean; atlas?: string; frame?: string; anchor?: { x: number; y: number } },
                 x: number, y: number, w: number, h: number, label: string, depth: number): Phaser.GameObjects.Image | null {
       if (d.missing) { this.placeholder(x, y, w, h, label, depth); return null; }
-      return this.add.image(x, y, d.atlas!, d.frame!).setOrigin(d.anchor!.x, d.anchor!.y).setDepth(depth);
+      // ⚠️ **声明尺寸就是画出来的尺寸**（票 72 · 与横版那一支对齐）。`hud.buttons` / `hud.start`
+      //   传进来的盒子是**配置声明的**，而这里画的是**包里原生像素** —— 不补这一句，
+      //   声明 28×22 的 `hud.start` 会照包里的 44×22 画、右边缘出屏
+      //   （实测读数在 `.scratch/game-maker-v2/experiments/72-two-shell-size/`）。
+      //   ⚠️ 其余四个调用者（砖 · 核心 · 插槽 · 场地）传的盒子由**包里的尺寸**算出 ⇒ 对它们是空操作。
+      return this.add.image(x, y, d.atlas!, d.frame!).setOrigin(d.anchor!.x, d.anchor!.y).setDepth(depth)
+        .setDisplaySize(w, h);
     }
 
     private drawArena(): void {
