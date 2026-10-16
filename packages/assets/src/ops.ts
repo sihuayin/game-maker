@@ -694,13 +694,6 @@ function resourceBrief(manifest: AssetPackManifest): string {
   return lines.join("\n");
 }
 
-/** 把「锚点」翻译成人能照着摆的一句话 —— 这一条是模型最容易搞错的地方。 */
-const anchorHint = (a: { x: number; y: number }): string =>
-  a.y === 1 && a.x > 0 ? "底边中心（**站在地面线上的东西写 at.y = 地面线的 y**）"
-    : a.y === 1 && a.x === 0 ? "左下角"
-      : a.x === 0 && a.y === 0 ? "左上角"
-        : `{x:${a.x}, y:${a.y}}（归一化锚点，\`at\` 是它落在的那个点）`;
-
 export type CompileRuntimeOptions = {
   /** `run/v<N>/game-design.json` —— 理解层的收尾产物（票 10）。 */
   designPath: string;
@@ -872,9 +865,6 @@ ${designBrief(design)}
 
 # 资源包清单（**只许用这里面的东西**）
 ${resourceBrief(manifest)}
-
-# 锚点的意思（照这个摆）
-${[...new Set(manifest.assets.map((a) => `${a.kind}：${anchorHint(a.anchor)}`))].join(" · ")}
 
 # 手感：玩家跳多高、一跃多远（⚠️ **关卡不照这套摆就会「够不到」**）
 玩家**只有单跳**（没有二段跳、没有冲刺）。**默认手感** —— ⚠️ 正是**你不写 \`player.move\` 时外壳读的那一套**：
