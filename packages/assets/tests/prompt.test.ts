@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { PLAN_TOOL_DESCRIPTION, TD_REFERENCE_SCALE, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
+import { PLAN_TOOL_DESCRIPTION, SKELETON_SHAPE_NOTE, TD_REFERENCE_SCALE, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
 import type { AssetSpec, StyleSpec } from "@game-maker/contracts";
 
 describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
@@ -69,6 +69,23 @@ describe("塔防提示词：几处**量出来的**措辞，别被「统一措辞
     const s = TD_REFERENCE_SCALE;
     expect(prompt).toMatch(new RegExp(`${s.damage.min}–${s.damage.max}`));
     expect(prompt).toMatch(new RegExp(`${s.hp.min}–${s.hp.max}`));
+  });
+
+  it("⚠️ 骨架那句「位置、尺寸、锚点是一整套」**在送给模型的文本里**（票 93 · 调用点见证）", () => {
+    // ⚠️ 断的是**特征字面**，不是那个常量本身 —— 断常量等于它自己跟自己比，
+    //   而那正是本文件头顶那条「光是标『可选』不够」的同款空断言。
+    expect(prompt).toMatch(/位置、尺寸、锚点是一整套/);
+    expect(prompt).toMatch(/三样一起/);
+    // ⚠️ 与票 86 §0-A 反向：抬头里那句「逐字照抄」**不许**再回来 ——
+    //   那一跑量到**模型把 `hud` 那一块 15/15 逐字照抄**，而「照抄」与「示例」同时说会互相抵消。
+    expect(prompt).not.toMatch(/逐字照抄这个骨架/);
+  });
+
+  it("⚠️ 常量自检：那句话**非空**、三样都点名（守「有人把常量清空」而不必给生产函数加参数）", () => {
+    // ⚠️ 这一条是票 93 的 Q4 = 乙：**不为测试扩大生产函数的签名** ——
+    //   ③ 那一格（「传入空措辞 ⇒ 红」）改由「常量自检 ＋ 清空常量的变异探针」承担。
+    expect(SKELETON_SHAPE_NOTE.length).toBeGreaterThan(0);
+    for (const w of ["位置", "尺寸", "锚点"]) expect(SKELETON_SHAPE_NOTE).toContain(w);
   });
 });
 

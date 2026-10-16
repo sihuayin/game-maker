@@ -28,7 +28,7 @@ import { masterRatioNotes, referenceImagesOf } from "./master.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
-import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, designBrief, drawListFewShot, drawListOpsSpec, paletteLine, PLAN_TOOL_DESCRIPTION, PLAN_TOOL_NAME, recipeShapeSpec, styleBrief, tdConfigPrompt } from "./prompt.js";
+import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, designBrief, drawListFewShot, drawListOpsSpec, paletteLine, PLAN_TOOL_DESCRIPTION, PLAN_TOOL_NAME, recipeShapeSpec, SKELETON_SHAPE_HEADING, SKELETON_SHAPE_NOTE, styleBrief, tdConfigPrompt } from "./prompt.js";
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
@@ -854,7 +854,8 @@ export async function compileRuntime(opts: CompileRuntimeOptions): Promise<Comma
    要捡几件由 \`kind:"pickup"\` 的实体条数**派生** —— 多写一个数就拒。
 7. \`gate\` 必须指向一个**真的存在**且 \`kind:"goal"\` 的实体；实体 id **不得重复**；**至少要有 1 个 pickup**。
 8. ⚠️ **\`hud\` 的坐标是屏幕空间（≤ ${vp.w}×${vp.h}），不是世界空间。**
-   世界可以宽 1440，但屏幕只有 ${vp.w} 宽 —— HUD 写到 x > ${vp.w - 72} 就跑出屏幕了，直接拒。
+   例如世界可以宽 1440，但屏幕只有 ${vp.w} 宽 —— 判的是**整个盒子**：清单里那件资源的**锚点落在 \`at\` 上**，
+   按你声明的**尺寸**量出来的矩形，**四条边**都要落在屏幕内（左边、上边一样管，不是只看右边超没超）。直接拒。
 9. \`anim\` 只在资源有**多个**动画时才需要，且必须是清单里**真实存在**的动画名。
    ⚠️ **只许用下面清单里的 id 与动画名** —— 清单里没有的一律拒收。
 10. ⚠️ \`player.anims\` 那三格（${PLAYER_ACTION_NAMES.map((n) => `\`${n}\``).join(" / ")}）**三格互不相同** ——
@@ -889,11 +890,12 @@ ${[...new Set(manifest.assets.map((a) => `${a.kind}：${anchorHint(a.anchor)}`))
 
 ⚠️ **别写 \`player.move\`**（骨架里也没有它）—— 写了上面两条数就不成立了。真要写，就照同样的两条公式重算、并照你写的那一套摆。
 
-# 形状（**逐字照抄这个骨架**；\`<…>\` 是占位符，换成清单里真实的 id 与动画名）
+${SKELETON_SHAPE_HEADING}
 ${JSON.stringify(gameConfigExample, null, 2)}
 
-⚠️ 骨架里的**位置只是示意**（都摆在地面线上）—— 按这一关的设计把东西铺开，并让它**真的可通关**：
-照上面「手感」那一节的两条硬上限摆 —— **台阶别高过跳跃顶点、沟别宽过同高跨度**。`;
+${SKELETON_SHAPE_NOTE}
+按这一关的设计把东西铺开，并让它**真的可通关**：照上面「手感」那一节的两条硬上限摆 ——
+**台阶别高过跳跃顶点、沟别宽过同高跨度**。`;
 
   // ⚠️ **账**：一格 = 一次调用（`STRUCTURED_CALL_ATTEMPTS` 次往返都记在里面）。
   const call = spentCall("compile-runtime", "game-config");
@@ -1560,7 +1562,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
 // ── verify：校验一个已有资源包 ───────────────────────────────────────────────
 export type VerifyOptions = { packDir: string; outRoot?: string };
 
-/** 校验一个包：schema + **逐文件 checksum** + spec↔产物对账。 */
+/** 校验一个包：schema + **逐文件 checksum**。 */
 export function verifyPack(opts: VerifyOptions): CommandResult {
   const root = opts.outRoot ?? path.dirname(path.resolve(opts.packDir));
   const manifestPath = path.join(opts.packDir, "manifest.json");

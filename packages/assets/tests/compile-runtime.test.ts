@@ -245,6 +245,22 @@ describe("§问话面：发出去的那一发", () => {
     expect(text).toContain("手感");
   });
 
+  it("⚠️ 骨架那句「位置、尺寸、锚点是一整套」在**横版那一发**里（票 93 · 调用点见证）", async () => {
+    // ⚠️ **为什么横版这一条也得有**（票 93 的 Q5 = 甲）：横版那个调用点**本票也改了**，
+    //   而共用的常量只保证**字面不漂**，不保证**两处都引了它**。
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    expect(text).toMatch(/位置、尺寸、锚点是一整套/);
+    expect(text).toMatch(/三样一起/);
+    // ⚠️ 抬头里那句「逐字照抄」不许再回来（票 93 的 Q2 = 乙）
+    expect(text).not.toMatch(/逐字照抄这个骨架/);
+    // ⚠️ 而那条**单边算术**也不许再回来（票 73 的 Q2 = 乙：「不得只用 `x + 宽` 判断」）——
+    //   它今天的样子是「HUD 写到 x > 408 就跑出屏幕了，直接拒」。
+    expect(text).not.toMatch(/x > \d/);
+  });
+
   it("⚠️ **设计层那 12 个 ① 档字段逐个具名**进提示词（票 10 的裁定：具名插值在下游 —— 本步是下游之一）", async () => {
     const d = tmp();
     const sp = spy();

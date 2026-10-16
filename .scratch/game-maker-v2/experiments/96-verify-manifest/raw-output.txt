@@ -1,0 +1,40 @@
+
+══════════════════════════════════════════════════════════════════════════════
+① `verifyPack({packDir})` 今天说什么 —— 三个包，零清单
+══════════════════════════════════════════════════════════════════════════════
+  fixtures/packs/last-train/v2 ⇒ ok=true
+  fixtures/packs/counter-siege/v4 ⇒ ok=true
+
+══════════════════════════════════════════════════════════════════════════════
+② 清单 fixtures/recipes/last-train.json ＋ 包 fixtures/packs/last-train/v2
+══════════════════════════════════════════════════════════════════════════════
+  清单资产 9 · 包里资产 9
+  逐条对账的读数：**缺 0** · **不符 0** · 包里多出 0
+
+══════════════════════════════════════════════════════════════════════════════
+② 清单 fixtures/recipes/counter-siege.json ＋ 包 fixtures/packs/counter-siege/v4
+══════════════════════════════════════════════════════════════════════════════
+  清单资产 21 · 包里资产 21
+  逐条对账的读数：**缺 0** · **不符 0** · 包里多出 0
+
+══════════════════════════════════════════════════════════════════════════════
+② 清单 fixtures/recipes/counter-siege-derived.json ＋ 包 fixtures/packs/counter-siege/v4
+══════════════════════════════════════════════════════════════════════════════
+  清单资产 21 · 包里资产 21
+  逐条对账的读数：**缺 15** · **不符 5** · 包里多出 15
+    · 缺（前 6）：tile-walkway · tile-shutter-door · trap-nailgun · trap-shock-floor · trap-searchlight · projectile-nail
+    · 资源 "enemy-scavenger"：尺寸对不上：spec 要 15×15，产物是 14×14
+    · 资源 "enemy-scavenger"：动画 "walk" 要 4 帧，实际 2 帧
+    · 资源 "enemy-brute"：尺寸对不上：spec 要 19×19，产物是 20×20
+    · 资源 "enemy-brute"：动画 "walk" 要 4 帧，实际 2 帧
+    · 资源 "ui-icon-scrap"：尺寸对不上：spec 要 16×16，产物是 10×10
+    ⚠️ 反向：包里多出而清单里没有的（**这一族今天没有任何判据看得见**）：tile-walk · tile-door · slot-socket · slot-ring · tower-nailgun · tower-shock …
+
+══════════════════════════════════════════════════════════════════════════════
+③ 包里有指回清单的指针吗（决定清单能不能自动找）
+══════════════════════════════════════════════════════════════════════════════
+  fixtures/packs/last-train/v2: generator={"name":"game-maker","version":"0.0.0"}
+    provenance={"mode":"generated"} · 顶层键=format,id,version,createdAt,generator,provenance,palette,atlases,assets,files
+  fixtures/packs/counter-siege/v4: generator={"name":"game-maker","version":"0.0.0"}
+    provenance={"mode":"generated"} · 顶层键=format,id,version,createdAt,generator,provenance,palette,atlases,assets,files
+  ⇒ 「清单从哪来」要由**调用方给**；包里没有可自动发现的路。

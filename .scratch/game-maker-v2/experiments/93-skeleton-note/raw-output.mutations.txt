@@ -1,0 +1,36 @@
+# 票 93 的变异探针（Q4 = 乙）—— 两发，都是**只改一行、跑完复原**
+
+探针**不落进测试**：它证的是那三条常驻判据**红得起来**（票 81 的教训：零判据的判据等于没有）。
+
+## 第 1 发：把 `SKELETON_SHAPE_NOTE` 清空（``）
+
+期望：**常量自检 + 两侧调用点见证**一起红。
+
+```
+ Test Files  2 failed (2)
+      Tests  3 failed | 46 passed (49)
+ FAIL  packages/assets/tests/compile-runtime.test.ts > §问话面：发出去的那一发 > ⚠️ 骨架那句「位置、尺寸、锚点是一整套」在**横版那一发**里（票 93 · 调用点见证）
+ FAIL  packages/assets/tests/prompt.test.ts > 塔防提示词：几处**量出来的**措辞，别被「统一措辞」抹平 > ⚠️ 骨架那句「位置、尺寸、锚点是一整套」**在送给模型的文本里**（票 93 · 调用点见证）
+ FAIL  packages/assets/tests/prompt.test.ts > 塔防提示词：几处**量出来的**措辞，别被「统一措辞」抹平 > ⚠️ 常量自检：那句话**非空**、三样都点名（守「有人把常量清空」而不必给生产函数加参数）
+```
+
+## 第 2 发：把抬头改回「**逐字照抄这个骨架**」
+
+期望：两侧那条 `not.toMatch(/逐字照抄这个骨架/)` 红 —— 证明**反向那半句**不是空断言。
+
+```
+ Test Files  2 failed (2)
+      Tests  2 failed | 47 passed (49)
+ FAIL  packages/assets/tests/compile-runtime.test.ts > §问话面：发出去的那一发 > ⚠️ 骨架那句「位置、尺寸、锚点是一整套」在**横版那一发**里（票 93 · 调用点见证）
+ FAIL  packages/assets/tests/prompt.test.ts > 塔防提示词：几处**量出来的**措辞，别被「统一措辞」抹平 > ⚠️ 骨架那句「位置、尺寸、锚点是一整套」**在送给模型的文本里**（票 93 · 调用点见证）
+```
+
+## 第 3 发：把规则 8 的**单边算术**改回去（`x > ${vp.w - 72}`）
+
+期望：横版那条 `not.toMatch(/x > \d/)` 红 —— 证明票 73 Q2 = 乙 那一改**有判据守着**。
+
+```
+ Test Files  1 failed (1)
+      Tests  1 failed | 26 passed (27)
+ FAIL  packages/assets/tests/compile-runtime.test.ts > §问话面：发出去的那一发 > ⚠️ 骨架那句「位置、尺寸、锚点是一整套」在**横版那一发**里（票 93 · 调用点见证）
+```
