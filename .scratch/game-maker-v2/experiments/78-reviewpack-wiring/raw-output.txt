@@ -1,0 +1,30 @@
+═══ fixtures/packs/last-train/v2 ═══
+   ① 联系表：3440×1130px · 图集里共 22 帧 · 拼了 25ms  ← **纯函数，零网络**
+   ② authoring/stylespec.json：过 StyleSpecSchema = ✅ 过 · reviewPack 要的 5 个键缺 0 个
+   ③ 真发一次会发出去：POST http://localhost/v1/messages · model `deepseek-v4-pro` · 请求体 40908 字节
+        其中 base64 图 40160 字节（39KB）· 提示词 474 字节 · ok=true
+
+═══ fixtures/packs/counter-siege/v4 ═══
+   ① 联系表：1370×562px · 图集里共 26 帧 · 拼了 12ms  ← **纯函数，零网络**
+   ② authoring/stylespec.json：过 StyleSpecSchema = ✅ 过 · reviewPack 要的 5 个键缺 0 个
+   ③ 真发一次会发出去：POST http://localhost/v1/messages · model `deepseek-v4-pro` · 请求体 15524 字节
+        其中 base64 图 14100 字节（14KB）· 提示词 1144 字节 · ok=true
+
+═══ ④ 原图（票 22 要喂的那张）够不够得着 ═══
+
+   run-out-2026-10-13e（v1）
+      包里那份 authoring/visual-world.json 指向 : `style.png`
+      那个路径在 **包里** 存在吗                : ❌ **不在（悬空）**
+      那个路径在 **run 目录里** 存在吗           : ✅ 在（2228 字节）
+      包里 18 张 png 里有参考图吗      : ❌ **没有** —— 全是交付图集与生成物
+
+   run-out-2026-10-13h（v1）
+      包里那份 authoring/visual-world.json 指向 : `style.png`
+      那个路径在 **包里** 存在吗                : ❌ **不在（悬空）**
+      那个路径在 **run 目录里** 存在吗           : ✅ 在（2228 字节）
+      包里 15 张 png 里有参考图吗      : ❌ **没有** —— 全是交付图集与生成物
+
+⇒ 读出来的：**对 packDir 跑，原图够不着；对 runDir 跑（或额外给一个图路径）才够得着。**
+
+⇒ 读出来的：**「一次视觉调用」的代价 = 上面 ③ 那个请求体**（图占绝大部分）；
+   而 ① 与 ② 都是**免费的纯函数**（零网络），可以随便跑。

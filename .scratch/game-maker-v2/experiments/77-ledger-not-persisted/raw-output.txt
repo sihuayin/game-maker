@@ -1,0 +1,111 @@
+票 77 探针 · 失败现场上的账 —— 壳印出来的 vs 盘上真花的
+读点：/Volumes/shy/some-projects/game-maker/.scratch/game-maker-v2/experiments/e2e-wasteland/raw
+跑数：12
+
+════════ 逐跑 ════════
+
+── run-out-2026-10-10   exit 4 · 26928ms · 进度停在「visual-world」
+   ③ 壳印的账        : 1 行  analyze-reference 1
+   🗂 失败现场 .failed-2026-10-10T10-22-04-770Z/ : intent.md
+
+── run-out-2026-10-10b   exit 4 · 58087ms · 进度停在「character-dna」
+   ③ 壳印的账        : 1 行  character-dna 1
+   🗂 失败现场 .failed-2026-10-10T10-36-45-891Z/ : game-design.json · game-intent.json · intent.md · style.png · visual-world.json
+
+── run-out-2026-10-10c   exit 1 · 572760ms · 进度停在「pack：sign-post（7/24）」
+   ③ 壳印的账        : **连 `ledger` 这个键都没有**
+   ① run 级账 [wasteland-scavenger-assets] : 5 行  analyze-reference 1 · analyze-intent 1 · compile-design 1 · character-dna 1 · plan-assets 1
+   ② 包的账   [wasteland-scavenger-assets] : （没有这份文件）
+
+── run-out-2026-10-11a   exit 4 · 58493ms · 进度停在「character-dna」
+   ③ 壳印的账        : 1 行  character-dna 1
+   🗂 失败现场 .failed-2026-10-11T05-13-03-917Z/ : game-design.json · game-intent.json · intent.md · style.png · visual-world.json
+
+── run-out-2026-10-13a   exit 4 · 53538ms · 进度停在「design」
+   ③ 壳印的账        : 1 行  compile-design 1
+   🗂 失败现场 .failed-2026-10-13T02-21-58-177Z/ : game-intent.json · intent.md · style.png · visual-world.json
+
+── run-out-2026-10-13b   exit 4 · 101476ms · 进度停在「recipe」
+   ③ 壳印的账        : 1 行  plan-assets 1
+   🗂 失败现场 .failed-2026-10-13T09-22-52-685Z/ : character-dna.json · game-design.json · game-intent.json · intent.md · style.png · visual-world.json
+
+── run-out-2026-10-13c   exit 4 · 33535ms · 进度停在「visual-world」
+   ③ 壳印的账        : 1 行  analyze-reference 1
+   🗂 失败现场 .failed-2026-10-13T09-47-03-032Z/ : intent.md
+
+── run-out-2026-10-13d   exit 0 · 69639ms · 进度停在「recipe」
+   ③ 壳印的账        : **连 `ledger` 这个键都没有**
+   ① run 级账 [ruined-city-scavenger] : 5 行  analyze-reference 1 · analyze-intent 1 · compile-design 1 · character-dna 1 · plan-assets 1
+   ② 包的账   [ruined-city-scavenger] : （没有这份文件）
+
+── run-out-2026-10-13e   exit 4 · 200790ms · 进度停在「config」
+   ③ 壳印的账        : 1 行  compile-runtime 1
+   ① run 级账 [ruined-city-scavenger] : 5 行  analyze-reference 1 · analyze-intent 1 · compile-design 1 · character-dna 1 · plan-assets 1
+   ② 包的账   [ruined-city-scavenger] : 30 行  master 2 · image 12 · drawlist 16
+   ⭐ 这一跑真买的图       : 14 张（master + image）
+
+── run-out-2026-10-13f   exit 4 · 32423ms · 进度停在「visual-world」
+   ③ 壳印的账        : 1 行  analyze-reference 1
+   🗂 失败现场 .failed-2026-10-13T12-20-35-123Z/ : intent.md · visual-world-attempts.json
+
+── run-out-2026-10-13g   exit 0 · 71824ms · 进度停在「recipe」
+   ③ 壳印的账        : **连 `ledger` 这个键都没有**
+   ① run 级账 [ruined-city-scavenger] : 5 行  analyze-reference 1 · analyze-intent 1 · compile-design 1 · character-dna 1 · plan-assets 1
+   ② 包的账   [ruined-city-scavenger] : （没有这份文件）
+
+── run-out-2026-10-13h   exit 4 · 424021ms · 进度停在「qa」
+   ③ 壳印的账        : **连 `ledger` 这个键都没有**
+   ① run 级账 [ruined-city-scavenger] : 35 行  analyze-reference 1 · analyze-intent 1 · compile-design 1 · character-dna 1 · plan-assets 1 · master 2 · image 9 · drawlist 18 · compile-runtime 1
+   ② 包的账   [ruined-city-scavenger] : 29 行  master 2 · image 9 · drawlist 18
+   ⭐ 这一跑真买的图       : 11 张（master + image）
+
+════════ A · 真值**在盘上**的失败（段 B / 站点段）════════
+
+⚠️ **「盘上」= run 级账 ∪ 包的账（按行**去重**）** —— 两份账**口径不同、且会重叠**：
+   run 级那份是「链级并集」（段 A ∪ 段 B），包那份是段 B 的一部分 ⇒ **相加就是重复计数**。
+   而去重之后还差的那一行，是**只挂在异常上、两份账里都没有**的那一发（见下）。
+
+⚠️ 少报  run-out-2026-10-13e    壳印  1 行  vs  这一跑真花 36 行  ⇒ 差 35   （真买的图 14 张）
+        盘上两份账去重后 35 行 · 外加**只挂在异常上、两边都没写**的 compile-runtime 1 行
+        ⚠️ 而 run 级那份账自己也**不全**：段 B 自己那一段只在**成功**时才写进去（13e 那份只有段 A 的 5 行）
+⚠️ 少报  run-out-2026-10-13h    壳印  0 行  vs  这一跑真花 35 行  ⇒ 差 35   （真买的图 11 张）
+        盘上两份账去重后 35 行
+        ⚠️ 而 run 级那份账自己也**不全**：段 B 自己那一段只在**成功**时才写进去（13e 那份只有段 A 的 5 行）
+
+════════ B · 真值**不在盘上**的失败（段 A · 理解层）════════
+
+（段 A 的 run 级账只在**成功**时写（create-game.ts:314）⇒ 它一失败，连那份文件都没有；
+  失败现场里也没有账。⇒ 「前面那几步跑过没有」只剩**进度行**这一个记录 —— 而进度行**不是账**。）
+
+run-out-2026-10-10     死在「visual-world」
+     进度行宣告跑过 : 1/5  → visual-world
+     壳印出来的账   : 1 行   ⇒ 与进度行差 0 行（每行 = 一个**付过钱**的步骤）
+
+run-out-2026-10-10b    死在「character-dna」
+     进度行宣告跑过 : 4/5  → visual-world · intent · design · character-dna
+     壳印出来的账   : 1 行   ⇒ 与进度行差 3 行（每行 = 一个**付过钱**的步骤）
+
+run-out-2026-10-11a    死在「character-dna」
+     进度行宣告跑过 : 4/5  → visual-world · intent · design · character-dna
+     壳印出来的账   : 1 行   ⇒ 与进度行差 3 行（每行 = 一个**付过钱**的步骤）
+
+run-out-2026-10-13a    死在「design」
+     进度行宣告跑过 : 3/5  → visual-world · intent · design
+     壳印出来的账   : 1 行   ⇒ 与进度行差 2 行（每行 = 一个**付过钱**的步骤）
+
+run-out-2026-10-13b    死在「recipe」
+     进度行宣告跑过 : 5/5  → visual-world · intent · design · character-dna · recipe
+     壳印出来的账   : 1 行   ⇒ 与进度行差 4 行（每行 = 一个**付过钱**的步骤）
+
+run-out-2026-10-13c    死在「visual-world」
+     进度行宣告跑过 : 1/5  → visual-world
+     壳印出来的账   : 1 行   ⇒ 与进度行差 0 行（每行 = 一个**付过钱**的步骤）
+
+run-out-2026-10-13f    死在「visual-world」
+     进度行宣告跑过 : 1/5  → visual-world
+     壳印出来的账   : 1 行   ⇒ 与进度行差 0 行（每行 = 一个**付过钱**的步骤）
+
+════════ C · 不是失败的那种（exit 0 · 检查点停）════════
+
+run-out-2026-10-13d    exit 0（`create` 在清单检查点停）· 壳印 0 行（没有 ledger 键 —— 成功路径本来就没有）  · run 级账 5 行
+run-out-2026-10-13g    exit 0（`create` 在清单检查点停）· 壳印 0 行（没有 ledger 键 —— 成功路径本来就没有）  · run 级账 5 行

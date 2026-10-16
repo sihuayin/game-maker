@@ -1,0 +1,29 @@
+票 77 · 第二个探针 —— 「挂累积的账」这句话挂不挂得上
+
+情形 ①：异常上**已经**有一行账
+   （`ops.ts` 每一处 `ledgerCarrying(call.record())` 造的就是这个形状：段 A / 段 B 的 config）
+   `"ledger" in e` 挂之前 = true
+   账：挂之前 ["compile-runtime"]  →  挂之后 ["compile-runtime"]   ⚠️ **没挂上（空操作）**
+
+情形 ②：异常上**没有**账 —— 而构造时**连第三个参数都没给**
+   （`assertQaPassed`（`create-game.ts:205`）与 `failWith`（`layout.ts:56`）今天就是这个形状）
+   `"ledger" in e` 挂之前 = true
+   账：挂之前 undefined  →  挂之后 undefined   ⚠️ **没挂上（空操作）**
+
+情形 ③（对照）：异常是**普通 `Error`**
+   （`ops.ts:1248` 与 `packAssets` 的 catch 靠的就是这一档 —— 它是有效的）
+   `"ledger" in e` 挂之前 = false
+   账：挂之前 undefined  →  挂之后 ["analyze-reference","analyze-intent","compile-design"]   ⭐ 挂上了
+
+⇒ 读出来的：
+   ① **挂不上** · ② **挂不上** · ③ 挂得上
+
+⚠️ ② 挂不上，是因为 `CommandError` 的构造器**无条件**赋 `this.ledger = opts.ledger`
+   ⇒ `'ledger' in e` **恒真** ⇒ `carryOnError` 的「只加不改」（`command.ts:133-140`）
+   把它当成「下层已经挂过了」，于是一次**静默的空操作**。
+   ⚠️ 仓库自己已经记着这条：`ops.ts:1233-1235` 逐字「`CommandError` 的构造器**无条件**赋
+      `ledger`/`failureDir` ⇒ `'ledger' in e` 恒真 ⇒ 下面那句 `carryOnError` 对它们本来就是个 no-op」。
+
+   ⇒ 结论：票面把 (a) 说成「要动 `ledgerCarrying` 的形状」——
+     ⚠️ 而量下来它有个**更靠前**的坎：在我们最想挂的那两个抛点上，
+     `carryOnError` 这个**动词本身**就是空操作（①②），与挂的是什么形状无关。

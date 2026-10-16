@@ -17,7 +17,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, VISUAL_WORLD_ATTEMPTS_FORMAT, VisualWorldSpecSchema,
+  STRUCTURED_CALL_ATTEMPTS, STYLE_MEDIA_TYPES, UPSTREAM_TIMEOUT_MS, VISUAL_WORLD_ATTEMPTS_FORMAT, VisualWorldSpecSchema,
   carryOnError, forcedTool, parseToolUse,
   type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleReference,
   type ToolUseFailure,
@@ -33,11 +33,9 @@ const REQUESTED_MODEL = "deepseek-v4-pro";
  *  这是**上限不是分配**，给足不花钱；而**截断**会把一次本来会成功的调用变成 `truncated` 重采样。 */
 const MAX_TOKENS = 16_000;
 
-/** 媒体类型按**扩展名**判。⚠️ 我们**不解析图片内容**（票 08 的 R1-Q7）——
- *  `vision` 够不着 `assets` 的 `png.ts`，也没有必要：上游本来就会重编码（票 04 实测：送纯单色图 5 次零命中）。 */
-const MEDIA_TYPES: Record<string, string> = {
-  ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp",
-};
+// ⚠️ **媒体类型白名单已提到 `contracts`**（2026-10-16 · [票 78](../../../.scratch/game-maker-v2/issues/78-reviewpack-wiring.md)）：
+//   两个包要用同一份（`vision` 喂 `analyze-reference` · `assets` 喂 `reviewPack`），
+//   而 R11 说新包彼此不依赖 ⇒ 只有 `contracts` 放得下。**内容一字未改**，只是搬了个家。
 
 /** 模型面向的 schema = 契约 **减掉**调用方注入的那一个键（票 08 的 R1-Q2）。
  *  ⚠️ `.omit()` 会**丢掉**顶层那条越界 `superRefine`（v4 实测）—— 那是**预期的**：
@@ -193,9 +191,9 @@ function assertRequirement(text: string): string {
 function imageBlocks(refs: StyleReference[], cwd: string): Record<string, unknown>[] {
   return refs.map((r) => {
     const ext = path.extname(r.path).toLowerCase();
-    const media = MEDIA_TYPES[ext];
+    const media = STYLE_MEDIA_TYPES[ext];
     if (media === undefined)
-      throw new Error(`参考图 ${r.path} 的扩展名 "${ext}" 不在白名单里（${Object.keys(MEDIA_TYPES).join(" / ")}）` +
+      throw new Error(`参考图 ${r.path} 的扩展名 "${ext}" 不在白名单里（${Object.keys(STYLE_MEDIA_TYPES).join(" / ")}）` +
         " —— 我们**按扩展名**判媒体类型，不解析图片内容（R1-Q7）。");
     let bytes: Buffer;
     try { bytes = fs.readFileSync(path.resolve(cwd, r.path)); }

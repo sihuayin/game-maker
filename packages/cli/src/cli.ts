@@ -14,7 +14,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
+import { reviewRun, runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -28,6 +28,13 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker site   <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
+  game-maker review <run 目录> [--json]
+
+\`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
+  把包的联系表与**原图**一起喂给视觉模型，要一份「哪里不像」的观察清单。
+  ⚠️ **它要花钱**（一次视觉调用），所以它**不在创建链上**：要不要跑、跑几次，由人决定；
+  ⚠️ 它**不打分、不判定通过与否、也不阻断任何产物** —— 拿不到结果就当没有。
+  ⚠️ 花了的那一发**记进 <run 目录>/ledger.json**（run 级那份）。
 
 \`create\` 是**两段**（R9：人工点只有一个，在清单处）：
   · 不带 \`--yes\` ⇒ 跑到清单为止就**停下**（退出码 0，\`data.status = "awaiting"\`），
@@ -578,6 +585,15 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
       case "inspect": {
         const dir = positionals[0]; if (!dir) throw new CommandError("usage", "inspect 需要一个资源包目录");
         result = inspectPack({ packDir: path.resolve(dir) });
+        break;
+      }
+      case "review": {
+        // ⚠️ **它吃 run 目录、不吃包目录**（票 78）：契约要求「接线必须能同时取得两者」——
+        //   而**原图不在包里**（本票量到）⇒ 只有从 run 侧才够得着；
+        //   记账要写的 `run/v<N>/ledger.json` 也在那一侧。包由那一支自己按 gameId 找最新的一个。
+        const dir = positionals[0];
+        if (!dir) throw new CommandError("usage", "review 需要一个 run 目录（build 打出来的那个：<out>/<gameId>/run/v<N>）");
+        result = await reviewRun({ runDir: path.resolve(dir), outRoot, transport, ...up });
         break;
       }
       default: throw new CommandError("usage", `不认识的操作 "${command}"`);

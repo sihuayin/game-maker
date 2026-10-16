@@ -565,3 +565,48 @@ function readRunLedger(runDir: string): LedgerCall[] {
     return [];
   }
 }
+
+/**
+ * **把一笔「事后诊断」的花费补记进这一次运行的账** —— [票 78](../../../.scratch/game-maker-v2/issues/78-reviewpack-wiring.md)
+ * 的 `game-maker review` 那一支用它（人裁 Q2 = 乙：「**事后必须记账**」）。
+ *
+ * ⚠️⚠️ **为什么是 run 级那一份，而不是包内那一份** —— 两处各自的理由都是硬的：
+ *   · **口径**：`contracts/src/run-ledger.ts` 的文件头逐字写着它回答的是
+ *     「**这一次运行总共花了什么**」，而抽查这一发正是「这一次运行」花掉的；
+ *     包内那份回答的是「**这个包花了什么**」，是一份**收据**。
+ *   · **包内那份根本写不得**：它**进了 `manifest.files[]`**（`walk(packDir)` 穷举），
+ *     而 `verify` 逐条比 `sum !== f.checksum` ⇒ **追加一行会让那个包 `verify` 不过**
+ *     （票 78 量到：13e 那个包的 `files[]` 59 条里就有 `ledger.json · checksum sha256:1b897…`）。
+ * ⇒ 这也**没有**去统一两份账的口径（人裁逐字：「**不在本轮擅自统一两份账的口径**」）——
+ *   只是**往口径本来就对的那一份追加**，两份账各自照旧。
+ *
+ * ⚠️ **`createdAt` 与 `run.wallClockMs` 一律沿用原值**：它们描述的是**那次运行**，不是这一次追加。
+ *   重算它们等于把「人等了多久」改写成「追加发生在什么时候」—— 那是另一件事。
+ * ⚠️ **没有 run 级账就抛**，不凭空造一份：`run/v<N>/ledger.json` 是 `runUnderstanding` 定稿时
+ *   （`create-game.ts:314`）写下的 ⇒ **它不在，就说明这一次运行根本没定稿**
+ *   （现场还叫 `.failed-*`），而那种情况下「往这一次运行的账上记」没有落脚点。
+ *   ⚠️ 这里**不许静默降级** —— 人裁逐字：「**不把「不阻断」误读成「可以不记账」**」。
+ */
+export function recordRunSpend(runDir: string, calls: readonly LedgerCall[]): void {
+  if (calls.length === 0) return;
+  const p = path.join(runDir, RUN_ARTIFACT.ledger);
+  if (!fs.existsSync(p))
+    throw new Error(
+      `记账失败：这一次运行还没有 \`run/v<N>/ledger.json\`（${p}）。\n` +
+      "⚠️ 那份账是运行**定稿**时写下的 —— 它不在，说明这一次运行根本没定稿（现场还叫 `.failed-*`）。\n" +
+      "   ⇒ 「把这一发记进这一次运行的账」没有落脚点；**别把这句话读成「那就别记了」**（票 78 的人裁逐字：\n" +
+      "   「不把「不阻断」误读成「可以不记账」」）。",
+    );
+  let doc: Partial<RunLedger> = {};
+  try { doc = JSON.parse(fs.readFileSync(p, "utf8")) as Partial<RunLedger>; } catch { doc = {}; }
+  const merged = [...(Array.isArray(doc.calls) ? doc.calls : []), ...calls];
+  const out: RunLedger = {
+    format: RUN_LEDGER_FORMAT,
+    gameId: doc.gameId ?? path.basename(path.dirname(path.dirname(runDir))),
+    runVersion: doc.runVersion ?? parseRunVersion(runDir),
+    createdAt: doc.createdAt ?? new Date().toISOString(),
+    run: { wallClockMs: doc.run?.wallClockMs ?? 0, byStep: summarizeCalls(merged) },
+    calls: merged,
+  };
+  fs.writeFileSync(p, jstr(out));
+}

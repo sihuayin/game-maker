@@ -305,3 +305,16 @@ export const VisualWorldSpecSchema = z.strictObject({
 export type VisualWorldSpec = z.infer<typeof VisualWorldSpecSchema>;
 export type StyleSpecShape = z.infer<typeof StyleSpecShape>;
 export type StyleReference = z.infer<typeof VisualWorldSpecSchema>["styleReferences"][number];
+
+/**
+ * 参考图送上游时的**媒体类型白名单** —— 按**扩展名**判，**不解析图片内容**（票 08 的 R1-Q7）。
+ *
+ * ⚠️ **它住契约、不住某一个包**：两个包要用它 —— `vision`（喂 `analyze-reference`）
+ *   与 `assets`（喂 `reviewPack` 那一发，[票 78](../../../.scratch/game-maker-v2/issues/78-reviewpack-wiring.md)）。
+ *   ⚠️ 而 R11 说**新包彼此不依赖、只依赖 `contracts`** ⇒ 只有这一处放得下；
+ *   各写一份就是「两份定义会漂」（`run-ledger.ts` 文件头那条教训）。
+ *   ⚠️ 2026-10-16 从 `vision/src/analyze-reference.ts` 的局部常量**提上来**的，内容一字未改。
+ */
+export const STYLE_MEDIA_TYPES: Record<string, string> = {
+  ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp",
+};
