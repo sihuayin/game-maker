@@ -203,6 +203,23 @@ export const AssetPackEntry = z.object({
       if (!names.has(fn)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `动画 "${an.name}" 引用了不存在的帧 "${fn}"`, path: ["animations"] });
       grouped.add(fn);
     }
+  // ── 票 89：**动画名不许重复** ───────────────────────────────────────────
+  // ⚠️ 它与上面那条「帧名重复」**不是同一条，也不是它的翻版** —— 两条各自治一条进路：
+  //   · `drawlist` / `image`：帧名 `= <资源 id>.<动画名><序号>`（`framePlan` 派的）⇒ 同名动画
+  //     必然撞帧名 ⇒ **上面那条**本来就会拒它（那正是票 79 立案时读到的半边）。
+  //   · `import`：帧名是**配方自己写的**（`pack.ts` 的 `src.sheet?.names`），**不由动画名派生**
+  //     ⇒ 一份「两条同名动画、帧名两两不同」的产物**上面那条一个字都碰不到它**。
+  //     ⚠️ 票 79 的探针 ③ 真跑出来过一份，而它**过得了本契约**（现场 `experiments/79-anim-name-dup/`）。
+  //     这一条就是那半边的堵点。
+  // ⚠️ **后果不是「多一条」**：造包时动画条目按**状态名**过滤（`pack.ts` 的
+  //   `frames.filter((f) => f.state === a.name)`）⇒ 两条同名条目筛出**同一批帧** ⇒ **两条合体**，
+  //   而读者侧 `resolvePackRef` 静默取第一条。⚠️ 解释留在这里，**不进报文**（票 89 的人裁 Q4）。
+  const animNames = new Set<string>();
+  for (const an of a.animations ?? []) {
+    if (animNames.has(an.name)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `动画名重复："${an.name}"`, path: ["animations"] });
+    animNames.add(an.name);
+  }
+
   // 分层背景：帧与层**一一对应**，且帧名必须是 `<背景 id>.<层名>`。
   // 这条不查的话，「第 i 层配第 i 帧」就成了一条**没写在任何契约里的约定** ——
   // 而壳子按名字取帧，它对不上时是静默的。
@@ -374,6 +391,17 @@ export function resolvePackRef(ref: AssetPackRef, manifest: AssetPackManifest): 
   };
 
   if (ref.anim !== undefined) {
+    // ⚠️ **这里的 first-match-wins 是安全的 —— 而它的成立前提必须写出来**（票 89 的人裁 Q3：
+    //   「不加运行时判据，但记录这一依赖关系及其成立前提」）：
+    //   · **依赖**：交付侧那条「动画名重复」判据（`AssetPackEntry.superRefine`，票 89 补的）
+    //     不收同名 ⇒ 走到这里的 `manifest` **不可能**有两条同名动画 ⇒ `find` 取不到歧义。
+    //   · **前提**：**每一个生产调用点都先过 `parseAssetPack`**。今天那几处都过：
+    //     `demo/src/world.ts`（不过 ⇒ `pack = null`，本函数**根本不跑**，画面降级成占位符）·
+    //     `qa/src/gameplay.ts`（不过 ⇒ **抛**）· `assets/src/ops.ts` 链上每一步（各自 parse 一遍）。
+    //     ⚠️ **前提一破，静默歧义就原样回来**：那时它**不报歧义**、只悄悄解到生成器先吐的那一条。
+    //   ⚠️ 而**今天不在这里加判据**：那会是一条**永远不会响的判据**，而下一个人会把它当成活的
+    //     （`pack.ts` 票 38 那条注释的同一条纪律）。真到了那一天，正确做法是**报错**
+    //     —— 与下面那支「必须指明 anim」同口径。
     const anim = animations.find((a) => a.name === ref.anim);
     if (!anim) {
       const known = animations.map((a) => a.name).join(", ") || "（无）";

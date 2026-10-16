@@ -159,6 +159,8 @@ export const UiSpec = z.object({
 // 而 `discriminatedUnion` 只接受 `ZodObject`。放在这里反而更清楚 —— 它是**类级**的规则。
 // ⚠️ **票 58 的层名唯一性也放在这一层**（同一条理由：它是 `background` 这一类的规则，
 //   而 `BackgroundSpec` 自己不可能是 `ZodEffects`）。
+// ⚠️ **票 89 的动画名唯一性同款**（`animation` 这一类的规则，而 `AnimatedSpec` 同样不可能是
+//   `ZodEffects`）—— 两条并排住在这里，是因为它们说的是**同一件事**：一份清单自己跟自己打架。
 export const AssetSpecSchema = z
   .discriminatedUnion("kind", [SpriteSpec, AnimatedSpec, BackgroundSpec, UiSpec])
   .superRefine((s, ctx) => {
@@ -176,6 +178,30 @@ export const AssetSpecSchema = z
         if (seen.has(l.name))
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: `层名重复："${l.name}"`, path: ["layers"] });
         seen.add(l.name);
+      }
+    }
+
+    // ── 票 89：**动画名不许重复** ──────────────────────────────────────────────
+    // ⚠️ 它与上面那条层名**同款同形**（连报文都是同一句式的第三句），而它治的进路**更宽**：
+    //   ⚠️ **帧名是从动画名派生出来的** —— `framePlan`（`packages/assets/src/prompt.ts:148-155`）
+    //   写的是 `` `${spec.id}.${a.name}${a.frames > 1 ? i + 1 : ""}` ``。
+    //   ⇒ 在 `drawlist` / `image` 这两条策略上，两条同名动画**必然**撞帧名，
+    //     于是交付侧那条「帧名重复」本来也会拒它 —— 而那时包已经生成完了（票 46 量到的同一条进路）。
+    //   ⚠️ **而 `import` 那条策略逃得掉**：它的帧名是**配方自己写的**（`pack.ts` 的
+    //     `src.sheet?.names`），**不由动画名派生** ⇒ 一份「两条同名动画」的产物
+    //     **帧名两两不同**、因此**过得了交付侧契约**（票 89 的探针 ③ 真跑出来过一份，
+    //     现场在 `experiments/79-anim-name-dup/`）⇒ 这一条**不是**上一条的翻版，它自己是一个缺口。
+    // ⚠️ **重复的后果不是「多一条」**：造包时动画条目是按**状态名**过滤的
+    //   （`pack.ts` 的 `frames.filter((f) => f.state === a.name)`）⇒ 两条同名条目筛出**同一批帧**
+    //   ⇒ ⚠️ **两条都变成了同一条**（合体）；而读者侧（`resolvePackRef`）静默取第一条，
+    //   对账侧（`auditAssetSpec`）用 `Set` 比 ⇒ 它**对覆盖度检查是隐形的**。
+    //   ⚠️ 这段话是**注释**、不进报文：报文照「X 名重复："…"」那一族，短、点名（票 89 的人裁 Q4）。
+    if (s.kind === "animation") {
+      const seen = new Set<string>();
+      for (const a of s.animations) {
+        if (seen.has(a.name))
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: `动画名重复："${a.name}"`, path: ["animations"] });
+        seen.add(a.name);
       }
     }
 

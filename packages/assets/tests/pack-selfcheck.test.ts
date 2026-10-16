@@ -115,3 +115,97 @@ describe("票 46 · 非法产物不许被当作成功产物交付", () => {
     expect(a.audit).toEqual([]);
   }, 120_000);
 });
+
+/**
+ * 票 89 · **动画名重复** —— 而这一份走的是 `import`。
+ *
+ * ⚠️ **为什么不能拿分层背景那条现成形状来试**：那条（`dupLayerRecipe`）靠的是
+ *   「帧名由层名派生」⇒ 两层同名**必然**撞帧名。动画名在 `drawlist` / `image` 上同款；
+ *   ⚠️ 而 `import` 那条进路的帧名是**配方自己写的**（`src.sheet.names`），**不由动画名派生**
+ *   ⇒ 探针 ③ 真跑出来的那份产物**帧名两两不同**，于是「帧名重复」一个字都不响、
+ *   而它当时**过了交付侧契约**（票 79 的立案读数，现场 `experiments/79-anim-name-dup/`）。
+ *   ⇒ 本文件这一组问的正是那半边：**今天是「过了」，补上之后应当「抛」**。
+ */
+describe("票 89 · 动画名重复走 `import` 那条进路：产物过不了交付侧契约", () => {
+  /**
+   * 一份 `import` 配方，两条同名动画 —— 而 `sheet.names` 是**四个互不相同的帧名**。
+   * ⚠️ 帧名与动画名**都不是派生的**（这正是 `import` 那条进路与另外两条的分野）。
+   */
+  const dupAnimRecipe = (): AssetRecipe => ({
+    format: "asset-recipe/v1",
+    id: "t89-anim-dup",
+    styleRef: "authoring/stylespec.json",
+    assets: [{
+      spec: {
+        kind: "animation", id: "hero", role: "玩家角色", description: "一个两帧待机的角色",
+        styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 256, h: 256 }, required: true,
+        animations: [{ name: "idle", frames: 2, loop: true }, { name: "idle", frames: 2, loop: true }],
+      },
+      source: {
+        kind: "import", ref: "fixtures/import/wan-player-1024.png", background: { tolerance: 30 },
+        sheet: {
+          columns: 4, rows: 1, frameWidth: 256, frameHeight: 256,
+          names: ["hero.a", "hero.b", "hero.c", "hero.d"],
+          animations: [{ name: "idle", frames: ["hero.a", "hero.b"] }, { name: "idle", frames: ["hero.c", "hero.d"] }],
+        },
+      },
+    }],
+  });
+
+  /** 同一份配方的**阴性对照**：只把两条动画名（与 sheet 的分组名）改成两两不同。 */
+  const okAnimRecipe = (): AssetRecipe => {
+    const r = dupAnimRecipe();
+    const spec = r.assets[0]!.spec as unknown as { animations: { name: string; frames: number; loop: boolean }[] };
+    spec.animations = [{ name: "idle", frames: 2, loop: true }, { name: "walk", frames: 2, loop: true }];
+    const src = r.assets[0]!.source as unknown as { sheet: { animations: { name: string; frames: string[] }[] } };
+    src.sheet.animations = [{ name: "idle", frames: ["hero.a", "hero.b"] }, { name: "walk", frames: ["hero.c", "hero.d"] }];
+    return r;
+  };
+
+  it("阳性：两条同名 ⇒ 生产函数抛（退 4）· `pack/` 不出现 · 失败现场里那份违约 manifest 可看", async () => {
+    const out = tmp();
+    const recipe = dupAnimRecipe();
+
+    // ⚠️ **两道闸的层次**（与上面那一组同款）：入口那道**现在也**拒它（票 89 的创作侧判据）。
+    const front = parseRecipe(recipe);
+    expect(front.ok, "入口那道**现在也**拒它（票 89 补的创作侧判据）").toBe(false);
+    if (!front.ok) expect(front.errors.join()).toMatch(/动画名重复/);
+    // 而下面故意**绕过**入口 —— 撞的是**生产函数里**那道自校验（这才是本文件问的问题）。
+
+    let err: unknown;
+    try {
+      await buildAssetPack({ recipe, style: STYLE, outDir: out, recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH });
+    } catch (e) { err = e; }
+
+    expect(err, "必须抛 —— 这正是票 89 补上的那半边").toBeInstanceOf(Error);
+    expect(exitCodeOfError(err)).toBe(4);
+    // ② 报错**点名到字段与原因** —— 而且说的是**动画名**，不是被它连累的帧名
+    const msg = String((err as Error).message);
+    expect(msg).toMatch(/动画名重复/);
+    expect(msg).toMatch(/assets\[0\]\.animations/);
+
+    // ③ 正式版本目录**根本没出现**
+    const gameDir = path.join(out, recipe.id);
+    expect(existsSync(path.join(gameDir, "pack")), "pack/ 不许出现").toBe(false);
+
+    // ④ 失败现场留着，而那份违约 manifest 里**两条同名动画都还在**（可追溯它到底写了几条）
+    const sites = readdirSync(gameDir).filter((d) => d.startsWith("failed-"));
+    expect(sites.length).toBe(1);
+    const kept = JSON.parse(readFileSync(path.join(gameDir, sites[0]!, "manifest.json"), "utf8"));
+    expect(kept.assets[0].animations.map((a: { name: string }) => a.name)).toEqual(["idle", "idle"]);
+    // ⚠️ 而帧名**确实是两两不同**的 —— 这条断言把这个用例与上面那一组**分开**：
+    //   它证明了「帧名重复」那条判据在这里**一个字都不响**，拦住它的是新加的那一条。
+    expect(new Set(kept.assets[0].frames.map((f: { name: string }) => f.name)).size).toBe(4);
+  }, 120_000);
+
+  it("阴性：同一份配方、动画名两两不同 ⇒ 照常提交、对账为空（新的那条不误杀 `import`）", async () => {
+    const r = await buildAssetPack({
+      recipe: okAnimRecipe(), style: STYLE, outDir: tmp(), recipeDir: ROOT, generate: stub, sourceDateEpoch: EPOCH,
+    });
+    expect(r.packDir).toMatch(/\/pack\/v\d+$/);
+    expect(r.manifest.assets[0]!.animations!.map((a) => a.name)).toEqual(["idle", "walk"]);
+    // 两条动画各自拿到的帧**是分开的**（同名那两份会合体 —— 那正是票 89 量到的后果）
+    expect(r.manifest.assets[0]!.animations!.map((a) => a.frames)).toEqual([["hero.a", "hero.b"], ["hero.c", "hero.d"]]);
+    expect(r.audit).toEqual([]);
+  }, 120_000);
+});

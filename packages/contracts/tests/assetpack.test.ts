@@ -200,6 +200,13 @@ describe("反例 —— 落地时新增的几条", () => {
     expect(errorsOf(mutate((m) => { m.assets[1]!.frames.push({ name: "platform" }); }))).toMatch(/帧名重复/);
   });
 
+  it("⚠️ **动画名**重复被拒（票 89）—— 帧名那条碰不到它", () => {
+    // ⚠️ 这份 mutation 造的正是票 89 探针 ③ 那份产物的**形状**：两条同名动画，
+    //   而帧名（`player.idle` / `player.walk1`）**两两不同** ⇒ 上面那条「帧名重复」一个字都不响。
+    const e = errorsOf(mutate((m2) => { m2.assets[0]!.animations![1]!.name = "idle"; }));
+    expect(e).toMatch(/动画名重复/);
+  });
+
   it("⚠️ 多于一帧却不归组被拒 —— 那一帧是不可达的（票 26）", () => {
     const e = errorsOf(mutate((m2) => { m2.assets[0]!.animations = [{ name: "walk", frames: ["player.walk1"], loop: true }]; }));
     expect(e).toMatch(/不属于任何动画/);

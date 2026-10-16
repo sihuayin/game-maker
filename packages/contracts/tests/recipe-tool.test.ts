@@ -102,7 +102,7 @@ describe("§镜像与契约**行为一致**（漂移测试）", () => {
 describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像放行 —— 那几条 gate 模型看不见", () => {
   // `toJSONSchema` 静默丢掉 `superRefine`（票 08 实测）⇒ 镜像里有没有它们，**模型看见的一样**；
   // 而把同一批判据在两种方言里各写一遍，就是 `derivePackMode` 那种漂移。⇒ 它们的落点是**装配后**那次
-  // `parseRecipe`。⚠️ 所以这五条**不是**漂移，是**分工**：镜像管线形状，契约判成立与否。
+  // `parseRecipe`。⚠️ 所以这六条**不是**漂移，是**分工**：镜像管线形状，契约判成立与否。
   it("① 路径的字符检查（绝对路径）—— 镜像只到 `min(1)`", () => {
     const r = clone("last-train.json") as unknown as Record<string, unknown>;
     r["styleRef"] = "/绝对路径.json";
@@ -156,6 +156,18 @@ describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像�
     expect(v3(r)).toBe(false);
     expect(v4(r)).toBe(true);
   });
+
+  it("⑥ 同一个资源的**动画名重复**（票 89 补的那条 · 与上面五条同款）", () => {
+    // ⚠️ 与 ⑤ 同款（也是**新加的一条判据**），而它比 ⑤ **多治一条进路**：
+    //   `drawlist` / `image` 的帧名由动画名派生（同名必然撞帧名，交付侧那条本来也拒），
+    //   ⚠️ 而 `import` 的帧名是**配方自己写的** ⇒ 那一条进路上只有**这一条**拦得住
+    //   （票 89 的探针 ③ 真跑出过一份「过了交付侧契约」的产物）。
+    const r = clone("shift-change.json");
+    const spec = r.assets.find((a) => a.spec.kind === "animation")!.spec as unknown as { animations: { name: string }[] };
+    spec.animations[1]!.name = spec.animations[0]!.name; // idle / run / jump → idle / idle / jump
+    expect(v3(r)).toBe(false);
+    expect(v4(r)).toBe(true);
+  });
 });
 
 describe("§镜像存在的**全部理由**：`toolInputSchema` 转得动它", () => {
@@ -169,6 +181,7 @@ describe("§镜像存在的**全部理由**：`toolInputSchema` 转得动它", (
     expect(text).not.toContain("宽高比");      // 母版比例那条
     expect(text).not.toContain("中央区");      // 九宫格那条
     expect(text).not.toContain("层名");        // 层名重复那条（票 58 补的）
+    expect(text).not.toContain("动画名");      // 动画名重复那条（票 89 补的）
   });
 
   it("⚠️ 而**v3 那份转不动** —— 这就是镜像存在的理由（v3 的 `ZodObject` 没有 `_zod`）", () => {

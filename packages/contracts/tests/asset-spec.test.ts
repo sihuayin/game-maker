@@ -124,6 +124,22 @@ describe("按类的硬要求", () => {
     // ⚠️ 名字**两两不同**就过 —— 这条不是「不许有近义词」，是「不许有两个同名的」
     expect(AssetSpecSchema.safeParse({ ...INTERIOR, layers: [{ name: "far", parallax: 0 }, { name: "near", parallax: 1 }] }).success).toBe(true);
   });
+
+  it("⚠️ 动画名重复被拒（票 89）—— 与上一条**同一族**，而它自己就是一个缺口", () => {
+    // ⚠️ 为什么它不是上一条的翻版：`drawlist` / `image` 的帧名由动画名**派生**（`framePlan`），
+    //   所以同名动画在那两条策略上**必然**撞帧名、被交付侧那条「帧名重复」顺手拒掉；
+    //   ⚠️ 而 `import` 的帧名是**配方自己写的**（`src.sheet.names`）⇒ 那份产物帧名两两不同、
+    //   **过得了交付侧契约**（票 89 的探针 ③ 真跑出来过一份）。⇒ 这一条堵的正是那半边。
+    const dup = { ...PLAYER, animations: [{ name: "idle", frames: 1 }, { name: "idle", frames: 4 }] };
+    const r = AssetSpecSchema.safeParse(dup);
+    expect(r.success).toBe(false);
+    if (!r.success) expect(r.error.issues.map((i) => i.message).join()).toMatch(/动画名重复/);
+
+    // ⚠️ 名字**两两不同**就过 —— 与上一条同款：不是「不许有近义词」，是「不许有两个同名的」。
+    //   玩家那份 `PLAYER`（idle / walk / jump）本来就是这个形状，这里再写一遍是为了让
+    //   「阳性也过」这件事**在同一个用例里**看得见（否则它只是一条恒假判据的反面）。
+    expect(AssetSpecSchema.safeParse(PLAYER).success).toBe(true);
+  });
 });
 
 describe("UI 九宫格：中央区不能空", () => {
