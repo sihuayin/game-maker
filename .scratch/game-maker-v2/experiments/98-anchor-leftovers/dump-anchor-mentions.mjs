@@ -1,0 +1,13 @@
+import fs from "node:fs"; import path from "node:path";
+const ROOT = path.resolve(new URL("../../../..", import.meta.url).pathname);
+const { assetPlanPrompt, CONFIG_TOOL_DESCRIPTION } = await import(path.join(ROOT, "packages/assets/dist/index.js"));
+const RUN = path.join(ROOT, ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13e/ruined-city-scavenger/run/v1");
+const DESIGN = JSON.parse(fs.readFileSync(path.join(RUN, "game-design.json"), "utf8"));
+const VWS = JSON.parse(fs.readFileSync(path.join(RUN, "visual-world.json"), "utf8"));
+const plan = assetPlanPrompt({ design: DESIGN, vws: VWS, echo: { styleRef: "x", styleId: VWS.style.id } });
+console.log("—— ① assetPlanPrompt（真 design + 真 world 渲染）——");
+console.log("  长度", plan.length, "字符 · 「锚点」", (plan.match(/锚点/g) ?? []).length, "次 · `anchor`", (plan.match(/anchor/g) ?? []).length, "次");
+for (const line of plan.split("\n")) if (/anchor|锚点/.test(line)) console.log("   |", line.trim().slice(0, 140));
+console.log("—— ④ CONFIG_TOOL_DESCRIPTION ——");
+console.log("  长度", CONFIG_TOOL_DESCRIPTION.length, "字符");
+for (const line of CONFIG_TOOL_DESCRIPTION.split("\n")) if (/锚点|左下角|底边中心/.test(line)) console.log("   |", line.trim());

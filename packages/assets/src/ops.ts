@@ -633,7 +633,7 @@ export const gameConfigExample = {
     { id: "gate", kind: "goal", at: { x: 1400, y: 250 }, asset: "<终点资源的 id>", anim: "<动画名>" },
   ],
   hud: {
-    panel: { asset: "<ui 面板资源的 id>", at: { x: 8, y: 262 }, size: { w: 72, h: 32 } },
+    panel: { asset: "<ui 面板资源的 id>", at: { x: 72, y: 238 }, size: { w: 72, h: 32 } },
     pip: { asset: "<ui 标记资源的 id>", at: { x: 12, y: 250 }, step: { x: 20, y: 0 } },
   },
   objective: { kind: "collect-then-reach", gate: "gate" },

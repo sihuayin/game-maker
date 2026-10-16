@@ -85,6 +85,20 @@ describe("§发出去的那一发（R16 的协议）", () => {
     expect(b.messages[0].content[0].type).toBe("text");
   });
 
+  it("⚠️ 创作侧那段**锚点说明**真在送出去的文本里（票 98 的 Q5 = (b) · 阳性见证）", async () => {
+    const d = stage();
+    const c = capture();
+    await run(d, c.f);
+    const text: string = c.seen[0]!.messages[0].content[0].text;
+    // ⚠️ 断的是**稳定的短语**，不是整段逐字 —— 免得下一次小改措辞就红。
+    //   ⚠️ 它证的是「那段话**真的到了模型手上**」，**不证**「模型照做了」（后者要真上游，归票 23）。
+    //   ⚠️ 这不是恒真：加这段话之前，这一侧对锚点**一个字都没有**
+    //     （票 98 的读数 B：6284 字符里「锚点」0 次，`` `anchor` `` 只以 JSON 键名出现两次）。
+    expect(text).toContain("你在这里选什么锚点");
+    // 而「锚点会决定配置那一步怎么写 `at`」这层**因果**要连在一起说，不许只剩一个键名。
+    expect(text).toContain("那边就得按它写");
+  });
+
   it("⚠️ 工具 schema **是 v4 镜像**（v3 那份 `toolInputSchema` 转不动）：7 键、封口、无 `$ref`", async () => {
     const d = stage();
     const c = capture();

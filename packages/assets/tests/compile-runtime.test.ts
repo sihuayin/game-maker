@@ -7,8 +7,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PLAYER_MOVE, jumpSpan, maxJumpHeight, parseGameConfig, STRUCTURED_CALL_ATTEMPTS, type GameDesignSpec } from "@game-maker/contracts";
-import { CommandError, compileRuntime, gameConfigExample } from "../src/index.js";
+import { DEFAULT_PLAYER_MOVE, auditScreenSpace, entityBox, jumpSpan, maxJumpHeight, parseGameConfig, STRUCTURED_CALL_ATTEMPTS, type GameDesignSpec } from "@game-maker/contracts";
+import { CommandError, DEFAULT_VIEWPORT, compileRuntime, gameConfigExample } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 /** ⚠️ 真产物：票 40 的包 + 票 33 的配置（那份配置**本身就是**一份合法正例）。 */
@@ -52,6 +52,15 @@ const run = (d: string, input: unknown, over: Record<string, unknown> = {}) =>
   });
 const fileOf = (d: string, v = 1) => path.join(d, "out", "last-train", "game-configs", `v${v}.json`);
 
+/** ⚠️ **九种锚点**：四角 ＋ 四条边中点 ＋ 中心 —— 票 98 的 **Q5 = (b)** 那条性质性见证的射程。
+ *  理由：骨架是**给模型照写的**，而模型会自己挑锚点（真跑里 4/4 件 `ui` 都是中心）⇒
+ *  只在某一个锚点下成立的数，会让照抄骨架的人**在花完钱之后**撞上 `auditScreenSpace` 硬失败。
+ *  ⚠️ 穷尽的是**角与边/中心**这一族 —— 盒子是 `at − anchor×size`，极端值必落在角上。 */
+const NINE_ANCHORS = [
+  { x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 },
+  { x: 0.5, y: 0 }, { x: 0.5, y: 1 }, { x: 0, y: 0.5 }, { x: 1, y: 0.5 }, { x: 0.5, y: 0.5 },
+] as const;
+
 describe("⚠️ 提示词里的示例**必须自己先过 schema**（旧票 40 那条守门人，原样保留）", () => {
   it("`gameConfigExample` 是一份合法的 game-config", () => {
     const r = parseGameConfig(gameConfigExample);
@@ -63,6 +72,19 @@ describe("⚠️ 提示词里的示例**必须自己先过 schema**（旧票 40 
     if (!r.ok) return;
     expect(r.value.hud.panel.at.x).toBeLessThan(480);
     expect(r.value.world.size.h).toBe(270);
+
+    // ⚠️ 而上面那条 `at.x < 480` **抓不住**「这一格只在某一个锚点下成立」（8 也 < 480）——
+    //   骨架里那一格是**给模型照抄位置**的，而模型会自己挑锚点（真跑 4/4 件 ui 全是中心）
+    //   ⇒ 这里逐格算给**九种锚点**，用的就是**生产那条判据自己**（`entityBox` + `auditScreenSpace`）。
+    //   ⚠️ 它不是恒真：这一格曾经是 `(8,262)` —— 那时**只有 `{0,1}` 一种**过得了（票 98 的读数 C）。
+    const { at, size } = gameConfigExample.hud.panel;
+    for (const anchor of NINE_ANCHORS) {
+      const box = entityBox(at, size, anchor);
+      expect(
+        auditScreenSpace(DEFAULT_VIEWPORT, [{ where: "hud.panel", at, box }]),
+        `锚点 ${JSON.stringify(anchor)} ⇒ 盒子 ${JSON.stringify(box)} 出了视口`,
+      ).toEqual([]);
+    }
   });
 });
 
@@ -264,6 +286,13 @@ describe("§问话面：发出去的那一发", () => {
     //   （立案读数：`last-train` 上逐字印出 `ui：左下角 · ui：左上角`；13h 上是 `ui：左上角 · ui：{x:0.5, y:0.5}…`），
     //   而逐资源的 `resourceBrief` **本来就**把真锚点一件一件印过。
     expect(text).not.toMatch(/锚点的意思/);
+    // ⚠️ 而那句把 **HUD 的锚点**说成「**左下角**」的话不许再回来（票 98 的 Q5 = (b)）——
+    //   它把**某一份包的取值**说成了**强制**：真跑里那半句 **0/10** 命中（票 90 的读数 A），
+    //   而 HUD 的锚点归资源包（票 91：「由包声明、契约不钉值」）。
+    //   ⚠️ **它不住 `messages[0]` 那一段文本里，住在工具说明里**（铁律 1 是 `CONFIG_TOOL_DESCRIPTION`，
+    //     `ops.ts:899` 把它交给 `forcedTool`）—— 第一版断在 `text` 上，**当场是绿的**（空守卫），已改。
+    const desc: string = sp.seen[0]!.tools[0].description;
+    expect(desc).not.toMatch(/HUD 面板是/);
   });
 
   it("⚠️ **设计层那 12 个 ① 档字段逐个具名**进提示词（票 10 的裁定：具名插值在下游 —— 本步是下游之一）", async () => {
