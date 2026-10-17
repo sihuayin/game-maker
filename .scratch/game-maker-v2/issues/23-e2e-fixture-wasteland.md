@@ -5,6 +5,9 @@ Status: claimed
 Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
+> ⚠️ **2026-10-17（票 99 已关）**：第十九跑的「地面线」失败已裁 —— 治在**动画提示词三处 ＋ 失败才触发的底部横带救援**，
+> **不裁资源级重生成**；施工载体是[票 100](100-ground-line-construction.md)（**立票 ≠ 批准施工**）。
+> **下一次段 B 的付费真跑仍要另出报告 + 逐次明确同意**；票 100 未施工之前不要重跑。
 > ⏳ **2026-10-13（票 61 关掉之后）· 段 B 的付费报告已重新出一份，等人裁 —— 而它第一条结论是「段 B 单独跑不了」。**
 > 票 61 那条闸门住在 `planAssets` = **段 A 的第五步**，而 `build` **不跑那一步**（它读盘上那份 `asset-recipe.json`）；
 > 盘上那份旧清单**正是那条缝的形状**（玩家名下三件 `kind:"animation"`、三路里没有 `run`）⇒ **只跑段 B 会再死一次 `config`**，
@@ -3960,3 +3963,676 @@ gate 信息里点名的 `open-chest`）；② ⚠️ **票 60 的仪器这一次
 **先出一份付费运行报告（预算 / 最大调用次数 / 停止条件 / 验收条件），拿到人明确同意之后再跑**。
 ⚠️ 而且这一次的终点**仍然不确定**：抠底之后的**下一个**观测点是 `pack.ts` 的**帧数核对**，
 它至今**一次都没响过**（`检测到` 在 `raw/run.json` 里出现 0 次 —— 上一次的抛点在它前面）。
+
+---
+
+## ⏳ 第十七次真跑的付费运行报告（2026-10-17 出 · **等人裁 · 未获批 · 一笔未花**）
+
+> ⭐ **这一份与第十六份的关系：那份说「钱应该等那件事裁完再花」，而那件事已经裁完并落地了。**
+> 十六份 §六 风险 2 点名的「两处样板各自合法、合起来不成立」⇒ [票 76](76-cross-stage-sample-conflict.md)
+> 裁了 **Q1 = (a) 修段 A**；施工票 [票 88](88-recipe-shape-sample-as-data.md) 已把
+> `recipeShapeSpec()` 的背景层样板**换成数据并改正**（`sky p0` · `wall p0.6 铺 x` · `ground p1 铺 x`），
+> 还加了一条跨阶段测试。⚠️ **但「模型读了会不会照做」免费证不了** —— 票 88 的收口末行逐字把它交给本票，
+> 「另出报告 + 逐次明确同意」。
+> ⇒ **这一跑的正题只有一句：模型这次写出来的背景层，是不是合规的那一副形状。**
+> ⚠️ **「出报告」不是许可**；**批准不继承**（第十六跑那次「(丙) 不跑」的裁定已经用掉）。
+> ⚠️ **我不预设它会成功，也不预设它该跑** —— §七 把「不跑」照样摆成一个正经选项。
+
+### 〇、开跑前就地量到的（免费 · 零构建 · 零上游请求 · 零状态修改）
+
+**读数 ① —— 三个口的现状**（独立 TCP 探针；末尾那条**必然关着**的端口是探针自证）：
+
+```text
+7890   OPEN                    ← 生图那条路（驱动注入 fetchImpl 走它）
+15721  OPEN                    ← 文本上游（ANTHROPIC_BASE_URL，http 直连）
+65500  CLOSED(ECONNREFUSED)    ← 自证：探针报得出 CLOSED，说明「OPEN」不是假阳性
+```
+
+⚠️ `game-maker.local.json` 里 `image.proxy` 写的是 `http://127.0.0.1:9098`（**今天关着**）——
+不影响本跑：驱动把 `https:` 注入到 `7890`，注入优先。**本跑不改那个文件，也不改任何端口状态。**
+
+**读数 ② —— 生图上游配得起来**（`resolveImageTransport` + `describeImageTransport`，不回显 key）：
+
+```text
+source  : file（game-maker.local.json）· 该文件是**合法 JSON** ✅
+生图上游：gemini · https://generativelanguage.googleapis.com/v1beta ·
+          模型 gemini-2.5-flash-image（key 已配置，53 字符） · 经代理 http://127.0.0.1:9098
+warnings: []
+```
+
+⚠️ **本跑不花钱买图**（段 A 的代码路径里没有 `pack`），这一条只是把「真要买时那条路通不通」记在现场。
+
+**读数 ③ —— 闸门与工作树**：HEAD **`24275af`**（票 95 收口）。
+
+```text
+工作树：只有 `.scratch/game-maker-v2/experiments/72-two-shell-size/` 是未跟踪（票 72 留下的，本跑不碰）
+tracked 改动：0（`git status --short` 可核）
+dist 与 src：`packages/assets/dist/prompt.js` / `ops.js` 的 mtime 是 **2026-10-17T10:31:55**，
+             比对应 `src` 的 **2026-10-16T23:01:31** 新 ⇒ 本跑读的是**当前源码的产物**
+```
+
+⚠️ **写在这里，免得被读成「工作树全干净」**：那个未跟踪目录在，但它不在任何真跑的代码路径上。
+
+**读数 ④ —— 两个检查点在盘上**（段 A 的旧现场 + 段 B 的旧现场）：
+
+```text
+raw/run-out-2026-10-13g/ruined-city-scavenger/run/v1/   ← 第十四跑的段 A 检查点（10 份）
+  sha256（前 12 位）：
+    asset-recipe.json 9227698efc82 · character-dna.json 9fa31d13fc7b
+    game-design.json c33d5b969efe · game-intent.json 3534050cfcc0
+    ledger.json 5222e5da0ce4 · stylespec.json 2293e431f776
+    visual-world.json 8ec72e1dbe98 · intent.md 314efbd6b46b
+    reference.png 76ed648ec71d · style.png 76ed648ec71d
+
+raw/run-out-2026-10-13h/ruined-city-scavenger/          ← 第十五跑的段 B 现场（61 个文件，含 pack/v1）
+```
+
+⚠️ 这两份**都不许被本跑改动**（§四 阴性 ⑥⑦）。
+
+**读数 ⑤ ⭐ 这一份报告的核心：旧检查点**测不了**票 88 的修复，而修复本身已经免费验过。**
+
+- **旧检查点 13g 的背景层**（逐字从盘上读）：
+
+```text
+bg-ruined-street  【sky p0.1 不铺】·【silhouette p0.4 不铺】· facade p1 铺 x
+```
+
+- **拿今天的判据 `auditLayerCoverage`（世界 1440×270 · 视口 480×270 · 标称 480×270）去量它**：
+
+```text
+2 条 error
+  [error] scene.background[0] —— 层 "bg-ruined-street.sky" 盖不住世界……最坏时屏幕上只剩 384×270px
+  [error] scene.background[1] —— 层 "bg-ruined-street.silhouette" 盖不住世界……只剩 96×270px
+```
+
+⇒ **与第十六份读数 ⑤ 逐字同源**（384 / 96）。**旧检查点是票 88 施工之前的产物**，
+它即使今天再跑一次段 B，也仍然会在 `config` 死在这两条上 —— **拿它验不了「模型会不会照新样板写」**。
+
+- **票 88 改完之后的样板**（从构建产物 `recipeShapeSpec()` 渲出来核对过）：
+
+```text
+background → "layers":[{"name":"sky","parallax":0},
+                       {"name":"wall","parallax":0.6,"tileable":{"x":true,"y":false}},
+                       {"name":"ground","parallax":1,"tileable":{"x":true,"y":false}}]
+```
+
+- **同一把判据量这副样板**：
+
+```text
+0 条 error
+```
+
+⭐ **⇒ 免费这一侧已经闭合**：旧形状必拒（2 条），新样板恒过（0 条）。
+**唯一还缺的读数，就是「模型在真跑里写的是哪一副」。**
+
+**读数 ⑥ —— 预算的参照（从旧检查点算，不打开上游）**：
+
+```text
+13g 的 imageCalls.total = 11（{animation:6, single:0, background:3, master:2}）
+13g 的清单 22 件（animation 3 · sprite 12 · background 1 · ui 6）· drawlist 18 件 ⇒ 文本上界 36 发
+```
+
+⚠️ 这些是**段 B 的数**；段 A 本身 **0 张图**，文本上界 **15 发**（见 §二）。
+
+### 一、这次要跑的是什么
+
+**只跑段 A**（`create` **不带 `--yes`** ⇒ 理解层五步跑完、到清单为止停下）：
+
+```text
+create --style fixtures/e2e/wasteland-platformer/style.png \
+       --intent fixtures/e2e/wasteland-platformer/intent.md \
+       --out   <新目录 raw/run-out-2026-10-17a> \
+       --json --concurrency-image 2
+```
+
+- 五步：`analyze-reference` → `analyze-intent` → `compile-design` → `character-dna` → `plan-assets`
+- **0 张图**（`pack` 不在这条路径上）· **≤15 发文本**（5 步 × `STRUCTURED_CALL_ATTEMPTS`=3）
+- 落点必须是**新目录**；旧检查点与旧现场**一个字节不碰**。
+- ⚠️ **驱动本报告这一版没有写** —— 照第十五跑那条纪律：**获批之后才落地，落地后先给人看一眼再跑**。
+  驱动会沿用 `run-2026-10-13g.mjs` 的形状（`rmSync(OUT)` 只清本跑自己的目录 · 150 分钟 `setTimeout` ·
+  注入 `https:` → `7890` · 跑前给旧检查点拍 sha256、跑后复验）。
+
+### 二、预算 · 最大调用次数（**上界 + 实测对照**）
+
+| 项 | **上界** | 依据 | ⚠️ 最近一次同段实测（第十四跑 · 13g） |
+|---|---|---|---|
+| 图片 | **0** | 段 A 的路径里没有 `pack` | **0 / 0** |
+| 文本往返 | **15**（5 步 × 3） | `STRUCTURED_CALL_ATTEMPTS` | **7**（两步各 2 发） |
+| 墙钟 | **150 分钟硬叫停** | 驱动里那个 `setTimeout` —— 全仓唯一真实现的闸 | **71.8s** |
+
+⚠️ **本仓没有任何成本账 / 费率常量 / 调用预算开关**（grep 零命中）⇒ **只报调用次数，不折算金额**。
+⚠️ 文本上游是**本机 15721**（`ANTHROPIC_BASE_URL`），但**发出去的仍然是真调用** ⇒ 仍要逐次点头。
+⚠️ 段 A 的文本上界是**可能达到的**：`analyze-reference` 与 `plan-assets` 历史上都出现过 `attempts: 2`。
+
+### 三、停止条件（照旧五条，一条不改）
+
+**① 撞到任何 `CommandError` ⇒ 停**，不重试、不修、不自动往下走（R13）；
+**② 150 分钟到 ⇒ 硬叫停**（驱动里那个 `setTimeout`）；
+**③ 生图连续失败到上界 ⇒ 停**（本段没有生图，这条不适用，但仍原样保留）；
+**④ 任何一步抛 ⇒ 就让它抛** —— 失败现场照票 55 / 票 60 那套机制落盘，**不手动去救**；
+**⑤ 我随时可以停**（不需要理由）。
+⚠️ **另加一条（只对本报告有效）**：**不许用「再抽一次」去躲任何一步的 schema 失败** —— R13。
+
+### 四、验收条件
+
+**阳性（段 A 要看见的）**：
+
+1. ⭐ **新清单里的背景层形状** —— 逐层读 `asset-recipe.json`：
+   **不平铺的层 `parallax` 必须是 `0`**；`parallax > 0` 的层必须写 `tileable`（或把资源画得足够宽）。
+   ⚠️ 这一条**就是**本跑的正题；**中间层**要单独点名（票 76 读数 ④ 的 `0.4` 不铺正是它）。
+2. ⭐ **拿生产判据重放** —— 把新清单的背景层喂进 `auditLayerCoverage`（视口 480×270 ·
+   世界 1440×270 · 标称 480×270）⇒ **0 条 `error`**。⚠️ 世界 1440 是**骨架那个数**，
+   段 A 里没有 `config`，这是**压力测试的口径**，不是「模型写了 1440」。
+3. **五步走完**：退出码 0 · `data.status = "awaiting"` · `run/v1/` 十份产物在 · `ledger.json` 在。
+4. **票 61 的闸门放行**（不误伤）：玩家名下恰好一件 `kind:"animation"`，三路 `idle` / `run` / `jump` 齐备，
+   每路 ≥2 帧，`characterId` 严格等于设计层玩家 id。
+5. **票 89 的动画名唯一性**：同一件 animation 资源里 `animations[].name` 不重复。
+6. **账**：逐发 `attempts` / `failures` 记下来；**0 张图**（`generated/ 0 · masters/ 0`）；
+   `imageCalls` 只作**预测**记下，不当闸。
+
+**阴性（要确认没变的）**：
+
+7. **13g 那 10 份的 sha256 逐份不变**（读数 ④ 那张表，跑前拍、跑后复验）。
+8. **13h 与更早的旧现场逐字节不动**；`fixtures/e2e/wasteland-platformer/` 三份不动
+   （`intent.md 314efbd6b46b` · `style.png 76ed648ec71d` · `README.md 9018e91091ec`）。
+9. **段 A 只许产理解层**：新目录里**没有** `pack/` · `game-config.json` · `qa-report.json` · `site/`。
+
+### 五、明确不做
+
+**不改任何代码**（含提示词 / 契约 / `STRUCTURED_CALL_ATTEMPTS` / `BUILD_STEPS`）·
+**不为让它过而改输入**（fixture 一个字节不改）· **不跑段 B**（另一次报告 + 另一次点头）·
+**不自动重试 / 不加修复循环**（R13）· **不动 `packages/qa` 一行** ·
+**不改 `game-maker.local.json` 一个字** · **不改 `7890` / `15721` / `9098` 的状态** ·
+**不采买任何东西** · **不开新票** · **不动旧检查点与旧现场的字节** ·
+**不用共享日志做请求级归因** · **不提交 commit**。
+
+### 六、已知风险（不藏）
+
+1. ⭐ **模型可能不照新样板写** —— 这正是本跑要量的；**n=1，过了也只说明「这一次照做了」**。
+2. **`analyze-reference` 首发不是必过**：票 27 量到的首发率 **80%（4/5）**；第十四跑是 `attempts: 2`（首发 `schema`）。
+   三次尝试全灭的概率不是 0。
+3. **`plan-assets` 可能再次 `schema`**：第十四跑也是 `attempts: 2`（`failures: ["schema"]`）。
+   ⚠️ 而票 88 之后那段提示词**变长了**（样板从两行变三行 + 配对规矩），
+   票 85 / 94 / 98 又分别往资源清单 / 配置提示词里加过字 ⇒ **输出形状的风险不降反升**，这是要如实说的。
+4. **文本上游是本机 15721**：它挂了 ⇒ 退出码 3；那不是模型的错，也不是本跑要验的东西。
+5. **段 A 里没有世界宽度**：验收第 2 条用骨架的 1440 做压力测试是**我选的尺子**；
+   如果模型写的背景层里**没有正视差的非平铺层**，第 1 条是 **N/A**，不能读成「通过」。
+6. **票 77 那个账务缺口仍在**（判据前移 ⇒ 已花的钱可能不进异常 / 不进 run 级账）：
+   段 A **不买图**，所以这一条本跑碰不到；但**失败时的 run 级账仍可能缺**，读账时要记住。
+7. **不预设成功**：即使 ⓪–⑥ 全绿，也只把「模型照做」从 **0 个窗口**抬到 **1 个窗口**。
+
+### 七、这次申请的是哪一段（**三种裁定都记在现场，含「不跑」**）
+
+| | 申请 | 花什么 | 跑完能知道什么 |
+|---|---|---|---|
+| **(甲) 只跑段 A**（**推荐**） | `create` 不带 `--yes` | **0 张图 · ≤15 发文本** | ⭐ **新清单的背景层是不是票 88 教的那副形状** · 票 61 闸门 / 票 89 唯一性在真跑上的读数 · 新提示词（85 / 94 / 98）之后的输出形状 |
+| **(乙) 段 A + 段 B** | A 跑完拿新检查点再 `build` | 段 A 的文本 + 段 B 的 **≤11 张图** | 站点能不能第一次装出来 —— ⚠️ **但段 B 必须等段 A 跑完、拿新的 `imageCalls` 单独出一份报告、再单独点头**；**本报告不申请段 B** |
+| **(丙) 不跑** | — | **0** | 已经拿到的：旧形状必拒（2 条）· 新样板恒过（0 条）—— **但「模型会不会照做」仍然没有窗口** |
+
+> ⭐ **⇒ 我推荐 (甲)。** 三个理由：
+> **① 它花的钱是零张图** —— 上界只有 15 发文本，而它回答的正是第十六份报告说「钱应该等它裁完」的那件事；
+> **② 它是唯一能验票 88 的跑法** —— 旧检查点 13g 是施工前的产物，拿它跑段 B **只会重放那两条已知的 error**；
+> **③ 它把「模型照不照做」从猜测变成一个有现场、有账、可复核的窗口** —— 这正是票 23 的终点需要的下一格。
+> ⚠️ **我不说「跑了就离站点更近一步」**：段 A 只回答「清单形状对不对」；
+> 段 B 的钱要等这一跑的结果出来再单独申请。
+
+### 八、批准用语（照本票一贯的规矩）
+
+- **报告不是许可**；**批准不继承**（第十六跑那次「(丙) 不跑」已经用掉）。
+- 要跑的话，请给一句**明确的、只覆盖这一跑的话**，例如：**「跑段 A」**。
+- 获批之后我会：**先落地驱动 → 把驱动贴给你看 → 再跑**（照第十五跑那条纪律）。
+- 未获批之前：**不建驱动 · 不建 `raw/run-out-2026-10-17a` · 不发任何上游请求 · 不动端口 · 不提交**。
+
+
+---
+
+### ⚠️ 结果（2026-10-17 · **段 A 已按「批段 A」跑完** —— 一次性 · **死在最后一步**）
+
+**退出码 4 · 墙钟 57.5s · 买图 0 张 · 走到 `recipe` 为止 —— 前四步全过，第五步三发全空。**
+
+```text
+步：visual-world → intent → design → character-dna → recipe
+  · visual-world   ✅
+  · intent         ✅
+  · design         ✅
+  · character-dna  ✅
+  · recipe         ❌  attempts=3 · failures=["empty-input","empty-input","empty-input"]
+                        · 29692ms · 输出 2449 token · model=deepseek-flash
+```
+
+**⭐ 这一跑没有回答正题**：`asset-recipe.json` **没落** ⇒「模型写出来的背景层是不是票 88 教的那副形状」
+**一个读数都没有**。⚠️ 它也没有买到任何图（段 A 本来就不买）—— **0 / 0**，
+全目录唯一的 PNG 是输入副本 `style.png`（2228B）。
+
+#### 前四步的产物（现场在 `.failed-2026-10-17T02-49-08-832Z/`）
+
+```text
+visual-world.json  format=visual-world/v1 · 顶层 palette 是**对象**（6 键）· format / styleIdentity 都在 ✅
+game-intent.json   format=game-intent/v1
+game-design.json   format=game-design/v1 · player.id = "scavenger-player"
+character-dna.json format=character-dna/v1
+```
+
+⚠️ 这四份**是票 55 的失败现场机制写下来的**，不是本驱动手写的；`run/v1/` 没有建出来。
+⚠️ **本跑的阴性判据全过**：旧检查点 13g **10/10** 逐字节未变 · fixture **3/3** 未变 ·
+`pack/` / `game-config.json` / `qa-report.json` / `site/` **都不在**。
+
+#### 死因的读法（照票 59 的纪律，不越界）
+
+- **`empty-input` = 数据丢了，不是模型不听话、也不是坏 JSON**：工具被调了、`input` 是空的。
+  票 59 的定向探针量过同一个调用点：**n=4 · 空=3**，第 4 发拿到完整入参（7 键 · 6808 字符）；
+  丢的那几发各自记了 4430 / 3198 / 3512 个输出 token ⇒ **丢失点在「模型生成之后」**，
+  但**具体哪一环掉了无法定位**（代理转译？传输？）—— 票 59 人裁明写「无法定位就写无法定位，不推断」。
+- **今天 3/3 全空** —— 与第九跑（3/3 空）、第十三 / 十四跑（2 发过）同一族；
+  ⚠️ **不写成「系统性故障」**（票 59 的纪律：样本太小）。
+- ⚠️ **本跑没有再抽一次**：停止条件 ① 写死「撞到任何 `CommandError` ⇒ 停，不重试、不修」；
+  本 session **没有重跑、没有改代码、没有改配置、没有提交、没有开新票**。
+
+#### 下一步（要人裁；本 session 不擅自动）
+
+三条路都记在这里，**一条都没执行**：
+
+| | 做法 | 花什么 | 能知道什么 |
+|---|---|---|---|
+| **(甲) 只重跑 `plan`** | `game-maker plan --design <失败现场>/game-design.json --visual-world <失败现场>/visual-world.json --out <新目录>` | **≤3 发文本 · 0 张图** | ⭐ **直接回答正题**（背景层形状 + 判据重放）· 不产完整检查点 |
+| **(乙) 重跑整个段 A** | `create` 不带 `--yes`（同第十七跑） | **≤15 发文本 · 0 张图** | 产**干净检查点** · 但前四步会**重抽**，是另一个样本 |
+| **(丙) 不跑** | — | **0** | 停在「前四步过了、recipe 三发全空」这一格 |
+
+⚠️ **(甲) 是生产命令，不是手工拼现场**：`plan` 调的就是 `planAssets`（与 `create` 第五步同一个函数、
+同一份提示词、同一个 `playerAnimationGate`），只是少了前四步的包装。
+⚠️ **本报告不推荐哪一条** —— 先等人裁；**批准不继承**，要跑哪一条都要**新的明确点头**。
+
+
+---
+
+### ✅ 补跑结果（2026-10-17 · **人裁「甲：只重跑 plan」** · 一次性 · **正题答到了**）
+
+**命令**（生产命令，不是手工拼现场）：
+
+```text
+game-maker plan --design  <第十七跑失败现场>/game-design.json
+                --visual-world <第十七跑失败现场>/visual-world.json
+                --out   raw/plan-2026-10-17a --json
+```
+
+**退出码 0 · 墙钟 8.4s · 文本 1 发 · 买图 0 张。**
+
+```text
+账：plan-assets · target=recipe · attempts=1 · failures=∅ · 8420ms
+    model=deepseek-flash · input 226 / output 2196 token
+产物：ruined-street-assets/recipes/v1.json（9473B）
+      ruined-street-assets/recipes/stylespec.json（1044B）
+      ruined-street-assets/recipes/reference.png（2228B，原图副本）
+清单：13 件（animation×2 · sprite×8 · background×1 · ui×2）
+```
+
+#### ⭐ 正题：模型写出来的背景层，**就是票 88 教的那副形状**
+
+```text
+background  level-ruined-street-bg · size 960×540
+  [0] sky     parallax=0     铺 x=❌
+  [1] wall    parallax=0.6   铺 x=✅
+  [2] ground  parallax=1     铺 x=✅
+⇒ 逐层配对（不平铺 ⇒ p0）：✅ 全过
+⇒ auditLayerCoverage（视口 480×270 · 世界 1440×270 · 标称 960×540）：✅ **0 条 error**
+```
+
+⚠️ **这是「模型读了会照做」的第一个真跑窗口（n=1）**：它**没有**再写 `sky p0.1` / `silhouette p0.4`
+那种「不平铺 + 正视差」的形状。⚠️ **n=1 不改任何率**，也不写成「稳了」。
+
+#### 其余判据
+
+```text
+票 61 闸门：① 恰好一件 animation ✅ · ② idle/run/jump 齐备 ✅ · ③ 每路 ≥2 帧 ✅
+票 89 唯一性：✅
+imageCalls（预测，不是闸）：9（animation 4 · single 0 · background 3 · master 2）
+```
+
+#### 阴性（逐条核过）
+
+- **第十七跑的失败现场未被改动**：五份 mtime 仍是 `10:48`（本跑是 `10:52`），
+  四份 JSON + `style.png` 的 sha256 与补跑前一致。
+- **旧检查点 13g**：**10/10** 逐字节未变（sha256 逐份与报告 §〇 读数 ④ 相同）。
+- **fixture**：**3/3** 未变（`intent.md 314efbd6b46b` · `style.png 76ed648ec71d` · `README.md 9018e91091ec`）。
+- **生成图**：`generated/ 0 · masters/ 0`。
+
+#### ⚠️ 一处如实交代（驱动的错，不是产物的错）
+
+补跑驱动 `plan-2026-10-17a.mjs` 的产物搜索把 `recipes/stylespec.json` 也当成了 recipe，
+于是在打印完正题之后、跑到 `imageCallsOf` 时**崩了**（`TypeError: recipe.assets is not iterable`）。
+⚠️ **`plan` 本身退出码 0、产物完整**；上面那些判据是**崩掉之后用一份只读脚本重新核的**。
+⚠️ 驱动已就地修正（只认 `recipes/v<N>.json`），**但没有为了修驱动再跑一次付费命令**。
+
+#### 这一步没有做的
+
+- **没有产完整检查点**（`plan` 只写 recipe 目录；`run/v1/` 还是没有）。
+- **没有跑段 B** · **没有组装检查点** · **没有改代码 / fixture / 配置 / 端口** · **没有提交** · **没有开新票**。
+
+#### 下一步（要人裁；本 session 不擅自动）
+
+| | 做法 | 花什么 | 能知道什么 |
+|---|---|---|---|
+| **(A) 重跑整个段 A** | `create` 不带 `--yes` | **≤15 发文本 · 0 张图** | 产**干净检查点**（含 recipe），之后才能单独申请段 B；⚠️ 前四步与 recipe 会重抽 |
+| **(B) 手工组装检查点** | 把失败现场四份 + 本跑 recipe 拷进一个新 `run/v1/` | 0 | 能立刻接段 B —— ⚠️ **但这是手工拼现场**，Destination 写明唯一的人工点是清单检查点（R9）⇒ **不推荐**，要做得单独裁 |
+| **(C) 停在这里** | — | 0 | 正题已答（n=1）；段 B 与站点仍然没到 |
+
+⚠️ **批准不继承**：要跑 (A) 或做 (B) 都要**新的明确点头**。
+
+
+---
+
+### ✅ 第十八次真跑（段 A 重跑）结果（2026-10-17 · **人裁「重跑段 A」** · 一次性 · **成功**）
+
+**退出码 0 · 墙钟 29.2s · 买图 0 张 · 五步全过 · 五步各 1 发（无重采样）。**
+
+```text
+落点：raw/run-out-2026-10-17b/wasteland-scavenger-assets/run/v1/（10 份）
+      asset-recipe.json 8364B · character-dna.json 2736B · game-design.json 4842B
+      game-intent.json 2154B · intent.md 257B · ledger.json 2063B
+      reference.png 2228B · style.png 2228B · stylespec.json 1235B · visual-world.json 5462B
+状态：awaiting · gameId = wasteland-scavenger-assets · run v1 · 歧义 7 条
+```
+
+#### ⭐ 正题（第二次成功窗口）：背景层仍然合规
+
+```text
+background  level-downtown-ruins · size 1920×540
+  [0] sky      parallax=0     铺 x=❌
+  [1] horizon  parallax=0     铺 x=❌
+  [2] facade   parallax=0.6   铺 x=✅   ← 中间层：正视差 + 平铺
+  [3] ground   parallax=1     铺 x=✅
+⇒ 逐层配对（不平铺 ⇒ p0）：✅ 全过
+⇒ auditLayerCoverage（视口 480×270 · 世界 1440×270 · 标称 1920×540）：✅ **0 条 error**
+```
+
+⚠️ **模型没有逐字抄三层的样板**：它写了**四层**（多了一条 `horizon p0`），
+但那四层**逐条满足「不平铺 ⇒ p0」**，而中间层 `facade p0.6` **写了 `tileable`** ——
+正是票 76 读数 ④ / 票 88 要治的那一格。⇒ **n=2 的成功窗口**（补跑 `plan` + 本跑），**两次都合规**。
+⚠️ **n=2 不改任何率**，不写成「稳了」。
+
+#### 其余判据
+
+```text
+票 61 闸门：① 恰好一件 animation ✅ · ② idle/run/jump 齐备 ✅ · ③ 每路 ≥2 帧 ✅
+票 89 唯一性：✅
+清单：10 件（animation×2 · sprite×5 · background×1 · ui×2）· drawlist 6 件
+imageCalls（预测，不是闸）：11（animation 4 · single 1 · background 4 · master 2）
+```
+
+**账（`run/v1/ledger.json`）**：
+
+| 步 | attempts | ms | in / out |
+|---|---|---|---|
+| `analyze-reference` | 1 | 7247 | 200 / 1454 |
+| `analyze-intent` | 1 | 2833 | 243 / 651 |
+| `compile-design` | 1 | 6895 | 2225 / 1317 |
+| `character-dna` | 1 | 4613 | 2136 / 686 |
+| `plan-assets` | 1 | 7408 | 2916 / 1947 |
+
+⇒ **真往返 5 发**（上界 15）· 五步全部首发过。
+
+#### 阴性（逐条核过）
+
+- **旧检查点 13g**：**10/10** 逐字节未变。
+- **fixture**：**3/3** 未变。
+- **段 A 只产理解层**：`pack/` · `game-config.json` · `qa-report.json` · `site/` **都不在**。
+- **生成图**：`generated/ 0 · masters/ 0`。
+- **第十七跑的失败现场**未被本跑触碰（mtime 仍是 `10:48`；本跑落点是 `10:53–10:54`）。
+
+#### 边界
+
+未跑段 B · 未改代码 / fixture / 配置 / 端口 · 未提交 · 未开新票 · 零生图调用。
+
+
+---
+
+## ⏳ 第十九次真跑（**段 B**）的付费运行报告（2026-10-17 出 · **等人裁 · 未获批 · 一笔未花**）
+
+> ⭐ **这一份与第十五份的关系：第十五跑死在站点装配期的那两条层覆盖 error，今天第一次有了「输入侧已经合规」的检查点。**
+> 第十八跑的段 A 产出了 `raw/run-out-2026-10-17b/wasteland-scavenger-assets/run/v1/`：
+> 背景四层 `sky p0` · `horizon p0` · `facade p0.6 铺x` · `ground p1 铺x` ⇒
+> `auditLayerCoverage`（视口 480×270 · 世界 1440×270）**0 条 error**。
+> ⇒ **这是第一次有机会把 `pack` → `config` → `qa` → **站点** 四段走完。**
+> ⚠️ **「出报告」不是许可**；**批准不继承**（第十八跑那次「重跑段 A」已经用掉）。
+> ⚠️ **段 B 买 11 张图** —— 这不是零成本的一跑；§七 把「不跑」照样摆成一个正经选项。
+
+### 〇、开跑前就地量到的（免费 · 零构建 · 零上游请求 · 零状态修改）
+
+**读数 ① —— 三个口的现状**（独立 TCP 探针；末尾那条**必然关着**的端口是探针自证）：
+
+```text
+7890   OPEN                    ← 生图那条路（驱动注入 fetchImpl 走它）
+15721  OPEN                    ← 文本上游（ANTHROPIC_BASE_URL，http 直连）
+65500  CLOSED(ECONNREFUSED)    ← 自证：探针报得出 CLOSED，说明「OPEN」不是假阳性
+```
+
+⚠️ `game-maker.local.json` 里 `image.proxy` 写的是 `http://127.0.0.1:9098`（**今天关着**）——
+不影响本跑：驱动把 `https:` 注入到 `7890`，注入优先。**本跑不改那个文件，也不改任何端口状态。**
+
+**读数 ② —— 生图上游配得起来**（`resolveImageTransport` + `describeImageTransport`，不回显 key）：
+
+```text
+source  : file（game-maker.local.json）· 该文件是**合法 JSON** ✅
+生图上游：gemini · https://generativelanguage.googleapis.com/v1beta ·
+          模型 gemini-2.5-flash-image（key 已配置，53 字符） · 经代理 http://127.0.0.1:9098
+warnings: []
+```
+
+**读数 ③ —— 闸门与工作树**：HEAD **`24275af`**。
+
+```text
+工作树：只有 `.scratch/game-maker-v2/experiments/72-two-shell-size/` 是未跟踪（票 72 留下的，本跑不碰）
+tracked 改动：0
+dist 与 src：`packages/assets/dist/prompt.js` / `ops.js` 比对应 src 新（2026-10-17T10:31:55）
+```
+
+**读数 ④ —— 输入检查点（第十八跑的段 A）**：
+
+```text
+raw/run-out-2026-10-17b/wasteland-scavenger-assets/run/v1/（10 份）
+  asset-recipe.json  5ae82f1fc46e   character-dna.json 486169f22a18
+  game-design.json   99665e23c536   game-intent.json   32b64348a54c
+  intent.md          314efbd6b46b   ledger.json        cc48783f1e99
+  reference.png      76ed648ec71d   style.png          76ed648ec71d
+  stylespec.json     76b232af84ff   visual-world.json  e260470a1a68
+状态：awaiting · gameId = wasteland-scavenger-assets · run v1
+```
+
+**读数 ⑤ —— 段 B 的预算与形状（从这份检查点算）**：
+
+```text
+清单 10 件（animation×2 · sprite×5 · background×1 · ui×2）· drawlist 6 件 · image source 4 件
+imageCalls（预测，不是闸）：11（animation 4 · single 1 · background 4 · master 2）
+背景层：sky p0 不铺 · horizon p0 不铺 · facade p0.6 铺x · ground p1 铺x
+auditLayerCoverage（视口 480×270 · 世界 1440×270 · 标称 1920×540）：✅ 0 条 error
+```
+
+**读数 ⑥ —— 旧现场都在**：`run-out-2026-10-13g` · `13h` · `17a` · `17b` 均 present，本跑不碰。
+
+### 一、这次要跑的是什么
+
+**段 B**（`build`：`pack` → `config` → `qa` → 站点），**跑在副本上、不在原件上**：
+
+```text
+驱动先把 18 跑的 run/v1（10 份）逐字节拷进本跑自己的新目录
+  raw/run-out-2026-10-17c/wasteland-scavenger-assets/run/v1/
+再跑：
+  build <那个副本> --out raw/run-out-2026-10-17c --json --concurrency-image 2
+```
+
+- **落点必须是新目录**；原件（`run-out-2026-10-17b/...`）**一个字节不动**。
+- `build` 会往副本里**加**一份 `game-config.json`（那是它该做的事），并产 `pack/v1` · `qa-report.json` · `site/v1`。
+- ⚠️ **驱动本报告这一版没有写** —— 照第十五跑那条纪律：**获批之后才落地，落地后先给人看一眼再跑**。
+  驱动沿用 `run-2026-10-13h.mjs` 的形状（`rmSync(OUT)` 只清本跑自己的目录 · 150 分钟 `setTimeout` ·
+  注入 `https:` → `7890` · 跑前给输入检查点拍 sha256、跑后复验）。
+
+### 二、预算 · 最大调用次数（**上界 + 实测对照**）
+
+| 项 | **上界** | 依据 | ⚠️ 最近一次同段实测（第十五跑 · 13h） |
+|---|---|---|---|
+| 图片 | **11** | `imageCallsOf(recipe)` —— 从配方算出来的预测，**不是闸** | **11**（真买 = 声明） |
+| ｜ 明细 | `{animation:4, single:1, background:4, master:2}` | 两件动画资源 · 一件 sprite · 四层背景 · 两张母版 | — |
+| 文本往返 | **12**（`drawlist 6 件 × 2`） | `pack.ts` + `generate.ts`（`attempts ?? 2`） | 第十五跑：**18**（drawlist 9 件） |
+| 上游往返（无重采样） | **≤19 发** | `2 母版 + 9 图 + 12 drawlist`（按本配方重算） | 第十五跑：**30 发** |
+| 墙钟 | **150 分钟硬叫停** | 驱动里那个 `setTimeout` —— 全仓唯一真实现的闸 | 第十五跑：424.0s |
+
+⚠️ **本仓没有任何成本账 / 费率常量 / 调用预算开关** ⇒ **只报调用次数，不折算金额**。
+⚠️ **`imageCalls` 是预测不是闸** —— **没有任何东西会在超过 11 时停下来**。
+
+### 三、停止条件（照旧五条，一条不改）
+
+**① 撞到任何 `CommandError` ⇒ 停**，不重试、不修、不自动往下走（R13）；
+**② 150 分钟到 ⇒ 硬叫停**（驱动里那个 `setTimeout`）；
+**③ 生图连续失败到上界 ⇒ 停**（不追加、不换模型）；
+**④ 任何一步抛 ⇒ 就让它抛** —— 失败现场照票 55 / 票 60 那套机制落盘，**不手动去救**；
+**⑤ 我随时可以停**（不需要理由）。
+⚠️ **另加一条（只对本报告有效）**：**不许用「再抽一次」去躲任何一步的失败** —— R13。
+
+### 四、验收条件
+
+**阳性（段 B 要看见的）**：
+
+1. ⭐ **`config` 这一次过层覆盖**：`run/v1/game-config.json` 落盘，且 `auditLayerCoverage`
+   （视口 480×270 · config 自己写的世界尺寸）**0 条 error** —— 第十五跑就是死在这一条上。
+2. ⭐ **站点第一次装配出来**：`site/v1/index.html` 在 · `site/v1` 目录非空 ·
+   外壳需要的入口文件俱在。**这是本跑的主要读数**。
+3. **`pack` 跑完**：`pack/v1/manifest.json` 落盘、过 `parseAssetPack`；
+   真买图数（数盘上的 PNG 字节）与声明 `imageCalls` 对上。
+4. **`qa` 执行**：`run/v1/qa-report.json` 落盘；**R3：不许有分数**（逐字找 `score` / `rating` / `分数`）。
+5. **票 61 配置侧**：`player.anims` 三格**互不相同**，且三个名字都能在同一件玩家 animation 资源的
+   `animations[]` 里解析得到。
+6. **账**：`pack/v1/ledger.json` 逐发 `attempts` / `failures` · **run 级 `ledger.json` 在不在**
+   （票 77 说它可能不在 —— 本跑能坐实那一格）。
+
+**阴性（要确认没变的）**：
+
+7. **输入检查点 10 份逐字节不变**（读数 ④ 那张 sha256 表，跑前拍、跑后复验）。
+8. **旧现场 13g / 13h / 17a / 17b 逐字节不动**；`fixtures/**` 不动。
+9. **`build` 只许往副本里加东西**：副本里那五份理解层产物（`visual-world` / `game-intent` /
+   `game-design` / `character-dna` / `asset-recipe`）逐字节不变。
+
+### 五、明确不做
+
+**不改任何代码**（含提示词 / 契约 / `STRUCTURED_CALL_ATTEMPTS` / `BUILD_STEPS`）·
+**不为让它过而改输入**（18 跑那份清单**一个字节不改** —— 手改它就等于把要验的东西验没）·
+**不自动重生成 / 不加重试 / 不加修复循环**（R13）·
+**不动 `packages/qa` 一行** · **不改 `game-maker.local.json` 一个字** ·
+**不改 `7890` / `15721` / `9098` 的状态** · **不采买任何东西** · **不开新票** ·
+**不动旧检查点与旧现场的字节** · **不用共享日志做请求级归因** · **不提交 commit** ·
+**不启动浏览器 / 不做人眼评审**（站点装配出来 ≠ 人眼验收）。
+
+### 六、已知风险（不藏）
+
+1. ⭐ **站点从来没装出来过**：这是第一次走到这一步，**下游还有没有别的硬失败，今天不知道**。
+   第十五跑死在层覆盖；本跑把那个已知拦路石拆了，但**不能保证后面没有第二块**。
+2. **生图有真钱**：上界 **11 次调用**。⚠️ 按本配方的层形状，**它们不该再花在「已知会死的那一步之前」** ——
+   但「不该」不是「不会」，§四.1 是本跑要验的那一条。
+3. **`drawlist` 的文本往返可能撞 `empty-input`**：票 34 的探针合计约 **3/16（≈19%）**。
+   本跑上界 12 发，三发重采样用完仍可能失败。
+4. **票 77 那个账务缺口仍在**：判据前移 ⇒ 已花的钱可能不进异常、也不进 run 级账。
+   本跑如果死在 `config` / `qa`，**读账时要记得去 `pack/v1/ledger.json` 数**。
+5. **上游回图漂画布是常态**（票 39 量到的）；票 39 之后母版那处不再阻断，别处的漂移仍由
+   `downscaleArea` 静默拉伸吸收。
+6. **票 42 那个跨数组重名洞仍然潜伏**（`GameDesignSpec` 的 `player` / `enemies` / `npcs` 各查各的）。
+7. **n=1**：18 跑那份清单只是**一个**合规窗口；本跑过了也只说明「这一次能走完」，不证明稳。
+
+### 七、这次申请的是哪一段（**三种裁定都记在现场，含「不跑」**）
+
+| | 申请 | 花什么 | 跑完能知道什么 |
+|---|---|---|---|
+| **(甲) 跑段 B 全段**（**推荐**） | `build`：pack → config → qa → 站点 | **≤11 张图 · ≤12 发文本** | ⭐ **站点能不能第一次装出来** · 层覆盖在真跑上**第一次过** · `qa` 在合规输入上第一次执行 · 账的读数 |
+| **(乙) 只跑 `pack`** | `pack --recipe <18 跑清单>` | **≤11 张图 · ≤? 文本** | 只验「图能生出来、包能落盘」；**config / qa / 站点仍然没动**，且之后还要再跑一次 config/site |
+| **(丙) 不跑** | — | **0** | 停在「段 A 合规、段 B 四段仍未走完」这一格 |
+
+> ⭐ **⇒ 我推荐 (甲)。** 三个理由：
+> **① 已知的拦路石已经拆了** —— 第十五跑死在站点装配期的层覆盖，今天同一个判据在 18 跑清单上是 **0 条 error**；
+> **② 这是唯一能回答「站点到底能不能装出来」的跑法** —— (乙) 只验包，回答不了 Destination 那一条；
+> **③ 它的钱花在已知能过的铺路上** —— 11 张图对应的是 10 件资源，而不是「先买 11 张再去撞层覆盖」。
+> ⚠️ **我不预设它会成功**：§六 风险 1 明写「后面还有没有第二块不知道」。
+> ⚠️ **段 B 的钱要单独点头** —— 这份报告不覆盖段 A，也不覆盖别的跑。
+
+### 八、批准用语（照本票一贯的规矩）
+
+- **报告不是许可**；**批准不继承**（第十八跑那次「重跑段 A」已经用掉）。
+- 要跑的话，请给一句**明确的、只覆盖这一跑的话**，例如：**「批段 B」**。
+- 获批之后我会：**先落地驱动 → 把驱动贴给你看 → 再跑**（照第十五跑那条纪律）。
+- 未获批之前：**不建驱动 · 不建 `raw/run-out-2026-10-17c` · 不发任何上游请求 · 不动端口 · 不提交**。
+
+
+---
+
+### ⚠️ 第十九次真跑（段 B）结果（2026-10-17 · **人裁「批段 B」** · 一次性 · **死在 `pack`**）
+
+**退出码 1 · 墙钟 157.5s · 买图 11 张（9 generated + 2 masters）· 没有 `manifest.json` / `config` / `qa` / 站点。**
+
+```text
+步：pack → pack：player-scavenger（0/10）→ … → pack：ui-scrap-icon（9/10）
+失败点：资源 "enemy-wasteland" 的动画 "patrol"
+  spec 声明 4 帧，但生成的图上**检测到 1 块**
+```
+
+#### 账（`failed-2026-10-17T03-03-43-155Z/ledger.json`，17 发）
+
+| 步 | 目标 | attempts | ms |
+|---|---|---|---|
+| master | `master-player-scavenger` | 1 | 24651 |
+| master | `master-enemy-wasteland` | 1 | 17059 |
+| image | `player-scavenger` | **3** | 29936 |
+| image | `enemy-wasteland` | 1 | 27929 |
+| drawlist | `scrap-resource` | 1 | 1898 |
+| drawlist | `prop-street-lamp` | 1 | 1972 |
+| drawlist | `prop-bench` | 1 | 2100 |
+| drawlist | `hazard-spike-rubble` | 1 | 2598 |
+| drawlist | `ui-scrap-counter` | 1 | 2102 |
+| drawlist | `ui-scrap-icon` | 1 | 2037 |
+| image | `chest-ruined-city` | 1 | 19291 |
+| image | `level-downtown-ruins` | 1 | 30511 |
+| image | `player-scavenger` | 1 | 19276 |
+| image | `level-downtown-ruins` | 1 | 30291 |
+| image | `player-scavenger` | 1 | 29821 |
+| image | `level-downtown-ruins` | 1 | 14593 |
+| image | `level-downtown-ruins` | **2** | 22996 |
+
+⇒ 真买 **11 张**（2 母版 + 9 张动画/单帧/背景），**全部发生在失败之前** —— 这正是第十五跑
+「钱在崩之前花」的同一形状。
+
+#### ⭐ 免费诊断（用生产函数、只读、零上游）：**是地面线，不是抠色**
+
+```text
+enemy-wasteland.patrol.png：1344×768
+dominantOpaqueColor = [222, 8, 139] · keyedPixels 765192 = 74.1%
+segmentRow（按实测众数色抠完）→ **1 块**，bbox = (0,0,1344,768)
+逐行墨覆盖率：y = 671..767 共 **97 行** > 90% ⇒ **一条贯穿全宽的灰色地面带**
+把 y ≥ 671 裁掉再分块 → **4 块**：
+  (60,346,162×325) · (398,270,188×401) · (761,288,187×383) · (1142,346,128×325)
+```
+
+⇒ **四个角色本来是分开的，抠色也正常（74.1% 是粉色背景）**；
+把底部那条横带裁掉，`segmentRow` 立刻给出**正好 4 块**。
+⚠️ **根因是模型画了一条「地面线」** —— prompt 里写着「背景必须是纯色 #ff00ff、不要格线/边框」，
+但「4 个角色的脚底落在同一条水平线上」被模型画成了**一条实体横线**。
+⚠️ 这不是 `pack.ts` 的错误文案说的「抠色把主体抠掉了」；那条文案是**指错方向**的那一类。
+
+#### 阴性（逐条核过）
+
+- **输入检查点 10 份**：**10/10** 逐字节未变。
+- **副本里五份理解层产物**：**5/5** 逐字节相同。
+- 生成图：`generated/ 9 · masters/ 2`（与账一致；**没有第 12 张**）。
+- 失败现场：`raw/run-out-2026-10-17c/wasteland-scavenger-assets/failed-2026-10-17T03-03-43-155Z/`
+  （含 9 张生成图 + 2 张母版 + 6 份 drawlist + 账）。
+
+#### 这一跑没有答到的
+
+- **`config` 没跑**（`pack` 先抛）⇒ **层覆盖那条已知拦路石在真跑上仍然没有被重放**。
+- **`qa` / 站点没跑** ⇒ **站点第一次装出来**仍然没发生。
+
+#### 下一步（要人裁；本 session 不擅自动）
+
+| | 做法 | 花什么 | 能知道什么 |
+|---|---|---|---|
+| **(A) 立一张提示词票** | 只登记/裁定：多帧动画图上**禁止任何贯穿全宽的地面/地平线/横带**，并把「脚底对齐」与「画线」分开写 | 0 | 把根因变成可审查、可施工的一条；**立票 ≠ 施工** |
+| **(B) 资源级重生成** | 改完提示词后只重出 `enemy-wasteland.patrol`（1 张图 + 可能的 drawlist） | ~1 张图 | 立刻验提示词改得对不对；⚠️ 资源级重生成按票 33 **今天是「推迟、未批准」** |
+| **(C) 改分块逻辑** | 让 `segmentRow` 忽略满宽容差带 | 0 张图，但改代码 | 能绕过地面线 —— ⚠️ **可能把「角色真的连在一起」也一起放过**，风险高，**不推荐** |
+| **(D) 原样再跑段 B** | 同一份清单再买 11 张 | 11 张图 | **大概率同一形状**（R13 明令不许用「再抽一次」当修复） |
+
+⚠️ **本 session 没有立票、没有改提示词、没有改分块逻辑、没有再跑、没有提交。**

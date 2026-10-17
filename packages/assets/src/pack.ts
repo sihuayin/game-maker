@@ -21,7 +21,7 @@ import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
-import { segmentRowCells } from "./sheet.js";
+import { bottomBand, cropAboveBand, segmentRowCells } from "./sheet.js";
 import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioReading } from "./master.js";
 import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
@@ -127,6 +127,9 @@ type AssetSourceLike =
       alphaThreshold?: number | null;
     };
 
+/** 一次底部横带救援（票 100）。`cover` 是带子各行覆盖率的平均值。 */
+export type GroundBandRescue = { assetId: string; anim?: string; rows: number; cover: number };
+
 export type BuildPackResult = {
   manifest: AssetPackManifest;
   packDir: string;
@@ -135,6 +138,12 @@ export type BuildPackResult = {
   imageCalls: ({ assetId: string; master?: true } & ImageGenCall)[];
   /** spec ↔ 产物的对账结果（`auditAssetSpec`）。**有内容不等于失败** —— 交调用方决定。 */
   audit: string[];
+  /**
+   * **底部横带救援的事实记录**（票 99 / 票 100）：哪些动画在第一次分块数不符之后，
+   * 裁掉了一条贴着底部的横带、并因此切出了正确的 N 帧。
+   * ⚠️ **有内容不是失败** —— 但**不许静默**：调用方要把它印出来。
+   */
+  groundBands?: GroundBandRescue[];
   /**
    * **母版那几发的比例读数**（票 39）。⚠️ 它是**观察**那一侧的东西：不阻断、不打分。
    * ⚠️ **含匹配的那些**（`match: true`）—— 只报不匹配的话，人分不清「这次全对」与「这次压根没量」。
@@ -332,6 +341,8 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   type Built = { spec: AssetSpec; origin: "generated" | "imported"; paletteBinding: "exact" | "composited" | "quantized"; frames: { name: string; state?: string; image: RasterImage }[]; animations?: { name: string; frames: string[]; fps?: number; loop: boolean }[]; authoring: { kind: "drawlist" | "bitmap"; ref: string; original?: string }[] };
   /** 生图调用的账 —— 一次调用就是一笔钱，逐条记下来交调用方报出来。 */
   const imageCalls: ({ assetId: string; master?: true } & ImageGenCall)[] = [];
+  /** 底部横带救援（票 100）—— 只在分块数不符时触发；有记录就交调用方印出来。 */
+  const groundBands: GroundBandRescue[] = [];
 
   // ⚠️ **并发跑**（票 47）：每一次调用只吃自己的 `spec` + StyleSpec。
   //   串行纯属浪费：实测 9 个资源串行 43.7s，而墙钟本可以贴着最慢的那一个走。
@@ -835,7 +846,21 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             // ⚠️ **探针与最终交付用的是同一个颜色**（`unitKey`）—— 票 35 时这里是「我们告诉模型的
             //   那个底色」，票 37 之后单帧/多帧改成了**这张图上量出来的众数色**。
             //   ⚠️ 两处一旦分家，就会出现「探针按 A 抠、交付按 B 抠」：分块数得对，出来的帧却是花的。
-            const seg = segmentRowCells(image, keyed.image);
+            let seg = segmentRowCells(image, keyed.image);
+            if (seg.cells.length !== u.frames) {
+              // ⚠️ **底部横带救援**（票 99 的 Q1 = (c) · 票 100）：**只在第一次数量不符时**尝试 ——
+              //   正常图的行为一字不改。带子必须**贴着画面底部 / ink 底边**、逐行覆盖率 ≥ 90%、
+              //   至少 3 行；命中后把它**从原图和探针里一起裁掉**（只让分块忽略会让每一帧都带一条横带）。
+              //   重分块**正好 N 块**才接受；否则仍抛原来的错（下面加一句指出这条可能的成因）。
+              const band = bottomBand(keyed.image);
+              if (band !== null) {
+                const cropped = segmentRowCells(cropAboveBand(image, band), cropAboveBand(keyed.image, band));
+                if (cropped.cells.length === u.frames) {
+                  groundBands.push({ assetId: spec.id, ...(u.anim === undefined ? {} : { anim: u.anim }), rows: band.rows, cover: band.cover });
+                  seg = cropped;
+                }
+              }
+            }
             if (seg.cells.length !== u.frames)
               throw new Error(
                 `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
@@ -846,7 +871,9 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
                 //   —— 众数色若是主体，整排角色会被一起抠掉，那时先响的就是这条「检测到 1 块」。
                 `⚠️ 抠底用的是**实测众数色** —— ${colourReport(measured, keyed.keyedPixels, pixels)}；` +
                 `抠掉了 ${((keyed.keyedPixels / pixels) * 100).toFixed(1)}% 的像素。` +
-                `若那个众数色其实是**主体**，整排角色会被一起抠掉，块数就会先错在这里。`,
+                `若那个众数色其实是**主体**，整排角色会被一起抠掉，块数就会先错在这里。\n` +
+                // 票 100：同一个位置还有另一种成因 —— 底部横带把每一列都连上了。
+                `⚠️ 也可能是**底部一条贯穿画面的横带**（地面线 / 底座连线）：本轮已尝试忽略底部 ≥90% 的连续横带，仍未切出 ${u.frames} 块。`,
               );
             cells.push(...seg.cells);
           }
@@ -1176,6 +1203,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
   return {
     manifest, packDir: finalDir, audit, imageCalls,
     ...(masterRatioList.length > 0 ? { masterRatios: masterRatioList } : {}),
+    ...(groundBands.length > 0 ? { groundBands } : {}),
     ...(ledgerDoc ? { ledger: ledgerDoc } : {}),
   };
 }

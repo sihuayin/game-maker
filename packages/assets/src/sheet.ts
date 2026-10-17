@@ -8,7 +8,7 @@
 //
 // 也就是说：模型不按格子排版，但它会在角色之间留干净的缝。切法要跟着这个事实走。
 import { emptyImage, type RasterImage } from "./image.js";
-import type { Box } from "./import.js";
+import { cropToBox, type Box } from "./import.js";
 
 export type SegmentOptions = {
   /** alpha 下限，与 `trimToInk` 同一把尺子。 */
@@ -81,6 +81,45 @@ export function segmentRow(img: RasterImage, opts: SegmentOptions = {}): Box[] {
     return boxes.filter((b) => b.w >= median * rel);
   }
   return boxes;
+}
+
+/**
+ * 画面**最底部**那一段连续的高覆盖率横带（票 99 · 票 100）。
+ *
+ * ⚠️ **只认「最底部的那一段有墨的行」**：从整幅图最下面的 ink 行往上走，连续满足
+ *   `coverage >= minCover` 的行才算；一旦断开就停。画面中部的高覆盖行**不算** ——
+ *   那可能是几个角色并排时的一行（实测正常图最高到 83.4%），不是「贯穿底部的横带」。
+ *
+ * ⚠️ **它不是判据，是救援的入口**：`pack` 只在「第一次分块数 ≠ spec 的 N」时才调它；
+ *   正常图的行为一字不改。返回的 `cover` 是带子各行覆盖率的平均值（区间 `y0..y1` 含端点）。
+ */
+export function bottomBand(
+  img: RasterImage,
+  { floor = 128, minCover = 0.9, minRows = 3 }: { floor?: number; minCover?: number; minRows?: number } = {},
+): { y0: number; y1: number; rows: number; cover: number } | null {
+  const cover = (y: number): number => {
+    let n = 0;
+    for (let x = 0; x < img.width; x++) if (img.data[(y * img.width + x) * 4 + 3]! >= floor) n++;
+    return n / img.width;
+  };
+  // 最下面的 ink 行 —— 它下面必须是空的，带子才叫「贴着底部」。
+  let y1 = -1;
+  for (let y = img.height - 1; y >= 0; y--) if (cover(y) > 0) { y1 = y; break; }
+  if (y1 < 0) return null;
+  let y0 = y1;
+  let sum = 0;
+  while (y0 >= 0 && cover(y0) >= minCover) { sum += cover(y0); y0--; }
+  y0++;
+  const rows = y1 - y0 + 1;
+  if (rows < minRows || y0 <= 0) return null;   // y0 <= 0 = 整幅图都是带子，裁完什么也不剩
+  return { y0, y1, rows, cover: sum / rows };
+}
+
+/** 把 `bottomBand` 找到的那一段（连同它下面的空行）裁掉，只留 `y < band.y0`。 */
+export function cropAboveBand(img: RasterImage, band: { y0: number }): RasterImage {
+  if (band.y0 <= 0 || band.y0 > img.height)
+    throw new Error(`cropAboveBand: y0=${band.y0} 超出图像高度 ${img.height}`);
+  return cropToBox(img, { x: 0, y: 0, w: img.width, h: band.y0 });
 }
 
 /** 把若干块横排拼成一张联系表（供人眼验收）。块之间留 `gap` 列透明。 */

@@ -241,3 +241,63 @@ describe("规划工具的描述：那两条**明说是辅助**的散文（票 58
     expect(PLAN_TOOL_DESCRIPTION).toMatch(/只为少一次返工/);
   });
 });
+
+describe("多帧动画：底部横带的三处措辞（票 99 · 票 100）", () => {
+  // ⚠️ **这三条是「先红后绿」的见证**（票 94 / 98 的纪律）：先只加断言、源码一行不动 ⇒ 红；
+  //   再改 `animationSheetPrompt` ⇒ 绿。没有那一次红，它们就是三条空守卫。
+  const STYLE: StyleSpec = JSON.parse(readFileSync(fileURLToPath(new URL(
+    "../../../.scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json", import.meta.url)), "utf8"));
+
+  const ANIM: AssetSpec = {
+    kind: "animation", id: "guard", role: "角色", description: "一个巡逻的东西",
+    styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 },
+    required: true,
+    animations: [{ name: "patrol", frames: 4, fps: 6, loop: true }],
+  };
+  const DNA: CharacterDNA = {
+    id: "guard", identity: "它只在固定的一小段地面上来回走，走到头就折返。",
+    silhouette: "方柱", face: "none", clothing: "none", gear: [],
+    palette: ["palette:0"], visualConstraints: [],
+  };
+  const sprite: AssetSpec = {
+    kind: "sprite", id: "crate", role: "木箱", description: "一个木箱",
+    styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 16, h: 16 }, required: true,
+  };
+  const scene: AssetSpec = {
+    kind: "background", id: "bg", role: "背景", description: "一条街",
+    styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 480, h: 270 }, required: true,
+    layers: [{ name: "sky", parallax: 0 }],
+  };
+  const A_LAYER = { name: "sky", index: 0, total: 1, tileX: false };
+
+  it("① 除了角色像素，别的都不要有（含地面 / 地平线 / 底座连线）", () => {
+    const p = imagePrompt(ANIM, STYLE);
+    expect(p).toContain("除了这 4 个角色本身的像素，别的都不要有");
+    expect(p).toContain("不要画地面");
+    expect(p).toContain("地平线");
+    expect(p).toContain("底座连线");
+  });
+
+  it("② 脚底「对齐到同一个高度」—— 不再要求画那条水平线", () => {
+    const p = imagePrompt(ANIM, STYLE);
+    expect(p).toContain("对齐到同一个高度");
+    expect(p).toContain("只是**位置对齐**");
+    expect(p).toContain("**不要**在脚下画线");
+    expect(p).not.toContain("脚底落在**同一条水平线**上");
+    // 正控：对齐这个要求本身还在（别把整句删掉也算「绿」）
+    expect(p).toContain("脚底");
+  });
+
+  it("③ DNA 里提到「地面」时，说明那是在讲怎么动，不是让画地面", () => {
+    const p = imagePrompt(ANIM, STYLE, { dna: DNA });
+    expect(p).toContain("那是在说它**怎么动**");
+    expect(p).toContain("不是让你把地面画出来");
+    expect(p).toContain("只有 4 个角色");
+  });
+
+  it("负控：另外两张模板**不含**这段新话（改动只在动画模板）", () => {
+    expect(imagePrompt(sprite, STYLE)).not.toContain("除了这");
+    expect(imagePrompt(scene, STYLE, { layer: A_LAYER })).not.toContain("除了这");
+    expect(imagePrompt(sprite, STYLE)).not.toContain("那是在说它**怎么动**");
+  });
+});

@@ -1533,7 +1533,12 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       // ⚠️ **母版比例的观察**（票 39 的 Q1 ①）：当场给人看的那一份。
       //   ⚠️ 它**不是**「有内容就是错」—— 不阻断、不打分（上游守不守住 `aspectRatio` 不是设计能控的）。
       //   真值在包内 `master-ratios.json`（+ 每张母版那一格），失败现场也留得住。
-      ...(res.masterRatios === undefined ? [] : masterRatioNotes(res.masterRatios))],
+      ...(res.masterRatios === undefined ? [] : masterRatioNotes(res.masterRatios)),
+      // ⚠️ **底部横带救援的观察**（票 100）：有内容不是失败，但**不许静默** ——
+      //   人要知道这一帧是从一张「底下带横带」的图上救回来的。
+      ...(res.groundBands === undefined ? [] : res.groundBands.map((g) =>
+        `⚠️ 底部横带：${g.assetId}${g.anim === undefined ? "" : `.${g.anim}`} 忽略了 ${g.rows} 行` +
+        `（覆盖率 ${(g.cover * 100).toFixed(1)}%）`))],
     data: {
       packId: m.id, version: m.version,
       ...(res.imageCalls.length > 0
@@ -1541,6 +1546,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
         : {}),
       // ⚠️ **结构化那一份**（不是渲染好的句子）—— 两个壳各自决定怎么呈现。
       ...(res.masterRatios === undefined ? {} : { masterRatios: res.masterRatios }),
+      ...(res.groundBands === undefined ? {} : { groundBands: res.groundBands }),
       ledgerCalls: ledger, ledgerRun: summarizeCalls(ledger),
       assetCount: m.assets.length, fileCount: m.files.length,
       provenanceMode: m.provenance.mode, paletteCoverage: m.palette.coverage,
