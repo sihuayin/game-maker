@@ -2125,6 +2125,16 @@ Effort: game-maker-v2
 > ⚠️ **边界一字未越**：没动源码 / 契约 / 测试 / fixture / R 表 / 提示词 / `packages/qa` /
 > `game-maker.local.json` · 零付费 · 未提交。
 > ✅ **前沿（本段扫描）：103 —— 一张**（81 已关；其余 open 票全部 `claimed` ⇒ 不在前沿）。
+> ✅ **2026-10-17（票 103 施工收口）**：补塔防配置四边世界尺的**近端**判据 **已施工 · 已关 · 已提交**
+> （人裁逐字「提交 关票」）。＋2 条测试（阳性 · 阴性）；**阴性先红后绿**
+> （删掉 `td-config.ts:446` 的近端子句 ⇒ `1 failed / 1 passed`，已还原、`md5` 相同）。
+> 全量 **87 文件 / 1492 条全绿** · `tsc -b --force` 干净 · `pnpm build` 干净 · `check:deps` ✅ 9 包 ·
+> `check:links` ✅ 328 份文档 / 1993 条链接。
+> ⚠️ **远端那一格仍未裁**（探针 B 量到整条 `inWorld` 含远端也零判据）—— 本票按裁定只补近端；
+> 要补须另一次点头 / 另一张票。
+> ⚠️ **边界**：源码零改动（只加测试）· fixture / R 表 / 提示词 / `packages/qa` / `game-maker.local.json`
+> 一个字节没动 · 零付费 · **未推送**。
+> ✅ **前沿（本段扫描）：空 —— 没有 open / unblocked / unclaimed 的票**（103 已关；其余 open 票全部 `claimed`）。
 
 ## Destination
 
@@ -2660,6 +2670,8 @@ Style Image + Game Intent
 - [票 101 的施工：两块碎块过滤（`>=3` guard → `>=2`）＋ 底部横带阈值 90 → 80](issues/102-two-box-speck-construction.md)：**已施工 · 已关 · 已提交**（人裁「施工 · 不提交」→「关票 + 提交」）—— `sheet.ts:78` 两块也走相对宽度过滤（n=2 时 median = 较大块；**不直接删守卫**，0 块时 `ws[0]` 是 `undefined`）· `bottomBand` 的 `minCover` **0.9 → 0.8**（`minRows` 3 不变、形状不变）· `pack.ts:852/:876` 注释与失败报文同步到 80%（救援策略一字未改）· ＋5 条合成测试与 `twoBlockSheet` 助手。⭐ **先红后绿**：只加断言 ⇒ **3 failed / 6 passed**（碎块静默通过 · 84.4% 横带救不了 · 0.30 已知代价静默通过）；改源码 ⇒ 9/9。⭐ **13h 免费回放**：未过滤 2 块（28×31 + 1189×575）→ 过滤后 **1 块** → 横带 **15 行 / 均值 88.5%** → 裁后**两个真角色**（363×560 / 414×560）。⚠️ 全量 **87 文件 / 1490 条全绿**（基线 1485 ⇒ +5）· `tsc -b --force` 干净 · `check:deps` ✅ 9 包 · `check:links` ✅ 326 份文档 / 1977 条链接 · **dist 复核过**（新值在 `dist/sheet.js:75` / `:96` 与 `dist/pack.js:727`，旧值 0 命中）。⚠️ 边界：未改 `segmentRow` 其他默认 · 未加墨面积 · 未扩展到画面中部 · fixture / R 表 / `packages/qa` / `game-maker.local.json` 一个字节没动 · 零付费 · **未推送**。
 
 - [「世界尺」有几份、负坐标语义要不要统一](issues/81-world-ruler-semantics-differences.md)：**第一轮** Q1 (a) 口径 = 盒子 × 四边 **3 份** · Q2 (b) 顺延 · Q3 (乙) 保留差异、以「塔防 world.size == 视口」为条件 · Q3′ 横版 `pokeOut` 不动 · Q4 (a) 语义与判据同一张施工票（[票 83](issues/83-td-world-equals-viewport-and-pokeout.md)）· Q5 (a) 删 `allowPokeOut` 参数、留检查；**第二轮（闸由票 83 / 84 兑现）** Q1 (a) **两份配置世界尺保持独立**（不完全同义，差的正是近端那一刀；谓词与报文都不抽共用）· Q2 (a) 另立[票 103](issues/103-td-config-world-ruler-criteria.md) 补塔防配置近端判据 · Q3 (a) 路径点尺子进雾 · Q4 (a) 裁完即关。⭐⭐ 第二轮量到**塔防配置那条四边 `inWorld` 整条零判据**（删近端子句或整条变空函数，`td-config.test.ts` 均 48/48 全绿；已还原）⇒ 票 83 §6 第 3 条在配置这一处没有兑现；远端那一格仍未裁。
+
+- [塔防配置四边世界尺的判据 —— 票 81 第二轮 Q2(a) 裁出的施工票（票 83 §6 第 3 条的遗漏格）](issues/103-td-config-world-ruler-criteria.md)：**已施工 · 已关 · 已提交**（人裁逐字「提交 关票」）—— `packages/contracts/tests/td-config.test.ts:193` 新增 **2 条**：阳性（真关卡的插槽/柜台在世界里 ⇒ 一声不响）＋ 阴性（`slot "s1"` 的盒子 `(-7,-7)` ⇒ 硬失败，报文逐字断在世界与盒子上）。⭐ **证伪实测**：删掉 `td-config.ts:446` 的 `b.x < 0 || b.y < 0` ⇒ **1 failed / 1 passed**，红的正是阴性那条；已还原，`md5 = 6e55b246…`。⚠️ **源码零改动**（只加测试）· 全量 **87/1492** · `tsc -b --force` / `build` 干净 · `check:deps` 9 包 · `check:links` 328/1993。⚠️ **远端那一格仍未裁**（探针 B：整条 `inWorld` 含远端也零判据）—— 本票按裁定只补近端。
 
 ## Not yet specified
 
