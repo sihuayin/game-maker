@@ -37,7 +37,7 @@ const round = (v: number) => Math.round(v * 10) / 10;
  * **spec ↔ 产物对账**：`AssetSpec` 说要做成什么样，包里实际做出的是什么。
  *
  * 这是「需求 vs 产物」**唯一**的对账点。没有它，`AssetSpec` 里的
- * `size` / `animations` / `anchor` 就只是写给自己看的注释。
+ * `kind` / `size` / `animations` 就只是写给自己看的注释。
  *
  * @param drawlists 可选：给了就顺带核对每份 drawlist 的 `viewBox` 与声明的尺寸。
  *                  不一致时锚点的分母就错了，而错误会**静默**传递到装配。
