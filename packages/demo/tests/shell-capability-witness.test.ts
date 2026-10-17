@@ -33,7 +33,8 @@ const WITNESS: Record<Capability, Witness> = {
   "camera:side-scroll":          { file: "../src/shell/scene.ts", needle: "cam.setBounds(" },
   "camera:parallax":             { file: "../src/shell/scene.ts", needle: "setScrollFactor(l.parallax)" },
   "collision:aabb":              { file: "../src/shell/scene.ts", needle: "this.physics.add.overlap(" },
-  "motion:cyclic":               { file: "../src/shell/scene.ts", needle: "h.t0 % h.periodMs" },
+  // 票 106：三角波从 `scene.ts` 提到纯函数 `hazard.ts` —— 见证跟着实现走
+  "motion:cyclic":               { file: "../src/hazard.ts", needle: "elapsedMs % periodMs" },
   "objective:collect-then-reach": { file: "../src/shell/scene.ts", needle: "this.collected < world.objective.pickupCount" },
   "hud:screen-space":            { file: "../src/shell/scene.ts", needle: "setScrollFactor(0)" },
   // 「1 交付态像素 = 1 屏幕像素」靠的是视口是**外壳的常量**（`CONTEXT.md:456-459`）。

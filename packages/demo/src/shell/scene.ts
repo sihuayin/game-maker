@@ -7,6 +7,7 @@
 //   那是渲染器自己的事，与数据无关。
 import Phaser from "phaser";
 import { BACKDROP, formatIssue, type Box, type Drawn, type WorldDescription } from "../world.js";
+import { hazardAnchor } from "../hazard.js";
 
 /** 占位符的纹理名。**品红/黑棋盘** —— 票 32 裁决 3 要的是「刺眼」，不是好看。 */
 const PLACEHOLDER = "__placeholder__";
@@ -48,11 +49,14 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
       // 地形（看不见的碰撞）
       for (const t of world.terrain) this.addSolid(t);
 
+      // 玩家（票 105：**必须在实体之前**）
+      // ⚠️ pickup / hazard / goal 在 `addEntity` 里注册 overlap 时调 `playerOrStub()`；
+      //   实体先建时 `this.player` 还是 undefined ⇒ 全部绑到 1×1 的 stub 上，之后没有重绑
+      //   —— 拾取 / 危险 / 终点在真站点里全部不触发。stub 只该在「玩家画不出来」时兜底。
+      this.addPlayer();
+
       // 实体
       for (const e of world.entities) this.addEntity(e);
-
-      // 玩家
-      this.addPlayer();
 
       // 底色（票 50）—— 在**铺任何东西之前**定下来：什么都没有画的地方透过去就是它
       this.cameras.main.setBackgroundColor(BACKDROP);
@@ -234,14 +238,13 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
     private advanceHazards(delta: number): void {
       for (const h of this.hazards) {
         h.t0 += delta;
-        if (h.distance <= 0 || h.periodMs <= 0) continue;
-        // 单程 distance、周期 periodMs 的往返：三角波
-        const phase = (h.t0 % h.periodMs) / h.periodMs;
-        const k = phase < 0.5 ? phase * 2 : 2 - phase * 2;
-        const p = h.start + k * h.distance;
-        const b = h.sprite.body as Phaser.Physics.Arcade.StaticBody;
-        if (h.axis === "x") b.reset(p + b.halfWidth, b.center.y); else b.reset(b.center.x, p + b.halfHeight);
-        h.sprite.setPosition(b.center.x, b.center.y);
+        // ⚠️ **按锚点落位，不做盒心往返**（票 106）：资源锚点是 {0.5,1}，
+        //   把 `body.center` 写回精灵会把这半个身位每帧再减一次（敌人 7 秒后 y=-21838）。
+        //   纯函数只给锚点；静态体由 `updateFromGameObject()` 自己跟上。
+        const p = hazardAnchor(h.start, h.distance, h.periodMs, h.t0);
+        if (h.axis === "x") h.sprite.setPosition(p, h.sprite.y);
+        else h.sprite.setPosition(h.sprite.x, p);
+        (h.sprite.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject();
       }
     }
 
