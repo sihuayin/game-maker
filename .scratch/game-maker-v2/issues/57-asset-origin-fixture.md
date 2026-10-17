@@ -1,7 +1,7 @@
 # 57. 资源级的 `AssetOrigin.fixture` 零生产者 —— 留、删、还是等一个生产者？
 
 Type: grilling
-Status: claimed
+Status: resolved
 Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
@@ -127,3 +127,17 @@ export function derivePackMode(...) { ...; if (allOf("fixture")) return "fixture
 - ✅ **没加全仓零生产者扫描**（补充裁定第 3 条：如需，**另立票**）—— 本轮**没有**据此开票。
 - ✅ 不动 R 表 · 不动提示词 · `packages/qa` 一行没碰 · `game-maker.local.json` 一个字没动 · **零付费**。
 - ⚠️ **提交与关票都没做**（人裁原话）。
+
+---
+
+### ✅ 收口（2026-10-17 · 人裁逐字「收口剩余的 claimed 票」）
+
+> ⚠️ 本轮只做两件：① 本票 `claimed` → `resolved` + 这一节；② 本图 `## Decisions so far` 加一行。
+> **源码 / 测试 / 契约 / 提示词 / `packages/qa` 一个字节没动**。
+
+- **裁定**：Q1 (b) 删除 · Q4 (a) `assetpack/v3 → v4` · Q5 (a) `PackMode.fixture` 一起删。
+- **施工已落地（2026-10-14）**：`assetpack.ts` 删两档枚举 + 升 v4 · 两份入库包 `format` 改 v4 ·
+  `CONTEXT.md` 的 `Fixture Asset Pack` 理由重写 · 相关测试同步。
+- ⚠️ **一处照旧没动**：`pack.ts:84` 那句过期版本注释（在写入侧，边界逐字「不改写入侧」）——
+  要动它须**另一次授权**。
+- ⚠️ **没加全仓零生产者扫描**（补充裁定第 3 条：如需另立票）。

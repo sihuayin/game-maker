@@ -1,7 +1,7 @@
 # 62. `hud.panel` 被**两把坐标语义不同的尺子**各判一次 —— 世界尺与视口尺，而后者自己的报文写着「尺子是视口」
 
 Type: grilling
-Status: claimed
+Status: resolved
 Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
@@ -145,3 +145,17 @@ auditScreenSpace  响在 b.x < 0                （视口尺查下界）
   四处断言**一处没动**）—— 它们归票 80。
 - ✅ 不动 R 表 · 提示词一行不碰 · `packages/qa` 一行不碰 · `game-maker.local.json` 一个字没动 · **零付费**。
 - ⚠️ **没有施工、没有提交、没有关票。**
+
+---
+
+### ✅ 收口（2026-10-17 · 人裁逐字「收口剩余的 claimed 票」）
+
+> ⚠️ 本轮只做两件：① 本票 `claimed` → `resolved` + 这一节；② 本图 `## Decisions so far` 加一行。
+> **源码 / 测试 / 契约 / 提示词 / `packages/qa` 一个字节没动** —— 本票自己一行动代码都没碰，施工全在派生票里。
+
+- **六问全裁**：Q1 (a) 整含式重复 · Q2 (a) 只由视口尺判 · Q3 (c) 只裁、施工另立票 ·
+  Q4 (a) 世界尺另开票 · Q5 (a) 锚点约定另开票 · Q6 (a) 免费探针到此为止。
+- **派生票全部 resolved**：[票 80](80-hud-panel-world-ruler-removal.md)（横版移除）·
+  [票 81](81-world-ruler-semantics-differences.md)（世界尺口径）·
+  [票 82](82-hud-anchor-convention-ownership.md)（锚点归属）—— 以及 81 派生的
+  [票 83](83-td-world-equals-viewport-and-pokeout.md) / [票 84](84-td-hud-panel-world-ruler-redundant.md)。

@@ -1,7 +1,7 @@
 # 58. 「层名不许重复」只住在交付侧 —— 创作侧那份镜像漏了它，于是走到**花完钱之后**才被拒
 
 Type: grilling
-Status: claimed
+Status: resolved
 Owner: claude (2026-10-13)
 Blocked by: —
 Map: ../map.md
@@ -135,3 +135,16 @@ Map: ../map.md
 - ⚠️ **本条点名的派生票开了**：[票 79「动画名重复」](79-duplicate-animation-names.md)（`Status: open`，
   **只登记、不施工**）。本票射程**没有**扩大。
 - ⚠️ **提交与关票都没做**（人裁原话）。
+
+---
+
+### ✅ 收口（2026-10-17 · 人裁逐字「收口剩余的 claimed 票」）
+
+> ⚠️ 本轮只做两件：① 本票 `claimed` → `resolved` + 这一节；② 本图 `## Decisions so far` 加一行。
+> **源码 / 测试 / 契约 / 提示词 / `packages/qa` 一个字节没动**。
+
+- **裁定**：Q1 (a) 补在 `AssetSpecSchema.superRefine` 的 union 层 · Q2 (a) 不升版本 ·
+  Q3 (a) 动画名重复另开票 · Q4 (a) 免费验证到此为止 · Q5 (b) 散文落在模型面向的工具描述并声明「不是防线」。
+- **施工已落地（2026-10-14）**：契约唯一落点 + 镜像清单 + 散文 + 四侧测试；
+  派生[票 79](79-duplicate-animation-names.md) 已 resolved。
+- ⚠️ **不升版本** · 不取消票 46 的交付侧自校验 · `scale9Borders` / `size` 对账没碰。

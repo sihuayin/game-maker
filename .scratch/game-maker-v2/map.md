@@ -2136,6 +2136,18 @@ Effort: game-maker-v2
 > 一个字节没动 · 零付费 · **未推送**。
 > ✅ **前沿（本段扫描）：空 —— 没有 open / unblocked / unclaimed 的票**（103 已关；其余 open 票全部 `claimed`）。
 
+> ✅ **2026-10-17（清账：九张 `claimed` 票收口）**：按人裁「收口剩余的 claimed 票」，
+> **22 / 57 / 58 / 62 / 71 / 75 / 76 / 77 / 80** 九张从 `claimed` → `resolved`，
+> 每张都在票面留了 `## 收口`、并在 `## Decisions so far` 落了一行。
+> ⚠️ 其中 **57 / 58 / 80** 的施工早在盘上并已入库；**22 / 62 / 71 / 76** 的派生施工票
+> （78 / 80 / 85 / 88）都已 resolved；**75 / 77** 是**只裁不施工**的票 ——
+> 关闭只代表**裁定已入档**，**不代表代码已改**（77 的账务修复仍要另立施工票 + 独立许可）。
+> ⚠️ **23 没有关**：它停在第十九次真跑（段 B 死在 `pack` 的地面线）之后，
+> 下一步 A / B / C / D 仍等人裁 —— 它不是「收口」能关的票。
+> ✅ **前沿（本段扫描）：空** —— 其余 open 票全部 `claimed`；**23 是唯一剩下的 `claimed`**。
+> ⚠️ **边界**：本轮只改票面与本图索引 —— 源码 / 测试 / 契约 / 提示词 / `packages/qa` /
+> `game-maker.local.json` 一个字节没动 · 零付费 · 未提交 · 未推送。
+
 ## Destination
 
 仓库升级到 **V2**：一条命令
@@ -2673,6 +2685,16 @@ Style Image + Game Intent
 
 - [塔防配置四边世界尺的判据 —— 票 81 第二轮 Q2(a) 裁出的施工票（票 83 §6 第 3 条的遗漏格）](issues/103-td-config-world-ruler-criteria.md)：**已施工 · 已关 · 已提交**（人裁逐字「提交 关票」）—— `packages/contracts/tests/td-config.test.ts:193` 新增 **2 条**：阳性（真关卡的插槽/柜台在世界里 ⇒ 一声不响）＋ 阴性（`slot "s1"` 的盒子 `(-7,-7)` ⇒ 硬失败，报文逐字断在世界与盒子上）。⭐ **证伪实测**：删掉 `td-config.ts:446` 的 `b.x < 0 || b.y < 0` ⇒ **1 failed / 1 passed**，红的正是阴性那条；已还原，`md5 = 6e55b246…`。⚠️ **源码零改动**（只加测试）· 全量 **87/1492** · `tsc -b --force` / `build` 干净 · `check:deps` 9 包 · `check:links` 328/1993。⚠️ **远端那一格仍未裁**（探针 B：整条 `inWorld` 含远端也零判据）—— 本票按裁定只补近端。
 
+- [视觉观察要喂原图：reviewPack 今天比的是 contact sheet，不是参考图](issues/22-review-with-reference-image.md)：**三问全裁**（Q1 (a) 是缺口但只补观察来源 · Q2 (a) 本票只裁方向、接线另开票 · Q3 (b) 暂不立词）—— 接线由[票 78](issues/78-reviewpack-wiring.md) 落地并已关（CLI `review` · 两张图都喂 · 一次付费视觉调用事前告知 + 事后记账 · **不进链**），Q3 由 78 裁为「不适用 + 登记结构约束」。⚠️ 真跑观察仍归[票 23](issues/23-e2e-fixture-wasteland.md)。
+- [资源级 `AssetOrigin.fixture` 零生产者 —— 留、删、还是等一个生产者？](issues/57-asset-origin-fixture.md)：**删除**（Q1 (b)）＋ `assetpack/v3 → v4`（Q4 (a)）＋ `PackMode.fixture` 一起删（Q5 (a)）；施工已落地（`assetpack.ts` · 两份入库包 `format` · `CONTEXT.md` 词条重写）· 未加全仓零生产者扫描。⚠️ `pack.ts:84` 那句过期版本注释仍未动（在写入侧，要另一次授权）。
+- [「层名不许重复」只住在交付侧 —— 创作侧那份镜像漏了它](issues/58-layer-name-uniqueness-one-sided.md)：**补在 `AssetSpecSchema.superRefine` 的 union 层**（Q1 (a)，唯一规则落点）· 不升版本（Q2 (a)）· 动画名重复另开票（Q3 (a) ⇒ [票 79](issues/79-duplicate-animation-names.md)，已关）· 散文落在模型面向的工具描述并声明「不是防线」（Q5 (b)）；施工已落地（契约 + 镜像 + 散文 + 四侧测试）。
+- [`hud.panel` 被两把坐标语义不同的尺子各判一次](issues/62-hud-panel-double-ruler.md)：**Q1 (a) 整含式重复** · **Q2 (a) 只由视口尺判** · **Q3 (c) 只裁、施工另立票**（⇒ 票 80）· **Q4 (a)** 世界尺差异另开票（⇒ 票 81）· **Q5 (a)** 锚点约定另开票（⇒ 票 82）· **Q6 (a)** 免费探针到此为止。派生四票全部 resolved（80 / 81 / 82 / 83 / 84）⇒ 本票收口。
+- [把「这件资源是不是九宫格」补进模型看得到的资源清单](issues/71-scale9-into-model-brief.md)：**五问全裁**（Q1 (乙) 标记词 + 半句后果 · Q2 (a) 只印「九宫格」· Q3 (b) 只抽九宫格说明一截 · Q4 (a) 正反两条判据 · Q5 (甲) 铁律不加行）；施工由[票 85](issues/85-nine-slice-into-brief-construction.md) 落地并已关（共用函数住 `ops.ts` 且不 export · 两侧都印 · 正反断言 + 塔防 spy）。
+- [意图层的 `mechanics[]` 是一个杂物抽屉](issues/75-intent-mechanics-junk-drawer.md)：**Q1 (c) 不动**（现有「先分家」提示词已把错格从 6/7 降到 0/6；形状判据会误伤 3/6 条真机制）· Q2 条件性 (丙) 只作 QA 观察 · Q3 (a) R12 不变 · Q4 (a) 免费验证到此为止 · Q5 (a) 只登记不开票。⚠️ 本票**关闭 = 裁定已入档**，没有施工；设计层「不许顶替」仍留在 `Not yet specified`。
+- [两处样板各自合法、合起来不成立](issues/76-cross-stage-sample-conflict.md)：**Q1 (a) 修段 A** · **Q2 (c) 样板数据化 + 跨阶段一致性测试、另立施工票**（⇒ 票 88）· **Q3 (a)** 两票严格分工、解除票 65 边界 ① · **Q4 (a)** 免费对读到此为止；施工由[票 88](issues/88-recipe-shape-sample-as-data.md) 落地并已关。
+- [判据每前移一步，就越可能死在「账还没落盘」的那一段里](issues/77-ledger-lost-when-judgement-moves-earlier.md)：**Q1 (a) 要治** · **Q2 (a) 有条件通过**（段 A 复用已有 catch · 段 B 新增最小范围 catch · 两处只携带完整累积账并原样抛出 · 施工票必须解决 `CommandError` 上的空操作）· **Q3 (a)**「完全不带账」也归本票 · **Q4 (a)** 免费验证到此为止。⚠️ **本票关闭 = 裁定已入档；施工未授权、未立票** —— 要落这一纸裁定须另立施工票 + 独立许可。
+- [横版 `hud.panel` 的世界尺那一条移除](issues/80-hud-panel-world-ruler-removal.md)：**施工已落地并收口** —— 删掉 `game-config.ts` 里 `hud.panel` 的 `inWorld(...)`（只剩 3 处调用），四处断言改为视口判据（③④ 换证人 `terrain`），另动第五处让注释继续为真；证伪实测「把那一行加回去 ⇒ 当场红」。⚠️ 真跑观察仍归票 23。
+
 ## Not yet specified
 
 <!-- 通往终点的雾：在范围内，但还说不成一张票。前沿推过去时会毕业 -->
@@ -2917,7 +2939,7 @@ Style Image + Game Intent
   ⇒ 今天看得见它的时刻是 **R9 的检查点**。真要给它一个落点，干净的路是**第三个观察来源**
   （动契约 + 一个新的渲染处）—— **今天没有人要**。等有人开。
 
-- **把 `inspect` 的观察接进创建链**（票 20 的 Q2 派生）：契约要求**每个来源恰好一条**观察，而合成器**只装配、不采集**（它住 `qa`、白名单只有 `contracts`，够不着 `inspectPack`）⇒ 今天两条都写 `unavailable`，`qa-report.json` 的观察那一半**恒空**。⚠️ 接得起来的那条路很直：`pipeline` **两个都够得着**（它的白名单里有 `assets`），跑一次 `inspectPack`、把 `summary` **原样**递进合成器（`createQaRunner({ observations })` 这种工厂，`QaRunner` 形状不用动）。⚠️ 它今天没做的两个理由：① `inspect` 自称「唯一的重活」（它要**解全部图集**）—— 让每一次 `create` 顺便跑一遍是**新行为**；② 人今天看得见观察的时刻是 **R9 的检查点**，而那在 QA **之前**。⇒ 值一张自己的票。⚠️ 另一条 `review` **不在这里**：它要花一次视觉调用的钱，且今天喂的是联系表 ⇒ 压在[视觉观察要喂原图](issues/22-review-with-reference-image.md) 上。
+- **把 `inspect` 的观察接进创建链**（票 20 的 Q2 派生）：契约要求**每个来源恰好一条**观察，而合成器**只装配、不采集**（它住 `qa`、白名单只有 `contracts`，够不着 `inspectPack`）⇒ 今天两条都写 `unavailable`，`qa-report.json` 的观察那一半**恒空**。⚠️ 接得起来的那条路很直：`pipeline` **两个都够得着**（它的白名单里有 `assets`），跑一次 `inspectPack`、把 `summary` **原样**递进合成器（`createQaRunner({ observations })` 这种工厂，`QaRunner` 形状不用动）。⚠️ 它今天没做的两个理由：① `inspect` 自称「唯一的重活」（它要**解全部图集**）—— 让每一次 `create` 顺便跑一遍是**新行为**；② 人今天看得见观察的时刻是 **R9 的检查点**，而那在 QA **之前**。⇒ 值一张自己的票。⚠️ 另一条 `review` **不在这里**：它要花一次视觉调用的钱 ⇒ [票 78](issues/78-reviewpack-wiring.md) 已裁成 **CLI 命令、不进链**（2026-10-16 收口）—— 所以本格只说的是 `inspect` 那一半。
   ⚠️ **2026-10-13（[票 47](issues/47-unreached-constraints-enforcer.md)）：这一格缩了一截，但没毕业。**
   票 47 把那句「`inspect` 的观察**报得出来**」那一半做完了 —— `paletteUsage` 以前**静默丢掉**色板外像素
   （`ops.ts` 那个 `if (i >= 0)` **没有 else**）⇒ 「交付图与色板对不上」**没有任何落点**；
@@ -3051,20 +3073,6 @@ Style Image + Game Intent
   ⚠️ 它与[票 52](issues/52-id-is-the-class-not-the-one.md) **同源**（都在问「意图层那份 `entities[]` 的质量」），
   但**不是同一个问题**：票 52 问的是 `id` 的**名字**，这条问的是**要不要有这一条**。
 
-- ⚠️ **`qa/src/assemble.ts:133` 那句「过期理由」**（[票 22](issues/22-review-with-reference-image.md) 的 **Q2** 逐字要求记在这里 ·
-  2026-10-14 · **人裁 A2 = (a) 记**：只补记，**不借此实施接线**）：
-  `qa-report.json` 里 `review` 那条观察**恒写 `unavailable`**（`packages/qa/src/assemble.ts:130-135`），
-  自陈的理由逐字是「这次创建链没有跑 `reviewPack`（**它要花一次视觉调用的钱，而它今天比的是联系表、不是参考图**）」。
-  ⚠️ **后半个理由随票 22 的 Q1 裁定了 ⇒ 过期**：Q1 = (a)「是缺口，**但只补足观察的信息来源**」⇒
-  「它今天比的是联系表、不是参考图」**不再是一个能拿来说「所以不跑」的理由**；
-  而**前半个理由（要花一次视觉调用的钱）仍然成立**，一个字没变。
-  ⚠️ **接线本身没有做、也不许在这里顺手做**：票 22 的 Q2 逐字写着「**接线另开票**」⇒
-  本轮开了[票 78](issues/78-reviewpack-wiring.md)（`Status: open`，**只登记、不施工**）：
-  「接线票须**独立裁定**调用位置、调用成本及与 R9 清单检查点的先后关系」。
-  ⇒ **这一格要等的不是「接线做完了」，是票 78 把上面那三件裁掉** ——
-  在那之前 `assemble.ts:133` 那句话**照旧写着**（本轮**不动它**：动它是一次**施工**，要另一次授权；
-  ⚠️ 而本格是**地图记录**，**不等于**施工完成 —— 人裁补充边界第 7 条原话
-  「仅补记 `Not yet specified` 中指定的一格，**不把地图记录视为施工完成**」）。
 
 - ⚠️ **设计层那条「不许拿近似的值顶替」的禁令，今天没有 gate 看着**
   （[票 75](issues/75-intent-mechanics-junk-drawer.md) 的 **Q5 = (a)「只登记，不开票」** · 人裁 2026-10-15 ·
