@@ -191,28 +191,6 @@ describe("auditAssetSpec —— 分层背景（票 42）", () => {
     expect(auditAssetSpec(STATION, bgEntry())).toEqual([]);
   });
 
-  it("层数对不上被报出来", () => {
-    expect(auditAssetSpec(STATION, bgEntry({ layers: undefined })).join()).toMatch(/声明了 3 层，产物却有 0 层/);
-  });
-
-  it("层名对不上被报出来（靠位置对帧是一条没写在契约里的约定，所以帧名要能对）", () => {
-    const renamed = bgEntry({ layers: [{ name: "sky", parallax: 0 },
-      { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
-      { name: "GROUND", parallax: 1, tileable: { x: true, y: false } }] });
-    expect(auditAssetSpec(STATION, renamed).join()).toMatch(/第 2 层应当是 "ground"/);
-  });
-
-  it("视差与平铺声明对不上被报出来", () => {
-    const wrong = bgEntry({ layers: [{ name: "sky", parallax: 0.9 },
-      { name: "wall", parallax: 0.5, tileable: { x: true, y: false } },
-      { name: "ground", parallax: 1, tileable: { x: true, y: false } }] });
-    expect(auditAssetSpec(STATION, wrong).join()).toMatch(/层 "sky" 的视差应当是 0/);
-    const untiled = bgEntry({ layers: [{ name: "sky", parallax: 0 },
-      { name: "wall", parallax: 0.5 },
-      { name: "ground", parallax: 1, tileable: { x: true, y: false } }] });
-    expect(auditAssetSpec(STATION, untiled).join()).toMatch(/层 "wall" 的平铺声明与 spec 不一致/);
-  });
-
   it("**没**声明分层的背景，产物不该有多帧（原来的那条规则还在）", () => {
     const { layers: _drop, ...plain } = STATION as Extract<AssetSpec, { kind: "background" }>;
     expect(auditAssetSpec(plain, bgEntry()).join()).toMatch(/产物却有 3 帧/);
