@@ -2158,6 +2158,22 @@ Effort: game-maker-v2
 > 票 100 的提示词改动在这一次生效；救援路径仍由第十九跑那张图的免费回放证着。
 > ✅ **票 23 已关、已提交** —— 本图的**到达判据**（链跑完 + 真跑一次 + `run` / `pack` / `site` 三份产物）**已满足**；
 > **前沿为空**。⚠️ **n=1** · 站点没有在浏览器里打开 · 人眼评审不在本跑 —— 这些是**无票的余量**，不是未关的票。
+> ⏳ **2026-10-17（背景层落位 bug）**：站点点开后人眼 / 截图发现**背景四层全黑** ——
+> `buildBackground` 把 `at` 写死成 `{0,0}`，而 e2e 的背景锚点是 `{0,1}`（左下）⇒ 四层盒子
+> `y=-540..0`，与视口 `0..270` **零重叠**。⇒ 立[票 104](issues/104-background-layer-offscreen-placement.md)
+> （**立票 ≠ 批准施工**）；修复**零付费、不需重新生图**。
+> ✅ **前沿（本段扫描）：104 —— 一张**（其余票全部 `resolved`）。
+> ✅ **2026-10-17（票 104 施工收口）**：背景层按资源锚点落位 **已施工 · 已关 · 已提交**（人裁逐字「提交 & 关票 改票面」）。
+> §5 三问全按推荐：**(a)** `at = {x: anchor.x*W, y: anchor.y*H}`（`draw.at` 与 `box` 同源）· 判据只加外壳层 · `at.x` 一并按锚点算。
+> ⭐ **先红后绿**：未改源码时新测试 **2 failed / 21 passed**（左下锚点 · `{0.5,*}`；阳性对照本来就绿）；改后 **23/23**。
+> ⭐ **零付费重装配 `site/v2`**（复用 `pack/v1`；`site/v1` 原样保留、未覆盖）：真实 e2e 四层盒子由
+> `{0,-540,1920,540}`（与视口零重叠）变为 `{0,-270,1920,540}`（底边贴世界底）·
+> 无头 Chrome 截图：v1 四层全黑 → v2 天空 / 远景 / 立面 / 地面全部出现，玩家 / HUD / 拾取物无遮挡。
+> 全量 **87 文件 / 1495 条全绿**（基线 1492 ⇒ +3）· `tsc -b --force` 干净 · `pnpm build` 干净 · `check:deps` ✅ 9 包 ·
+> `check:links` ✅ 330 份文档 / 2021 条链接（收口时复测）· 两份 ledger mtime 未动（零上游）。
+> ⚠️ **边界**：未改 `auditLayerCoverage`（契约层留独立票）· 未重新生图 / 未重跑资源管线 / 零付费 · **未推送**。
+> ✅ **前沿（本段扫描）：空 —— 没有 open / unblocked / unclaimed 的票**（104 已关；其余票全部 `resolved`）。
+
 
 ## Destination
 
@@ -2695,6 +2711,7 @@ Style Image + Game Intent
 - [「世界尺」有几份、负坐标语义要不要统一](issues/81-world-ruler-semantics-differences.md)：**第一轮** Q1 (a) 口径 = 盒子 × 四边 **3 份** · Q2 (b) 顺延 · Q3 (乙) 保留差异、以「塔防 world.size == 视口」为条件 · Q3′ 横版 `pokeOut` 不动 · Q4 (a) 语义与判据同一张施工票（[票 83](issues/83-td-world-equals-viewport-and-pokeout.md)）· Q5 (a) 删 `allowPokeOut` 参数、留检查；**第二轮（闸由票 83 / 84 兑现）** Q1 (a) **两份配置世界尺保持独立**（不完全同义，差的正是近端那一刀；谓词与报文都不抽共用）· Q2 (a) 另立[票 103](issues/103-td-config-world-ruler-criteria.md) 补塔防配置近端判据 · Q3 (a) 路径点尺子进雾 · Q4 (a) 裁完即关。⭐⭐ 第二轮量到**塔防配置那条四边 `inWorld` 整条零判据**（删近端子句或整条变空函数，`td-config.test.ts` 均 48/48 全绿；已还原）⇒ 票 83 §6 第 3 条在配置这一处没有兑现；远端那一格仍未裁。
 
 - [塔防配置四边世界尺的判据 —— 票 81 第二轮 Q2(a) 裁出的施工票（票 83 §6 第 3 条的遗漏格）](issues/103-td-config-world-ruler-criteria.md)：**已施工 · 已关 · 已提交**（人裁逐字「提交 关票」）—— `packages/contracts/tests/td-config.test.ts:193` 新增 **2 条**：阳性（真关卡的插槽/柜台在世界里 ⇒ 一声不响）＋ 阴性（`slot "s1"` 的盒子 `(-7,-7)` ⇒ 硬失败，报文逐字断在世界与盒子上）。⭐ **证伪实测**：删掉 `td-config.ts:446` 的 `b.x < 0 || b.y < 0` ⇒ **1 failed / 1 passed**，红的正是阴性那条；已还原，`md5 = 6e55b246…`。⚠️ **源码零改动**（只加测试）· 全量 **87/1492** · `tsc -b --force` / `build` 干净 · `check:deps` 9 包 · `check:links` 328/1993。⚠️ **远端那一格仍未裁**（探针 B：整条 `inWorld` 含远端也零判据）—— 本票按裁定只补近端。
+- [背景层被摆到视口上方 —— `buildBackground` 把 `at` 写死为 `{0,0}`，与包的左下锚点冲突](issues/104-background-layer-offscreen-placement.md)：**三问全按推荐 · 已施工 · 已关 · 已提交**（人裁「施工104」→「提交 & 关票 改票面」）—— §4.1 **(a)** `at = {x: anchor.x*W, y: anchor.y*H}`（`draw.at` 与 `box` 同源）· 判据只加外壳层（`auditLayerCoverage` 不进本票）· `at.x` 一并按锚点算。⭐ **先红后绿**：未改源码时新测试 **2 failed / 21 passed**（左下锚点盒底对不上 270 · `{0.5,*}` 的 `at.x` 仍是 0），改后 **23/23**；last-train 阳性对照盒子逐字 `{0,0,480,270}` / `{0,0,1440,270}`×2。⭐ **零付费重装配 `site/v2`**：真实 e2e 四层由 `{0,-540,1920,540}`（与视口零重叠）变为 `{0,-270,1920,540}`（底边贴世界底）；无头 Chrome 截图 v1 全黑 → v2 四层全现、玩家/HUD/拾取物无遮挡；两份 ledger mtime 未动（零上游）。⚠️ 全量 **87/1495**（基线 1492 ⇒ +3）· `tsc` / `build` 干净 · `check:deps` 9 包 · `check:links` 330/2020。⚠️ 边界：未改契约层判据 · 未重新生图 / 未重跑资源管线 · 零付费 · 未推送。
 
 - [视觉观察要喂原图：reviewPack 今天比的是 contact sheet，不是参考图](issues/22-review-with-reference-image.md)：**三问全裁**（Q1 (a) 是缺口但只补观察来源 · Q2 (a) 本票只裁方向、接线另开票 · Q3 (b) 暂不立词）—— 接线由[票 78](issues/78-reviewpack-wiring.md) 落地并已关（CLI `review` · 两张图都喂 · 一次付费视觉调用事前告知 + 事后记账 · **不进链**），Q3 由 78 裁为「不适用 + 登记结构约束」。⚠️ 真跑观察仍归[票 23](issues/23-e2e-fixture-wasteland.md)。
 - [资源级 `AssetOrigin.fixture` 零生产者 —— 留、删、还是等一个生产者？](issues/57-asset-origin-fixture.md)：**删除**（Q1 (b)）＋ `assetpack/v3 → v4`（Q4 (a)）＋ `PackMode.fixture` 一起删（Q5 (a)）；施工已落地（`assetpack.ts` · 两份入库包 `format` · `CONTEXT.md` 词条重写）· 未加全仓零生产者扫描。⚠️ `pack.ts:84` 那句过期版本注释仍未动（在写入侧，要另一次授权）。

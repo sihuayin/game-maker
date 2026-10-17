@@ -155,6 +155,57 @@ describe("正常数据：last-train 装配正确", () => {
   });
 });
 
+/**
+ * 票 104：背景**按资源自己声明的锚点**落位 —— 不是一律钉在左上角。
+ *
+ * ⚠️ 现场：e2e 的 `level-downtown-ruins` 是 1920×540、锚点 `{0,1}`（左下），世界高 270。
+ *   `at` 写死 `{0,0}` 时整块被放到 `y=-540..0` —— 与视口零重叠，四层全黑。
+ *   这里把 last-train 的背景资源换成同一形状（帧名 / 层名保持不变，仍是合法包形状）。
+ */
+describe("背景：落点由资源锚点决定（票 104）", () => {
+  /** 把 last-train 的背景资源改成 e2e 那份形状：1920×540、左下锚点。 */
+  const e2ePack = (anchor: { x: number; y: number } = { x: 0, y: 1 }) => {
+    const pack = structuredClone(MANIFEST);
+    const bg = pack.assets.find((a: { id: string }) => a.id === "bg-dusk-halt");
+    bg.size = { w: 1920, h: 540 };
+    bg.anchor = anchor;
+    return pack;
+  };
+  const buildE2e = (anchor?: { x: number; y: number }) =>
+    buildWorld(e2ePack(anchor), valid({ world: { size: { w: 1920, h: 270 } } }), { packBase: "" });
+
+  it("左下锚点：每一层的底边贴着世界底，且与视口有重叠", () => {
+    const w = buildE2e();
+    expect(w.background).toHaveLength(3);
+    for (const l of w.background) {
+      expect(l.box.y + l.box.h, "底边对齐世界底").toBe(270);
+      expect(l.box.y, "盒子要伸进视口（否则整层在视口上方）").toBeLessThan(w.viewport.h);
+      expect(l.box.y + l.box.h).toBeGreaterThan(0);
+      expect(l.draw.missing).toBe(false);
+      if (!l.draw.missing) expect(l.draw.at).toEqual({ x: 0, y: 270 });
+    }
+  });
+
+  it("左上锚点的旧包盒子逐字不变（阳性对照：修 e2e 不许改坏 last-train）", () => {
+    const w = build(valid());
+    expect(w.background.map((l) => l.box)).toEqual([
+      { x: 0, y: 0, w: 480, h: 270 },
+      { x: 0, y: 0, w: 1440, h: 270 },
+      { x: 0, y: 0, w: 1440, h: 270 },
+    ]);
+    for (const l of w.background) expect(l.draw.missing ? null : l.draw.at).toEqual({ x: 0, y: 0 });
+  });
+
+  it("`at` 的两个轴都按锚点算 —— `{0.5,*}` 的背景不会被下一次踩到", () => {
+    const w = buildE2e({ x: 0.5, y: 1 });
+    for (const l of w.background) {
+      if (l.draw.missing) throw new Error("背景层不该解不到");
+      expect(l.draw.at).toEqual({ x: 960, y: 270 });
+      expect(l.box.x + l.box.w / 2, "锚点落在世界宽中点 ⇒ 盒子仍以 960 居中").toBe(960);
+    }
+  });
+});
+
 describe("坏数据要显形，不许静默（票 32 裁决 3）", () => {
   it("终点指向不存在的实体 → 留下一条 error，但世界照常产出", () => {
     const w = build(valid({ objective: { kind: "collect-then-reach", gate: "__没有__" } }));

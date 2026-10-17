@@ -1,0 +1,206 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 1920,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "level-downtown-ruins"
+    }
+  },
+  "player": {
+    "asset": "player-scavenger",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 250
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 250,
+      "w": 700,
+      "h": 20
+    },
+    {
+      "x": 750,
+      "y": 250,
+      "w": 1170,
+      "h": 20
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "w": 20,
+      "h": 250
+    },
+    {
+      "x": 1900,
+      "y": 0,
+      "w": 20,
+      "h": 250
+    }
+  ],
+  "entities": [
+    {
+      "id": "scrap-1",
+      "kind": "pickup",
+      "at": {
+        "x": 180,
+        "y": 250
+      },
+      "asset": "scrap-resource"
+    },
+    {
+      "id": "scrap-2",
+      "kind": "pickup",
+      "at": {
+        "x": 260,
+        "y": 250
+      },
+      "asset": "scrap-resource"
+    },
+    {
+      "id": "scrap-3",
+      "kind": "pickup",
+      "at": {
+        "x": 340,
+        "y": 250
+      },
+      "asset": "scrap-resource"
+    },
+    {
+      "id": "spike-1",
+      "kind": "hazard",
+      "at": {
+        "x": 470,
+        "y": 250
+      },
+      "asset": "hazard-spike-rubble"
+    },
+    {
+      "id": "enemy-1",
+      "kind": "hazard",
+      "at": {
+        "x": 620,
+        "y": 250
+      },
+      "asset": "enemy-wasteland",
+      "anim": "patrol",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 60,
+        "periodMs": 3000
+      }
+    },
+    {
+      "id": "chest-1",
+      "kind": "goal",
+      "at": {
+        "x": 830,
+        "y": 250
+      },
+      "asset": "chest-ruined-city"
+    },
+    {
+      "id": "scrap-4",
+      "kind": "pickup",
+      "at": {
+        "x": 1100,
+        "y": 250
+      },
+      "asset": "scrap-resource"
+    },
+    {
+      "id": "scrap-5",
+      "kind": "pickup",
+      "at": {
+        "x": 1250,
+        "y": 250
+      },
+      "asset": "scrap-resource"
+    },
+    {
+      "id": "scrap-6",
+      "kind": "pickup",
+      "at": {
+        "x": 1400,
+        "y": 250
+      },
+      "asset": "scrap-resource"
+    },
+    {
+      "id": "lamp-1",
+      "kind": "decor",
+      "at": {
+        "x": 560,
+        "y": 250
+      },
+      "asset": "prop-street-lamp"
+    },
+    {
+      "id": "bench-1",
+      "kind": "decor",
+      "at": {
+        "x": 1000,
+        "y": 250
+      },
+      "asset": "prop-bench"
+    },
+    {
+      "id": "lamp-2",
+      "kind": "decor",
+      "at": {
+        "x": 1600,
+        "y": 250
+      },
+      "asset": "prop-street-lamp"
+    },
+    {
+      "id": "gate-1",
+      "kind": "goal",
+      "at": {
+        "x": 1850,
+        "y": 250
+      },
+      "asset": "chest-ruined-city"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "ui-scrap-counter",
+      "at": {
+        "x": 72,
+        "y": 8
+      },
+      "size": {
+        "w": 72,
+        "h": 32
+      }
+    },
+    "pip": {
+      "asset": "ui-scrap-icon",
+      "at": {
+        "x": 12,
+        "y": 24
+      },
+      "step": {
+        "x": 20,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "gate-1"
+  }
+}
