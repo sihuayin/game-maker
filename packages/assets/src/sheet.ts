@@ -74,8 +74,11 @@ export function segmentRow(img: RasterImage, opts: SegmentOptions = {}): Box[] {
     boxes.push({ x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 });
   }
   // 按**相对宽度**再滤一遍碎片（见 `minRelativeWidth` 的注释）。
+  // ⚠️ 两块时也执行（票 101 / 102）：13h 的现场正是「1 个真角色 + 1 个 28px 碎块」，
+  //   旧守卫 `>= 3` 会让碎块凑够 2 帧、静默通过。n=2 时 median 取的是**较大块**，
+  //   等价于「≥ 较大块的 40%」。⚠️ 不能直接删守卫：0 块时 `ws[0]` 是 undefined。
   const rel = opts.minRelativeWidth ?? 0.4;
-  if (boxes.length >= 3) {
+  if (boxes.length >= 2) {
     const ws = [...boxes.map((b) => b.w)].sort((a, b) => a - b);
     const median = ws[Math.floor(ws.length / 2)]!;
     return boxes.filter((b) => b.w >= median * rel);
@@ -90,12 +93,16 @@ export function segmentRow(img: RasterImage, opts: SegmentOptions = {}): Box[] {
  *   `coverage >= minCover` 的行才算；一旦断开就停。画面中部的高覆盖行**不算** ——
  *   那可能是几个角色并排时的一行（实测正常图最高到 83.4%），不是「贯穿底部的横带」。
  *
+ * ⚠️ **minCover 取 80% 是量出来的（票 101 / 102）**：13h 的横带 15 行、每行 ≥85%、均值 88.5%，
+ *   而盘上 21 张正常图的底部连续段是 **0 行 ≥80%** —— 形状本身已经把误报挡住了，
+ *   80% 只是给真横带留余量；命中后仍要「重分块正好 N 块」才接受。
+ *
  * ⚠️ **它不是判据，是救援的入口**：`pack` 只在「第一次分块数 ≠ spec 的 N」时才调它；
  *   正常图的行为一字不改。返回的 `cover` 是带子各行覆盖率的平均值（区间 `y0..y1` 含端点）。
  */
 export function bottomBand(
   img: RasterImage,
-  { floor = 128, minCover = 0.9, minRows = 3 }: { floor?: number; minCover?: number; minRows?: number } = {},
+  { floor = 128, minCover = 0.8, minRows = 3 }: { floor?: number; minCover?: number; minRows?: number } = {},
 ): { y0: number; y1: number; rows: number; cover: number } | null {
   const cover = (y: number): number => {
     let n = 0;

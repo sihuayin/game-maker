@@ -849,7 +849,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             let seg = segmentRowCells(image, keyed.image);
             if (seg.cells.length !== u.frames) {
               // ⚠️ **底部横带救援**（票 99 的 Q1 = (c) · 票 100）：**只在第一次数量不符时**尝试 ——
-              //   正常图的行为一字不改。带子必须**贴着画面底部 / ink 底边**、逐行覆盖率 ≥ 90%、
+              //   正常图的行为一字不改。带子必须**贴着画面底部 / ink 底边**、逐行覆盖率 ≥ 80%、
               //   至少 3 行；命中后把它**从原图和探针里一起裁掉**（只让分块忽略会让每一帧都带一条横带）。
               //   重分块**正好 N 块**才接受；否则仍抛原来的错（下面加一句指出这条可能的成因）。
               const band = bottomBand(keyed.image);
@@ -873,7 +873,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
                 `抠掉了 ${((keyed.keyedPixels / pixels) * 100).toFixed(1)}% 的像素。` +
                 `若那个众数色其实是**主体**，整排角色会被一起抠掉，块数就会先错在这里。\n` +
                 // 票 100：同一个位置还有另一种成因 —— 底部横带把每一列都连上了。
-                `⚠️ 也可能是**底部一条贯穿画面的横带**（地面线 / 底座连线）：本轮已尝试忽略底部 ≥90% 的连续横带，仍未切出 ${u.frames} 块。`,
+                `⚠️ 也可能是**底部一条贯穿画面的横带**（地面线 / 底座连线）：本轮已尝试忽略底部 ≥80% 的连续横带，仍未切出 ${u.frames} 块。`,
               );
             cells.push(...seg.cells);
           }

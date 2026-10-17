@@ -115,3 +115,75 @@ describe("多帧底部横带：失败才触发的救援（票 99 / 票 100）", 
       .rejects.toThrow(/检测到 1 块[\s\S]*底部一条贯穿画面的横带/);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 票 101 / 102：**两块时的碎块过滤**（`>=3` guard → `>=2`）与 80% 横带阈值。
+//
+// ⚠️ 本组测试的形状是量出来的，不是拍的：
+//   · 13h 的真现场 = 角落一块 28×31 碎块 + 一块 1189×575 大块（宽度比 2.4%）；
+//   · 盘上合法 2 帧的最低宽度比是 **0.647**（10-09 scavenger-idle）；
+//   · 13h 的底部横带 **15 行 / 每行 ≥85% / 均值 88.5%**（90% 阈值救不了它）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * 两块形状的合成 sheet（64×20）。
+ *
+ * - `widths`：每个真角色的矩形宽度，角色之间留 ≥2 列的底色缝；
+ * - `speck`：左上角另画一个 **2×2** 的墨点 —— 它恰好通过 `minWidth` (=2) 与
+ *   `minInkRows` (=2)，是 13h 那块 28×31 碎块的缩小同构；
+ * - `band`：底部 4 行的横带宽度（像素）。取值要 **≥ 0.8·w 且 < 0.9·w**，
+ *   才能证明「80% 阈值」真的生效，而不是只测 100%。
+ */
+const twoBlockSheet = (opts: {
+  widths: readonly number[];
+  speck?: boolean;
+  band?: { width: number };
+}): RasterImage => {
+  const w = 64, h = 20;
+  const data = Buffer.alloc(w * h * 4);
+  const put = (x: number, y: number, c: [number, number, number]) => {
+    const o = (y * w + x) * 4;
+    data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;
+  };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) put(x, y, px("#ff00ff"));
+  const ink = px(STYLE.palette[0]!);
+  let x = 4;
+  for (const bw of opts.widths) {
+    for (let y = 2; y < 16; y++) for (let xx = x; xx < x + bw; xx++) put(xx, y, ink);
+    x += bw + 6;
+  }
+  if (opts.speck === true) for (let y = 0; y < 2; y++) for (let xx = 0; xx < 2; xx++) put(xx, y, ink);
+  if (opts.band !== undefined) {
+    const offset = Math.floor((w - opts.band.width) / 2);
+    for (let y = 16; y < 20; y++) for (let xx = offset; xx < offset + opts.band.width; xx++) put(xx, y, px(BAND));
+  }
+  return { width: w, height: h, data };
+};
+
+describe("两块时的碎块过滤（票 101 / 102）", () => {
+  it("⭐ 碎块 + 1 个真角色、spec 2 ⇒ 过滤后只剩 1 块，**硬失败**", async () => {
+    await expect(build(twoBlockSheet({ widths: [8], speck: true }), 2))
+      .rejects.toThrow(/检测到 1 块/);
+  });
+
+  it("合法双帧、宽度比 0.65（实测最低 0.647 的量级）⇒ **不误杀**", async () => {
+    const { manifest } = await build(twoBlockSheet({ widths: [10, 15] }), 2);
+    expect(manifest.assets[0]!.animations![0]!.frames).toEqual(["guard.idle1", "guard.idle2"]);
+  });
+
+  it("碎块 + 2 个真角色（3 块）⇒ 现有 median 过滤行为不变", async () => {
+    const { manifest } = await build(twoBlockSheet({ widths: [8, 12], speck: true }), 2);
+    expect(manifest.assets[0]!.animations![0]!.frames).toEqual(["guard.idle1", "guard.idle2"]);
+  });
+
+  it("⭐ 底部横带 **84.4%** 宽 + 2 个分离角色 ⇒ 80% 阈值救得了（90% 救不了）", async () => {
+    const { manifest, groundBands } = await build(twoBlockSheet({ widths: [8, 8], band: { width: 54 } }), 2);
+    expect(manifest.assets[0]!.animations![0]!.frames).toEqual(["guard.idle1", "guard.idle2"]);
+    expect(groundBands).toEqual([{ assetId: "guard", anim: "idle", rows: 4, cover: 0.84375 }]);
+  });
+
+  it("已知代价：宽度比 0.30 的第二帧被当碎块丢弃 ⇒ 预期**硬失败**（不列为必须通过的合法帧）", async () => {
+    await expect(build(twoBlockSheet({ widths: [4, 13] }), 2))
+      .rejects.toThrow(/检测到 1 块/);
+  });
+});
