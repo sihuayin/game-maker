@@ -1,0 +1,745 @@
+{
+  "format": "assetpack/v4",
+  "id": "wasteland-scavenger-assets",
+  "version": 1,
+  "createdAt": "2026-10-17T12:43:29.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 9,
+    "values": [
+      "#5a3a22",
+      "#7a4a28",
+      "#2f3a45",
+      "#f0b53c",
+      "#1f2733",
+      "#232c3a",
+      "#4a4f57",
+      "#8c8f95",
+      "#e8c9a0"
+    ],
+    "coverage": {
+      "exact": 4,
+      "composited": 2,
+      "quantized": 4,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 80,
+        "h": 1216
+      },
+      "frames": 12,
+      "assets": [
+        "enemy-wasteland",
+        "player-scavenger"
+      ],
+      "checksum": "sha256:be27c9270bcc4cabf8d989ca91fa9991a0aa0ce9eb4a7a0f0595da1ff4a7eeec"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 1920,
+        "h": 2160
+      },
+      "frames": 4,
+      "assets": [
+        "level-downtown-ruins"
+      ],
+      "checksum": "sha256:96caae0f4a368176e319971d85d44aca3df241b03275fc2a0096f062736b45f6"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 64,
+        "h": 104
+      },
+      "frames": 5,
+      "assets": [
+        "chest-ruined-city",
+        "hazard-spike-rubble",
+        "prop-bench",
+        "prop-street-lamp",
+        "scrap-resource"
+      ],
+      "checksum": "sha256:e5fb7a522f162ce3c21580ea8511280f865874f71d408e907f12bf858d473114"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 128,
+        "h": 32
+      },
+      "frames": 2,
+      "assets": [
+        "ui-scrap-counter",
+        "ui-scrap-icon"
+      ],
+      "checksum": "sha256:b21290358ec9cef0649c1479216cb3754555f667cbaddc979700af9492ec3af3"
+    }
+  ],
+  "assets": [
+    {
+      "id": "player-scavenger",
+      "kind": "animation",
+      "role": "玩家：可左右奔跑、跳跃、拾取与开箱的拾荒者",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-scavenger.idle1"
+        },
+        {
+          "name": "player-scavenger.idle2"
+        },
+        {
+          "name": "player-scavenger.run1"
+        },
+        {
+          "name": "player-scavenger.run2"
+        },
+        {
+          "name": "player-scavenger.run3"
+        },
+        {
+          "name": "player-scavenger.run4"
+        },
+        {
+          "name": "player-scavenger.jump1"
+        },
+        {
+          "name": "player-scavenger.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "player-scavenger.idle1",
+            "player-scavenger.idle2"
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "player-scavenger.run1",
+            "player-scavenger.run2",
+            "player-scavenger.run3",
+            "player-scavenger.run4"
+          ],
+          "fps": 10,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "player-scavenger.jump1",
+            "player-scavenger.jump2"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "enemy-wasteland",
+      "kind": "animation",
+      "role": "在固定地面区间来回巡逻的接触伤害敌人",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 80,
+        "h": 88
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-wasteland.patrol1"
+        },
+        {
+          "name": "enemy-wasteland.patrol2"
+        },
+        {
+          "name": "enemy-wasteland.patrol3"
+        },
+        {
+          "name": "enemy-wasteland.patrol4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "patrol",
+          "frames": [
+            "enemy-wasteland.patrol1",
+            "enemy-wasteland.patrol2",
+            "enemy-wasteland.patrol3",
+            "enemy-wasteland.patrol4"
+          ],
+          "fps": 6,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-wasteland.patrol.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "scrap-resource",
+      "kind": "sprite",
+      "role": "散落在街道与平台上的可拾取废料",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "scrap-resource"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/scrap-resource.json"
+        }
+      ]
+    },
+    {
+      "id": "chest-ruined-city",
+      "kind": "sprite",
+      "role": "接触即开的宝箱，箱盖弹起并爆出宝物",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 26
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest-ruined-city"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest-ruined-city.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "hazard-spike-rubble",
+      "kind": "sprite",
+      "role": "贴地的碎石尖刺危险带，接触即结束本关",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hazard-spike-rubble"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hazard-spike-rubble.json"
+        }
+      ]
+    },
+    {
+      "id": "level-downtown-ruins",
+      "kind": "background",
+      "role": "第一关的横向带状街区背景，贯穿全宽的地面与轨道条带",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 1920,
+        "h": 540
+      },
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0
+        },
+        {
+          "name": "horizon",
+          "parallax": 0
+        },
+        {
+          "name": "facade",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "ground",
+          "parallax": 1,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "level-downtown-ruins.sky"
+        },
+        {
+          "name": "level-downtown-ruins.horizon"
+        },
+        {
+          "name": "level-downtown-ruins.facade"
+        },
+        {
+          "name": "level-downtown-ruins.ground"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/level-downtown-ruins.sky.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/level-downtown-ruins.horizon.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/level-downtown-ruins.facade.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/level-downtown-ruins.ground.png",
+          "original": "生图 · 4 次调用"
+        }
+      ]
+    },
+    {
+      "id": "prop-street-lamp",
+      "kind": "sprite",
+      "role": "街道点缀道具：路灯",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": false,
+      "size": {
+        "w": 16,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-street-lamp"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-street-lamp.json"
+        }
+      ]
+    },
+    {
+      "id": "prop-bench",
+      "kind": "sprite",
+      "role": "街道点缀道具：长椅",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": false,
+      "size": {
+        "w": 40,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "prop-bench"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/prop-bench.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-scrap-counter",
+      "kind": "ui",
+      "role": "屏幕左上角显示已收集废料数量的状态条底板",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-scrap-counter"
+        }
+      ],
+      "scale9Borders": {
+        "x": 8,
+        "y": 8,
+        "w": 80,
+        "h": 16
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-scrap-counter.json"
+        }
+      ]
+    },
+    {
+      "id": "ui-scrap-icon",
+      "kind": "ui",
+      "role": "废料计数旁的小图标",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "ui-scrap-icon"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/ui-scrap-icon.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/hazard-spike-rubble.json",
+      "bytes": 4177,
+      "checksum": "sha256:2542ee51ec73d7a0000e33b1e6243ad1151c937bb461052875cebcf0ddf05963"
+    },
+    {
+      "path": "authoring/drawlist/prop-bench.json",
+      "bytes": 2017,
+      "checksum": "sha256:e4f92f4a42911175905a0b21fd52a4c1a6d729bcd6d620d7906c4dead60890eb"
+    },
+    {
+      "path": "authoring/drawlist/prop-street-lamp.json",
+      "bytes": 2917,
+      "checksum": "sha256:7b6ec49809275ee7071d4aa6a2c31a4aa883acec96f0fb3a329e1110bc9b7f7a"
+    },
+    {
+      "path": "authoring/drawlist/scrap-resource.json",
+      "bytes": 2561,
+      "checksum": "sha256:97b16799eb2c98f7cc534d296b3da891c3de7222a12f0b2e2dd675b3275b8c46"
+    },
+    {
+      "path": "authoring/drawlist/ui-scrap-counter.json",
+      "bytes": 3798,
+      "checksum": "sha256:a2ea4bcf3cee133588188afbad3a6412ff468aab93a655b4c695e94da65aa917"
+    },
+    {
+      "path": "authoring/drawlist/ui-scrap-icon.json",
+      "bytes": 2607,
+      "checksum": "sha256:ddb4d5d2941fa805ba84cf14605339c52363e19820b48b27359ea5488a69b96c"
+    },
+    {
+      "path": "authoring/generated/chest-ruined-city.png",
+      "bytes": 860425,
+      "checksum": "sha256:77d206273d918f5ab43871e6407a137f942a953cdf718249d49a0296f01f4133"
+    },
+    {
+      "path": "authoring/generated/chest-ruined-city.prompt.txt",
+      "bytes": 1856,
+      "checksum": "sha256:80c99a7def269ac876b77b47d064476e15cc84b2dac277c2d1233a248354b7ff"
+    },
+    {
+      "path": "authoring/generated/enemy-wasteland.patrol.png",
+      "bytes": 850132,
+      "checksum": "sha256:b1edc012daebe872ab033fa337871eab6d4c3013acb9ac7d0f2b21ca8d7d786d"
+    },
+    {
+      "path": "authoring/generated/enemy-wasteland.patrol.prompt.txt",
+      "bytes": 4073,
+      "checksum": "sha256:f6d6e67012be4e98c2508cf1a69bb2992ee7cc7f8c54fbfdba77b24734dc9af7"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.facade.png",
+      "bytes": 832093,
+      "checksum": "sha256:7e1af7e03a32e663568a4ed59812820e5111245b18e395bfd934504b35f7ae0d"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.facade.prompt.txt",
+      "bytes": 1801,
+      "checksum": "sha256:6d5790cf57ccaa9afc969bdc2ae0f87648dc06f087dae4faefc54fef8faa97ac"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.ground.png",
+      "bytes": 776889,
+      "checksum": "sha256:3f6057dfd95d99d44b9e641e93a2f085249e29e486faebdaee4209e1f4f50cc0"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.ground.prompt.txt",
+      "bytes": 1756,
+      "checksum": "sha256:9de33aa1d50f283e842a2850408217f04dd83418526082ba238eae7231cc4e9b"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.horizon.png",
+      "bytes": 779346,
+      "checksum": "sha256:568e9702dcd137b2cbbe844a1f470fe73b718e1569c5b78a41bdba205758671a"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.horizon.prompt.txt",
+      "bytes": 1590,
+      "checksum": "sha256:ae92f29f3e5de5fd724f5349d43e3cd789dd3e7c30c0f671a3ac74b045dc0986"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.sky.png",
+      "bytes": 588951,
+      "checksum": "sha256:84a8b8c627800ee6da9aaafe172a5a93d23f448076ebb43768fd6105a26fae3e"
+    },
+    {
+      "path": "authoring/generated/level-downtown-ruins.sky.prompt.txt",
+      "bytes": 1835,
+      "checksum": "sha256:77bc54d2eae9e51bd269f8ed132b3db576e75d5a363e8f0dc713aa1709e6c50b"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.idle.png",
+      "bytes": 947439,
+      "checksum": "sha256:fa199e8399f8a738f0365a4b35583deeb4b44ff745b74a60580f166bb342c696"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.idle.prompt.txt",
+      "bytes": 4237,
+      "checksum": "sha256:d5f67481ba8f42d4467682c43dd05e6c281f315044934f4a235a510e54cceab5"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.jump.png",
+      "bytes": 988674,
+      "checksum": "sha256:ec03d18a29f5a819d41e1d6e482e9a5a6672392d061512e0d0a97bb0150d485a"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.jump.prompt.txt",
+      "bytes": 4237,
+      "checksum": "sha256:42ab42ea06c21ed7c059fb322b9c9b37d5c5037e14626ca5fad2f64cd219a3bf"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.run.png",
+      "bytes": 939781,
+      "checksum": "sha256:a151ec80c9f164eea242487c6475117a2527b49da5faa768f1fb867d10cfb000"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.run.prompt.txt",
+      "bytes": 4235,
+      "checksum": "sha256:bc1ec95dd57e001139b9015237b529a65916d8dd3ab694638dae1ff007ece3df"
+    },
+    {
+      "path": "authoring/masters/master-enemy-wasteland.png",
+      "bytes": 794102,
+      "checksum": "sha256:e2f404fb624a90200a941240120e4581add197aa53054a459428f3973770d0fe"
+    },
+    {
+      "path": "authoring/masters/master-enemy-wasteland.prompt.txt",
+      "bytes": 4187,
+      "checksum": "sha256:97b1c2acb99f49c3f1139b05f36ee7a1c3ba768bbafe01265c60578d0b1282fc"
+    },
+    {
+      "path": "authoring/masters/master-enemy-wasteland.ratio.json",
+      "bytes": 442,
+      "checksum": "sha256:ce406d5b72505ab7f24b83d2d9ce100d4100196f31bb89d4b9fa2b277f55cdb6"
+    },
+    {
+      "path": "authoring/masters/master-player-scavenger.png",
+      "bytes": 843529,
+      "checksum": "sha256:5e6fc3ef011eda3f77a2826916c0c57da9589c1279969a41040b4e9dd776025d"
+    },
+    {
+      "path": "authoring/masters/master-player-scavenger.prompt.txt",
+      "bytes": 4355,
+      "checksum": "sha256:46a7bdefc6af2d49b2c9d249d4e962d2cf5755df1c7f6f8f33885e7a570eba6f"
+    },
+    {
+      "path": "authoring/masters/master-player-scavenger.ratio.json",
+      "bytes": 441,
+      "checksum": "sha256:ef18abbbe7ccba1df9c1a17d2fd4e78cd31c010be7224d9bdabacbb9f119f7b6"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1235,
+      "checksum": "sha256:76b232af84ff4510022e8f495b0bb07bdb4e438e866ccf1fa9a092d4626f0b6e"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 5462,
+      "checksum": "sha256:e260470a1a680f6b30aa115abca87009abe92d5def1aba84632f2a7cd89861f2"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 859,
+      "checksum": "sha256:4b8e16a660c6f9dcd1bde47c515db6e0ab4bc1594551677afcdfd7e7decc91cd"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5097,
+      "checksum": "sha256:7f45ed03b4e243a3bdbabf39236c90a879fecb42369954aff8ee246617641908"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 14309,
+      "checksum": "sha256:be27c9270bcc4cabf8d989ca91fa9991a0aa0ce9eb4a7a0f0595da1ff4a7eeec"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1882,
+      "checksum": "sha256:3120906522ac7c15e1a77a9ab2c22e8e45fc2a380a984107fc0347f3172a50c4"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 37607,
+      "checksum": "sha256:96caae0f4a368176e319971d85d44aca3df241b03275fc2a0096f062736b45f6"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 2195,
+      "checksum": "sha256:4c5fc05bcfc73fa49d0bf7b8710c5ecf13a457b4b66c30557c8969268907c4dc"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 949,
+      "checksum": "sha256:e5fb7a522f162ce3c21580ea8511280f865874f71d408e907f12bf858d473114"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1095,
+      "checksum": "sha256:3dd589decc9388ba7156776aeae139d50190c767629f409744ebf31c9970241a"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 487,
+      "checksum": "sha256:b21290358ec9cef0649c1479216cb3754555f667cbaddc979700af9492ec3af3"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 4754,
+      "checksum": "sha256:5dac1923118f83d4feccfce84ac46e0499c52415c673a3a52663b2a213a99376"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 757,
+      "checksum": "sha256:cf2f377e05ca980727ddcec8433ed3781667a11bc78ea29bcb41052589a7208e"
+    }
+  ]
+}

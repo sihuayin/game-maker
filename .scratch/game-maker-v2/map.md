@@ -2147,6 +2147,17 @@ Effort: game-maker-v2
 > ✅ **前沿（本段扫描）：空** —— 其余 open 票全部 `claimed`；**23 是唯一剩下的 `claimed`**。
 > ⚠️ **边界**：本轮只改票面与本图索引 —— 源码 / 测试 / 契约 / 提示词 / `packages/qa` /
 > `game-maker.local.json` 一个字节没动 · 零付费 · 未提交 · 未推送。
+> ⏳ **2026-10-17（票 23 第二十跑报告）**：报告已出、**等人裁** —— 第十九跑死在 `pack` 的那张
+> `enemy-wasteland.patrol.png` 用**当前生产代码**免费回放：第一次 1 块 → `bottomBand` 97 行（cover 1）
+> → 裁后**正好 4 块** ⇒ 票 100 / 102 的救援路径接得住。预算 11 张图 / 12 发文本 / 150 分钟硬停；
+> **报告不是许可**（要跑请给「批第二十跑 · 段 B 重跑」）。
+> ✅ **2026-10-17（票 23 第二十跑结果）**：**跑通** —— 退出码 0 · 251.0s · `pack` → `config` → `qa` ·
+> **站点第一次装配出来**（`site/v1/` 四件）。`auditLayerCoverage` **0 error** · `qa-report.failures: []` ·
+> `player.anims` 三格互不相同 · `enemy-wasteland.patrol` **4 帧** · run 级 ledger **23 发** ·
+> 输入 10/10 与理解层 5/5 逐字节不变。⭐ 新生成的 patrol 图**第一次分块就是 4 块**（救援未触发）——
+> 票 100 的提示词改动在这一次生效；救援路径仍由第十九跑那张图的免费回放证着。
+> ✅ **票 23 已关、已提交** —— 本图的**到达判据**（链跑完 + 真跑一次 + `run` / `pack` / `site` 三份产物）**已满足**；
+> **前沿为空**。⚠️ **n=1** · 站点没有在浏览器里打开 · 人眼评审不在本跑 —— 这些是**无票的余量**，不是未关的票。
 
 ## Destination
 
@@ -2694,6 +2705,8 @@ Style Image + Game Intent
 - [两处样板各自合法、合起来不成立](issues/76-cross-stage-sample-conflict.md)：**Q1 (a) 修段 A** · **Q2 (c) 样板数据化 + 跨阶段一致性测试、另立施工票**（⇒ 票 88）· **Q3 (a)** 两票严格分工、解除票 65 边界 ① · **Q4 (a)** 免费对读到此为止；施工由[票 88](issues/88-recipe-shape-sample-as-data.md) 落地并已关。
 - [判据每前移一步，就越可能死在「账还没落盘」的那一段里](issues/77-ledger-lost-when-judgement-moves-earlier.md)：**Q1 (a) 要治** · **Q2 (a) 有条件通过**（段 A 复用已有 catch · 段 B 新增最小范围 catch · 两处只携带完整累积账并原样抛出 · 施工票必须解决 `CommandError` 上的空操作）· **Q3 (a)**「完全不带账」也归本票 · **Q4 (a)** 免费验证到此为止。⚠️ **本票关闭 = 裁定已入档；施工未授权、未立票** —— 要落这一纸裁定须另立施工票 + 独立许可。
 - [横版 `hud.panel` 的世界尺那一条移除](issues/80-hud-panel-world-ruler-removal.md)：**施工已落地并收口** —— 删掉 `game-config.ts` 里 `hud.panel` 的 `inWorld(...)`（只剩 3 处调用），四处断言改为视口判据（③④ 换证人 `terrain`），另动第五处让注释继续为真；证伪实测「把那一行加回去 ⇒ 当场红」。⚠️ 真跑观察仍归票 23。
+
+- [E2E fixture + 真跑一次：`fixtures/e2e/wasteland-platformer/`](issues/23-e2e-fixture-wasteland.md)：**第二十跑（段 B 重跑）跑通、已关、已提交** —— 退出码 0 · 251.0s · `pack` → `config` → `qa` · **站点第一次装配出来**；`auditLayerCoverage` **0 error** · `qa-report.failures: []` · `player.anims` 三格互不相同 · `enemy-wasteland.patrol` **4 帧** · run 级 ledger **23 发** · 输入 **10/10** 与理解层 **5/5** 逐字节不变。⭐ **新生成的 patrol 图第一次分块就是 4 块**（救援未触发）—— 票 100 的提示词改动在这一次生效；票 100 / 102 的救援路径仍由第十九跑那张图的免费回放证着。⚠️ **n=1** · 站点未在浏览器里打开 · 人眼评审不在本跑 · **image attempts 13**（唯一图 11）。
 
 ## Not yet specified
 

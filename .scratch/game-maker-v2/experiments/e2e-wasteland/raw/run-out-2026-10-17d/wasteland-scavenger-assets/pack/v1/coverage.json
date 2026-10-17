@@ -1,0 +1,39 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.sky",
+      "w": 1920,
+      "h": 540,
+      "opaque": 1036800,
+      "ratio": 1
+    },
+    {
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.horizon",
+      "w": 1920,
+      "h": 540,
+      "opaque": 524087,
+      "ratio": 0.5054851466049383
+    },
+    {
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.facade",
+      "w": 1920,
+      "h": 540,
+      "opaque": 847502,
+      "ratio": 0.8174209104938271
+    },
+    {
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.ground",
+      "w": 1920,
+      "h": 540,
+      "opaque": 180692,
+      "ratio": 0.17427854938271606
+    }
+  ]
+}

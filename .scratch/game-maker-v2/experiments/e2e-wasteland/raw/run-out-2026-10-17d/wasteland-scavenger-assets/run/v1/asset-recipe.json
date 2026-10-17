@@ -1,0 +1,315 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-scavenger",
+        "role": "玩家：可左右奔跑、跳跃、拾取与开箱的拾荒者",
+        "description": "方块剪影拾荒者，短粗四肢，纯色上衣与腰带、小帽，三路极简动作：站立微晃、向右奔跑摆腿、跳起收腿",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 72,
+          "h": 108
+        },
+        "required": true,
+        "characterId": "player-scavenger",
+        "masterAsset": "master-player-scavenger",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-wasteland",
+        "role": "在固定地面区间来回巡逻的接触伤害敌人",
+        "description": "横宽低矮的方块巡逻者，两截粗腿交替挪动，朝一侧缓慢移动，不跳跃、不追击",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 80,
+          "h": 88
+        },
+        "required": true,
+        "characterId": "enemy-wasteland",
+        "masterAsset": "master-enemy-wasteland",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "scrap-resource",
+        "role": "散落在街道与平台上的可拾取废料",
+        "description": "一小堆叠着的金属废件：几个错位的小矩形与一根斜放的短条，贴地摆放，体量很小",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 20,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-ruined-city",
+        "role": "接触即开的宝箱，箱盖弹起并爆出宝物",
+        "description": "扁平的方箱体加一块略微倾斜的箱盖，正面一条横向锁扣小块，整体是纯色块面",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 26
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-spike-rubble",
+        "role": "贴地的碎石尖刺危险带，接触即结束本关",
+        "description": "贴地的一段破碎瓦砾带：几块三角尖刺与参差的小矩形碎石交错排成横向带，两端收低",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "level-downtown-ruins",
+        "role": "第一关的横向带状街区背景，贯穿全宽的地面与轨道条带",
+        "description": "极简扁平废都横向景：大块天空色域下压一条窄亮地平线，中景是占据画面主体的平顶与三角顶建筑立面体块，底部为贯穿全宽的地面与重复小方块的轨道条带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 1
+        },
+        "size": {
+          "w": 1920,
+          "h": 540
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0,
+            "description": "顶部大块纯色天空域，无云无纹理"
+          },
+          {
+            "name": "horizon",
+            "parallax": 0,
+            "description": "天空之下一条极窄的亮色地平线带，贯穿全宽"
+          },
+          {
+            "name": "facade",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "占画面主体的建筑立面与远景体块：平顶与三角顶大矩形，稀疏窗格与少量几何小道具点缀"
+          },
+          {
+            "name": "ground",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "贯穿全宽的地面条带与横向轨道，含细碎重复小方块分段"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-street-lamp",
+        "role": "街道点缀道具：路灯",
+        "description": "一根细竖杆顶部一个短横臂加一块小方形发光块，剪影极简",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 64
+        },
+        "required": false
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "prop-bench",
+        "role": "街道点缀道具：长椅",
+        "description": "一条横向长板加两条短粗腿的极简长椅剪影",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 40,
+          "h": 20
+        },
+        "required": false
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-scrap-counter",
+        "role": "屏幕左上角显示已收集废料数量的状态条底板",
+        "description": "一条扁长的纯色底板块，左侧留出小方块图标位，右侧留出数字位，边框轻微内缩，会被拉伸以适应数字位数",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 96,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "ui-scrap-icon",
+        "role": "废料计数旁的小图标",
+        "description": "一小块叠着的金属废件图标，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-player-scavenger",
+      "role": "玩家角色母版（拾荒者）",
+      "description": "方正矮身方块拾荒者：矩形堆叠的剪影，头身比约 1:1.5，短粗四肢，纯色块上衣加腰带与小帽，手里无道具，站姿朝右",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "player-scavenger",
+      "size": {
+        "w": 72,
+        "h": 108
+      }
+    },
+    {
+      "id": "master-enemy-wasteland",
+      "role": "巡逻敌人母版（废都游荡者）",
+      "description": "与玩家同一套方块剪影语言但更横宽低矮的巡逻者，矩形躯干加两截粗腿，头部是一个平顶方块，整体呈沉重色块",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy-wasteland",
+      "size": {
+        "w": 80,
+        "h": 88
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

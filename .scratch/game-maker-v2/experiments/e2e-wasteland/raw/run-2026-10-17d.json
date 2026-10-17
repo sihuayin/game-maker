@@ -1,0 +1,20 @@
+{
+ "code": 0,
+ "ms": 251003,
+ "text": "{\n  \"command\": \"build\",\n  \"summary\": [\n    \"这次运行：wasteland-scavenger-assets/run/v1（v1 · wasteland-scavenger-assets）· 包 v1\",\n    \"包：wasteland-scavenger-assets/pack/v1（10 个资源）\",\n    \"⚠️ **用户没说清的地方**：title：用户没有给游戏起名\",\n    \"⚠️ **用户没说清的地方**：winConditions：需求只写了“最终目标”，没说明具体是什么目标\",\n    \"⚠️ **用户没说清的地方**：loseConditions：需求没提失败条件，暂按被敌人或危险伤到就会失败来推\",\n    \"⚠️ **用户没说清的地方**：mechanics：需求没提战斗方式，玩家是否攻击敌人不明\",\n    \"⚠️ **用户没说清的地方**：progression：需求没提进阶或关卡推进方式\",\n    \"⚠️ **用户没说清的地方**：challenge：需求没提难度来源与数值\",\n    \"⚠️ **用户没说清的地方**：entities：需求没说明敌人种类、资源种类与宝箱数量\",\n    \"⚠️ **母版比例**：2 张量过 —— 一致 1 张 · **不一致 1 张**\",\n    \"  · 母版 \\\"master-enemy-wasteland\\\" 那一发回来的图是 1024×1024（比例 1.000），而 canonical 画布是 80×88（比例 0.909） —— **差 10.0%**（回来的更宽）。\",\n    \"  ⚠️ 母版是参考图：它的头身比会被后面每一个动画照着画。⇒ 读数在包内 `master-ratios.json` 里。\",\n    \"✅ QA：没有一条判据说不行 · 5/6 条由 QA 跑过（裁决 incomplete） —— 没跑的：层覆盖\",\n    \"站点：wasteland-scavenger-assets/site/v1（复用已存在的包 wasteland-scavenger-assets/pack/v1）\",\n    \"消费：外壳 v2 · 资源包 v1（10 个资源）\",\n    \"校验：三族 + 第四族（几何）+ 第五族（HUD 屏幕空间）全过\",\n    \"⚠️ 起服务时 **HTTP server 的根必须是 wasteland-scavenger-assets/** —— 打开 /site/v1/index.html（根指到 site 里面会 404，而 Phaser 静默失败）\"\n  ],\n  \"data\": {\n    \"status\": \"complete\",\n    \"gameId\": \"wasteland-scavenger-assets\",\n    \"runVersion\": 1,\n    \"packVersion\": 1,\n    \"runDir\": \"wasteland-scavenger-assets/run/v1\",\n    \"packDir\": \"wasteland-scavenger-assets/pack/v1\",\n    \"config\": \"wasteland-scavenger-assets/run/v1/game-config.json\",\n    \"siteDir\": \"wasteland-scavenger-assets/site/v1\",\n    \"entry\": \"wasteland-scavenger-assets/site/v1/index.html\",\n    \"serveRoot\": \"wasteland-scavenger-assets\",\n    \"ambiguity\": [\n      \"title：用户没有给游戏起名\",\n      \"winConditions：需求只写了“最终目标”，没说明具体是什么目标\",\n      \"loseConditions：需求没提失败条件，暂按被敌人或危险伤到就会失败来推\",\n      \"mechanics：需求没提战斗方式，玩家是否攻击敌人不明\",\n      \"progression：需求没提进阶或关卡推进方式\",\n      \"challenge：需求没提难度来源与数值\",\n      \"entities：需求没说明敌人种类、资源种类与宝箱数量\"\n    ],\n    \"qaVerdict\": \"incomplete\",\n    \"qaReport\": \"wasteland-scavenger-assets/run/v1/qa-report.json\"\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"wasteland-scavenger-assets/run/v1\",\n      \"kind\": \"run\"\n    },\n    {\n      \"path\": \"wasteland-scavenger-assets/pack/v1\",\n      \"kind\": \"asset-pack\"\n    },\n    {\n      \"path\": \"wasteland-scavenger-assets/run/v1/qa-report.json\",\n      \"kind\": \"qa-report\"\n    },\n    {\n      \"path\": \"wasteland-scavenger-assets/site/v1\",\n      \"kind\": \"demo-site\"\n    }\n  ]\n}\n  · pack\n  · pack：player-scavenger（0/10）\n  · pack：enemy-wasteland（1/10）\n  · pack：scrap-resource（2/10）\n  · pack：chest-ruined-city（3/10）\n  · pack：hazard-spike-rubble（4/10）\n  · pack：level-downtown-ruins（5/10）\n  · pack：prop-street-lamp（6/10）\n  · pack：prop-bench（7/10）\n  · pack：ui-scrap-counter（8/10）\n  · pack：ui-scrap-icon（9/10）\n  · config\n  · qa\n",
+ "steps": [
+  "  · pack\n",
+  "  · pack：player-scavenger（0/10）\n",
+  "  · pack：enemy-wasteland（1/10）\n",
+  "  · pack：scrap-resource（2/10）\n",
+  "  · pack：chest-ruined-city（3/10）\n",
+  "  · pack：hazard-spike-rubble（4/10）\n",
+  "  · pack：level-downtown-ruins（5/10）\n",
+  "  · pack：prop-street-lamp（6/10）\n",
+  "  · pack：prop-bench（7/10）\n",
+  "  · pack：ui-scrap-counter（8/10）\n",
+  "  · pack：ui-scrap-icon（9/10）\n",
+  "  · config\n",
+  "  · qa\n"
+ ]
+}
