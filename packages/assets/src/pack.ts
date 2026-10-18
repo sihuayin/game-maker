@@ -903,6 +903,9 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           //   把最远层抠掉 43~60%（实测三张真图）。
           ...(key === null ? {} : { background: { tolerance: bgOpt.tolerance, colors: [key] } }),
           ...(isBg ? { trim: false } : {}),
+          // 票 107：生图会在角色头顶留下极淡的字形；它们是帧内孤立碎点，必须在并集包围盒前丢掉，
+          // 否则 idle 被压成 71/108 高、run 满高。背景层不丢（留白/星点可能是设计，且它不裁框）。
+          ...(isBg ? {} : { dropSpecks: true }),
           ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
         }));
         const stateOf = new Map<string, string>();

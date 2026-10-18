@@ -1,0 +1,221 @@
+{
+  "format": "assetpack/v4",
+  "id": "wasteland-scavenger-assets",
+  "version": 1,
+  "createdAt": "2026-10-17T16:09:23.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 9,
+    "values": [
+      "#5a3a22",
+      "#7a4a28",
+      "#2f3a45",
+      "#f0b53c",
+      "#1f2733",
+      "#232c3a",
+      "#4a4f57",
+      "#8c8f95",
+      "#e8c9a0"
+    ],
+    "coverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 72,
+        "h": 864
+      },
+      "frames": 8,
+      "assets": [
+        "player-scavenger"
+      ],
+      "checksum": "sha256:a580ad38ac06147509012d2f021dead085da3a77de908bd981e497d6ab24083b"
+    }
+  ],
+  "assets": [
+    {
+      "id": "player-scavenger",
+      "kind": "animation",
+      "role": "玩家：可左右奔跑、跳跃、拾取与开箱的拾荒者",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "player-scavenger.idle1"
+        },
+        {
+          "name": "player-scavenger.idle2"
+        },
+        {
+          "name": "player-scavenger.run1"
+        },
+        {
+          "name": "player-scavenger.run2"
+        },
+        {
+          "name": "player-scavenger.run3"
+        },
+        {
+          "name": "player-scavenger.run4"
+        },
+        {
+          "name": "player-scavenger.jump1"
+        },
+        {
+          "name": "player-scavenger.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "player-scavenger.idle1",
+            "player-scavenger.idle2"
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "player-scavenger.run1",
+            "player-scavenger.run2",
+            "player-scavenger.run3",
+            "player-scavenger.run4"
+          ],
+          "fps": 10,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "player-scavenger.jump1",
+            "player-scavenger.jump2"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/player-scavenger.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/generated/player-scavenger.idle.png",
+      "bytes": 967658,
+      "checksum": "sha256:c54f7994d5c1050909f9cb9b9bb4a8ba66b2ea00ab5f9d593439fcc0b286b1f2"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.idle.prompt.txt",
+      "bytes": 4570,
+      "checksum": "sha256:856552444299ccef4b0a18c807b218c19b8cb642c736d725b2a0b8e8173c5b40"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.jump.png",
+      "bytes": 933378,
+      "checksum": "sha256:5a2d96f16f7e1357398c9b1fca162580586c812583ad0eb216edbbbff96adb20"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.jump.prompt.txt",
+      "bytes": 4570,
+      "checksum": "sha256:6d3c71613a1e76da120d4f63b036be7e506bbf85c759cc210e88f2d2dd48052c"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.run.png",
+      "bytes": 960443,
+      "checksum": "sha256:e7596b20a1c28fdcc204ee37692c839c999a43b3a7a15544a93f6dd6f63e8ecd"
+    },
+    {
+      "path": "authoring/generated/player-scavenger.run.prompt.txt",
+      "bytes": 4568,
+      "checksum": "sha256:432e3daad9efee203947cdab59b4d64a79d4a483728a15ea53dec198dd6b8e43"
+    },
+    {
+      "path": "authoring/masters/master-player-scavenger.png",
+      "bytes": 796545,
+      "checksum": "sha256:9ac58816dca89d19be3635367e09ad629606fd8d2cad3a16f589187418ab267f"
+    },
+    {
+      "path": "authoring/masters/master-player-scavenger.prompt.txt",
+      "bytes": 4796,
+      "checksum": "sha256:92849580a453ce3ee5dda2e433a5a4dbd28dbc1f7b379c4ee2bc3968642d7d09"
+    },
+    {
+      "path": "authoring/masters/master-player-scavenger.ratio.json",
+      "bytes": 441,
+      "checksum": "sha256:ef18abbbe7ccba1df9c1a17d2fd4e78cd31c010be7224d9bdabacbb9f119f7b6"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1235,
+      "checksum": "sha256:76b232af84ff4510022e8f495b0bb07bdb4e438e866ccf1fa9a092d4626f0b6e"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 118,
+      "checksum": "sha256:5d96e7330cd8a4047347a622e8d7d16f221ded04cd41fb9ed85b93505bb63641"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 3470,
+      "checksum": "sha256:bfbe46ec853f107346612602e99157de99804056015e9e15c960d35b315c7918"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 10356,
+      "checksum": "sha256:a580ad38ac06147509012d2f021dead085da3a77de908bd981e497d6ab24083b"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 1274,
+      "checksum": "sha256:6eb7c42346f92817d4b0ca7be73e6175cb1ec9230c5435c23f5f86ee4c73dbb8"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 441,
+      "checksum": "sha256:ef18abbbe7ccba1df9c1a17d2fd4e78cd31c010be7224d9bdabacbb9f119f7b6"
+    }
+  ]
+}

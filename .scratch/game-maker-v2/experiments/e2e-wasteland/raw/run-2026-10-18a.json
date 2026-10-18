@@ -1,0 +1,37 @@
+{
+  "run": "2026-10-18a",
+  "ticket": "107",
+  "approval": "批准 107 付费跑：4 张 / ≤12 发 / 30 分钟",
+  "paid": {
+    "protocol": "gemini",
+    "model": "gemini-2.5-flash-image",
+    "proxy": "127.0.0.1:7890",
+    "uniqueImages": 4,
+    "targets": ["master-player-scavenger", "player-scavenger.idle", "player-scavenger.run", "player-scavenger.jump"],
+    "trips": 4,
+    "attemptsPerCall": [1, 1, 1, 1],
+    "wallClockMs": 183000,
+    "capTrips": 12,
+    "textCalls": 0,
+    "retriesBeyondGenerator": 0
+  },
+  "frames": {
+    "idle/jump": "主块满高 108px · 帧内孤立碎点 0",
+    "run": "4 帧 · 腿/臂可辨",
+    "master": "832×1248（2:3）与 72×108 比例一致"
+  },
+  "pack": {
+    "v1": "player-only（4 张）",
+    "v2": "merged；verify 43 文件全对；与 v1 差异仅 13 个预期文件；敌人帧/背景/道具/UI 逐字节不变"
+  },
+  "site": "site/v1（新 run）",
+  "screenshots": ["/tmp/demo-shots107/30-idle.png", "/tmp/demo-shots107/31-run.png", "/tmp/demo-shots107/32-jump.png", "/tmp/demo-shots107/33-stop.png"],
+  "checks": {
+    "pnpm test": "90 files / 1504 tests",
+    "tsc -b --force": "clean",
+    "pnpm build": "clean",
+    "check:deps": "9 packages",
+    "check:links": "335 docs / 2027 links"
+  },
+  "notes": ["n=1", "护目镜画在眼睛位置（设计写的是额前）"]
+}

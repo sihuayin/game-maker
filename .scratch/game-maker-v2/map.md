@@ -2196,6 +2196,34 @@ Effort: game-maker-v2
 > 全量 **89 文件 / 1500 条全绿**（基线 87 / 1495 ⇒ +2 文件 / +5 条）· `tsc -b --force` 干净 ·
 > `pnpm build` 干净 · `check:deps` ✅ 9 包 · `check:links` ✅ 332 份文档 / 2025 条链接（收口时复测）。
 > ✅ **前沿（本段扫描）：空 —— 没有 open / unblocked / unclaimed 的票**（105 / 106 已关；其余票全部 `resolved`）。
+> ⏳ **2026-10-17（角色美术不满意）**：交付的 `player-scavenger.idle` 等帧实测 **6 块 / 96px 头顶碎点**，
+> 且碎点被算进包围盒 ⇒ idle/jump 只有 71/108 高（run 满高）—— 游戏里站住会缩小；
+> 另一半是 DNA 本身（包袱必须大于躯干 / 空白方脸 / 极低帽檐）。
+> 人已选方向「改 DNA 并重新生图（付费）」；⇒ 立[票 107](issues/107-player-redesign-regeneration.md)
+> （书面报告：新 DNA · 4 张唯一图 · ≤12 发 · 30 分钟硬停）。⚠️ **方向 ≠ 批准付费跑** —— **等逐字点头**。
+> ✅ **前沿（本段扫描）：107 —— 一张**（open / unclaimed；等付费点头）。
+> ✅ **2026-10-18（票 107 付费跑施工）**：新 DNA + 玩家资产重生图 **已施工（付费跑 4 发）· 未提交 · 未关票**
+> （人裁逐字「批准 107 付费跑：4 张 / ≤12 发 / 30 分钟」）。
+> 免费前置：帧内碎点过滤（4 条测试，**先红 4 failed → 绿 4/4**）+ 假 generator dry run（4 发 fake）——
+> idle/jump 从 71/108 恢复到**满高 108、碎点 0**。
+> 付费段：**4 发（master + idle/run/jump），全部 attempts=1，183.0s**，预算余 8 发；新母版 832×1248（2:3）比例一致。
+> 合包 `pack/v2`：`verify` **43 文件全对**；与 v1 差异仅 **13 个预期文件**；**敌人帧与背景/道具/UI 逐字节不变**。
+> 新 run 的 `site/v1` 装配全过；截图 `/tmp/demo-shots107/30-idle · 31-run · 32-jump · 33-stop`。
+> 全量 **90 文件 / 1504 条全绿**（基线 89 / 1500 ⇒ +1 文件 / +4 条）· `tsc -b --force` / `pnpm build` 干净 ·
+> `check:deps` ✅ 9 包。
+> ⚠️ 观察：护目镜画在眼睛位置（设计写的是额前）；其余新约束兑现。
+> ✅ **前沿（本段扫描）：空**（107 `claimed` / 施工完成，等提交与关票；其余票全部 `resolved`）。
+> ✅ **2026-10-18（票 107 施工收口）**：新 DNA + 玩家资产重生图 **已施工 · 已关 · 已提交**
+> （人裁「批准 107 付费跑：4 张 / ≤12 发 / 30 分钟」→「提交 并 关票」）。
+> 付费段 **4 发全部 attempts=1 · 183.0s**；合包 `pack/v2` `verify` **43 文件全对**、与 v1 差异仅 13 个预期文件；
+> 敌人帧/背景/道具/UI 逐字节不变；新站点 `site/v1` 全过。
+> 全量 **90 文件 / 1504 条全绿** · `tsc -b --force` / `build` 干净 · `check:deps` ✅ 9 包 ·
+> `check:links` ✅ 335 份文档 / 2027 条链接（收口复测）。
+> ⚠️ **n=1**；护目镜画在眼睛位置（非设计写的额前），已记录 —— 继续调须另一次付费点头。
+> ✅ **前沿（本段扫描）：空 —— 没有 open / unblocked / unclaimed 的票**（107 已关；其余票全部 `resolved`）。
+
+
+
 
 
 
@@ -2738,6 +2766,7 @@ Style Image + Game Intent
 - [塔防配置四边世界尺的判据 —— 票 81 第二轮 Q2(a) 裁出的施工票（票 83 §6 第 3 条的遗漏格）](issues/103-td-config-world-ruler-criteria.md)：**已施工 · 已关 · 已提交**（人裁逐字「提交 关票」）—— `packages/contracts/tests/td-config.test.ts:193` 新增 **2 条**：阳性（真关卡的插槽/柜台在世界里 ⇒ 一声不响）＋ 阴性（`slot "s1"` 的盒子 `(-7,-7)` ⇒ 硬失败，报文逐字断在世界与盒子上）。⭐ **证伪实测**：删掉 `td-config.ts:446` 的 `b.x < 0 || b.y < 0` ⇒ **1 failed / 1 passed**，红的正是阴性那条；已还原，`md5 = 6e55b246…`。⚠️ **源码零改动**（只加测试）· 全量 **87/1492** · `tsc -b --force` / `build` 干净 · `check:deps` 9 包 · `check:links` 328/1993。⚠️ **远端那一格仍未裁**（探针 B：整条 `inWorld` 含远端也零判据）—— 本票按裁定只补近端。
 - [背景层被摆到视口上方 —— `buildBackground` 把 `at` 写死为 `{0,0}`，与包的左下锚点冲突](issues/104-background-layer-offscreen-placement.md)：**三问全按推荐 · 已施工 · 已关 · 已提交**（人裁「施工104」→「提交 & 关票 改票面」）—— §4.1 **(a)** `at = {x: anchor.x*W, y: anchor.y*H}`（`draw.at` 与 `box` 同源）· 判据只加外壳层（`auditLayerCoverage` 不进本票）· `at.x` 一并按锚点算。⭐ **先红后绿**：未改源码时新测试 **2 failed / 21 passed**（左下锚点盒底对不上 270 · `{0.5,*}` 的 `at.x` 仍是 0），改后 **23/23**；last-train 阳性对照盒子逐字 `{0,0,480,270}` / `{0,0,1440,270}`×2。⭐ **零付费重装配 `site/v2`**：真实 e2e 四层由 `{0,-540,1920,540}`（与视口零重叠）变为 `{0,-270,1920,540}`（底边贴世界底）；无头 Chrome 截图 v1 全黑 → v2 四层全现、玩家/HUD/拾取物无遮挡；两份 ledger mtime 未动（零上游）。⚠️ 全量 **87/1495**（基线 1492 ⇒ +3）· `tsc` / `build` 干净 · `check:deps` 9 包 · `check:links` 330/2020。⚠️ 边界：未改契约层判据 · 未重新生图 / 未重跑资源管线 · 零付费 · 未推送。
 - [实体交互全部绑在 1×1 替身上 —— 拾取 / 危险 / 终点在真站点里都不触发](issues/105-entity-overlap-bound-to-stub.md)：**已施工 · 已关 · 已提交**（人裁「另立两张施工票 并 实现」→「提交 并 关票」）—— `create()` 里 `addPlayer()` 移到实体循环之前（`addEntity` 在注册 overlap 那一刻调 `playerOrStub()`；实体先建时全部绑到 1×1 的 stub，之后没有重绑）。⭐ 源码见证先红后绿（`expected 561 to be less than 496` → 绿）。⭐ **零付费 `site/v3` 运行时**：碰撞器 10 条从 `Rectangle↔Sprite` 变为 `Sprite↔Sprite`；三堆废料 ⇒ `collected=3` / 3 pip；尖刺 ⇒ 退回起点；集齐 6 个到 gate ⇒ `won=true`。⚠️ n=1 · 全量 **89/1500**（基线 87/1495 ⇒ +2 文件 / +5 条）· `tsc` / `build` 干净 · `check:deps` 9 包 · `check:links` 332 份文档。⚠️ 边界：`playerOrStub` / `addEntity` / `hitHazard` / `tryWin` 一行未改 · 零付费 · 未推送。- [会动的危险物每帧被抬高半个身位 —— 敌人 7 秒后飞到 `y=-21838`](issues/106-hazard-motion-origin-drift.md)：**已施工 · 已关 · 已提交**（人裁「另立两张施工票 并 实现」→「提交 并 关票」）—— 三角波提成纯函数 `src/hazard.ts`（返回**锚点**位置），`advanceHazards` 改为 `setPosition(锚点)` + `StaticBody.updateFromGameObject()`，删掉 `b.reset` / `b.center` 往返（锚点 `{0.5,1}` 时盒心写回精灵会每帧再减半个身位）。⭐ 纯函数 3 条 + 源码见证先红后绿；⭐ 全量抓到 `motion:cyclic` 的能力见证仍指旧位置（**1 failed / 1499 passed**），改指 `hazard.ts` 后 **89/1500 全绿**。⭐ **`site/v3` 运行时**：敌人 `y` 恒 250、`x` 在 625..676 往返、可见。⚠️ n=1 · 边界：未改 `motion` 契约 / `start` 语义 / 轴切换 · 零付费 · 未推送。
+- [角色重设计 + 玩家资产重生图 —— 新 DNA、4 张付费图](issues/107-player-redesign-regeneration.md)：**已施工（付费跑 4 发）· 已关 · 已提交**（人裁「批准 107 付费跑：4 张 / ≤12 发 / 30 分钟」→「提交 并 关票」）—— 免费前置：帧内碎点过滤（`dropDetachedSpecks`，4 条测试先红后绿）+ 假 generator dry run；付费段：**4 发（master + idle/run/jump）全部 attempts=1 · 183.0s**，新母版 832×1248（2:3）比例一致；合包 `pack/v2` `verify` 43 文件全对、与 v1 差异仅 13 个预期文件，敌人帧/背景/道具/UI 逐字节不变；新站点 `site/v1` 全过；全量 **90/1504**（基线 89/1500 ⇒ +1 文件 / +4 条）· `tsc`/`build` 干净 · `check:deps` 9 包 · `check:links` 335/2027。⚠️ n=1；护目镜画在眼睛位置（非设计写的额前）—— 继续调须另一次付费点头 · 零其它上游调用 · 未推送。
 
 - [视觉观察要喂原图：reviewPack 今天比的是 contact sheet，不是参考图](issues/22-review-with-reference-image.md)：**三问全裁**（Q1 (a) 是缺口但只补观察来源 · Q2 (a) 本票只裁方向、接线另开票 · Q3 (b) 暂不立词）—— 接线由[票 78](issues/78-reviewpack-wiring.md) 落地并已关（CLI `review` · 两张图都喂 · 一次付费视觉调用事前告知 + 事后记账 · **不进链**），Q3 由 78 裁为「不适用 + 登记结构约束」。⚠️ 真跑观察仍归[票 23](issues/23-e2e-fixture-wasteland.md)。
 - [资源级 `AssetOrigin.fixture` 零生产者 —— 留、删、还是等一个生产者？](issues/57-asset-origin-fixture.md)：**删除**（Q1 (b)）＋ `assetpack/v3 → v4`（Q4 (a)）＋ `PackMode.fixture` 一起删（Q5 (a)）；施工已落地（`assetpack.ts` · 两份入库包 `format` · `CONTEXT.md` 词条重写）· 未加全仓零生产者扫描。⚠️ `pack.ts:84` 那句过期版本注释仍未动（在写入侧，要另一次授权）。

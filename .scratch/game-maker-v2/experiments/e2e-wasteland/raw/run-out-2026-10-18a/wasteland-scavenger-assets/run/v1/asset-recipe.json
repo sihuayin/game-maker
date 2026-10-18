@@ -1,0 +1,67 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "player-scavenger",
+        "role": "玩家：可左右奔跑、跳跃、拾取与开箱的拾荒者",
+        "description": "方块剪影拾荒者，肩宽略大于躯干，与肩同宽的背包收在上背，短檐帽下露出两只方眼与半脸围巾，额前黄色护目镜；三路极简动作：站立微晃、向右奔跑摆腿、跳起收腿",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 72,
+          "h": 108
+        },
+        "required": true,
+        "characterId": "player-scavenger",
+        "masterAsset": "master-player-scavenger",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-player-scavenger",
+      "role": "玩家角色母版（拾荒者）",
+      "description": "方正矮身方块拾荒者：头身比约 1:1.5，肩宽略大于躯干，与肩同宽的方形背包收在上背；短檐帽不遮眼，两只方眼与深色半脸围巾；额前黄色护目镜；短粗四肢、腰带与矮筒靴；站姿朝右，无手持道具",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "player-scavenger",
+      "size": {
+        "w": 72,
+        "h": 108
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

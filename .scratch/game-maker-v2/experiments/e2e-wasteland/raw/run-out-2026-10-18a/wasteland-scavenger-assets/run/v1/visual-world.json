@@ -1,0 +1,195 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "flat pixel art",
+      "minimalist",
+      "side-scroller",
+      "muted palette",
+      "geometric"
+    ],
+    "description": "极简扁平像素横版场景：大块纯色面构成地平线、墙面与地面，形体由矩形、三角形和圆点堆出，无描边、无渐变、无纹理，靠色阶差与几何图形区分层次。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "2D 正交侧面",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "正交侧视，无透视收缩"
+  },
+  "composition": {
+    "foreground": "最底部为横向带状地面与轨道，贯穿全宽",
+    "midground": "占据中央的大型建筑立面/远景体块",
+    "background": "顶部大块天空，其下一条极窄亮色地平线带",
+    "objectScale": "大型横向矩形体块为主，小道具点缀",
+    "characterScale": "角色约占总高四分之一，居中",
+    "density": "低，元素稀疏、留白多"
+  },
+  "palette": {
+    "primary": [
+      "palette:0"
+    ],
+    "secondary": [
+      "palette:1",
+      "palette:2"
+    ],
+    "accent": [
+      "palette:3",
+      "palette:4"
+    ],
+    "background": [
+      "palette:5"
+    ],
+    "shadow": [
+      "palette:6"
+    ],
+    "highlight": [
+      "palette:7",
+      "palette:8"
+    ]
+  },
+  "lighting": {
+    "direction": "无明确光源，视作全局均匀光照",
+    "softness": "硬边，无阴影渐变",
+    "contrast": "低至中等，靠色阶区分体积",
+    "mood": "平静、荒芜、略带萧瑟"
+  },
+  "materials": {
+    "facade": {
+      "appearance": "哑光纯色大面墙体",
+      "texture": "无，纯色块",
+      "color": [
+        "palette:0",
+        "palette:1"
+      ]
+    },
+    "ground": {
+      "appearance": "横向条带地面，含细碎重复分段",
+      "texture": "像素级重复小方块",
+      "color": [
+        "palette:6",
+        "palette:7"
+      ]
+    },
+    "metal": {
+      "appearance": "冷灰色金属/石板构件",
+      "texture": "纯色，边缘硬直",
+      "color": [
+        "palette:2",
+        "palette:7"
+      ]
+    },
+    "glow": {
+      "appearance": "小面积暖黄色发光物，如灯、太阳",
+      "texture": "纯色圆或矩形，无光晕",
+      "color": [
+        "palette:3",
+        "palette:8"
+      ]
+    },
+    "character": {
+      "appearance": "由矩形拼合的方块小人，深色制服与亮色点缀",
+      "texture": "纯色，无描边",
+      "color": [
+        "palette:4",
+        "palette:5",
+        "palette:7"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "方正矮身，头身比接近 1:1.5，四肢短粗",
+    "silhouette": "方块剪影，轮廓为矩形堆叠",
+    "poseLanguage": "静态站姿或极简行走，无细节动作",
+    "clothing": "简化为纯色块的上衣、腰带与帽子",
+    "faceAbstraction": "面部全抽象，仅有眼睛方块与留白"
+  },
+  "environment": {
+    "architecture": "横向展开的大型体块建筑，屋顶为三角或平顶，墙面为整块色域",
+    "terrain": "平坦地面 + 横向轨道/条带，无起伏地形",
+    "props": "画框、长椅、路灯、悬挂灯、窗格等构成简单几何的少量道具",
+    "textureDensity": "极低，几乎无纹理，仅轨道处有重复小方块"
+  },
+  "shapeLanguage": [
+    "矩形为基本单位",
+    "三角作屋顶与山形符号",
+    "圆作灯与日",
+    "直角与水平线为主",
+    "无圆角、无描边、无渐变",
+    "对称与居中倾向"
+  ],
+  "constraints": [
+    "所有形体只用矩形、三角、圆拼合，禁止曲线与有机轮廓",
+    "禁止描边、渐变、噪点与照片纹理，色块必须平涂",
+    "每屏强调色只用于少数发光或可交互物件，其余保持低饱和",
+    "地面必须是横贯全宽的横向条带以承接横版移动",
+    "角色与道具须保持像素对齐，尺寸取整",
+    "背景与前景必须靠色阶深浅区分层次，不靠明暗投影"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "极简扁平像素风",
+      "大色块几何构成",
+      "低饱和暖棕与冷灰对比",
+      "横版侧视舞台感"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面视角",
+      "angle": "平视",
+      "parallax": "背景静止，前景横向循环滚动"
+    },
+    "composition": {
+      "grain": "水平分层：天空-地平线-立面-地面-轨道",
+      "anchor": "主体居中，两侧留空"
+    },
+    "palette": [
+      "#5a3a22",
+      "#7a4a28",
+      "#2f3a45",
+      "#f0b53c",
+      "#1f2733",
+      "#232c3a",
+      "#4a4f57",
+      "#8c8f95",
+      "#e8c9a0"
+    ],
+    "lighting": {
+      "scheme": "均匀无方向光",
+      "shadows": "无投影，仅以深色块暗示凹陷"
+    },
+    "shapeLanguage": [
+      "矩形",
+      "三角形",
+      "圆点",
+      "水平条带"
+    ],
+    "material": [
+      "平涂纯色",
+      "哑光无反射",
+      "像素硬边"
+    ],
+    "environment": [
+      "废弃城市立面",
+      "轨道与地面带",
+      "稀疏建筑装饰"
+    ],
+    "characterStyle": [
+      "方块人",
+      "色块服装",
+      "抽象五官"
+    ],
+    "constraints": [
+      "禁止渐变与描边",
+      "禁止有机曲线",
+      "强调色仅用于发光/可交互物",
+      "保持像素对齐"
+    ],
+    "confidence": 0.82
+  }
+}

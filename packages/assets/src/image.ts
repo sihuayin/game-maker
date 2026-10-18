@@ -72,3 +72,79 @@ export function paletteExactness(img: RasterImage, palette: readonly string[]): 
   const offPalette = [...off].map(([color, pixels]) => ({ color, pixels })).sort((a, b) => b.pixels - a.pixels || a.color.localeCompare(b.color));
   return { exact: offPalette.length === 0, offPalette };
 }
+
+/**
+ * 丢掉**帧内**的孤立碎点（票 107 的免费前置）。
+ *
+ * ⚠️ 现场：生图会在角色头顶留下极淡的字形/噪点；抠底之后它们变成几十个不透明像素。
+ *   切帧时它们**不是**独立的块（和角色在同一列），却被算进并集包围盒 ⇒
+ *   idle 帧被压到 71/108 高、头顶永远飘着碎点；run 帧没有碎点 ⇒ 满高 —— 游戏里站住会缩小。
+ *
+ * 规则（保守）：以最大的连通块为主块；只丢「面积 < max(minArea, maxShare × 主块面积)」
+ * **且**包围盒与主块包围盒**完全不相交**的块。贴身的饰件、大的分离部件都留下。
+ * 返回新图（不改原图）；没有可丢的块时原样返回。
+ */
+export function dropDetachedSpecks(
+  img: RasterImage,
+  opts: { floor?: number; maxShare?: number; minArea?: number } = {},
+): RasterImage {
+  const floor = opts.floor ?? 1;
+  const maxShare = opts.maxShare ?? 0.05;
+  const minArea = opts.minArea ?? 4;
+  const { width: w, height: h, data } = img;
+  const labels = new Int32Array(w * h).fill(0); // 0 = 没看过
+  const sizes = [0];
+  const boxes = [{ x0: 0, y0: 0, x1: -1, y1: -1 }];
+  const stack: number[] = [];
+  let n = 0;
+  for (let sy = 0; sy < h; sy++)
+    for (let sx = 0; sx < w; sx++) {
+      const start = sy * w + sx;
+      if (labels[start] !== 0 || data[start * 4 + 3]! < floor) continue;
+      n += 1;
+      labels[start] = n;
+      stack.push(start);
+      let size = 0;
+      let x0 = sx, y0 = sy, x1 = sx, y1 = sy;
+      while (stack.length > 0) {
+        const i = stack.pop()!;
+        const x = i % w, y = (i - x) / w;
+        size += 1;
+        if (x < x0) x0 = x; if (x > x1) x1 = x;
+        if (y < y0) y0 = y; if (y > y1) y1 = y;
+        for (let dy = -1; dy <= 1; dy++)
+          for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = x + dx, ny = y + dy;
+            if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+            const j = ny * w + nx;
+            if (labels[j] !== 0 || data[j * 4 + 3]! < floor) continue;
+            labels[j] = n;
+            stack.push(j);
+          }
+      }
+      sizes.push(size);
+      boxes.push({ x0, y0, x1, y1 });
+    }
+  if (n <= 1) return img;
+  let main = 1;
+  for (let c = 2; c <= n; c++) if (sizes[c]! > sizes[main]!) main = c;
+  const mb = boxes[main]!;
+  const limit = Math.max(minArea, Math.ceil(sizes[main]! * maxShare));
+  const drop = new Set<number>();
+  for (let c = 1; c <= n; c++) {
+    if (c === main || sizes[c]! >= limit) continue;
+    const b = boxes[c]!;
+    const intersects = !(b.x1 < mb.x0 || b.x0 > mb.x1 || b.y1 < mb.y0 || b.y0 > mb.y1);
+    if (!intersects) drop.add(c);
+  }
+  if (drop.size === 0) return img;
+  const out = { width: w, height: h, data: Buffer.from(data) };
+  for (let i = 0; i < w * h; i++)
+    if (drop.has(labels[i]!)) {
+      const s = i * 4;
+      out.data[s] = 0; out.data[s + 1] = 0; out.data[s + 2] = 0; out.data[s + 3] = 0;
+    }
+  return out;
+}
+

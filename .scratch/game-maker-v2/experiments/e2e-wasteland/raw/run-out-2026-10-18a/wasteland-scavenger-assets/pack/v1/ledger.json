@@ -1,0 +1,57 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-17T16:09:23.000Z",
+  "run": {
+    "wallClockMs": 182612,
+    "byStep": {
+      "master": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "image": {
+        "calls": 3,
+        "attempts": 3
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 35070,
+      "requestedSize": "aspect 2:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 49631,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 47072,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 46594,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

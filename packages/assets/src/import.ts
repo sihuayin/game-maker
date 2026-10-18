@@ -10,7 +10,7 @@
 //
 // 所以这里做的不是「重采样回原网格」（没有那个网格），是**重建**一个：
 // 抠背景 → 裁到包围盒 → 面积平均降采样 → alpha 二值化 → 量化到世界色板。
-import { emptyImage, inkBBox, resizeNearest, type RasterImage } from "./image.js";
+import { dropDetachedSpecks, emptyImage, inkBBox, resizeNearest, type RasterImage } from "./image.js";
 import { quantizeToPalette } from "./quantize.js";
 
 export type Box = { x: number; y: number; w: number; h: number };
@@ -300,6 +300,11 @@ export type ImportOptions = {
   trimBox?: Box;
   /** 整数倍放大（像素风放大），默认 1。 */
   pixelScale?: number;
+  /**
+   * 丢掉帧内孤立碎点（票 107 的免费前置）。**默认 false** —— 人给的位图不替人做主；
+   * 只有生图那条路会传 true（模型会在角色头顶留下极淡的字形）。
+   */
+  dropSpecks?: boolean;
 };
 
 export type ImportResult = RasterImage & {
@@ -422,8 +427,13 @@ export function importFrames(images: readonly RasterImage[], opts: ImportOptions
         "并集裁框是在同一个坐标系里算的，尺寸不同就无从并起",
       );
   const prepared = images.map((img) => prepareFrame(img, opts));
+  // ⚠️ **碎点必须在并集包围盒之前丢**（票 107）：否则头顶那些孤立像素会把框撑高，
+  //   主体被缩小到框里 —— idle 只有 71/108 高，而 run 满高。
+  const cleaned = opts.dropSpecks
+    ? prepared.map((p) => ({ ...p, keyed: dropDetachedSpecks(p.keyed, { floor: inkFloor(opts.alphaThreshold) }) }))
+    : prepared;
   const box = opts.trim === false
     ? null
-    : unionInkBBox(prepared.map((p) => p.keyed), { floor: inkFloor(opts.alphaThreshold) });
-  return prepared.map((p) => finishFrame(p, opts, box));
+    : unionInkBBox(cleaned.map((p) => p.keyed), { floor: inkFloor(opts.alphaThreshold) });
+  return cleaned.map((p) => finishFrame(p, opts, box));
 }

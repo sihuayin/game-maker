@@ -1,0 +1,23 @@
+{
+  "format": "qa-report/v1",
+  "checked": [
+    "palette-binding",
+    "constructive-constraint",
+    "reference-resolution",
+    "reachability",
+    "intent-coverage"
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "source": "inspect",
+      "outcome": "unavailable",
+      "reason": "这次创建链没有跑 `inspect`（它是诊断命令，链上没有人调它）—— 没有可原样搬来的观察，而**空不等于「比过了、没差异」**"
+    },
+    {
+      "source": "review",
+      "outcome": "unavailable",
+      "reason": "这次创建链没有跑 `reviewPack`（它是**人工主动调用的诊断命令** —— `game-maker review <run 目录>` 那一支，**不由创建链自动调用**；而执行它还会产生**一次视觉调用**的成本） —— 没有可原样搬来的观察，而**空不等于「比过了、没差异」**"
+    }
+  ]
+}

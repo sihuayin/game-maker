@@ -1,0 +1,303 @@
+{
+  "frames": {
+    "player-scavenger.idle1": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.idle2": {
+      "frame": {
+        "x": 0,
+        "y": 108,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.jump1": {
+      "frame": {
+        "x": 0,
+        "y": 216,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.jump2": {
+      "frame": {
+        "x": 0,
+        "y": 324,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.run1": {
+      "frame": {
+        "x": 0,
+        "y": 432,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.run2": {
+      "frame": {
+        "x": 0,
+        "y": 540,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.run3": {
+      "frame": {
+        "x": 0,
+        "y": 648,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-scavenger.run4": {
+      "frame": {
+        "x": 0,
+        "y": 756,
+        "w": 72,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 72,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 108
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "enemy-wasteland.patrol1": {
+      "frame": {
+        "x": 0,
+        "y": 864,
+        "w": 80,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 88
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "enemy-wasteland.patrol2": {
+      "frame": {
+        "x": 0,
+        "y": 952,
+        "w": 80,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 88
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "enemy-wasteland.patrol3": {
+      "frame": {
+        "x": 0,
+        "y": 1040,
+        "w": 80,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 88
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "enemy-wasteland.patrol4": {
+      "frame": {
+        "x": 0,
+        "y": 1128,
+        "w": 80,
+        "h": 88
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 88
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.animations.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 80,
+      "h": 1216
+    },
+    "scale": 1
+  }
+}
