@@ -779,6 +779,11 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(inspect.outcome).toBe("ok");
     expect(inspect.lines!.join("\n")).toMatch(/源图 \/ 目标尺寸/);
     expect(inspect.lines!.join("\n")).toMatch(/源图 .* → 目标 /);
+    // v3 终端摘要：结构化数据同时交到 BuildResult（不落盘、不进报告）
+    expect(b.inspectData).toBeDefined();
+    expect(b.inspectData!.assets.length).toBe(4);
+    expect(b.inspectData!.layerCoverage.length).toBe(1);       // drawlist 背景只有一帧
+    expect(b.inspectData!.paletteUsage.offPalette.pixels).toBe(0);
     expect(report.observations.find((o) => o.source === "review")!.outcome).toBe("unavailable");
     expect(report.checked.sort()).toEqual(["constructive-constraint", "intent-coverage", "palette-binding", "reachability", "reference-resolution"]);
     expect(qaVerdict(report as never)).toBe("incomplete");
@@ -795,6 +800,7 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(inspect.reason).toMatch(/inspect 未能完成/);
     expect(inspect.reason).not.toContain("/private/secret/path");
     expect(inspect.lines).toBeUndefined();
+    expect(b.inspectData).toBeUndefined();                     // 抛错 ⇒ 没有结构化数据
     expect(report.checked).toHaveLength(5);
     expect(qaVerdict(report as never)).toBe("incomplete");
   });

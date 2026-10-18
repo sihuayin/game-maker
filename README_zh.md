@@ -102,6 +102,10 @@ game-maker inspect fixtures/packs/counter-siege/v4
 `inspect` 还会报「源图 → 目标」尺寸（**观察**，从不阻断）。在 `create` / `build` 里，这份 inspect summary
 会作为 `qa-report.json` 的 `inspect` 观察落盘；`review` 仍是**人工主动调用的付费诊断**，自动链不会调用它。
 
+`create --yes` / `build` 跑完时，终端还会默认显示一段 3–4 行的**观察摘要**（资源数、源图→目标、最大长宽比差、
+色板外像素、背景层最低覆盖）。它只聚合 inspect 的**结构化结果**，不评分、不阻断；完整文本仍在
+`qa-report.json` 与 `game-maker inspect`。
+
 ## 完整管线 —— 从需求到能玩的游戏
 
 这条路要调模型，先把文本上游配好（见[配置](#配置)）。

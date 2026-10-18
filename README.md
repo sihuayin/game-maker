@@ -102,6 +102,11 @@ game-maker inspect fixtures/packs/counter-siege/v4
 the inspect summary is written into `qa-report.json` as the `inspect` observation; `review` stays a manual,
 paid diagnostic and is never called by the automated chain.
 
+`create --yes` / `build` also print a short 3–4 line **observation digest** by default (asset count,
+source → target observations, the largest aspect-ratio delta, off-palette pixels, and the lowest
+background-layer coverage). It aggregates inspect's **structured** data — no scoring, no gating — and
+the full text still lives in `qa-report.json` and `game-maker inspect`.
+
 ## Full pipeline — requirement to playable game
 
 This path calls a model, so it needs the text upstream configured first (see [Configuration](#configuration)).

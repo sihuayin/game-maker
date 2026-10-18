@@ -24,7 +24,7 @@ import {
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { compileRuntime, inspectPack, nextPackVersion, packAssets, planAssets, type ImageTransport } from "@game-maker/assets";
+import { compileRuntime, inspectPack, nextPackVersion, packAssets, planAssets, type ImageTransport, type InspectData } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
@@ -138,6 +138,12 @@ export type BuildResult = {
   /** ⚠️ **缺席 = 没跑**（调用方显式写了 `null`）—— 不是「跑了但没问题」。 */
   qa?: QAReport;
   /**
+   * **inspect 的结构化观察数据**（v3 终端摘要）。⚠️ 只在 inspect 成功、且 `data` 里至少有一格
+   * 可用的结构化字段时出现；inspect 抛错或整份不可用 ⇒ **缺席**（不是空对象）。
+   * ⚠️ 它不落盘、不进 qa 报告、不进 MCP 输出 —— 只是 pipeline 把已经算好的东西交给 CLI 去做摘要。
+   */
+  inspectData?: InspectData;
+  /**
    * **母版那几发的比例读数**（票 39）。⚠️ 它是**观察**那一侧的东西：不阻断、不打分。
    * ⚠️ **缺席 = 这一次没量到**（清单里没有 `authoring[]`，或那几条都不是 `image` 源）——
    *   不是「量了、全对」（全对是 `match: true` 的记录，照样在数组里）。
@@ -217,6 +223,14 @@ function assertQaPassed(report: QAReport, reportPath: string): void {
     + "判据说的是**产物**的问题，重抽改不了那些事实。\n"
     + "   要去的地方：设计层 / 资源清单 / 包（不是上游模型）。",
   );
+}
+
+/** `inspectPack.data` 的收窄（与 `ledgerOf` 同款纪律）。⚠️ 形状由 assets 的 `InspectData` 保证；
+ *  这里只判断「有没有至少一格可用的结构化数据」—— 一格都没有 ⇒ 当作缺席，CLI 整块省略。 */
+function inspectDataOf(data: Record<string, unknown>): InspectData | undefined {
+  const usable = data["assets"] !== undefined || data["sourceSizes"] !== undefined
+    || data["layerCoverage"] !== undefined || data["paletteUsage"] !== undefined;
+  return usable ? (data as unknown as InspectData) : undefined;
 }
 
 /** 风格身份 = 参考图 basename 的 slug（票 08 的 R2-Q2：**由调用方生成**，模型照抄、这里强制覆盖）。 */
@@ -474,6 +488,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
 
   // ── QA：**默认跑**（票 20 的 Q3），而它的硬失败**阻断**（R3 · 票 20 的 Q4）──────────
   let qa: QAReport | undefined;
+  let inspectData: InspectData | undefined;
   if (runner !== undefined) {
     say("qa");
     // ⚠️ **免费 inspect 观察**（v3 视觉 QA 接口）：pack 已经落盘；只报数、不判。
@@ -482,6 +497,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     try {
       const inspected = (input.inspect ?? inspectPack)({ packDir });
       inspectObservation = { source: "inspect", outcome: "ok", lines: inspected.summary };
+      inspectData = inspectDataOf(inspected.data);
     } catch (e) {
       inspectObservation = { source: "inspect", outcome: "unavailable", reason: inspectUnavailableReason(e, packDir) };
     }
@@ -524,6 +540,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     manifest: manifest.value,
     config: config.value,
     ...(qa !== undefined ? { qa } : {}),
+    ...(inspectData === undefined ? {} : { inspectData }),
     ...(masterRatios === undefined ? {} : { masterRatios }),
     paths: {
       runDir, packDir,

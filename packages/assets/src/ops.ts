@@ -18,7 +18,7 @@ import {
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
   type AssetPackEntry, type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
-  type AssetSource,
+  type AssetSource, type LayerCoverage,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
@@ -1798,11 +1798,41 @@ function paletteUsage(packDir: string, m: AssetPackManifest) {
   };
 }
 
-type SourceSizeEntry = {
+export type SourceSizeEntry = {
   id: string; unit: string;
   source: { w: number; h: number; ar: number };
   target: { w: number; h: number; ar: number };
   deltaAr: number;
+};
+
+/** `inspectPack.data` 的形状（v3 终端摘要）。⚠️ 它**一直是这个形状** —— 本类型只是把它定型并导出，
+ *  不是新契约、不落盘、不改报告。 */
+export type InspectPaletteUsage = {
+  perAsset: { id: string; usedColors: number; opacityPixels: number; offPalettePixels: number; top: { color: string; share: number }[] }[];
+  perColor: { color: string; assets: number; share: number }[];
+  totalPixels: number;
+  opaquePixels: number;
+  offPalette: { pixels: number; share: number; colors: { color: string; pixels: number }[] };
+};
+
+export type InspectAsset = {
+  id: string;
+  kind: AssetPackEntry["kind"];
+  size: AssetPackEntry["size"];
+  origin: AssetPackEntry["origin"];
+  paletteBinding: AssetPackEntry["paletteBinding"];
+  frames: number;
+  animations: { name: string; frames: number; fps: number | null; loop: boolean }[];
+};
+
+export type InspectData = {
+  packId: string;
+  version: number;
+  provenanceMode: AssetPackManifest["provenance"]["mode"];
+  assets: InspectAsset[];
+  paletteUsage: InspectPaletteUsage;
+  layerCoverage: LayerCoverage[];
+  sourceSizes: SourceSizeEntry[];
 };
 
 /** `源图 → 目标` 的尺寸观察（v3 视觉 QA 接口）。⚠️ 只**记录**，不设阈值、不判通过/失败。 */
@@ -1902,16 +1932,16 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
     `（**观察，不是判据** —— 对不上可以是设计）`
   );
 
+  const data: InspectData = {
+    packId: m.id, version: m.version, provenanceMode: m.provenance.mode,
+    assets: m.assets.map((a) => ({ id: a.id, kind: a.kind, size: a.size, origin: a.origin,
+      paletteBinding: a.paletteBinding, frames: a.frames.length,
+      animations: (a.animations ?? []).map((x) => ({ name: x.name, frames: x.frames.length, fps: x.fps ?? null, loop: x.loop })) })),
+    paletteUsage: usage, layerCoverage: bg,
+    sourceSizes: sourceSizes.entries,
+  };
   return {
-    command: "inspect", summary: lines,
-    data: {
-      packId: m.id, version: m.version, provenanceMode: m.provenance.mode,
-      assets: m.assets.map((a) => ({ id: a.id, kind: a.kind, size: a.size, origin: a.origin,
-        paletteBinding: a.paletteBinding, frames: a.frames.length,
-        animations: (a.animations ?? []).map((x) => ({ name: x.name, frames: x.frames.length, fps: x.fps ?? null, loop: x.loop })) })),
-      paletteUsage: usage, layerCoverage: backgroundCoverage(opts.packDir, m),
-      sourceSizes: sourceSizes.entries,
-    },
+    command: "inspect", summary: lines, data,
     artifacts: [{ path: rel(root, opts.packDir), kind: "asset-pack" }],
   };
 }

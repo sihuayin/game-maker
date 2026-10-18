@@ -180,7 +180,7 @@ const runC = async (argv: string[], deps: CliDeps) => {
   return { code: await run(argv, io, deps), io, text: () => io.lines.join("") + io.errors.join("") };
 };
 const jsonOf = (io: { lines: string[] }) =>
-  JSON.parse(io.lines.join("")) as { data?: Record<string, unknown>; artifacts?: { path: string; kind: string }[]; error?: string };
+  JSON.parse(io.lines.join("")) as { summary?: string[]; data?: Record<string, unknown>; artifacts?: { path: string; kind: string }[]; error?: string };
 const create = (s: ReturnType<typeof stage>, extra: string[] = []) =>
   ["create", "--style", s.style, "--intent", s.intent, "--out", s.outRoot, ...extra];
 const jread = (p: string) => JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, unknown>;
@@ -372,6 +372,32 @@ describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5�
     expect(r.text()).toMatch(/没跑的：层覆盖/);
     // ⚠️ 「这一版还没有 QA 实现 —— 票 17-20」**从票 17 起就是假话**，已经删了
     expect(r.text()).not.toMatch(/还没有 QA 实现/);
+
+    // v3 终端摘要：默认出现、来自结构化数据、在站点行之前
+    const text = r.text();
+    expect(text).toMatch(/资源观察摘要（不评分 · 不阻断）：/);
+    expect(text).toMatch(/4 个资源/);
+    expect(text).toMatch(/色板外像素 0 个（0\.00%）/);
+    expect(text).toMatch(/背景层 1 帧 · 最低覆盖 100\.0%（bg-dusk）/);
+    expect(text).toMatch(/全文：wasteland\/run\/v1\/qa-report\.json · game-maker inspect wasteland\/pack\/v1/);
+    expect(text.indexOf("站点：")).toBeGreaterThan(text.indexOf("资源观察摘要"));
+
+    // `--json` 的 summary 自然包含；`data` 不新增字段（Q6）
+    expect(out.summary!.join("\n")).toMatch(/资源观察摘要/);
+    expect(out.data!["inspectData"]).toBeUndefined();
+  });
+
+  it("`build` 那一路也默认展示摘要：站点路径仍在摘要之后", async () => {
+    const s = stage();
+    const first = await runC(create(s, ["--json"]), s.deps);
+    expect(first.code, first.text()).toBe(EXIT.ok);
+    const runDir = String(jsonOf(first.io).data!["runDir"]);
+    const r = await runC(["build", path.join(s.outRoot, runDir), "--out", s.outRoot], s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    const text = r.text();
+    expect(text).toMatch(/资源观察摘要（不评分 · 不阻断）：/);
+    expect(text).toMatch(/背景层 1 帧 · 最低覆盖 100\.0%（bg-dusk）/);
+    expect(text.indexOf("站点：")).toBeGreaterThan(text.indexOf("资源观察摘要"));
   });
 
   it("⚠️ 判据硬失败 ⇒ 退出码 **4**、**站点不产**、报告**已经落盘**，而文案里有路径与详情", async () => {

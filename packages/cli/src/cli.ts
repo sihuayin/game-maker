@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   CommandError, EXIT, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack,
-  type CommandResult,
+  type CommandResult, type InspectData,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
@@ -15,6 +15,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
 import { reviewRun, runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
+import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -312,7 +313,7 @@ function createComplete(
   b: Awaited<ReturnType<typeof runBuild>>, site: CommandResult, outRoot: string,
 ): CommandResult {
   const r = recipeLines(u);
-  const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot);
+  const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot, b.inspectData, b.paths.packDir);
   return {
     command: "create",
     summary: [
@@ -350,7 +351,7 @@ function buildComplete(
   const intentPath = path.join(b.runDir, "game-intent.json");
   let ambiguity: string[] = [];
   try { ambiguity = (JSON.parse(fs.readFileSync(intentPath, "utf8")) as { ambiguity?: string[] }).ambiguity ?? []; } catch { /* 读不到就算了 */ }
-  const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot);
+  const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot, b.inspectData, b.paths.packDir);
   return {
     command: "build",
     summary: [
@@ -393,12 +394,15 @@ export function renderHuman(r: CommandResult): string {
  * ⚠️ **`incomplete` 不是失败**，而它今天**恒真**（`checked` 恒 5/6 —— 第六条「层覆盖」由
  *   装配期的硬失败保证，不归任何族，见票 19）。⇒ 这里把「跑了的那几条怎么样」与
  *   「哪几条没跑」**分开说**，否则那一行会被读成「有问题」。
- * ⚠️ **观察不打**：今天两条都是 `unavailable`（链上还没接采集）—— 打出来只是噪声，
- *   而它要说话的时候，话在 `qa-report.json` 里。
+ * ⚠️ **inspect 观察打摘要**（v3 终端摘要）：聚合数据来自 pipeline 收窄好的 `InspectData`，
+ *   不解析 `qa-report` 里那几行文本；inspect 不可用 ⇒ 一行同源原因；`review` 仍不打。
  * ⚠️ **判据失败那一路不在这里**：`runBuild` 在硬失败上**抛**（报告先落盘、再抛），
  *   文案与报告路径都在那个异常里 —— 别在这里再判一次「过没过」。
  */
-function qaReportOf(qa: QAReport, qaReportPath: string, outRoot: string): {
+function qaReportOf(
+  qa: QAReport, qaReportPath: string, outRoot: string,
+  inspectData: InspectData | undefined, packDir: string,
+): {
   summary: string[]; data: Record<string, unknown>; artifact: { path: string; kind: string };
 } {
   const verdict = qaVerdict(qa);
@@ -412,6 +416,9 @@ function qaReportOf(qa: QAReport, qaReportPath: string, outRoot: string): {
         ? `✅ QA：没有一条判据说不行 · ${ran}`
         : `✅ QA：没有一条 error，但有 ${qa.failures.length} 条警告 · ${ran}`,
       ...qa.failures.map((f) => `  ⚠️ [${f.judgement}] ${f.target}：${f.detail.replace(/\n/g, "\n    ")}`),
+      ...inspectDigestLines(inspectData, inspectObservationOf(qa.observations), {
+        qaReport: path, packDir: relPath(outRoot, packDir),
+      }),
     ],
     data: { qaVerdict: verdict, qaReport: path },
     artifact: { path, kind: "qa-report" },
