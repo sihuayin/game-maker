@@ -1,8 +1,8 @@
 # 02. 抠底后的品红边缘：加一步 despill / 边缘清理
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-18 · 人裁「施工 02」→「提交 关票」)
 Blocked by: —
 Map: ../map.md
 > 派生自 C/C2 交付帧预览：抠底后仍残留红/品红像素。
@@ -34,7 +34,34 @@ Map: ../map.md
 - 不跑付费上游；不改 `game-maker.local.json`。
 - 不把 despill 做成“猜测主体”的启发式；只做颜色判据。
 
-## 5 · 待裁
+## 5 · 裁定（2026-10-18）
 
-- despill 住 `import.ts` 还是 `pack.ts`？
-- 阈值是否进契约（还是只做内部常量）？
+1. **despill 住 `import.ts`** —— `prepareFrame` 里 `keyBackground` 之后一步。
+   单帧 / 多帧 / 背景层三条路天然共用；`pack` 继续只做装配，不碰颜色。
+2. **阈值不进契约** —— 内部常量 `DESPILL_THRESHOLDS`（五条来自 C/C2 实测）＋
+   `ImportOptions.despill`（`false` 关闭 / partial 覆盖）。模型与 planner 写不进配方。
+
+## 6 · 施工记录（2026-10-18）
+
+- **`despillMagenta(img, { thresholds })`**：只把命中 `R>140 · G<110 · B>80 · R−G>70 · B−G>35`
+  的**不透明**像素置透明；不改输入、不读连通块/边缘距离，返回 `removedPixels`。
+- **接入 `prepareFrame`**：抠底之后跑。两道门：
+  - 没有 `background`（人给的透明 PNG、背景最远层）⇒ **不跑**；
+  - 省略 `despill` 时，只有**底色本身属于品红家族**才自动跑 —— 天空层的 `[41,41,64]` 不跑。
+    这一条是施工时被现有真图测试抓出来的：无条件跑会把 `layer-exp-treatment-sky` 的交付透明率
+    从 25.46% 推到 27.18%，即误删内容。
+  - `despill:false` 关闭；partial = 显式开启并覆盖阈值。
+- **report**：`ImportResult.report.despilledPixels` 逐帧/逐格记录删除数。
+- **真图 fixture**：新增 `fixtures/model-paint-despill/`，C/C2 六张已付费原图（master/idle/run 各两份）
+  ＋ README（来源、尺寸、众数色、抠掉比例、逐张残留读数 5,260 / 11,943 / 7,692 / 5,201 / 9,162 / 12,116）。
+  背景层用已有 `fixtures/model-paint-layers/`（wall 374 / ground 212）。
+- **先红后绿**：实现前新用例 **15 条红**；现在 16 条全绿。
+- **验收读数**：6 张真图抠完命中判据数逐张钉死，despill 后 **0**；交付态（降采样+二值化+量化后）也是 **0**；
+  红/棕色像素删除前后逐张相等；单帧 / 4 格横排 / 2×6 多行 / 非最远背景层四条路各自有断言。
+- **五闸**：全量 **100 文件 / 1601 条全绿**（+16）· `tsc -b --force` 干净 · `pnpm build` ✅ ·
+  `check:deps` 9 包 ✅ · `check:links` 384 份文档 / 2097 条链接 ✅。
+- **边界**：零付费上游 · `game-maker.local.json` 一字未动 · 颜色判据（非主体猜测）·
+  没有 `background` 的图不碰 · 未动探针期尚未入库的源码改动。
+- **未做 / 后续**：`despilledPixels` 目前只在 `ImportResult.report`，`pack` 不外露到 manifest
+  （票面只要求 report）；亮粉色（`B−G` 够大）会与品红一起被删 —— 这是颜色判据的已知边界。
+

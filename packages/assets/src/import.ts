@@ -76,6 +76,53 @@ export function keyBackground(
 }
 
 /**
+ * **抠底之后的品红边缘清理**（票 02）—— 只认颜色，不猜主体。
+ *
+ * ⚠️ 判据来自 C/C2 两份已付费探针的实测（`fixtures/model-paint-despill/README.md`）：
+ *   `R > 140 · G < 110 · B > 80 · R−G > 70 · B−G > 35` ⇒ 置透明。
+ *   `B−G > 35` 这一条是**与红/棕色正交**的那道门：红围巾/皮靴的 `B` 低，够不着它。
+ * ⚠️ **不读连通块、不读边缘距离**：它不是「猜主体」的启发式，是一条纯色判据。
+ *   代价是**亮粉色**（`B−G` 够大）也会被删 —— 这是颜色判据本身的边界，不是没想清楚。
+ * ⚠️ **只在 `keyBackground` 之后跑**（`prepareFrame`）：没有 `background` 的图（人给的透明 PNG、
+ *   背景的最远层）**一个像素都不碰**。已经透明的像素也跳过。
+ */
+export type DespillThresholds = {
+  /** 红通道下限（严格大于）。 */
+  rMin: number;
+  /** 绿通道上限（严格小于）。 */
+  gMax: number;
+  /** 蓝通道下限（严格大于）。 */
+  bMin: number;
+  /** `R − G` 下限（严格大于）。 */
+  rgMin: number;
+  /** `B − G` 下限（严格大于）—— 与红/棕色正交的那道门。 */
+  bgMin: number;
+};
+
+/** 票 02 的默认阈值（C/C2 实测；**不要**为了少删几个像素随意放宽）。 */
+export const DESPILL_THRESHOLDS: DespillThresholds = { rMin: 140, gMax: 110, bMin: 80, rgMin: 70, bgMin: 35 };
+
+/** 把命中品红判据的**不透明**像素置透明。输入不改；返回删了多少像素。 */
+export function despillMagenta(
+  img: RasterImage,
+  { thresholds = DESPILL_THRESHOLDS, floor = 128 }: { thresholds?: Partial<DespillThresholds>; floor?: number } = {},
+): { image: RasterImage; removedPixels: number } {
+  const t = { ...DESPILL_THRESHOLDS, ...thresholds };
+  const out: RasterImage = { width: img.width, height: img.height, data: Buffer.from(img.data) };
+  let removed = 0;
+  for (let i = 0; i < img.width * img.height; i++) {
+    const s = i * 4;
+    if (out.data[s + 3]! < floor) continue;
+    const r = out.data[s]!, g = out.data[s + 1]!, b = out.data[s + 2]!;
+    if (r > t.rMin && g < t.gMax && b > t.bMin && r - g > t.rgMin && b - g > t.bgMin) {
+      out.data[s + 3] = 0;
+      removed++;
+    }
+  }
+  return { image: out, removedPixels: removed };
+}
+
+/**
  * 这张图**实际交付**的底色：不透明像素里出现次数最多的那个颜色（**票 37 的 Q1**）。
  *
  * ⚠️ **为什么不能继续用「我们声明的那个颜色」抠底**：第三次真跑那 **9/9** 张在容差 30 下
@@ -289,6 +336,16 @@ export type ImportOptions = {
   background?: { tolerance?: number; colors?: readonly [number, number, number][] };
   /** alpha 二值化阈值，默认 0.5。传 `null` 保留半透明边缘（不推荐，会产出色板外颜色）。 */
   alphaThreshold?: number | null;
+  /**
+   * 抠底后的**品红边缘清理**（票 02）。
+   *  - 省略 = 只有**底色本身是品红家族**时才按 `DESPILL_THRESHOLDS` 跑；
+   *  - `false` = 关；
+   *  - 给一个 partial = **显式开启**并覆盖其中的阈值（其余仍取默认）。
+   * ⚠️ **没有 `background` 的图不跑** —— 人给的透明 PNG 与背景最远层都不碰。
+   * ⚠️ **底色不是品红（如天空层的深蓝）⇒ 省略时也不跑**：那上面没有「抠底留下的品红边缘」，
+   *   按颜色硬删只会误伤内容（票 38 的三张天空真图会当场红）。
+   */
+  despill?: false | Partial<DespillThresholds>;
   /** 裁到非透明包围盒，默认 true。 */
   trim?: boolean;
   /**
@@ -314,6 +371,8 @@ export type ImportResult = RasterImage & {
   report: {
     sourceSize: { w: number; h: number };
     keyedPixels: number;
+    /** 抠底之后又按品红判据删掉的像素数（票 02）。没有跑 despill 时是 0。 */
+    despilledPixels: number;
     backgroundColors: [number, number, number][];
     trimmedTo: { w: number; h: number } | null;
     distinctColorsBeforeQuantize: number;
@@ -344,14 +403,26 @@ type Prepared = { keyed: RasterImage; report: ImportResult["report"] };
 /** 抠背景那一段。单独拆出来是因为多帧要先知道**每帧**的 ink 在哪，才能算并集框。 */
 function prepareFrame(img: RasterImage, opts: ImportOptions): Prepared {
   const report: ImportResult["report"] = {
-    sourceSize: { w: img.width, h: img.height }, keyedPixels: 0, backgroundColors: [],
+    sourceSize: { w: img.width, h: img.height }, keyedPixels: 0, despilledPixels: 0, backgroundColors: [],
     trimmedTo: null, distinctColorsBeforeQuantize: 0,
   };
   if (!opts.background) return { keyed: img, report };
   const k = keyBackground(img, opts.background);
   report.keyedPixels = k.keyedPixels;
   report.backgroundColors = k.backgroundColors;
-  return { keyed: k.image, report };
+  // ── 票 02：抠底之后再清品红边缘（顺序是判据的一部分：先抠底，免得把整片底当「暖色」研究）──
+  // ⚠️ **只对「品红家族」的底色自动生效**：C/C2 的众数色（`[212,32,139]` 一类）与
+  //   两张真·非最远层（`[209,77,164]` / `[224,65,153]`）都过判据；而天空层的 `[41,41,64]`
+  //   不过 —— 在它上面硬删「品红」只会误伤内容（票 38 的交付态读数会从 25.46% 漂到 27.18%）。
+  //   显式给 `despill` 对象 = 调用方明确要求跑，不再过这道自动门。
+  const explicit = opts.despill !== undefined && opts.despill !== false;
+  const magentaKey = k.backgroundColors.some((c) =>
+    c[0] > DESPILL_THRESHOLDS.rMin && c[1] < DESPILL_THRESHOLDS.gMax && c[2] > DESPILL_THRESHOLDS.bMin &&
+    c[0] - c[1] > DESPILL_THRESHOLDS.rgMin && c[2] - c[1] > DESPILL_THRESHOLDS.bgMin);
+  if (opts.despill === false || (!explicit && !magentaKey)) return { keyed: k.image, report };
+  const d = despillMagenta(k.image, opts.despill === undefined ? {} : { thresholds: opts.despill });
+  report.despilledPixels = d.removedPixels;
+  return { keyed: d.image, report };
 }
 
 /** 裁框 → 降采样 → 二值化 → 量化那一段。`box` 是同资源各帧共用的并集框；null = 各帧裁自己的。 */
