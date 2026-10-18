@@ -99,6 +99,9 @@ cd out/counter-siege && python3 -m http.server 8000
 game-maker inspect fixtures/packs/counter-siege/v4
 ```
 
+`inspect` 还会报「源图 → 目标」尺寸（**观察**，从不阻断）。在 `create` / `build` 里，这份 inspect summary
+会作为 `qa-report.json` 的 `inspect` 观察落盘；`review` 仍是**人工主动调用的付费诊断**，自动链不会调用它。
+
 ## 完整管线 —— 从需求到能玩的游戏
 
 这条路要调模型，先把文本上游配好（见[配置](#配置)）。

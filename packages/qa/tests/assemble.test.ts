@@ -86,7 +86,7 @@ describe("§干净的真现场：三族都跑、合成一份**过得了契约**�
     expect(r.failures).toEqual([]);
   });
 
-  it("两条观察：`inspect` / `review` 各一条，**都是 `unavailable`**（合成器今天只装配、不采集）", async () => {
+  it("两条观察：`inspect` / `review` 各一条；standalone 没给 inspect ⇒ 都是 `unavailable`", async () => {
     const r = await run(stage());
     expect(r.observations).toHaveLength(2);
     expect(r.observations.map((o) => o.source).sort()).toEqual(["inspect", "review"]);
@@ -95,6 +95,24 @@ describe("§干净的真现场：三族都跑、合成一份**过得了契约**�
       // ⚠️ 理由**必须说得出**（契约靠联合保证这件事）—— 而且要说清「没拿到 ≠ 比过了、没差异」
       if (o.outcome === "unavailable") expect(o.reason).toMatch(/没有可原样搬来的观察/);
     }
+  });
+
+  it("上游提供 inspect 观察 ⇒ inspect 原样 ok，review 仍 unavailable；判据/qaVerdict 不变（v3 视觉 QA 接口）", async () => {
+    const clean = await run(stage());
+    const inspect: Observation = { source: "inspect", outcome: "ok", lines: ["源图 / 目标尺寸（**观察，不是判据**）：", "  p-body.idle 源图 512×270 (1.896) → 目标 64×48 (1.333) · 长宽比差 -29.7%"] };
+    const r = await run({ ...stage(), inspectObservation: inspect });
+    expect(bySource(r, "inspect")).toEqual(inspect);
+    expect(bySource(r, "review")?.outcome).toBe("unavailable");
+    expect(r.checked).toEqual(clean.checked);
+    expect(r.failures).toEqual(clean.failures);
+    expect(qaVerdict(r)).toBe(qaVerdict(clean));
+    expect(QAReportSchema.safeParse(r).success).toBe(true);
+  });
+
+  it("上游提供 unavailable ⇒ 原样装配（失败不伪装 ok）", async () => {
+    const un: Observation = { source: "inspect", outcome: "unavailable", reason: "inspect 未能完成（测试）" };
+    const r = await run({ ...stage(), inspectObservation: un });
+    expect(bySource(r, "inspect")).toEqual(un);
   });
 });
 

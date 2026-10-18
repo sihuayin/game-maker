@@ -447,6 +447,14 @@ export type QaContext = {
   /** 已落盘的 `asset-recipe.json` 的绝对路径 —— 视觉族（票 17）要读它。 */
   recipePath: string;
   gameId: string;
+  /**
+   * **上游算好的 `inspect` 观察**（v3 视觉 QA 接口）。
+   *
+   * ⚠️ 它是**输入**，不是报告契约：`qaRunner` 只**原样装配**，不读 PNG、不调用 `inspectPack`、
+   *   不调用 `reviewPack`、不改写 `lines`。没给（standalone / 旧调用方）⇒ 保持旧的 `unavailable`。
+   * ⚠️ 只接受 `source: "inspect"`；review 注入不在这个口子上。
+   */
+  inspectObservation?: Observation;
 };
 
 /**

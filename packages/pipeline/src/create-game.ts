@@ -19,12 +19,12 @@ import {
   parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
   RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
-  type GameIntentSpec, type LedgerCall, type MasterRatio, type QAReport, type QaRunner, type RunLedger,
-  type RuntimeProfileRef, type VisualWorldSpec,
+  type CommandResult, type GameIntentSpec, type LedgerCall, type MasterRatio, type Observation,
+  type QAReport, type QaRunner, type RunLedger, type RuntimeProfileRef, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { compileRuntime, nextPackVersion, packAssets, planAssets, type ImageTransport } from "@game-maker/assets";
+import { compileRuntime, inspectPack, nextPackVersion, packAssets, planAssets, type ImageTransport } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
@@ -121,6 +121,11 @@ export type BuildInput = {
   /** 外壳视口 / HUD 行高（票 14：**外壳的常量**，由壳那一侧传）。省略用 `assets` 的默认值。 */
   viewport?: { w: number; h: number };
   hudLineHeight?: number;
+  /**
+   * `inspectPack` 的**测试注入口**（默认就是 `inspectPack`）。生产链不传；
+   * 测试用它覆盖「inspect 抛错 ⇒ unavailable」那一档。
+   */
+  inspect?: (opts: { packDir: string; outRoot?: string }) => CommandResult;
 };
 
 export type BuildResult = {
@@ -364,6 +369,13 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
   }
 }
 
+/** inspect 失败的 `unavailable` 理由：自包含，但不把绝对路径/堆栈/内部细节写进持久化报告。 */
+function inspectUnavailableReason(e: unknown, _packDir: string): string {
+  // ⚠️ 只留**类别**，不留 message（它可以带绝对路径）—— 要定位就手动跑 `game-maker inspect`。
+  const category = e instanceof CommandError ? e.kind : "包内产物读取/解码失败";
+  return `inspect 未能完成（${category}）—— 观察不可用，但不影响 QA 判定`;
+}
+
 /**
  * **第二段：构建**（清单 → 包 → 配置 → QA）。
  *
@@ -464,6 +476,15 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   let qa: QAReport | undefined;
   if (runner !== undefined) {
     say("qa");
+    // ⚠️ **免费 inspect 观察**（v3 视觉 QA 接口）：pack 已经落盘；只报数、不判。
+    //   抛错 ⇒ unavailable + build 继续（观察不阻断；绝不伪装成 ok）。
+    let inspectObservation: Observation;
+    try {
+      const inspected = (input.inspect ?? inspectPack)({ packDir });
+      inspectObservation = { source: "inspect", outcome: "ok", lines: inspected.summary };
+    } catch (e) {
+      inspectObservation = { source: "inspect", outcome: "unavailable", reason: inspectUnavailableReason(e, packDir) };
+    }
     // ⚠️ **四份产物的路径逐个传**（票 19 的 Q4/Q11）：QA 不自己拼文件名 ——
     //   那九个名字的家是本模块的 `RUN_ARTIFACT`，而 `packages/qa` 的白名单只有 `contracts`。
     const produced = await runner({
@@ -471,7 +492,8 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
       configPath: path.join(runDir, RUN_ARTIFACT.config),
       intentPath: path.join(runDir, RUN_ARTIFACT.gameIntent),
       designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
-      recipePath: path.join(runDir, RUN_ARTIFACT.recipe)
+      recipePath: path.join(runDir, RUN_ARTIFACT.recipe),
+      inspectObservation,
     });
     // ⚠️ **先过一遍它自己的契约**（票 20 的 Q4 的第 2 步）：落一份**过不了 schema** 的报告，
     //   等于让下游（修复循环）拿到它解析不了的东西 —— 而今天不炸，只因为没人 parse 它。

@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import type { AssetRecipe, AuthoringAsset, CharacterDNAFile, DrawList, StyleSpec } from "@game-maker/contracts";
 import { CharacterDNASchema, MASTER_RATIOS_FILE, parseMasterRatios } from "@game-maker/contracts";
-import { buildAssetPack, verifyPack, type DrawListGenerator, type ImageGenerator, type ImageRequest } from "../src/index.js";
+import { buildAssetPack, inspectPack, verifyPack, type DrawListGenerator, type ImageGenerator, type ImageRequest } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BASE: AssetRecipe = JSON.parse(readFileSync(ROOT + "fixtures/recipes/shift-change-master.json", "utf8"));
@@ -139,6 +139,14 @@ describe("§母版前段：`image` 的母版（⭐ DNA → 母版那条箭头）
     expect(req.negativePrompt).not.toContain("human figure");
     expect(existsSync(path.join(packDir, "authoring/masters/player-master.png"))).toBe(true);
     expect(existsSync(path.join(packDir, "authoring/masters/player-master.prompt.txt"))).toBe(true);
+  });
+
+  it("inspectPack：母版也进「源图 → 目标」观察，目标用 master-ratios 的 canonical（v3 视觉 QA 接口）", async () => {
+    const r = recorder();
+    const { packDir } = await build({ recipe: recipe({ master: asImage() }), generateImage: r.gen, characterDna: DNA });
+    const text = inspectPack({ packDir }).summary.join("\n");
+    expect(text).toContain("源图 / 目标尺寸");
+    expect(text).toMatch(/player-master\s+源图 832×1248 \(0\.667\) → 目标 832×1248 \(0\.667\) · 长宽比差 0\.0%/);
   });
 
   it("账：`step:\"master\"` · `target` 是**母版 id**（不是引用它的资产 id）", async () => {

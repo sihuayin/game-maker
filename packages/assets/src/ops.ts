@@ -1798,6 +1798,64 @@ function paletteUsage(packDir: string, m: AssetPackManifest) {
   };
 }
 
+type SourceSizeEntry = {
+  id: string; unit: string;
+  source: { w: number; h: number; ar: number };
+  target: { w: number; h: number; ar: number };
+  deltaAr: number;
+};
+
+/** `源图 → 目标` 的尺寸观察（v3 视觉 QA 接口）。⚠️ 只**记录**，不设阈值、不判通过/失败。 */
+function sourceSizeObservations(packDir: string, m: AssetPackManifest): { lines: string[]; entries: SourceSizeEntry[] } {
+  const entries: SourceSizeEntry[] = [];
+  const ar = (s: { w: number; h: number }) => s.w / s.h;
+  const add = (id: string, unit: string, raw: string, target: { w: number; h: number }) => {
+    const file = path.join(packDir, raw);
+    if (!fs.existsSync(file)) return;
+    const img = decodePNG(fs.readFileSync(file));
+    const source = { w: img.width, h: img.height, ar: img.width / img.height };
+    const t = { ...target, ar: ar(target) };
+    entries.push({ id, unit, source, target: t, deltaAr: (t.ar / source.ar - 1) * 100 });
+  };
+  for (const a of m.assets) {
+    const bitmaps = a.authoring.filter((x) => x.kind === "bitmap" && x.ref.endsWith(".png"));
+    if (bitmaps.length === 0) continue; // drawlist：无位图，跳过
+    const find = (suffix: string) => bitmaps.find((x) => path.basename(x.ref) === suffix)?.ref;
+    if (a.kind === "animation" && a.animations) {
+      for (const anim of a.animations) {
+        const raw = find(`${a.id}.${anim.name}.png`);
+        if (raw !== undefined) add(a.id, anim.name, raw, { w: a.size.w * anim.frames.length, h: a.size.h });
+      }
+    } else if (a.kind === "background" && a.layers) {
+      for (const layer of a.layers) {
+        const raw = find(`${a.id}.${layer.name}.png`);
+        if (raw !== undefined) add(a.id, layer.name, raw, { w: a.size.w, h: a.size.h });
+      }
+    } else {
+      // single sprite / ui / import：一个位图资源
+      add(a.id, "", bitmaps[0]!.ref, { w: a.size.w, h: a.size.h });
+    }
+  }
+  // 母版：既有 master-ratios.json 的 canonical（requested）口径。
+  const ratiosPath = path.join(packDir, MASTER_RATIOS_FILE);
+  if (fs.existsSync(ratiosPath)) {
+    const ratios = parseMasterRatios(JSON.parse(fs.readFileSync(ratiosPath, "utf8")));
+    if (ratios.ok)
+      for (const mr of ratios.value.masters)
+        add(mr.master, "", `authoring/masters/${mr.master}.png`, { w: mr.requested.w, h: mr.requested.h });
+  }
+  const pct = (d: number) => {
+    const v = Math.abs(d) < 0.05 ? 0 : d;
+    return `${v > 0 ? "+" : v < 0 ? "-" : ""}${Math.abs(v).toFixed(1)}%`;
+  };
+  const lines = entries.map((e) => {
+    const label = e.unit === "" ? e.id : `${e.id}.${e.unit}`;
+    return `  ${label.padEnd(30)} 源图 ${e.source.w}×${e.source.h} (${e.source.ar.toFixed(3)}) → `
+      + `目标 ${e.target.w}×${e.target.h} (${e.target.ar.toFixed(3)}) · 长宽比差 ${pct(e.deltaAr)}`;
+  });
+  return { lines, entries };
+}
+
 export function inspectPack(opts: { packDir: string; outRoot?: string }): CommandResult {
   const root = opts.outRoot ?? path.dirname(path.resolve(opts.packDir));
   const parsed = parseAssetPack(JSON.parse(fs.readFileSync(path.join(opts.packDir, "manifest.json"), "utf8")));
@@ -1806,6 +1864,7 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
   // ⚠️ 扫交付态图集要**解 PNG** —— 这是 `inspect` 唯一的重活，而它是诊断命令，值。
   const usage = paletteUsage(opts.packDir, m);
   const byId = new Map(usage.perAsset.map((u) => [u.id, u]));
+  const sourceSizes = sourceSizeObservations(opts.packDir, m);
 
   const lines = [`${m.id} v${m.version} · ${m.provenance.mode}`, `${m.assets.length} 个资源 · ${m.atlases.length} 张图集`];
   for (const a of m.assets) {
@@ -1816,6 +1875,10 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
     //   不必让每一行都拖着「色板外 0」这个噪声。
     const offA = u && u.offPalettePixels > 0 ? ` · 色板外 ${u.offPalettePixels}` : "";
     lines.push(`  ${a.id} · ${a.kind} · ${a.size.w}×${a.size.h} · ${a.origin}/${a.paletteBinding} · ${a.frames.length} 帧${anim}${uses}${offA}`);
+  }
+  if (sourceSizes.lines.length > 0) {
+    lines.push(`源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：`);
+    lines.push(...sourceSizes.lines);
   }
   // ⚠️ 这一块是**观察**不是判据（票 39）—— 不打分、不阻断，只是把人眼判「像不像同一个世界」时要看的事实摆出来
   // 每一层背景画得有多满（票 50）—— ⚠️ 这个量**是判据**（层覆盖），但它**判在 QA 那边**
@@ -1847,6 +1910,7 @@ export function inspectPack(opts: { packDir: string; outRoot?: string }): Comman
         paletteBinding: a.paletteBinding, frames: a.frames.length,
         animations: (a.animations ?? []).map((x) => ({ name: x.name, frames: x.frames.length, fps: x.fps ?? null, loop: x.loop })) })),
       paletteUsage: usage, layerCoverage: backgroundCoverage(opts.packDir, m),
+      sourceSizes: sourceSizes.entries,
     },
     artifacts: [{ path: rel(root, opts.packDir), kind: "asset-pack" }],
   };

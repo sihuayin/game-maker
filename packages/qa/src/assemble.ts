@@ -41,7 +41,7 @@
 //       **钱已经答了**（账里那一笔）」，所以这里不必区分，也**不许**伪造一份 `summary`。
 //     ⚠️ 它的意思**不是**「这两个命令跑失败了」，而是「这一次**没有可搬的引用**」——
 //       理由那句话把这件事说清楚，否则读报告的人会把「没拿到」读成「比过了、没差异」。
-//     ⚠️ 「把 `inspect` 的观察接进创建链」是**在范围内**的下一步，还没人开（见地图的
+//     ⚠️ 「把 `inspect` 的观察接进创建链」**已由 v3 视觉 QA 接口接入**（pipeline 提供、qaRunner 只装配）；见
 //       Not yet specified）。
 //     ⚠️ **`review` 那条已经裁了，而裁定是「不进链」**（2026-10-16 · [票 78](../../../.scratch/game-maker-v2/issues/78-reviewpack-wiring.md)，
 //       人裁 Q1 = (a)）：它是**人主动调用的付费诊断命令**（`game-maker review <run 目录>`），
@@ -92,8 +92,12 @@ export const qaRunner: QaRunner = async (ctx: QaContext): Promise<QAReport> => {
     "intent-coverage": declared(intent, "intent-coverage"),
   };
 
-  // ③ 两条观察（见文件头三）。
-  return buildQAReport(judgements, NOT_COLLECTED);
+  // ③ 两条观察（见文件头三）。⚠️ inspect 那一条由**上游**算好传进来（v3 视觉 QA 接口）；
+  //   没传（standalone / 旧调用方）⇒ 保持旧的 unavailable。review 仍 unavailable。
+  const inspect = ctx.inspectObservation
+    ?? NOT_COLLECTED.find((o) => o.source === "inspect")!;
+  const review = NOT_COLLECTED.find((o) => o.source === "review")!;
+  return buildQAReport(judgements, [inspect, review]);
 };
 
 /**
@@ -128,8 +132,8 @@ const NOT_COLLECTED: readonly Observation[] = [
   {
     source: "inspect",
     outcome: "unavailable",
-    reason: "这次创建链没有跑 `inspect`（它是诊断命令，链上没有人调它）—— 没有可原样搬来的观察，"
-      + "而**空不等于「比过了、没差异」**",
+    reason: "这一次调用没有提供 `inspect` 观察（创建链会由 pipeline 提供；standalone 调用方没有）——"
+      + " 没有可原样搬来的观察，而**空不等于「比过了、没差异」**",
   },
   {
     source: "review",

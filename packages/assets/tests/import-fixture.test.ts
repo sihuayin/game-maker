@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseRecipe, type StyleSpec } from "@game-maker/contracts";
-import { buildAssetPack, verifyPack } from "../src/index.js";
+import { buildAssetPack, inspectPack, verifyPack } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const FIX = path.join(ROOT, "fixtures/e2e/wasteland-platformer");
@@ -30,5 +30,11 @@ describe("手写 import fixture：规则/pack 三路线中的 import 真的能�
     expect(v.summary?.some((x) => x.includes("通过")), JSON.stringify(v)).toBe(true);
     const parsed = parseAssetPack(readJson(path.join(res.packDir, "manifest.json")));
     expect(parsed.ok).toBe(true);
+    // v3 视觉 QA 接口：import 原图也进「源图 → 目标」观察
+    const ins = inspectPack({ packDir: res.packDir });
+    const text = ins.summary.join("\n");
+    expect(text).toContain("源图 / 目标尺寸");
+    expect(text).toMatch(/import-demo\s+源图 .* → 目标 32×32 .* 长宽比差 /);
+    expect((ins.data as { sourceSizes?: unknown[] }).sourceSizes?.length).toBeGreaterThan(0);
   });
 });

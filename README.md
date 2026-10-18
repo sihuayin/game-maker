@@ -98,6 +98,10 @@ Both fixture packs are the real thing, not stubs — `inspect` an asset pack to 
 game-maker inspect fixtures/packs/counter-siege/v4
 ```
 
+`inspect` also reports source-image → target dimensions (an observation, never a gate). In `create`/`build`,
+the inspect summary is written into `qa-report.json` as the `inspect` observation; `review` stays a manual,
+paid diagnostic and is never called by the automated chain.
+
 ## Full pipeline — requirement to playable game
 
 This path calls a model, so it needs the text upstream configured first (see [Configuration](#configuration)).

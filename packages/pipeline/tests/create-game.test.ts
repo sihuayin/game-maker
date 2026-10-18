@@ -761,3 +761,41 @@ describe("§票 61 · 玩家那条链**端到端**（清单 ⇒ 包 ⇒ 配置�
     expect(fs.existsSync(runPath(h, "game-config.json"))).toBe(false);
   });
 });
+
+// ── v3 视觉 QA 接口：inspect 观察进入 qa-report ───────────────────────────────
+describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
+  const reportOf = (h: ReturnType<typeof harness>) => readJson(runPath(h, "qa-report.json")) as {
+    observations: { source: string; outcome: string; lines?: string[]; reason?: string }[];
+    checked: string[]; failures: unknown[];
+  };
+
+  it("成功：inspect ok（含源图/目标尺寸段），review unavailable；六判据与 qaVerdict 不变", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    expect(b.packVersion).toBe(1);
+    const report = reportOf(h);
+    const inspect = report.observations.find((o) => o.source === "inspect")!;
+    expect(inspect.outcome).toBe("ok");
+    expect(inspect.lines!.join("\n")).toMatch(/源图 \/ 目标尺寸/);
+    expect(inspect.lines!.join("\n")).toMatch(/源图 .* → 目标 /);
+    expect(report.observations.find((o) => o.source === "review")!.outcome).toBe("unavailable");
+    expect(report.checked.sort()).toEqual(["constructive-constraint", "intent-coverage", "palette-binding", "reachability", "reference-resolution"]);
+    expect(qaVerdict(report as never)).toBe("incomplete");
+  });
+
+  it("inspect 抛错：unavailable + build 继续；六判据与 qaVerdict 不变；reason 不带路径", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir, { inspect: () => { throw new Error("boom /private/secret/path"); } });
+    expect(b.packVersion).toBe(1);
+    const report = reportOf(h);
+    const inspect = report.observations.find((o) => o.source === "inspect")!;
+    expect(inspect.outcome).toBe("unavailable");
+    expect(inspect.reason).toMatch(/inspect 未能完成/);
+    expect(inspect.reason).not.toContain("/private/secret/path");
+    expect(inspect.lines).toBeUndefined();
+    expect(report.checked).toHaveLength(5);
+    expect(qaVerdict(report as never)).toBe("incomplete");
+  });
+});
