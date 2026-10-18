@@ -87,7 +87,8 @@ describe("`plan-assets` 的账（它取代了 `derive` —— 而协议从「纯
   const run = (d: string, fetchImpl: typeof fetch, over: Record<string, unknown> = {}) =>
     planAssets({
       designPath: path.join(d, "game-design.json"), visualWorldPath: path.join(d, "visual-world.json"),
-      outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl, ...over,
+      outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl,
+      imageTransport: { protocol: "gemini", baseUrl: "http://x", apiKey: "k" }, ...over,
     });
 
   /** 上游的回应体是**工具调用那一档**（`parseToolUse` 读 `content[].input`），不是 `content[].text`。 */

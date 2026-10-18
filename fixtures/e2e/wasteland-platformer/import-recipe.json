@@ -1,0 +1,20 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "import-fixture",
+  "styleRef": "stylespec.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "import-demo",
+        "role": "既有素材导入夹具",
+        "description": "一张已经存在、要求原样使用的图",
+        "styleId": "style",
+        "anchor": { "x": 0.5, "y": 0.5 },
+        "size": { "w": 32, "h": 32 },
+        "required": true
+      },
+      "source": { "kind": "import", "ref": "import-frame.png" }
+    }
+  ]
+}

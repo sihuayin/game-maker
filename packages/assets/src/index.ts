@@ -24,3 +24,4 @@ export * from "./generate.js";
 export * from "./review.js";
 export * from "./coverage.js";
 export * from "./ops.js";
+export * from "./route.js";

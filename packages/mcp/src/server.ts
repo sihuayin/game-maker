@@ -227,14 +227,17 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
       try {
         let result: CommandResult;
         switch (name) {
-          case "plan_assets":
+          case "plan_assets": {
             tick(0.05, "正在规划资源清单…");
+            const imageTransport = imageTransportOf();
             result = await planAssets({
               designPath: String(args.designPath), visualWorldPath: String(args.visualWorldPath),
               outRoot: String(args.outDir ?? "out"),
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...(imageTransport === undefined ? {} : { imageTransport }),
             });
             break;
+          }
           case "build_asset_pack":
             result = await packAssets({
               recipePath: String(args.recipePath), outRoot: String(args.outDir ?? "out"),
@@ -270,6 +273,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               styleReferences: [{ path: String(args.stylePath) }],
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
               ...(args.styleId === undefined ? {} : { styleId: String(args.styleId) }),
+              ...(imageTransportOf() === undefined ? {} : { imageTransport: imageTransportOf()! }),
               onProgress: (p) => tick(0.4, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),
             });
             tick(0.5, "构建层：生图 → 配置 → QA → 站点…");

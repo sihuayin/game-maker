@@ -466,8 +466,10 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         if (typeof flags.style !== "string") throw new CommandError("usage", "create 需要 --style <一张参考图>");
         if (typeof flags.intent !== "string") throw new CommandError("usage", "create 需要 --intent <需求文本 | 需求.md>");
         const requirement = readRequirement(cwd, flags.intent);
+        const imgForPlan = resolveImageTransport({ env, cwd });
         const understanding = await runUnderstanding({
           outRoot, requirement, transport, cwd, ...up,
+          ...(imgForPlan.transport ? { imageTransport: imgForPlan.transport } : {}),
           // ⚠️ 恰好一张（票 16 的 Q4）：契约是复数、而**实现推到第一阶段之后**（票 26）——
           //   多张会被 `parseArgs` 当「同一个选项给两次」拒掉。
           styleReferences: [{ path: styleRefOf(cwd, flags.style) }],
@@ -501,10 +503,14 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         //   —— 旧 `derive` 吃「需求 + StyleSpec」，这一道吃「设计 + 这个世界」。名字跟着变。
         if (typeof flags.design !== "string" || typeof flags["visual-world"] !== "string")
           throw new CommandError("usage", "plan 需要 --design 与 --visual-world");
+        // ⚠️ 免费解析 image transport，只用于能力快照/规划期拒绝；不探测在线、不发请求。
+        const img = resolveImageTransport({ env, cwd });
+        for (const w of img.warnings) io.err(`⚠️ ${w}\n`);
         result = await planAssets({
           designPath: path.resolve(flags.design),
           visualWorldPath: path.resolve(flags["visual-world"]),
           outRoot, transport, ...up,
+          ...(img.transport ? { imageTransport: img.transport } : {}),
         });
         break;
       }

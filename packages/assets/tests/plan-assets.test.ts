@@ -9,7 +9,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { GameDesignSpec, VisualWorldSpec } from "@game-maker/contracts";
+import { parseAssetPlan, type GameDesignSpec, type VisualWorldSpec } from "@game-maker/contracts";
 import { CommandError, planAssets } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
@@ -66,10 +66,11 @@ const capture = (input: unknown = RECIPE) => {
   }) as unknown as typeof fetch;
   return { f, seen };
 };
+const IMAGE = { protocol: "gemini" as const, baseUrl: "http://x", apiKey: "k" };
 const run = (d: string, fetchImpl: typeof fetch) =>
   planAssets({
     designPath: path.join(d, "game-design.json"), visualWorldPath: path.join(d, "visual-world.json"),
-    outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl,
+    outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl, imageTransport: IMAGE,
   });
 
 describe("§发出去的那一发（R16 的协议）", () => {
@@ -177,14 +178,31 @@ describe("⚠️ 骨架**本身**的判据（探针第一轮抓到的那处缺�
     expect(text).toContain("两层");
   });
 
-  it("⚠️ 而 `source.kind` **不写死**（写死等于替模型把策略定了，与 `00 §2.4` 正面冲突）", async () => {
+  it("⚠️ 最终 `source.kind` 由 **resolver** 决定；模型的 source.kind 只作为候选记录（v3 票 09）", async () => {
     const d = stage();
     const c = capture();
-    await run(d, c.f);
+    const r = await run(d, c.f);
     const text: string = c.seen[0]!.messages[0].content[0].text;
-    expect(text).toContain("drawlist|image|import");     // 三选一的占位
-    expect(text).not.toContain('"source":{"kind":"drawlist"}');
-    expect(text).toContain("别照抄成");
+    expect(text).toContain("drawlist|image|import");     // 模型仍看到三选一
+    // 模型这份 fixture 把 player / background 都写成 drawlist；硬信号应覆盖为 image。
+    const planPath = path.join(d, "out", String(r.data["plan"]));
+    const plan = parseAssetPlan(JSON.parse(fs.readFileSync(planPath, "utf8")));
+    expect(plan.ok, plan.ok ? "" : plan.errors.join(" / ")).toBe(true);
+    if (!plan.ok) return;
+    const player = plan.value.assets.find((a) => a.id === "player-odin")!;
+    const bg = plan.value.assets.find((a) => a.id === "store-interior-bg")!;
+    expect(player.route).toBe("image");
+    expect(player.candidate).toBe("drawlist");
+    expect(player.participated).toBe(false);
+    expect(bg.route).toBe("image");
+    expect(bg.candidate).toBe("drawlist");
+    expect(bg.participated).toBe(false);
+    // Recipe 的 source.kind 与 sidecar 的 route 一致
+    const recipe = JSON.parse(fs.readFileSync(planPath.replace(/\.plan\.json$/, ".json"), "utf8"));
+    for (const a of plan.value.assets) {
+      const entry = recipe.assets.find((e: any) => e.spec.id === a.id);
+      expect(entry.source.kind, a.id).toBe(a.route);
+    }
   });
 });
 

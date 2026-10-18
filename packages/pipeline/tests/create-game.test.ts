@@ -7,8 +7,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
-import { buildAssetPack, framePlan, type DrawListGenerator } from "@game-maker/assets";
+import { DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { buildAssetPack, decodePNG, encodePNG, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
 
@@ -28,14 +28,16 @@ function harness(over: { recipeId?: string; designFails?: number; override?: Rec
   };
 }
 const TRANSPORT = { baseUrl: "http://up.test", apiKey: "k" };
+/** v3 票 09：planner 需要 image 能力；用一条假 transport，不探测在线。 */
+const IMAGE = { protocol: "gemini" as const, baseUrl: "http://up.test", apiKey: "k" };
 const understand = (h: ReturnType<typeof harness>, over: Record<string, unknown> = {}) =>
   runUnderstanding({
     outRoot: h.outRoot, requirement: "做一个废土横版寻宝游戏",
     styleReferences: [{ path: "style.png" }],
-    transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd, ...over,
+    transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd, imageTransport: IMAGE, ...over,
   });
 const build = (h: ReturnType<typeof harness>, runDir: string, over: Record<string, unknown> = {}) =>
-  runBuild({ outRoot: h.outRoot, runDir, transport: TRANSPORT, fetchImpl: h.fetchImpl, ...over });
+  runBuild({ outRoot: h.outRoot, runDir, transport: TRANSPORT, fetchImpl: h.fetchImpl, imageTransport: IMAGE, ...over });
 
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, unknown>;
 const runPath = (h: ReturnType<typeof harness>, ...rest: string[]) => path.join(h.outRoot, "wasteland", "run", "v1", ...rest);
@@ -58,6 +60,21 @@ describe("§第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13）", () => {
     // ⚠️ 参考图拷进来之后，VWS 里的路径改写成**同目录的 basename**（契约：相对它自己）
     expect(r.visualWorld.styleReferences[0]!.path).toBe("style.png");
     expect(fs.existsSync(path.join(r.run.dir, "style.png"))).toBe(true);
+  });
+
+  it("plan sidecar 跟着落进 run；route 与 Recipe 的 source.kind 逐项一致（v3 票 09）", async () => {
+    const h = harness();
+    const r = await understand(h);
+    expect(r.paths.recipePlan).toBe("wasteland/run/v1/asset-recipe.plan.json");
+    const plan = parseAssetPlan(readJson(runPath(h, "asset-recipe.plan.json")));
+    expect(plan.ok, plan.ok ? "" : plan.errors.join(" / ")).toBe(true);
+    if (!plan.ok) return;
+    expect(plan.value.capabilities.routes.image).toBe(true);
+    expect(plan.value.assets.map((a) => a.id).sort()).toEqual(r.recipe.assets.map((a) => a.spec.id).sort());
+    for (const a of plan.value.assets) {
+      const e = r.recipe.assets.find((x) => x.spec.id === a.id)!;
+      expect(e.source.kind, a.id).toBe(a.route);
+    }
   });
 
   it("`intent.md` 是**原样字节**（§13 的原话：不做规范化）", async () => {
@@ -117,7 +134,15 @@ describe("§第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15）", 
     expect(steps.has("analyze-reference"), "理解段在").toBe(true);
     expect(steps.has("drawlist"), "构建段在").toBe(true);
     const packed = readJson(path.join(b.paths.packDir, "ledger.json")) as { calls: { step: string }[] };
-    expect([...new Set(packed.calls.map((c) => c.step))]).toEqual(["drawlist"]);   // 包里那份只有构建这一段
+    expect([...new Set(packed.calls.map((c) => c.step))].sort()).toEqual(["drawlist", "image"]);   // resolver 后 bg/p-body 走 image
+  });
+
+  it("旧 run 没有 sidecar ⇒ build 照常（pack 不读它；不推断历史理由）", async () => {
+    const h = harness();
+    const u = await understand(h);
+    fs.rmSync(runPath(h, "asset-recipe.plan.json"));
+    const b = await build(h, u.run.dir);
+    expect(b.packVersion).toBe(u.run.version);
   });
 });
 
@@ -163,6 +188,22 @@ describe("§invariant 2 · 构建 attempt 的版本", () => {
         format: "drawlist+curve/v1", id: spec.id, frame: f.name, viewBox: [0, 0, spec.size.w, spec.size.h],
         expectedSize: [spec.size.w, spec.size.h], ops: [{ op: "rect", x: 0, y: 0, w: spec.size.w, h: spec.size.h, fill: "palette:0" }],
       }))) as DrawListGenerator,
+      // v3 票 09：resolver 后 bg-dusk / p-body 走 image；给一个假生图器（不联网）。
+      generateImage: (async (req: { prompt: string }) => {
+        const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(req.prompt)?.[1] ?? 0);
+        const isBg = n === 0 && /背景|这一层|层\b/.test(req.prompt);
+        const w = n > 0 ? Math.max(512, n * 128 + 64) : 480, h = 270;
+        const data = Buffer.alloc(w * h * 4);
+        const fill = (x0: number, y0: number, x1: number, y1: number, c: [number, number, number]) => {
+          for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+            const s = (y * w + x) * 4; data[s] = c[0]; data[s + 1] = c[1]; data[s + 2] = c[2]; data[s + 3] = 255;
+          }
+        };
+        fill(0, 0, w, h, isBg ? [90, 80, 70] : [255, 0, 255]);
+        if (n > 0) for (let k = 0; k < n; k++) fill(64 + k * 128, 50, 128 + k * 128, 220, [220, 220, 220]);
+        else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
+        return { image: decodePNG(encodePNG({ width: w, height: h, data })), call: { protocol: "fake", ms: 0, attempts: 1 } };
+      }) as any,
       sourceDateEpoch: 1790208000,
     });
     expect(res.manifest.version).toBe(7);
@@ -190,7 +231,7 @@ describe("§invariant 3 · recipe 磁盘真相", () => {
     const r = await createGame({
       outRoot: h.outRoot, requirement: "做一个废土横版寻宝游戏",
       styleReferences: [{ path: "style.png" }],
-      transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd,
+      transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd, imageTransport: IMAGE,
       onRecipe: ({ recipePath, recipe }) => {
         seenRecipe = recipePath;
         expect(recipe.id).toBe("wasteland");

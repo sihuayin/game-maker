@@ -83,6 +83,7 @@ const run = (d: string, fetchImpl: typeof fetch) =>
   planAssets({
     designPath: path.join(d, "game-design.json"), visualWorldPath: path.join(d, "visual-world.json"),
     outRoot: path.join(d, "out"), transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl,
+    imageTransport: { protocol: "gemini", baseUrl: "http://x", apiKey: "k" },
   });
 
 /** 差一点的清单（每发都回同一份）⇒ 抛出来的那个 `CommandError`。 */

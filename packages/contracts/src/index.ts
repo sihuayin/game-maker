@@ -163,3 +163,5 @@ export * from "./config-tool.js";
 // ⚠️ 判据是**六条**，名字只住 `QA_JUDGEMENTS` 一处，同时被 `checked` 与
 //   `QAFailure.judgement` 取用 —— 于是「码的条数 = 判据的条数」在类型上只有一份。
 export * from "./qa.js";
+
+export * from "./asset-plan.js";

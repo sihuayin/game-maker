@@ -18,6 +18,8 @@ export const RUN_ARTIFACT = {
   gameDesign: "game-design.json",
   characterDna: "character-dna.json",
   recipe: "asset-recipe.json",
+  /** 规划记录（v3 票 09；**v<N>.plan.json 摊平后的名字**）。 */
+  recipePlan: "asset-recipe.plan.json",
   config: "game-config.json",
   qaReport: "qa-report.json",
   ledger: "ledger.json",
@@ -99,7 +101,9 @@ export function flattenPlannerOutput(stagingDir: string, recipeId: string, recip
   const from = path.join(stagingDir, recipeId, "recipes");
   for (const name of fs.readdirSync(from)) {
     if (path.join(from, name) === recipeFile) continue;   // 清单由调用方改名另写
-    fs.renameSync(path.join(from, name), path.join(stagingDir, name));
+    // ⚠️ **plan sidecar 有固定名字**（run 里叫 `asset-recipe.plan.json`，不是 `v<N>.plan.json`）。
+    const dest = /^v\d+\.plan\.json$/.test(name) ? RUN_ARTIFACT.recipePlan : name;
+    fs.renameSync(path.join(from, name), path.join(stagingDir, dest));
   }
   fs.rmSync(path.join(stagingDir, recipeId), { recursive: true, force: true });
 }

@@ -771,7 +771,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           //   · ⚠️ **本地的抠底读数也不该存在**：按众数色抠最远层会抠掉三成 —— 留一个
           //     `keyedPixels` 在那里，下一个人会以为这一层真被抠了那么多。那正是票 37 治的那个病
           //     （「我们声明了什么」被当成「模型交付了什么」的同款：把**没做的事**记成**做了**）。
-          const farthest = isBg && u.layer !== undefined && u.layer.index === 0;
+          // ⚠️ **无 `layers` 的背景 = 只有一层**（v3 票 09：background 硬信号走 image）——
+          //   它没有 `layer.index` 可读，但它就是最远（也是唯一）的那一层，必须按「不抠」处理；
+          //   否则整张图会被众数色抠空，站点的「最远层必须画满」会把它判死。
+          const farthest = isBg && (u.layer === undefined || u.layer.index === 0);
           const keyedProbe = farthest ? null : keyBackground(image, { tolerance: bgOpt.tolerance, colors: [unitKey] });
           /** 这张图的像素总数（判据的分母）。 */
           const pixels = image.width * image.height;

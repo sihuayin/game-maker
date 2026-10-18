@@ -49,6 +49,8 @@ export type UnderstandingInput = {
   styleReferences: readonly { path: string }[];
   /** 文本上游（理解层那五发都要它）。 */
   transport: Transport;
+  /** 生图上游（**免费解析**；只用于规划期能力快照/参考图能力检查；不探测在线）。 */
+  imageTransport?: ImageTransport;
   /**
    * 风格身份的**覆盖口**（票 08 的 R2-Q2：「参考图 basename 的 slug，由 CLI 生成」，
    * 而票 08 的播下把「`--style-id` 是覆盖口」留给了票 16）。不给就由 basename 推。
@@ -66,7 +68,7 @@ export type UnderstandingInput = {
 /** 第一段写下的那几项（相对 `outRoot`）。 */
 export type UnderstandingPaths = {
   runDir: string; intentMd: string; visualWorld: string; gameIntent: string;
-  gameDesign: string; characterDna: string; recipe: string;
+  gameDesign: string; characterDna: string; recipe: string; recipePlan: string;
 };
 
 /** 第二段写下的那几项。⚠️ `qaReport` 缺席 = **QA 没跑**（不是「跑了没问题」）。 */
@@ -294,6 +296,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
       visualWorldPath: path.join(run.tmpDir, RUN_ARTIFACT.visualWorld),
       outRoot: run.tmpDir,
       transport: input.transport,
+      ...(input.imageTransport !== undefined ? { imageTransport: input.imageTransport } : {}),
       ...(input.fetchImpl !== undefined ? { fetchImpl: input.fetchImpl } : {}),
     });
     ledger.push(...ledgerOf(planned.data));
@@ -327,6 +330,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
         gameDesign: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.gameDesign)),
         characterDna: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.characterDna)),
         recipe: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.recipe)),
+        recipePlan: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.recipePlan)),
       },
       ledger,
     };

@@ -12,12 +12,13 @@ import {
   auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
   formatIssues, GameDesignSpecSchema,
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
-  parseAssetPack, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
+  parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
   PLAYER_ACTION_NAMES,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
   type AssetPackEntry, type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
+  type AssetSource,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
@@ -28,6 +29,7 @@ import { masterRatioNotes, referenceImagesOf } from "./master.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
+import { plannerCapabilitiesOf, resolveRoute, sourceForDecision, type ExistingAsset } from "./route.js";
 import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, designBrief, drawListFewShot, drawListOpsSpec, paletteLine, PLAN_TOOL_DESCRIPTION, PLAN_TOOL_NAME, recipeShapeSpec, SKELETON_SHAPE_HEADING, SKELETON_SHAPE_NOTE, styleBrief, tdConfigPrompt } from "./prompt.js";
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
@@ -81,6 +83,16 @@ export type PlanAssetsOptions = {
   transport?: Transport; fetchImpl?: typeof fetch;
   /** 一次上游调用的超时（毫秒）。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
   timeoutMs?: number;
+  /**
+   * 生图 transport（**免费解析**，不探测在线）。用于构造能力快照与参考图能力检查；
+   * 不给 ⇒ `routes.image = false`（第四轮 Q14.1：能力缺失归 usage）。
+   */
+  imageTransport?: ImageTransport;
+  /**
+   * 既有素材（**fixture / 手写 Recipe 路径专用**；create 链传空，第一轮 Q4）。
+   * `ref` 相对 recipe 输出目录解析；可访问性由 planAssets 预检查后传给 resolver。
+   */
+  existingAssets?: readonly { id: string; ref: string; mustReuse: boolean }[];
 };
 
 /** 上游自报的模型名与用量（与 `callText` 那条路同款 —— 它们是「花了什么」的事实，票 45）。 */
@@ -258,6 +270,12 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
 
   const design = d.data;
   const world = w.data;
+  const existingInputs = opts.existingAssets ?? [];
+  const capabilities = plannerCapabilitiesOf({
+    design,
+    ...(opts.imageTransport === undefined ? {} : { imageTransport: opts.imageTransport }),
+    hasExistingAssets: existingInputs.length > 0,
+  });
   const refs = world.styleReferences;
   /** ⚠️ 风格与清单**住同一个目录** ⇒ `styleRef` 就是一个普通文件名（与 `derive` 当年的做法一字不差）。 */
   const STYLE_FILE = "stylespec.json";
@@ -325,10 +343,52 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
 
   const dir = path.join(opts.outRoot, checked.value.id, "recipes");
   fs.mkdirSync(dir, { recursive: true });
+
+  // ── 确定性路线决策（第一~四轮）────────────────────────────────────────────
+  // ⚠️ 模型给的 `source.kind` 只是**候选**；这里是唯一最终写入者。
+  const existingAssets: ExistingAsset[] = existingInputs.map((x) => {
+    let accessible = false;
+    try {
+      const abs = path.resolve(dir, x.ref);
+      accessible = fs.existsSync(abs) && fs.statSync(abs).isFile();
+    } catch { accessible = false; }
+    return { ...x, accessible };
+  });
+  const decisions = checked.value.assets.map((entry) => {
+    const existing = existingAssets.find((a) => a.id === entry.spec.id);
+    const decision = resolveRoute({
+      spec: entry.spec, context: { design, visualWorld: world },
+      capabilities, existingAssets, candidate: entry.source.kind,
+    });
+    if (!decision.ok)
+      throw new CommandError(
+        decision.failure === "capability" ? "usage" : "invalid",
+        `资源 "${entry.spec.id}" 的路线决策失败（${decision.failure}）：${decision.message}`,
+        ledgerCarrying(call.record()),
+      );
+    // ⚠️ 参考图能力：协议不支持时在**规划期**拒（不把已知问题推到 pack）。
+    if (decision.route === "image" && opts.imageTransport?.protocol === "dashscope-mcp" &&
+        (entry.spec.masterAsset !== undefined || (entry.source.kind === "image" && entry.source.reference !== undefined)))
+      throw new CommandError(
+        "usage",
+        `资源 "${entry.spec.id}" 需要参考图/母版，而 image 协议 \`dashscope-mcp\` 不支持参考图`,
+        ledgerCarrying(call.record()),
+      );
+    return { entry, decision, source: sourceForDecision(entry.source as AssetSource, decision, existing) };
+  });
+  const finalRecipe = { ...checked.value, assets: decisions.map(({ entry, source }) => ({ spec: entry.spec, source })) };
+  const finalChecked = parseRecipe(finalRecipe);
+  if (!finalChecked.ok)
+    throw new CommandError(
+      "invalid",
+      `路线改写后的清单不过契约：${finalChecked.errors.slice(0, 4).join("；")}`,
+      ledgerCarrying(call.record()),
+    );
+
   // ⚠️ 落盘的风格是**这个世界的 `style` 子树**（R6 说的那个「兼容载体」）—— 它原样就是一份
   //   `StyleSpec`，所以配方契约与 `pack` 都**一行不用改**。
   fs.writeFileSync(path.join(dir, STYLE_FILE), JSON.stringify(world.style, null, 2) + "\n");
-  const out: Record<string, unknown> = { ...checked.value, styleRef: STYLE_FILE };
+  const out: Record<string, unknown> = { ...finalChecked.value, styleRef: STYLE_FILE };
   if (refs.length > 0) {
     // ⚠️ 风格参考图**拷进配方目录**（与 stylespec 同款）：`referenceImage` 是**原图参与生图**的唯一入口
     //   （`03 §15` 要求原图必须参与），而世界那边的路径是**相对 `visual-world.json`** 的。
@@ -343,13 +403,42 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
   const file = path.join(dir, `v${version}.json`);
   fs.writeFileSync(file, JSON.stringify(out, null, 2) + "\n");
 
+  // plan sidecar：**规划成功才有**；由 resolver 输出直接生成，不从 Recipe 反推。
+  const sidecar = {
+    format: "asset-plan/v1",
+    recipeId: finalChecked.value.id,
+    recipeVersion: version,
+    plannerVersion: "1",
+    capabilities,
+    inputs: {
+      styleRef: STYLE_FILE,
+      ...(typeof out["referenceImage"] === "string" ? { referenceImage: out["referenceImage"] } : {}),
+    },
+    assets: decisions.map(({ entry, decision }) => ({
+      id: entry.spec.id,
+      route: decision.route,
+      reason: { code: decision.reason.code, ...(decision.reason.text === undefined ? {} : { text: decision.reason.text }) },
+      inputs: decision.inputs,
+      candidate: decision.candidate,
+      participated: decision.participated,
+    })),
+  };
+  const planParsed = parseAssetPlan(sidecar);
+  if (!planParsed.ok)
+    throw new CommandError("invalid", `plan sidecar 不过契约：${planParsed.errors.slice(0, 4).join("；")}`, ledgerCarrying(call.record()));
+  const planFile = path.join(dir, `v${version}.plan.json`);
+  fs.writeFileSync(planFile, JSON.stringify(planParsed.value, null, 2) + "\n");
+
   const kinds: Record<string, number> = {};
-  for (const a of checked.value.assets) kinds[a.spec.kind] = (kinds[a.spec.kind] ?? 0) + 1;
+  for (const a of finalChecked.value.assets) kinds[a.spec.kind] = (kinds[a.spec.kind] ?? 0) + 1;
   return {
     command: "plan",
-    summary: [`清单已落盘：${rel(opts.outRoot, file)}`, `${checked.value.assets.length} 个资源（${Object.entries(kinds).map(([k, v]) => `${k}×${v}`).join(" · ")}）`],
-    data: { recipeId: checked.value.id, version, assetCount: checked.value.assets.length, kinds, ledger: asLedger(call.record()) },
-    artifacts: [{ path: rel(opts.outRoot, file), kind: "asset-recipe" }]
+    summary: [`清单已落盘：${rel(opts.outRoot, file)}`, `规划记录已落盘：${rel(opts.outRoot, planFile)}`, `${finalChecked.value.assets.length} 个资源（${Object.entries(kinds).map(([k, v]) => `${k}×${v}`).join(" · ")}）`],
+    data: { recipeId: finalChecked.value.id, version, assetCount: finalChecked.value.assets.length, kinds, plan: rel(opts.outRoot, planFile), ledger: asLedger(call.record()) },
+    artifacts: [
+      { path: rel(opts.outRoot, file), kind: "asset-recipe" },
+      { path: rel(opts.outRoot, planFile), kind: "asset-plan" },
+    ]
   };
 }
 

@@ -18,13 +18,42 @@ const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 //   所以数据走**运行时读的 JSON**、逻辑各留一份。**会漂的那部分因此只有一处。**
 const CANNED = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/upstream/canned.json"), "utf8")) as Record<string, Record<string, unknown>>;
 
+
+/** 假生图回应（v3 票 09）：动画 → N 个分离色块；背景/层 → 纯色；单物体 → 纯色底 + 一个块。 */
+function imageReply(body: Record<string, any>): Response {
+  const prompt = String(body?.contents?.[0]?.parts?.[0]?.text ?? "");
+  const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
+  const anim = n > 0;
+  const isBg = !anim && /背景|这一层|层\b/.test(prompt);
+  const w = anim ? Math.max(512, n * 128 + 64) : 480;
+  const h = anim || isBg ? 270 : 256;
+  const data = Buffer.alloc(w * h * 4);
+  const fill = (x0: number, y0: number, x1: number, y1: number, c: [number, number, number]) => {
+    for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+      const s = (y * w + x) * 4; data[s] = c[0]; data[s + 1] = c[1]; data[s + 2] = c[2]; data[s + 3] = 255;
+    }
+  };
+  fill(0, 0, w, h, isBg ? [90, 80, 70] : [255, 0, 255]);
+  if (anim) {
+    const bw = 64, gap = 64;
+    for (let k = 0; k < n; k++) {
+      const x0 = gap + k * (bw + gap);
+      fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
+    }
+  } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
+  return {
+    ok: true, status: 200,
+    json: async () => ({ candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: encodePNG({ width: w, height: h, data }).toString("base64") } }] } }] }),
+    text: async () => "",
+  } as unknown as Response;
+}
+
 /**
  * 一份**带生图资源**的清单（票 40 的检查点用例）—— 在骨架那 4 条 drawlist 之上再添四类。
  *
- * ⚠️ 数字是**故意挑开的**：3 个 image 源**资产** → **9 次**生图**调用**
- *   （3 个动画 · 1 个单帧 · 3 层背景 · 2 张生图母版；另有一个 `import` 源资产与一张 `import`
- *   母版 —— 那是人给的图，**一次调用都不发**）。
- *   ⇒ 「资产数」与「调用数」在这份夹具里**明确不相等**，报错那个就会当场红。
+ * ⚠️ v3 票 09 后，模型清单里的 **bg-dusk / p-body** 也会被 resolver 覆盖为 image。
+ *   ⇒ 最终 image 调用 = p-body 3 路 + bg-dusk 1 + scavenger 3 路 + bg-waste 3 层 + crate 1 + 母版 2 = **13 次**。
+ *   ⚠️ `import` 源不再出现在 create 链夹具里（第一轮 Q4：create 链不提供 existingAssets）。
  */
 function imageHeavyRecipe(): Record<string, unknown> {
   const base = structuredClone(CANNED["recipe"]!) as { assets: unknown[] };
@@ -41,13 +70,10 @@ function imageHeavyRecipe(): Record<string, unknown> {
         source: { kind: "image" } },
       { spec: { kind: "sprite", id: "crate", role: "木箱", description: "可推的箱子", ...C, anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 } },
         source: { kind: "image" } },
-      { spec: { kind: "sprite", id: "ported", role: "人给的图", description: "人手导入的", ...C, anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 } },
-        source: { kind: "import", ref: "art/ported.png" } },
     ],
     authoring: [
       { id: "m-scavenger", role: "母版", description: "拾荒者的母版", source: { kind: "image" }, characterId: "p-scavenger", size: { w: 32, h: 48 } },
       { id: "m-drone", role: "母版", description: "无人机的母版", source: { kind: "image" }, characterId: "e-drone", size: { w: 32, h: 32 } },
-      { id: "m-ported", role: "母版", description: "人手给的母版", source: { kind: "import", ref: "art/m.png" }, characterId: "p-scavenger", size: { w: 32, h: 48 } },
     ],
   };
 }
@@ -86,6 +112,7 @@ function fakeUpstream(over: {
   const json = (body: unknown) => ({ ok: true, status: 200, json: async () => body, text: async () => JSON.stringify(body) }) as Response;
   return (async (_url: string, init: RequestInit) => {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    if (body["generationConfig"] !== undefined) return imageReply(body);
     if (body["tools"] !== undefined) {
       const name = (body["tool_choice"] as { name: string }).name;
       const input = name === "emit_asset_recipe" ? { ...(over.recipe ?? CANNED["recipe"]), id: over.recipeId } : TOOL[name];
@@ -138,7 +165,12 @@ function stage(over: {
   fs.writeFileSync(intent, "做一个废土横版寻宝游戏\n第二行\n");
   const deps: CliDeps = {
     fetchImpl: fakeUpstream({ recipeId: "wasteland", ...over }),
-    env: { ANTHROPIC_BASE_URL: "http://up.test", ANTHROPIC_AUTH_TOKEN: "k" },
+    env: {
+      ANTHROPIC_BASE_URL: "http://up.test", ANTHROPIC_AUTH_TOKEN: "k",
+      GAME_MAKER_IMAGE_PROTOCOL: "gemini",
+      GAME_MAKER_IMAGE_BASE_URL: "http://up.test",
+      GAME_MAKER_IMAGE_API_KEY: "k",
+    },
     cwd: ROOT,
   };
   return { cwd, outRoot: path.join(cwd, "out"), deps, style, intent };
@@ -158,14 +190,14 @@ describe("§`--intent` 收两种东西（票 16 的 Q3；票 09 定的方向）"
     const s = stage();
     const text = "做一个废土横版寻宝游戏\n第二行带着空格  \n";
     const r = await runC(["create", "--style", s.style, "--intent", text, "--out", s.outRoot], s.deps);
-    expect(r.code).toBe(EXIT.ok);
+    expect(r.code, r.text()).toBe(EXIT.ok);
     expect(fs.readFileSync(path.join(s.outRoot, "wasteland", "run", "v1", "intent.md"), "utf8")).toBe(text);
   });
 
   it("`.md` 路径存在 ⇒ **读那个文件**（逐字节）", async () => {
     const s = stage();
     const r = await runC(create(s), s.deps);
-    expect(r.code).toBe(EXIT.ok);
+    expect(r.code, r.text()).toBe(EXIT.ok);
     expect(fs.readFileSync(path.join(s.outRoot, "wasteland", "run", "v1", "intent.md"), "utf8"))
       .toBe("做一个废土横版寻宝游戏\n第二行\n");
   });
@@ -188,11 +220,11 @@ describe("§检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8�
   it("退出码 **0**（这一步是成功的），而 `status` 说得出「还等着你」", async () => {
     const s = stage();
     const r = await runC(create(s, ["--json"]), s.deps);
-    expect(r.code).toBe(EXIT.ok);
+    expect(r.code, r.text()).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
     expect(d["status"]).toBe("awaiting");
-    expect(d["imageCalls"]).toBe(0);                 // 夹具那份清单全是 drawlist ⇒ 下一步不花钱
-    expect(d["imageCallBreakdown"]).toEqual({ animation: 0, single: 0, background: 0, master: 0 });
+    expect(d["imageCalls"]).toBe(4);                 // resolver 后 bg-dusk 1 + p-body 3（票 09）
+    expect(d["imageCallBreakdown"]).toEqual({ animation: 3, single: 1, background: 0, master: 0 });
     expect(String(d["runDir"])).toBe("wasteland/run/v1");
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "pack"))).toBe(false);   // 停住了
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "site"))).toBe(false);
@@ -209,18 +241,18 @@ describe("§检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8�
   // ⚠️⚠️ **本票（40）的主判据**：检查点报的必须是**生图调用次数**，不是 image 源**资产**数。
   //   期望值**写死在这里**（不由 `imageCallsOf` 推出来 —— 那会变成同一份实现自证）。
   //   「它真被 `pack` 用上了」那半边由 `assets/tests/recipes-sweep.test.ts` 的 `told` 兜着。
-  it("⚠️⚠️ **报的是调用次数**：3 个 image 源资产 = **9 次**（动画 3 · 单帧 1 · 背景层 3 · 母版 2）", async () => {
+  it("⚠️⚠️ **报的是 resolver 后的调用次数**：**13 次**（动画 6 · 单帧 2 · 背景层 3 · 母版 2）", async () => {
     const s = stage({ recipe: imageHeavyRecipe() });
     const r = await runC(create(s, ["--json"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
-    expect(d["assetCount"]).toBe(8);                 // 4 条骨架 + 4 条新加的
-    expect(d["imageCalls"]).toBe(9);                 // ⚠️ **不是 3**（image 源资产数），也不是 8（资源总数）
-    expect(d["imageCallBreakdown"]).toEqual({ animation: 3, single: 1, background: 3, master: 2 });
+    expect(d["assetCount"]).toBe(7);                 // 4 条骨架 + 3 条新加的（import 已移出 create 夹具）
+    expect(d["imageCalls"]).toBe(13);                // ⚠️ resolver 后：p-body 3 + bg-dusk 1 + scavenger 3 + bg-waste 3 + crate 1 + 母版 2
+    expect(d["imageCallBreakdown"]).toEqual({ animation: 6, single: 2, background: 3, master: 2 });
     // ⚠️ 旧字段**真的走了**（留着它 = 同一份 `data` 里两个「都在说生图数量」的字段）
     expect(d["imageAssetCount"]).toBeUndefined();
     // 人看的那一行：分类 + 那句「这是上限」
-    expect(r.text()).toMatch(/\*\*预计 9 次生图调用\*\*（动画 3 次 · 单帧 1 次 · 背景层 3 层 · 母版 2 张）/);
+    expect(r.text()).toMatch(/\*\*预计 13 次生图调用\*\*（动画 6 次 · 单帧 2 次 · 背景层 3 层 · 母版 2 张）/);
     expect(r.text()).toMatch(/清单完整派发时的上限/);
   });
 
@@ -247,10 +279,10 @@ describe("§`--yes`：一路跑到站点（票 16 的 Q6），三条产物**同�
   it("run / pack / site 都是 v1，且 `status = complete`", async () => {
     const s = stage();
     const r = await runC(create(s, ["--yes", "--json"]), s.deps);
-    expect(r.code).toBe(EXIT.ok);
+    expect(r.code, r.text()).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
     expect(d["status"]).toBe("complete");
-    expect(d["imageCalls"]).toBe(0);              // ⚠️ `createComplete` 那一份**也**报这把尺子（票 40）
+    expect(d["imageCalls"]).toBe(4);              // resume 后 resolver 的最终路线（票 09）
     expect(d["runVersion"]).toBe(1);
     expect(d["packVersion"]).toBe(1);
     expect(String(d["siteDir"])).toBe("wasteland/site/v1");    // ⚠️ 父指定的那个 N
@@ -422,7 +454,7 @@ describe("§参数面：几条硬线（票 16 的 Q4/Q5）", () => {
   it("`--help` 里看得到这两条新命令（且 `--help` 本身是成功）", async () => {
     const s = stage();
     const r = await runC(["--help"], s.deps);
-    expect(r.code).toBe(EXIT.ok);
+    expect(r.code, r.text()).toBe(EXIT.ok);
     expect(r.text()).toMatch(/game-maker create --style/);
     expect(r.text()).toMatch(/game-maker build/);
   });
@@ -439,8 +471,8 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const s = stage({ delayMs: 12, probe });
     const r = await runC(create(s, ["--yes", "--concurrency-image", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(4);   // 4 个 drawlist 资源 = 4 次文本调用（这一版没有生图资源）
-    expect(probe.peak()).toBe(4);    // ⚠️ **不是 2** —— 那正是票 41 之前那四处代码写出来的东西
+    expect(probe.total()).toBe(2);   // 只剩 2 个 UI drawlist（bg/p-body 已被 resolver 覆盖为 image）
+    expect(probe.peak()).toBe(2);    // 2 个 drawlist 都并发
   });
 
   it("⚠️ 而 `--concurrency 2` ⇒ 峰值 **2**（同一个数两边都用 —— 原义一个字没变）", async () => {
@@ -448,7 +480,7 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const s = stage({ delayMs: 12, probe });
     const r = await runC(create(s, ["--yes", "--concurrency", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(4);
+    expect(probe.total()).toBe(2);
     expect(probe.peak()).toBe(2);
   });
 
@@ -457,7 +489,7 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const s = stage({ delayMs: 12, probe });
     const r = await runC(create(s, ["--yes", "--concurrency", "3", "--concurrency-image", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.peak()).toBe(3);
+    expect(probe.peak()).toBe(2);
   });
 
   it("参数面：`--concurrency-image 0` ⇒ 参数错（2），且文案点名**给的那个 flag**", async () => {
@@ -478,7 +510,7 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const runDir = path.join(s.outRoot, "wasteland", "run", "v1");
     const r = await runC(["build", runDir, "--out", s.outRoot, "--concurrency", "2"], s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(4);
+    expect(probe.total()).toBe(2);
     expect(probe.peak()).toBe(2);
   });
 });
@@ -508,7 +540,55 @@ describe("§`pack` 也走同一个解析（票 41 的 Q4）", () => {
     const recipe = path.join(s.outRoot, "wasteland", "run", "v1", "asset-recipe.json");
     const r = await runC(packOf(s, recipe, ["--concurrency-image", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(4);
-    expect(probe.peak()).toBe(4);           // ⚠️ 不是 2
+    expect(probe.total()).toBe(2);
+    expect(probe.peak()).toBe(2);           // 只有 2 个 drawlist
+  });
+});
+
+// ── v3 票 09：plan 的三档退出码（usage 2 / invalid 4 / upstream 3）────────────
+describe("§v3 09 · plan 退出码与 sidecar", () => {
+  const planStage = () => {
+    const s = stage();
+    const design = path.join(s.cwd, "design.json");
+    const world = path.join(s.cwd, "world.json");
+    fs.writeFileSync(design, JSON.stringify(CANNED["design"]));
+    fs.writeFileSync(world, JSON.stringify({ ...CANNED["visualWorld"]!, styleReferences: [{ path: "style.png" }] }));
+    const argv = (out: string) => ["plan", "--design", design, "--visual-world", world, "--out", out, "--json"];
+    return { s, argv };
+  };
+
+  it("阳性：plan 成功（0），artifacts 里有 sidecar", async () => {
+    const { s, argv } = planStage();
+    const r = await runC(argv(s.outRoot), s.deps);
+    expect(r.code, r.text()).toBe(EXIT.ok);
+    const d = jsonOf(r.io);
+    expect(d.artifacts?.some((a) => a.kind === "asset-plan")).toBe(true);
+    expect(fs.existsSync(path.join(s.outRoot, "wasteland", "recipes", "v1.plan.json"))).toBe(true);
+  });
+
+  it("能力缺失：无 image transport ⇒ usage(2)，不产 sidecar", async () => {
+    const { s, argv } = planStage();
+    const emptyCwd = fs.mkdtempSync(path.join(os.tmpdir(), "gm-no-image-"));
+    const deps: CliDeps = { ...s.deps, cwd: emptyCwd, env: { ANTHROPIC_BASE_URL: "http://up.test", ANTHROPIC_AUTH_TOKEN: "k" } };
+    const r = await runC(argv(s.outRoot), deps);
+    expect(r.code).toBe(EXIT.usage);
+    expect(fs.existsSync(path.join(s.outRoot, "wasteland", "recipes", "v1.plan.json"))).toBe(false);
+  });
+
+  it("语义不合格：UI 候选 import（无 ref）⇒ invalid(4)", async () => {
+    const { s, argv } = planStage();
+    const bad = structuredClone(CANNED["recipe"]!) as { assets: any[] };
+    bad.assets.find((a) => a.spec.id === "ui-pip")!.source = { kind: "import", ref: "x.png" };
+    const deps: CliDeps = { ...s.deps, fetchImpl: fakeUpstream({ recipeId: "wasteland", recipe: bad }) };
+    const r = await runC(argv(s.outRoot), deps);
+    expect(r.code).toBe(EXIT.invalid);
+    expect(fs.existsSync(path.join(s.outRoot, "wasteland", "recipes", "v1.plan.json"))).toBe(false);
+  });
+
+  it("上游失败：文本 500 ⇒ upstream(3)", async () => {
+    const { s, argv } = planStage();
+    const deps: CliDeps = { ...s.deps, fetchImpl: (async () => new Response("boom", { status: 500 })) as unknown as typeof fetch };
+    const r = await runC(argv(s.outRoot), deps);
+    expect(r.code).toBe(EXIT.upstream);
   });
 });

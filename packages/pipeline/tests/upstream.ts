@@ -30,6 +30,36 @@ const TOOL_INPUT: Record<string, unknown> = {
   emit_character_dna: CANNED.characterDna, emit_game_config: CANNED.gameConfig,
 };
 
+
+/** 一张**合法**的假生图回应（v3 票 09 后 bg / 动画硬信号都走 image）。
+ *
+ * ⚠️ 按提示词分三种：动画分解图 → N 个分离色块；背景/层 → 整张纯色；单物体 → 纯色底 + 一个块。
+ *   这不是判据，只是让 pack 的抠底/分块/量化走通。
+ */
+const imageReply = (body: Record<string, any>) => {
+  const prompt = String(body?.contents?.[0]?.parts?.[0]?.text ?? "");
+  const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
+  const anim = n > 0;
+  const isBg = !anim && /背景|这一层|层\b/.test(prompt);
+  const w = anim ? Math.max(512, n * 128 + 64) : 480;
+  const h = anim || isBg ? 270 : 256;
+  const data = Buffer.alloc(w * h * 4);
+  const fill = (x0: number, y0: number, x1: number, y1: number, c: [number, number, number]) => {
+    for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+      const s = (y * w + x) * 4; data[s] = c[0]; data[s + 1] = c[1]; data[s + 2] = c[2]; data[s + 3] = 255;
+    }
+  };
+  fill(0, 0, w, h, isBg ? [90, 80, 70] : [255, 0, 255]);
+  if (anim) {
+    const bw = 64, gap = 64;
+    for (let k = 0; k < n; k++) {
+      const x0 = gap + k * (bw + gap);
+      fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
+    }
+  } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
+  return { candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: encodePNG({ width: w, height: h, data }).toString("base64") } }] } }] };
+};
+
 const json = (body: unknown, status = 200) =>
   ({ ok: status < 400, status, json: async () => body, text: async () => JSON.stringify(body) }) as Response;
 
@@ -66,6 +96,8 @@ export function fakeUpstream(opts: UpstreamOptions): typeof fetch {
   return (async (_url: string, init: RequestInit) => {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
     opts.seen?.push(body);
+    // 生图那一支（v3 票 09 后 bg / 动画硬信号都走 image）
+    if (body["generationConfig"] !== undefined) return json(imageReply(body));
     if (body["tools"] === undefined) {
       // drawlist 那一支（`content` 是**一个字符串**，与理解层那五发的块数组不同）
       const content = (body["messages"] as { content: unknown }[])[0]!.content;
