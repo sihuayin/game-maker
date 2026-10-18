@@ -761,7 +761,9 @@ export const PLAN_TOOL_DESCRIPTION = `输出一份 AssetRecipe（asset-recipe/v1
    它**不进交付包**，是给同角色的资产当「参考图」用的。资产的 \`masterAsset\` 指它的 \`id\`。
    ⚠️ **母版的 \`size\` 是画布**（不是缩放目标），而它与引用它的资产的 \`size\` **宽高比必须一致**
    —— 否则同一个角色会有两套头身比。
-   ⚠️ 母版**不必每份清单都有**；但只要你写了，就必须有资产指着它（否则它是一张没有入边的表）。
+   ⚠️ **每个写了 \`characterId\` 的 \`animation\` 都必须有一张母版，且 \`masterAsset\` 指向它** ——
+   这是 DNA → 母版 → 动画那条链的入口；其余资源不必有母版。
+   反过来，只要你写了母版，就必须有资产指着它（否则它是一张没有入边的表）。
 
 5. \`dependsOn\` 是**资产 → 资产**的顺序边：写**别的资产的 \`id\`**。
    ⚠️ 不许指向母版（那一类边由 \`masterAsset\` 表达）· 不许指向自己 · **整张图不许有环**。
@@ -864,11 +866,13 @@ ${worldBrief(vws)}
     "styleId":"${echo.styleId}","anchor":{"x":0..1,"y":0..1},"size":{"w":int,"h":int},
     "required":true,
     "characterId":"<设计层那个实体的 id，属于角色的资产才写>",
-    "masterAsset":"<authoring[] 里那张母版的 id，用母版才写>",
+    "masterAsset":"<authoring[] 里那张母版的 id —— 带 characterId 的 animation 必填>",
     "dependsOn":["<别的资产 id，要先造完它才轮到这一条>"],
     "animations":[{"name":"...","frames":int,"fps":num,"loop":bool}]},
    "source":{"kind":"drawlist|image|import"}}]}
-⚠️ \`authoring[]\` **只有真给了母版才写**（没写它就得把 \`masterAsset\` 也去掉 —— 指过去而那边没有，是拒绝）。
+⚠️ **每个写了 \`characterId\` 的 \`animation\` 都要写一张母版（\`authoring[]\`）并让 \`masterAsset\` 指向它** ——
+   母版画布的比例必须与那个动画的 \`size\` 一致。planner 会兜底补齐漏写的，但多花一次生图的仍是这一份清单。
+⚠️ 母版只给**角色**：其余资源不要写 \`authoring[]\`，也不要写 \`masterAsset\`（指过去而那边没有，是拒绝）。
 
 ⚠️ \`anchor\` 是这件资源的**参考点**（归一化 0..1），**不是左上角** ——
   配置那一步把 \`at\` 写成「**这个点**落在哪儿」。⇒ **你在这里选什么锚点，那边就得按它写 \`at\`。**

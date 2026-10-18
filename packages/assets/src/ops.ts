@@ -26,6 +26,7 @@ import { backgroundCoverage } from "./coverage.js";
 import { buildAssetPack, normalizePalette } from "./pack.js";
 import { createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator, ImageGenerationError, type ImageGenerator } from "./image-gen.js";
 import { masterRatioNotes, referenceImagesOf } from "./master.js";
+import { ensureCharacterMasters } from "./planner-masters.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
@@ -354,7 +355,17 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     } catch { accessible = false; }
     return { ...x, accessible };
   });
-  const decisions = checked.value.assets.map((entry) => {
+  // ── 票 03：**母版兜底**（在路线决策之前）────────────────────────────────────
+  // ⚠️ B 跑量到 3 个角色、0 张母版：提示词当时逐字允许省略（「母版不必每份清单都有」），
+  //   而链上的 DNA → 母版 → 动画**没有任何一步要求它必须存在**。这里按票面补成确定性的：
+  //   每个带 `characterId` 的 animation 都必须指着一张本角色、同比例的母版。
+  // ⚠️ **import 的 mustReuse 资产不补**：那一路用的是人给的位图，`masterAsset` 在那里没有意义。
+  //   放在决策**之前**，是为了让 resolver 的 `inputs.masterAsset` 与随后的能力检查都看见这条边。
+  const withMasters = ensureCharacterMasters(checked.value, {
+    skipAssetIds: new Set(existingAssets.filter((a) => a.mustReuse).map((a) => a.id)),
+  });
+
+  const decisions = withMasters.assets.map((entry) => {
     const existing = existingAssets.find((a) => a.id === entry.spec.id);
     const decision = resolveRoute({
       spec: entry.spec, context: { design, visualWorld: world },
@@ -376,7 +387,7 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
       );
     return { entry, decision, source: sourceForDecision(entry.source as AssetSource, decision, existing) };
   });
-  const finalRecipe = { ...checked.value, assets: decisions.map(({ entry, source }) => ({ spec: entry.spec, source })) };
+  const finalRecipe = { ...withMasters, assets: decisions.map(({ entry, source }) => ({ spec: entry.spec, source })) };
   const finalChecked = parseRecipe(finalRecipe);
   if (!finalChecked.ok)
     throw new CommandError(

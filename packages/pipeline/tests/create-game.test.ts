@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type CharacterDNAFile, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, decodePNG, encodePNG, framePlan, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
@@ -134,7 +134,8 @@ describe("§第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15）", 
     expect(steps.has("analyze-reference"), "理解段在").toBe(true);
     expect(steps.has("drawlist"), "构建段在").toBe(true);
     const packed = readJson(path.join(b.paths.packDir, "ledger.json")) as { calls: { step: string }[] };
-    expect([...new Set(packed.calls.map((c) => c.step))].sort()).toEqual(["drawlist", "image"]);   // resolver 后 bg/p-body 走 image
+    // 票 03：p-body 带 characterId ⇒ planner 补了一张母版 ⇒ 包里多一个 `master` 步骤
+    expect([...new Set(packed.calls.map((c) => c.step))].sort()).toEqual(["drawlist", "image", "master"]);
   });
 
   it("旧 run 没有 sidecar ⇒ build 照常（pack 不读它；不推断历史理由）", async () => {
@@ -182,6 +183,8 @@ describe("§invariant 2 · 构建 attempt 的版本", () => {
     const res = await buildAssetPack({
       recipe: readJson(path.join(u.run.dir, "asset-recipe.json")) as unknown as AssetRecipe,
       style, outDir: out, recipeDir: u.run.dir, version: 7,
+      // 票 03：清单里现在带着母版（planner 兜底补的）⇒ 母版是 DNA 的渲染图，必须给基因
+      characterDna: readJson(path.join(u.run.dir, "character-dna.json")) as unknown as CharacterDNAFile,
       // ⚠️ 帧数要与 `framePlan` 对得上（`p-body` 是 6 帧：三路动画各 2 帧 —— 票 61 的 Q3(ii)
       //   「每路至少 2 帧」把这份桩从「各 1 帧」改成了「各 2 帧」）—— 给少了会当场拒
       generate: ((spec: AssetSpec) => framePlan(spec).map((f) => ({

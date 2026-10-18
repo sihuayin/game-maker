@@ -223,8 +223,8 @@ describe("§检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8�
     expect(r.code, r.text()).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
     expect(d["status"]).toBe("awaiting");
-    expect(d["imageCalls"]).toBe(4);                 // resolver 后 bg-dusk 1 + p-body 3（票 09）
-    expect(d["imageCallBreakdown"]).toEqual({ animation: 3, single: 1, background: 0, master: 0 });
+    expect(d["imageCalls"]).toBe(5);                 // resolver 后 bg-dusk 1 + p-body 3 + 母版 1（票 09 · 票 03）
+    expect(d["imageCallBreakdown"]).toEqual({ animation: 3, single: 1, background: 0, master: 1 });
     expect(String(d["runDir"])).toBe("wasteland/run/v1");
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "pack"))).toBe(false);   // 停住了
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "site"))).toBe(false);
@@ -282,7 +282,7 @@ describe("§`--yes`：一路跑到站点（票 16 的 Q6），三条产物**同�
     expect(r.code, r.text()).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
     expect(d["status"]).toBe("complete");
-    expect(d["imageCalls"]).toBe(4);              // resume 后 resolver 的最终路线（票 09）
+    expect(d["imageCalls"]).toBe(5);              // resume 后 resolver 的最终路线 + 母版兜底（票 09 · 票 03）
     expect(d["runVersion"]).toBe(1);
     expect(d["packVersion"]).toBe(1);
     expect(String(d["siteDir"])).toBe("wasteland/site/v1");    // ⚠️ 父指定的那个 N
