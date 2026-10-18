@@ -8,7 +8,7 @@
 //
 // 也就是说：模型不按格子排版，但它会在角色之间留干净的缝。切法要跟着这个事实走。
 import { emptyImage, type RasterImage } from "./image.js";
-import { cropToBox, type Box } from "./import.js";
+import { cropToBox, foregroundBlocks, sliceGrid, type Box } from "./import.js";
 
 export type SegmentOptions = {
   /** alpha 下限，与 `trimToInk` 同一把尺子。 */
@@ -177,4 +177,91 @@ export function segmentRowCells(img: RasterImage, probe: RasterImage, opts: Segm
     throw new Error(`segmentRowCells: probe(${probe.width}×${probe.height}) 与 img(${img.width}×${img.height}) 不同尺寸 —— 它们是同一张图抠前与抠后`);
   const boxes = segmentRow(probe, opts);
   return { cells: cellsFromBoxes(img, boxes), boxes };
+}
+
+/**
+ * 把**生成出来的**固定网格图按 `columns × rows` 切 —— 票 01。
+ *
+ * ⚠️ 与 `sliceGrid`（导入通道）**不是同一个入口**：那一份的输入是人用工具排的 sheet
+ *   （格宽/间距/偏移都写得出来），而这里只有「几列几行」—— 格子大小由**回来的图**定。
+ *   上游按 aspect 表回尺寸，**不必整除**（实测 Gemini 常态），所以余下的边缘像素**居中让掉**，
+ *   而不是让最后一格窄 1 像素（那会让 `importFrames` 的共用裁框错位）。
+ *
+ * 返回**行优先**：`frames[row * columns + column]`，与 `framePlan` 的顺序一致。
+ */
+export function sliceGridCells(img: RasterImage, spec: { columns: number; rows: number }): RasterImage[] {
+  const { columns, rows } = spec;
+  if (![columns, rows].every((v) => Number.isInteger(v) && v > 0))
+    throw new Error("sliceGridCells: columns / rows 必须是正整数");
+  if (img.width < columns || img.height < rows)
+    throw new Error(`sliceGridCells: 图 ${img.width}×${img.height} 装不下 ${columns}×${rows} 的网格`);
+  const frameWidth = Math.floor(img.width / columns);
+  const frameHeight = Math.floor(img.height / rows);
+  return sliceGrid(img, {
+    columns, rows, frameWidth, frameHeight,
+    offsetX: Math.floor((img.width - columns * frameWidth) / 2),
+    offsetY: Math.floor((img.height - rows * frameHeight) / 2),
+  });
+}
+
+/** 一格的读数**为什么不合格**。⚠️ 报文由 `pack` 拼（这里只交事实，不带资源名）。 */
+export type SheetCellIssue =
+  | { kind: "empty"; index: number; row: number; column: number }
+  | { kind: "fragmented"; index: number; row: number; column: number; blocks: number; largestShare: number }
+  | { kind: "border"; index: number; row: number; column: number; edges: { top: number; bottom: number; left: number; right: number } };
+
+/**
+ * **每格内容校验**（票 01 的人裁：严格结构）。
+ *
+ * 三条判据：
+ *  ① **空格**：一个不透明像素都没有 ⇒ 失败（模型漏画一格）。
+ *  ② **四边框**：墨同时贴住格子的上/下/左/右四条边、且每条边覆盖率 ≥ `borderCover`
+ *     ⇒ 失败。这是 C2 idle 那种「黑框」的形状：角色自身贴一条边是构图，**四条边**同时贴住
+ *     只可能是画框 / 画溢出格。
+ *  ③ **多主体/碎片**：抠底后最大连通块占比 < `minLargestShare` ⇒ 失败。
+ *     0.6 是**单帧那条已有的尺子**（`pack.ts` 的「最大块 ≥ 60%」），不是这一票新拍的数。
+ *
+ * ⚠️ **文字**只能被 ③ 间接发现（文字是额外连通块）。小号标注（C2 的 `48:1`）在 60% 这条线
+ *   底下可能漏过 —— 没有 OCR 就不假装能判；提示词那一侧已经逐字禁止编号/文字。
+ * ⚠️ 输入必须是**抠过背景**的那一份（alpha 才是墨），与 `segmentRowCells` 的探针同款。
+ */
+export function auditSheetCells(
+  cells: readonly RasterImage[],
+  opts: { columns: number; rows: number; minLargestShare?: number; borderCover?: number },
+): SheetCellIssue[] {
+  const { columns, rows, minLargestShare = 0.6, borderCover = 0.5 } = opts;
+  if (![columns, rows].every((v) => Number.isInteger(v) && v > 0))
+    throw new Error("auditSheetCells: columns / rows 必须是正整数");
+  if (cells.length !== columns * rows)
+    throw new Error(`auditSheetCells: 给了 ${cells.length} 格，但网格是 ${columns}×${rows} = ${columns * rows} 格`);
+
+  const ink = (img: RasterImage, x: number, y: number): boolean => img.data[(y * img.width + x) * 4 + 3]! >= 128;
+  /** 四条边的墨覆盖率（分母是该边的长度）。 */
+  const edgeCover = (img: RasterImage) => {
+    let top = 0, bottom = 0, left = 0, right = 0;
+    for (let x = 0; x < img.width; x++) {
+      if (ink(img, x, 0)) top++;
+      if (ink(img, x, img.height - 1)) bottom++;
+    }
+    for (let y = 0; y < img.height; y++) {
+      if (ink(img, 0, y)) left++;
+      if (ink(img, img.width - 1, y)) right++;
+    }
+    return { top: top / img.width, bottom: bottom / img.width, left: left / img.height, right: right / img.height };
+  };
+
+  const issues: SheetCellIssue[] = [];
+  cells.forEach((cell, index) => {
+    const row = Math.floor(index / columns), column = index % columns;
+    const blocks = foregroundBlocks(cell);
+    if (blocks.total === 0) { issues.push({ kind: "empty", index, row, column }); return; }
+    const edges = edgeCover(cell);
+    if (Math.min(edges.top, edges.bottom, edges.left, edges.right) >= borderCover) {
+      issues.push({ kind: "border", index, row, column, edges });
+      return;
+    }
+    if (blocks.largestShare < minLargestShare)
+      issues.push({ kind: "fragmented", index, row, column, blocks: blocks.areas.length, largestShare: blocks.largestShare });
+  });
+  return issues;
 }

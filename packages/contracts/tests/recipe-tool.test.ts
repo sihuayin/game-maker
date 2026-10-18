@@ -7,7 +7,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { AssetRecipe, parseRecipe, toolInputSchema, type AssetRecipe as Recipe } from "../src/index.js";
+import { AssetRecipe, parseRecipe, toolInputSchema, type AssetRecipe as Recipe, type AssetSpec } from "../src/index.js";
 import { RecipeToolSchema } from "../src/recipe-tool.js";
 
 const RECIPE_DIR = fileURLToPath(new URL("../../../fixtures/recipes/", import.meta.url));
@@ -94,6 +94,17 @@ describe("§镜像与契约**行为一致**（漂移测试）", () => {
     expect(tiers4).toEqual(tiers3);
   });
 
+  it("⚠️ 固定网格 `sheet`：合法形状两份都过（票 01）", () => {
+    // ⚠️ 网格是**逐动画**的；镜像必须认得这个键，否则模型根本写不出它
+    //   （`toJSONSchema` 只转形状，跨字段的 cols×rows === frames 由 v3 的 superRefine 判）。
+    const r = clone("last-train.json");
+    const anim = r.assets.find((e) => e.spec.kind === "animation")!.spec as Extract<AssetSpec, { kind: "animation" }>;
+    anim.animations = anim.animations.map((a) => ({ ...a, sheet: { columns: 1, rows: a.frames } }));
+    expect(v3(r)).toBe(true);
+    expect(v4(r)).toBe(true);
+    expect(agree(r)).toBe(true);
+  });
+
   it("两份对**垃圾输入**的口径一致（`null` / 数组 / 空对象 / 字符串）", () => {
     for (const junk of [null, 1, "x", [], {}, { format: "asset-recipe/v1" }]) expect(agree(junk)).toBe(true);
   });
@@ -149,7 +160,7 @@ describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像�
     // ⚠️ 这一条与那四条**有一处不同**：它是**新加的一条判据**，不是「本来就有的判据没镜像」。
     //   票 46 量到它只住在**交付侧**（`AssetPackEntry.superRefine`），创作侧放它过去 ⇒
     //   一份产不出合法包的配方，**走到花完钱之后**才被拒。票 58 把它补在了
-    //   `AssetSpecSchema.superRefine` 的 union 层 —— 于是**明示例外从四条变成五条**。
+    //   `AssetSpecSchema.superRefine` 的 union 层 —— 于是**明示例外从四条变成七条**。
     const r = clone("last-train.json");
     const spec = r.assets.find((a) => a.spec.kind === "background")!.spec as { layers?: { name: string }[] };
     spec.layers![0]!.name = spec.layers![1]!.name; // 两层同名
@@ -168,6 +179,17 @@ describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像�
     expect(v3(r)).toBe(false);
     expect(v4(r)).toBe(true);
   });
+
+  it("⑦ `sheet` 网格与 frames 不一致 —— v3 拒，镜像放行（superRefine 不进 JSON Schema）", () => {
+    // ⚠️ 与上面几条同款：`toJSONSchema` 静默丢掉 `superRefine` ⇒ 模型看见的只有形状。
+    //   把跨字段判据在两种方言里各写一遍就是漂移，所以它只住在 v3。
+    const r = clone("shift-change.json");
+    const anim = r.assets[0]!.spec as Extract<AssetSpec, { kind: "animation" }>;
+    anim.animations = [{ name: "idle", frames: 4, loop: true, sheet: { columns: 3, rows: 2 } }];
+    expect(v3(r)).toBe(false);
+    expect(v4(r)).toBe(true);
+  });
+
 });
 
 describe("§镜像存在的**全部理由**：`toolInputSchema` 转得动它", () => {

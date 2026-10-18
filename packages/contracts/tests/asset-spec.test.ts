@@ -140,6 +140,28 @@ describe("按类的硬要求", () => {
     //   「阳性也过」这件事**在同一个用例里**看得见（否则它只是一条恒假判据的反面）。
     expect(AssetSpecSchema.safeParse(PLAYER).success).toBe(true);
   });
+
+  it("⚠️ 固定网格：sheet 的 columns × rows 必须等于 frames（票 01）", () => {
+    // ⚠️ 网格是**逐动画**的：一个动画就是一次生图调用（`imageUnitsOf`），
+    //   所以 cols×rows 必须与这个动画自己的 frames 对齐；不可满足的清单不能进付费跑。
+    const grid = { ...PLAYER, animations: [{ name: "walk", frames: 4, sheet: { columns: 2, rows: 2 } }] };
+    expect(AssetSpecSchema.safeParse(grid).success).toBe(true);
+
+    const bad = { ...PLAYER, animations: [{ name: "walk", frames: 4, sheet: { columns: 3, rows: 2 } }] };
+    const r = AssetSpecSchema.safeParse(bad);
+    expect(r.success).toBe(false);
+    if (!r.success) expect(r.error.issues.map((i) => i.message).join()).toMatch(/sheet 网格 3×2 = 6 格.*frames=4/);
+
+    // 阳性对照：旧清单（无 `sheet`）照旧过 —— 旧路径一字不改
+    expect(AssetSpecSchema.safeParse(PLAYER).success).toBe(true);
+  });
+
+  it("⚠️ sheet 只认 columns / rows 两个正整数 —— 多余键与 0 都拒", () => {
+    const withExtra = { ...PLAYER, animations: [{ name: "walk", frames: 4, sheet: { columns: 2, rows: 2, frameWidth: 8 } }] };
+    expect(AssetSpecSchema.safeParse(withExtra).success).toBe(false);
+    const zero = { ...PLAYER, animations: [{ name: "walk", frames: 4, sheet: { columns: 0, rows: 2 } }] };
+    expect(AssetSpecSchema.safeParse(zero).success).toBe(false);
+  });
 });
 
 describe("UI 九宫格：中央区不能空", () => {

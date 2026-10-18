@@ -437,13 +437,25 @@ function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: stri
   const anim = animName === undefined ? spec.animations[0]! : spec.animations.find((a) => a.name === animName);
   if (!anim) throw new Error(`spec 里没有动画 "${animName}"`);
   const n = anim.frames;
-  const total = spec.animations.reduce((s, a) => s + a.frames, 0);
-  return `画一张**横排的游戏角色动画分解图**：横向排开 **${n} 个**格子，每格画同一个角色在
-「${anim.name}」这组动作里一个连续瞬间的样子。整张图共 ${n} 个角色，不多不少。
+  // ── 票 01：**固定网格**与旧的「横排一排」是两套排版说法 ─────────────────────
+  // ⚠️ 不能两份都留在同一段提示词里（「网格」与「横向排开」同时说，模型只执行一条 ——
+  //   这一支已经吃过一次「4 个角色 + 只有 1 个物体」的亏）。省略 `sheet` ⇒ 旧文字**逐字不变**。
+  const sheet = anim.sheet;
+  const layout = sheet === undefined
+    ? `画一张**横排的游戏角色动画分解图**：横向排开 **${n} 个**格子，每格画同一个角色在
+「${anim.name}」这组动作里一个连续瞬间的样子。整张图共 ${n} 个角色，不多不少。`
+    : `画一张**固定网格的游戏角色动画分解图**：**${sheet.columns} 列 × ${sheet.rows} 行**，共 **${n} 个格子**，
+每格画同一个角色在「${anim.name}」这组动作里一个连续瞬间的样子。整张图共 ${n} 个角色，不多不少。
+**按行优先排列**：先第一行从左到右，再第二行，依此类推 —— 第 1 格是第 1 帧，逐格递增到第 ${n} 帧。
+**每一格恰好一个角色**，放在格子中央；格与格之间必须留出纯色 ${bg} 的空隙。`;
+  return `${layout}
 
 ⚠️⚠️ 最重要的一条，请先读它：**背景必须是纯色 ${bg}**，整张图铺满，不要渐变、不要噪点、
    不要纹理、不要图案、不要格线、不要编号、不要文字、不要水印、不要边框。
    ${n} 个角色之间要留出**明显的空隙**（背景色露出来），这样才切得开。
+   ${sheet === undefined ? "" : `⚠️ 这是一张**固定网格**：${sheet.columns} 列 × ${sheet.rows} 行。
+   **格子的边界只存在于排版里** —— 不要画格线、不要画格子边框、不要编号、不要写帧号或文字。
+   每一格里的角色都必须完整落在这一格内，不要越过格子边界。`}
    画面里**除了这 ${n} 个角色本身的像素，别的都不要有**：不要画地面、地平线、街道、
    阴影、底座连线，也不要画任何横贯画面的线或带。
    列表里的其他颜色**一个都不要**用来画背景。
@@ -458,7 +470,7 @@ ${dna === undefined
 
 ⚠️ 上面身份描述里若提到「地面 / 街道 / 来回走」之类，那是在说它**怎么动**，
    不是让你把地面画出来 —— 这一张图里**只有 ${n} 个角色**。`}
-这组动作是「${anim.name}」（共 ${total} 帧里的第 ${spec.animations.findIndex((a) => a.name === anim.name) + 1} 组）。
+这一张图**只画这组动作**「${anim.name}」；本图角色数就是上面那个数，与别的动作组无关。
 
 硬性要求：
 - ${n} 个角色**长得一模一样**：脸、帽子、衣服、配色、描边、像素尺度全都不能变，
@@ -466,7 +478,9 @@ ${dna === undefined
 - ${n} 个角色的**大小一致**，脚底**对齐到同一个高度**，不要有的高有的矮。
   ⚠️ 只是**位置对齐** —— **不要**在脚下画线、地面、地平线或阴影来表示对齐。
 - 每个角色的**外接矩形**长宽比必须**精确**是 ${spec.size.w} : ${spec.size.h}（宽 : 高）。
-  画布本身是横条（${n} 个并排），但每个角色自己的比例要守住 ——
+  ${sheet === undefined
+    ? `画布本身是横条（${n} 个并排），但每个角色自己的比例要守住 ——`
+    : `画布本身是 ${sheet.columns} 列 × ${sheet.rows} 行的网格（每格 ${spec.size.w} : ${spec.size.h}），每个角色自己的比例要守住 ——`}
   交付管线会把它两方向独立缩放到 ${spec.size.w}×${spec.size.h} 像素。
 
 角色**本身**的颜色只用下面这些：
@@ -478,7 +492,7 @@ identity: ${JSON.stringify(style.identity)}
 material: ${JSON.stringify(style.material)}
 
 画法：硬边色块、边缘干净利落、不要抗锯齿、不要柔边、不要渐变、不要写实照片质感、
-不要体积光、不要景深。正视角度、正交投影、不要任何透视。
+不要体积光、不要景深。**侧视、朝右**、正交投影、不要任何透视。
 
 再强调一次：${n} 个角色，背景纯色 ${bg}，角色身上**不要**出现 ${bg} 这个颜色。`;
 }
@@ -532,6 +546,9 @@ const renderSampleLayers = (): string =>
 export const recipeShapeSpec = (): string => `每个 spec 只许有这些键：kind / id / role / description / styleId / anchor / size / required。
 按类可以另加，且**形状必须逐字如下**：
   animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
+               ← 可选 \`sheet\`：\`{"columns":2,"rows":2}\` —— 这次生图按**固定网格**排版，
+                 \`columns × rows\` 必须等于这个动画的 \`frames\`（省略 = 旧的按墨迹间隙切）；
+                 只对 \`source.kind:"image"\` 有意义。
   background → "layers":[${renderSampleLayers()}]
                ← **数组**，每项是对象，**从远到近**排序；层名会拼成帧名 \`<资源 id>.<层名>\`
                ← ⚠️ **视差与平铺必须配对**：**不平铺的层，\`parallax\` 必须是 \`0\`**；

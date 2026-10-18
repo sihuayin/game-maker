@@ -21,7 +21,7 @@ import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
-import { bottomBand, cropAboveBand, segmentRowCells } from "./sheet.js";
+import { auditSheetCells, bottomBand, cropAboveBand, segmentRowCells, sliceGridCells, type SheetCellIssue } from "./sheet.js";
 import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioReading } from "./master.js";
 import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
@@ -650,6 +650,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             : u.layer !== undefined ? `authoring/generated/${spec.id}.${u.layer.name}.png`
               : `authoring/generated/${spec.id}.png`;
         const units = imageUnitsOf(spec).map((u) => ({ ...u, raw: rawName(u) }));
+        /** 这个 unit 的**固定网格**（票 01）。省略 = 旧路径（按墨迹间隙分块）。 */
+        const gridOf = (u: ImageUnit) =>
+          u.anim === undefined || spec.kind !== "animation"
+            ? undefined
+            : spec.animations.find((a) => a.name === u.anim)?.sheet;
 
         // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
         // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。
@@ -658,6 +663,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         //   ⚠️ **`key === null` = 这一批不抠底**（票 38 的 Q1：最远层）—— 见下面 `flatMap`。
         const batches: { cells: RasterImage[]; key: [number, number, number] | null }[] = [];
         for (const u of units) {
+          const grid = gridOf(u);
           // ⚠️ **始终派生**（[票 35](35-multiframe-needs-background.md) 的 Q1）：此前是
           //   `src.prompt ?? imagePrompt(…)`，而真跑里 planner **每一条都填了** `src.prompt`
           //   ⇒ `imagePrompt()` 一次都没跑过，把「背景必须是纯色 ${bg}」「画布是 N 倍宽」
@@ -688,7 +694,13 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             rec = { step: "image", target: spec.id, attempts: 1 };
             opts.ledger?.push(rec);
             return opts.generateImage!({
-              prompt, size: { w: spec.size.w * u.frames, h: spec.size.h },
+              prompt,
+              // ⚠️ 画布也是**图单元的形状**（票 01）：固定网格按 cols×rows 申请，不是 N 倍宽的一条横带。
+              //   上游回来的尺寸由它自己的 aspect 表定，所以 `sliceGridCells` 不要求整除。
+              size: {
+                w: spec.size.w * (grid?.columns ?? u.frames),
+                h: spec.size.h * (grid?.rows ?? 1),
+              },
               negativePrompt: imageNegativePrompt(),
               ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
             }, {
@@ -837,48 +849,77 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
                 `${colourReport(measured, keyed.keyedPixels, pixels)}。\n` + NOT_A_RETRY);
           }
           const cells: RasterImage[] = [];
+
+          /** 把一格的读数拼成人能读的报文（资源名 / 动画名 / 第几格）。 */
+          const sheetIssueText = (issue: SheetCellIssue): string => {
+            const where = `第 ${issue.index + 1} 格（第 ${issue.row + 1} 行第 ${issue.column + 1} 列）`;
+            if (issue.kind === "empty") return `${where}是空的`;
+            if (issue.kind === "border")
+              return `${where}有边框：墨同时贴住四条边（覆盖率 上 ${(issue.edges.top * 100).toFixed(1)}% · 下 ${(issue.edges.bottom * 100).toFixed(1)}% · 左 ${(issue.edges.left * 100).toFixed(1)}% · 右 ${(issue.edges.right * 100).toFixed(1)}%）`;
+            return `${where}有多主体（${issue.blocks} 块互不相连的墨，最大一块只占 ${(issue.largestShare * 100).toFixed(1)}%）`;
+          };
           // ⚠️ `key === null` = **这一批不抠底**（票 38 的 Q1：最远层）。递到 `importFrames`
           //   那边就是**不传 `background`**，走它现成的「原样返回」那条路（见下面 `flatMap`）。
           batches.push({ cells, key: farthest ? null : unitKey });
-          if (u.frames === 1) { cells.push(image); }
+          // ⚠️ `grid !== undefined` 时**哪怕只有 1 帧**也走按格分支（1×1 网格 = 整张图）——
+          //   契约允许多少格就等于 frames；跳过它会让 1 帧资源**绕开内容校验**。
+          if (u.frames === 1 && grid === undefined) { cells.push(image); }
           else {
             // ⚠️ 多帧必然抠过底（背景层恒为 1 帧 ⇒ 走到这里的不是背景层）。
             const keyed = keyedProbe!;
-            // ⚠️ **按墨迹间隙分块**，不等分 —— 实测模型不按格子排版（见 sheet.ts 的文件头）。
-            // ⚠️ 分块看的是 alpha，所以探针必须是**抠过背景**的那一份；原图（纯 RGB）每一列都有"墨"。
-            // ⚠️ **探针与最终交付用的是同一个颜色**（`unitKey`）—— 票 35 时这里是「我们告诉模型的
-            //   那个底色」，票 37 之后单帧/多帧改成了**这张图上量出来的众数色**。
-            //   ⚠️ 两处一旦分家，就会出现「探针按 A 抠、交付按 B 抠」：分块数得对，出来的帧却是花的。
-            let seg = segmentRowCells(image, keyed.image);
-            if (seg.cells.length !== u.frames) {
-              // ⚠️ **底部横带救援**（票 99 的 Q1 = (c) · 票 100）：**只在第一次数量不符时**尝试 ——
-              //   正常图的行为一字不改。带子必须**贴着画面底部 / ink 底边**、逐行覆盖率 ≥ 80%、
-              //   至少 3 行；命中后把它**从原图和探针里一起裁掉**（只让分块忽略会让每一帧都带一条横带）。
-              //   重分块**正好 N 块**才接受；否则仍抛原来的错（下面加一句指出这条可能的成因）。
-              const band = bottomBand(keyed.image);
-              if (band !== null) {
-                const cropped = segmentRowCells(cropAboveBand(image, band), cropAboveBand(keyed.image, band));
-                if (cropped.cells.length === u.frames) {
-                  groundBands.push({ assetId: spec.id, ...(u.anim === undefined ? {} : { anim: u.anim }), rows: band.rows, cover: band.cover });
-                  seg = cropped;
+            if (grid !== undefined) {
+              // ── 票 01：**按格切**，不再数连通块 ─────────────────────────────────
+              // ⚠️ 探针必须是**抠过背景**的那一份（alpha 才是墨）；交付仍用原图（`pack` 后面
+              //   会拿整批 cells 再抠一遍，与旧的 segment 路径同款）。顺序行优先 ⇒ 与 `framePlan` 对齐。
+              const rawCells = sliceGridCells(image, grid);
+              const keyedCells = sliceGridCells(keyed.image, grid);
+              const issues = auditSheetCells(keyedCells, { columns: grid.columns, rows: grid.rows });
+              if (issues.length > 0)
+                throw new Error(
+                  `资源 "${spec.id}" 的动画 "${u.anim}"：固定网格 ${grid.columns}×${grid.rows} 的**按格校验没过** —— ` +
+                  issues.map(sheetIssueText).join("；") +
+                  "。⚠️ **不静默取剩下的**：空格 / 多主体 / 边框都会让 manifest 的帧名与动作分组对不上。\n" +
+                  `⚠️ 抠底用的是**实测众数色** —— ${colourReport(measured, keyed.keyedPixels, pixels)}；` +
+                  `抠掉了 ${((keyed.keyedPixels / pixels) * 100).toFixed(1)}% 的像素。`,
+                );
+              cells.push(...rawCells);
+            } else {
+              // ⚠️ **按墨迹间隙分块**，不等分 —— 实测模型不按格子排版（见 sheet.ts 的文件头）。
+              // ⚠️ 分块看的是 alpha，所以探针必须是**抠过背景**的那一份；原图（纯 RGB）每一列都有"墨"。
+              // ⚠️ **探针与最终交付用的是同一个颜色**（`unitKey`）—— 票 35 时这里是「我们告诉模型的
+              //   那个底色」，票 37 之后单帧/多帧改成了**这张图上量出来的众数色**。
+              //   ⚠️ 两处一旦分家，就会出现「探针按 A 抠、交付按 B 抠」：分块数得对，出来的帧却是花的。
+              let seg = segmentRowCells(image, keyed.image);
+              if (seg.cells.length !== u.frames) {
+                // ⚠️ **底部横带救援**（票 99 的 Q1 = (c) · 票 100）：**只在第一次数量不符时**尝试 ——
+                //   正常图的行为一字不改。带子必须**贴着画面底部 / ink 底边**、逐行覆盖率 ≥ 80%、
+                //   至少 3 行；命中后把它**从原图和探针里一起裁掉**（只让分块忽略会让每一帧都带一条横带）。
+                //   重分块**正好 N 块**才接受；否则仍抛原来的错（下面加一句指出这条可能的成因）。
+                const band = bottomBand(keyed.image);
+                if (band !== null) {
+                  const cropped = segmentRowCells(cropAboveBand(image, band), cropAboveBand(keyed.image, band));
+                  if (cropped.cells.length === u.frames) {
+                    groundBands.push({ assetId: spec.id, ...(u.anim === undefined ? {} : { anim: u.anim }), rows: band.rows, cover: band.cover });
+                    seg = cropped;
+                  }
                 }
               }
+              if (seg.cells.length !== u.frames)
+                throw new Error(
+                  `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
+                  "生图模型的帧数不可信（实测要 6 给 5）。要么重出这张图，要么把 spec 的帧数改成它真能画出来的数量 —— " +
+                  "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。\n" +
+                  // ⚠️ **把抠底那份读数一并附上**（票 35 §6 的老纪律：判据的位置本身就是判据的一部分，
+                  //   而**指错方向的错**比不报还贵）：块数不对也可能是**抠底本身出了事**
+                  //   —— 众数色若是主体，整排角色会被一起抠掉，那时先响的就是这条「检测到 1 块」。
+                  `⚠️ 抠底用的是**实测众数色** —— ${colourReport(measured, keyed.keyedPixels, pixels)}；` +
+                  `抠掉了 ${((keyed.keyedPixels / pixels) * 100).toFixed(1)}% 的像素。` +
+                  `若那个众数色其实是**主体**，整排角色会被一起抠掉，块数就会先错在这里。\n` +
+                  // 票 100：同一个位置还有另一种成因 —— 底部横带把每一列都连上了。
+                  `⚠️ 也可能是**底部一条贯穿画面的横带**（地面线 / 底座连线）：本轮已尝试忽略底部 ≥80% 的连续横带，仍未切出 ${u.frames} 块。`,
+                );
+              cells.push(...seg.cells);
             }
-            if (seg.cells.length !== u.frames)
-              throw new Error(
-                `资源 "${spec.id}" 的动画 "${u.anim}"：spec 声明 ${u.frames} 帧，但在生成的图上**检测到 ${seg.cells.length} 块**。` +
-                "生图模型的帧数不可信（实测要 6 给 5）。要么重出这张图，要么把 spec 的帧数改成它真能画出来的数量 —— " +
-                "**不静默取前 N 个**，那会让 manifest 的帧名与动画分组对不上。\n" +
-                // ⚠️ **把抠底那份读数一并附上**（票 35 §6 的老纪律：判据的位置本身就是判据的一部分，
-                //   而**指错方向的错**比不报还贵）：块数不对也可能是**抠底本身出了事**
-                //   —— 众数色若是主体，整排角色会被一起抠掉，那时先响的就是这条「检测到 1 块」。
-                `⚠️ 抠底用的是**实测众数色** —— ${colourReport(measured, keyed.keyedPixels, pixels)}；` +
-                `抠掉了 ${((keyed.keyedPixels / pixels) * 100).toFixed(1)}% 的像素。` +
-                `若那个众数色其实是**主体**，整排角色会被一起抠掉，块数就会先错在这里。\n` +
-                // 票 100：同一个位置还有另一种成因 —— 底部横带把每一列都连上了。
-                `⚠️ 也可能是**底部一条贯穿画面的横带**（地面线 / 底座连线）：本轮已尝试忽略底部 ≥80% 的连续横带，仍未切出 ${u.frames} 块。`,
-              );
-            cells.push(...seg.cells);
           }
           imageCalls.push({ assetId: spec.id, ...call });
         }

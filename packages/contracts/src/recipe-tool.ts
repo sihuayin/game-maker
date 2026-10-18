@@ -49,6 +49,11 @@ const InputPathShape = z.string().min(1);
 const AnimationSpecShape = z.strictObject({
   name: z.string().min(1),
   frames: z.number().int().positive(),
+  // 只镜像**形状**：`columns × rows === frames` 那条跨字段判据住在 v3 的 superRefine 里，
+  // `toJSONSchema` 转不出来（与其余几条 gate 同款，见文件头）。
+  sheet: z
+    .strictObject({ columns: z.number().int().positive(), rows: z.number().int().positive() })
+    .optional(),
   fps: z.number().positive().optional(),
   loop: z.boolean().default(true)
 });

@@ -81,7 +81,7 @@ const stub: DrawListGenerator = (spec) => drawlists(spec as never);
 function recorder(over: { failMaster?: boolean; masterImage?: (req: ImageRequest) => { width: number; height: number; data: Buffer } } = {}) {
   const calls: { which: "master" | "anim" | "crate"; req: ImageRequest }[] = [];
   const gen: ImageGenerator = async (req) => {
-    const which = req.prompt.includes("母版参考图") ? "master" : req.prompt.includes("这组动作是") ? "anim" : "crate";
+    const which = req.prompt.includes("母版参考图") ? "master" : req.prompt.includes("游戏角色动画分解图") ? "anim" : "crate";
     calls.push({ which, req });
     if (which === "master" && over.failMaster) throw new Error("母版那一发挂了（测试注入）");
     const img = which === "master" && over.masterImage !== undefined

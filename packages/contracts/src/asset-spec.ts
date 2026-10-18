@@ -68,6 +68,19 @@ const COMMON = {
 export const AnimationSpec = z.object({
   name: z.string().min(1),
   frames: z.number().int().positive(),
+  /**
+   * **固定网格**（票 01）：这次生图按 `columns × rows` 的格子排版，`pack` 按格切，
+   * 不再按墨迹间隙数块。⚠️ **逐动画** —— 一个动画就是一次生图调用（`imageUnitsOf`），
+   * 网格属于那一次调用；省略 = 走旧的连通块路径，行为一个字不改。
+   * ⚠️ 与 `ImportSource.sheet` **不是同一个东西**：那份描述的是人给的位图（含格宽/间距），
+   * 这份只定排版，格子大小由 `size` 决定。两者同名不同层，别混。
+   * ⚠️ **只对 `source.kind === "image"` 有意义**：drawlist 一帧一份、import 用自己的
+   * `source.sheet` ⇒ 那两条路上写了 **不会被读**，别写。
+   */
+  sheet: z.object({
+    columns: z.number().int().positive(),
+    rows: z.number().int().positive(),
+  }).strict().optional(),
   fps: z.number().positive().optional(),
   loop: z.boolean().default(true),
 }).strict();
@@ -198,10 +211,20 @@ export const AssetSpecSchema = z
     //   ⚠️ 这段话是**注释**、不进报文：报文照「X 名重复："…"」那一族，短、点名（票 89 的人裁 Q4）。
     if (s.kind === "animation") {
       const seen = new Set<string>();
-      for (const a of s.animations) {
+      for (const [i, a] of s.animations.entries()) {
         if (seen.has(a.name))
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: `动画名重复："${a.name}"`, path: ["animations"] });
         seen.add(a.name);
+        // ── 票 01：**网格必须与帧数对齐** ─────────────────────────────────────
+        // ⚠️ 不可满足的网格与「帧数对不上」同族：放过去就是在**花完钱之后**才被
+        //   `sliceGrid` / 产物对账拦下。跨字段判据住在这里（成员自己不能是 ZodEffects，
+        //   与上面两条 union 层判据同一条理由）。
+        if (a.sheet !== undefined && a.sheet.columns * a.sheet.rows !== a.frames)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `动画 "${a.name}"：sheet 网格 ${a.sheet.columns}×${a.sheet.rows} = ${a.sheet.columns * a.sheet.rows} 格，与 frames=${a.frames} 不一致`,
+            path: ["animations", i, "sheet"],
+          });
       }
     }
 

@@ -301,3 +301,44 @@ describe("多帧动画：底部横带的三处措辞（票 99 · 票 100）", ()
     expect(imagePrompt(sprite, STYLE)).not.toContain("那是在说它**怎么动**");
   });
 });
+
+describe("固定网格：多帧提示词按 cols×rows 描述（票 01）", () => {
+  // ⚠️ 这一组也是「先红后绿」的见证：网格的话进提示词之前，下面几条必须红。
+  const STYLE: StyleSpec = JSON.parse(readFileSync(fileURLToPath(new URL(
+    "../../../.scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json", import.meta.url)), "utf8"));
+
+  const GRID: AssetSpec = {
+    kind: "animation", id: "guard", role: "角色", description: "一个巡逻的人",
+    styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 24 },
+    required: true,
+    animations: [{ name: "run", frames: 9, sheet: { columns: 3, rows: 3 }, fps: 8, loop: true }],
+  };
+
+  it("网格、逐格规则、行优先都在 —— 且不再说「横向排开」", () => {
+    const p = imagePrompt(GRID, STYLE);
+    expect(p).toContain("3 列 × 3 行");
+    expect(p).toContain("每一格恰好一个角色");
+    expect(p).toContain("行优先");
+    expect(p).toContain("不要画格线");
+    expect(p).toContain("不要编号");
+    expect(p).toContain("不要写帧号或文字");
+    expect(p).toContain("9 个角色");
+    // 网格与横条是两套说法：模型不能同时读到「格子」与「横排一排」
+    expect(p).not.toContain("横向排开");
+  });
+
+  it("清单形状说明也认得 sheet —— 否则模型被告知「只许这些键」，永远写不出它", () => {
+    const spec = recipeShapeSpec();
+    expect(spec).toContain("`sheet`");
+    expect(spec).toContain("columns × rows");
+    expect(spec).toContain("固定网格");
+  });
+
+  it("没写 sheet 的旧路径一字不改 —— 仍走横排", () => {
+    const old = { ...GRID, animations: [{ name: "run", frames: 9, fps: 8, loop: true }] };
+    const p = imagePrompt(old, STYLE);
+    expect(p).toContain("横向排开");
+    expect(p).not.toContain("3 列 × 3 行");
+    expect(p).not.toContain("每一格恰好一个角色");
+  });
+});
