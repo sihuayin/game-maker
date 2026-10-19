@@ -65,6 +65,15 @@ describe("§母版的提示词：DNA 的**八个字段**逐个具名", () => {
     expect(prompt()).toContain("832×1248 像素");
   });
 
+  it("⚠️ 不再说「外接矩形比例必须精确」「两方向独立缩放就是硬拉伸」（票 11）", () => {
+    const p = prompt();
+    expect(p).not.toContain("外接矩形");
+    expect(p).not.toContain("两方向独立缩放");
+    expect(p).not.toContain("硬拉伸");
+    expect(p).toContain("画布是 832×1248 像素");
+    expect(p).toContain("照这张图的头身比与形象");
+  });
+
   it("人写的那两格（`role` / `description`）也进 —— 它们是**这一张图**的说法", () => {
     const p = prompt();
     expect(p).toContain(MASTER.role);
