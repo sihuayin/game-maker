@@ -49,7 +49,7 @@ Map: ../map.md
 
 ### 交付物
 
-- 裁切表：[`../../assets/crop-table.md`](../../assets/crop-table.md)
+- 裁切表：[`../assets/crop-table.md`](../assets/crop-table.md)
   （复核预览：`crop-table-overlay.png` · `crop-table-targets.png`）
 - 迁移运行目录：[`runs/2026-10-19a-migration/`](../runs/2026-10-19a-migration/)
   - `imported/*.png`：7 张目标尺寸 PNG

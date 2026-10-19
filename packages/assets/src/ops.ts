@@ -369,7 +369,7 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     const existing = existingAssets.find((a) => a.id === entry.spec.id);
     const decision = resolveRoute({
       spec: entry.spec, context: { design, visualWorld: world },
-      capabilities, existingAssets, candidate: entry.source.kind,
+      capabilities, existingAssets, candidate: entry.source.kind === "frames" ? "image" : entry.source.kind,
     });
     if (!decision.ok)
       throw new CommandError(
@@ -1513,7 +1513,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
   // ⚠️ **票 29 的闸**：在这之前这一行是 `JSON.parse(...) as StyleSpec` —— 一句编译期的谎。
   const style = readStyle(styleAbs);
 
-  const needsImage = r.value.assets.some((a) => a.source.kind === "image");
+  const needsImage = r.value.assets.some((a) => a.source.kind === "image" || a.source.kind === "frames");
   if (needsImage && !opts.imageTransport)
     throw new CommandError("usage",
       `这份清单里有 source.kind="image" 的资源，但**没配生图凭据** —— ` +

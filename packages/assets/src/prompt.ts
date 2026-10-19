@@ -441,10 +441,18 @@ function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: stri
   // ⚠️ 不能两份都留在同一段提示词里（「网格」与「横向排开」同时说，模型只执行一条 ——
   //   这一支已经吃过一次「4 个角色 + 只有 1 个物体」的亏）。省略 `sheet` ⇒ 旧文字**逐字不变**。
   const sheet = anim.sheet;
+  // 票 16 的 A：`rows=1` 走**单行等距排开**，不叫「网格」——
+  // ⚠️ 2.5 听到「网格」会画格线、编号，并把 4×2 画成 4×3（2026-10-19 真跑证据）。
+  const oneRow = sheet !== undefined && sheet.rows === 1;
   const layout = sheet === undefined
     ? `画一张**横排的游戏角色动画分解图**：横向排开 **${n} 个**格子，每格画同一个角色在
 「${anim.name}」这组动作里一个连续瞬间的样子。整张图共 ${n} 个角色，不多不少。`
-    : `画一张**固定网格的游戏角色动画分解图**：**${sheet.columns} 列 × ${sheet.rows} 行**，共 **${n} 个格子**，
+    : oneRow
+      ? `画一张**横向等距排开的游戏角色动画分解图**：一行排开 **${n} 个**角色，
+每个角色是同一个角色在「${anim.name}」这组动作里一个连续瞬间的样子。整张图共 ${n} 个角色，不多不少。
+**从左到右**：第 1 个是第 1 帧，逐个递增到第 ${n} 帧。
+**每两个角色之间留出纯色 ${bg} 的空隙**；不要画任何分隔线、边框、编号或文字。`
+      : `画一张**固定网格的游戏角色动画分解图**：**${sheet.columns} 列 × ${sheet.rows} 行**，共 **${n} 个格子**，
 每格画同一个角色在「${anim.name}」这组动作里一个连续瞬间的样子。整张图共 ${n} 个角色，不多不少。
 **按行优先排列**：先第一行从左到右，再第二行，依此类推 —— 第 1 格是第 1 帧，逐格递增到第 ${n} 帧。
 **每一格恰好一个角色**，放在格子中央；格与格之间必须留出纯色 ${bg} 的空隙。`;
@@ -453,7 +461,10 @@ function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: stri
 ⚠️⚠️ 最重要的一条，请先读它：**背景必须是纯色 ${bg}**，整张图铺满，不要渐变、不要噪点、
    不要纹理、不要图案、不要格线、不要编号、不要文字、不要水印、不要边框。
    ${n} 个角色之间要留出**明显的空隙**（背景色露出来），这样才切得开。
-   ${sheet === undefined ? "" : `⚠️ 这是一张**固定网格**：${sheet.columns} 列 × ${sheet.rows} 行。
+   ${sheet === undefined ? "" : oneRow
+     ? `⚠️ 这是一行**等距排开**的角色 —— 画面里**没有任何分隔线、边框、编号、文字**。
+   ${n} 个角色之间必须留出明显的空隙；每个角色完整、互不重叠。`
+     : `⚠️ 这是一张**固定网格**：${sheet.columns} 列 × ${sheet.rows} 行。
    **格子的边界只存在于排版里** —— 不要画格线、不要画格子边框、不要编号、不要写帧号或文字。
    每一格里的角色都必须完整落在这一格内，不要越过格子边界。`}
    画面里**除了这 ${n} 个角色本身的像素，别的都不要有**：不要画地面、地平线、街道、
@@ -480,7 +491,9 @@ ${dna === undefined
 - 每个角色的**外接矩形**长宽比必须**精确**是 ${spec.size.w} : ${spec.size.h}（宽 : 高）。
   ${sheet === undefined
     ? `画布本身是横条（${n} 个并排），但每个角色自己的比例要守住 ——`
-    : `画布本身是 ${sheet.columns} 列 × ${sheet.rows} 行的网格（每格 ${spec.size.w} : ${spec.size.h}），每个角色自己的比例要守住 ——`}
+    : oneRow
+      ? `画布本身是一行（${n} 个并排，每个角色 ${spec.size.w} : ${spec.size.h}），每个角色自己的比例要守住 ——`
+      : `画布本身是 ${sheet.columns} 列 × ${sheet.rows} 行的网格（每格 ${spec.size.w} : ${spec.size.h}），每个角色自己的比例要守住 ——`}
   交付管线会把它两方向独立缩放到 ${spec.size.w}×${spec.size.h} 像素。
 
 角色**本身**的颜色只用下面这些：
@@ -495,6 +508,53 @@ material: ${JSON.stringify(style.material)}
 不要体积光、不要景深。**侧视、朝右**、正交投影、不要任何透视。
 
 再强调一次：${n} 个角色，背景纯色 ${bg}，角色身上**不要**出现 ${bg} 这个颜色。`;
+}
+
+/**
+ * **逐帧**生图提示词（票 17）：一次调用只画**一帧**。
+ *
+ * ⚠️ 与 `animationSheetPrompt` 是两套模式：那边要求「一图 N 帧」，模型守不住数量/排版
+ *   （2026-10-19 三次真跑的实测）；这里只要**一个角色**，帧数交给调用方按 framePlan 收集。
+ * ⚠️ 仍然要求**侧视 / 朝右 / 同一个角色的形象**；母版参考图由 pack 递进来。
+ */
+export function animationFramePrompt(
+  spec: AssetSpec, style: StyleSpec, animName: string, frameIndex: number, dna?: CharacterDNA,
+): string {
+  const bg = keyColorFor(style.palette);
+  if (spec.kind !== "animation") throw new Error("animationFramePrompt 只用于 animation 资源");
+  const anim = spec.animations.find((a) => a.name === animName);
+  if (!anim) throw new Error(`spec 里没有动画 "${animName}"`);
+  const n = anim.frames;
+  // ⚠️ **角色 vs 物件**（票 17 的逐帧冒烟）：废料 / 净水 / 终端没有 `characterId`，
+  //   若这里仍说「画一个角色」，模型会照着画人（第三次单行真跑的 scrap 就是 5 个人）。
+  //   没有 `characterId` / DNA 的一律按**物件**说。
+  const isCharacter = dna !== undefined || spec.characterId !== undefined;
+  const noun = isCharacter ? "角色" : "物件";
+  const who = dna === undefined
+    ? `这个${noun}是：${spec.description}（${spec.role}）`
+    : `这个角色是：\n${dnaBrief(dna, style)}`;
+  return `画一张**单个游戏${noun}**的像素画：同一个${noun}在「${anim.name}」这段动画的**第 ${frameIndex + 1} 帧 / 共 ${n} 帧**。
+整张图**只有一个${noun}**；不要多帧、不要分隔线、不要边框、不要编号、不要文字。
+背景必须是纯色 ${bg}，整张图铺满；不要渐变、不要噪点、不要纹理、不要图案、
+不要地面、不要地平线、不要阴影、不要横线。
+
+${who}
+
+${noun}的**外接矩形**长宽比必须**精确**是 ${spec.size.w} : ${spec.size.h}（宽 : 高）；
+交付管线会把它两方向独立缩放到 ${spec.size.w}×${spec.size.h} 像素。
+
+${noun}**本身**的颜色只用下面这些：
+${style.palette.join("  ")}
+（注意：这条是给**${noun}**定的，背景的 ${bg} 是唯一的例外。）
+
+这个世界的视觉语法（只用于${noun}本身的配色与质感）：
+identity: ${JSON.stringify(style.identity)}
+material: ${JSON.stringify(style.material)}
+
+画法：硬边色块、边缘干净利落、不要抗锯齿、不要柔边、不要渐变、不要写实照片质感、
+不要体积光、不要景深。${isCharacter ? "**侧视、朝右**、正交投影、不要任何透视。" : "正交投影、不要任何透视。"}
+
+再强调一次：**只有一个${noun}**，背景纯色 ${bg}，${noun}身上**不要**出现 ${bg} 这个颜色。`;
 }
 
 /**

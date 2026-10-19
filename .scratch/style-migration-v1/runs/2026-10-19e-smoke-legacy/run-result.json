@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/style-migration-v1/runs/2026-10-19e-smoke-legacy/smoke-interactions/pack/v1",
+  "imageRequests": 1,
+  "textRequests": 0,
+  "verify": {
+    "packId": "smoke-interactions",
+    "version": 1,
+    "ok": true,
+    "problems": [],
+    "provenanceMode": "generated"
+  },
+  "summary": [
+    "资源包：smoke-interactions/pack/v1（v1）",
+    "1 个资源 · 1 张图集 · 7 个文件",
+    "来源：generated",
+    "账：1 次调用 · 1 次往返（无重试）· 墙钟 21.1s · 调用耗时合计 18.4s · 见包内 ledger.json",
+    "生图：1 次调用 · office-debris"
+  ],
+  "data": {
+    "packId": "smoke-interactions",
+    "version": 1,
+    "imageCalls": [
+      {
+        "assetId": "office-debris",
+        "protocol": "gemini",
+        "requestedSize": "aspect 3:2",
+        "ms": 18353,
+        "attempts": 1,
+        "requestedModel": "gemini-2.5-flash-image"
+      }
+    ],
+    "imageUpstream": "生图上游：gemini · https://generativelanguage.googleapis.com/v1beta · 模型 gemini-2.5-flash-image（key 已配置，53 字符） · 经代理 http://127.0.0.1:7890",
+    "ledgerCalls": [
+      {
+        "step": "image",
+        "target": "office-debris",
+        "attempts": 1,
+        "upstream": "gemini",
+        "ms": 18353,
+        "requestedSize": "aspect 3:2",
+        "requestedModel": "gemini-2.5-flash-image"
+      }
+    ],
+    "ledgerRun": {
+      "image": {
+        "calls": 1,
+        "attempts": 1
+      }
+    },
+    "assetCount": 1,
+    "fileCount": 7,
+    "provenanceMode": "generated",
+    "paletteCoverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  }
+}

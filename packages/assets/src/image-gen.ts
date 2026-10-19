@@ -218,18 +218,26 @@ export function createDashScopeMcpGenerator(opts: DashScopeOptions): ImageGenera
   };
 }
 
-// ── Gemini ────────────────────────────────────────────────────────────────────
+// ── Gemini（Interactions API）─────────────────────────────────────────────────
 //
-// 2026-09-26 实测的往返（`generativelanguage.googleapis.com/v1beta`）：
+// 2026-10-19（票 13 / 票 12 的 A2）：改用 **Interactions API**，显式要 PNG。
 //
-//   POST {baseUrl}/models/{model}:generateContent      x-goog-api-key: <key>
-//   {"contents":[{"parts":[{"text":…},{"inline_data":{"mime_type":"image/png","data":<b64>}}]}],
-//    "generationConfig":{"responseModalities":["IMAGE"],"imageConfig":{"aspectRatio":"16:9"}}}
-//   → candidates[0].content.parts[].inlineData.{mimeType,data}
+//   POST {baseUrl}/interactions                         x-goog-api-key: <key>
+//   {"model":…,
+//    "input":[{"type":"text","text":…},
+//             {"type":"image","mime_type":"image/png","data":<b64>}],
+//    "response_format":{"type":"image","mime_type":"image/png",
+//                       "aspect_ratio":"16:9","image_size":"1K"}}
+//   → steps[].type === "model_output" → content[].type === "image" → data (base64)
 //
-// ⚠️ 四条实测事实：
+// ⚠️ 为什么不用 legacy `generateContent`（票 10 的真跑证据）：
+//   `gemini-3.1-flash-lite-image` 在 `generateContent` 下回的是**非 PNG** 的 inline data，
+//   而 legacy `ImageConfig`（v1beta discovery）**没有输出 MIME 入口** ⇒ 无法要求 PNG。
+//   Interactions API 的 `response_format.mime_type` 才有这个入口。
+//
+// ⚠️ 下面四条是 2.5 时代在 `generateContent` 上实测的，Interactions 路径**尚未付费验证**：
 //   ① **长宽比只有参数说了算**：只在提示词里写 "wide" 会拿到 1024×1024；
-//      给 `imageConfig.aspectRatio` 才会出 1344×768。**这是必需的** —— 不然 64×16 的
+//      给 `aspect_ratio` 才会出目标比例。**这是必需的** —— 不然 64×16 的
 //      地面模块会拿到方图，进管线就是 4 倍拉伸。（不过真正定生死的是**物体**的包围盒，
 //      管线会裁到它，所以画布长宽比对不上也能救。）
 //   ② **没有 alpha**（返回 colorType 2），与 DashScope 一样。
@@ -267,6 +275,14 @@ export type GeminiOptions = {
   apiKey: string;
   /** 实测默认 `gemini-2.5-flash-image`。 */
   model?: string;
+  /**
+   * 走哪套 API。
+   * - `"auto"`（默认）：`gemini-2.5-*` 走 legacy `generateContent`（已知回 PNG）；
+   *   其余（3.x / nano-banana）走 Interactions。
+   * - `"generateContent"`：强制 legacy（2.5 的 PNG 路径）。
+   * - `"interactions"`：强制新 API（3.x；⚠️ 实测只回 JPEG）。
+   */
+  api?: "auto" | "generateContent" | "interactions";
   timeoutMs?: number;
   /**
    * 尝试次数。
@@ -282,38 +298,109 @@ export type GeminiOptions = {
   fetchImpl?: typeof fetch;
 };
 
-/** 从 `generateContent` 的回应里把第一张图抠出来。形状错就抛，绝不猜。 */
-function imageFromGemini(res: unknown): RasterImage {
-  const d = res as { error?: unknown; candidates?: { content?: { parts?: unknown[] } }[]; promptFeedback?: unknown };
+/** Interactions 回应里的图片块。⚠️ 同时兼容 REST 的 snake_case 与 SDK 的 camelCase。 */
+type GeminiImageBlock = {
+  type?: string;
+  data?: string;
+  mime_type?: string;
+  mimeType?: string;
+  inline_data?: { data?: string; mime_type?: string };
+  inlineData?: { data?: string; mimeType?: string };
+};
+
+/** 从 legacy `generateContent` 的回应里把第一张图抠出来。形状错就抛，绝不猜。 */
+function imageFromGenerateContent(res: unknown): RasterImage {
+  const d = res as {
+    error?: unknown;
+    candidates?: { content?: { parts?: unknown[] } }[];
+    promptFeedback?: unknown;
+  };
   if (d.error) throw new Error(`Gemini 报错：${JSON.stringify(d.error).slice(0, 300)}`);
   for (const c of d.candidates ?? [])
-    for (const p of (c.content?.parts ?? []) as { inlineData?: { data?: string }; text?: string }[])
-      if (typeof p.inlineData?.data === "string") return decodePNG(Buffer.from(p.inlineData.data, "base64"));
+    for (const p of (c.content?.parts ?? []) as { inlineData?: { data?: string; mimeType?: string } }[]) {
+      if (typeof p.inlineData?.data !== "string") continue;
+      // legacy 2.5 实测回 PNG；若哪天变了，明确失败，不静默解码别的格式。
+      if (p.inlineData.mimeType !== undefined && p.inlineData.mimeType !== "image/png")
+        throw new Error(`上游回了 ${p.inlineData.mimeType}，而 legacy 路径要求 image/png —— 不静默解码别的格式`);
+      return decodePNG(Buffer.from(p.inlineData.data, "base64"));
+    }
   throw new Error(`回应里没有图（${JSON.stringify(d.promptFeedback ?? d.candidates ?? d).slice(0, 250)}）`);
+}
+
+/** 从 Interactions 回应里把第一张图抠出来。形状错就抛，绝不猜。 */
+function imageFromInteraction(res: unknown): RasterImage {
+  const d = res as {
+    error?: unknown;
+    output_image?: GeminiImageBlock;
+    outputImage?: GeminiImageBlock;
+    steps?: { type?: string; content?: GeminiImageBlock[]; parts?: GeminiImageBlock[] }[];
+  };
+  if (d.error) throw new Error(`Gemini 报错：${JSON.stringify(d.error).slice(0, 300)}`);
+
+  const blocks: GeminiImageBlock[] = [];
+  for (const img of [d.output_image, d.outputImage]) if (img) blocks.push(img);
+  for (const step of d.steps ?? []) {
+    if (step.type !== "model_output") continue;
+    blocks.push(...(step.content ?? []), ...(step.parts ?? []));
+  }
+
+  for (const block of blocks) {
+    const inline = (block.inline_data ?? block.inlineData) as { data?: string; mime_type?: string; mimeType?: string } | undefined;
+    const data = block.data ?? inline?.data;
+    if (typeof data !== "string" || data.length === 0) continue;
+    const mime = block.mime_type ?? block.mimeType ?? inline?.mime_type ?? inline?.mimeType;
+    if (mime !== undefined && mime !== "image/png")
+      throw new Error(`上游回了 ${mime}，而本次请求明确要求 image/png —— 不静默解码别的格式`);
+    return decodePNG(Buffer.from(data, "base64"));
+  }
+
+  const shape = (d.steps ?? []).map((s) =>
+    `${s.type ?? "?"}[${[...(s.content ?? []), ...(s.parts ?? [])].map((c) => c.type ?? "?").join(",")}]`).join(" ");
+  throw new Error(`回应里没有图（steps: ${shape || "无"}）`);
 }
 
 export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
   const attempts = opts.attempts ?? 4;   // 见 GeminiOptions.attempts 的注释：实测 8% 的秒拒率
   const model = opts.model ?? "gemini-2.5-flash-image";
 
+  const api = opts.api ?? "auto";
+  const useLegacy = api === "generateContent" || (api === "auto" && /^gemini-2\.5(?:-|$)/.test(model));
+
   return async ({ prompt, size, negativePrompt, reference, styleReference }, { onFailure } = {}) => {
     const t0 = Date.now();
     const doFetch = opts.fetchImpl ?? fetch;
-    const url = `${opts.baseUrl.replace(/\/+$/, "")}/models/${model}:generateContent`;
+    const aspect = geminiAspect(size);
+    const url = useLegacy
+      ? `${opts.baseUrl.replace(/\/+$/, "")}/models/${model}:generateContent`
+      : `${opts.baseUrl.replace(/\/+$/, "")}/interactions`;
     // ⚠️ 图与提示词的**顺序必须对上**：正文里按「先风格图、后母版」点名，这里就按这个顺序塞。
     const notes: string[] = [];
     if (styleReference) notes.push("附件第 1 张是这个游戏世界的**风格参考图** —— **只借它的色彩、材质与渲染质感**，" +
       "绝对不要画它里面的任何东西（不要画房间、柜台、货架、海报、文字）。它只是调色与质感的依据。");
     if (reference) notes.push(`附件第 ${styleReference ? 2 : 1} 张是要照画的**角色本身** —— 保持它的形象与配色。`);
     const head = [prompt, ...notes].join("\n\n");
-    const parts: unknown[] = [{ text: negativePrompt ? `${head}\n\nAvoid: ${negativePrompt}` : head }];
-    // ⚠️ 参考图**内联**，不走 URL（那正是 DashScope 那条路断掉的地方）。
-    for (const img of [styleReference, reference])
-      if (img) parts.push({ inline_data: { mime_type: "image/png", data: encodePNG(img).toString("base64") } });
-    const body = {
-      contents: [{ parts }],
-      generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: geminiAspect(size) } },
-    };
+    const text = negativePrompt ? `${head}\n\nAvoid: ${negativePrompt}` : head;
+    // 两条路的参考图都**内联**，不走 URL（那正是 DashScope 那条路断掉的地方）。
+    const images = [styleReference, reference].filter((x): x is NonNullable<typeof x> => x !== undefined);
+    const body = useLegacy
+      ? {
+          contents: [{
+            parts: [
+              { text },
+              ...images.map((img) => ({ inline_data: { mime_type: "image/png", data: encodePNG(img).toString("base64") } })),
+            ],
+          }],
+          generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: aspect } },
+        }
+      : {
+          model,
+          input: [
+            { type: "text", text },
+            ...images.map((img) => ({ type: "image", mime_type: "image/png", data: encodePNG(img).toString("base64") })),
+          ],
+          // ⚠️ `image_size:"1K"`：3.1 Flash Lite 只支持 1K；其余新模型默认也是 1K。
+          response_format: { type: "image", mime_type: "image/png", aspect_ratio: aspect, image_size: "1K" },
+        };
 
     let lastErr: unknown;
     let trips = 0;                       // ⚠️ **发起过几轮**（一轮里有几趟 HTTP，看协议）—— 与文本那条同名同义（票 06）
@@ -332,20 +419,21 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
           });
         } finally { clearTimeout(timer); }
         if (!res.ok) throw new Error(`上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
-        const image = imageFromGemini(await res.json());
+        const json = await res.json();
+        const image = useLegacy ? imageFromGenerateContent(json) : imageFromInteraction(json);
         return {
           image,
           call: {
-            protocol: "gemini", requestedSize: `aspect ${geminiAspect(size)}`, ms: Date.now() - t0, attempts: i,
+            protocol: "gemini", requestedSize: `aspect ${aspect}`, ms: Date.now() - t0, attempts: i,
             requestedModel: model,
           },
         };
       } catch (e) {
         lastErr = e;
         const msg = (e as Error).message ?? "";
-        // ⚠️ `NO_IMAGE` 也要重试：实测 Gemini 会**偶尔**拒一次（同一个提示词前后两次一成一败），
+        // ⚠️ 「没有图」也要重试：实测 Gemini 会**偶尔**拒一次（同一个提示词前后两次一成一败），
         // 那是抽样抖动而不是确定性拒绝 —— 不重试的话一次抖动就毁掉整包。
-        if (i >= attempts || !/HTTP 5\d\d|fetch failed|aborted|network|ECONN|429|NO_IMAGE/i.test(msg)) break;
+        if (i >= attempts || !/HTTP 5\d\d|fetch failed|aborted|network|ECONN|429|NO_IMAGE|no image|没有图/i.test(msg)) break;
       }
     }
     onFailure?.({ upstream: "gemini", ms: Date.now() - t0, attempts: trips, requestedModel: model });

@@ -84,6 +84,33 @@ describe("§ `imageCallsOf`：一张清单全派发时要发几次（票 40 的 
     expect(got.breakdown.animation + got.breakdown.single + got.breakdown.background + got.breakdown.master).toBe(got.total);
   });
 
+  it("§ `frames` 源：**一帧一次调用**（票 17）—— 12 帧 = 12 次，不是 2 次", () => {
+    const r = recipeOf({
+      assets: [{
+        spec: spec({
+          kind: "animation", id: "hero", ...COMMON,
+          animations: [{ name: "idle", frames: 4 }, { name: "run", frames: 8 }],
+        }),
+        source: { kind: "frames" },
+      }],
+    });
+    expect(imageCallsOf(r)).toEqual({ total: 12, breakdown: { animation: 12, single: 0, background: 0, master: 0 } });
+  });
+
+  it("§ `frames` 只用于 animation，且**不能与 `sheet` 同时写**", () => {
+    const base = { format: RECIPE_FORMAT, id: "t", styleRef: "s.json", referenceImage: "r.png" };
+    const sprite = parseRecipe({ ...base, assets: [{ spec: { kind: "sprite", id: "a", ...COMMON }, source: { kind: "frames" } }] });
+    expect(sprite.ok).toBe(false);
+    const withSheet = parseRecipe({
+      ...base,
+      assets: [{
+        spec: spec({ kind: "animation", id: "a", ...COMMON, animations: [{ name: "run", frames: 4, sheet: { columns: 4, rows: 1 } }] }),
+        source: { kind: "frames" },
+      }],
+    });
+    expect(withSheet.ok).toBe(false);
+  });
+
   it("⚠️ 母版：**`image` 的算、`import` 的不算**（人给的图一分钱不花），且**asset 的 import 源也不发**", () => {
     const r = recipeOf({
       assets: [

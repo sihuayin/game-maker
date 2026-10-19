@@ -1,0 +1,587 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruin-scavenger-extraction-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "characterRef": "character-dna.json",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-actor",
+        "role": "玩家拾荒者，侧视四头身，背包与破旧外套构成不对称轮廓",
+        "description": "一名低饱和脏旧外套、短裤、靴子与背囊的拾荒者，身体前倾行走，轻微起伏；站立时略喘、奔跑时大步前倾、跳跃时收腿抬臂",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 64
+        },
+        "required": true,
+        "characterId": "scavenger-actor",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 8,
+            "fps": 12,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ],
+        "masterAsset": "master-scavenger-actor"
+      },
+      "source": {
+        "kind": "frames"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "wasteland-enemy",
+        "role": "地面巡逻敌人，进入距离后加速冲向玩家",
+        "description": "蜷伏在废墟通道中的低矮拾荒怪物，四肢着地、背部隆起，脏污布料与剥落皮肤混杂；巡逻时慢步左右移动，发现玩家后前倾加速冲刺，遇到高差停下",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "wasteland-enemy",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 6,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "charge",
+            "frames": 6,
+            "fps": 14,
+            "loop": true
+          },
+          {
+            "name": "halt",
+            "frames": 3,
+            "fps": 8,
+            "loop": false
+          }
+        ],
+        "masterAsset": "master-wasteland-enemy"
+      },
+      "source": {
+        "kind": "frames"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "ceiling-lurker",
+        "role": "倒挂在天花板与通风管下的伏击敌人，落下扑击后回位",
+        "description": "倒挂的干瘪人形怪物，细长四肢与长爪，皮肤灰暗紧贴骨骼，衣物碎片垂下；静止时轻微晃动，落下扑击后拉回原位悬挂",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0
+        },
+        "size": {
+          "w": 48,
+          "h": 56
+        },
+        "required": true,
+        "characterId": "ceiling-lurker",
+        "animations": [
+          {
+            "name": "hang",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "lunge",
+            "frames": 5,
+            "fps": 14,
+            "loop": false
+          },
+          {
+            "name": "retreat",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ],
+        "masterAsset": "master-ceiling-lurker"
+      },
+      "source": {
+        "kind": "frames"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scrap-resource",
+        "role": "可拾取的金属废料，撤离评价的计数依据",
+        "description": "小捧锈蚀金属废料：扭曲铁片、螺栓、断裂管件，用一条脏布带粗略捆着，边缘有暗色描边，微光闪烁提示可拾取",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "frames"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "clean-water",
+        "role": "可拾取的净水，恢复拾荒者部分伤势",
+        "description": "半满的旧玻璃瓶与铁罐装净水，瓶身有灰尘与指纹，水面反光；轻微上下浮动，瓶口偶有水滴落下",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "frames"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-terrain",
+        "role": "环境危害：塌陷坑洞、裸露钢筋与辐射蒸汽区",
+        "description": "地面上一处破裂塌陷的方形坑口，边缘碎裂水泥与裸露锈钢筋，坑内暗影深沉，旁边的辐射蒸汽由地面裂口渗出、半透明地浮动",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "collapsed-floor",
+        "role": "踩踏即短暂塌落的水泥楼板，玩家必须在塌落前跳走",
+        "description": "一块看起来与普通地面无异的水泥楼板，边缘已有细裂缝与剥落，底下隐约露出断裂钢筋；完全踩上后出现裂痕与轻微下沉",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/collapsed-floor.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "extraction-point",
+        "role": "城市尽头的撤离信号终端，抵达并停留后触发撤离",
+        "description": "一台立在地面的旧军用撤离终端：锈蚀铁柜、脏玻璃屏与天线，屏幕上是低分辨率的荧光撤离标记，周围有线缆与水泥碎块；通电时屏幕闪烁、指示灯明灭",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 96
+        },
+        "required": true,
+        "animations": [
+          {
+            "name": "standby",
+            "frames": 3,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "active",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "frames"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-floor",
+        "role": "破碎瓷砖与水泥地面，可平铺的地面砖",
+        "description": "一块正方形的碎瓷砖水泥地面砖：褪色方格瓷砖残片与裸水泥交界，裂缝、碎石、泥尘与暗色血污散布，四边可无缝拼接",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 64,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/tile-floor.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "metal-platform",
+        "role": "可站立的金属平台与栏杆段",
+        "description": "一段镀锌铁皮与角钢搭成的悬空平台，板面锈斑、螺栓与防滑纹，边缘带简易护栏；侧视可见厚度与支架投影",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 96,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/metal-platform.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "vent-duct",
+        "role": "横贯上方的通风管道，可作通道与悬挂巢穴",
+        "description": "一截横放的镀锌通风管，方形截面、接缝与铆钉清晰，表面凹痕、锈迹与积尘，侧面有格栅通风口",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 96,
+          "h": 40
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/vent-duct.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "concrete-step",
+        "role": "混凝土台阶与可攀爬的高低差",
+        "description": "两三级破损的混凝土台阶，边角崩缺、表面有裂纹与泥尘，踏面残留脏污涂层",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/concrete-step.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wooden-crate",
+        "role": "散落的木箱，可站上也可作障碍",
+        "description": "一只旧木包装箱，边角磨损开裂、木板翘起，侧面有褪色印记与铁钉，箱顶积尘",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/wooden-crate.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "office-debris",
+        "role": "办公室房间里的桌椅、床架等散落家具",
+        "description": "一张翻倒的旧办公桌与歪斜椅子，木料开裂、金属架生锈，旁边一卷散开的旧床架弹簧；轮廓分明便于辨认",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 96,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "minLargestShare": 0.5
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "broken-wall",
+        "role": "前景剪影与场景中的断墙残壁",
+        "description": "半截崩塌的混凝土墙，抹灰剥落露出砖石、边缘参差并挂着断裂钢筋，表面有裂缝与积尘",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 96
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/broken-wall.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "ruined-city-backdrop",
+        "role": "三层纵深的废墟城市背景：天际线雾霭 / 断墙街区 / 近景地面层",
+        "description": "后启示录废弃城市的纵深背景，低对比度压暗、层层雾霭；最远是雾中的废墟天际线，中间是被掏空的断墙街区，最近的一层是与可通行地面齐平的破碎街面与杂物剪影",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 640,
+          "h": 360
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "skyline",
+            "parallax": 0,
+            "description": "远处雾霭中的废墟天际线：模糊的断楼剪影与塔吊残骸，低对比度灰调，几乎不动"
+          },
+          {
+            "name": "blocks",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "中远景的断墙街区：被掏空的楼体、破窗与倒塌的结构，压暗并罩一层雾"
+          },
+          {
+            "name": "street",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "与主街面齐平的近背景层：破碎瓷砖路面、杂乱的碎墙与杂物剪影，随镜头同速移动"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "屏幕角落的状态面板底板，显示背包与生命",
+        "description": "一块被拉伸使用的脏旧铁皮面板底板：四边等宽磨损边框与暗色描边，中央区平坦可重复，布满细划痕与污渍",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "scrap-icon",
+        "role": "HUD 上的废料计数图标",
+        "description": "一枚 16×16 的锈蚀废料图标：扭曲铁片与螺栓，暗色描边，按原尺寸绘制不拉伸",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "health-icon",
+        "role": "HUD 上的生命 / 伤势图标",
+        "description": "一枚 16×16 的心形或绷带式伤势图标，脏旧布料与暗色描边，按原尺寸绘制不拉伸",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-scavenger-actor",
+      "role": "角色母版（scavenger-actor）",
+      "description": "同一角色的所有动作共用这张形象参考：玩家拾荒者，侧视四头身，背包与破旧外套构成不对称轮廓",
+      "source": {
+        "kind": "import",
+        "ref": "reuse/master-scavenger-actor.png"
+      },
+      "characterId": "scavenger-actor",
+      "size": {
+        "w": 864,
+        "h": 1152
+      }
+    },
+    {
+      "id": "master-wasteland-enemy",
+      "role": "角色母版（wasteland-enemy）",
+      "description": "同一角色的所有动作共用这张形象参考：地面巡逻敌人，进入距离后加速冲向玩家",
+      "source": {
+        "kind": "import",
+        "ref": "reuse/master-wasteland-enemy.png"
+      },
+      "characterId": "wasteland-enemy",
+      "size": {
+        "w": 1024,
+        "h": 1024
+      }
+    },
+    {
+      "id": "master-ceiling-lurker",
+      "role": "角色母版（ceiling-lurker）",
+      "description": "同一角色的所有动作共用这张形象参考：倒挂在天花板与通风管下的伏击敌人，落下扑击后回位",
+      "source": {
+        "kind": "import",
+        "ref": "reuse/master-ceiling-lurker.png"
+      },
+      "characterId": "ceiling-lurker",
+      "size": {
+        "w": 864,
+        "h": 1008
+      }
+    }
+  ]
+}

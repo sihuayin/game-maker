@@ -89,6 +89,14 @@ export const ImageSource = z.object({
   background: z.object({ tolerance: z.number().nonnegative() }).strict().optional(),
   /** alpha 二值化阈值，默认 0.5。`null` = 保留半透明边缘（不推荐，会产出色板外颜色）。 */
   alphaThreshold: z.number().min(0).max(1).nullable().optional(),
+  /**
+   * **单帧抠底后**「最大连通块占全部墨的比例」的下限。默认 **0.6**。
+   *
+   * ⚠️ 0.6 是给**单主体**资源准备的（防抠穿 / 防多主体混进一帧）；
+   *   多部件道具（桌子 + 椅子 + 弹簧卷）本身就会碎成多块 —— 那是**内容**，不是错。
+   *   ⇒ 这类资源在清单里**显式**给一个更低的值（例如 0.5），别改全局默认。
+   */
+  minLargestShare: z.number().min(0).max(1).optional(),
 }).strict();
 
 /**
@@ -120,7 +128,19 @@ export const ImportSource = z.object({
   alphaThreshold: z.number().min(0).max(1).nullable().optional(),
 }).strict();
 
-export const AssetSource = z.discriminatedUnion("kind", [DrawlistSource, ImageSource, ImportSource]);
+/**
+ * 让管线**逐帧**调生图模型：**每帧一次调用**（票 17）。
+ *
+ * ⚠️ 它与 `image` 的区别不是「画一张还是画一排」，而是**一次调用只画一帧**：
+ *   模型不再需要遵守「一图 N 帧」的数量 / 排版（2026-10-19 三次真跑证明它守不住）。
+ *   代价是调用数 = 帧数（玩家 16 + 敌人 15 + 潜伏者 13 + …）。
+ *
+ * ⚠️ **只用于 `animation` 资源**；且**不许与 `sheet` 同时写** —— 两种模式都在回答
+ *   「帧怎么来」，同时写就是两种意图打架（契约当场拒）。
+ */
+export const FramesSource = z.object({ kind: z.literal("frames") }).strict();
+
+export const AssetSource = z.discriminatedUnion("kind", [DrawlistSource, ImageSource, ImportSource, FramesSource]);
 
 /** **创作态母版** —— 参与生成、**不进交付包**（票 04 Q1/Q2）。
  *
@@ -300,6 +320,21 @@ export const AssetRecipe = z.object({
       issue(["assets", i, "spec", "size"],
         `资产 "${e.spec.id}" 的尺寸 ${w}×${h} 与母版 "${m}" 的画布 ${c.w}×${c.h} **宽高比不一致**` +
         " —— ⚠️ 母版的画布决定它的头身比，而动画的比例由这里的尺寸定；两套比例 = 同一个角色两种长相");
+  });
+
+  // ── 逐帧源（票 17）──
+  // ⚠️ 它只对 animation 有意义；且与 `sheet` 是两种互斥的排版说法。
+  r.assets.forEach((e, i) => {
+    const { spec, source } = e;
+    if (source.kind !== "frames") return;
+    if (spec.kind !== "animation")
+      issue(["assets", i, "source"], `\`source.kind="frames"\` 只用于 animation 资源（收到 ${spec.kind}）`);
+    else if (spec.animations.some((a) => a.sheet !== undefined))
+      issue(["assets", i, "source"], "`source.kind=\"frames\"` 与 `animations[].sheet` **不能同时写** —— 两种模式都在回答「帧怎么来」");
+  });
+  r.authoring?.forEach((a, i) => {
+    if (a.source.kind === "frames")
+      issue(["authoring", i, "source"], "母版不支持 `source.kind=\"frames\"`（母版是一张位图，不是动画）");
   });
 
   r.assets.forEach((e, i) => {

@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { PLAN_TOOL_DESCRIPTION, SKELETON_SHAPE_NOTE, TD_REFERENCE_SCALE, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
+import { PLAN_TOOL_DESCRIPTION, SKELETON_SHAPE_NOTE, TD_REFERENCE_SCALE, animationFramePrompt, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
 import type { AssetSpec, StyleSpec } from "@game-maker/contracts";
 
 describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
@@ -327,11 +327,34 @@ describe("固定网格：多帧提示词按 cols×rows 描述（票 01）", () =
     expect(p).not.toContain("横向排开");
   });
 
+  it("rows=1 走单行等距排开，不说「固定网格」/「格子」（票 16 的 A）", () => {
+    const oneRow: AssetSpec = {
+      ...GRID,
+      animations: [{ name: "run", frames: 8, sheet: { columns: 8, rows: 1 }, fps: 12, loop: true }],
+    };
+    const p = imagePrompt(oneRow, STYLE);
+    expect(p).toContain("一行排开");
+    expect(p).toContain("等距排开");
+    expect(p).toContain("8 个角色");
+    expect(p).toContain("没有任何分隔线");
+    expect(p).not.toContain("固定网格");
+    expect(p).not.toContain("格子");
+  });
+
   it("清单形状说明也认得 sheet —— 否则模型被告知「只许这些键」，永远写不出它", () => {
     const spec = recipeShapeSpec();
     expect(spec).toContain("`sheet`");
     expect(spec).toContain("columns × rows");
     expect(spec).toContain("固定网格");
+  });
+
+  it("逐帧提示词：**只有一个角色 / 帧号**，不出现「网格」（票 17）", () => {
+    const p = animationFramePrompt({ ...GRID, characterId: "guard" }, STYLE, "run", 2);
+    expect(p).toContain("第 3 帧 / 共 9 帧");
+    expect(p).toContain("只有一个角色");
+    expect(p).toContain("侧视、朝右");
+    expect(p).not.toContain("网格");
+    expect(p).not.toContain("格子");
   });
 
   it("没写 sheet 的旧路径一字不改 —— 仍走横排", () => {

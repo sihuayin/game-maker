@@ -126,11 +126,13 @@ const SheetShape = z.strictObject({
 
 export const AssetSourceShape = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("drawlist") }),
+  z.strictObject({ kind: z.literal("frames") }),
   z.strictObject({
     kind: z.literal("image"),
     reference: InputPathShape.optional(),
     background: z.strictObject({ tolerance: z.number().nonnegative() }).optional(),
-    alphaThreshold: z.number().min(0).max(1).nullable().optional()
+    alphaThreshold: z.number().min(0).max(1).nullable().optional(),
+    minLargestShare: z.number().min(0).max(1).optional()
   }),
   z.strictObject({
     kind: z.literal("import"),

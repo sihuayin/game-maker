@@ -98,6 +98,13 @@ export function imageCallsOf(recipe: {
 }): ImageCalls {
   const breakdown: ImageCallBreakdown = { animation: 0, single: 0, background: 0, master: 0 };
   for (const e of recipe.assets) {
+    // 票 17：逐帧源**每帧一次调用** —— 检查点报的「预计调用数」必须跟着这把尺子走，
+    // 否则人批准付费跑时看到的数会小于真发出去的数（票 40 的同一个病）。
+    if (e.source.kind === "frames") {
+      if (e.spec.kind === "animation")
+        breakdown.animation += e.spec.animations.reduce((n, a) => n + a.frames, 0);
+      continue;
+    }
     if (e.source.kind !== "image") continue;
     for (const u of imageUnitsOf(e.spec)) breakdown[classOf(u)]++;
   }

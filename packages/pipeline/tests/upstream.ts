@@ -37,7 +37,7 @@ const TOOL_INPUT: Record<string, unknown> = {
  *   这不是判据，只是让 pack 的抠底/分块/量化走通。
  */
 const imageReply = (body: Record<string, any>) => {
-  const prompt = String(body?.contents?.[0]?.parts?.[0]?.text ?? "");
+  const prompt = String(body?.input?.[0]?.text ?? body?.contents?.[0]?.parts?.[0]?.text ?? "");
   const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
   const anim = n > 0;
   const isBg = !anim && /背景|这一层|层\b/.test(prompt);
@@ -57,7 +57,10 @@ const imageReply = (body: Record<string, any>) => {
       fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
     }
   } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
-  return { candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: encodePNG({ width: w, height: h, data }).toString("base64") } }] } }] };
+  const png64 = encodePNG({ width: w, height: h, data }).toString("base64");
+  return body["response_format"] !== undefined
+    ? { steps: [{ type: "model_output", content: [{ type: "image", mime_type: "image/png", data: png64 }] }] }
+    : { candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: png64 } }] } }] };
 };
 
 const json = (body: unknown, status = 200) =>
@@ -97,7 +100,7 @@ export function fakeUpstream(opts: UpstreamOptions): typeof fetch {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
     opts.seen?.push(body);
     // 生图那一支（v3 票 09 后 bg / 动画硬信号都走 image）
-    if (body["generationConfig"] !== undefined) return json(imageReply(body));
+    if (body["response_format"] !== undefined || body["generationConfig"] !== undefined) return json(imageReply(body));
     if (body["tools"] === undefined) {
       // drawlist 那一支（`content` 是**一个字符串**，与理解层那五发的块数组不同）
       const content = (body["messages"] as { content: unknown }[])[0]!.content;

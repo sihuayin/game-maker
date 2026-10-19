@@ -133,12 +133,13 @@ describe("错误分类与重试边界 —— 这一条每次调用都是钱", ()
   });
 });
 
-describe("Gemini 客户端", () => {
+describe("Gemini 客户端（Interactions API）", () => {
   const png64 = PNG.toString("base64");
-  const okGemini = (parts: unknown[]) =>
-    new Response(JSON.stringify({ candidates: [{ content: { parts } }] }), { status: 200 });
+  const interaction = (blocks: unknown[]) =>
+    new Response(JSON.stringify({ steps: [{ type: "model_output", content: blocks }] }), { status: 200 });
+  const okGemini = () => interaction([{ type: "image", mime_type: "image/png", data: png64 }]);
   const fakeGemini = (res: () => Response) => {
-    const seen: { url: string; key?: string; body: Record<string, unknown> }[] = [];
+    const seen: { url: string; key?: string; body: Record<string, any> }[] = [];
     const impl = (async (url: string, init?: RequestInit) => {
       const h = init?.headers as Record<string, string> | undefined;
       seen.push({ url, ...(h?.["x-goog-api-key"] ? { key: h["x-goog-api-key"] } : {}), body: JSON.parse(String(init?.body)) });
@@ -146,7 +147,7 @@ describe("Gemini 客户端", () => {
     }) as unknown as typeof fetch;
     return { impl, seen };
   };
-  const g = (f: typeof fetch) => createGeminiGenerator({ baseUrl: "https://g.example/v1beta", apiKey: SECRET, fetchImpl: f });
+  const g = (f: typeof fetch) => createGeminiGenerator({ baseUrl: "https://g.example/v1beta", apiKey: SECRET, model: "gemini-3.1-flash-lite-image", api: "interactions", fetchImpl: f });
 
   it("长宽比只有参数说了算（实测：只写提示词会拿到 1024×1024）", () => {
     expect(geminiAspect({ w: 16, h: 16 })).toBe("1:1");
@@ -156,47 +157,157 @@ describe("Gemini 客户端", () => {
     expect(geminiAspect({ w: 48, h: 48 })).toBe("1:1");
   });
 
-  it("走对端点、带对头、把长宽比放进 generationConfig", async () => {
-    const up = fakeGemini(() => okGemini([{ inlineData: { mimeType: "image/png", data: png64 } }]));
+  it("走对端点、带对头、把 PNG / aspect / 1K 放进 response_format", async () => {
+    const up = fakeGemini(okGemini);
     const r = await g(up.impl)({ prompt: "a crate", size: { w: 32, h: 48 } });
     expect(r.image.width).toBe(8);
-    expect(up.seen[0]!.url).toBe("https://g.example/v1beta/models/gemini-2.5-flash-image:generateContent");
+    expect(up.seen[0]!.url).toBe("https://g.example/v1beta/interactions");
     expect(up.seen[0]!.key).toBe(SECRET);
-    const gc = (up.seen[0]!.body as { generationConfig: { imageConfig: { aspectRatio: string } } }).generationConfig;
-    expect(gc.imageConfig.aspectRatio).toBe("2:3");
-    expect(r.call.protocol).toBe("gemini");
+    const body = up.seen[0]!.body;
+    expect(body["model"]).toBe("gemini-3.1-flash-lite-image");
+    expect(body["response_format"]).toEqual({
+      type: "image", mime_type: "image/png", aspect_ratio: "2:3", image_size: "1K",
+    });
+    expect(r.call).toMatchObject({
+      protocol: "gemini", requestedSize: "aspect 2:3", attempts: 1, requestedModel: "gemini-3.1-flash-lite-image",
+    });
   });
 
-  it("⚠️ 参考图**内联**传（DashScope 那条路就断在这儿）", async () => {
-    const up = fakeGemini(() => okGemini([{ inlineData: { mimeType: "image/png", data: png64 } }]));
+  it("⚠️ 参考图按 input[] 内联，先风格图、后母版", async () => {
+    const up = fakeGemini(okGemini);
     const ref = emptyImage(4, 4);
-    await g(up.impl)({ prompt: "walk", size: { w: 16, h: 16 }, reference: ref });
-    const parts = (up.seen[0]!.body as { contents: { parts: Record<string, unknown>[] }[] }).contents[0]!.parts;
-    expect(parts.length).toBe(2);
-    expect(parts[1]).toHaveProperty("inline_data");
-    const inline = parts[1]!.inline_data as { mime_type: string; data: string };
-    expect(inline.mime_type).toBe("image/png");
+    const style = emptyImage(3, 3);
+    await g(up.impl)({ prompt: "walk", size: { w: 16, h: 16 }, styleReference: style, reference: ref });
+    const input = up.seen[0]!.body["input"] as Record<string, unknown>[];
+    expect(input).toHaveLength(3);
+    expect(input[0]).toMatchObject({ type: "text" });
+    expect(input[1]).toMatchObject({ type: "image", mime_type: "image/png" });
+    expect(input[2]).toMatchObject({ type: "image", mime_type: "image/png" });
+    expect(String(input[0]!["text"])).toContain("附件第 1 张");
+    expect(String(input[0]!["text"])).toContain("附件第 2 张");
+    const inline = input[1] as { data: string };
     expect(inline.data.length).toBeGreaterThan(0);
   });
 
   it("negativePrompt 拼进正文（Gemini 没有这个字段）", async () => {
-    const up = fakeGemini(() => okGemini([{ inlineData: { mimeType: "image/png", data: png64 } }]));
+    const up = fakeGemini(okGemini);
     await g(up.impl)({ prompt: "a crate", size: { w: 16, h: 16 }, negativePrompt: "scene, border" });
-    const text = ((up.seen[0]!.body as { contents: { parts: { text: string }[] }[] }).contents[0]!.parts[0]!).text;
+    const text = String((up.seen[0]!.body["input"] as { text: string }[])[0]!.text);
     expect(text).toContain("a crate");
     expect(text).toContain("Avoid: scene, border");
   });
 
-  it("形状不对就抛，且带上原文", async () => {
+  it("兼容顶层 output_image（SDK 便利属性）", async () => {
+    const up = fakeGemini(() => new Response(JSON.stringify({
+      output_image: { data: png64, mime_type: "image/png" },
+    }), { status: 200 }));
+    const r = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(r.image.width).toBe(8);
+  });
+
+  it("没有 mime_type 时按 PNG 签名判定", async () => {
+    const up = fakeGemini(() => interaction([{ type: "image", data: png64 }]));
+    const r = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(r.image.width).toBe(8);
+  });
+
+  it("⚠️ 上游回非 PNG 就明确失败，不静默解码", async () => {
+    const up = fakeGemini(() => interaction([{ type: "image", mime_type: "image/jpeg", data: png64 }]));
+    const e = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
+    expect(e).toBeInstanceOf(ImageGenerationError);
+    expect((e as Error).message).toMatch(/image\/jpeg/);
+    expect((e as Error).message).toMatch(/image\/png/);
+    expect(up.seen).toHaveLength(1);   // 确定性错，不重试
+  });
+
+  it("形状不对就抛，且带上 steps 摘要", async () => {
     for (const [name, body] of [
-      ["没有 candidates", {}],
-      ["parts 里没有图", { candidates: [{ content: { parts: [{ text: "I cannot." }] } }] }],
+      ["没有 steps", {}],
+      ["steps 里没有图", { steps: [{ type: "model_output", content: [{ type: "text", text: "I cannot." }] }] }],
     ] as [string, unknown][]) {
       const up = fakeGemini(() => new Response(JSON.stringify(body), { status: 200 }));
       const e = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
       expect(e, name).toBeInstanceOf(ImageGenerationError);
       expect((e as Error).message, name).toMatch(/回应里没有图/);
     }
+  });
+
+  it("4xx 不重试；5xx 按 attempts 重试；上游 error 不重试", async () => {
+    const bad = fakeGemini(() => new Response("boom", { status: 400 }));
+    await expect(g(bad.impl)({ prompt: "x", size: { w: 16, h: 16 } })).rejects.toThrow(/HTTP 400/);
+    expect(bad.seen).toHaveLength(1);
+
+    const flaky = fakeGemini(() => new Response("boom", { status: 500 }));
+    const e = await g(flaky.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
+    expect(e).toBeInstanceOf(ImageGenerationError);
+    expect(flaky.seen).toHaveLength(4);
+
+    const err = fakeGemini(() => new Response(JSON.stringify({ error: { code: 400, message: "bad model" } }), { status: 200 }));
+    const e2 = await g(err.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
+    expect((e2 as Error).message).toMatch(/Gemini 报错/);
+    expect(err.seen).toHaveLength(1);
+  });
+});
+
+describe("Gemini legacy（2.5 generateContent，PNG 路径）", () => {
+  const png64 = PNG.toString("base64");
+  const okLegacy = () => new Response(JSON.stringify({
+    candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: png64 } }] } }],
+  }), { status: 200 });
+  const fakeGemini = (res: () => Response) => {
+    const seen: { url: string; key?: string; body: Record<string, any> }[] = [];
+    const impl = (async (url: string, init?: RequestInit) => {
+      const h = init?.headers as Record<string, string> | undefined;
+      seen.push({ url, ...(h?.["x-goog-api-key"] ? { key: h["x-goog-api-key"] } : {}), body: JSON.parse(String(init?.body)) });
+      return res();
+    }) as unknown as typeof fetch;
+    return { impl, seen };
+  };
+  const g = (f: typeof fetch) => createGeminiGenerator({
+    baseUrl: "https://g.example/v1beta", apiKey: SECRET, model: "gemini-2.5-flash-image", api: "generateContent", fetchImpl: f,
+  });
+
+  it("走 legacy 端点、带对头、把长宽比放进 generationConfig", async () => {
+    const up = fakeGemini(okLegacy);
+    const r = await g(up.impl)({ prompt: "a crate", size: { w: 32, h: 48 } });
+    expect(r.image.width).toBe(8);
+    expect(up.seen[0]!.url).toBe("https://g.example/v1beta/models/gemini-2.5-flash-image:generateContent");
+    expect(up.seen[0]!.key).toBe(SECRET);
+    const body = up.seen[0]!.body;
+    expect(body["generationConfig"]).toMatchObject({ imageConfig: { aspectRatio: "2:3" }, responseModalities: ["IMAGE"] });
+    expect(String((body["contents"] as { parts: { text?: string }[] }[])[0]!.parts[0]!.text)).toContain("a crate");
+  });
+
+  it("参考图走 inline_data，negativePrompt 拼进正文", async () => {
+    const up = fakeGemini(okLegacy);
+    await g(up.impl)({ prompt: "walk", size: { w: 16, h: 16 }, negativePrompt: "scene", reference: emptyImage(4, 4) });
+    const parts = (up.seen[0]!.body["contents"] as { parts: Record<string, any>[] }[])[0]!.parts;
+    expect(parts).toHaveLength(2);
+    expect(String(parts[0]!["text"])).toContain("Avoid: scene");
+    expect(parts[1]!["inline_data"]).toMatchObject({ mime_type: "image/png" });
+  });
+
+  it("legacy 回非 PNG 也明确失败", async () => {
+    const up = fakeGemini(() => new Response(JSON.stringify({
+      candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/jpeg", data: png64 } }] } }],
+    }), { status: 200 }));
+    const e = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
+    expect(e).toBeInstanceOf(ImageGenerationError);
+    expect((e as Error).message).toMatch(/image\/jpeg/);
+    expect((e as Error).message).toMatch(/image\/png/);
+    expect(up.seen).toHaveLength(1);
+  });
+
+  it("auto：2.5 走 legacy，3.x 走 Interactions", async () => {
+    const up = fakeGemini(okLegacy);
+    const auto = (model: string) => createGeminiGenerator({
+      baseUrl: "https://g.example/v1beta", apiKey: SECRET, model, fetchImpl: up.impl,
+    });
+    await auto("gemini-2.5-flash-image")({ prompt: "a", size: { w: 16, h: 16 } });
+    expect(up.seen[0]!.url).toBe("https://g.example/v1beta/models/gemini-2.5-flash-image:generateContent");
+    // 3.x 走 Interactions；同一个 fake 回的是 legacy 形状 ⇒ 会明确失败，但端点已证明。
+    await auto("gemini-3.1-flash-lite-image")({ prompt: "b", size: { w: 16, h: 16 } }).catch(() => undefined);
+    expect(up.seen[1]!.url).toBe("https://g.example/v1beta/interactions");
   });
 });
 

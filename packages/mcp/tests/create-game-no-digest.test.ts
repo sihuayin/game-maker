@@ -37,9 +37,9 @@ const json = (body: unknown) => ({ ok: true, status: 200, json: async () => body
 function fakeUpstream(): typeof fetch {
   return (async (_url: string, init: RequestInit) => {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
-    if (body["generationConfig"] !== undefined) {
+    if (body["response_format"] !== undefined || body["generationConfig"] !== undefined) {
       // 与 CLI 测试同款：动画 → N 个分离色块；背景/层 → 纯色；单物体 → 纯色底 + 一个块。
-      const prompt = String((body as any)?.contents?.[0]?.parts?.[0]?.text ?? "");
+      const prompt = String((body as any)?.input?.[0]?.text ?? (body as any)?.contents?.[0]?.parts?.[0]?.text ?? "");
       const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
       const anim = n > 0;
       const isBg = !anim && /背景|这一层|层\b/.test(prompt);
@@ -59,8 +59,10 @@ function fakeUpstream(): typeof fetch {
           fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
         }
       } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
-      const png = encodePNG({ width: w, height: h, data });
-      return json({ candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: png.toString("base64") } }] } }] });
+      const png = encodePNG({ width: w, height: h, data }).toString("base64");
+      return json(body["response_format"] !== undefined
+        ? { steps: [{ type: "model_output", content: [{ type: "image", mime_type: "image/png", data: png }] }] }
+        : { candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: png } }] } }] });
     }
     if (body["tools"] !== undefined) {
       const TOOL: Record<string, unknown> = {

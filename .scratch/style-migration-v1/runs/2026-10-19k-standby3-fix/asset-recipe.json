@@ -1,0 +1,29 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "standby3-fix",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "extraction-point",
+        "role": "城市尽头的撤离信号终端，抵达并停留后触发撤离",
+        "description": "一台立在地面的旧军用撤离终端：锈蚀铁柜、脏玻璃屏与天线，屏幕上是低分辨率的荧光撤离标记，周围有线缆与水泥碎块；通电时屏幕闪烁、指示灯明灭",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 96
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ]
+}

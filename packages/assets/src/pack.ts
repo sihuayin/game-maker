@@ -22,7 +22,7 @@ import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
 import { auditSheetCells, bottomBand, cropAboveBand, segmentRowCells, sliceGridCells, type SheetCellIssue } from "./sheet.js";
-import { framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
+import { animationFramePrompt, framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioReading } from "./master.js";
 import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
 import { encodePNG, decodePNG } from "./png.js";
@@ -65,6 +65,13 @@ export type BuildPackOptions = {
    * cwd 相对才碰巧能跑）。
    */
   recipeDir: string;
+  /**
+   * **复用现场**（票 18）：一个失败现场 / 已有包的根目录。
+   * 给了它，`authoring/generated/<原图名>` 与 `authoring/drawlist/<帧名>.json`
+   * **存在就直接读、不再调用上游**；缺任何一份就抛（拒绝偷偷重发）。
+   * ⚠️ 复用出来的图/指令**不计入 `imageCalls` / `ledger`** —— 它们没有花钱。
+   */
+  reuseFrom?: string;
   generate: DrawListGenerator;
   /** 清单里有 `kind: "image"` 的资源时必填，否则**开跑前**就失败（不静默跳过）。 */
   generateImage?: ImageGenerator;
@@ -116,10 +123,11 @@ export type BuildPackOptions = {
 
 type AssetSourceLike =
   | { kind: "drawlist" }
+  | { kind: "frames" }
   // ⚠️ **没有 `prompt`**（票 35 的 Q1）：提示词**始终**由 `imagePrompt()` 派生，覆盖那个口子
   //   已从契约里删掉（`recipe.ts`）—— 这份手抄镜像跟着一起删，否则模型不给、这里却仍写着可选，
   //   下一个人会以为它活着。
-  | { kind: "image"; reference?: string; background?: { tolerance: number }; alphaThreshold?: number | null }
+  | { kind: "image"; reference?: string; background?: { tolerance: number }; alphaThreshold?: number | null; minLargestShare?: number }
   | {
       kind: "import"; ref: string;
       sheet?: { columns: number; rows: number; frameWidth: number; frameHeight: number; offsetX?: number; offsetY?: number; spacingX?: number; spacingY?: number; names: string[]; animations?: { name: string; frames: string[] }[] };
@@ -557,9 +565,18 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
       let binding: Built["paletteBinding"] = "exact";
 
       if (entry.source.kind === "drawlist") {
+        // 票 18：复用现场的 drawlist（零文本调用）；缺文件就抛，不偷偷重发。
+        const reused = opts.reuseFrom === undefined
+          ? undefined
+          : plan.map((p) => {
+              const file = path.join(opts.reuseFrom!, "authoring/drawlist", `${p.name}.json`);
+              if (!fs.existsSync(file))
+                throw new Error(`reuseFrom 模式缺少 drawlist：${file} —— 拒绝重发（票 18）`);
+              return JSON.parse(fs.readFileSync(file, "utf8")) as DrawList;
+            });
         // ⚠️ `async () =>` 不是多余的：`DrawListGenerator` 的返回是 `DrawList[] | Promise<DrawList[]>`，
       //   直接包一层会让闸门的泛型吃进那个**联合**（于是 await 完还剩一个 Promise）。
-      const drawlists = await textGate(async () => generate(spec, style));
+      const drawlists = reused ?? await textGate(async () => generate(spec, style));
         // ⚠️ **这是「注入契约」的断言，不是一条生产路径上的判据**（[票 49](../../../.scratch/game-maker-v2/issues/49-compiletdgame-mislabels-errors.md) 的裁定 Q5 = ① —— **保持原样，只把它说明白**）：
         //   · `generate` 是**注入**进来的（`DrawListGenerator`），它承诺「清单要几帧就给几帧」；
         //   · **生产路径上这一条够不着** —— 唯一的生产调用方 `packAssets` 造的是**真生成器**，
@@ -583,8 +600,10 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         });
         // 票 36：对 drawlist 资源，绑定关系是**解析期静态**的 —— 不需要渲染后再扫
         binding = drawlists.some((d) => paletteBindingOf(d.ops) === "composited") ? "composited" : "exact";
-      } else if (entry.source.kind === "image") {
+      } else if (entry.source.kind === "image" || entry.source.kind === "frames") {
         const src = entry.source;
+        const frameMode = src.kind === "frames";
+        const imageSrc = src.kind === "image" ? src : undefined;
         if (!opts.generateImage)
           throw new Error(`资源 "${spec.id}" 是 source.kind="image"，但调用方没给 generateImage —— 这是**调用方的 bug**，不静默跳过`);
         origin = "generated";
@@ -605,7 +624,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
         //   ⚠️ **`import` 那条路不走这里**（见下面 `else` 分支）：人给的 PNG **可能真的自带透明底**，
         //      `recipe.ts` 那句「不给就假定人已经给了透明底」是它自己的语义。这条不对称是**故意的**。
         const keyColor = hexToRgb(keyColorFor(palette));
-        const bgOpt = { tolerance: src.background?.tolerance ?? 30, colors: [keyColor] };
+        const bgOpt = { tolerance: imageSrc?.background?.tolerance ?? 30, colors: [keyColor] };
         const declaredColors = bgOpt.colors;
         const isBg = spec.kind === "background";
         // ⚠️⚠️ **2026-10-10 · 票 37 就地更正上面那段「兑现承诺」**（带日期的注，不改原文）：
@@ -631,8 +650,8 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           throw new Error(
             `资产 "${spec.id}" 的母版 "${spec.masterAsset}" **没造出来**（${masterFailure.get(spec.masterAsset) ?? "原因未知"}）` +
             " —— ⚠️ 参考图不成立时发出去的那一笔是白花的钱（票 13 的 Q5）。");
-        const reference = master ?? (src.reference
-          ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, src.reference)))
+        const reference = master ?? (imageSrc?.reference
+          ? decodePNG(fs.readFileSync(path.resolve(opts.recipeDir, imageSrc.reference)))
           : undefined);
         // ⚠️ **一个 unit 一次调用**，而「**怎么切**」**不在这里** —— 那是 `imageUnitsOf` 那把尺子
         //   （`@game-maker/contracts` · **票 40**）。⚠️ 抽它出来的理由：检查点报的那个数与这里
@@ -649,10 +668,17 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           u.anim !== undefined ? `authoring/generated/${spec.id}.${u.anim}.png`
             : u.layer !== undefined ? `authoring/generated/${spec.id}.${u.layer.name}.png`
               : `authoring/generated/${spec.id}.png`;
-        const units = imageUnitsOf(spec).map((u) => ({ ...u, raw: rawName(u) }));
+        /** 逐帧模式（票 17）：一个**帧**一个 unit，顺序与 `framePlan` 完全一致。 */
+        type PackUnit = ImageUnit & { raw: string; frame?: number; frameCount?: number };
+        const units: PackUnit[] = frameMode
+          ? plan.filter((p) => p.anim !== null).map((p) => ({
+              anim: p.anim!, frames: 1, frame: p.index, frameCount: p.total,
+              raw: `authoring/generated/${p.name}.png`,
+            }))
+          : imageUnitsOf(spec).map((u) => ({ ...u, raw: rawName(u) }));
         /** 这个 unit 的**固定网格**（票 01）。省略 = 旧路径（按墨迹间隙分块）。 */
-        const gridOf = (u: ImageUnit) =>
-          u.anim === undefined || spec.kind !== "animation"
+        const gridOf = (u: PackUnit) =>
+          frameMode || u.anim === undefined || spec.kind !== "animation"
             ? undefined
             : spec.animations.find((a) => a.name === u.anim)?.sheet;
 
@@ -669,13 +695,15 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           //   ⇒ `imagePrompt()` 一次都没跑过，把「背景必须是纯色 ${bg}」「画布是 N 倍宽」
           //   「一排 N 个」那些话**整段丢掉**了。那个字段已经**从契约里删掉**
           //   （`recipe.ts` / `recipe-tool.ts`），所以这里没有 `??` 可写了 —— 形状上就不可能再覆盖。
-          const prompt = imagePrompt(spec, style, {
-            ...(u.anim === undefined ? {} : { anim: u.anim }),
-            ...(u.layer === undefined ? {} : { layer: u.layer }),
-            // ⚠️ **有 DNA 就把身份那一句换成基因的八个字段**（票 13 的 Q3，人类裁定「替换，不是叠加」）；
-            //   没有 DNA（不是角色 / 调用方没给文件）就照旧用 `spec.description`。
-            ...(dna === undefined ? {} : { dna }),
-          });
+          const prompt = frameMode && u.anim !== undefined && u.frame !== undefined
+            ? animationFramePrompt(spec, style, u.anim, u.frame, dna)
+            : imagePrompt(spec, style, {
+                ...(u.anim === undefined ? {} : { anim: u.anim }),
+                ...(u.layer === undefined ? {} : { layer: u.layer }),
+                // ⚠️ **有 DNA 就把身份那一句换成基因的八个字段**（票 13 的 Q3，人类裁定「替换，不是叠加」）；
+                //   没有 DNA（不是角色 / 调用方没给文件）就照旧用 `spec.description`。
+                ...(dna === undefined ? {} : { dna }),
+              });
           // ⚠️ 过**生图**那道闸 —— 一次调用就是一笔钱，别把它和文本调用共用一个上限
           // ⚠️ **发出即记**（2026-09-30 · 票 05）：这一笔**已经花出去了** —— 它回不回来是另一回事。
           //   先记一笔「已发出」（`ms` 缺席）。之后有**两条**收尾的路，都会把它补成事实：
@@ -689,43 +717,60 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           //   （票 47「失败即止」），而**那几笔一分钱没花** —— 记在外面就会**多报**。
           //   （实测：4 个资源、并发 1、第一个就挂 ⇒ 上游只收到 **1** 笔，账上却写了 **4** 笔。
           //   那直接违反票 05 的判据：报出来的笔数 **===** 真实发出的笔数。）
-          let rec: LedgerCall | undefined;
-          const { image, call } = await imageGate(() => {
-            rec = { step: "image", target: spec.id, attempts: 1 };
-            opts.ledger?.push(rec);
-            return opts.generateImage!({
-              prompt,
-              // ⚠️ 画布也是**图单元的形状**（票 01）：固定网格按 cols×rows 申请，不是 N 倍宽的一条横带。
-              //   上游回来的尺寸由它自己的 aspect 表定，所以 `sliceGridCells` 不要求整除。
-              size: {
-                w: spec.size.w * (grid?.columns ?? u.frames),
-                h: spec.size.h * (grid?.rows ?? 1),
-              },
-              negativePrompt: imageNegativePrompt(),
-              ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
-            }, {
-              // ⚠️ **失败也要交账**（2026-09-30 · 票 06）：这一笔**烧掉了几趟往返**是事实，
-              //   而失败那条路上，生成器内部的重试此前**没有任何人记** —— 账上只剩一个「发出时的 1」。
-              //   仓库的纪律：「重试烧掉的额度要能单独看见，**否则失败的归因是错的**」。
-              //   ⚠️ 只补 `ms` / `attempts`：`model` / `usage` / `requestId` 拿不到就**缺席**，不编。
-              onFailure: (f) => { if (rec) Object.assign(rec, f); },
+          // 票 18：复用模式 —— 现场已有对应原图就直接读，**不再调用上游**；缺文件就抛。
+          // 复用出来的帧**不计入 imageCalls / ledger**（它们没有花钱）。
+          const reusePath = opts.reuseFrom === undefined
+            ? undefined
+            : path.join(opts.reuseFrom, "authoring/generated", path.basename(u.raw));
+          let image: RasterImage;
+          let call: ImageGenCall | undefined;
+          if (reusePath !== undefined) {
+            if (!fs.existsSync(reusePath))
+              throw new Error(`reuseFrom 模式缺少生图文件：${reusePath} —— 拒绝重发（票 18）`);
+            image = decodePNG(fs.readFileSync(reusePath));
+          } else {
+            let rec: LedgerCall | undefined;
+            const res = await imageGate(() => {
+              rec = { step: "image", target: spec.id, attempts: 1 };
+              opts.ledger?.push(rec);
+              return opts.generateImage!({
+                prompt,
+                // ⚠️ 画布也是**图单元的形状**（票 01）：固定网格按 cols×rows 申请，不是 N 倍宽的一条横带。
+                //   上游回来的尺寸由它自己的 aspect 表定，所以 `sliceGridCells` 不要求整除。
+                size: frameMode
+                  ? { w: spec.size.w, h: spec.size.h }
+                  : {
+                      w: spec.size.w * (grid?.columns ?? u.frames),
+                      h: spec.size.h * (grid?.rows ?? 1),
+                    },
+                negativePrompt: imageNegativePrompt(),
+                ...(styleReference ? { styleReference } : {}), ...(reference ? { reference } : {}),
+              }, {
+                // ⚠️ **失败也要交账**（2026-09-30 · 票 06）：这一笔**烧掉了几趟往返**是事实，
+                //   而失败那条路上，生成器内部的重试此前**没有任何人记** —— 账上只剩一个「发出时的 1」。
+                //   仓库的纪律：「重试烧掉的额度要能单独看见，**否则失败的归因是错的**」。
+                //   ⚠️ 只补 `ms` / `attempts`：`model` / `usage` / `requestId` 拿不到就**缺席**，不编。
+                onFailure: (f) => { if (rec) Object.assign(rec, f); },
+              });
             });
-          });
-          // 回来了：把这一笔**补成事实**（同一个对象 —— 账里仍是**一笔**，不是两笔）
-          // ⚠️ **紧跟着 await 做**，别挪到后面去：落盘与「分块」那两段都会抛，
-          //   一笔**已经回来了**的调用若卡在它们后面，就会一直停在 `ms` 缺席 ——
-          //   而两个壳会把它印成「**还没回来**」，那是**假话**（账里那句定义：缺席 = 发出去了、还没回来）。
-          // ⚠️ 走到这里 = 闸门**放行过**它 ⇒ `rec` 必然已经写上（闸门只做两件事：放行、或拒）
-          // ⚠️ `satisfies` 不是装饰：`Object.assign` 会**丢掉对象字面量的多余属性检查**
-          //   （把键名写错不再报错）。这一句把它找回来。
-          if (rec) Object.assign(rec, {
-            upstream: call.protocol, ms: call.ms, attempts: call.attempts,
-            ...(call.requestedSize !== undefined ? { requestedSize: call.requestedSize } : {}),
-            ...(call.requestedModel !== undefined ? { requestedModel: call.requestedModel } : {}),
-            ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
-            ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
-            ...(call.usage !== undefined ? { usage: call.usage } : {}),
-          } satisfies Omit<LedgerCall, "step" | "target">);
+            image = res.image;
+            call = res.call;
+            // 回来了：把这一笔**补成事实**（同一个对象 —— 账里仍是**一笔**，不是两笔）
+            // ⚠️ **紧跟着 await 做**，别挪到后面去：落盘与「分块」那两段都会抛，
+            //   一笔**已经回来了**的调用若卡在它们后面，就会一直停在 `ms` 缺席 ——
+            //   而两个壳会把它印成「**还没回来**」，那是**假话**（账里那句定义：缺席 = 发出去了、还没回来）。
+            // ⚠️ 走到这里 = 闸门**放行过**它 ⇒ `rec` 必然已经写上（闸门只做两件事：放行、或拒）
+            // ⚠️ `satisfies` 不是装饰：`Object.assign` 会**丢掉对象字面量的多余属性检查**
+            //   （把键名写错不再报错）。这一句把它找回来。
+            if (rec) Object.assign(rec, {
+              upstream: call.protocol, ms: call.ms, attempts: call.attempts,
+              ...(call.requestedSize !== undefined ? { requestedSize: call.requestedSize } : {}),
+              ...(call.requestedModel !== undefined ? { requestedModel: call.requestedModel } : {}),
+              ...(call.requestId !== undefined ? { requestId: call.requestId } : {}),
+              ...(call.sourceHost !== undefined ? { sourceHost: call.sourceHost } : {}),
+              ...(call.usage !== undefined ? { usage: call.usage } : {}),
+            } satisfies Omit<LedgerCall, "step" | "target">);
+          }
           // 原图落盘：它既是创作态，也是「那次调用到底给了什么」的唯一证据。
           fs.writeFileSync(path.join(packDir, u.raw), encodePNG(image));
           fs.writeFileSync(path.join(packDir, u.raw.replace(/\.png$/, ".prompt.txt")), prompt + "\n");
@@ -842,10 +887,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
             //    照字面写「块数 === 1」会把这张**真图判成不合格** —— 下一跑当场白花钱。
             //    （边界见票 37 §8：**判据要挡得住真的错，不许把真图判死**。）
             const blocks = foregroundBlocks(keyed.image);
-            if (blocks.largestShare < 0.6)
+            const minLargestShare = imageSrc?.minLargestShare ?? 0.6;
+            if (blocks.largestShare < minLargestShare)
               throw new Error(
                 `资源 "${spec.id}" 的底色判据没过：按**实测众数色**抠完，剩下的墨**碎成了 ${blocks.areas.length} 块**，` +
-                `最大的一块只占 ${(blocks.largestShare * 100).toFixed(1)}%（要求 ≥ 60%）—— 主体多半被抠穿了。\n` +
+                `最大的一块只占 ${(blocks.largestShare * 100).toFixed(1)}%（要求 ≥ ${(minLargestShare * 100).toFixed(0)}%）—— 主体多半被抠穿了。\n` +
                 `${colourReport(measured, keyed.keyedPixels, pixels)}。\n` + NOT_A_RETRY);
           }
           const cells: RasterImage[] = [];
@@ -921,7 +967,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
               cells.push(...seg.cells);
             }
           }
-          imageCalls.push({ assetId: spec.id, ...call });
+          if (call !== undefined) imageCalls.push({ assetId: spec.id, ...call });
         }
         // ⚠️ **背景走两条与「一件道具」不同的规矩**（票 43 · **票 38 改写了第①条**），
         //   都要在这里定，不能留给默认：
@@ -950,7 +996,7 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           // 票 107：生图会在角色头顶留下极淡的字形；它们是帧内孤立碎点，必须在并集包围盒前丢掉，
           // 否则 idle 被压成 71/108 高、run 满高。背景层不丢（留白/星点可能是设计，且它不裁框）。
           ...(isBg ? {} : { dropSpecks: true }),
-          ...(src.alphaThreshold !== undefined ? { alphaThreshold: src.alphaThreshold } : {}),
+          ...(imageSrc?.alphaThreshold !== undefined ? { alphaThreshold: imageSrc.alphaThreshold } : {}),
         }));
         const stateOf = new Map<string, string>();
         if (spec.kind === "animation") {

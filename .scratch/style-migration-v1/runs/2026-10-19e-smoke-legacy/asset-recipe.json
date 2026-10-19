@@ -1,0 +1,29 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "smoke-interactions",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "office-debris",
+        "role": "办公室房间里的桌椅、床架等散落家具",
+        "description": "一张翻倒的旧办公桌与歪斜椅子，木料开裂、金属架生锈，旁边一卷散开的旧床架弹簧；轮廓分明便于辨认",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 96,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ]
+}

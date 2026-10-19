@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/style-migration-v1/runs/2026-10-19g-smoke-single-row/smoke-single-row/pack/v1",
+  "imageRequests": 1,
+  "textRequests": 0,
+  "verify": {
+    "packId": "smoke-single-row",
+    "version": 1,
+    "ok": true,
+    "problems": [],
+    "provenanceMode": "generated"
+  },
+  "summary": [
+    "资源包：smoke-single-row/pack/v1（v1）",
+    "1 个资源 · 1 张图集 · 7 个文件",
+    "来源：generated",
+    "账：1 次调用 · 1 次往返（无重试）· 墙钟 21.9s · 调用耗时合计 17.3s · 见包内 ledger.json",
+    "生图：1 次调用 · scavenger-actor"
+  ],
+  "data": {
+    "packId": "smoke-single-row",
+    "version": 1,
+    "imageCalls": [
+      {
+        "assetId": "scavenger-actor",
+        "protocol": "gemini",
+        "requestedSize": "aspect 16:9",
+        "ms": 17270,
+        "attempts": 1,
+        "requestedModel": "gemini-2.5-flash-image"
+      }
+    ],
+    "imageUpstream": "生图上游：gemini · https://generativelanguage.googleapis.com/v1beta · 模型 gemini-2.5-flash-image（key 已配置，53 字符） · 经代理 http://127.0.0.1:7890",
+    "ledgerCalls": [
+      {
+        "step": "image",
+        "target": "scavenger-actor",
+        "attempts": 1,
+        "upstream": "gemini",
+        "ms": 17270,
+        "requestedSize": "aspect 16:9",
+        "requestedModel": "gemini-2.5-flash-image"
+      }
+    ],
+    "ledgerRun": {
+      "image": {
+        "calls": 1,
+        "attempts": 1
+      }
+    },
+    "assetCount": 1,
+    "fileCount": 7,
+    "provenanceMode": "generated",
+    "paletteCoverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  }
+}

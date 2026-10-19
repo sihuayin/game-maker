@@ -21,7 +21,7 @@ const CANNED = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/upstream/can
 
 /** 假生图回应（v3 票 09）：动画 → N 个分离色块；背景/层 → 纯色；单物体 → 纯色底 + 一个块。 */
 function imageReply(body: Record<string, any>): Response {
-  const prompt = String(body?.contents?.[0]?.parts?.[0]?.text ?? "");
+  const prompt = String(body?.input?.[0]?.text ?? body?.contents?.[0]?.parts?.[0]?.text ?? "");
   const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
   const anim = n > 0;
   const isBg = !anim && /背景|这一层|层\b/.test(prompt);
@@ -41,11 +41,11 @@ function imageReply(body: Record<string, any>): Response {
       fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
     }
   } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
-  return {
-    ok: true, status: 200,
-    json: async () => ({ candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: encodePNG({ width: w, height: h, data }).toString("base64") } }] } }] }),
-    text: async () => "",
-  } as unknown as Response;
+  const png64 = encodePNG({ width: w, height: h, data }).toString("base64");
+  const reply = body["response_format"] !== undefined
+    ? { steps: [{ type: "model_output", content: [{ type: "image", mime_type: "image/png", data: png64 }] }] }
+    : { candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: png64 } }] } }] };
+  return { ok: true, status: 200, json: async () => reply, text: async () => "" } as unknown as Response;
 }
 
 /**
@@ -112,7 +112,7 @@ function fakeUpstream(over: {
   const json = (body: unknown) => ({ ok: true, status: 200, json: async () => body, text: async () => JSON.stringify(body) }) as Response;
   return (async (_url: string, init: RequestInit) => {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
-    if (body["generationConfig"] !== undefined) return imageReply(body);
+    if (body["response_format"] !== undefined || body["generationConfig"] !== undefined) return imageReply(body);
     if (body["tools"] !== undefined) {
       const name = (body["tool_choice"] as { name: string }).name;
       const input = name === "emit_asset_recipe" ? { ...(over.recipe ?? CANNED["recipe"]), id: over.recipeId } : TOOL[name];
