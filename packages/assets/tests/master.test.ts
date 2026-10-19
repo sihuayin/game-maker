@@ -123,6 +123,22 @@ describe("§比例读数（票 39：它从**判据**降成**观察**）", () => 
     expect(l).toContain("2.8%");
   });
 
+  it("⚠️ C2 现场（请求 48×64 · 回来 858×1178）⇒ 差 2.9%（读数要对得上现场）", () => {
+    const r = masterRatioReading({ w: 48, h: 64 }, { width: 858, height: 1178 });
+    expect(r.match).toBe(false);
+    expect(r.ratioDelta * 100).toBeCloseTo(-2.886, 2);
+    const l = line({ w: 48, h: 64 }, { width: 858, height: 1178 }, "master-probe-player");
+    expect(l).toContain("858×1178");
+    expect(l).toContain("2.9%");
+  });
+
+  it("⚠️ 10% 漂移（请求 48×64 · 回来 66×80）⇒ `match:false`、差 10.0%，仍然是观察", () => {
+    const r = masterRatioReading({ w: 48, h: 64 }, { width: 66, height: 80 });
+    expect(r.match).toBe(false);
+    expect(r.ratioDelta).toBeCloseTo(0.1, 10);
+    expect(line({ w: 48, h: 64 }, { width: 66, height: 80 })).toContain("10.0%");
+  });
+
   it("⚠️ 文案里**没有**那两条出路（票 39 的 Q2）—— 它只陈述读数，不指路", () => {
     const l = line({ w: 64, h: 96 }, { width: 1024, height: 1024 });
     expect(l).not.toContain("重出");

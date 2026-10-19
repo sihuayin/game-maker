@@ -245,6 +245,10 @@ export const DESIGN_TOOL_DESCRIPTION = `输出一份 GameDesignSpec —— 把�
    ⚠️ **这句说的是 \`player.id\`，不是「把桶里那条删掉」**：若意图层**就是**把主角登记成了某个桶里的
    一条（\`role\` 写着「玩家控制的…」），那条**留着**、\`id\` 按第 3 条**原样沿用** ——
    它是意图层登记过的实体，删了它，下游就**再也说不出「用户要的那个东西做成了没有」**。
+   ⚠️ **写完自检一遍**：\`player.id\` 是否与四个桶里任何一个 \`id\` 相同？相同就**改 \`player.id\`**。
+   例：意图层 \`entities = [{"id":"scavenger-player","type":"npc"}]\`
+   ⇒ 合法：\`player.id = "hero"\`、\`npcs[0].id = "scavenger-player"\`；
+   ❌ 非法：\`player.id = "scavenger-player"\`（与 \`npcs[0].id\` 重复，整份会被拒）。
 
 只调这个工具，不要解释。`;
 

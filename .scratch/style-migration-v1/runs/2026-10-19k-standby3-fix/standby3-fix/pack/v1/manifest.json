@@ -1,0 +1,142 @@
+{
+  "format": "assetpack/v4",
+  "id": "standby3-fix",
+  "version": 1,
+  "createdAt": "2026-10-19T13:10:09.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 32,
+    "values": [
+      "#000000",
+      "#080000",
+      "#180000",
+      "#200000",
+      "#100700",
+      "#290705",
+      "#1a0d05",
+      "#380702",
+      "#210f03",
+      "#290d02",
+      "#420605",
+      "#310c00",
+      "#221205",
+      "#301100",
+      "#391404",
+      "#321905",
+      "#421600",
+      "#523730",
+      "#454a50",
+      "#794c35",
+      "#58554e",
+      "#685247",
+      "#786151",
+      "#676862",
+      "#74716c",
+      "#8e7161",
+      "#82847f",
+      "#a97f67",
+      "#a0827a",
+      "#a3a09b",
+      "#c89f8b",
+      "#d2a087"
+    ],
+    "coverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 64,
+        "h": 96
+      },
+      "frames": 1,
+      "assets": [
+        "extraction-point"
+      ],
+      "checksum": "sha256:5239416be1b1d4dee15372aff27c2797c01418944366a535fd3371e43ed28f2d"
+    }
+  ],
+  "assets": [
+    {
+      "id": "extraction-point",
+      "kind": "sprite",
+      "role": "城市尽头的撤离信号终端，抵达并停留后触发撤离",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 96
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "extraction-point"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.png",
+          "original": "生图"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/generated/extraction-point.png",
+      "bytes": 1545168,
+      "checksum": "sha256:15f58e376550bbdb5e3f53d229f518176d4253c2d4df776bc6e5a6519ecd7c0f"
+    },
+    {
+      "path": "authoring/generated/extraction-point.prompt.txt",
+      "bytes": 2231,
+      "checksum": "sha256:088ff6f3f76857891ef8927574bf9d0d265e256ee59364bbaba91e0983ca815c"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1835,
+      "checksum": "sha256:3e2f30955ab483891eb74eeaac437f637fd27e00438f5e9d8a86df3929c64ef4"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 104,
+      "checksum": "sha256:7a6b87a42a1c1b7eed6ab82a84dc119cf2c4f9a2f57d72d26834573fe9322de4"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 605,
+      "checksum": "sha256:29171ed0e6ad04b33bc67d0a620f17490ee10d178295a3b6be63f651fa7e38b4"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 3171,
+      "checksum": "sha256:5239416be1b1d4dee15372aff27c2797c01418944366a535fd3371e43ed28f2d"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 503,
+      "checksum": "sha256:04f24b6243eb201de9c5d01049a2d20bab0d66a22b7dc099e99b4ec2b9f4fd2a"
+    }
+  ]
+}

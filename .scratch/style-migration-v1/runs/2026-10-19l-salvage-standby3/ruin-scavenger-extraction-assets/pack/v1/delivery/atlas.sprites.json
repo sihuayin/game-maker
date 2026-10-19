@@ -1,0 +1,231 @@
+{
+  "frames": {
+    "broken-wall": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 96
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "office-debris": {
+      "frame": {
+        "x": 0,
+        "y": 96,
+        "w": 96,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "tile-floor": {
+      "frame": {
+        "x": 0,
+        "y": 160,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "concrete-step": {
+      "frame": {
+        "x": 0,
+        "y": 224,
+        "w": 64,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "hazard-terrain": {
+      "frame": {
+        "x": 0,
+        "y": 272,
+        "w": 64,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "metal-platform": {
+      "frame": {
+        "x": 0,
+        "y": 320,
+        "w": 96,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "wooden-crate": {
+      "frame": {
+        "x": 0,
+        "y": 368,
+        "w": 48,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "vent-duct": {
+      "frame": {
+        "x": 0,
+        "y": 416,
+        "w": 96,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "collapsed-floor": {
+      "frame": {
+        "x": 0,
+        "y": 456,
+        "w": 64,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.sprites.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 96,
+      "h": 488
+    },
+    "scale": 1
+  }
+}

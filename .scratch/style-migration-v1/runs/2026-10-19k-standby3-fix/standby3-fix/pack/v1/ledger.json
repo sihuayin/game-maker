@@ -1,0 +1,26 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "standby3-fix",
+  "packVersion": 1,
+  "createdAt": "2026-10-19T13:10:09.000Z",
+  "run": {
+    "wallClockMs": 14742,
+    "byStep": {
+      "image": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "image",
+      "target": "extraction-point",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14107,
+      "requestedSize": "aspect 2:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

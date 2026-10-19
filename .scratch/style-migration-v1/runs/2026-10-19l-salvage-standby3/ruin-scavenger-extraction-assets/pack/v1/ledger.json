@@ -1,0 +1,11 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-20T00:00:00.000Z",
+  "run": {
+    "wallClockMs": 57304,
+    "byStep": {}
+  },
+  "calls": []
+}

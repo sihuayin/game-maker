@@ -191,6 +191,23 @@ describe("§母版前段：`image` 的母版（⭐ DNA → 母版那条箭头）
     expect(v.summary.join("\n")).toContain("差 50.0%");
   });
 
+  it("⚠️ C2 那种 2.9% 漂移（48×64 → 858×1178）⇒ 记录、放行、不阻断", async () => {
+    // ⚠️ 这一条与上面那条 1024×1024 一起构成「上游回图这一支重新变成判据就会红」的守卫：
+    //   只要有人在 size 对不上时抛错 / 只阻断引用它的资产，这里就走不到 `ratiosOf`。
+    const r = recorder({ masterImage: () => image(858, 1178, STYLE.palette[1]!) });
+    const c2 = recipe({ master: { ...asImage(), size: { w: 48, h: 64 } } });
+    c2.assets[0]!.spec.size = { w: 48, h: 64 };
+    const { packDir } = await build({ recipe: c2, generateImage: r.gen, characterDna: DNA });
+    const all = ratiosOf(path.join(packDir, MASTER_RATIOS_FILE));
+    expect(all.masters).toHaveLength(1);
+    expect(all.masters[0]).toMatchObject({
+      master: "player-master", match: false,
+      requested: { w: 48, h: 64 }, returned: { w: 858, h: 1178 },
+    });
+    expect(all.masters[0]!.ratioDelta * 100).toBeCloseTo(-2.886, 2);
+    expect(r.of("anim"), "观察不阻断：引用它的资产照发").toHaveLength(1);
+  });
+
   it("⚠️ **一致的那些也记**（票 39 的 Q5）—— 只记不匹配的，分不清「全对」与「压根没量」", async () => {
     const r = recorder();   // 默认回的就是 `req.size`（832×1248）⇒ 与 canonical 完全一致
     const { packDir } = await build({ recipe: recipe({ master: asImage() }), generateImage: r.gen, characterDna: DNA });
