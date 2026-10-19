@@ -1,0 +1,33 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "scrap-icon",
+  "frame": "scrap-icon",
+  "viewBox": [
+    0,
+    0,
+    16,
+    16
+  ],
+  "expectedSize": [
+    16,
+    16
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 16,
+      "h": 16,
+      "fill": "palette:0"
+    },
+    {
+      "op": "rect",
+      "x": 1,
+      "y": 1,
+      "w": 14,
+      "h": 2,
+      "fill": "palette:1"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "ok": true,
+  "fullRecipeAssets": 19,
+  "stubRecipeAssets": 10,
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/style-migration-v1/runs/2026-10-19a-migration/stub-out/ruin-scavenger-extraction-assets/pack/v1",
+  "verify": {
+    "packId": "ruin-scavenger-extraction-assets",
+    "version": 1,
+    "ok": true,
+    "problems": [],
+    "provenanceMode": "mixed"
+  },
+  "audit": [],
+  "imageCalls": 0,
+  "assets": [
+    {
+      "id": "collapsed-floor",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 64,
+        "h": 32
+      },
+      "frames": 1
+    },
+    {
+      "id": "tile-floor",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 64,
+        "h": 64
+      },
+      "frames": 1
+    },
+    {
+      "id": "metal-platform",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 96,
+        "h": 48
+      },
+      "frames": 1
+    },
+    {
+      "id": "vent-duct",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 96,
+        "h": 40
+      },
+      "frames": 1
+    },
+    {
+      "id": "concrete-step",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 64,
+        "h": 48
+      },
+      "frames": 1
+    },
+    {
+      "id": "wooden-crate",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "frames": 1
+    },
+    {
+      "id": "broken-wall",
+      "kind": "sprite",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "size": {
+        "w": 64,
+        "h": 96
+      },
+      "frames": 1
+    },
+    {
+      "id": "hud-panel",
+      "kind": "ui",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "frames": 1
+    },
+    {
+      "id": "scrap-icon",
+      "kind": "ui",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "frames": 1
+    },
+    {
+      "id": "health-icon",
+      "kind": "ui",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "frames": 1
+    }
+  ]
+}

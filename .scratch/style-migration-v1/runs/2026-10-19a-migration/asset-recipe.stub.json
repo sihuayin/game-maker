@@ -1,0 +1,232 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruin-scavenger-extraction-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "collapsed-floor",
+        "role": "踩踏即短暂塌落的水泥楼板，玩家必须在塌落前跳走",
+        "description": "一块看起来与普通地面无异的水泥楼板，边缘已有细裂缝与剥落，底下隐约露出断裂钢筋；完全踩上后出现裂痕与轻微下沉",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/collapsed-floor.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "tile-floor",
+        "role": "破碎瓷砖与水泥地面，可平铺的地面砖",
+        "description": "一块正方形的碎瓷砖水泥地面砖：褪色方格瓷砖残片与裸水泥交界，裂缝、碎石、泥尘与暗色血污散布，四边可无缝拼接",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 64,
+          "h": 64
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/tile-floor.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "metal-platform",
+        "role": "可站立的金属平台与栏杆段",
+        "description": "一段镀锌铁皮与角钢搭成的悬空平台，板面锈斑、螺栓与防滑纹，边缘带简易护栏；侧视可见厚度与支架投影",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 96,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/metal-platform.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "vent-duct",
+        "role": "横贯上方的通风管道，可作通道与悬挂巢穴",
+        "description": "一截横放的镀锌通风管，方形截面、接缝与铆钉清晰，表面凹痕、锈迹与积尘，侧面有格栅通风口",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 96,
+          "h": 40
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/vent-duct.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "concrete-step",
+        "role": "混凝土台阶与可攀爬的高低差",
+        "description": "两三级破损的混凝土台阶，边角崩缺、表面有裂纹与泥尘，踏面残留脏污涂层",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/concrete-step.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wooden-crate",
+        "role": "散落的木箱，可站上也可作障碍",
+        "description": "一只旧木包装箱，边角磨损开裂、木板翘起，侧面有褪色印记与铁钉，箱顶积尘",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/wooden-crate.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "broken-wall",
+        "role": "前景剪影与场景中的断墙残壁",
+        "description": "半截崩塌的混凝土墙，抹灰剥落露出砖石、边缘参差并挂着断裂钢筋，表面有裂缝与积尘",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 96
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "import",
+        "ref": "imported/broken-wall.png"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "屏幕角落的状态面板底板，显示背包与生命",
+        "description": "一块被拉伸使用的脏旧铁皮面板底板：四边等宽磨损边框与暗色描边，中央区平坦可重复，布满细划痕与污渍",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "scrap-icon",
+        "role": "HUD 上的废料计数图标",
+        "description": "一枚 16×16 的锈蚀废料图标：扭曲铁片与螺栓，暗色描边，按原尺寸绘制不拉伸",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "health-icon",
+        "role": "HUD 上的生命 / 伤势图标",
+        "description": "一枚 16×16 的心形或绷带式伤势图标，脏旧布料与暗色描边，按原尺寸绘制不拉伸",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}
