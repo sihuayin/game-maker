@@ -8,4 +8,5 @@
 //   `StyleSpec` 转成生成提示词，本包把参考图转成 `VisualWorldSpec`）。
 export * from "./prompts.js";
 export * from "./build-visual-world.js";
+export * from "./palette.js";
 export * from "./analyze-reference.js";

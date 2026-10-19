@@ -133,8 +133,14 @@ function fakeUpstream(over: {
 
 /** 一张真的小 PNG（参考图那一格要能解码）。 */
 function tinyPng(w = 8, h = 8): Buffer {
+  // ⚠️ 票 04 之后参考图会被**确定性提色**：纯色图只能提出 1 色，而 canned 的 DNA/配方
+  //   引用了 palette:0/1 ⇒ 会撞「越界」。四象限四色仍是很小的图，只用于跑通链路。
   const data = Buffer.alloc(w * h * 4);
-  for (let i = 0; i < w * h; i++) { data[i * 4] = 255; data[i * 4 + 1] = 0; data[i * 4 + 2] = 255; data[i * 4 + 3] = 255; }
+  const colors = [[255, 0, 255], [0, 255, 0], [0, 0, 255], [255, 255, 0]];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const s = (y * w + x) * 4, c = colors[(y < h / 2 ? 0 : 2) + (x < w / 2 ? 0 : 1)]!;
+    data[s] = c[0]!; data[s + 1] = c[1]!; data[s + 2] = c[2]!; data[s + 3] = 255;
+  }
   return encodePNG({ width: w, height: h, data });
 }
 const dirs: string[] = [];

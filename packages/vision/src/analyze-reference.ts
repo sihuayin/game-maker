@@ -18,13 +18,14 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   STRUCTURED_CALL_ATTEMPTS, STYLE_MEDIA_TYPES, UPSTREAM_TIMEOUT_MS, VISUAL_WORLD_ATTEMPTS_FORMAT, VisualWorldSpecSchema,
-  carryOnError, forcedTool, parseToolUse,
+  carryOnError, forcedTool, formatIssues, parseToolUse,
   type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleReference,
   type ToolUseFailure,
   type VisualWorldAttempt, type VisualWorldAttempts, type VisualWorldResponseSummary, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildVisualWorld } from "./build-visual-world.js";
 import { TOOL_DESCRIPTION, TOOL_NAME, visionPrompt } from "./prompts.js";
+import { applyDeterministicPalette, extractPalette, PALETTE_SIZE, type PaletteSource } from "./palette.js";
 
 /** 请求的模型名。⚠️ 与 `assets` 同源（票 24 的实况：代理**请求一个、回另一个**，`model` 与 `requestedModel` 是两个事实）。 */
 const REQUESTED_MODEL = "deepseek-v4-pro";
@@ -59,6 +60,15 @@ export type AnalyzeReferenceInput = {
    */
   cwd?: string;
   transport: { baseUrl: string; apiKey: string };
+  /**
+   * 参考图的**已解码像素**（第一阶段恰好一张）。
+   *
+   * ⚠️ 给了 ⇒ 模型成功后，`style.palette` 按它**确定性替换**，六个桶 / `materials.*.color`
+   *   里的 `palette:N` 按「旧色最近的新色」改写（票 04）。不给 ⇒ 保持模型色板（旧行为，
+   *   直接调用本文件的测试与手工路径走这一支）。
+   * ⚠️ 解码不在这里做：`vision` 只许依赖 `contracts`，PNG 解码器在 `assets`（调用方递）。
+   */
+  referencePixels?: PaletteSource;
   /** 测试可注入（`review.ts` 同款用法）。 */
   fetchImpl?: typeof fetch;
   /** 一次上游调用的超时。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
@@ -205,7 +215,7 @@ function imageBlocks(refs: StyleReference[], cwd: string): Record<string, unknow
 /** 一次往返。**只做一次** —— 重采样在调用方那层（R16 的固定次数）。 */
 async function onceThrough(o: {
   baseUrl: string; apiKey: string; body: string; timeoutMs: number; doFetch: typeof fetch;
-  styleReferences: StyleReference[]; styleId: string;
+  styleReferences: StyleReference[]; styleId: string; referencePixels?: PaletteSource;
 }): Promise<Trip> {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), o.timeoutMs);
@@ -244,7 +254,23 @@ async function onceThrough(o: {
   //   发明一个到不了的值是 R7 的门）；分开读**靠 `detail`** —— 与票 55 的 Q2(r3) 同一条分工。
   //   ⚠️ 而 `raw` 仍然带模型那一份原话（它**过了** `ModelFacingSpec`，只是装配之后越了界）。
   if (!built.ok) return { kind: "bad", failure: "schema", detail: `装配后不过契约：${built.detail}`, spent, raw: parsed.raw, response };
-  return { kind: "ok", value: built.spec, spent };
+
+  // ── 票 04：**确定性色板**（模型成功后、成品过契约之前）────────────────────────
+  // ⚠️ 顺序是判据的一部分：先让模型那份过契约（六桶/材料里的 `palette:N` 必须合法），
+  //   再把色板换成参考图提取的那份，并把引用按「旧色的最近新色」改写。
+  //   反过来（先换再验）会让一个自相矛盾的模型输出被我们**救活**，越界 gate 就成了假牙。
+  let spec = built.spec;
+  if (o.referencePixels !== undefined) {
+    const palette = extractPalette(o.referencePixels, { size: PALETTE_SIZE });
+    if (palette.length > 0) {
+      const replaced = applyDeterministicPalette(spec, palette);
+      const again = VisualWorldSpecSchema.safeParse(replaced);
+      if (!again.success)
+        return { kind: "bad", failure: "schema", detail: `确定性色板装配后不过契约：${formatIssues(again.error).slice(0, 4).join("；")}`, spent, raw: parsed.raw, response };
+      spec = again.data;
+    }
+  }
+  return { kind: "ok", value: spec, spent };
 }
 
 /**
@@ -310,6 +336,7 @@ export async function analyzeReference(input: AnalyzeReferenceInput): Promise<An
     const once = await onceThrough({
       baseUrl: input.transport.baseUrl, apiKey: input.transport.apiKey, body, timeoutMs, doFetch,
       styleReferences, styleId: input.styleId,
+      ...(input.referencePixels === undefined ? {} : { referencePixels: input.referencePixels }),
     });
     if (once.kind === "upstream") {
       // ⚠️ **上游失败不记进 `attempts`**：它发生在取到 body 之前，压根没有模型入参

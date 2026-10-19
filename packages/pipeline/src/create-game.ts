@@ -24,7 +24,7 @@ import {
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { compileRuntime, inspectPack, nextPackVersion, packAssets, planAssets, type ImageTransport, type InspectData } from "@game-maker/assets";
+import { compileRuntime, decodePNG, inspectPack, nextPackVersion, packAssets, planAssets, type ImageTransport, type InspectData } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
@@ -262,8 +262,23 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     writeIntentMd(run.tmpDir, input.requirement);
 
     say("visual-world");
+    // ── 票 04：确定性色板需要**已解码的参考图像素** ─────────────────────────────
+    // ⚠️ `vision` 只许依赖 `contracts`（R11）⇒ PNG 解码在**本层**做（本包够得着 `assets`）。
+    // ⚠️ 只支持 PNG：确定性提取不能靠猜 jpg/webp 的像素。非 PNG 在**第一笔上游之前**拒，
+    //   报一句人能做得到的事（转成 PNG）。
+    if (input.styleReferences.length !== 1)
+      throw new CommandError("usage", `第一阶段恰好要 1 张参考图，给了 ${input.styleReferences.length} 张（R18）。`);
+    const refAbs = path.resolve(cwd, input.styleReferences[0]!.path);
+    if (path.extname(refAbs).toLowerCase() !== ".png")
+      throw new CommandError(
+        "usage",
+        `确定性色板提取只支持 PNG 参考图，而这张是 "${path.extname(refAbs) || "（无扩展名）"}"` +
+        " —— 请先把参考图转成 PNG（jpg/webp 的像素解码没有实现，猜一个色板会让可复现性失效）。",
+      );
+    const referencePixels = decodePNG(fs.readFileSync(refAbs));
     const world = await analyzeReference({
       styleReferences: input.styleReferences as { path: string }[],
+      referencePixels,
       requirementText: input.requirement,
       styleId: input.styleId ?? styleIdOf(input.styleReferences[0]!.path),
       // ⚠️ 那几条相对路径**相对谁**由调用方说 —— 而 `createGame` 的那个 `cwd` 与**进程**的
