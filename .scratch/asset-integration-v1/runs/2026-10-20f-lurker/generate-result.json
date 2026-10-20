@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "model": "gemini-2.5-flash-image",
+  "proxy": "http://127.0.0.1:7890",
+  "requests": 7,
+  "frames": [
+    {
+      "name": "ceiling-lurker.hang1",
+      "ms": 16196,
+      "attempts": 2,
+      "model": "gemini-2.5-flash-image",
+      "bytes": 1189028
+    },
+    {
+      "name": "ceiling-lurker.hang2",
+      "ms": 18731,
+      "attempts": 1,
+      "model": "gemini-2.5-flash-image",
+      "bytes": 1202622
+    },
+    {
+      "name": "ceiling-lurker.hang3",
+      "ms": 16040,
+      "attempts": 1,
+      "model": "gemini-2.5-flash-image",
+      "bytes": 1108176
+    },
+    {
+      "name": "ceiling-lurker.lunge4",
+      "ms": 17118,
+      "attempts": 1,
+      "model": "gemini-2.5-flash-image",
+      "bytes": 1024234
+    },
+    {
+      "name": "ceiling-lurker.retreat2",
+      "ms": 18379,
+      "attempts": 1,
+      "model": "gemini-2.5-flash-image",
+      "bytes": 1090709
+    },
+    {
+      "name": "ceiling-lurker.retreat3",
+      "ms": 16140,
+      "attempts": 1,
+      "model": "gemini-2.5-flash-image",
+      "bytes": 1087821
+    }
+  ]
+}

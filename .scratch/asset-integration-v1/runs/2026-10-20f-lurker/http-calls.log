@@ -1,0 +1,22 @@
+2026-10-20T06:47:25.730Z START model=gemini-2.5-flash-image proxy=http://127.0.0.1:7890 maxImageReq=12 frames=6
+2026-10-20T06:47:28.068Z FAIL Cannot read properties of undefined (reading 'length') requests=0 done=0
+2026-10-20T06:47:52.734Z START model=gemini-2.5-flash-image proxy=http://127.0.0.1:7890 maxImageReq=12 frames=6
+2026-10-20T06:47:55.679Z IMG-REQ #1 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:47:55.887Z IMG-REQ #2 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:48:11.058Z IMG-RES #2 200 application/json; charset=UTF-8
+2026-10-20T06:48:12.053Z DONE ceiling-lurker.hang1 ms=16196 attempts=2 bytes=1189028
+2026-10-20T06:48:12.860Z IMG-REQ #3 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:48:30.558Z IMG-RES #3 200 application/json; charset=UTF-8
+2026-10-20T06:48:31.734Z DONE ceiling-lurker.hang2 ms=18731 attempts=1 bytes=1202622
+2026-10-20T06:48:32.504Z IMG-REQ #4 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:48:47.635Z IMG-RES #4 200 application/json; charset=UTF-8
+2026-10-20T06:48:48.727Z DONE ceiling-lurker.hang3 ms=16040 attempts=1 bytes=1108176
+2026-10-20T06:48:49.500Z IMG-REQ #5 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:49:05.726Z IMG-RES #5 200 application/json; charset=UTF-8
+2026-10-20T06:49:06.888Z DONE ceiling-lurker.lunge4 ms=17118 attempts=1 bytes=1024234
+2026-10-20T06:49:07.658Z IMG-REQ #6 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:49:25.217Z IMG-RES #6 200 application/json; charset=UTF-8
+2026-10-20T06:49:26.347Z DONE ceiling-lurker.retreat2 ms=18379 attempts=1 bytes=1090709
+2026-10-20T06:49:27.116Z IMG-REQ #7 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+2026-10-20T06:49:42.354Z IMG-RES #7 200 application/json; charset=UTF-8
+2026-10-20T06:49:43.543Z DONE ceiling-lurker.retreat3 ms=16140 attempts=1 bytes=1087821

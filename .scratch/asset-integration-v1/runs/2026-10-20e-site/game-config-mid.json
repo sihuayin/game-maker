@@ -1,0 +1,258 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 640,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "ruined-city-backdrop"
+    }
+  },
+  "player": {
+    "asset": "scavenger-actor",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 560,
+      "y": 250
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 250,
+      "w": 240,
+      "h": 20
+    },
+    {
+      "x": 288,
+      "y": 250,
+      "w": 352,
+      "h": 20
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "w": 8,
+      "h": 250
+    },
+    {
+      "x": 632,
+      "y": 0,
+      "w": 8,
+      "h": 250
+    }
+  ],
+  "entities": [
+    {
+      "id": "lurker-hang",
+      "kind": "decor",
+      "at": {
+        "x": 250,
+        "y": 0
+      },
+      "asset": "ceiling-lurker",
+      "anim": "hang"
+    },
+    {
+      "id": "lurker-lunge",
+      "kind": "decor",
+      "at": {
+        "x": 400,
+        "y": 0
+      },
+      "asset": "ceiling-lurker",
+      "anim": "lunge"
+    },
+    {
+      "id": "lurker-retreat",
+      "kind": "decor",
+      "at": {
+        "x": 520,
+        "y": 0
+      },
+      "asset": "ceiling-lurker",
+      "anim": "retreat"
+    },
+    {
+      "id": "office-debris-1",
+      "kind": "decor",
+      "at": {
+        "x": 100,
+        "y": 250
+      },
+      "asset": "office-debris"
+    },
+    {
+      "id": "tile-floor-1",
+      "kind": "decor",
+      "at": {
+        "x": 120,
+        "y": 190
+      },
+      "asset": "tile-floor"
+    },
+    {
+      "id": "vent-duct-1",
+      "kind": "decor",
+      "at": {
+        "x": 170,
+        "y": 130
+      },
+      "asset": "vent-duct"
+    },
+    {
+      "id": "concrete-step-1",
+      "kind": "solid",
+      "at": {
+        "x": 180,
+        "y": 250
+      },
+      "asset": "concrete-step"
+    },
+    {
+      "id": "wooden-crate-1",
+      "kind": "solid",
+      "at": {
+        "x": 320,
+        "y": 250
+      },
+      "asset": "wooden-crate"
+    },
+    {
+      "id": "metal-platform-1",
+      "kind": "solid",
+      "at": {
+        "x": 470,
+        "y": 250
+      },
+      "asset": "metal-platform"
+    },
+    {
+      "id": "collapsed-floor-1",
+      "kind": "solid",
+      "at": {
+        "x": 550,
+        "y": 225
+      },
+      "asset": "collapsed-floor"
+    },
+    {
+      "id": "broken-wall-1",
+      "kind": "decor",
+      "at": {
+        "x": 560,
+        "y": 250
+      },
+      "asset": "broken-wall"
+    },
+    {
+      "id": "hazard-terrain-1",
+      "kind": "hazard",
+      "at": {
+        "x": 380,
+        "y": 250
+      },
+      "asset": "hazard-terrain"
+    },
+    {
+      "id": "enemy-patrol",
+      "kind": "hazard",
+      "at": {
+        "x": 480,
+        "y": 250
+      },
+      "asset": "wasteland-enemy",
+      "anim": "patrol",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 40,
+        "periodMs": 3000
+      }
+    },
+    {
+      "id": "scrap-1",
+      "kind": "pickup",
+      "at": {
+        "x": 120,
+        "y": 230
+      },
+      "asset": "scrap-resource",
+      "anim": "idle"
+    },
+    {
+      "id": "water-1",
+      "kind": "pickup",
+      "at": {
+        "x": 215,
+        "y": 225
+      },
+      "asset": "clean-water",
+      "anim": "idle"
+    },
+    {
+      "id": "health-marker",
+      "kind": "decor",
+      "at": {
+        "x": 215,
+        "y": 203
+      },
+      "asset": "health-icon"
+    },
+    {
+      "id": "scrap-2",
+      "kind": "pickup",
+      "at": {
+        "x": 430,
+        "y": 180
+      },
+      "asset": "scrap-resource",
+      "anim": "idle"
+    },
+    {
+      "id": "extraction",
+      "kind": "goal",
+      "at": {
+        "x": 600,
+        "y": 250
+      },
+      "asset": "extraction-point",
+      "anim": "active"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "hud-panel",
+      "at": {
+        "x": 44,
+        "y": 32
+      },
+      "size": {
+        "w": 72,
+        "h": 48
+      }
+    },
+    "pip": {
+      "asset": "scrap-icon",
+      "at": {
+        "x": 20,
+        "y": 32
+      },
+      "step": {
+        "x": 18,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "extraction"
+  }
+}
