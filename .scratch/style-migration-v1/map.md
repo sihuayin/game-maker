@@ -13,7 +13,7 @@ Effort: style-migration-v1
 > `runs/2026-10-19l-salvage-standby3/ruin-scavenger-extraction-assets/pack/v1/`
 > （`verifyPack` ok · 19 资源 · 61 帧 · 0 次最终重建上游调用；**最终包已入库 2026-10-19**）。
 > 已知内容瑕疵：潜伏者 hang/lunge/retreat 语义混用；多图地面线；绿外套量化成棕。
-> 后续可另立票：潜伏者定向修复（≤13 发，需报告 + 点头）· 地面线零付费清理 · 色板复盘。
+> 后续已整理到 [asset-integration-v1](../asset-integration-v1/map.md)：站点集成 / 潜伏者语义 / 地面线 / 色板 / 模型迁移。
 
 ## Destination
 
