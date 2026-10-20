@@ -10,6 +10,7 @@ Effort: asset-integration-v1
 > ✅ **2026-10-20 · 06 已产出策展包 v4**（34 色 = 32 提取 + 2 策展；`verifyPack` ok · 61 帧 · 0 上游）。
 > ✅ **2026-10-20 · 03 已收口 → 策展包 v6**（v4 的 34 色 + 地面线清理；`verifyPack` ok · 61 动画帧 · 0 上游）。
 > ✅ **2026-10-20 · 02 已收口 → pack v7**（lurker hang/lunge/retreat 语义修复；2 张付费新帧 + 4 张零付费旋转）。
+> ✅ **2026-10-20 · 05 已收口（research）** → 推荐「冻结 2.5 + `gemini-nano-banana-2.1` + JPEG 解码」；路线定稿见 [07](issues/07-model-route-ratification.md)。
 > ⚠️ **本图承载施工**（不是纯决策图）；任何付费生图 / 文本调用仍须**逐次**报告 + 逐字点头。
 
 ## Destination
@@ -28,12 +29,13 @@ Effort: asset-integration-v1
   （在 v4 上做地面线清理；34 色；`verifyPack` ok · 61 动画帧 · 0 上游）。
 - **最终包（02 定稿 · 当前集成起点）**：`.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/`
   （在 v6 上修 lurker 语义；34 色；`verifyPack` ok · 61 动画帧 · 0 上游）。
+- **模型路线报告（05 定稿）**：`research/model-route-2026-10-20.md`（零付费；官方文档 / discovery + 本地离线 JPEG 模拟）。
 - **原始设计**（与包同源）：`runs/2026-10-18d/ruin-scavenger-extraction-assets/run/v1/game-design.json`
 - **付费闸**：生图 / 文本上游都算付费动作；先出书面预算报告 + 逐字点头，一笔都不能自行发。
 - **零付费工具**：`reuseFrom` + `minLargestShare` 让「patch 一帧 → 复用重建」不花钱；
   `verifyPack` / `inspect` 本地免费。
-- **建议顺序**：06 色板（已完成，v4）→ 03 地面线（**已完成**，v6）→ 01 站点集成（**已完成**，零上游）→
-  02 潜伏者（**已完成**，v7）；05 模型迁移仍开（research）。
+- **顺序**：06 色板（已完成，v4）→ 03 地面线（**已完成**，v6）→ 01 站点集成（**已完成**，零上游）→
+  02 潜伏者（**已完成**，v7）→ 05 模型路线（**已收口**，research）→ 07 路线定稿（**开**，人裁）。
 - **站点**：`runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/`（**site/v3** 消费 v7；v1/v2 是 v6 的历史版本；
   配置与证据在同目录）。
 - **已知瑕疵**：~~潜伏者倒挂/站立语义混用~~（02 已修，见 v7）；~~多帧地面线 / 细虚线~~（03 已修，见 v6）；
@@ -65,13 +67,26 @@ Effort: asset-integration-v1
   付费 6 帧（7 发 HTTP / 6 张成功，≈$0.20–0.23），`lunge4` / `retreat3` 采用；
   `hang1/2/3` / `retreat2` 被拒后用**原 raw 180° 旋转**零付费补足。`pack/v7` `verifyPack` ok ·
   61 动画帧（4/5/4）· 0 上游；与 v6 只差 lurker 6 帧。证据：`runs/2026-10-20f-lurker/lurker-report.md`。
+- [05. 2.5 停服后的模型路线](issues/05-model-migration.md)：**已收口（research）** ——
+  推荐「冻结 2.5 产物 + `gemini-nano-banana-2.1` + Interactions JPEG 解码」；2.5 legacy PNG 只作
+  已批准小补丁的临时旁路。Interactions 输出枚举**只有 JPEG**（换 3.1-flash / 3-pro 也不解决）；
+  2.5 停服日期三份官方口径矛盾（2027-03-15 / 2026-10-02 / 「未弃用」），不能当安全桥。
+  66 次量级成本：2.1 ≈ $2.4–2.5，3-pro ≈ $9.2，冻结 = $0。离线模拟显示压缩本身温和，
+  风险在**逐帧裁框抖动**（q90 下 1K bbox 漂移 1–8 px）。施工面 ≈ 0.5–1.5 人日（`jpeg-js`）。
+  报告：`research/model-route-2026-10-20.md`；7 个人裁点已立为
+  [07](issues/07-model-route-ratification.md)。
 
 ## Not yet specified
 
-（暂无。02 / 03 已收口；05 模型路线仍是一张 research 票。）
+（暂无。02 / 03 / 05 已收口；07 是当前唯一的开放决策票。）
 
 ## Out of scope
 
 - **开宝箱 / 外壳交互**：属玩法 / 运行时 effort；本图只记录，不立票。
 - **玩法扩展**（攻击 / 受伤 / 死亡 / 多关卡索引）。
 - **跨游戏视觉记忆**。
+
+- **模型路线的落地施工**（JPEG 解码 / 同动画 smoke / fixture 重基线 / 动画级共享裁框）：
+  Destination 只要求「未来跑批的模型路线有结论」；05 已给出结论，07 负责定稿。
+  落地与付费验证另开 effort，付费仍须逐次报告 + 逐字点头。
+  （若要把落地拉进本图，先显式改 Destination。）
