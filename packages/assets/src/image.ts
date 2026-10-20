@@ -148,3 +148,82 @@ export function dropDetachedSpecks(
   return out;
 }
 
+/**
+ * 丢掉帧**底部**的地面线 / 细虚线（票 03 的零付费后处理）。
+ *
+ * 现场：模型会在角色脚下画一条贯穿画面的细横线（或几段虚线）。它有两个麻烦：
+ *   · 它常常**贴着脚**（和身体连成一块）⇒ `dropDetachedSpecks` 的「孤立」判据够不着它；
+ *   · 它落在 ink 包围盒的底边上 ⇒ 并集裁框把它当真内容，跳跃帧被整体缩小、脚离底边更远。
+ *
+ * 判据（**只看 alpha**，不猜颜色）：
+ *   · 从 ink 最底一行往上找，先跳过 ≤ `maxTail` 行抗锯齿残边；
+ *   · 线是「行覆盖**突然跳高**」的那一段：从底边往上找第一行满足
+ *     `覆盖(y) − 覆盖(y−1) ≥ minJump × 宽`，且它到 `end` 的每一行都 ≥ `minCover × 宽`；
+ *   · 这一段必须**薄**（≤ `maxRows` 行）—— 否则那是身体 / 底座，不是线。
+ *   ⚠️ 只看绝对覆盖率不够：一条宽身体的帧（`jump2`）整段身体都过 `minCover`。
+ *     跳变把「线」和「面积大的身体」分开 —— 真图上线的跳变是 **0.39–0.44×宽**，
+ *     最窄的一条（`wasteland-enemy.patrol2`）也有 **0.058×宽**。
+ *
+ * **脚部保护**：只删「正上方没有墨」的像素（逐行从上往下处理）。贴脚的那一小段会留下，
+ * 成为脚底的延伸，而不是把脚切掉 —— 判据宁可少删，也不许切到脚。
+ *
+ * 默认值来自真图实测（`.scratch/style-migration-v1/runs/2026-10-19k-patch` 的 61 帧）：
+ * 线所在行覆盖 **0.30–0.77**，脚所在行 **0.16–0.25**，线高 **5px**。
+ * `maxRows` 按图高 1% 取（1184 → 12 行）。
+ *
+ * 返回新图（不改原图）；没有命中时原样返回。**默认不启用**（见 `ImportOptions.dropBottomLines`）——
+ * 人给的位图不替人做主，只有生图那条路会传 true。
+ */
+export function dropBottomGroundLines(
+  img: RasterImage,
+  opts: { floor?: number; minCover?: number; minJump?: number; maxRows?: number; maxTail?: number } = {},
+): RasterImage {
+  const floor = opts.floor ?? 1;
+  const minCover = opts.minCover ?? 0.28;
+  const minJump = opts.minJump ?? 0.04;
+  const maxRows = opts.maxRows ?? Math.max(2, Math.ceil(img.height * 0.01));
+  const maxTail = opts.maxTail ?? 3;
+  const { width: w, height: h, data } = img;
+  const counts = new Int32Array(h);
+  let bot = -1;
+  for (let y = 0; y < h; y++) {
+    let c = 0;
+    for (let x = 0; x < w; x++) if (data[(y * w + x) * 4 + 3]! >= floor) c++;
+    counts[y] = c;
+    if (c > 0) bot = y;
+  }
+  if (bot < 0) return img;
+  const need = minCover * w;
+  const jump = minJump * w;
+  // 最底几行可能是线的抗锯齿残边（覆盖不够），先跳过；跳太多就说明底下不是线。
+  let y = bot, tail = 0;
+  while (y >= 0 && counts[y]! < need) {
+    tail++;
+    if (tail > maxTail) return img;
+    y--;
+  }
+  const end = y;
+  // 在「线最多能有 maxRows 行」的窗口里，**从最高的候选行往下**找第一个跳变 = 线的顶边。
+  // ⚠️ 从底边往上找会把线内部的行覆盖波动当成顶边，只删掉下半截。
+  let start = -1;
+  for (let yy = Math.max(1, end - maxRows + 1); yy <= end; yy++) {
+    if (counts[yy]! < need || counts[yy]! - counts[yy - 1]! < jump) continue;
+    let ok = true;
+    for (let k = yy; k <= end; k++) if (counts[k]! < need) { ok = false; break; }
+    if (ok) { start = yy; break; }
+  }
+  if (start < 0) return img;
+  const out: RasterImage = { width: w, height: h, data: Buffer.from(data) };
+  let removed = 0;
+  for (let yy = start; yy <= bot; yy++)
+    for (let xx = 0; xx < w; xx++) {
+      const s = (yy * w + xx) * 4;
+      if (out.data[s + 3]! < floor) continue;
+      // 正上方有墨 ⇒ 这是脚 / 身体的一部分，留下。
+      const above = yy > 0 && out.data[((yy - 1) * w + xx) * 4 + 3]! >= floor;
+      if (above) continue;
+      out.data[s] = 0; out.data[s + 1] = 0; out.data[s + 2] = 0; out.data[s + 3] = 0;
+      removed++;
+    }
+  return removed === 0 ? img : out;
+}

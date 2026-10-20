@@ -10,7 +10,7 @@
 //
 // 所以这里做的不是「重采样回原网格」（没有那个网格），是**重建**一个：
 // 抠背景 → 裁到包围盒 → 面积平均降采样 → alpha 二值化 → 量化到世界色板。
-import { dropDetachedSpecks, emptyImage, inkBBox, resizeNearest, type RasterImage } from "./image.js";
+import { dropBottomGroundLines, dropDetachedSpecks, emptyImage, inkBBox, resizeNearest, type RasterImage } from "./image.js";
 import { quantizeToPalette } from "./quantize.js";
 
 export type Box = { x: number; y: number; w: number; h: number };
@@ -362,6 +362,13 @@ export type ImportOptions = {
    * 只有生图那条路会传 true（模型会在角色头顶留下极淡的字形）。
    */
   dropSpecks?: boolean;
+  /**
+   * 丢掉帧**底部**的地面线 / 细虚线（票 03）。**默认 false** —— 人给的位图不替人做主；
+   * 只有生图那条路（动画帧）会传 true。
+   * ⚠️ 它和 `dropSpecks` 是两条判据：地面线常常**贴着脚**、不是孤立碎点，
+   *   放宽碎片阈值救不了它；这里判的是「底部一条薄的、覆盖够宽的高覆盖行带」。
+   */
+  dropBottomLines?: boolean;
 };
 
 export type ImportResult = RasterImage & {
@@ -498,11 +505,16 @@ export function importFrames(images: readonly RasterImage[], opts: ImportOptions
         "并集裁框是在同一个坐标系里算的，尺寸不同就无从并起",
       );
   const prepared = images.map((img) => prepareFrame(img, opts));
-  // ⚠️ **碎点必须在并集包围盒之前丢**（票 107）：否则头顶那些孤立像素会把框撑高，
-  //   主体被缩小到框里 —— idle 只有 71/108 高，而 run 满高。
-  const cleaned = opts.dropSpecks
-    ? prepared.map((p) => ({ ...p, keyed: dropDetachedSpecks(p.keyed, { floor: inkFloor(opts.alphaThreshold) }) }))
-    : prepared;
+  // ⚠️ **碎点与地面线都必须在并集包围盒之前丢**：
+  //   · 票 107：否则头顶那些孤立像素会把框撑高，主体被缩小到框里 —— idle 只有 71/108 高，而 run 满高；
+  //   · 票 03：底部地面线会把跳跃帧的框拉到画面底部，角色整体缩小、脚离底边更远。
+  //   顺序：先删地面线（它可能贴着脚、连着主体），再删孤立碎点。
+  const cleaned = prepared.map((p) => {
+    let keyed = p.keyed;
+    if (opts.dropBottomLines) keyed = dropBottomGroundLines(keyed, { floor: inkFloor(opts.alphaThreshold) });
+    if (opts.dropSpecks) keyed = dropDetachedSpecks(keyed, { floor: inkFloor(opts.alphaThreshold) });
+    return { ...p, keyed };
+  });
   const box = opts.trim === false
     ? null
     : unionInkBBox(cleaned.map((p) => p.keyed), { floor: inkFloor(opts.alphaThreshold) });

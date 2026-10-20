@@ -996,6 +996,9 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           // 票 107：生图会在角色头顶留下极淡的字形；它们是帧内孤立碎点，必须在并集包围盒前丢掉，
           // 否则 idle 被压成 71/108 高、run 满高。背景层不丢（留白/星点可能是设计，且它不裁框）。
           ...(isBg ? {} : { dropSpecks: true }),
+          // 票 03：模型会在角色脚下画一条贴脚的细地面线。它常常和脚连成一块 ⇒ `dropSpecks` 丢不掉，
+          // 还会进并集包围盒把跳跃帧拉小。只对**动画**开：单帧道具（地形块 / 废墟）的底边可能就是内容。
+          ...(isBg || spec.kind !== "animation" ? {} : { dropBottomLines: true }),
           ...(imageSrc?.alphaThreshold !== undefined ? { alphaThreshold: imageSrc.alphaThreshold } : {}),
         }));
         const stateOf = new Map<string, string>();
