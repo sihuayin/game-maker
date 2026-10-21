@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { PLAN_TOOL_DESCRIPTION, SKELETON_SHAPE_NOTE, TD_REFERENCE_SCALE, animationFramePrompt, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
-import type { AssetSpec, StyleSpec } from "@game-maker/contracts";
+import type { AssetSpec, CharacterDNA, StyleSpec } from "@game-maker/contracts";
 
 describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
   const spec = recipeShapeSpec();

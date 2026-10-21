@@ -7,7 +7,7 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  CommandError, compileRuntime, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack,
+  acceptAnimationPack, CommandError, compileRuntime, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
@@ -112,6 +112,27 @@ const TOOLS = [
       "何时用：拿到一个来源不明的包、或者怀疑产物被外部改动过的时候。\n" +
       "**这是唯一能发现「包被人手改过」的手段** —— 而且它不会自动被别处调用，要主动跑。",
     inputSchema: { type: "object", properties: { packDir: { type: "string", description: "资源包目录（含 manifest.json 的那一层）" } }, required: ["packDir"] },
+  },
+  {
+    name: "accept_asset_pack",
+    description:
+      "对一个**交付态**资源包跑结构验收（animation-acceptance/v1），写出 `out/<packId>/acceptance/v<N>/report.json` + `report.md`；" +
+      "报告版本只增不减。给了 `baselineDir` 时还按 baseline 的 raw 帧算指标与 verdict。" +
+      "**这是两个壳共享的同一份验收核心**：CLI `accept` 与它读的是同一份报告。\n" +
+      "何时用：资源包已经生成/导入完，想知道图集、帧矩形、锚点、checksum、动画顺序**结构上**对不对；" +
+      "它只读、不生成资源、不花钱。\n" +
+      "会失败的情况：包或 baseline 不合法（坏 manifest / 坏 baseline schema / 找不到图集 PNG）→ 退出码 4，" +
+      "不写报告；⚠️ **结构 findings 不是失败** —— 它们照常落盘并原样返回，但有 `severity: \"error\"` 时本次调用" +
+      "回 `isError: true` + 退出码 1（warning / info 不阻断）。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        packDir: { type: "string", description: "资源包目录（含 manifest.json 的那一层）" },
+        baselineDir: { type: "string", description: "冻结基准目录（含 baseline.json）；省略则不计算 metrics / verdict" },
+        outDir: { type: "string", description: "报告根目录，默认 ./out。回报的路径都相对于它" },
+      },
+      required: ["packDir"],
+    },
   },
   {
     name: "create_game",
@@ -226,6 +247,8 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
       };
       try {
         let result: CommandResult;
+        /** 结构验收的 findings 有 error 时：仍返回同一份 CommandResult，但回 isError + exit 1。 */
+        let errorFindings = false;
         switch (name) {
           case "plan_assets": {
             tick(0.05, "正在规划资源清单…");
@@ -255,6 +278,51 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
           case "verify_asset_pack":
             result = verifyPack({ packDir: String(args.packDir) });
             break;
+          case "accept_asset_pack": {
+            tick(0.1, "正在验收资源包…");
+            // ⚠️ 与 CLI `accept` 是**同一个** core：验证 / findings / 报告语义都不在这里另写一份。
+            //   findings 有 error 时**不抛**（core 的边界）—— 报告照写，再由本壳映射成 exit 1。
+            const accepted = acceptAnimationPack({
+              packDir: String(args.packDir),
+              ...(args.baselineDir === undefined ? {} : { baselineDir: String(args.baselineDir) }),
+            });
+            const outDir = String(args.outDir ?? "out");
+            const written = writeAcceptanceReport({ report: accepted.report, outDir });
+            const count = (severity: "error" | "warning" | "info"): number =>
+              accepted.report.findings.filter((f) => f.severity === severity).length;
+            errorFindings = accepted.hasErrors;
+            result = {
+              command: "accept",
+              summary: [
+                ...accepted.summary,
+                `报告：${written.reportJson}（v${written.version}）· ${written.reportMarkdown}`,
+                accepted.hasErrors
+                  ? `结论：有 ${count("error")} 条 error findings（warning / info 不阻断）`
+                  : "结论：无 error findings（warning / info 不阻断）",
+              ],
+              data: {
+                packId: accepted.report.pack.id,
+                packVersion: accepted.report.pack.version,
+                baselineId: accepted.report.baseline?.id ?? null,
+                hasErrors: accepted.hasErrors,
+                findings: {
+                  total: accepted.report.findings.length,
+                  errors: count("error"),
+                  warnings: count("warning"),
+                  info: count("info"),
+                },
+                reportVersion: written.version,
+                reportDir: written.dir,
+                report: written.reportJson,
+                reportMarkdown: written.reportMarkdown,
+              },
+              artifacts: [
+                { path: written.reportJson, kind: "acceptance-report" },
+                { path: written.reportMarkdown, kind: "acceptance-report-markdown" },
+              ],
+            };
+            break;
+          }
           case "compile_runtime":
             tick(0.2, "正在编译游戏配置…");
             result = await compileRuntime({
@@ -333,7 +401,8 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
         return reply(id, {
           content: [{ type: "text", text: result.summary.join("\n") }],
           structuredContent: result,          // 机器可读的那一份与 CLI --json **同源**
-          isError: false,
+          isError: errorFindings,
+          ...(errorFindings ? { _exitCode: 1 } : {}),
         });
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);

@@ -68,6 +68,12 @@ export * from "./geometry.js";
 // ── 交付态：资源包自描述 ──────────────────────────────────────────────────
 export * from "./assetpack.js";
 
+// ── 交付态验收：图集 JSON 读码器 + `animation-acceptance/v1` 报告 ─────────
+// ⚠️ 图集 JSON 是**读**侧契约（帧矩形只住在那里）；验收报告是**写**侧产物，
+//   两者都不扩 `assetpack/v4` 的形状（Phase 0 计划 §10）。
+export * from "./atlas-json.js";
+export * from "./animation-acceptance.js";
+
 // ── Zod 错误 → 人可读（**只此一份**，v3 与 v4 都吃；票 28 起住这儿）─────────
 export * from "./zod-issues.js";
 

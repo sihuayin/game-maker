@@ -27,3 +27,5 @@ export * from "./review.js";
 export * from "./coverage.js";
 export * from "./ops.js";
 export * from "./route.js";
+export * from "./animation-metrics.js";
+export * from "./acceptance.js";

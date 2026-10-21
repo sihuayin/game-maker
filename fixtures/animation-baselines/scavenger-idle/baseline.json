@@ -1,0 +1,270 @@
+{
+  "baselineId": "scavenger-actor.idle.v7.2026-10-19",
+  "sourceCommit": "e267ac4",
+  "sourcePack": {
+    "path": ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7",
+    "manifest": {
+      "id": "ruin-scavenger-extraction-assets",
+      "version": 7
+    }
+  },
+  "model": "gemini-2.5-flash-image",
+  "asset": {
+    "id": "scavenger-actor",
+    "animation": "idle",
+    "frameCount": 4,
+    "size": {
+      "w": 48,
+      "h": 64
+    },
+    "fps": 6,
+    "loop": true,
+    "anchor": {
+      "x": 0.5,
+      "y": 1
+    }
+  },
+  "raw": [
+    {
+      "name": "scavenger-actor.idle1",
+      "sha256": "068ee2d78df156fd92afddbd6d257ffe4b109db8da5ebc077bb3b421192c0ebd"
+    },
+    {
+      "name": "scavenger-actor.idle2",
+      "sha256": "617b75aa427ca81b8e5073e797f52bc13ef0ed23e61fa29de0097dd3ba00642b"
+    },
+    {
+      "name": "scavenger-actor.idle3",
+      "sha256": "44255922f326b8029e7846674b626c58ef8599c342ea2ac9c8cc3e70a57b33b3"
+    },
+    {
+      "name": "scavenger-actor.idle4",
+      "sha256": "a8de40a37e2e3e036a674cbd77ebdaaf5f5c920f7ca02a63e4917c776e04ec47"
+    }
+  ],
+  "delivery": [
+    {
+      "name": "scavenger-actor.idle1",
+      "sha256": "7b104187610f1cdf3cd370a532d116b36bd3d090d8ff6ae98e67116985d47626",
+      "pixelSha256": "d21d898dc942c84a4e7a113331c9cd9685ba0c44063c4156f0ec866a046a21c6",
+      "atlasRect": {
+        "x": 64,
+        "y": 192,
+        "w": 48,
+        "h": 64
+      }
+    },
+    {
+      "name": "scavenger-actor.idle2",
+      "sha256": "f70ca81ffebd5107d48e8ebbd3b329e0626368180a8fa9ee1e6c72c182137570",
+      "pixelSha256": "2e82660272a0a806bcd277131967dbbd2e616ff644b03d691c7a7d870d2deba6",
+      "atlasRect": {
+        "x": 112,
+        "y": 192,
+        "w": 48,
+        "h": 64
+      }
+    },
+    {
+      "name": "scavenger-actor.idle3",
+      "sha256": "af7989dfe7f97a8a51bd307c7e87fe278e44a1c94d1a3c91519e9d73c64ee1b9",
+      "pixelSha256": "7bb59d2fbb9afcbef74421d99b590f9998f9546d290991e80213d78ff6782f8e",
+      "atlasRect": {
+        "x": 160,
+        "y": 192,
+        "w": 48,
+        "h": 64
+      }
+    },
+    {
+      "name": "scavenger-actor.idle4",
+      "sha256": "1b82931aa7ef6f09747c377350ece5089c730ddd52bbac7a75edfd0f59592861",
+      "pixelSha256": "cc68e5f00018c74af3a6761e5c745afc20e827b2896f2dff156a279d284a8efa",
+      "atlasRect": {
+        "x": 208,
+        "y": 192,
+        "w": 48,
+        "h": 64
+      }
+    }
+  ],
+  "atlas": {
+    "checksum": "sha256:a3ecf5294d850678fdcb71295880e0eda4d682d29bca4bc8f3032f1711836735",
+    "metaChecksum": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+  },
+  "manifest": {
+    "checksum": "sha256:e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326"
+  },
+  "reference": {
+    "path": ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/reference.png",
+    "sha256": "6fb15bca429f898635f408eca3c60e861451880312eb6b3b6447e7028ddb9bbc",
+    "pixelSha256": "46baf979c57e88a5c65b5f47032187e17e274a64559d590c220d26164a65def9"
+  },
+  "master": {
+    "path": ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/reuse/master-scavenger-actor.png",
+    "sha256": "e8ea2999b8fed280766539ed8612d774eb8950b1652b2a1bc25079ef2ce19e51",
+    "pixelSha256": "df8f9343397449dbb983a5ac220541ed07ab29b582e6d7234260d4cf0bc0206c",
+    "packCopy": {
+      "path": ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/authoring/masters/master-scavenger-actor.png",
+      "sha256": "5b264bbdd9c5ad7b0f1e547865b70e239182adf2a14461624767b04175b6cac8",
+      "pixelSha256": "df8f9343397449dbb983a5ac220541ed07ab29b582e6d7234260d4cf0bc0206c",
+      "note": "与输入母版逐像素相同，但 PNG 重编码后字节 hash 不同"
+    }
+  },
+  "stylespec": {
+    "actual": {
+      "path": ".scratch/style-migration-v1/runs/2026-10-19i-real-frames/stylespec.json",
+      "paletteSize": 32,
+      "sha256": "3e2f30955ab483891eb74eeaac437f637fd27e00438f5e9d8a86df3929c64ef4"
+    },
+    "pack": {
+      "path": ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/authoring/stylespec.json",
+      "paletteSize": 34,
+      "sha256": "c97744b41189efe6237a16bd1d8d710a763ca58ca18cbd2bf32ff6eb16201fc4"
+    }
+  },
+  "palette": {
+    "source": "sourcePack/stylespec.json#/palette",
+    "size": 34,
+    "values": [
+      "#000000",
+      "#080000",
+      "#180000",
+      "#200000",
+      "#100700",
+      "#290705",
+      "#1a0d05",
+      "#380702",
+      "#210f03",
+      "#290d02",
+      "#420605",
+      "#310c00",
+      "#221205",
+      "#301100",
+      "#391404",
+      "#321905",
+      "#421600",
+      "#523730",
+      "#454a50",
+      "#794c35",
+      "#58554e",
+      "#685247",
+      "#786151",
+      "#676862",
+      "#74716c",
+      "#8e7161",
+      "#82847f",
+      "#a97f67",
+      "#a0827a",
+      "#a3a09b",
+      "#c89f8b",
+      "#d2a087",
+      "#59503b",
+      "#50432b"
+    ]
+  },
+  "prompts": {
+    "actual": [
+      {
+        "name": "actual.idle1",
+        "sha256": "e30e0c375e51e90ffa468cb261fd4617f1ac229dd2c9937d20da9447296b6f09",
+        "paletteSize": 32
+      },
+      {
+        "name": "actual.idle2",
+        "sha256": "f034d0114990f0e6a4198e17304e9f59b9cbdb4364da3f6d035b2ec976584f50",
+        "paletteSize": 32
+      },
+      {
+        "name": "actual.idle3",
+        "sha256": "30dfd1cb221ffdab35bafb1e2d899f5f46274bcaa5a1a68566392f21c1808215",
+        "paletteSize": 32
+      },
+      {
+        "name": "actual.idle4",
+        "sha256": "4be8cf5a6479aee42959133c8bf2c7e34acef5baddc18f760d6f42249d54b823",
+        "paletteSize": 32
+      }
+    ],
+    "pack": [
+      {
+        "name": "pack.idle1",
+        "sha256": "e0dc4b842eadcb2ae741187bad28a3f1bb3e03c17ea976de50c730d709595791",
+        "paletteSize": 34
+      },
+      {
+        "name": "pack.idle2",
+        "sha256": "849c5565a22079974fe3fbc5d29c17a5bc19e000f646609755c578a8b1d7e87c",
+        "paletteSize": 34
+      },
+      {
+        "name": "pack.idle3",
+        "sha256": "ebdf0d56ee4f651fe414955969e07ce3c70e52384c6d65d1521aff6c1b4529e0",
+        "paletteSize": 34
+      },
+      {
+        "name": "pack.idle4",
+        "sha256": "64cffc619f928ebeb044398a4400eda2a75e032baa75e8e5968e163bc6a84f6a",
+        "paletteSize": 34
+      }
+    ]
+  },
+  "standardVersion": "ticket-12/2026-10-21",
+  "thresholds": {
+    "alphaMaskDiffPct": {
+      "green": 1,
+      "yellow": 3
+    },
+    "bboxWidthDiffPct": {
+      "green": 2,
+      "yellow": 5
+    },
+    "positionDriftPct": {
+      "green": 1,
+      "yellow": 3
+    },
+    "backgroundL1": {
+      "green": 10,
+      "yellow": 20
+    },
+    "paletteCountMin": 14,
+    "offPaletteMax": 0,
+    "boundaryDarkPctMin": 50
+  },
+  "expectedMetrics": {
+    "alphaMaskDiffPct": 0.4,
+    "bboxWidthDiffPct": 0.2,
+    "positionDriftPct": 0.4,
+    "backgroundL1": 3,
+    "paletteCountMin": 18,
+    "offPalette": 0,
+    "boundaryDarkPctMin": 87.4
+  },
+  "expectedMetricsTolerance": {
+    "alphaMaskDiffPct": 0.1,
+    "bboxWidthDiffPct": 0.1,
+    "positionDriftPct": 0.1,
+    "backgroundL1": 0,
+    "paletteCountMin": 0,
+    "offPalette": 0,
+    "boundaryDarkPctMin": 0.1
+  },
+  "provenance": {
+    "failedRun": ".scratch/style-migration-v1/runs/2026-10-19i-real-frames/ruin-scavenger-extraction-assets/failed-2026-10-19T11-50-47-861Z",
+    "generatedDir": ".scratch/style-migration-v1/runs/2026-10-19i-real-frames/ruin-scavenger-extraction-assets/failed-2026-10-19T11-50-47-861Z/authoring/generated",
+    "httpCallsLog": ".scratch/style-migration-v1/runs/2026-10-19i-real-frames/http-calls.log",
+    "imageRequests": 70,
+    "http200": 68,
+    "pngResponses": 66,
+    "textRequests": 3,
+    "finalState": "failed",
+    "failureResource": "office-debris",
+    "logLines": [
+      "2026-10-19T11:43:48.895Z START model=gemini-2.5-flash-image proxy=http://127.0.0.1:7890 recipe=asset-recipe.json maxImageReq=132 maxTextReq=6",
+      "2026-10-19T11:50:46.463Z IMG-RES #70 200",
+      "2026-10-19T11:50:46.518Z IMG-MIME #70 image/png b64len=1660864 shape=candidates",
+      "2026-10-19T11:50:47.861Z FAIL 资源 \"office-debris\" 的底色判据没过：按**实测众数色**抠完，剩下的墨**碎成了 33 块**，最大的一块只占 55.4%（要求 ≥ 60%）—— 主体多半被抠穿了。"
+    ],
+    "note": "v7 ledger.json 的 calls 为空：v7 是零付费重建，不是生成账本；真实生成账本在 19i 日志。"
+  }
+}

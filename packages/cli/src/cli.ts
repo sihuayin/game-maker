@@ -4,8 +4,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack,
-  type CommandResult, type InspectData,
+  CommandError, EXIT, acceptAnimationPack, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
+  type AcceptanceResult, type CommandResult, type InspectData, type WrittenAcceptanceReport,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
@@ -29,6 +29,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker site   <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
+  game-maker accept <资源包目录> [--baseline <baseline 目录>] [--out <目录>] [--json]
   game-maker review <run 目录> [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
@@ -36,6 +37,13 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   ⚠️ **它要花钱**（一次视觉调用），所以它**不在创建链上**：要不要跑、跑几次，由人决定；
   ⚠️ 它**不打分、不判定通过与否、也不阻断任何产物** —— 拿不到结果就当没有。
   ⚠️ 花了的那一发**记进 <run 目录>/ledger.json**（run 级那份）。
+
+\`accept\` 是**结构验收**（免费、不生成、不调用上游）：读一个交付态资源包，逐项核对
+  manifest / 图集 JSON / PNG / 动画帧，写 \`<out>/<packId>/acceptance/v<N>/report.json\` 与
+  \`report.md\`（版本只增不减，**绝不覆盖**）。
+  --baseline <目录> 给一份冻结基准（含 \`baseline.json\`）时才算指标与 verdict；不给则 metrics 为 null。
+  ⚠️ findings **不是异常**：有 error findings ⇒ 退出码 **1**，报告**照样落盘**；
+     包 / 基准本身不合法（读不出、schema 不过）⇒ **4**，不产出报告。
 
 \`create\` 是**两段**（R9：人工点只有一个，在清单处）：
   · 不带 \`--yes\` ⇒ 跑到清单为止就**停下**（退出码 0，\`data.status = "awaiting"\`），
@@ -60,6 +68,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   0  成功
   1  失败   2  参数错   3  上游不可达   4  产物/清单不合法
   ⚠️ 3 在 2026-09-25 之前从 pack 里返回不出来（上游死活都被降级链兜住、照样出包）。
+  ⚠️ accept：0 = 无 error findings；1 = 有 error findings（报告已落盘）；4 = 包/基准不合法。
 
 ⚠️ 打开站点时 **HTTP server 的根必须是 <out>/<gameId>/**（pack/ 与 site/ 的父目录）——
    根指到 site 里面会 404，而 Phaser 的 loader **静默失败**。
@@ -82,6 +91,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "design", "visual-world", "out", "recipe", "config", "shell", "game-id", "pack", "concurrency", "concurrency-image", "level",
     // 票 16：`create` / `build` 的那几个
     "style", "intent", "style-id", "version",
+    // 票 06：`accept` 的可选冻结基准
+    "baseline",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -425,6 +436,50 @@ function qaReportOf(
   };
 }
 
+/**
+ * `accept` 的回报（票 06）。⚠️ **人类与 `--json` 是同一份 `CommandResult`** ——
+ * findings 不在这里另算一遍：`hasErrors` 由 core 判，报告已由 core 写盘。
+ * ⚠️ 退出码**不放在这里**：`run()` 打印完之后按 `hasErrors` 返回 1 ——
+ *   抛异常会让「验收失败」被当成「输入不合法」，还会把已落盘的报告说成失败。
+ */
+function acceptComplete(
+  accepted: AcceptanceResult, written: WrittenAcceptanceReport,
+): CommandResult {
+  const errors = accepted.report.findings.filter((f) => f.severity === "error");
+  const warnings = accepted.report.findings.filter((f) => f.severity === "warning");
+  const infos = accepted.report.findings.filter((f) => f.severity === "info");
+  const shown = errors.slice(0, 10);
+  return {
+    command: "accept",
+    summary: [
+      ...accepted.summary,
+      `报告：${written.reportJson} · ${written.reportMarkdown}`,
+      accepted.hasErrors
+        ? `✗ ${errors.length} 条 error findings（报告已落盘）`
+        : "✅ 没有 error findings（warning / info 不阻断）",
+      ...shown.map((f) => `  ✗ [${f.code}] ${f.message}`),
+      ...(errors.length > shown.length ? [`  ……还有 ${errors.length - shown.length} 条 error findings，见报告`] : []),
+    ],
+    data: {
+      packId: accepted.report.pack.id,
+      packVersion: accepted.report.pack.version,
+      baselineId: accepted.report.baseline?.id ?? null,
+      hasErrors: accepted.hasErrors,
+      findings: { total: accepted.report.findings.length, errors: errors.length, warnings: warnings.length, info: infos.length },
+      // ⚠️ 字段名与 MCP（票 07）**逐字对齐**：`report` 是 JSON、`reportMarkdown` 是 md，
+      //    `reportDir` 是它们共同的相对目录 —— 两个壳的 `data` 不许各起一套名字。
+      reportVersion: written.version,
+      reportDir: written.dir,
+      report: written.reportJson,
+      reportMarkdown: written.reportMarkdown,
+    },
+    artifacts: [
+      { path: written.reportJson, kind: "acceptance-report" },
+      { path: written.reportMarkdown, kind: "acceptance-report-markdown" },
+    ],
+  };
+}
+
 /** 出站通道。测试注入收集器就能完全离线地驱动它（否则测试会把 stdout 刷满）。 */
 export type CliIo = { out: (s: string) => void; err: (s: string) => void };
 const REAL_IO: CliIo = { out: (s) => void process.stdout.write(s), err: (s) => void process.stderr.write(s) };
@@ -467,6 +522,9 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
     if (command === "") { io.err(USAGE); return EXIT.usage; }
 
     let result: CommandResult;
+    // ⚠️ **case 级退出码**（票 06）：`accept` 的「有 error findings」是**成功产出报告**但退出码 1，
+    //   不是异常 —— 打印完之后按这里返回，别的命令保持 0。
+    let exitCode: number = EXIT.ok;
     switch (command) {
       case "create": {
         // ⚠️ **两段的第一段**（票 16 的 Q1/Q2/Q6/Q8）：跑到清单为止就停（除非 `--yes`）。
@@ -600,6 +658,20 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         result = inspectPack({ packDir: path.resolve(dir) });
         break;
       }
+      case "accept": {
+        // ⚠️ **结构验收 ≠ verify**（票 06）：findings 是报告，不是异常；只有「包/基准本身
+        //   读不出或不过 schema」才由 core 抛 `CommandError("invalid")` ⇒ 退出码 4。
+        const dir = positionals[0]; if (!dir) throw new CommandError("usage", "accept 需要一个资源包目录");
+        const accepted = acceptAnimationPack({
+          packDir: path.resolve(dir),
+          ...(typeof flags.baseline === "string" ? { baselineDir: path.resolve(flags.baseline) } : {}),
+        });
+        // ⚠️ 默认 `--out ./out` 由 `outRoot` 统一解析；报告版本由 core 抢 `mkdirSync` 分配。
+        const written = writeAcceptanceReport({ report: accepted.report, outDir: outRoot });
+        result = acceptComplete(accepted, written);
+        exitCode = accepted.hasErrors ? EXIT.failure : EXIT.ok;
+        break;
+      }
       case "review": {
         // ⚠️ **它吃 run 目录、不吃包目录**（票 78）：契约要求「接线必须能同时取得两者」——
         //   而**原图不在包里**（本票量到）⇒ 只有从 run 侧才够得着；
@@ -613,7 +685,7 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
     }
 
     io.out((json ? JSON.stringify(result, null, 2) : renderHuman(result)) + "\n");
-    return EXIT.ok;
+    return exitCode;
   } catch (raw) {
     // ⚠️ 先翻译（见 `asCommandError`）—— 那一步决定了退出码是不是 4。
     const e = asCommandError(raw);

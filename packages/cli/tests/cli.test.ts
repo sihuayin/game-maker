@@ -1,11 +1,12 @@
-import { copyFileSync, existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { EXIT, encodePNG, exitCodeOfError, CommandError } from "@game-maker/assets";
-import { ASSET_PACK_FORMAT } from "@game-maker/contracts";
+import { ASSET_PACK_FORMAT, parseAnimationAcceptance } from "@game-maker/contracts";
 import { parseArgs, concurrencyFromFlags, renderHuman, run, type CliIo } from "../src/cli.js";
 
 /** 收下 CLI 的所有出站，测试因此不会把 stdout 刷满。 */
@@ -285,4 +286,144 @@ describe("⚠️ **判断失败**：壳也要把账与现场说全（票 50）",
     expect(doc.failureDir, "现场指针（票 48 给 MCP 补的就是这一格）").toMatch(/failed-/);
     expect(existsSync(doc.failureDir!), "指针指过去得真有个地方").toBe(true);
   });
+});
+
+// ── 票 06 · `accept`（结构验收 + 报告 writer） ────────────────────────────────
+//
+// ⚠️ **所有落盘都进临时 `--out`** —— 这里一条也不许写仓库的 `out/`。
+// ⚠️ v7 与冻结 baseline 是本仓已入库的**真包 / 真基准**（与 `acceptance.test.ts` 同一组）；
+//   缺了才 skip，而不是让整组永远静默不跑。
+const V7 = path.join(ROOT, ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7");
+const BASELINE = path.join(ROOT, "fixtures/animation-baselines/scavenger-idle");
+const hasAcceptFixture = existsSync(path.join(V7, "manifest.json")) && existsSync(path.join(BASELINE, "baseline.json"));
+const acceptOut = (tag: string) => mkdtempSync(path.join(tmpdir(), `gm-cli-accept-${tag}-`));
+const sha = (b: Buffer) => "sha256:" + createHash("sha256").update(b).digest("hex");
+
+describe.skipIf(!hasAcceptFixture)("accept · v7 + 冻结 baseline", () => {
+  it("exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析", async () => {
+    const out = acceptOut("ok");
+    const { code, io } = await runC(["accept", V7, "--baseline", BASELINE, "--out", out]);
+    expect(code).toBe(EXIT.ok);
+    const rel = "ruin-scavenger-extraction-assets/acceptance/v1/report.json";
+    const abs = path.join(out, rel);
+    expect(existsSync(abs)).toBe(true);
+    const report = JSON.parse(readFileSync(abs, "utf8"));
+    expect(parseAnimationAcceptance(report).ok).toBe(true);
+    expect(report.pack).toMatchObject({ id: "ruin-scavenger-extraction-assets", version: 7 });
+    expect(report.baseline.id).toBe("scavenger-actor.idle.v7.2026-10-19");
+    expect(report.findings).toEqual([]);
+    const text = io.lines.join("");
+    expect(text).toMatch(/结构验收：ruin-scavenger-extraction-assets v7/);
+    expect(text).toMatch(/✅ 没有 error findings/);
+    expect(text).toContain(`→ ${rel}`);
+    expect(text).toContain("→ ruin-scavenger-extraction-assets/acceptance/v1/report.md");
+  }, 120_000);
+
+  it("`--json` 与人类输出**同源**：JSON = summary + artifacts 的那一份", async () => {
+    const human = await runC(["accept", V7, "--out", acceptOut("human")]);
+    const machine = await runC(["accept", V7, "--out", acceptOut("json"), "--json"]);
+    expect(human.code).toBe(EXIT.ok);
+    expect(machine.code).toBe(EXIT.ok);
+    const doc = JSON.parse(machine.io.lines.join("")) as {
+      command: string; summary: string[]; artifacts: { path: string; kind: string }[];
+      data: Record<string, unknown>;
+    };
+    expect(doc.command).toBe("accept");
+    // ⚠️ 字段名与 artifacts kind 是与 MCP（票 07）**逐字对齐**的：两个壳同源。
+    expect(doc.data).toMatchObject({
+      packId: "ruin-scavenger-extraction-assets", packVersion: 7,
+      baselineId: null, hasErrors: false, reportVersion: 1,
+      reportDir: "ruin-scavenger-extraction-assets/acceptance/v1",
+      report: "ruin-scavenger-extraction-assets/acceptance/v1/report.json",
+      reportMarkdown: "ruin-scavenger-extraction-assets/acceptance/v1/report.md",
+      findings: { total: 0, errors: 0, warnings: 0, info: 0 },
+    });
+    expect(doc.artifacts.map((a) => a.kind)).toEqual(["acceptance-report", "acceptance-report-markdown"]);
+    const rendered = doc.summary.join("\n") + "\n"
+      + doc.artifacts.map((a) => `→ ${a.path}`).join("\n") + "\n";
+    expect(human.io.lines.join("")).toBe(rendered);
+  }, 120_000);
+
+  it("版本只增不减：两次 accept 写 v1 / v2，v1 逐字节不变", async () => {
+    const out = acceptOut("version");
+    const first = await runC(["accept", V7, "--out", out, "--json"]);
+    expect(first.code).toBe(EXIT.ok);
+    const firstDoc = JSON.parse(first.io.lines.join("")) as { data: { report: string } };
+    expect(firstDoc.data.report).toBe("ruin-scavenger-extraction-assets/acceptance/v1/report.json");
+    const before = readFileSync(path.join(out, firstDoc.data.report), "utf8");
+    const second = await runC(["accept", V7, "--out", out, "--json"]);
+    expect(second.code).toBe(EXIT.ok);
+    const secondDoc = JSON.parse(second.io.lines.join("")) as { data: { report: string } };
+    expect(secondDoc.data.report).toBe("ruin-scavenger-extraction-assets/acceptance/v2/report.json");
+    expect(existsSync(path.join(out, secondDoc.data.report))).toBe(true);
+    // ⚠️ 钉的是**既有那一份没被覆盖**，不是「多了一个目录」。
+    expect(readFileSync(path.join(out, firstDoc.data.report), "utf8")).toBe(before);
+  }, 120_000);
+});
+
+describe("accept · 负例与退出码", () => {
+  it("缺位置参数 / `--baseline` 缺值 ⇒ 参数错 2", async () => {
+    expect((await runC(["accept"])).code).toBe(EXIT.usage);
+    expect((await runC(["accept", "some-pack", "--baseline"])).code).toBe(EXIT.usage);
+  });
+
+  it("`--baseline` 是带值选项（不会掉成位置参数）", () => {
+    const p = parseArgs(["accept", "some-pack", "--baseline", "some-baseline"]);
+    expect(p.flags.baseline).toBe("some-baseline");
+    expect(p.positionals).toEqual(["some-pack"]);
+  });
+
+  it("不是资源包 ⇒ 4（不是 1），且不产出报告", async () => {
+    const bad = mkdtempSync(path.join(tmpdir(), "gm-cli-accept-badpack-"));
+    writeFileSync(path.join(bad, "manifest.json"), "{}");
+    const out = acceptOut("badpack");
+    const { code } = await runC(["accept", bad, "--out", out]);
+    expect(code).toBe(EXIT.invalid);
+    expect(readdirSync(out)).toEqual([]);
+  });
+
+  it("baseline 不合法 ⇒ 4，且不产出报告", async () => {
+    const emptyBaseline = mkdtempSync(path.join(tmpdir(), "gm-cli-accept-badbaseline-"));
+    const out = acceptOut("badbaseline");
+    const { code } = await runC(["accept", V7, "--baseline", emptyBaseline, "--out", out]);
+    expect(code).toBe(EXIT.invalid);
+    expect(readdirSync(out)).toEqual([]);
+  }, 120_000);
+
+  it.skipIf(!hasAcceptFixture)("有 error findings ⇒ 1（报告照样落盘，不是 4）", async () => {
+    // 临时复制真包，只把一张图集 JSON 的帧矩形推出图集边界；**同步改 manifest 的
+    // files[] checksum / bytes**，让它先通过 verifyPack（否则那是 exit 4 的输入不合法，
+    // 而不是本用例要量的「验收失败」）。
+    const packDir = mkdtempSync(path.join(tmpdir(), "gm-cli-accept-findings-"));
+    cpSync(V7, packDir, { recursive: true });
+    const metaRel = "delivery/atlas.animations.json";
+    const metaPath = path.join(packDir, metaRel);
+    const atlas = JSON.parse(readFileSync(metaPath, "utf8")) as {
+      frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+      meta: { size: { w: number; h: number } };
+    };
+    const firstName = Object.keys(atlas.frames)[0]!;
+    atlas.frames[firstName]!.frame.y = atlas.meta.size.h;   // y + h > 图集高度
+    const bytes = Buffer.from(JSON.stringify(atlas, null, 2) + "\n");
+    writeFileSync(metaPath, bytes);
+    const manifestPath = path.join(packDir, "manifest.json");
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
+      files: { path: string; bytes: number; checksum: string }[];
+    };
+    const entry = manifest.files.find((f) => f.path === metaRel)!;
+    entry.bytes = bytes.length;
+    entry.checksum = sha(bytes);
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+
+    const out = acceptOut("findings");
+    const { code, io } = await runC(["accept", packDir, "--out", out, "--json"]);
+    expect(code).toBe(EXIT.failure);
+    expect(code).not.toBe(EXIT.invalid);
+    const doc = JSON.parse(io.lines.join("")) as { data: { hasErrors: boolean; report: string } };
+    expect(doc.data.hasErrors).toBe(true);
+    const report = JSON.parse(readFileSync(path.join(out, doc.data.report), "utf8"));
+    expect(parseAnimationAcceptance(report).ok).toBe(true);
+    expect(report.findings.some((f: { code: string; severity: string }) =>
+      f.code === "atlas.frame.out-of-bounds" && f.severity === "error")).toBe(true);
+  }, 120_000);
 });

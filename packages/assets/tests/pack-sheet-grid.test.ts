@@ -158,7 +158,7 @@ describe("§ 假生成器 dry run：4 + 9 帧按格切进包（零上游）", ()
       for (let x = 0; x < w; x++) { put(x, 0, ink); put(x, h - 1, ink); }
       for (let y = 0; y < h; y++) { put(0, y, ink); put(w - 1, y, ink); }
       for (let y = 30; y < 70; y++) for (let x = 30; x < 70; x++) put(x, y, ink);
-      return { image: { width: w, height: h, data }, call: { protocol: "openai", ms: 1, attempts: 1 } };
+      return { image: { width: w, height: h, data }, call: { protocol: "openai", requestedSize: `${w}x${h}`, ms: 1, attempts: 1 } };
     };
     await expect(buildAssetPack({
       recipe: r, style: STYLE, outDir: tmp(), recipeDir: ROOT,
