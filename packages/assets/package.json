@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@game-maker/contracts": "workspace:*",
+    "jpeg-js": "0.4.4",
     "zod": "catalog:"
   },
   "devDependencies": {

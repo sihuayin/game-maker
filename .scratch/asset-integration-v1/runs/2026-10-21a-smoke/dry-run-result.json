@@ -1,0 +1,166 @@
+{
+  "ok": true,
+  "mode": "dry",
+  "model": "gemini-nano-banana-2.1",
+  "api": "interactions",
+  "proxy": null,
+  "requests": 2,
+  "frames": [
+    {
+      "name": "scavenger-actor.idle1",
+      "bytes": 115,
+      "model": "gemini-nano-banana-2.1",
+      "ms": 808,
+      "attempts": 1,
+      "decoded": {
+        "w": 8,
+        "h": 8
+      },
+      "baseline": {
+        "w": 864,
+        "h": 1184
+      },
+      "bbox": {
+        "x": 2,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "baselineBbox": {
+        "x": 0,
+        "y": 0,
+        "w": 744,
+        "h": 1143
+      },
+      "imported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 4,
+          "h": 4
+        }
+      },
+      "baselineImported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 454,
+          "h": 1076
+        }
+      },
+      "key": [
+        255,
+        255,
+        255
+      ],
+      "baselineKey": [
+        210,
+        60,
+        155
+      ]
+    },
+    {
+      "name": "scavenger-actor.idle2",
+      "bytes": 115,
+      "model": "gemini-nano-banana-2.1",
+      "ms": 799,
+      "attempts": 1,
+      "decoded": {
+        "w": 8,
+        "h": 8
+      },
+      "baseline": {
+        "w": 864,
+        "h": 1184
+      },
+      "bbox": {
+        "x": 2,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "baselineBbox": {
+        "x": 6,
+        "y": 5,
+        "w": 738,
+        "h": 1139
+      },
+      "imported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 4,
+          "h": 4
+        }
+      },
+      "baselineImported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 454,
+          "h": 1076
+        }
+      },
+      "key": [
+        255,
+        255,
+        255
+      ],
+      "baselineKey": [
+        211,
+        61,
+        155
+      ]
+    }
+  ],
+  "dryBodies": [
+    {
+      "url": "https://generativelanguage.googleapis.com/v1beta/interactions",
+      "model": "gemini-nano-banana-2.1",
+      "response_format": {
+        "type": "image",
+        "mime_type": "image/jpeg",
+        "aspect_ratio": "3:4",
+        "image_size": "1K"
+      },
+      "input": [
+        {
+          "type": "text",
+          "textLength": 1720
+        },
+        {
+          "type": "image",
+          "mime_type": "image/png"
+        },
+        {
+          "type": "image",
+          "mime_type": "image/png"
+        }
+      ]
+    },
+    {
+      "url": "https://generativelanguage.googleapis.com/v1beta/interactions",
+      "model": "gemini-nano-banana-2.1",
+      "response_format": {
+        "type": "image",
+        "mime_type": "image/jpeg",
+        "aspect_ratio": "3:4",
+        "image_size": "1K"
+      },
+      "input": [
+        {
+          "type": "text",
+          "textLength": 1720
+        },
+        {
+          "type": "image",
+          "mime_type": "image/png"
+        },
+        {
+          "type": "image",
+          "mime_type": "image/png"
+        }
+      ]
+    }
+  ]
+}

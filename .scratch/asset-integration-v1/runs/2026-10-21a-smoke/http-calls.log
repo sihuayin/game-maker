@@ -1,0 +1,7 @@
+2026-10-21T01:35:21.868Z START mode=live model=gemini-nano-banana-2.1 api=interactions proxy=http://127.0.0.1:7890 maxImageReq=4 frames=2
+2026-10-21T01:35:22.676Z IMG-REQ #1 https://generativelanguage.googleapis.com/v1beta/interactions model=gemini-nano-banana-2.1 mime=image/jpeg aspect=3:4 size=1K inputs=3
+2026-10-21T01:36:10.043Z IMG-RES #1 200 mime=image/jpeg bytes=359772 raw=evidence/raw/scavenger-actor.idle1.req1.jpg
+2026-10-21T01:36:10.719Z DONE scavenger-actor.idle1 896x1200 ms=48243 attempts=1 bbox={"x":114,"y":110,"w":782,"h":1090} baseline=864x1184 bbox={"x":0,"y":0,"w":744,"h":1143}
+2026-10-21T01:36:11.519Z IMG-REQ #2 https://generativelanguage.googleapis.com/v1beta/interactions model=gemini-nano-banana-2.1 mime=image/jpeg aspect=3:4 size=1K inputs=3
+2026-10-21T01:37:18.280Z IMG-RES #2 200 mime=image/jpeg bytes=402726 raw=evidence/raw/scavenger-actor.idle2.req2.jpg
+2026-10-21T01:37:18.965Z DONE scavenger-actor.idle2 896x1200 ms=67619 attempts=1 bbox={"x":114,"y":76,"w":650,"h":1084} baseline=864x1184 bbox={"x":6,"y":5,"w":738,"h":1139}

@@ -1,14 +1,29 @@
 // 生图客户端 —— 全部离线可测：往返形状、尺寸算术、错误分类、重试边界、key 不外泄。
 // 唯一没被这里覆盖的是「真上游收不收这种形状」，那需要真 key，见 experiments 里的实跑记录。
 import { describe, expect, it } from "vitest";
+import { encode as encodeJPEG } from "jpeg-js";
 import {
   ImageGenerationError, createDashScopeMcpGenerator, createGeminiGenerator, createOpenAIGenerator,
-  encodePNG, emptyImage, geminiAspect, openaiSize, requestSize,
+  decodeJPEG, encodePNG, emptyImage, geminiAspect, importBitmap, openaiSize, requestSize,
 } from "../src/index.js";
 
 const SECRET = "sk-THIS-MUST-NEVER-BE-PRINTED-0123456789";
 /** 一张 8×8 的真 PNG，当下载回来的图用。 */
 const PNG = encodePNG(emptyImage(8, 8));
+/**
+ * 一张 8×8 的真 JPEG —— 用 jpeg-js 本地转码，零付费。
+ * Interactions 的真实输出格式；不是拿 PNG 改名冒充的字节。
+ */
+const JPEG = (() => {
+  const data = Buffer.alloc(8 * 8 * 4);
+  for (let i = 0; i < 8 * 8; i++) {
+    data[i * 4] = (i * 37) & 255;
+    data[i * 4 + 1] = (i * 53) & 255;
+    data[i * 4 + 2] = (i * 71) & 255;
+    data[i * 4 + 3] = 255;
+  }
+  return encodeJPEG({ width: 8, height: 8, data }, 90).data;
+})();
 const okImage = () => new Response(PNG, { status: 200 });
 
 /** 一个假的上游：按请求体分派 initialize / tools/call / 下载。 */
@@ -133,11 +148,38 @@ describe("错误分类与重试边界 —— 这一条每次调用都是钱", ()
   });
 });
 
+describe("JPEG 解码（Interactions 的唯一输出格式）", () => {
+  it("解出 RGBA，alpha 恒 255", () => {
+    const img = decodeJPEG(JPEG);
+    expect(img.width).toBe(8);
+    expect(img.height).toBe(8);
+    expect(img.data.length).toBe(8 * 8 * 4);
+    for (let i = 3; i < img.data.length; i += 4) expect(img.data[i]).toBe(255);
+  });
+
+  it("不是 JPEG 就明确失败", () => {
+    expect(() => decodeJPEG(PNG)).toThrow(/不是 JPEG/);
+  });
+
+  it("解出的 JPEG 能走完整的导入管线（抠底→裁框→降采样→量化）", () => {
+    const out = importBitmap(decodeJPEG(JPEG), {
+      palette: ["#000000", "#ffffff", "#808080", "#ff0000", "#00ff00", "#0000ff"],
+      targetWidth: 4,
+      targetHeight: 4,
+    });
+    expect(out.width).toBe(4);
+    expect(out.height).toBe(4);
+    expect(out.data.length).toBe(4 * 4 * 4);
+  });
+});
+
 describe("Gemini 客户端（Interactions API）", () => {
   const png64 = PNG.toString("base64");
   const interaction = (blocks: unknown[]) =>
     new Response(JSON.stringify({ steps: [{ type: "model_output", content: blocks }] }), { status: 200 });
-  const okGemini = () => interaction([{ type: "image", mime_type: "image/png", data: png64 }]);
+  const jpeg64 = JPEG.toString("base64");
+  const okGemini = () => interaction([{ type: "image", mime_type: "image/jpeg", data: jpeg64 }]);
+  const okGeminiPNG = () => interaction([{ type: "image", mime_type: "image/png", data: png64 }]);
   const fakeGemini = (res: () => Response) => {
     const seen: { url: string; key?: string; body: Record<string, any> }[] = [];
     const impl = (async (url: string, init?: RequestInit) => {
@@ -157,7 +199,7 @@ describe("Gemini 客户端（Interactions API）", () => {
     expect(geminiAspect({ w: 48, h: 48 })).toBe("1:1");
   });
 
-  it("走对端点、带对头、把 PNG / aspect / 1K 放进 response_format", async () => {
+  it("走对端点、带对头、把 JPEG / aspect / 1K 放进 response_format", async () => {
     const up = fakeGemini(okGemini);
     const r = await g(up.impl)({ prompt: "a crate", size: { w: 32, h: 48 } });
     expect(r.image.width).toBe(8);
@@ -166,7 +208,7 @@ describe("Gemini 客户端（Interactions API）", () => {
     const body = up.seen[0]!.body;
     expect(body["model"]).toBe("gemini-3.1-flash-lite-image");
     expect(body["response_format"]).toEqual({
-      type: "image", mime_type: "image/png", aspect_ratio: "2:3", image_size: "1K",
+      type: "image", mime_type: "image/jpeg", aspect_ratio: "2:3", image_size: "1K",
     });
     expect(r.call).toMatchObject({
       protocol: "gemini", requestedSize: "aspect 2:3", attempts: 1, requestedModel: "gemini-3.1-flash-lite-image",
@@ -211,13 +253,40 @@ describe("Gemini 客户端（Interactions API）", () => {
     expect(r.image.width).toBe(8);
   });
 
-  it("⚠️ 上游回非 PNG 就明确失败，不静默解码", async () => {
-    const up = fakeGemini(() => interaction([{ type: "image", mime_type: "image/jpeg", data: png64 }]));
+  it("没有 mime_type 时按 JPEG 签名判定", async () => {
+    const up = fakeGemini(() => interaction([{ type: "image", data: jpeg64 }]));
+    const r = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(r.image.width).toBe(8);
+  });
+
+  it("JPEG 是主路径：解码成功", async () => {
+    const up = fakeGemini(okGemini);
+    const r = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(r.image.width).toBe(8);
+    expect(r.image.data.length).toBe(8 * 8 * 4);
+  });
+
+  it("PNG 兼容：旧桩 / 旧上游仍能走通", async () => {
+    const up = fakeGemini(okGeminiPNG);
+    const r = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } });
+    expect(r.image.width).toBe(8);
+  });
+
+  it("⚠️ 上游回 WebP 就明确失败，不静默解码", async () => {
+    const up = fakeGemini(() => interaction([{ type: "image", mime_type: "image/webp", data: jpeg64 }]));
     const e = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
     expect(e).toBeInstanceOf(ImageGenerationError);
+    expect((e as Error).message).toMatch(/image\/webp/);
     expect((e as Error).message).toMatch(/image\/jpeg/);
-    expect((e as Error).message).toMatch(/image\/png/);
     expect(up.seen).toHaveLength(1);   // 确定性错，不重试
+  });
+
+  it("⚠️ 声明 PNG 却给 JPEG 字节：按声明解码，不靠签名猜", async () => {
+    const up = fakeGemini(() => interaction([{ type: "image", mime_type: "image/png", data: jpeg64 }]));
+    const e = await g(up.impl)({ prompt: "x", size: { w: 16, h: 16 } }).catch((x: Error) => x);
+    expect(e).toBeInstanceOf(ImageGenerationError);
+    expect((e as Error).message).toMatch(/不是 PNG/);
+    expect(up.seen).toHaveLength(1);
   });
 
   it("形状不对就抛，且带上 steps 摘要", async () => {

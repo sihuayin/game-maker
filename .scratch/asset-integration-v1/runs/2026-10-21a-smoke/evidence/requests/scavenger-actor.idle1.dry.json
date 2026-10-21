@@ -1,0 +1,27 @@
+{
+  "url": "https://generativelanguage.googleapis.com/v1beta/interactions",
+  "model": "gemini-nano-banana-2.1",
+  "response_format": {
+    "type": "image",
+    "mime_type": "image/jpeg",
+    "aspect_ratio": "3:4",
+    "image_size": "1K"
+  },
+  "input": [
+    {
+      "type": "text",
+      "textLength": 1720
+    },
+    {
+      "type": "image",
+      "mime_type": "image/png",
+      "base64Bytes": 365288
+    },
+    {
+      "type": "image",
+      "mime_type": "image/png",
+      "base64Bytes": 1616936
+    }
+  ],
+  "note": "dry-run 请求摘要；参考图 base64 已省略，完整 body 未落库。"
+}

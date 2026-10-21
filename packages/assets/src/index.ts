@@ -8,6 +8,7 @@
 //   · 人工导入通道（sheet 切片、来源标注）→ 票 23
 export * from "./image.js";
 export * from "./png.js";
+export * from "./jpeg.js";
 export * from "./raster.js";
 export * from "./quantize.js";
 export * from "./atlas.js";

@@ -21,7 +21,8 @@
 // 这一条每次调用都是钱，4xx 重试是白花。
 import type { LedgerCall, LedgerUsage } from "@game-maker/contracts";
 import { ImageGenerationError, type ImageProtocol } from "./image-gen-error.js";
-import { decodePNG, encodePNG } from "./png.js";
+import { PNG_SIGNATURE, decodePNG, encodePNG } from "./png.js";
+import { decodeJPEG, isJPEG } from "./jpeg.js";
 import type { RasterImage } from "./image.js";
 
 export { ImageGenerationError };
@@ -220,13 +221,17 @@ export function createDashScopeMcpGenerator(opts: DashScopeOptions): ImageGenera
 
 // ── Gemini（Interactions API）─────────────────────────────────────────────────
 //
-// 2026-10-19（票 13 / 票 12 的 A2）：改用 **Interactions API**，显式要 PNG。
+// 2026-10-19（票 13 / 票 12 的 A2）：改用 **Interactions API**。
+// 2026-10-20（票 05 / 07）：输出格式定为 **JPEG** —— Interactions 的 MIME 枚举只有 JPEG
+//   （v1 / v1alpha / v1beta discovery rev 20261019），两次真实 400 只允许 image/jpeg。
+//   参考图仍以 PNG 内联；**输出**请求 JPEG，并由 `decodeUpstreamImage` 分派到 JPEG 解码器。
+//   legacy `generateContent` 路径继续只认 PNG。
 //
 //   POST {baseUrl}/interactions                         x-goog-api-key: <key>
 //   {"model":…,
 //    "input":[{"type":"text","text":…},
 //             {"type":"image","mime_type":"image/png","data":<b64>}],
-//    "response_format":{"type":"image","mime_type":"image/png",
+//    "response_format":{"type":"image","mime_type":"image/jpeg",
 //                       "aspect_ratio":"16:9","image_size":"1K"}}
 //   → steps[].type === "model_output" → content[].type === "image" → data (base64)
 //
@@ -308,6 +313,36 @@ type GeminiImageBlock = {
   inlineData?: { data?: string; mimeType?: string };
 };
 
+type GeminiImageFormat = "image/png" | "image/jpeg";
+
+/** 按字节签名嗅探；只认本仓库真正支持的两种格式。 */
+function sniffImageFormat(bytes: Buffer): GeminiImageFormat | undefined {
+  if (bytes.length >= PNG_SIGNATURE.length && bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) return "image/png";
+  if (isJPEG(bytes)) return "image/jpeg";
+  return undefined;
+}
+
+/**
+ * 上游 base64 → RasterImage。
+ *
+ * ⚠️ **声明了 mime 就以声明为准**：声明 JPEG 却给 PNG 字节，会在解码器那里响，
+ *   而不是靠签名「猜对了」继续跑。只有完全没声明时才嗅探。
+ * ⚠️ `allowed` 是每条路径自己的白名单：legacy 只认 PNG；Interactions 认 JPEG + PNG
+ *   （PNG 仅作旧桩 / 旧上游的兼容路径）。
+ */
+function decodeUpstreamImage(data: string, mime: string | undefined, allowed: readonly GeminiImageFormat[]): RasterImage {
+  const bytes = Buffer.from(data, "base64");
+  const declared = mime ?? sniffImageFormat(bytes);
+  const allowedText = allowed.join(" / ");
+  if (declared === undefined)
+    throw new Error(`上游没给 mime_type，且字节不是 JPEG / PNG —— 本路径只接受 ${allowedText}，不静默解码别的格式`);
+  if (declared !== "image/png" && declared !== "image/jpeg")
+    throw new Error(`上游回了 ${declared}，而本路径只接受 ${allowedText} —— 不静默解码别的格式`);
+  if (!allowed.includes(declared))
+    throw new Error(`上游回了 ${declared}，而本路径只接受 ${allowedText} —— 不静默解码别的格式`);
+  return declared === "image/png" ? decodePNG(bytes) : decodeJPEG(bytes);
+}
+
 /** 从 legacy `generateContent` 的回应里把第一张图抠出来。形状错就抛，绝不猜。 */
 function imageFromGenerateContent(res: unknown): RasterImage {
   const d = res as {
@@ -319,10 +354,8 @@ function imageFromGenerateContent(res: unknown): RasterImage {
   for (const c of d.candidates ?? [])
     for (const p of (c.content?.parts ?? []) as { inlineData?: { data?: string; mimeType?: string } }[]) {
       if (typeof p.inlineData?.data !== "string") continue;
-      // legacy 2.5 实测回 PNG；若哪天变了，明确失败，不静默解码别的格式。
-      if (p.inlineData.mimeType !== undefined && p.inlineData.mimeType !== "image/png")
-        throw new Error(`上游回了 ${p.inlineData.mimeType}，而 legacy 路径要求 image/png —— 不静默解码别的格式`);
-      return decodePNG(Buffer.from(p.inlineData.data, "base64"));
+      // legacy 2.5 实测回 PNG；本路径只认 PNG —— JPEG / WebP 都明确失败，不静默解码。
+      return decodeUpstreamImage(p.inlineData.data, p.inlineData.mimeType, ["image/png"]);
     }
   throw new Error(`回应里没有图（${JSON.stringify(d.promptFeedback ?? d.candidates ?? d).slice(0, 250)}）`);
 }
@@ -349,9 +382,8 @@ function imageFromInteraction(res: unknown): RasterImage {
     const data = block.data ?? inline?.data;
     if (typeof data !== "string" || data.length === 0) continue;
     const mime = block.mime_type ?? block.mimeType ?? inline?.mime_type ?? inline?.mimeType;
-    if (mime !== undefined && mime !== "image/png")
-      throw new Error(`上游回了 ${mime}，而本次请求明确要求 image/png —— 不静默解码别的格式`);
-    return decodePNG(Buffer.from(data, "base64"));
+    // Interactions 请求 image/jpeg；PNG 保留兼容（旧桩 / 旧上游）。
+    return decodeUpstreamImage(data, mime, ["image/jpeg", "image/png"]);
   }
 
   const shape = (d.steps ?? []).map((s) =>
@@ -399,7 +431,7 @@ export function createGeminiGenerator(opts: GeminiOptions): ImageGenerator {
             ...images.map((img) => ({ type: "image", mime_type: "image/png", data: encodePNG(img).toString("base64") })),
           ],
           // ⚠️ `image_size:"1K"`：3.1 Flash Lite 只支持 1K；其余新模型默认也是 1K。
-          response_format: { type: "image", mime_type: "image/png", aspect_ratio: aspect, image_size: "1K" },
+          response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: aspect, image_size: "1K" },
         };
 
     let lastErr: unknown;

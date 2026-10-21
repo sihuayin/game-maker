@@ -1,0 +1,24 @@
+{
+  "url": "https://generativelanguage.googleapis.com/v1beta/interactions",
+  "model": "gemini-nano-banana-2.1",
+  "response_format": {
+    "type": "image",
+    "mime_type": "image/jpeg",
+    "aspect_ratio": "3:4",
+    "image_size": "1K"
+  },
+  "inputs": [
+    {
+      "type": "text",
+      "textLength": 1720
+    },
+    {
+      "type": "image",
+      "mime_type": "image/png"
+    },
+    {
+      "type": "image",
+      "mime_type": "image/png"
+    }
+  ]
+}

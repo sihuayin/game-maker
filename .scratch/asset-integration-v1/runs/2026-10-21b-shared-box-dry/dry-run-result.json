@@ -1,0 +1,166 @@
+{
+  "palette": 34,
+  "floor": 128,
+  "target": {
+    "w": 48,
+    "h": 64
+  },
+  "sets": [
+    {
+      "name": "2.1",
+      "frames": [
+        {
+          "name": "idle1",
+          "dims": {
+            "w": 896,
+            "h": 1200
+          },
+          "key": [
+            234,
+            44,
+            188
+          ],
+          "bbox": {
+            "x": 114,
+            "y": 110,
+            "w": 650,
+            "h": 1050
+          }
+        },
+        {
+          "name": "idle2",
+          "dims": {
+            "w": 896,
+            "h": 1200
+          },
+          "key": [
+            216,
+            48,
+            155
+          ],
+          "bbox": {
+            "x": 150,
+            "y": 76,
+            "w": 474,
+            "h": 1084
+          }
+        }
+      ],
+      "boxes": {
+        "union": {
+          "x": 114,
+          "y": 76,
+          "w": 650,
+          "h": 1084
+        },
+        "average": {
+          "x": 132,
+          "y": 93,
+          "w": 562,
+          "h": 1067
+        }
+      },
+      "metrics": {
+        "perFrame": {
+          "alphaDiff": 550,
+          "alphaPct": 17.9,
+          "rgbChanged": 872,
+          "rgbPct": 28.4,
+          "meanL1": 32.99
+        },
+        "union": {
+          "alphaDiff": 218,
+          "alphaPct": 7.1,
+          "rgbChanged": 520,
+          "rgbPct": 16.9,
+          "meanL1": 19.03
+        },
+        "average": {
+          "alphaDiff": 245,
+          "alphaPct": 8,
+          "rgbChanged": 631,
+          "rgbPct": 20.5,
+          "meanL1": 22.78
+        }
+      }
+    },
+    {
+      "name": "2.5",
+      "frames": [
+        {
+          "name": "idle1",
+          "dims": {
+            "w": 864,
+            "h": 1184
+          },
+          "key": [
+            210,
+            60,
+            155
+          ],
+          "bbox": {
+            "x": 141,
+            "y": 21,
+            "w": 455,
+            "h": 1122
+          }
+        },
+        {
+          "name": "idle2",
+          "dims": {
+            "w": 864,
+            "h": 1184
+          },
+          "key": [
+            211,
+            61,
+            155
+          ],
+          "bbox": {
+            "x": 141,
+            "y": 18,
+            "w": 454,
+            "h": 1126
+          }
+        }
+      ],
+      "boxes": {
+        "union": {
+          "x": 141,
+          "y": 18,
+          "w": 455,
+          "h": 1126
+        },
+        "average": {
+          "x": 141,
+          "y": 20,
+          "w": 455,
+          "h": 1124
+        }
+      },
+      "metrics": {
+        "perFrame": {
+          "alphaDiff": 11,
+          "alphaPct": 0.4,
+          "rgbChanged": 150,
+          "rgbPct": 4.9,
+          "meanL1": 2.53
+        },
+        "union": {
+          "alphaDiff": 9,
+          "alphaPct": 0.3,
+          "rgbChanged": 123,
+          "rgbPct": 4,
+          "meanL1": 1.79
+        },
+        "average": {
+          "alphaDiff": 6,
+          "alphaPct": 0.2,
+          "rgbChanged": 139,
+          "rgbPct": 4.5,
+          "meanL1": 2.07
+        }
+      }
+    }
+  ]
+}

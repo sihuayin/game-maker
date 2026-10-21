@@ -11,13 +11,27 @@ Effort: asset-integration-v1
 > ✅ **2026-10-20 · 03 已收口 → 策展包 v6**（v4 的 34 色 + 地面线清理；`verifyPack` ok · 61 动画帧 · 0 上游）。
 > ✅ **2026-10-20 · 02 已收口 → pack v7**（lurker hang/lunge/retreat 语义修复；2 张付费新帧 + 4 张零付费旋转）。
 > ✅ **2026-10-20 · 05 已收口（research）** → 推荐「冻结 2.5 + `gemini-nano-banana-2.1` + JPEG 解码」；路线定稿见 [07](issues/07-model-route-ratification.md)。
+> ✅ **2026-10-20 · 07 已收口（人裁）** → 接受 JPEG / 长期默认 2.1 / 2.5 内部截止 2026-12-31；
+> 施工与付费验证立 [JPEG 施工](issues/08-jpeg-decoder.md) / [同动画 smoke](issues/09-two-frame-smoke.md) /
+> [fixture 重基线](issues/10-fixture-rebaseline.md) / [共享裁框](issues/11-shared-trimbox.md)
+> （JPEG 施工已完成；smoke 已收口；fixture 停止；共享裁框已关闭）。
+> ✅ **2026-10-21 · 08 已收口** → JPEG 解码 + Interactions 请求改 JPEG + 测试；全量 1647 条绿；0 上游。
+> ✅ **2026-10-21 · 09 已收口（人裁 A）**（2 发 / 2 张 JPEG / ≈$0.067 / 0 重试）—— 技术路径通，
+> 但帧间一致性未过：bbox 宽漂移 132px（2.5: 6px）、alpha 差 17.9%（2.5: 0.4%）。
+> 裁定：**触发共享裁框；dry-run 仍不可接受则拒绝 2.1 作为动画默认（C）**。
+> ✅ **2026-10-21 · 11 dry-run 完成**：并集框把 alpha 差 17.9% → **7.1%**，仍是 2.5 基线 0.4% 的 ~18×；
+> 2.1 两帧干净 bbox 宽 650 vs 474（2.5: 455 vs 454）⇒ 剩余是模型绘制方差。**C 已确认**。
+> ✅ **2026-10-21 · C 成立（人裁）** → 11 关闭（共享框不施工）；10 停止（fixtures 保留 2.5）；
+> JPEG 路径保留；2.1 不作为动画默认；替代动画模型立 [12](issues/12-alternative-animation-model.md)（先定验收标准）。
 > ⚠️ **本图承载施工**（不是纯决策图）；任何付费生图 / 文本调用仍须**逐次**报告 + 逐字点头。
 
 ## Destination
 
 最终资源包被集成进一个**可启动、可查看的本地站点**；
 已知内容瑕疵（潜伏者语义 / 地面线 / 色板）被收敛到可接受，或被明确裁定接受；
-未来跑批的模型路线有结论。
+未来跑批的模型路线有结论；
+JPEG 路线完成零付费施工，并以**同动画 2 帧 smoke** 验证真实 JPEG 交付（付费仍逐字点头）；
+动画替代模型在 2.5 内部截止前有结论（先定统一验收标准；本轮不授权调用或迁移）。
 
 ## Notes
 
@@ -30,12 +44,17 @@ Effort: asset-integration-v1
 - **最终包（02 定稿 · 当前集成起点）**：`.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/`
   （在 v6 上修 lurker 语义；34 色；`verifyPack` ok · 61 动画帧 · 0 上游）。
 - **模型路线报告（05 定稿）**：`research/model-route-2026-10-20.md`（零付费；官方文档 / discovery + 本地离线 JPEG 模拟）。
+- **C 裁定（2026-10-21）**：2.1 **不作为动画默认**；JPEG 路径（08）保留为基础能力，
+  不代表 2.1 获准用于动画生产。动画继续用 2.5；2.5 内部截止 **2026-12-31** 不变。
 - **原始设计**（与包同源）：`runs/2026-10-18d/ruin-scavenger-extraction-assets/run/v1/game-design.json`
 - **付费闸**：生图 / 文本上游都算付费动作；先出书面预算报告 + 逐字点头，一笔都不能自行发。
 - **零付费工具**：`reuseFrom` + `minLargestShare` 让「patch 一帧 → 复用重建」不花钱；
   `verifyPack` / `inspect` 本地免费。
 - **顺序**：06 色板（已完成，v4）→ 03 地面线（**已完成**，v6）→ 01 站点集成（**已完成**，零上游）→
-  02 潜伏者（**已完成**，v7）→ 05 模型路线（**已收口**，research）→ 07 路线定稿（**开**，人裁）。
+  02 潜伏者（**已完成**，v7）→ 05 模型路线（**已收口**，research）→ 07 路线定稿（**已收口**，人裁）→
+  08 JPEG 施工（**已完成**，零付费）→ 09 同动画 smoke（**已完成**，2 发 / 人裁 A）→
+  11 共享裁框（**已收口**，dry-run + 人裁 C）→ 10 fixture 重基线（**已停止**，未执行）→
+  12 替代动画模型（**开**，先定统一验收标准）。
 - **站点**：`runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/`（**site/v3** 消费 v7；v1/v2 是 v6 的历史版本；
   配置与证据在同目录）。
 - **已知瑕疵**：~~潜伏者倒挂/站立语义混用~~（02 已修，见 v7）；~~多帧地面线 / 细虚线~~（03 已修，见 v6）；
@@ -75,18 +94,35 @@ Effort: asset-integration-v1
   风险在**逐帧裁框抖动**（q90 下 1K bbox 漂移 1–8 px）。施工面 ≈ 0.5–1.5 人日（`jpeg-js`）。
   报告：`research/model-route-2026-10-20.md`；7 个人裁点已立为
   [07](issues/07-model-route-ratification.md)。
+- [07. 模型路线定稿](issues/07-model-route-ratification.md)：**已收口（人裁）** —— 接受 JPEG
+  （同动画 2 帧 smoke 为门槛）；长期默认 `gemini-nano-banana-2.1`（smoke + fixture 后生效）；
+  2.5 内部截止 **2026-12-31**（只约束新批次）。批准
+  [JPEG 施工](issues/08-jpeg-decoder.md) 零付费开工并限定范围；
+  [同动画 2 帧 smoke](issues/09-two-frame-smoke.md) 预算上限已批、执行前仍须逐字点头；
+  [fixture 重基线](issues/10-fixture-rebaseline.md) 替换 16 张 fixture、预算另批；
+  [动画级共享裁框](issues/11-shared-trimbox.md) 条件性立票。07 同时把 JPEG 施工 /
+  smoke / fixture 重基线拉入本图（Destination 已相应扩写）。
+- [08. JPEG 解码 + Interactions 请求改 JPEG](issues/08-jpeg-decoder.md)：**已收口** ——
+  `jpeg-js@0.4.4` + `decodeJPEG()`；Interactions 请求改 `image/jpeg`；按声明 MIME 分派
+  （Interactions JPEG / PNG 兼容，legacy 仅 PNG）；未知 / 冲突格式明确失败且不重试。
+  `@types/jpeg-js` 是 deprecated stub（jpeg-js 自带类型），未安装。全量 **105 文件 / 1647 条绿**；
+  0 上游；未改配置 / fixtures；09 已解除阻塞。
+- [09. 同动画 2 帧 smoke](issues/09-two-frame-smoke.md)：**已收口（人裁 A）** —— 2 发 / 2 张 JPEG /
+  ≈$0.067 / 0 重试；技术路径通，但帧间一致性未过（alpha 差 17.9% vs 2.5 的 0.4%；bbox 宽漂移
+  132px vs 6px）。idle1 是离群帧；结论是 2.1 逐帧方差 + 逐帧紧裁，不是 JPEG 压缩。
+  裁定：触发 [共享裁框](issues/11-shared-trimbox.md) 先做零付费 dry-run；仍不可接受则拒绝 2.1 作为动画默认。
+- [11. 动画级共享裁框](issues/11-shared-trimbox.md)：**已收口（人裁 C）** —— dry-run 把 2.1 alpha 差
+  **17.9% → 7.1%**，仍是 2.5 基线 **0.4%** 的 ~18×；干净 bbox 宽 **650 vs 474**（2.5: 455 vs 454）。
+  结论：共享框修不了模型姿势 / 轮廓宽度 / 明暗方差；**不施工**，保留为技术方向。
+- [10. 2.1 fixture 重基线](issues/10-fixture-rebaseline.md)：**停止，未执行** —— 2.1 未通过动画一致性验收；
+  **不是 fixture 工具缺陷**。保留现有 16 张 2.5 fixtures；未来替代模型通过验收后另立重基线票。
 
 ## Not yet specified
 
-（暂无。02 / 03 / 05 已收口；07 是当前唯一的开放决策票。）
+（暂无。07–11 已收口 / 停止；12 是当前唯一的开放决策票（替代动画模型，先定验收标准）。）
 
 ## Out of scope
 
 - **开宝箱 / 外壳交互**：属玩法 / 运行时 effort；本图只记录，不立票。
 - **玩法扩展**（攻击 / 受伤 / 死亡 / 多关卡索引）。
 - **跨游戏视觉记忆**。
-
-- **模型路线的落地施工**（JPEG 解码 / 同动画 smoke / fixture 重基线 / 动画级共享裁框）：
-  Destination 只要求「未来跑批的模型路线有结论」；05 已给出结论，07 负责定稿。
-  落地与付费验证另开 effort，付费仍须逐次报告 + 逐字点头。
-  （若要把落地拉进本图，先显式改 Destination。）

@@ -1,0 +1,129 @@
+{
+  "ok": true,
+  "mode": "live",
+  "model": "gemini-nano-banana-2.1",
+  "api": "interactions",
+  "proxy": "http://127.0.0.1:7890",
+  "requests": 2,
+  "frames": [
+    {
+      "name": "scavenger-actor.idle1",
+      "bytes": 940072,
+      "model": "gemini-nano-banana-2.1",
+      "ms": 48243,
+      "attempts": 1,
+      "decoded": {
+        "w": 896,
+        "h": 1200
+      },
+      "baseline": {
+        "w": 864,
+        "h": 1184
+      },
+      "bbox": {
+        "x": 114,
+        "y": 110,
+        "w": 782,
+        "h": 1090
+      },
+      "baselineBbox": {
+        "x": 0,
+        "y": 0,
+        "w": 744,
+        "h": 1143
+      },
+      "imported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 555,
+          "h": 1046
+        }
+      },
+      "baselineImported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 454,
+          "h": 1076
+        }
+      },
+      "key": [
+        234,
+        44,
+        188
+      ],
+      "baselineKey": [
+        210,
+        60,
+        155
+      ]
+    },
+    {
+      "name": "scavenger-actor.idle2",
+      "bytes": 1070118,
+      "model": "gemini-nano-banana-2.1",
+      "ms": 67619,
+      "attempts": 1,
+      "decoded": {
+        "w": 896,
+        "h": 1200
+      },
+      "baseline": {
+        "w": 864,
+        "h": 1184
+      },
+      "bbox": {
+        "x": 114,
+        "y": 76,
+        "w": 650,
+        "h": 1084
+      },
+      "baselineBbox": {
+        "x": 6,
+        "y": 5,
+        "w": 738,
+        "h": 1139
+      },
+      "imported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 472,
+          "h": 1080
+        }
+      },
+      "baselineImported": {
+        "w": 48,
+        "h": 64,
+        "trimmedTo": {
+          "w": 454,
+          "h": 1076
+        }
+      },
+      "key": [
+        216,
+        48,
+        155
+      ],
+      "baselineKey": [
+        211,
+        61,
+        155
+      ]
+    }
+  ],
+  "drift21": {
+    "dx": 0,
+    "dy": -34,
+    "dw": -132,
+    "dh": -6
+  },
+  "drift25": {
+    "dx": 6,
+    "dy": 5,
+    "dw": -6,
+    "dh": -4
+  },
+  "verdict": "pending-human"
+}
