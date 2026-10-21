@@ -1,0 +1,75 @@
+ruin-scavenger-extraction-assets v7 · mixed
+19 个资源 · 4 张图集
+  scavenger-actor · animation · 48×64 · generated/quantized · 16 帧 · 动画 idle(4) run(8) jump(4) · 用色 20/34
+  wasteland-enemy · animation · 48×48 · generated/quantized · 15 帧 · 动画 patrol(6) charge(6) halt(3) · 用色 18/34
+  ceiling-lurker · animation · 48×56 · generated/quantized · 13 帧 · 动画 hang(4) lunge(5) retreat(4) · 用色 19/34
+  scrap-resource · animation · 24×24 · generated/quantized · 4 帧 · 动画 idle(4) · 用色 20/34
+  clean-water · animation · 24×24 · generated/quantized · 4 帧 · 动画 idle(4) · 用色 22/34
+  hazard-terrain · sprite · 64×48 · generated/quantized · 1 帧 · 用色 13/34
+  collapsed-floor · sprite · 64×32 · imported/quantized · 1 帧 · 用色 14/34
+  extraction-point · animation · 64×96 · generated/quantized · 9 帧 · 动画 standby(3) active(6) · 用色 23/34
+  tile-floor · sprite · 64×64 · imported/quantized · 1 帧 · 用色 28/34
+  metal-platform · sprite · 96×48 · imported/quantized · 1 帧 · 用色 14/34
+  vent-duct · sprite · 96×40 · imported/quantized · 1 帧 · 用色 14/34
+  concrete-step · sprite · 64×48 · imported/quantized · 1 帧 · 用色 15/34
+  wooden-crate · sprite · 48×48 · imported/quantized · 1 帧 · 用色 20/34
+  office-debris · sprite · 96×64 · generated/quantized · 1 帧 · 用色 15/34
+  broken-wall · sprite · 64×96 · imported/quantized · 1 帧 · 用色 22/34
+  ruined-city-backdrop · background · 640×360 · generated/quantized · 3 帧 · 用色 24/34
+  hud-panel · ui · 48×48 · generated/exact · 1 帧 · 用色 16/34
+  scrap-icon · ui · 16×16 · generated/exact · 1 帧 · 用色 14/34
+  health-icon · ui · 16×16 · generated/composited · 1 帧 · 用色 8/34 · 色板外 41
+源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：
+  hazard-terrain                 源图 1184×864 (1.370) → 目标 64×48 (1.333) · 长宽比差 -2.7%
+  collapsed-floor                源图 64×32 (2.000) → 目标 64×32 (2.000) · 长宽比差 0.0%
+  tile-floor                     源图 64×64 (1.000) → 目标 64×64 (1.000) · 长宽比差 0.0%
+  metal-platform                 源图 96×48 (2.000) → 目标 96×48 (2.000) · 长宽比差 0.0%
+  vent-duct                      源图 96×40 (2.400) → 目标 96×40 (2.400) · 长宽比差 0.0%
+  concrete-step                  源图 64×48 (1.333) → 目标 64×48 (1.333) · 长宽比差 0.0%
+  wooden-crate                   源图 48×48 (1.000) → 目标 48×48 (1.000) · 长宽比差 0.0%
+  office-debris                  源图 1248×832 (1.500) → 目标 96×64 (1.500) · 长宽比差 0.0%
+  broken-wall                    源图 64×96 (0.667) → 目标 64×96 (0.667) · 长宽比差 0.0%
+  ruined-city-backdrop.skyline   源图 1344×768 (1.750) → 目标 640×360 (1.778) · 长宽比差 +1.6%
+  ruined-city-backdrop.blocks    源图 1344×768 (1.750) → 目标 640×360 (1.778) · 长宽比差 +1.6%
+  ruined-city-backdrop.street    源图 1344×768 (1.750) → 目标 640×360 (1.778) · 长宽比差 +1.6%
+背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：
+  ruined-city-backdrop.skyline 640×360  100.0%
+  ruined-city-backdrop.blocks 640×360  88.9%
+  ruined-city-backdrop.street 640×360  73.1%
+色板 34 色 · 交付态实际用到的像素分布（**观察，不是判据**）：
+  #000000 · 8/19 个资源用到 · 占全部不透明像素 0.1%
+  #080000 · 7/19 个资源用到 · 占全部不透明像素 0.0%
+  #180000 · 1/19 个资源用到 · 占全部不透明像素 0.0%
+  #200000 · 1/19 个资源用到 · 占全部不透明像素 0.0%
+  #100700 · 9/19 个资源用到 · 占全部不透明像素 0.2%
+  #290705 · 6/19 个资源用到 · 占全部不透明像素 0.1%
+  #1a0d05 · 15/19 个资源用到 · 占全部不透明像素 1.3%
+  #380702 · 2/19 个资源用到 · 占全部不透明像素 0.0%
+  #210f03 · 4/19 个资源用到 · 占全部不透明像素 0.0%
+  #290d02 · 3/19 个资源用到 · 占全部不透明像素 0.0%
+  #420605 · 7/19 个资源用到 · 占全部不透明像素 0.0%
+  #310c00 · 1/19 个资源用到 · 占全部不透明像素 0.0%
+  #221205 · 19/19 个资源用到 · 占全部不透明像素 3.9%
+  #301100 · 1/19 个资源用到 · 占全部不透明像素 0.0%
+  #391404 · 10/19 个资源用到 · 占全部不透明像素 0.2%
+  #321905 · 17/19 个资源用到 · 占全部不透明像素 12.2%
+  #421600 · 8/19 个资源用到 · 占全部不透明像素 0.0%
+  #523730 · 18/19 个资源用到 · 占全部不透明像素 19.6%
+  #454a50 · 16/19 个资源用到 · 占全部不透明像素 10.8%
+  #794c35 · 13/19 个资源用到 · 占全部不透明像素 0.5%
+  #58554e · 17/19 个资源用到 · 占全部不透明像素 16.4%
+  #685247 · 12/19 个资源用到 · 占全部不透明像素 1.2%
+  #786151 · 15/19 个资源用到 · 占全部不透明像素 0.6%
+  #676862 · 17/19 个资源用到 · 占全部不透明像素 8.6%
+  #74716c · 17/19 个资源用到 · 占全部不透明像素 5.8%
+  #8e7161 · 13/19 个资源用到 · 占全部不透明像素 0.4%
+  #82847f · 13/19 个资源用到 · 占全部不透明像素 13.2%
+  #a97f67 · 9/19 个资源用到 · 占全部不透明像素 0.4%
+  #a0827a · 9/19 个资源用到 · 占全部不透明像素 0.2%
+  #a3a09b · 11/19 个资源用到 · 占全部不透明像素 0.5%
+  #c89f8b · 8/19 个资源用到 · 占全部不透明像素 0.1%
+  #d2a087 · 4/19 个资源用到 · 占全部不透明像素 0.1%
+  #59503b · 14/19 个资源用到 · 占全部不透明像素 2.8%
+  #50432b · 14/19 个资源用到 · 占全部不透明像素 0.8%
+色板外像素 41 个 · 占全部不透明像素 0.01% · 前几色 #714335(6) #724439(5) #3c0703(5) #633c32(4) #120202(4) #65372a(3) #8e6353(2) #805347(2)（**观察，不是判据** —— 对不上可以是设计）
+→ v7

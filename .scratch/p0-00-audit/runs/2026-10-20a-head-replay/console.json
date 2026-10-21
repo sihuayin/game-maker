@@ -1,0 +1,260 @@
+[
+  {
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "%c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390"
+        },
+        {
+          "type": "string",
+          "value": "background: #ff0000"
+        },
+        {
+          "type": "string",
+          "value": "background: #ffff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ffff"
+        },
+        {
+          "type": "string",
+          "value": "color: #ffffff; background: #000000"
+        },
+        {
+          "type": "string",
+          "value": "background: transparent"
+        }
+      ],
+      "executionContextId": 1,
+      "timestamp": 1792495173076.446,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "p",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 75518
+          }
+        ]
+      }
+    }
+  },
+  {
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "[shell] v2 · 视口 480×270 · 世界 1920×270 · 4 张图集"
+        }
+      ],
+      "executionContextId": 1,
+      "timestamp": 1792495173144.654,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "create",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 95,
+            "columnNumber": 72620
+          }
+        ]
+      }
+    }
+  },
+  {
+    "method": "Log.entryAdded",
+    "params": {
+      "entry": {
+        "source": "network",
+        "level": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (File not found)",
+        "timestamp": 1792495173066.344,
+        "url": "http://127.0.0.1:8767/favicon.ico",
+        "networkRequestId": "53606.8"
+      }
+    }
+  },
+  {
+    "method": "Log.entryAdded",
+    "params": {
+      "entry": {
+        "source": "network",
+        "level": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (File not found)",
+        "timestamp": 1792495181332.567,
+        "url": "http://127.0.0.1:8767/favicon.ico",
+        "networkRequestId": "53606.32"
+      }
+    }
+  },
+  {
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "%c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390"
+        },
+        {
+          "type": "string",
+          "value": "background: #ff0000"
+        },
+        {
+          "type": "string",
+          "value": "background: #ffff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ffff"
+        },
+        {
+          "type": "string",
+          "value": "color: #ffffff; background: #000000"
+        },
+        {
+          "type": "string",
+          "value": "background: transparent"
+        }
+      ],
+      "executionContextId": 2,
+      "timestamp": 1792495181337.924,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "p",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 75518
+          },
+          {
+            "functionName": "boot",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 76687
+          },
+          {
+            "functionName": "p",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 2,
+            "columnNumber": 916
+          },
+          {
+            "functionName": "initialize",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 76480
+          },
+          {
+            "functionName": "construct",
+            "scriptId": "5",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 175
+          },
+          {
+            "functionName": "X0",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 96,
+            "columnNumber": 17997
+          }
+        ]
+      }
+    }
+  },
+  {
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "[shell] v2 · 视口 480×270 · 世界 1920×270 · 4 张图集"
+        }
+      ],
+      "executionContextId": 2,
+      "timestamp": 1792495181383.614,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "create",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 95,
+            "columnNumber": 72620
+          },
+          {
+            "functionName": "create",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22897
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22286
+          },
+          {
+            "functionName": "T.50792.s.emit",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 2285
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107505
+          },
+          {
+            "functionName": "fileProcessComplete",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107205
+          },
+          {
+            "functionName": "onProcessComplete",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 99467
+          },
+          {
+            "functionName": "data.onload",
+            "scriptId": "3",
+            "url": "http://127.0.0.1:8767/site/v1/shell.js",
+            "lineNumber": 20,
+            "columnNumber": 1526
+          }
+        ]
+      }
+    }
+  }
+]

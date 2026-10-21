@@ -1,0 +1,5 @@
+[
+  { "op": "wait", "ms": 2200 },
+  { "op": "shot", "name": "01-initial.png" },
+  { "op": "eval", "expr": "({title: document.title, canvases: [...document.querySelectorAll('canvas')].map(c=>({w:c.width,h:c.height,css:[c.style.width,c.style.height]})), bodyText: document.body.innerText, site: location.href})" }
+]

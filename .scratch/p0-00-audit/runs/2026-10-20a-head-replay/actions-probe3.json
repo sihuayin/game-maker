@@ -1,0 +1,3 @@
+[
+  { "op": "eval", "expr": "(()=>{const s=__gmGame.scene.getScene('shell'); return {keys:Object.keys(s), proto:Object.getOwnPropertyNames(Object.getPrototypeOf(s)).slice(0,80), player:!!s.player, collected:s.collected, won:s.won, pickups:(s.pickups||[]).length, gate:!!s.gate, cam:!!s.cameras?.main};})()" }
+]

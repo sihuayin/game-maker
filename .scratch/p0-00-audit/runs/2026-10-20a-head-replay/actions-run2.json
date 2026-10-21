@@ -1,0 +1,13 @@
+[
+  { "op": "down", "key": "ArrowLeft", "code": "ArrowLeft", "vk": 37 },
+  { "op": "wait", "ms": 1200 },
+  { "op": "up", "key": "ArrowLeft", "code": "ArrowLeft", "vk": 37 },
+  { "op": "shot", "name": "05-left.png" },
+  { "op": "down", "key": " ", "code": "Space", "vk": 32 },
+  { "op": "wait", "ms": 90 },
+  { "op": "up", "key": " ", "code": "Space", "vk": 32 },
+  { "op": "wait", "ms": 280 },
+  { "op": "shot", "name": "06-jump-under.png" },
+  { "op": "wait", "ms": 500 },
+  { "op": "shot", "name": "07-landed.png" }
+]

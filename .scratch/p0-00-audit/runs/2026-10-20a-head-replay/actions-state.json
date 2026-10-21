@@ -1,0 +1,3 @@
+[
+  { "op": "eval", "expr": "(()=>{const g=Phaser.GAMES[0]; const ss=g.scene.getScenes(true); return {games:Phaser.GAMES.length, scenes:ss.map(s=>({key:s.scene.key, player:s.player?{x:s.player.x,y:s.player.y,vy:s.player.body?.velocity.y}:null, collected:s.collected, won:s.won, pickups:(s.pickups||[]).map(p=>({x:p.x,y:p.y,active:p.active,visible:p.visible})), gate:s.gate?{x:s.gate.x,y:s.gate.y}:null, cam:s.cameras?.main?{scrollX:s.cameras.main.scrollX,scrollY:s.cameras.main.scrollY}:null}))};})()" }
+]

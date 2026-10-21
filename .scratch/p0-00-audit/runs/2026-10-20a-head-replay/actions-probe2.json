@@ -1,0 +1,3 @@
+[
+  { "op": "eval", "expr": "({version: Phaser.VERSION, keys: Object.keys(Phaser).slice(0,120), gameKeys: Object.keys(Phaser).filter(k=>/game/i.test(k)), hasGames: 'GAMES' in Phaser})" }
+]

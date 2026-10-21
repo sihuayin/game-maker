@@ -1,0 +1,7425 @@
+{
+  "resets": 0,
+  "maxX": 557,
+  "final": {
+    "x": 566,
+    "y": 193,
+    "vx": 90,
+    "vy": 0,
+    "onFloor": true,
+    "blockedRight": false,
+    "touchingRight": true,
+    "collected": 3,
+    "won": true,
+    "pickups": [
+      {
+        "x": 120,
+        "y": 230,
+        "active": false,
+        "visible": false
+      },
+      {
+        "x": 215,
+        "y": 225,
+        "active": false,
+        "visible": false
+      },
+      {
+        "x": 430,
+        "y": 180,
+        "active": false,
+        "visible": false
+      }
+    ],
+    "hazards": [
+      {
+        "x": 380,
+        "y": 250,
+        "axis": "x",
+        "dist": 0,
+        "period": 1000
+      },
+      {
+        "x": 490.4,
+        "y": 250,
+        "axis": "x",
+        "dist": 40,
+        "period": 3000
+      }
+    ],
+    "gate": {
+      "x": 600,
+      "y": 250
+    },
+    "scrollX": 160
+  },
+  "trace": [
+    {
+      "t": 1,
+      "x": 40,
+      "y": 250,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 492.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 38,
+      "x": 41.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 491.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 75,
+      "x": 44.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 490.8,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 112,
+      "x": 47.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 489.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 150,
+      "x": 50.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 489,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 188,
+      "x": 55,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 487.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 226,
+      "x": 58,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 486.8,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 263,
+      "x": 61,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 485.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 300,
+      "x": 65.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 484.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 338,
+      "x": 68.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 483.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 376,
+      "x": 71.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 482.8,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 415,
+      "x": 74.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 481.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 454,
+      "x": 79,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 480.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 492,
+      "x": 82,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 480.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 529,
+      "x": 85,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": true,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 481.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 730,
+      "x": 103,
+      "y": 226.3,
+      "vx": 90,
+      "vy": -255,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 486.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 768,
+      "x": 107.5,
+      "y": 215,
+      "vx": 90,
+      "vy": -210,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 487.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 807,
+      "x": 110.5,
+      "y": 208.8,
+      "vx": 90,
+      "vy": -180,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 488.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 844,
+      "x": 113.5,
+      "y": 203.5,
+      "vx": 90,
+      "vy": -150,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 489.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 880,
+      "x": 116.5,
+      "y": 199.3,
+      "vx": 90,
+      "vy": -120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 490.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 918,
+      "x": 121,
+      "y": 194.8,
+      "vx": 90,
+      "vy": -75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 491.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 956,
+      "x": 124,
+      "y": 193,
+      "vx": 90,
+      "vy": -45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 492.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 994,
+      "x": 127,
+      "y": 192.3,
+      "vx": 90,
+      "vy": -15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 493.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1032,
+      "x": 130,
+      "y": 192.5,
+      "vx": 90,
+      "vy": 15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 494.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1070,
+      "x": 134.5,
+      "y": 194.8,
+      "vx": 90,
+      "vy": 60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 495.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1108,
+      "x": 137.5,
+      "y": 197.5,
+      "vx": 90,
+      "vy": 90,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 496.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1145,
+      "x": 140.5,
+      "y": 201.3,
+      "vx": 90,
+      "vy": 120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 497.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1184,
+      "x": 145,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 499,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1222,
+      "x": 148,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 499.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1260,
+      "x": 151,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 500.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1298,
+      "x": 154,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 501.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1335,
+      "x": 158.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 503,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1373,
+      "x": 161.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 503.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1410,
+      "x": 164.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 504.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1448,
+      "x": 167.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 505.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1485,
+      "x": 172,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 507,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1523,
+      "x": 175,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 507.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1561,
+      "x": 178,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 508.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1599,
+      "x": 181,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 509.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1637,
+      "x": 185.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 511,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1676,
+      "x": 188.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 511.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1714,
+      "x": 191.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 512.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1751,
+      "x": 196,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 514.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1789,
+      "x": 199,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 515,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1828,
+      "x": 202,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 515.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1865,
+      "x": 205,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 516.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1903,
+      "x": 209.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 518.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1940,
+      "x": 212.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 519,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 1977,
+      "x": 215.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 519.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2014,
+      "x": 218.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 519.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2051,
+      "x": 223,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 517.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2089,
+      "x": 226,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 517,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2127,
+      "x": 229,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 516.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2165,
+      "x": 232,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 515.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2202,
+      "x": 236.5,
+      "y": 202.3,
+      "vx": 90,
+      "vy": 15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 513.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2240,
+      "x": 239.5,
+      "y": 203.5,
+      "vx": 90,
+      "vy": 45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 513,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 0
+    },
+    {
+      "t": 2278,
+      "x": 242.5,
+      "y": 205.8,
+      "vx": 90,
+      "vy": 75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 512.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 2.5
+    },
+    {
+      "t": 2316,
+      "x": 245.5,
+      "y": 209,
+      "vx": 90,
+      "vy": 105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true,
+          "visible": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 511.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 5.5
+    },
+    {
+      "t": 2353,
+      "x": 250,
+      "y": 215.8,
+      "vx": 90,
+      "vy": 150,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 509.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 10
+    },
+    {
+      "t": 2492,
+      "x": 262,
+      "y": 244.8,
+      "vx": 90,
+      "vy": 270,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 506.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 22
+    },
+    {
+      "t": 2529,
+      "x": 265,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 505.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 25
+    },
+    {
+      "t": 2566,
+      "x": 269.5,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 504.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 29.5
+    },
+    {
+      "t": 2603,
+      "x": 272,
+      "y": 250,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 503.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 32
+    },
+    {
+      "t": 2716,
+      "x": 272,
+      "y": 226.3,
+      "vx": 90,
+      "vy": -255,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 500.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 32
+    },
+    {
+      "t": 2754,
+      "x": 272,
+      "y": 215,
+      "vx": 90,
+      "vy": -210,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 499.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 32
+    },
+    {
+      "t": 2791,
+      "x": 272,
+      "y": 208.8,
+      "vx": 90,
+      "vy": -180,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 498.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 32
+    },
+    {
+      "t": 2829,
+      "x": 272,
+      "y": 203.5,
+      "vx": 90,
+      "vy": -150,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 497.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 32
+    },
+    {
+      "t": 2867,
+      "x": 276.5,
+      "y": 197.5,
+      "vx": 90,
+      "vy": -105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 496.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 36.5
+    },
+    {
+      "t": 2904,
+      "x": 279.5,
+      "y": 194.8,
+      "vx": 90,
+      "vy": -75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 495.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 39.5
+    },
+    {
+      "t": 2942,
+      "x": 282.5,
+      "y": 193,
+      "vx": 90,
+      "vy": -45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 494.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 42.5
+    },
+    {
+      "t": 2977,
+      "x": 285.5,
+      "y": 192.3,
+      "vx": 90,
+      "vy": -15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 493.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 45.5
+    },
+    {
+      "t": 3015,
+      "x": 288.5,
+      "y": 192.5,
+      "vx": 90,
+      "vy": 15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 492.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 48.5
+    },
+    {
+      "t": 3052,
+      "x": 293,
+      "y": 194.8,
+      "vx": 90,
+      "vy": 60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 491.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 53
+    },
+    {
+      "t": 3187,
+      "x": 305,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 487.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 65
+    },
+    {
+      "t": 3224,
+      "x": 308,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 486.8,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 68
+    },
+    {
+      "t": 3261,
+      "x": 311,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 485.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 71
+    },
+    {
+      "t": 3299,
+      "x": 314,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 485,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 74
+    },
+    {
+      "t": 3336,
+      "x": 318.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 483.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 78.5
+    },
+    {
+      "t": 3374,
+      "x": 321.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 482.8,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 81.5
+    },
+    {
+      "t": 3412,
+      "x": 324.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 481.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 84.5
+    },
+    {
+      "t": 3449,
+      "x": 327.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 481,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 87.5
+    },
+    {
+      "t": 3487,
+      "x": 332,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 480.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 92
+    },
+    {
+      "t": 3525,
+      "x": 335,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 481.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 95
+    },
+    {
+      "t": 3562,
+      "x": 338,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 482.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 98
+    },
+    {
+      "t": 3601,
+      "x": 342.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 483.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 102.5
+    },
+    {
+      "t": 3638,
+      "x": 345.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 484.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 105.5
+    },
+    {
+      "t": 3676,
+      "x": 348.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 485.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 108.5
+    },
+    {
+      "t": 3789,
+      "x": 359,
+      "y": 174.3,
+      "vx": 90,
+      "vy": -240,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 488.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 119
+    },
+    {
+      "t": 3827,
+      "x": 362,
+      "y": 167,
+      "vx": 90,
+      "vy": -210,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 489.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 122
+    },
+    {
+      "t": 3864,
+      "x": 365,
+      "y": 160.8,
+      "vx": 90,
+      "vy": -180,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 490.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 125
+    },
+    {
+      "t": 3901,
+      "x": 369.5,
+      "y": 153.3,
+      "vx": 90,
+      "vy": -135,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 491.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 129.5
+    },
+    {
+      "t": 3939,
+      "x": 372.5,
+      "y": 149.5,
+      "vx": 90,
+      "vy": -105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 492.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 132.5
+    },
+    {
+      "t": 3977,
+      "x": 375.5,
+      "y": 146.8,
+      "vx": 90,
+      "vy": -75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 493.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 135.5
+    },
+    {
+      "t": 4012,
+      "x": 378.5,
+      "y": 145,
+      "vx": 90,
+      "vy": -45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 494.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 138.5
+    },
+    {
+      "t": 4049,
+      "x": 383,
+      "y": 144.3,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 495.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 143
+    },
+    {
+      "t": 4086,
+      "x": 386,
+      "y": 145,
+      "vx": 90,
+      "vy": 30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 496.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 146
+    },
+    {
+      "t": 4123,
+      "x": 389,
+      "y": 146.8,
+      "vx": 90,
+      "vy": 60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 497.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 149
+    },
+    {
+      "t": 4160,
+      "x": 392,
+      "y": 149.5,
+      "vx": 90,
+      "vy": 90,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 498.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 152
+    },
+    {
+      "t": 4199,
+      "x": 395,
+      "y": 153.3,
+      "vx": 90,
+      "vy": 120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 499,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 155
+    },
+    {
+      "t": 4236,
+      "x": 399.5,
+      "y": 160.8,
+      "vx": 90,
+      "vy": 165,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 500.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 159.5
+    },
+    {
+      "t": 4274,
+      "x": 402.5,
+      "y": 167,
+      "vx": 90,
+      "vy": 195,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true,
+          "visible": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 501.2,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4312,
+      "x": 405.5,
+      "y": 174.3,
+      "vx": 90,
+      "vy": 225,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 502.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4442,
+      "x": 417.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 505.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4479,
+      "x": 420.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 506.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4516,
+      "x": 425,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 507.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4553,
+      "x": 428,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 508.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4590,
+      "x": 431,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 509.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4629,
+      "x": 434,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 510.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4667,
+      "x": 437,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 511.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4704,
+      "x": 441.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 512.7,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4742,
+      "x": 444.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 513.6,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4780,
+      "x": 447.5,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 514.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4818,
+      "x": 452,
+      "y": 202,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 515.9,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4928,
+      "x": 461,
+      "y": 178.3,
+      "vx": 90,
+      "vy": -255,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 518.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 4966,
+      "x": 464,
+      "y": 170.5,
+      "vx": 90,
+      "vy": -225,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 519.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5002,
+      "x": 468.5,
+      "y": 160.8,
+      "vx": 90,
+      "vy": -180,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 519.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5040,
+      "x": 471.5,
+      "y": 155.5,
+      "vx": 90,
+      "vy": -150,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 518.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5078,
+      "x": 474.5,
+      "y": 151.3,
+      "vx": 90,
+      "vy": -120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 517.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5117,
+      "x": 479,
+      "y": 146.8,
+      "vx": 90,
+      "vy": -75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 516.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5154,
+      "x": 482,
+      "y": 145,
+      "vx": 90,
+      "vy": -45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 515.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5193,
+      "x": 485,
+      "y": 144.3,
+      "vx": 90,
+      "vy": -15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 514.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5231,
+      "x": 488,
+      "y": 144.5,
+      "vx": 90,
+      "vy": 15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 513.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5269,
+      "x": 492.5,
+      "y": 146.8,
+      "vx": 90,
+      "vy": 60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 512.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5307,
+      "x": 495.5,
+      "y": 149.5,
+      "vx": 90,
+      "vy": 90,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 511.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5344,
+      "x": 498.5,
+      "y": 153.3,
+      "vx": 90,
+      "vy": 120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 510.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5384,
+      "x": 501.5,
+      "y": 158,
+      "vx": 90,
+      "vy": 150,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 509.5,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5422,
+      "x": 506,
+      "y": 167,
+      "vx": 90,
+      "vy": 195,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 508.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5460,
+      "x": 509,
+      "y": 174.3,
+      "vx": 90,
+      "vy": 225,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 507.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5497,
+      "x": 512,
+      "y": 182.5,
+      "vx": 90,
+      "vy": 255,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 506.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5535,
+      "x": 516.5,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 505,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5573,
+      "x": 519.5,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 504.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5611,
+      "x": 522.5,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 503.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5649,
+      "x": 525.5,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 502.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5686,
+      "x": 530,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 501,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5724,
+      "x": 533,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 500.1,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5762,
+      "x": 536,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 499.3,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5800,
+      "x": 539,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 498.4,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5836,
+      "x": 543.5,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 497,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    },
+    {
+      "t": 5990,
+      "x": 557,
+      "y": 193,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": true,
+      "collected": 3,
+      "won": true,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false,
+          "visible": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false,
+          "visible": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250,
+          "axis": "x",
+          "dist": 0,
+          "period": 1000
+        },
+        {
+          "x": 493,
+          "y": 250,
+          "axis": "x",
+          "dist": 40,
+          "period": 3000
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      },
+      "scrollX": 160
+    }
+  ]
+}

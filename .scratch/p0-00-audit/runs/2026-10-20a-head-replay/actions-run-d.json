@@ -1,0 +1,6 @@
+[
+  { "op": "inject", "source": "(()=>{let pv;Object.defineProperty(window,'Phaser',{configurable:true,get(){return pv},set(v){pv=v;try{const O=v.Game;v.Game=new Proxy(O,{construct(t,args){const inst=Reflect.construct(t,args);window.__gmGame=inst;return inst}})}catch(e){window.__gmHookError=String(e)}}})})();" },
+  { "op": "reload", "ms": 3000 },
+  { "op": "eval", "expr": "(()=>{const s=__gmGame?.scene?.getScene('shell');if(!s)return {game:!!__gmGame,scenes:__gmGame?.scene?.getScenes(true).map(x=>x.scene.key)};return {player:{x:s.player?.x,y:s.player?.y},collected:s.collected,won:s.won,pickups:(s.pickups||[]).map(p=>({x:p.x,y:p.y,active:p.active})),gate:s.gate?{x:s.gate.x,y:s.gate.y}:null,hazards:(s.hazards||[]).map(h=>({x:h.sprite.x,y:h.sprite.y,dist:h.distance})),cam:{scrollX:s.cameras.main.scrollX}};})()" },
+  { "op": "shot", "name": "20th-run-site-initial.png" }
+]

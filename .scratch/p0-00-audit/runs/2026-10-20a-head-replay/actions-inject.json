@@ -1,0 +1,5 @@
+[
+  { "op": "inject", "source": "(()=>{let pv;Object.defineProperty(window,'Phaser',{configurable:true,get(){return pv},set(v){pv=v;try{const O=v.Game;v.Game=new Proxy(O,{construct(t,args){const inst=Reflect.construct(t,args);window.__gmGame=inst;return inst}})}catch(e){window.__gmHookError=String(e)}}})})();" },
+  { "op": "reload", "ms": 2800 },
+  { "op": "eval", "expr": "({hook: window.__gmHookError ?? null, game: !!window.__gmGame, sceneKeys: window.__gmGame?.scene?.getScenes(true).map(s=>s.scene.key) ?? null})" }
+]

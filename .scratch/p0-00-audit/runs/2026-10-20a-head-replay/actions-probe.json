@@ -1,0 +1,3 @@
+[
+  { "op": "eval", "expr": "({phaser: typeof Phaser, keys: Object.keys(window).filter(k=>/phaser|game|scene/i.test(k)).slice(0,40), canvasKeys: Object.keys(document.querySelector('canvas')||{}).slice(0,40), parentKeys: Object.keys(document.querySelector('canvas')?.parentElement||{}).slice(0,20)})" }
+]
