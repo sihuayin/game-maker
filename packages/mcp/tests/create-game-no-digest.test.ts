@@ -109,8 +109,9 @@ describe("§v3 终端摘要 · MCP 输出不变", () => {
     fs.writeFileSync(intent, "做一个废土横版寻宝游戏\n");
     const outDir = path.join(cwd, "out");
 
-    // ⚠️ MCP 把 `stylePath` 原样往下传；契约要求它**相对 cwd**（绝对路径会被 `analyzeReference` 拒）。
-    const styleArg = path.relative(process.cwd(), style).split(path.sep).join("/");
+    // ⚠️ **票 02（P0-06）之后 MCP 自己做相对化**（与 CLI 的 `styleRefOf` 同一处实现）：
+    //   agent 给绝对路径是常态，这里直接给绝对路径 —— 它必须成功。
+    const styleArg = style;
     const out: any[] = [];
     await handle({
       jsonrpc: "2.0", id: 9, method: "tools/call",

@@ -1,0 +1,676 @@
+{
+  "command": "inspect",
+  "summary": [
+    "wasteland-scavenger-assets v2 · generated",
+    "10 个资源 · 4 张图集",
+    "  player-scavenger · animation · 72×108 · generated/quantized · 8 帧 · 动画 idle(2) run(4) jump(2) · 用色 9/9",
+    "  enemy-wasteland · animation · 80×88 · generated/quantized · 4 帧 · 动画 patrol(4) · 用色 9/9",
+    "  scrap-resource · sprite · 20×16 · generated/exact · 1 帧 · 用色 6/9",
+    "  chest-ruined-city · sprite · 32×26 · generated/quantized · 1 帧 · 用色 6/9",
+    "  hazard-spike-rubble · sprite · 64×20 · generated/exact · 1 帧 · 用色 8/9",
+    "  level-downtown-ruins · background · 1920×540 · generated/quantized · 4 帧 · 用色 8/9",
+    "  prop-street-lamp · sprite · 16×64 · generated/exact · 1 帧 · 用色 8/9",
+    "  prop-bench · sprite · 40×20 · generated/composited · 1 帧 · 用色 5/9",
+    "  ui-scrap-counter · ui · 96×32 · generated/composited · 1 帧 · 用色 8/9 · 色板外 184",
+    "  ui-scrap-icon · ui · 16×16 · generated/exact · 1 帧 · 用色 8/9",
+    "源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：",
+    "  player-scavenger.idle          源图 1184×864 (1.370) → 目标 144×108 (1.333) · 长宽比差 -2.7%",
+    "  player-scavenger.run           源图 1344×768 (1.750) → 目标 288×108 (2.667) · 长宽比差 +52.4%",
+    "  player-scavenger.jump          源图 1184×864 (1.370) → 目标 144×108 (1.333) · 长宽比差 -2.7%",
+    "  enemy-wasteland.patrol         源图 1344×768 (1.750) → 目标 320×88 (3.636) · 长宽比差 +107.8%",
+    "  chest-ruined-city              源图 1152×896 (1.286) → 目标 32×26 (1.231) · 长宽比差 -4.3%",
+    "  level-downtown-ruins.sky       源图 1344×768 (1.750) → 目标 1920×540 (3.556) · 长宽比差 +103.2%",
+    "  level-downtown-ruins.horizon   源图 1344×768 (1.750) → 目标 1920×540 (3.556) · 长宽比差 +103.2%",
+    "  level-downtown-ruins.facade    源图 1344×768 (1.750) → 目标 1920×540 (3.556) · 长宽比差 +103.2%",
+    "  level-downtown-ruins.ground    源图 1344×768 (1.750) → 目标 1920×540 (3.556) · 长宽比差 +103.2%",
+    "  master-enemy-wasteland         源图 1024×1024 (1.000) → 目标 80×88 (0.909) · 长宽比差 -9.1%",
+    "  master-player-scavenger        源图 832×1248 (0.667) → 目标 72×108 (0.667) · 长宽比差 0.0%",
+    "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+    "  level-downtown-ruins.sky 1920×540  100.0%",
+    "  level-downtown-ruins.horizon 1920×540  50.5%",
+    "  level-downtown-ruins.facade 1920×540  81.7%",
+    "  level-downtown-ruins.ground 1920×540  17.4%",
+    "色板 9 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+    "  #5a3a22 · 10/10 个资源用到 · 占全部不透明像素 7.4%",
+    "  #7a4a28 · 10/10 个资源用到 · 占全部不透明像素 20.2%",
+    "  #2f3a45 · 10/10 个资源用到 · 占全部不透明像素 35.1%",
+    "  #f0b53c · 8/10 个资源用到 · 占全部不透明像素 2.0%",
+    "  #1f2733 · 6/10 个资源用到 · 占全部不透明像素 0.5%",
+    "  #232c3a · 5/10 个资源用到 · 占全部不透明像素 0.1%",
+    "  #4a4f57 · 9/10 个资源用到 · 占全部不透明像素 23.6%",
+    "  #8c8f95 · 10/10 个资源用到 · 占全部不透明像素 7.6%",
+    "  #e8c9a0 · 7/10 个资源用到 · 占全部不透明像素 3.5%",
+    "色板外像素 184 个 · 占全部不透明像素 0.01% · 前几色 #a38440(63) #9e7e3b(63) #9c7c38(58)（**观察，不是判据** —— 对不上可以是设计）"
+  ],
+  "data": {
+    "packId": "wasteland-scavenger-assets",
+    "version": 2,
+    "provenanceMode": "generated",
+    "assets": [
+      {
+        "id": "player-scavenger",
+        "kind": "animation",
+        "size": {
+          "w": 72,
+          "h": 108
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 8,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      {
+        "id": "enemy-wasteland",
+        "kind": "animation",
+        "size": {
+          "w": 80,
+          "h": 88
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 4,
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "scrap-resource",
+        "kind": "sprite",
+        "size": {
+          "w": 20,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "chest-ruined-city",
+        "kind": "sprite",
+        "size": {
+          "w": 32,
+          "h": 26
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "hazard-spike-rubble",
+        "kind": "sprite",
+        "size": {
+          "w": 64,
+          "h": 20
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "level-downtown-ruins",
+        "kind": "background",
+        "size": {
+          "w": 1920,
+          "h": 540
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 4,
+        "animations": []
+      },
+      {
+        "id": "prop-street-lamp",
+        "kind": "sprite",
+        "size": {
+          "w": 16,
+          "h": 64
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "prop-bench",
+        "kind": "sprite",
+        "size": {
+          "w": 40,
+          "h": 20
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ui-scrap-counter",
+        "kind": "ui",
+        "size": {
+          "w": 96,
+          "h": 32
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ui-scrap-icon",
+        "kind": "ui",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      }
+    ],
+    "paletteUsage": {
+      "perAsset": [
+        {
+          "id": "player-scavenger",
+          "usedColors": 9,
+          "opacityPixels": 33994,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#2f3a45",
+              "share": 0.34738483261752073
+            },
+            {
+              "color": "#1f2733",
+              "share": 0.1971230217097135
+            },
+            {
+              "color": "#e8c9a0",
+              "share": 0.12846384656115786
+            }
+          ]
+        },
+        {
+          "id": "enemy-wasteland",
+          "usedColors": 9,
+          "opacityPixels": 12603,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1f2733",
+              "share": 0.4144251368721733
+            },
+            {
+              "color": "#2f3a45",
+              "share": 0.401253669761168
+            },
+            {
+              "color": "#7a4a28",
+              "share": 0.06601602792985797
+            }
+          ]
+        },
+        {
+          "id": "scrap-resource",
+          "usedColors": 6,
+          "opacityPixels": 124,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#2f3a45",
+              "share": 0.5967741935483871
+            },
+            {
+              "color": "#5a3a22",
+              "share": 0.14516129032258066
+            },
+            {
+              "color": "#8c8f95",
+              "share": 0.0967741935483871
+            }
+          ]
+        },
+        {
+          "id": "chest-ruined-city",
+          "usedColors": 6,
+          "opacityPixels": 266,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#7a4a28",
+              "share": 0.48872180451127817
+            },
+            {
+              "color": "#5a3a22",
+              "share": 0.21052631578947367
+            },
+            {
+              "color": "#2f3a45",
+              "share": 0.14285714285714285
+            }
+          ]
+        },
+        {
+          "id": "hazard-spike-rubble",
+          "usedColors": 8,
+          "opacityPixels": 359,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1f2733",
+              "share": 0.4735376044568245
+            },
+            {
+              "color": "#5a3a22",
+              "share": 0.23119777158774374
+            },
+            {
+              "color": "#7a4a28",
+              "share": 0.20891364902506965
+            }
+          ]
+        },
+        {
+          "id": "level-downtown-ruins",
+          "usedColors": 8,
+          "opacityPixels": 2589081,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#2f3a45",
+              "share": 0.3508522908321524
+            },
+            {
+              "color": "#4a4f57",
+              "share": 0.23920688460500078
+            },
+            {
+              "color": "#7a4a28",
+              "share": 0.2049727297060231
+            }
+          ]
+        },
+        {
+          "id": "prop-street-lamp",
+          "usedColors": 8,
+          "opacityPixels": 255,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1f2733",
+              "share": 0.3686274509803922
+            },
+            {
+              "color": "#2f3a45",
+              "share": 0.25882352941176473
+            },
+            {
+              "color": "#4a4f57",
+              "share": 0.10980392156862745
+            }
+          ]
+        },
+        {
+          "id": "prop-bench",
+          "usedColors": 5,
+          "opacityPixels": 250,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#5a3a22",
+              "share": 0.464
+            },
+            {
+              "color": "#7a4a28",
+              "share": 0.352
+            },
+            {
+              "color": "#2f3a45",
+              "share": 0.128
+            }
+          ]
+        },
+        {
+          "id": "ui-scrap-counter",
+          "usedColors": 8,
+          "opacityPixels": 2304,
+          "offPalettePixels": 184,
+          "top": [
+            {
+              "color": "#1f2733",
+              "share": 0.3151041666666667
+            },
+            {
+              "color": "#4a4f57",
+              "share": 0.2361111111111111
+            },
+            {
+              "color": "#232c3a",
+              "share": 0.19140625
+            }
+          ]
+        },
+        {
+          "id": "ui-scrap-icon",
+          "usedColors": 8,
+          "opacityPixels": 170,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1f2733",
+              "share": 0.5588235294117647
+            },
+            {
+              "color": "#f0b53c",
+              "share": 0.09411764705882353
+            },
+            {
+              "color": "#5a3a22",
+              "share": 0.07647058823529412
+            }
+          ]
+        }
+      ],
+      "perColor": [
+        {
+          "color": "#5a3a22",
+          "assets": 10,
+          "share": 0.07357243915062849
+        },
+        {
+          "color": "#7a4a28",
+          "assets": 10,
+          "share": 0.20205613624014956
+        },
+        {
+          "color": "#2f3a45",
+          "assets": 10,
+          "share": 0.35072191729229296
+        },
+        {
+          "color": "#f0b53c",
+          "assets": 8,
+          "share": 0.02003052414688874
+        },
+        {
+          "color": "#1f2733",
+          "assets": 6,
+          "share": 0.004929104107195227
+        },
+        {
+          "color": "#232c3a",
+          "assets": 5,
+          "share": 0.001468235714919018
+        },
+        {
+          "color": "#4a4f57",
+          "assets": 9,
+          "share": 0.23571681351549814
+        },
+        {
+          "color": "#8c8f95",
+          "assets": 10,
+          "share": 0.07603187606044509
+        },
+        {
+          "color": "#e8c9a0",
+          "assets": 7,
+          "share": 0.035472953771982806
+        }
+      ],
+      "totalPixels": 2639222,
+      "opaquePixels": 2639406,
+      "offPalette": {
+        "pixels": 184,
+        "share": 0.00006971265504435468,
+        "colors": [
+          {
+            "color": "#a38440",
+            "pixels": 63
+          },
+          {
+            "color": "#9e7e3b",
+            "pixels": 63
+          },
+          {
+            "color": "#9c7c38",
+            "pixels": 58
+          }
+        ]
+      }
+    },
+    "layerCoverage": [
+      {
+        "asset": "level-downtown-ruins",
+        "frame": "level-downtown-ruins.sky",
+        "w": 1920,
+        "h": 540,
+        "opaque": 1036800,
+        "ratio": 1
+      },
+      {
+        "asset": "level-downtown-ruins",
+        "frame": "level-downtown-ruins.horizon",
+        "w": 1920,
+        "h": 540,
+        "opaque": 524087,
+        "ratio": 0.5054851466049383
+      },
+      {
+        "asset": "level-downtown-ruins",
+        "frame": "level-downtown-ruins.facade",
+        "w": 1920,
+        "h": 540,
+        "opaque": 847502,
+        "ratio": 0.8174209104938271
+      },
+      {
+        "asset": "level-downtown-ruins",
+        "frame": "level-downtown-ruins.ground",
+        "w": 1920,
+        "h": 540,
+        "opaque": 180692,
+        "ratio": 0.17427854938271606
+      }
+    ],
+    "sourceSizes": [
+      {
+        "id": "player-scavenger",
+        "unit": "idle",
+        "source": {
+          "w": 1184,
+          "h": 864,
+          "ar": 1.3703703703703705
+        },
+        "target": {
+          "w": 144,
+          "h": 108,
+          "ar": 1.3333333333333333
+        },
+        "deltaAr": -2.7027027027027195
+      },
+      {
+        "id": "player-scavenger",
+        "unit": "run",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 288,
+          "h": 108,
+          "ar": 2.6666666666666665
+        },
+        "deltaAr": 52.38095238095237
+      },
+      {
+        "id": "player-scavenger",
+        "unit": "jump",
+        "source": {
+          "w": 1184,
+          "h": 864,
+          "ar": 1.3703703703703705
+        },
+        "target": {
+          "w": 144,
+          "h": 108,
+          "ar": 1.3333333333333333
+        },
+        "deltaAr": -2.7027027027027195
+      },
+      {
+        "id": "enemy-wasteland",
+        "unit": "patrol",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 320,
+          "h": 88,
+          "ar": 3.6363636363636362
+        },
+        "deltaAr": 107.79220779220778
+      },
+      {
+        "id": "chest-ruined-city",
+        "unit": "",
+        "source": {
+          "w": 1152,
+          "h": 896,
+          "ar": 1.2857142857142858
+        },
+        "target": {
+          "w": 32,
+          "h": 26,
+          "ar": 1.2307692307692308
+        },
+        "deltaAr": -4.2735042735042805
+      },
+      {
+        "id": "level-downtown-ruins",
+        "unit": "sky",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 1920,
+          "h": 540,
+          "ar": 3.5555555555555554
+        },
+        "deltaAr": 103.17460317460316
+      },
+      {
+        "id": "level-downtown-ruins",
+        "unit": "horizon",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 1920,
+          "h": 540,
+          "ar": 3.5555555555555554
+        },
+        "deltaAr": 103.17460317460316
+      },
+      {
+        "id": "level-downtown-ruins",
+        "unit": "facade",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 1920,
+          "h": 540,
+          "ar": 3.5555555555555554
+        },
+        "deltaAr": 103.17460317460316
+      },
+      {
+        "id": "level-downtown-ruins",
+        "unit": "ground",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 1920,
+          "h": 540,
+          "ar": 3.5555555555555554
+        },
+        "deltaAr": 103.17460317460316
+      },
+      {
+        "id": "master-enemy-wasteland",
+        "unit": "",
+        "source": {
+          "w": 1024,
+          "h": 1024,
+          "ar": 1
+        },
+        "target": {
+          "w": 80,
+          "h": 88,
+          "ar": 0.9090909090909091
+        },
+        "deltaAr": -9.090909090909093
+      },
+      {
+        "id": "master-player-scavenger",
+        "unit": "",
+        "source": {
+          "w": 832,
+          "h": 1248,
+          "ar": 0.6666666666666666
+        },
+        "target": {
+          "w": 72,
+          "h": 108,
+          "ar": 0.6666666666666666
+        },
+        "deltaAr": 0
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "v2",
+      "kind": "asset-pack"
+    }
+  ]
+}

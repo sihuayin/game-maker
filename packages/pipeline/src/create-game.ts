@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, parseAssetPack,
+  carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
   parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
   RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
@@ -24,7 +24,7 @@ import {
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { compileRuntime, decodePNG, inspectPack, nextPackVersion, packAssets, planAssets, type ImageTransport, type InspectData } from "@game-maker/assets";
+import { compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, inspectPack, nextPackVersion, packAssets, planAssets, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
@@ -126,6 +126,12 @@ export type BuildInput = {
    * 测试用它覆盖「inspect 抛错 ⇒ unavailable」那一档。
    */
   inspect?: (opts: { packDir: string; outRoot?: string }) => CommandResult;
+  /**
+   * `verifyPack` 的**测试注入口**（默认就是 `verifyPack`）。生产链不传。
+   * ⚠️ 与 `inspect` 同一个理由：让测试能在「包刚写完、配置还没编」这一格上篡改一个文件，
+   * 从而证明 `verifyPack` 真的**在链上、在这个位置**（而不是只被单元测试直接调过）。
+   */
+  verify?: (opts: { packDir: string; outRoot?: string }) => CommandResult;
 };
 
 export type BuildResult = {
@@ -233,6 +239,19 @@ function inspectDataOf(data: Record<string, unknown>): InspectData | undefined {
   return usable ? (data as unknown as InspectData) : undefined;
 }
 
+/**
+ * `--style` / MCP `stylePath` 变成一个**相对 `cwd` 的路径**（票 16 落地时撞上的那一条；
+ * 2026-10-21 从 `cli.ts` 搬到本层，票 02 / P0-06：MCP 要给同一份输入同一条规则）。
+ *
+ * ⚠️ `visual-world.json` 里那一格**以它自身为基准**（`StyleReferencePath` 的规矩），
+ *   所以调用方给的**绝对路径**会在 `analyzeReference` 那里被拒（「必须是相对路径」）。
+ *   而下游（票 15 的 `stageUnderstanding`）会把它拷进 run、改写成 basename ——
+ *   原始形状只需要「**相对 cwd、而且解析得到**」。
+ */
+export function styleRefOf(cwd: string, given: string): string {
+  return path.relative(cwd, path.resolve(cwd, given)).split(path.sep).join("/") || ".";
+}
+
 /** 风格身份 = 参考图 basename 的 slug（票 08 的 R2-Q2：**由调用方生成**，模型照抄、这里强制覆盖）。 */
 export function styleIdOf(referencePath: string): string {
   const base = path.basename(referencePath, path.extname(referencePath)).toLowerCase();
@@ -289,6 +308,13 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     });
     ledger.push(...(world.ledger ?? []));
     const vws = writeVisualWorld(run.tmpDir, world.spec, cwd);
+
+    // ⚠️ **空色板必须在这里停住**（CAP-SPEC-17 / 人裁 2026-10-21）：色板是**上一发**（analyze-reference）
+    //   的产物，所以不能要求「在产出色板之前」拒；但它必须在 **analyze-intent 及其后每一发付费调用之前**拒。
+    //   ⚠️ 先 `writeVisualWorld` 再判：失败现场里要留得下那份空色板的 VWS（诊断对象不许被自己弄丢）。
+    //   ⚠️ 账跟着异常走（`analyze-reference` **已经付过**）：与 `assertQaPassed` 同一条纪律。
+    const emptyPalette = emptyPaletteProblem(vws.style.palette, "这个世界");
+    if (emptyPalette !== null) throw new CommandError("invalid", emptyPalette, { ledger });
 
     say("intent");
     const intent = await analyzeIntent({
@@ -440,6 +466,16 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     ? nextPackVersion(input.outRoot, gameId)
     : runVersion;
 
+  // ⚠️ **设计 → 清单的覆盖闸**（CAP-SPEC-12）—— 构建段也查一次：清单是**磁盘真相**（人可改），
+  //   规划期那次查不到「人后来又删了一件」。放在 `packAssets` 之前 ⇒ 缺资源时不烧生图的钱。
+  const designParsed = GameDesignSpecSchema.safeParse(readRunJson(runDir, RUN_ARTIFACT.gameDesign));
+  if (!designParsed.success)
+    throw new Error(
+      `设计过不了契约（构建段读回的那一份）：${formatIssues(designParsed.error).slice(0, 4).join("；")}`,
+    );
+  const coverageError = designCoverageGate(parsed.value, designParsed.data);
+  if (coverageError !== null) throw new CommandError("invalid", coverageError);
+
   const t0 = Date.now();
   const ledger: LedgerCall[] = [];
   const runner = qaRunnerOf(input.qa);
@@ -468,6 +504,12 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   //   都看不到它，而「偏差仍可追溯」正是这次裁定的验收重点。
   const masterRatios = masterRatiosOf(packed.data);
   const packDir = path.join(input.outRoot, packed.artifacts[0]!.path);
+
+  // ⚠️ **包完整性入链**（CAP-ASSET-06 / 人裁 2026-10-21）：`packAssets` 成功之后、`compileRuntime` /
+  //   QA / site **之前**，逐文件对一遍 checksum。失败 ⇒ `invalid`（退出码 4），不产 config / QA / site。
+  //   ⚠️ **只做这一次**（全量 checksum 不重复）；包已经落盘、原样保留 —— 被篡改的那份就是诊断现场。
+  //   ⚠️ 放在 `say("config")` 之前：进度条上它就是「包之后的第一件事」，不是配置的一部分。
+  (input.verify ?? verifyPack)({ packDir, outRoot: input.outRoot });
 
   say("config");
   // ⚠️ 配置编译器也是**文件进出**的（它写 `<outRoot>/<id>/game-configs/`）—— 同样先落 staging，

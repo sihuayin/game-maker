@@ -1,0 +1,837 @@
+{
+  "command": "inspect",
+  "summary": [
+    "counter-siege v4 · generated",
+    "21 个资源 · 3 张图集",
+    "  tile-floor · sprite · 15×15 · generated/exact · 1 帧 · 用色 5/9",
+    "  tile-walk · sprite · 15×15 · generated/composited · 1 帧 · 用色 4/9 · 色板外 9",
+    "  tile-shelf · sprite · 15×15 · generated/exact · 1 帧 · 用色 7/9",
+    "  tile-wall · sprite · 15×15 · generated/composited · 1 帧 · 用色 6/9 · 色板外 29",
+    "  tile-door · sprite · 15×15 · generated/composited · 1 帧 · 用色 2/9",
+    "  slot-socket · sprite · 15×15 · generated/exact · 1 帧 · 用色 4/9",
+    "  slot-ring · sprite · 20×20 · generated/composited · 1 帧 · 用色 2/9 · 色板外 4",
+    "  tower-nailgun · sprite · 16×16 · generated/composited · 1 帧 · 用色 6/9 · 色板外 12",
+    "  tower-shock · sprite · 16×16 · generated/exact · 1 帧 · 用色 7/9",
+    "  tower-floodlight · sprite · 16×16 · generated/exact · 1 帧 · 用色 5/9",
+    "  fx-shock · animation · 24×24 · generated/exact · 3 帧 · 动画 zap(3) · 用色 6/9",
+    "  proj-nail · sprite · 6×6 · generated/exact · 1 帧 · 用色 5/9",
+    "  proj-beam · sprite · 8×8 · generated/composited · 1 帧 · 用色 5/9 · 色板外 3",
+    "  enemy-scavenger · animation · 14×14 · generated/exact · 2 帧 · 动画 walk(2) · 用色 6/9",
+    "  enemy-brute · animation · 20×20 · generated/exact · 2 帧 · 动画 walk(2) · 用色 8/9",
+    "  enemy-drone · animation · 12×12 · generated/exact · 2 帧 · 动画 hover(2) · 用色 5/9",
+    "  core-counter · sprite · 40×32 · generated/exact · 1 帧 · 用色 9/9",
+    "  ui-hud-bar · ui · 96×26 · generated/exact · 1 帧 · 用色 4/9",
+    "  ui-btn · ui · 44×22 · generated/exact · 1 帧 · 用色 5/9",
+    "  ui-icon-scrap · ui · 10×10 · generated/exact · 1 帧 · 用色 5/9",
+    "  ui-icon-life · ui · 10×10 · generated/exact · 1 帧 · 用色 6/9",
+    "色板 9 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+    "  #7c968e · 18/21 个资源用到 · 占全部不透明像素 10.0%",
+    "  #55685f · 18/21 个资源用到 · 占全部不透明像素 17.0%",
+    "  #a9b7ac · 18/21 个资源用到 · 占全部不透明像素 19.5%",
+    "  #3e3236 · 18/21 个资源用到 · 占全部不透明像素 39.8%",
+    "  #c3cdc9 · 12/21 个资源用到 · 占全部不透明像素 5.5%",
+    "  #ead8a6 · 10/21 个资源用到 · 占全部不透明像素 3.2%",
+    "  #c4694a · 10/21 个资源用到 · 占全部不透明像素 3.8%",
+    "  #4ebba4 · 4/21 个资源用到 · 占全部不透明像素 0.2%",
+    "  #6d8f52 · 4/21 个资源用到 · 占全部不透明像素 1.0%",
+    "色板外像素 57 个 · 占全部不透明像素 0.66% · 前几色 #7e827d(25) #719f94(5) #d59b73(4) #92b8aa(4) #697f77(4) #b3b79a(3) #958676(2) #a8b098(2)（**观察，不是判据** —— 对不上可以是设计）"
+  ],
+  "data": {
+    "packId": "counter-siege",
+    "version": 4,
+    "provenanceMode": "generated",
+    "assets": [
+      {
+        "id": "tile-floor",
+        "kind": "sprite",
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tile-walk",
+        "kind": "sprite",
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tile-shelf",
+        "kind": "sprite",
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tile-wall",
+        "kind": "sprite",
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tile-door",
+        "kind": "sprite",
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "slot-socket",
+        "kind": "sprite",
+        "size": {
+          "w": 15,
+          "h": 15
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "slot-ring",
+        "kind": "sprite",
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tower-nailgun",
+        "kind": "sprite",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tower-shock",
+        "kind": "sprite",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "tower-floodlight",
+        "kind": "sprite",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "fx-shock",
+        "kind": "animation",
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 3,
+        "animations": [
+          {
+            "name": "zap",
+            "frames": 3,
+            "fps": 12,
+            "loop": false
+          }
+        ]
+      },
+      {
+        "id": "proj-nail",
+        "kind": "sprite",
+        "size": {
+          "w": 6,
+          "h": 6
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "proj-beam",
+        "kind": "sprite",
+        "size": {
+          "w": 8,
+          "h": 8
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "enemy-scavenger",
+        "kind": "animation",
+        "size": {
+          "w": 14,
+          "h": 14
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 2,
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 2,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "enemy-brute",
+        "kind": "animation",
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 2,
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 2,
+            "fps": 5,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "enemy-drone",
+        "kind": "animation",
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 2,
+        "animations": [
+          {
+            "name": "hover",
+            "frames": 2,
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "core-counter",
+        "kind": "sprite",
+        "size": {
+          "w": 40,
+          "h": 32
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ui-hud-bar",
+        "kind": "ui",
+        "size": {
+          "w": 96,
+          "h": 26
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ui-btn",
+        "kind": "ui",
+        "size": {
+          "w": 44,
+          "h": 22
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ui-icon-scrap",
+        "kind": "ui",
+        "size": {
+          "w": 10,
+          "h": 10
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ui-icon-life",
+        "kind": "ui",
+        "size": {
+          "w": 10,
+          "h": 10
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      }
+    ],
+    "paletteUsage": {
+      "perAsset": [
+        {
+          "id": "tile-floor",
+          "usedColors": 5,
+          "opacityPixels": 225,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.35555555555555557
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.26222222222222225
+            },
+            {
+              "color": "#c3cdc9",
+              "share": 0.23555555555555555
+            }
+          ]
+        },
+        {
+          "id": "tile-walk",
+          "usedColors": 4,
+          "opacityPixels": 225,
+          "offPalettePixels": 9,
+          "top": [
+            {
+              "color": "#55685f",
+              "share": 0.2577777777777778
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.23555555555555555
+            },
+            {
+              "color": "#3e3236",
+              "share": 0.23555555555555555
+            }
+          ]
+        },
+        {
+          "id": "tile-shelf",
+          "usedColors": 7,
+          "opacityPixels": 225,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.7688888888888888
+            },
+            {
+              "color": "#55685f",
+              "share": 0.06666666666666667
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.057777777777777775
+            }
+          ]
+        },
+        {
+          "id": "tile-wall",
+          "usedColors": 6,
+          "opacityPixels": 225,
+          "offPalettePixels": 29,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.3111111111111111
+            },
+            {
+              "color": "#55685f",
+              "share": 0.26222222222222225
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.12
+            }
+          ]
+        },
+        {
+          "id": "tile-door",
+          "usedColors": 2,
+          "opacityPixels": 225,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.9466666666666667
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.05333333333333334
+            }
+          ]
+        },
+        {
+          "id": "slot-socket",
+          "usedColors": 4,
+          "opacityPixels": 225,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.72
+            },
+            {
+              "color": "#55685f",
+              "share": 0.10666666666666667
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.09777777777777778
+            }
+          ]
+        },
+        {
+          "id": "slot-ring",
+          "usedColors": 2,
+          "opacityPixels": 36,
+          "offPalettePixels": 4,
+          "top": [
+            {
+              "color": "#ead8a6",
+              "share": 0.6111111111111112
+            },
+            {
+              "color": "#c3cdc9",
+              "share": 0.2777777777777778
+            }
+          ]
+        },
+        {
+          "id": "tower-nailgun",
+          "usedColors": 6,
+          "opacityPixels": 133,
+          "offPalettePixels": 12,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.6766917293233082
+            },
+            {
+              "color": "#55685f",
+              "share": 0.15789473684210525
+            },
+            {
+              "color": "#c3cdc9",
+              "share": 0.022556390977443608
+            }
+          ]
+        },
+        {
+          "id": "tower-shock",
+          "usedColors": 7,
+          "opacityPixels": 252,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.47619047619047616
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.25793650793650796
+            },
+            {
+              "color": "#55685f",
+              "share": 0.12698412698412698
+            }
+          ]
+        },
+        {
+          "id": "tower-floodlight",
+          "usedColors": 5,
+          "opacityPixels": 256,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.3359375
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.28125
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.1953125
+            }
+          ]
+        },
+        {
+          "id": "fx-shock",
+          "usedColors": 6,
+          "opacityPixels": 980,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#a9b7ac",
+              "share": 0.3193877551020408
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.22959183673469388
+            },
+            {
+              "color": "#55685f",
+              "share": 0.1836734693877551
+            }
+          ]
+        },
+        {
+          "id": "proj-nail",
+          "usedColors": 5,
+          "opacityPixels": 16,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.5
+            },
+            {
+              "color": "#c3cdc9",
+              "share": 0.25
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.125
+            }
+          ]
+        },
+        {
+          "id": "proj-beam",
+          "usedColors": 5,
+          "opacityPixels": 64,
+          "offPalettePixels": 3,
+          "top": [
+            {
+              "color": "#c3cdc9",
+              "share": 0.28125
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.21875
+            },
+            {
+              "color": "#55685f",
+              "share": 0.171875
+            }
+          ]
+        },
+        {
+          "id": "enemy-scavenger",
+          "usedColors": 6,
+          "opacityPixels": 222,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.4954954954954955
+            },
+            {
+              "color": "#6d8f52",
+              "share": 0.2702702702702703
+            },
+            {
+              "color": "#55685f",
+              "share": 0.11711711711711711
+            }
+          ]
+        },
+        {
+          "id": "enemy-brute",
+          "usedColors": 8,
+          "opacityPixels": 661,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.6021180030257186
+            },
+            {
+              "color": "#c4694a",
+              "share": 0.16338880484114976
+            },
+            {
+              "color": "#ead8a6",
+              "share": 0.08018154311649017
+            }
+          ]
+        },
+        {
+          "id": "enemy-drone",
+          "usedColors": 5,
+          "opacityPixels": 201,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.6119402985074627
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.19900497512437812
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.12935323383084577
+            }
+          ]
+        },
+        {
+          "id": "core-counter",
+          "usedColors": 9,
+          "opacityPixels": 908,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.47577092511013214
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.1828193832599119
+            },
+            {
+              "color": "#c4694a",
+              "share": 0.10792951541850221
+            }
+          ]
+        },
+        {
+          "id": "ui-hud-bar",
+          "usedColors": 4,
+          "opacityPixels": 2496,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.41947115384615385
+            },
+            {
+              "color": "#55685f",
+              "share": 0.31530448717948717
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.19431089743589744
+            }
+          ]
+        },
+        {
+          "id": "ui-btn",
+          "usedColors": 5,
+          "opacityPixels": 968,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#a9b7ac",
+              "share": 0.35640495867768596
+            },
+            {
+              "color": "#7c968e",
+              "share": 0.29338842975206614
+            },
+            {
+              "color": "#3e3236",
+              "share": 0.16735537190082644
+            }
+          ]
+        },
+        {
+          "id": "ui-icon-scrap",
+          "usedColors": 5,
+          "opacityPixels": 66,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.7424242424242424
+            },
+            {
+              "color": "#55685f",
+              "share": 0.09090909090909091
+            },
+            {
+              "color": "#a9b7ac",
+              "share": 0.07575757575757576
+            }
+          ]
+        },
+        {
+          "id": "ui-icon-life",
+          "usedColors": 6,
+          "opacityPixels": 74,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#3e3236",
+              "share": 0.7162162162162162
+            },
+            {
+              "color": "#c3cdc9",
+              "share": 0.14864864864864866
+            },
+            {
+              "color": "#ead8a6",
+              "share": 0.06756756756756757
+            }
+          ]
+        }
+      ],
+      "perColor": [
+        {
+          "color": "#7c968e",
+          "assets": 18,
+          "share": 0.10027822861117551
+        },
+        {
+          "color": "#55685f",
+          "assets": 18,
+          "share": 0.1700672385810341
+        },
+        {
+          "color": "#a9b7ac",
+          "assets": 18,
+          "share": 0.19464409923487133
+        },
+        {
+          "color": "#3e3236",
+          "assets": 18,
+          "share": 0.3975191282170183
+        },
+        {
+          "color": "#c3cdc9",
+          "assets": 12,
+          "share": 0.05541386505912358
+        },
+        {
+          "color": "#ead8a6",
+          "assets": 10,
+          "share": 0.03246000463714352
+        },
+        {
+          "color": "#c4694a",
+          "assets": 10,
+          "share": 0.03848829121261303
+        },
+        {
+          "color": "#4ebba4",
+          "assets": 4,
+          "share": 0.001623000231857176
+        },
+        {
+          "color": "#6d8f52",
+          "assets": 4,
+          "share": 0.00950614421516346
+        }
+      ],
+      "totalPixels": 8626,
+      "opaquePixels": 8683,
+      "offPalette": {
+        "pixels": 57,
+        "share": 0.006564551422319475,
+        "colors": [
+          {
+            "color": "#7e827d",
+            "pixels": 25
+          },
+          {
+            "color": "#719f94",
+            "pixels": 5
+          },
+          {
+            "color": "#d59b73",
+            "pixels": 4
+          },
+          {
+            "color": "#92b8aa",
+            "pixels": 4
+          },
+          {
+            "color": "#697f77",
+            "pixels": 4
+          },
+          {
+            "color": "#b3b79a",
+            "pixels": 3
+          },
+          {
+            "color": "#958676",
+            "pixels": 2
+          },
+          {
+            "color": "#a8b098",
+            "pixels": 2
+          }
+        ]
+      }
+    },
+    "layerCoverage": [],
+    "sourceSizes": []
+  },
+  "artifacts": [
+    {
+      "path": "v4",
+      "kind": "asset-pack"
+    }
+  ]
+}

@@ -388,6 +388,27 @@
         "source": {
           "kind": "drawlist"
         }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "e-drone",
+          "role": "巡逻无人机",
+          "description": "沿月台往复巡逻的废土无人机，接触即伤。",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 32,
+            "h": 32
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
       }
     ]
   }

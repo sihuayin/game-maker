@@ -7,12 +7,12 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  acceptAnimationPack, CommandError, compileRuntime, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
+  acceptAnimationPack, asCommandError, CommandError, compileRuntime, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
-import { runBuild, runUnderstanding } from "@game-maker/pipeline";
+import { runBuild, runUnderstanding, styleRefOf } from "@game-maker/pipeline";
 import path from "node:path";
 import fs from "node:fs";
 
@@ -338,7 +338,10 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             const understanding = await runUnderstanding({
               outRoot: String(args.outDir ?? "out"),
               requirement: readIntent(String(args.intent)),
-              styleReferences: [{ path: String(args.stylePath) }],
+              // ⚠️ **与 CLI 同一条规则**（票 02 / P0-06）：`StyleReferencePath` 要求相对路径，
+              //   而 agent 给的大概率是绝对路径。这里**只做相对化、不做别的解释**；
+              //   `cwd` 与 `runUnderstanding` 的默认值同一个（`process.cwd()`）。
+              styleReferences: [{ path: styleRefOf(process.cwd(), String(args.stylePath)) }],
               transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
               ...(args.styleId === undefined ? {} : { styleId: String(args.styleId) }),
               ...(imageTransportOf() === undefined ? {} : { imageTransport: imageTransportOf()! }),
@@ -404,7 +407,11 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
           isError: errorFindings,
           ...(errorFindings ? { _exitCode: 1 } : {}),
         });
-      } catch (e) {
+      } catch (raw) {
+        // ⚠️ **先翻译**（票 02 / P0-06）：与 CLI 同一处 `asCommandError` ——
+        //   设计拒绝（`rejections`）/ 上游失败（`failure`）**不是** `CommandError`，
+        //   不翻译就会被 `exitCodeOfError` 认成「我们的 bug」退 1。
+        const e = asCommandError(raw);
         const message = e instanceof Error ? e.message : String(e);
         // ⚠️ **失败时已经花掉的那几笔**（票 46）—— 与 CLI 渲染的是**同一份数据**（R5）。
         //   包没产出来，它们没有别的家；而花了钱是事实。

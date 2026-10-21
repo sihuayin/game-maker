@@ -88,6 +88,32 @@ export class CommandError extends Error {
 export const exitCodeOfError = (e: unknown): number => (e instanceof CommandError ? EXIT[e.kind] : EXIT.failure);
 
 /**
+ * 把**理解层那几个错误类**翻译成 `CommandError`（票 16 的 Q3(b)；票 14 的播下：
+ * 「两类失败都退出码 4，但文案不同」）。
+ *
+ * ⚠️ **不翻译就会退成 1**：那几个类住在 `vision` / `game-design`（壳只依赖 `pipeline`），
+ *   所以 `exitCodeOfError` 认不出它们 —— 而那正是**票 16 的 E2E 探针当场撞出来的**：
+ *   真跑那一次「模型三发都没吐出一份过契约的 VisualWorldSpec」退的是 **1**，
+ *   而退出码表写着这一类是 **4**（`plan` / `pack` 对同一档也是 4）。
+ * ⚠️ 按**形状**认，不 import 那两个包（壳要薄）：带 `failure` 的（`CALL_FAILURES` 那七档）与
+ *   带 `rejections` 的（R12 的拒绝）—— 两者的形状都由 `contracts` 定，不是这里现编的。
+ * ⚠️ **2026-10-21 从 `cli.ts` 搬到 contracts**（票 02 / P0-06）：CLI 与 MCP 两个壳
+ *   必须给同一个失败同一个码；两份拷贝正是「必漂」的形状。
+ */
+export function asCommandError(e: unknown): unknown {
+  const o = e as { failure?: unknown; rejections?: unknown; ledger?: unknown; message?: unknown };
+  if (Array.isArray(o?.rejections))
+    return new CommandError("invalid", typeof o.message === "string" ? o.message : String(e),
+      o.ledger === undefined ? {} : { ledger: o.ledger as never });
+  if (typeof o?.failure !== "string") return e;
+  // ⚠️ 传输层那两档是「上游不可达」（3）—— 与 `assets` 那条链同款；其余都是「文书不合法」（4）。
+  const upstream = o.failure === "http" || o.failure === "timeout";
+  return new CommandError(upstream ? "upstream" : "invalid",
+    typeof o.message === "string" ? o.message : String(e),
+    o.ledger === undefined ? {} : { ledger: o.ledger as never });
+}
+
+/**
  * 异常上**带出来的东西** —— 两个壳按**能力**读，**不按类读**（2026-10-12 · 票 48）。
  *
  * ⚠️⚠️ **为什么是能力读、不是 `instanceof CommandError`**：

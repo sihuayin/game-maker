@@ -1,0 +1,1197 @@
+{
+  "packs": [
+    {
+      "label": "v7（最终包 / 已验收）",
+      "pack": ".scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7"
+    },
+    {
+      "label": "last-train v2（已接受 fixture）",
+      "pack": "fixtures/packs/last-train/v2"
+    },
+    {
+      "label": "counter-siege v4（已接受 fixture）",
+      "pack": "fixtures/packs/counter-siege/v4"
+    },
+    {
+      "label": "e2e 10-17d（真实单跑）",
+      "pack": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1"
+    },
+    {
+      "label": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "pack": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/pack/v2"
+    },
+    {
+      "label": "style-migration 10-19j",
+      "pack": ".scratch/style-migration-v1/runs/2026-10-19j-salvage/ruin-scavenger-extraction-assets/pack/v1"
+    },
+    {
+      "label": "style-migration 10-19k",
+      "pack": ".scratch/style-migration-v1/runs/2026-10-19k-standby3-fix/standby3-fix/pack/v1"
+    }
+  ],
+  "offPalette": [
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "scavenger-actor",
+      "pixels": 0,
+      "opacity": 22464,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "wasteland-enemy",
+      "pixels": 0,
+      "opacity": 20562,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "ceiling-lurker",
+      "pixels": 0,
+      "opacity": 11627,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "scrap-resource",
+      "pixels": 0,
+      "opacity": 1551,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "clean-water",
+      "pixels": 0,
+      "opacity": 1802,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "hazard-terrain",
+      "pixels": 0,
+      "opacity": 891,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "collapsed-floor",
+      "pixels": 0,
+      "opacity": 2048,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "extraction-point",
+      "pixels": 0,
+      "opacity": 30876,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "tile-floor",
+      "pixels": 0,
+      "opacity": 4096,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "metal-platform",
+      "pixels": 0,
+      "opacity": 2821,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "vent-duct",
+      "pixels": 0,
+      "opacity": 3208,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "concrete-step",
+      "pixels": 0,
+      "opacity": 2298,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "wooden-crate",
+      "pixels": 0,
+      "opacity": 1947,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "office-debris",
+      "pixels": 0,
+      "opacity": 2575,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "broken-wall",
+      "pixels": 0,
+      "opacity": 6144,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "ruined-city-backdrop",
+      "pixels": 0,
+      "opacity": 603591,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "hud-panel",
+      "pixels": 0,
+      "opacity": 2304,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "scrap-icon",
+      "pixels": 0,
+      "opacity": 139,
+      "share": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "health-icon",
+      "pixels": 41,
+      "opacity": 256,
+      "share": 0.16015625
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "player-traveler",
+      "pixels": 0,
+      "opacity": 5463,
+      "share": 0
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "bg-dusk-halt",
+      "pixels": 2524,
+      "opacity": 195946,
+      "share": 0.012881099894868995
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "prop-luggage-pile",
+      "pixels": 0,
+      "opacity": 794,
+      "share": 0
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "prop-awning-steps",
+      "pixels": 0,
+      "opacity": 866,
+      "share": 0
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "pickup-suitcase",
+      "pixels": 0,
+      "opacity": 93,
+      "share": 0
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "hazard-sweeping-carriage",
+      "pixels": 0,
+      "opacity": 6144,
+      "share": 0
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "signal-endlight",
+      "pixels": 24,
+      "opacity": 792,
+      "share": 0.030303030303030304
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "hud-lost-slots",
+      "pixels": 0,
+      "opacity": 864,
+      "share": 0
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "id": "hud-pip",
+      "pixels": 0,
+      "opacity": 76,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tile-floor",
+      "pixels": 0,
+      "opacity": 225,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tile-walk",
+      "pixels": 9,
+      "opacity": 225,
+      "share": 0.04
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tile-shelf",
+      "pixels": 0,
+      "opacity": 225,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tile-wall",
+      "pixels": 29,
+      "opacity": 225,
+      "share": 0.1288888888888889
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tile-door",
+      "pixels": 0,
+      "opacity": 225,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "slot-socket",
+      "pixels": 0,
+      "opacity": 225,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "slot-ring",
+      "pixels": 4,
+      "opacity": 36,
+      "share": 0.1111111111111111
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tower-nailgun",
+      "pixels": 12,
+      "opacity": 133,
+      "share": 0.09022556390977443
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tower-shock",
+      "pixels": 0,
+      "opacity": 252,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "tower-floodlight",
+      "pixels": 0,
+      "opacity": 256,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "fx-shock",
+      "pixels": 0,
+      "opacity": 980,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "proj-nail",
+      "pixels": 0,
+      "opacity": 16,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "proj-beam",
+      "pixels": 3,
+      "opacity": 64,
+      "share": 0.046875
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "enemy-scavenger",
+      "pixels": 0,
+      "opacity": 222,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "enemy-brute",
+      "pixels": 0,
+      "opacity": 661,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "enemy-drone",
+      "pixels": 0,
+      "opacity": 201,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "core-counter",
+      "pixels": 0,
+      "opacity": 908,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "ui-hud-bar",
+      "pixels": 0,
+      "opacity": 2496,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "ui-btn",
+      "pixels": 0,
+      "opacity": 968,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "ui-icon-scrap",
+      "pixels": 0,
+      "opacity": 66,
+      "share": 0
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "id": "ui-icon-life",
+      "pixels": 0,
+      "opacity": 74,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "player-scavenger",
+      "pixels": 0,
+      "opacity": 38060,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "enemy-wasteland",
+      "pixels": 0,
+      "opacity": 12603,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "scrap-resource",
+      "pixels": 0,
+      "opacity": 124,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "chest-ruined-city",
+      "pixels": 0,
+      "opacity": 266,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "hazard-spike-rubble",
+      "pixels": 0,
+      "opacity": 359,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "level-downtown-ruins",
+      "pixels": 0,
+      "opacity": 2589081,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "prop-street-lamp",
+      "pixels": 0,
+      "opacity": 255,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "prop-bench",
+      "pixels": 0,
+      "opacity": 250,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "ui-scrap-counter",
+      "pixels": 184,
+      "opacity": 2304,
+      "share": 0.0798611111111111
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "ui-scrap-icon",
+      "pixels": 0,
+      "opacity": 170,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "player-scavenger",
+      "pixels": 0,
+      "opacity": 33994,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "enemy-wasteland",
+      "pixels": 0,
+      "opacity": 12603,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "scrap-resource",
+      "pixels": 0,
+      "opacity": 124,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "chest-ruined-city",
+      "pixels": 0,
+      "opacity": 266,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "hazard-spike-rubble",
+      "pixels": 0,
+      "opacity": 359,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "level-downtown-ruins",
+      "pixels": 0,
+      "opacity": 2589081,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "prop-street-lamp",
+      "pixels": 0,
+      "opacity": 255,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "prop-bench",
+      "pixels": 0,
+      "opacity": 250,
+      "share": 0
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "ui-scrap-counter",
+      "pixels": 184,
+      "opacity": 2304,
+      "share": 0.0798611111111111
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "ui-scrap-icon",
+      "pixels": 0,
+      "opacity": 170,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "scavenger-actor",
+      "pixels": 0,
+      "opacity": 21036,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "wasteland-enemy",
+      "pixels": 0,
+      "opacity": 19821,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "ceiling-lurker",
+      "pixels": 0,
+      "opacity": 11791,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "scrap-resource",
+      "pixels": 0,
+      "opacity": 1551,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "clean-water",
+      "pixels": 0,
+      "opacity": 1802,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "hazard-terrain",
+      "pixels": 0,
+      "opacity": 891,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "collapsed-floor",
+      "pixels": 0,
+      "opacity": 2048,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "extraction-point",
+      "pixels": 0,
+      "opacity": 29670,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "tile-floor",
+      "pixels": 0,
+      "opacity": 4096,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "metal-platform",
+      "pixels": 0,
+      "opacity": 2821,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "vent-duct",
+      "pixels": 0,
+      "opacity": 3208,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "concrete-step",
+      "pixels": 0,
+      "opacity": 2298,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "wooden-crate",
+      "pixels": 0,
+      "opacity": 1947,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "office-debris",
+      "pixels": 0,
+      "opacity": 2575,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "broken-wall",
+      "pixels": 0,
+      "opacity": 6144,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "ruined-city-backdrop",
+      "pixels": 0,
+      "opacity": 603591,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "hud-panel",
+      "pixels": 0,
+      "opacity": 2304,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "scrap-icon",
+      "pixels": 0,
+      "opacity": 139,
+      "share": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "health-icon",
+      "pixels": 41,
+      "opacity": 256,
+      "share": 0.16015625
+    },
+    {
+      "pack": "style-migration 10-19k",
+      "id": "extraction-point",
+      "pixels": 0,
+      "opacity": 3929,
+      "share": 0
+    }
+  ],
+  "aspect": [
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "hazard-terrain",
+      "unit": "",
+      "source": "1184x864",
+      "target": "64x48",
+      "deltaAr": -2.7027027027027195
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "collapsed-floor",
+      "unit": "",
+      "source": "64x32",
+      "target": "64x32",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "tile-floor",
+      "unit": "",
+      "source": "64x64",
+      "target": "64x64",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "metal-platform",
+      "unit": "",
+      "source": "96x48",
+      "target": "96x48",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "vent-duct",
+      "unit": "",
+      "source": "96x40",
+      "target": "96x40",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "concrete-step",
+      "unit": "",
+      "source": "64x48",
+      "target": "64x48",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "wooden-crate",
+      "unit": "",
+      "source": "48x48",
+      "target": "48x48",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "office-debris",
+      "unit": "",
+      "source": "1248x832",
+      "target": "96x64",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "broken-wall",
+      "unit": "",
+      "source": "64x96",
+      "target": "64x96",
+      "deltaAr": 0
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "ruined-city-backdrop",
+      "unit": "skyline",
+      "source": "1344x768",
+      "target": "640x360",
+      "deltaAr": 1.5873015873015817
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "ruined-city-backdrop",
+      "unit": "blocks",
+      "source": "1344x768",
+      "target": "640x360",
+      "deltaAr": 1.5873015873015817
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "id": "ruined-city-backdrop",
+      "unit": "street",
+      "source": "1344x768",
+      "target": "640x360",
+      "deltaAr": 1.5873015873015817
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "player-scavenger",
+      "unit": "idle",
+      "source": "1184x864",
+      "target": "144x108",
+      "deltaAr": -2.7027027027027195
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "player-scavenger",
+      "unit": "run",
+      "source": "1344x768",
+      "target": "288x108",
+      "deltaAr": 52.38095238095237
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "player-scavenger",
+      "unit": "jump",
+      "source": "1184x864",
+      "target": "144x108",
+      "deltaAr": -2.7027027027027195
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "enemy-wasteland",
+      "unit": "patrol",
+      "source": "1344x768",
+      "target": "320x88",
+      "deltaAr": 107.79220779220778
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "chest-ruined-city",
+      "unit": "",
+      "source": "1152x896",
+      "target": "32x26",
+      "deltaAr": -4.2735042735042805
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "level-downtown-ruins",
+      "unit": "sky",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "level-downtown-ruins",
+      "unit": "horizon",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "level-downtown-ruins",
+      "unit": "facade",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "level-downtown-ruins",
+      "unit": "ground",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "master-player-scavenger",
+      "unit": "",
+      "source": "832x1248",
+      "target": "72x108",
+      "deltaAr": 0
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "id": "master-enemy-wasteland",
+      "unit": "",
+      "source": "1024x1024",
+      "target": "80x88",
+      "deltaAr": -9.090909090909093
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "player-scavenger",
+      "unit": "idle",
+      "source": "1184x864",
+      "target": "144x108",
+      "deltaAr": -2.7027027027027195
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "player-scavenger",
+      "unit": "run",
+      "source": "1344x768",
+      "target": "288x108",
+      "deltaAr": 52.38095238095237
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "player-scavenger",
+      "unit": "jump",
+      "source": "1184x864",
+      "target": "144x108",
+      "deltaAr": -2.7027027027027195
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "enemy-wasteland",
+      "unit": "patrol",
+      "source": "1344x768",
+      "target": "320x88",
+      "deltaAr": 107.79220779220778
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "chest-ruined-city",
+      "unit": "",
+      "source": "1152x896",
+      "target": "32x26",
+      "deltaAr": -4.2735042735042805
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "level-downtown-ruins",
+      "unit": "sky",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "level-downtown-ruins",
+      "unit": "horizon",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "level-downtown-ruins",
+      "unit": "facade",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "level-downtown-ruins",
+      "unit": "ground",
+      "source": "1344x768",
+      "target": "1920x540",
+      "deltaAr": 103.17460317460316
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "master-enemy-wasteland",
+      "unit": "",
+      "source": "1024x1024",
+      "target": "80x88",
+      "deltaAr": -9.090909090909093
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "id": "master-player-scavenger",
+      "unit": "",
+      "source": "832x1248",
+      "target": "72x108",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "hazard-terrain",
+      "unit": "",
+      "source": "1184x864",
+      "target": "64x48",
+      "deltaAr": -2.7027027027027195
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "collapsed-floor",
+      "unit": "",
+      "source": "64x32",
+      "target": "64x32",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "tile-floor",
+      "unit": "",
+      "source": "64x64",
+      "target": "64x64",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "metal-platform",
+      "unit": "",
+      "source": "96x48",
+      "target": "96x48",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "vent-duct",
+      "unit": "",
+      "source": "96x40",
+      "target": "96x40",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "concrete-step",
+      "unit": "",
+      "source": "64x48",
+      "target": "64x48",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "wooden-crate",
+      "unit": "",
+      "source": "48x48",
+      "target": "48x48",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "office-debris",
+      "unit": "",
+      "source": "1248x832",
+      "target": "96x64",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "broken-wall",
+      "unit": "",
+      "source": "64x96",
+      "target": "64x96",
+      "deltaAr": 0
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "ruined-city-backdrop",
+      "unit": "skyline",
+      "source": "1344x768",
+      "target": "640x360",
+      "deltaAr": 1.5873015873015817
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "ruined-city-backdrop",
+      "unit": "blocks",
+      "source": "1344x768",
+      "target": "640x360",
+      "deltaAr": 1.5873015873015817
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "id": "ruined-city-backdrop",
+      "unit": "street",
+      "source": "1344x768",
+      "target": "640x360",
+      "deltaAr": 1.5873015873015817
+    },
+    {
+      "pack": "style-migration 10-19k",
+      "id": "extraction-point",
+      "unit": "",
+      "source": "832x1248",
+      "target": "64x96",
+      "deltaAr": 0
+    }
+  ],
+  "coverage": [
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.skyline",
+      "ratio": 1
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.blocks",
+      "ratio": 0.8888237847222222
+    },
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.street",
+      "ratio": 0.7309288194444444
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "asset": "bg-dusk-halt",
+      "frame": "bg-dusk-halt.sky",
+      "ratio": 1
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "asset": "bg-dusk-halt",
+      "frame": "bg-dusk-halt.wall",
+      "ratio": 0.311929012345679
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "asset": "bg-dusk-halt",
+      "frame": "bg-dusk-halt.ground",
+      "ratio": 0.2
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.sky",
+      "ratio": 1
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.horizon",
+      "ratio": 0.5054851466049383
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.facade",
+      "ratio": 0.8174209104938271
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.ground",
+      "ratio": 0.17427854938271606
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.sky",
+      "ratio": 1
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.horizon",
+      "ratio": 0.5054851466049383
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.facade",
+      "ratio": 0.8174209104938271
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "asset": "level-downtown-ruins",
+      "frame": "level-downtown-ruins.ground",
+      "ratio": 0.17427854938271606
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.skyline",
+      "ratio": 1
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.blocks",
+      "ratio": 0.8888237847222222
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.street",
+      "ratio": 0.7309288194444444
+    }
+  ],
+  "packOff": [
+    {
+      "pack": "v7（最终包 / 已验收）",
+      "packId": "ruin-scavenger-extraction-assets",
+      "assets": 19,
+      "off": 41,
+      "share": 0.000056849694952856354,
+      "opacity": 721200
+    },
+    {
+      "pack": "last-train v2（已接受 fixture）",
+      "packId": "last-train",
+      "assets": 9,
+      "off": 2548,
+      "share": 0.012073654981567301,
+      "opacity": 211038
+    },
+    {
+      "pack": "counter-siege v4（已接受 fixture）",
+      "packId": "counter-siege",
+      "assets": 21,
+      "off": 57,
+      "share": 0.006564551422319475,
+      "opacity": 8683
+    },
+    {
+      "pack": "e2e 10-17d（真实单跑）",
+      "packId": "wasteland-scavenger-assets",
+      "assets": 10,
+      "off": 184,
+      "share": 0.00006960542801285582,
+      "opacity": 2643472
+    },
+    {
+      "pack": "e2e 10-18a（真实单跑 / 清单不完整）",
+      "packId": "wasteland-scavenger-assets",
+      "assets": 10,
+      "off": 184,
+      "share": 0.00006971265504435468,
+      "opacity": 2639406
+    },
+    {
+      "pack": "style-migration 10-19j",
+      "packId": "ruin-scavenger-extraction-assets",
+      "assets": 19,
+      "off": 41,
+      "share": 0.000057103938918284266,
+      "opacity": 717989
+    },
+    {
+      "pack": "style-migration 10-19k",
+      "packId": "standby3-fix",
+      "assets": 1,
+      "off": 0,
+      "share": 0,
+      "opacity": 3929
+    }
+  ]
+}

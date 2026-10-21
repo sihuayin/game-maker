@@ -1,0 +1,14 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/assets/tests/plan-frames-candidate.test.ts (1 test) 42ms
+ ✓ packages/mcp/tests/error-semantics.test.ts (3 tests) 54ms
+ ✓ packages/mcp/tests/create-game-no-digest.test.ts (1 test) 519ms
+   ✓ §v3 终端摘要 · MCP 输出不变 > create_game 的 content 与 structuredContent 都不出现摘要行  515ms
+
+ Test Files  3 passed (3)
+      Tests  5 passed (5)
+   Start at  21:19:47
+   Duration  6.07s (transform 5.69s, setup 0ms, collect 11.65s, tests 615ms, environment 0ms, prepare 2.34s)
+
+EXIT=0

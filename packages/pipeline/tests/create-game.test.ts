@@ -7,8 +7,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type CharacterDNAFile, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
-import { buildAssetPack, decodePNG, encodePNG, framePlan, type DrawListGenerator } from "@game-maker/assets";
+import { CommandError, DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type CharacterDNAFile, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { buildAssetPack, decodePNG, encodePNG, framePlan, verifyPack, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
 
@@ -40,6 +40,8 @@ const build = (h: ReturnType<typeof harness>, runDir: string, over: Record<strin
   runBuild({ outRoot: h.outRoot, runDir, transport: TRANSPORT, fetchImpl: h.fetchImpl, imageTransport: IMAGE, ...over });
 
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, unknown>;
+/** 全透明参考图：确定性提色提出 **0 色** ⇒ 模型给的空色板不会被替换掉（CAP-SPEC-17 的现场）。 */
+const transparentPng = (w = 8, h = 8) => encodePNG({ width: w, height: h, data: Buffer.alloc(w * h * 4) });
 const runPath = (h: ReturnType<typeof harness>, ...rest: string[]) => path.join(h.outRoot, "wasteland", "run", "v1", ...rest);
 
 describe("§第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13）", () => {
@@ -92,6 +94,27 @@ describe("§第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13）", () => {
     expect(Object.keys(doc["run"] as object).includes("byStep")).toBe(true);
     const steps = new Set((doc["calls"] as { step: string }[]).map((c) => c.step));
     expect([...steps].sort()).toEqual(["analyze-intent", "analyze-reference", "character-dna", "compile-design", "plan-assets"]);
+  });
+
+  // ── 票 01（P0-04）· 空色板前移（CAP-SPEC-17）────────────────────────────────
+  it("空色板 VWS ⇒ 在 `analyze-intent` 之前拒（exit 4），下游一发都不发；现场留着 VWS", async () => {
+    const h = harness({
+      override: { emit_visual_world: { ...CANNED.visualWorld, style: { ...(CANNED.visualWorld["style"] as object), palette: [] } } },
+    });
+    // ⚠️ 参考图必须**全透明**：确定性提色提出 0 色，模型那份空色板才不会被替换掉。
+    fs.writeFileSync(path.join(h.cwd, "style.png"), transparentPng());
+    const e = await understand(h).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect(exitCodeOfError(e)).toBe(4);
+    expect((e as CommandError).message).toMatch(/palette/);
+    // ⚠️ 只发了第一发：intent / design / dna / recipe 一发都没有
+    expect(h.seen.map((b) => (b["tool_choice"] as { name: string }).name)).toEqual(["emit_visual_world"]);
+    // 失败现场里留得下那份空色板的 VWS（`run` 还没定稿 ⇒ 现场是 `<outRoot>/.failed-*`）
+    const sites = fs.readdirSync(h.outRoot).filter((n) => n.startsWith(".failed-"));
+    expect(sites).toHaveLength(1);
+    const vws = JSON.parse(fs.readFileSync(path.join(h.outRoot, sites[0]!, "visual-world.json"), "utf8")) as { style: { palette: string[] } };
+    expect(vws.style.palette).toEqual([]);
   });
 
   it("五发都走了**强制工具调用**（R16：五个工具名各一次）", async () => {
@@ -225,7 +248,47 @@ describe("§invariant 3 · recipe 磁盘真相", () => {
       assets: [...doc.assets, { spec: { kind: "sprite", id: "crate-2", role: "第二只箱子", description: "又一只木条箱", styleId: "halt-dusk", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true, characterId: "p-scavenger" }, source: { kind: "drawlist" } }],
     }, null, 2) + "\n");
     const b = await build(h, u.run.dir);
-    expect(b.manifest.assets.map((a) => a.id).sort()).toEqual(["bg-dusk", "crate-2", "p-body", "ui-hud", "ui-pip"]);
+    expect(b.manifest.assets.map((a) => a.id).sort()).toEqual(["bg-dusk", "crate-2", "e-drone", "p-body", "ui-hud", "ui-pip"]);
+  });
+
+  // ── 票 01（P0-04）· 设计 → 清单的覆盖闸（CAP-SPEC-12）────────────────────────
+  it("人改清单删掉一件敌人资源 ⇒ 构建段在 `pack` 之前拒（exit 4），一个包都不产", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const p = runPath(h, "asset-recipe.json");
+    const doc = readJson(p) as { assets: { spec: { id: string } }[] };
+    fs.writeFileSync(p, JSON.stringify({ ...doc, assets: doc.assets.filter((a) => a.spec.id !== "e-drone") }, null, 2) + "\n");
+    const e = await build(h, u.run.dir).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect(exitCodeOfError(e)).toBe(4);
+    expect((e as CommandError).message).toMatch(/e-drone/);
+    expect(fs.existsSync(path.join(h.outRoot, "wasteland", "pack")), "缺资源时不烧生图的钱").toBe(false);
+  });
+
+  // ── 票 01（P0-04）· 包完整性入链（CAP-ASSET-06）────────────────────────────
+  it("篡改包内一个文件 ⇒ 在 config / QA / site 之前 `invalid`（exit 4）；原包保留", async () => {
+    const h = harness();
+    const u = await understand(h);
+    let packDir: string | undefined;
+    let calls = 0;
+    const e = await build(h, u.run.dir, {
+      verify: (opts: { packDir: string; outRoot?: string }) => {
+        calls += 1;
+        packDir = opts.packDir;
+        const manifest = readJson(path.join(opts.packDir, "manifest.json")) as { files: { path: string }[] };
+        fs.appendFileSync(path.join(opts.packDir, manifest.files[0]!.path), Buffer.from([0]));
+        return verifyPack(opts);
+      },
+    }).catch((x: unknown) => x);
+    expect(calls, "全量 checksum 只做一次").toBe(1);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect(exitCodeOfError(e)).toBe(4);
+    expect(fs.existsSync(path.join(u.run.dir, "game-config.json"))).toBe(false);
+    expect(fs.existsSync(path.join(u.run.dir, "qa-report.json"))).toBe(false);
+    expect(fs.existsSync(path.join(h.outRoot, "wasteland", "site"))).toBe(false);
+    expect(fs.existsSync(packDir!), "原包保留（诊断现场）").toBe(true);
   });
 
   it("检查点拿到的是**磁盘上那一份**：`createGame` 的 `onRecipe` 在构建之前被调，且改得动", async () => {
@@ -784,7 +847,7 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(inspect.lines!.join("\n")).toMatch(/源图 .* → 目标 /);
     // v3 终端摘要：结构化数据同时交到 BuildResult（不落盘、不进报告）
     expect(b.inspectData).toBeDefined();
-    expect(b.inspectData!.assets.length).toBe(4);
+    expect(b.inspectData!.assets.length).toBe(5);
     expect(b.inspectData!.layerCoverage.length).toBe(1);       // drawlist 背景只有一帧
     expect(b.inspectData!.paletteUsage.offPalette.pixels).toBe(0);
     expect(report.observations.find((o) => o.source === "review")!.outcome).toBe("unavailable");

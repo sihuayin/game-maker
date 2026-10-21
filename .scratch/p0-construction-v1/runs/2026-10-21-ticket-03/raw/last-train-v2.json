@@ -1,0 +1,467 @@
+{
+  "command": "inspect",
+  "summary": [
+    "last-train v2 · generated",
+    "9 个资源 · 4 张图集",
+    "  player-traveler · animation · 32×48 · generated/exact · 8 帧 · 动画 idle(2) run(4) jump(2) · 用色 6/8",
+    "  bg-dusk-halt · background · 480×270 · generated/composited · 3 帧 · 用色 8/8 · 色板外 2524",
+    "  prop-luggage-pile · sprite · 40×40 · generated/exact · 1 帧 · 用色 8/8",
+    "  prop-awning-steps · sprite · 56×32 · generated/exact · 1 帧 · 用色 7/8",
+    "  pickup-suitcase · sprite · 16×16 · generated/composited · 1 帧 · 用色 4/8",
+    "  hazard-sweeping-carriage · animation · 64×48 · generated/exact · 2 帧 · 动画 sweep(2) · 用色 7/8",
+    "  signal-endlight · animation · 16×40 · generated/composited · 4 帧 · 动画 red(2) green(2) · 用色 8/8 · 色板外 24",
+    "  hud-lost-slots · ui · 72×32 · generated/exact · 1 帧 · 用色 5/8",
+    "  hud-pip · ui · 12×12 · generated/exact · 1 帧 · 用色 7/8",
+    "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+    "  bg-dusk-halt.sky         480×270  100.0%",
+    "  bg-dusk-halt.wall        480×270  31.2%",
+    "  bg-dusk-halt.ground      480×270  20.0%",
+    "色板 8 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+    "  #3a3f5c · 8/9 个资源用到 · 占全部不透明像素 12.2%",
+    "  #6b4a3a · 5/9 个资源用到 · 占全部不透明像素 5.9%",
+    "  #9e9ea6 · 7/9 个资源用到 · 占全部不透明像素 4.6%",
+    "  #1c1c28 · 9/9 个资源用到 · 占全部不透明像素 7.9%",
+    "  #d4a64a · 9/9 个资源用到 · 占全部不透明像素 3.6%",
+    "  #e0c08a · 8/9 个资源用到 · 占全部不透明像素 11.9%",
+    "  #4a5a7a · 8/9 个资源用到 · 占全部不透明像素 37.2%",
+    "  #5a6a8a · 6/9 个资源用到 · 占全部不透明像素 16.8%",
+    "色板外像素 2548 个 · 占全部不透明像素 1.21% · 前几色 #526282(1564) #384159(536) #575460(424) #4f3a34(24)（**观察，不是判据** —— 对不上可以是设计）"
+  ],
+  "data": {
+    "packId": "last-train",
+    "version": 2,
+    "provenanceMode": "generated",
+    "assets": [
+      {
+        "id": "player-traveler",
+        "kind": "animation",
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 8,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      {
+        "id": "bg-dusk-halt",
+        "kind": "background",
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 3,
+        "animations": []
+      },
+      {
+        "id": "prop-luggage-pile",
+        "kind": "sprite",
+        "size": {
+          "w": 40,
+          "h": 40
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "prop-awning-steps",
+        "kind": "sprite",
+        "size": {
+          "w": 56,
+          "h": 32
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "pickup-suitcase",
+        "kind": "sprite",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "hazard-sweeping-carriage",
+        "kind": "animation",
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 2,
+        "animations": [
+          {
+            "name": "sweep",
+            "frames": 2,
+            "fps": 3,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "signal-endlight",
+        "kind": "animation",
+        "size": {
+          "w": 16,
+          "h": 40
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 4,
+        "animations": [
+          {
+            "name": "red",
+            "frames": 2,
+            "fps": 2,
+            "loop": true
+          },
+          {
+            "name": "green",
+            "frames": 2,
+            "fps": 2,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "hud-lost-slots",
+        "kind": "ui",
+        "size": {
+          "w": 72,
+          "h": 32
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "hud-pip",
+        "kind": "ui",
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      }
+    ],
+    "paletteUsage": {
+      "perAsset": [
+        {
+          "id": "player-traveler",
+          "usedColors": 6,
+          "opacityPixels": 5463,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.3382756727073037
+            },
+            {
+              "color": "#4a5a7a",
+              "share": 0.22112392458356214
+            },
+            {
+              "color": "#3a3f5c",
+              "share": 0.2138019403258283
+            }
+          ]
+        },
+        {
+          "id": "bg-dusk-halt",
+          "usedColors": 8,
+          "opacityPixels": 195946,
+          "offPalettePixels": 2524,
+          "top": [
+            {
+              "color": "#4a5a7a",
+              "share": 0.3846161697610566
+            },
+            {
+              "color": "#5a6a8a",
+              "share": 0.17333346942524983
+            },
+            {
+              "color": "#3a3f5c",
+              "share": 0.1188388637685893
+            }
+          ]
+        },
+        {
+          "id": "prop-luggage-pile",
+          "usedColors": 8,
+          "opacityPixels": 794,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.5541561712846348
+            },
+            {
+              "color": "#d4a64a",
+              "share": 0.13224181360201512
+            },
+            {
+              "color": "#4a5a7a",
+              "share": 0.1297229219143577
+            }
+          ]
+        },
+        {
+          "id": "prop-awning-steps",
+          "usedColors": 7,
+          "opacityPixels": 866,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.4561200923787529
+            },
+            {
+              "color": "#4a5a7a",
+              "share": 0.17551963048498845
+            },
+            {
+              "color": "#3a3f5c",
+              "share": 0.12009237875288684
+            }
+          ]
+        },
+        {
+          "id": "pickup-suitcase",
+          "usedColors": 4,
+          "opacityPixels": 93,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.5591397849462365
+            },
+            {
+              "color": "#6b4a3a",
+              "share": 0.1935483870967742
+            },
+            {
+              "color": "#e0c08a",
+              "share": 0.1827956989247312
+            }
+          ]
+        },
+        {
+          "id": "hazard-sweeping-carriage",
+          "usedColors": 7,
+          "opacityPixels": 6144,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.3424479166666667
+            },
+            {
+              "color": "#e0c08a",
+              "share": 0.25390625
+            },
+            {
+              "color": "#5a6a8a",
+              "share": 0.15364583333333334
+            }
+          ]
+        },
+        {
+          "id": "signal-endlight",
+          "usedColors": 8,
+          "opacityPixels": 792,
+          "offPalettePixels": 24,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.47474747474747475
+            },
+            {
+              "color": "#3a3f5c",
+              "share": 0.14646464646464646
+            },
+            {
+              "color": "#4a5a7a",
+              "share": 0.14646464646464646
+            }
+          ]
+        },
+        {
+          "id": "hud-lost-slots",
+          "usedColors": 5,
+          "opacityPixels": 864,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.3541666666666667
+            },
+            {
+              "color": "#3a3f5c",
+              "share": 0.3275462962962963
+            },
+            {
+              "color": "#9e9ea6",
+              "share": 0.22685185185185186
+            }
+          ]
+        },
+        {
+          "id": "hud-pip",
+          "usedColors": 7,
+          "opacityPixels": 76,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#1c1c28",
+              "share": 0.618421052631579
+            },
+            {
+              "color": "#9e9ea6",
+              "share": 0.14473684210526316
+            },
+            {
+              "color": "#5a6a8a",
+              "share": 0.09210526315789473
+            }
+          ]
+        }
+      ],
+      "perColor": [
+        {
+          "color": "#3a3f5c",
+          "assets": 8,
+          "share": 0.12200105520648473
+        },
+        {
+          "color": "#6b4a3a",
+          "assets": 5,
+          "share": 0.05915871264808864
+        },
+        {
+          "color": "#9e9ea6",
+          "assets": 7,
+          "share": 0.04612691256175356
+        },
+        {
+          "color": "#1c1c28",
+          "assets": 9,
+          "share": 0.07897740898844069
+        },
+        {
+          "color": "#d4a64a",
+          "assets": 9,
+          "share": 0.03558923689385582
+        },
+        {
+          "color": "#e0c08a",
+          "assets": 8,
+          "share": 0.11879706460741522
+        },
+        {
+          "color": "#4a5a7a",
+          "assets": 8,
+          "share": 0.3716101491678258
+        },
+        {
+          "color": "#5a6a8a",
+          "assets": 6,
+          "share": 0.16773945992613554
+        }
+      ],
+      "totalPixels": 208490,
+      "opaquePixels": 211038,
+      "offPalette": {
+        "pixels": 2548,
+        "share": 0.012073654981567301,
+        "colors": [
+          {
+            "color": "#526282",
+            "pixels": 1564
+          },
+          {
+            "color": "#384159",
+            "pixels": 536
+          },
+          {
+            "color": "#575460",
+            "pixels": 424
+          },
+          {
+            "color": "#4f3a34",
+            "pixels": 24
+          }
+        ]
+      }
+    },
+    "layerCoverage": [
+      {
+        "asset": "bg-dusk-halt",
+        "frame": "bg-dusk-halt.sky",
+        "w": 480,
+        "h": 270,
+        "opaque": 129600,
+        "ratio": 1
+      },
+      {
+        "asset": "bg-dusk-halt",
+        "frame": "bg-dusk-halt.wall",
+        "w": 480,
+        "h": 270,
+        "opaque": 40426,
+        "ratio": 0.311929012345679
+      },
+      {
+        "asset": "bg-dusk-halt",
+        "frame": "bg-dusk-halt.ground",
+        "w": 480,
+        "h": 270,
+        "opaque": 25920,
+        "ratio": 0.2
+      }
+    ],
+    "sourceSizes": []
+  },
+  "artifacts": [
+    {
+      "path": "v2",
+      "kind": "asset-pack"
+    }
+  ]
+}

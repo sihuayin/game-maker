@@ -252,7 +252,7 @@ describe("§检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8�
     const r = await runC(create(s, ["--json"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
     const d = jsonOf(r.io).data!;
-    expect(d["assetCount"]).toBe(7);                 // 4 条骨架 + 3 条新加的（import 已移出 create 夹具）
+    expect(d["assetCount"]).toBe(8);                 // 5 条骨架（含 e-drone）+ 3 条新加的（import 已移出 create 夹具）
     expect(d["imageCalls"]).toBe(13);                // ⚠️ resolver 后：p-body 3 + bg-dusk 1 + scavenger 3 + bg-waste 3 + crate 1 + 母版 2
     expect(d["imageCallBreakdown"]).toEqual({ animation: 6, single: 2, background: 3, master: 2 });
     // ⚠️ 旧字段**真的走了**（留着它 = 同一份 `data` 里两个「都在说生图数量」的字段）
@@ -382,7 +382,7 @@ describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5�
     // v3 终端摘要：默认出现、来自结构化数据、在站点行之前
     const text = r.text();
     expect(text).toMatch(/资源观察摘要（不评分 · 不阻断）：/);
-    expect(text).toMatch(/4 个资源/);
+    expect(text).toMatch(/5 个资源/);
     expect(text).toMatch(/色板外像素 0 个（0\.00%）/);
     expect(text).toMatch(/背景层 1 帧 · 最低覆盖 100\.0%（bg-dusk）/);
     expect(text).toMatch(/全文：wasteland\/run\/v1\/qa-report\.json · game-maker inspect wasteland\/pack\/v1/);
@@ -496,15 +496,16 @@ describe("§参数面：几条硬线（票 16 的 Q4/Q5）", () => {
 //   **真的没把 text 拖下来**。期望值由**假上游自己数的峰值**给，不由 `concurrencyFromFlags` 推。
 //   形状那一半（返回值里没有 `text` 键）住在 `cli.test.ts` 的纯函数单测里 —— 两层各钉一头。
 describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在飞的请求」）", () => {
-  // 夹具那 4 个 drawlist 资源**没有依赖边**，且在 `Promise.allSettled(recipe.assets.map(...))` 里
-  // **同步提交** ⇒ 默认闸门（文本 4）下四个同时在场，峰值**恰好 4**。
+  // 夹具那 5 个资源里，bg-dusk / p-body 被 resolver 覆盖成 image，剩 3 个 drawlist
+  // （ui-hud / ui-pip / e-drone）。它们**没有依赖边**，且在 `Promise.allSettled(recipe.assets.map(...))` 里
+  // **同步提交** ⇒ 默认闸门（文本 4）下三个同时在场，峰值**恰好 3**。
   it("⚠️ 只给 `--concurrency-image 2` ⇒ **文本峰值仍是 4**（image 那一半没把 text 拖下去）", async () => {
     const probe = makeProbe();
     const s = stage({ delayMs: 12, probe });
     const r = await runC(create(s, ["--yes", "--concurrency-image", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(2);   // 只剩 2 个 UI drawlist（bg/p-body 已被 resolver 覆盖为 image）
-    expect(probe.peak()).toBe(2);    // 2 个 drawlist 都并发
+    expect(probe.total()).toBe(3);   // 只剩 3 个 drawlist（bg/p-body 已被 resolver 覆盖为 image）
+    expect(probe.peak()).toBe(3);    // 3 个 drawlist 都并发
   });
 
   it("⚠️ 而 `--concurrency 2` ⇒ 峰值 **2**（同一个数两边都用 —— 原义一个字没变）", async () => {
@@ -512,7 +513,7 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const s = stage({ delayMs: 12, probe });
     const r = await runC(create(s, ["--yes", "--concurrency", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(2);
+    expect(probe.total()).toBe(3);
     expect(probe.peak()).toBe(2);
   });
 
@@ -521,7 +522,7 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const s = stage({ delayMs: 12, probe });
     const r = await runC(create(s, ["--yes", "--concurrency", "3", "--concurrency-image", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.peak()).toBe(2);
+    expect(probe.peak()).toBe(3);
   });
 
   it("参数面：`--concurrency-image 0` ⇒ 参数错（2），且文案点名**给的那个 flag**", async () => {
@@ -542,7 +543,7 @@ describe("§并发 flag 走到了引擎（票 41 —— 假上游数「同时在
     const runDir = path.join(s.outRoot, "wasteland", "run", "v1");
     const r = await runC(["build", runDir, "--out", s.outRoot, "--concurrency", "2"], s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(2);
+    expect(probe.total()).toBe(3);
     expect(probe.peak()).toBe(2);
   });
 });
@@ -564,7 +565,7 @@ describe("§`pack` 也走同一个解析（票 41 的 Q4）", () => {
     expect(r.text()).toMatch(/--concurrency-image 必须是 ≥1 的整数/);
   });
 
-  it("只设 image 时**文本那一半不被拖下来**：峰值仍是 4（默认）", async () => {
+  it("只设 image 时**文本那一半不被拖下来**：三个 drawlist 同时在场（默认闸门 4）", async () => {
     const probe = makeProbe();
     const s = stage({ delayMs: 12, probe });
     expect((await runC(create(s), s.deps)).code).toBe(EXIT.ok);
@@ -572,8 +573,8 @@ describe("§`pack` 也走同一个解析（票 41 的 Q4）", () => {
     const recipe = path.join(s.outRoot, "wasteland", "run", "v1", "asset-recipe.json");
     const r = await runC(packOf(s, recipe, ["--concurrency-image", "2"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
-    expect(probe.total()).toBe(2);
-    expect(probe.peak()).toBe(2);           // 只有 2 个 drawlist
+    expect(probe.total()).toBe(3);
+    expect(probe.peak()).toBe(3);           // 3 个 drawlist，默认文本闸门 4 ⇒ 全都在场
   });
 });
 

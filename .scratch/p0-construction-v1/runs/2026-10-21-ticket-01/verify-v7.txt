@@ -1,0 +1,4 @@
+✅ v7 通过：157 个文件的 checksum 全部对得上
+来源：mixed
+账：0 次调用被记在包内 ledger.json 里
+EXIT=0

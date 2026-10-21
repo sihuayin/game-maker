@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  CommandError, EXIT, acceptAnimationPack, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
+  asCommandError, CommandError, EXIT, acceptAnimationPack, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
   type AcceptanceResult, type CommandResult, type InspectData, type WrittenAcceptanceReport,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
@@ -14,7 +14,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { reviewRun, runBuild, runUnderstanding, type CreateStep } from "@game-maker/pipeline";
+import { reviewRun, runBuild, runUnderstanding, styleRefOf, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -188,45 +188,10 @@ function readRequirement(cwd: string, v: string): string {
   return fs.readFileSync(p, "utf8");
 }
 
-/**
- * `--style` 变成一个**相对 `cwd` 的路径**（票 16 落地时撞上的那一条）。
- *
- * ⚠️ `visual-world.json` 里那一格**以它自身为基准**（`StyleReferencePath` 的规矩），
- *   所以调用方给的**绝对路径**会在 `analyzeReference` 那里被拒（「必须是相对路径」）。
- *   而下游（票 15 的 `stageUnderstanding`）会把它拷进 run、改写成 basename ——
- *   原始形状只需要「**相对 cwd、而且解析得到**」。
- */
-const styleRefOf = (cwd: string, given: string): string =>
-  path.relative(cwd, path.resolve(cwd, given)).split(path.sep).join("/") || ".";
-
 const progressTo = (io: CliIo) => (p: { step: string; detail?: string }) =>
   io.err(`  · ${p.step}${p.detail === undefined ? "" : `：${p.detail}`}\n`);
 
 const relPath = (outRoot: string, p: string): string => path.relative(outRoot, p).split(path.sep).join("/");
-
-/**
- * 把**理解层那几个错误类**翻译成 `CommandError`（票 16 的 Q3(b)；票 14 的播下：
- * 「两类失败都退出码 4，但文案不同」）。
- *
- * ⚠️ **不翻译就会退成 1**：那几个类住在 `vision` / `game-design`（壳只依赖 `pipeline`），
- *   所以 `exitCodeOfError` 认不出它们 —— 而那正是**票 16 的 E2E 探针当场撞出来的**：
- *   真跑那一次「模型三发都没吐出一份过契约的 VisualWorldSpec」退的是 **1**，
- *   而退出码表写着这一类是 **4**（`plan` / `pack` 对同一档也是 4）。
- * ⚠️ 按**形状**认，不 import 那两个包（壳要薄）：带 `failure` 的（`CALL_FAILURES` 那七档）与
- *   带 `rejections` 的（R12 的拒绝）—— 两者的形状都由 `contracts` 定，不是这里现编的。
- */
-function asCommandError(e: unknown): unknown {
-  const o = e as { failure?: unknown; rejections?: unknown; ledger?: unknown; message?: unknown };
-  if (Array.isArray(o?.rejections))
-    return new CommandError("invalid", typeof o.message === "string" ? o.message : String(e),
-      o.ledger === undefined ? {} : { ledger: o.ledger as never });
-  if (typeof o?.failure !== "string") return e;
-  // ⚠️ 传输层那两档是「上游不可达」（3）—— 与 `assets` 那条链同款；其余都是「文书不合法」（4）。
-  const upstream = o.failure === "http" || o.failure === "timeout";
-  return new CommandError(upstream ? "upstream" : "invalid",
-    typeof o.message === "string" ? o.message : String(e),
-    o.ledger === undefined ? {} : { ledger: o.ledger as never });
-}
 
 /**
  * 构建段：**`create --yes` 与 `build` 共用这一份** —— 「两条路的产物等价」靠的就是它。

@@ -1,0 +1,1196 @@
+{
+  "command": "inspect",
+  "summary": [
+    "ruin-scavenger-extraction-assets v1 · mixed",
+    "19 个资源 · 4 张图集",
+    "  scavenger-actor · animation · 48×64 · generated/quantized · 16 帧 · 动画 idle(4) run(8) jump(4) · 用色 18/32",
+    "  wasteland-enemy · animation · 48×48 · generated/quantized · 15 帧 · 动画 patrol(6) charge(6) halt(3) · 用色 15/32",
+    "  ceiling-lurker · animation · 48×56 · generated/quantized · 13 帧 · 动画 hang(4) lunge(5) retreat(4) · 用色 16/32",
+    "  scrap-resource · animation · 24×24 · generated/quantized · 4 帧 · 动画 idle(4) · 用色 18/32",
+    "  clean-water · animation · 24×24 · generated/quantized · 4 帧 · 动画 idle(4) · 用色 21/32",
+    "  hazard-terrain · sprite · 64×48 · generated/quantized · 1 帧 · 用色 12/32",
+    "  collapsed-floor · sprite · 64×32 · imported/quantized · 1 帧 · 用色 12/32",
+    "  extraction-point · animation · 64×96 · generated/quantized · 9 帧 · 动画 standby(3) active(6) · 用色 22/32",
+    "  tile-floor · sprite · 64×64 · imported/quantized · 1 帧 · 用色 26/32",
+    "  metal-platform · sprite · 96×48 · imported/quantized · 1 帧 · 用色 13/32",
+    "  vent-duct · sprite · 96×40 · imported/quantized · 1 帧 · 用色 13/32",
+    "  concrete-step · sprite · 64×48 · imported/quantized · 1 帧 · 用色 13/32",
+    "  wooden-crate · sprite · 48×48 · imported/quantized · 1 帧 · 用色 18/32",
+    "  office-debris · sprite · 96×64 · generated/quantized · 1 帧 · 用色 13/32",
+    "  broken-wall · sprite · 64×96 · imported/quantized · 1 帧 · 用色 20/32",
+    "  ruined-city-backdrop · background · 640×360 · generated/quantized · 3 帧 · 用色 22/32",
+    "  hud-panel · ui · 48×48 · generated/exact · 1 帧 · 用色 16/32",
+    "  scrap-icon · ui · 16×16 · generated/exact · 1 帧 · 用色 14/32",
+    "  health-icon · ui · 16×16 · generated/composited · 1 帧 · 用色 8/32 · 色板外 41",
+    "源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：",
+    "  hazard-terrain                 源图 1184×864 (1.370) → 目标 64×48 (1.333) · 长宽比差 -2.7%",
+    "  collapsed-floor                源图 64×32 (2.000) → 目标 64×32 (2.000) · 长宽比差 0.0%",
+    "  tile-floor                     源图 64×64 (1.000) → 目标 64×64 (1.000) · 长宽比差 0.0%",
+    "  metal-platform                 源图 96×48 (2.000) → 目标 96×48 (2.000) · 长宽比差 0.0%",
+    "  vent-duct                      源图 96×40 (2.400) → 目标 96×40 (2.400) · 长宽比差 0.0%",
+    "  concrete-step                  源图 64×48 (1.333) → 目标 64×48 (1.333) · 长宽比差 0.0%",
+    "  wooden-crate                   源图 48×48 (1.000) → 目标 48×48 (1.000) · 长宽比差 0.0%",
+    "  office-debris                  源图 1248×832 (1.500) → 目标 96×64 (1.500) · 长宽比差 0.0%",
+    "  broken-wall                    源图 64×96 (0.667) → 目标 64×96 (0.667) · 长宽比差 0.0%",
+    "  ruined-city-backdrop.skyline   源图 1344×768 (1.750) → 目标 640×360 (1.778) · 长宽比差 +1.6%",
+    "  ruined-city-backdrop.blocks    源图 1344×768 (1.750) → 目标 640×360 (1.778) · 长宽比差 +1.6%",
+    "  ruined-city-backdrop.street    源图 1344×768 (1.750) → 目标 640×360 (1.778) · 长宽比差 +1.6%",
+    "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+    "  ruined-city-backdrop.skyline 640×360  100.0%",
+    "  ruined-city-backdrop.blocks 640×360  88.9%",
+    "  ruined-city-backdrop.street 640×360  73.1%",
+    "色板 32 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+    "  #000000 · 8/19 个资源用到 · 占全部不透明像素 0.1%",
+    "  #080000 · 7/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #180000 · 1/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #200000 · 1/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #100700 · 9/19 个资源用到 · 占全部不透明像素 0.2%",
+    "  #290705 · 7/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #1a0d05 · 15/19 个资源用到 · 占全部不透明像素 1.3%",
+    "  #380702 · 2/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #210f03 · 4/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #290d02 · 3/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #420605 · 7/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #310c00 · 1/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #221205 · 19/19 个资源用到 · 占全部不透明像素 3.9%",
+    "  #301100 · 1/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #391404 · 10/19 个资源用到 · 占全部不透明像素 0.2%",
+    "  #321905 · 17/19 个资源用到 · 占全部不透明像素 12.2%",
+    "  #421600 · 7/19 个资源用到 · 占全部不透明像素 0.0%",
+    "  #523730 · 18/19 个资源用到 · 占全部不透明像素 20.8%",
+    "  #454a50 · 17/19 个资源用到 · 占全部不透明像素 12.1%",
+    "  #794c35 · 13/19 个资源用到 · 占全部不透明像素 0.5%",
+    "  #58554e · 17/19 个资源用到 · 占全部不透明像素 17.0%",
+    "  #685247 · 12/19 个资源用到 · 占全部不透明像素 1.7%",
+    "  #786151 · 15/19 个资源用到 · 占全部不透明像素 0.6%",
+    "  #676862 · 17/19 个资源用到 · 占全部不透明像素 8.6%",
+    "  #74716c · 16/19 个资源用到 · 占全部不透明像素 5.8%",
+    "  #8e7161 · 12/19 个资源用到 · 占全部不透明像素 0.4%",
+    "  #82847f · 13/19 个资源用到 · 占全部不透明像素 13.3%",
+    "  #a97f67 · 9/19 个资源用到 · 占全部不透明像素 0.4%",
+    "  #a0827a · 9/19 个资源用到 · 占全部不透明像素 0.2%",
+    "  #a3a09b · 11/19 个资源用到 · 占全部不透明像素 0.5%",
+    "  #c89f8b · 8/19 个资源用到 · 占全部不透明像素 0.1%",
+    "  #d2a087 · 4/19 个资源用到 · 占全部不透明像素 0.1%",
+    "色板外像素 41 个 · 占全部不透明像素 0.01% · 前几色 #714335(6) #724439(5) #3c0703(5) #633c32(4) #120202(4) #65372a(3) #8e6353(2) #805347(2)（**观察，不是判据** —— 对不上可以是设计）"
+  ],
+  "data": {
+    "packId": "ruin-scavenger-extraction-assets",
+    "version": 1,
+    "provenanceMode": "mixed",
+    "assets": [
+      {
+        "id": "scavenger-actor",
+        "kind": "animation",
+        "size": {
+          "w": 48,
+          "h": 64
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 16,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 8,
+            "fps": 12,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      {
+        "id": "wasteland-enemy",
+        "kind": "animation",
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 15,
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 6,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "charge",
+            "frames": 6,
+            "fps": 14,
+            "loop": true
+          },
+          {
+            "name": "halt",
+            "frames": 3,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      {
+        "id": "ceiling-lurker",
+        "kind": "animation",
+        "size": {
+          "w": 48,
+          "h": 56
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 13,
+        "animations": [
+          {
+            "name": "hang",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "lunge",
+            "frames": 5,
+            "fps": 14,
+            "loop": false
+          },
+          {
+            "name": "retreat",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      {
+        "id": "scrap-resource",
+        "kind": "animation",
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 4,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "clean-water",
+        "kind": "animation",
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 4,
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "hazard-terrain",
+        "kind": "sprite",
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "collapsed-floor",
+        "kind": "sprite",
+        "size": {
+          "w": 64,
+          "h": 32
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "extraction-point",
+        "kind": "animation",
+        "size": {
+          "w": 64,
+          "h": 96
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 9,
+        "animations": [
+          {
+            "name": "standby",
+            "frames": 3,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "active",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          }
+        ]
+      },
+      {
+        "id": "tile-floor",
+        "kind": "sprite",
+        "size": {
+          "w": 64,
+          "h": 64
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "metal-platform",
+        "kind": "sprite",
+        "size": {
+          "w": 96,
+          "h": 48
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "vent-duct",
+        "kind": "sprite",
+        "size": {
+          "w": 96,
+          "h": 40
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "concrete-step",
+        "kind": "sprite",
+        "size": {
+          "w": 64,
+          "h": 48
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "wooden-crate",
+        "kind": "sprite",
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "office-debris",
+        "kind": "sprite",
+        "size": {
+          "w": 96,
+          "h": 64
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "broken-wall",
+        "kind": "sprite",
+        "size": {
+          "w": 64,
+          "h": 96
+        },
+        "origin": "imported",
+        "paletteBinding": "quantized",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "ruined-city-backdrop",
+        "kind": "background",
+        "size": {
+          "w": 640,
+          "h": 360
+        },
+        "origin": "generated",
+        "paletteBinding": "quantized",
+        "frames": 3,
+        "animations": []
+      },
+      {
+        "id": "hud-panel",
+        "kind": "ui",
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "scrap-icon",
+        "kind": "ui",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "exact",
+        "frames": 1,
+        "animations": []
+      },
+      {
+        "id": "health-icon",
+        "kind": "ui",
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "origin": "generated",
+        "paletteBinding": "composited",
+        "frames": 1,
+        "animations": []
+      }
+    ],
+    "paletteUsage": {
+      "perAsset": [
+        {
+          "id": "scavenger-actor",
+          "usedColors": 18,
+          "opacityPixels": 21036,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.47703936109526524
+            },
+            {
+              "color": "#321905",
+              "share": 0.25213918996006845
+            },
+            {
+              "color": "#685247",
+              "share": 0.06883437915953604
+            }
+          ]
+        },
+        {
+          "id": "wasteland-enemy",
+          "usedColors": 15,
+          "opacityPixels": 19821,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.4782806114726805
+            },
+            {
+              "color": "#321905",
+              "share": 0.22249129710912668
+            },
+            {
+              "color": "#685247",
+              "share": 0.13531103375208112
+            }
+          ]
+        },
+        {
+          "id": "ceiling-lurker",
+          "usedColors": 16,
+          "opacityPixels": 11791,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.39860910864218474
+            },
+            {
+              "color": "#321905",
+              "share": 0.27826308201170386
+            },
+            {
+              "color": "#221205",
+              "share": 0.2685098804172674
+            }
+          ]
+        },
+        {
+          "id": "scrap-resource",
+          "usedColors": 18,
+          "opacityPixels": 1551,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.4229529335912315
+            },
+            {
+              "color": "#321905",
+              "share": 0.12508059316569956
+            },
+            {
+              "color": "#794c35",
+              "share": 0.08123791102514506
+            }
+          ]
+        },
+        {
+          "id": "clean-water",
+          "usedColors": 21,
+          "opacityPixels": 1802,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#a3a09b",
+              "share": 0.2663706992230855
+            },
+            {
+              "color": "#523730",
+              "share": 0.11986681465038845
+            },
+            {
+              "color": "#82847f",
+              "share": 0.09711431742508324
+            }
+          ]
+        },
+        {
+          "id": "hazard-terrain",
+          "usedColors": 12,
+          "opacityPixels": 891,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#221205",
+              "share": 0.14702581369248036
+            },
+            {
+              "color": "#523730",
+              "share": 0.13692480359147025
+            },
+            {
+              "color": "#74716c",
+              "share": 0.12457912457912458
+            }
+          ]
+        },
+        {
+          "id": "collapsed-floor",
+          "usedColors": 12,
+          "opacityPixels": 2048,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#676862",
+              "share": 0.29638671875
+            },
+            {
+              "color": "#58554e",
+              "share": 0.19091796875
+            },
+            {
+              "color": "#1a0d05",
+              "share": 0.15234375
+            }
+          ]
+        },
+        {
+          "id": "extraction-point",
+          "usedColors": 22,
+          "opacityPixels": 29670,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.39322548028311427
+            },
+            {
+              "color": "#321905",
+              "share": 0.11752612066059993
+            },
+            {
+              "color": "#58554e",
+              "share": 0.06895854398382205
+            }
+          ]
+        },
+        {
+          "id": "tile-floor",
+          "usedColors": 26,
+          "opacityPixels": 4096,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#58554e",
+              "share": 0.2568359375
+            },
+            {
+              "color": "#523730",
+              "share": 0.166748046875
+            },
+            {
+              "color": "#676862",
+              "share": 0.108642578125
+            }
+          ]
+        },
+        {
+          "id": "metal-platform",
+          "usedColors": 13,
+          "opacityPixels": 2821,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#676862",
+              "share": 0.17440623892236795
+            },
+            {
+              "color": "#1a0d05",
+              "share": 0.14427507975895074
+            },
+            {
+              "color": "#454a50",
+              "share": 0.1368309110244594
+            }
+          ]
+        },
+        {
+          "id": "vent-duct",
+          "usedColors": 13,
+          "opacityPixels": 3208,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#58554e",
+              "share": 0.17549875311720697
+            },
+            {
+              "color": "#454a50",
+              "share": 0.1502493765586035
+            },
+            {
+              "color": "#523730",
+              "share": 0.13933915211970074
+            }
+          ]
+        },
+        {
+          "id": "concrete-step",
+          "usedColors": 13,
+          "opacityPixels": 2298,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.304177545691906
+            },
+            {
+              "color": "#454a50",
+              "share": 0.2724107919930374
+            },
+            {
+              "color": "#82847f",
+              "share": 0.12402088772845953
+            }
+          ]
+        },
+        {
+          "id": "wooden-crate",
+          "usedColors": 18,
+          "opacityPixels": 1947,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.3872624550590652
+            },
+            {
+              "color": "#685247",
+              "share": 0.17103235747303544
+            },
+            {
+              "color": "#321905",
+              "share": 0.15254237288135594
+            }
+          ]
+        },
+        {
+          "id": "office-debris",
+          "usedColors": 13,
+          "opacityPixels": 2575,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#523730",
+              "share": 0.5623300970873787
+            },
+            {
+              "color": "#794c35",
+              "share": 0.1533980582524272
+            },
+            {
+              "color": "#321905",
+              "share": 0.09281553398058252
+            }
+          ]
+        },
+        {
+          "id": "broken-wall",
+          "usedColors": 20,
+          "opacityPixels": 6144,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#a3a09b",
+              "share": 0.3318684895833333
+            },
+            {
+              "color": "#82847f",
+              "share": 0.12548828125
+            },
+            {
+              "color": "#523730",
+              "share": 0.12093098958333333
+            }
+          ]
+        },
+        {
+          "id": "ruined-city-backdrop",
+          "usedColors": 22,
+          "opacityPixels": 603591,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#58554e",
+              "share": 0.19246476504785526
+            },
+            {
+              "color": "#523730",
+              "share": 0.17709839941284744
+            },
+            {
+              "color": "#82847f",
+              "share": 0.1533571574128839
+            }
+          ]
+        },
+        {
+          "id": "hud-panel",
+          "usedColors": 16,
+          "opacityPixels": 2304,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#676862",
+              "share": 0.1623263888888889
+            },
+            {
+              "color": "#454a50",
+              "share": 0.16145833333333334
+            },
+            {
+              "color": "#180000",
+              "share": 0.14583333333333334
+            }
+          ]
+        },
+        {
+          "id": "scrap-icon",
+          "usedColors": 14,
+          "opacityPixels": 139,
+          "offPalettePixels": 0,
+          "top": [
+            {
+              "color": "#000000",
+              "share": 0.5035971223021583
+            },
+            {
+              "color": "#210f03",
+              "share": 0.07194244604316546
+            },
+            {
+              "color": "#421600",
+              "share": 0.07194244604316546
+            }
+          ]
+        },
+        {
+          "id": "health-icon",
+          "usedColors": 8,
+          "opacityPixels": 256,
+          "offPalettePixels": 41,
+          "top": [
+            {
+              "color": "#000000",
+              "share": 0.34375
+            },
+            {
+              "color": "#290705",
+              "share": 0.19140625
+            },
+            {
+              "color": "#a97f67",
+              "share": 0.08984375
+            }
+          ]
+        }
+      ],
+      "perColor": [
+        {
+          "color": "#000000",
+          "assets": 8,
+          "share": 0.0007117507117507118
+        },
+        {
+          "color": "#080000",
+          "assets": 7,
+          "share": 0.0004526790241075955
+        },
+        {
+          "color": "#180000",
+          "assets": 1,
+          "share": 0.000468000468000468
+        },
+        {
+          "color": "#200000",
+          "assets": 1,
+          "share": 0.0000013928585357156785
+        },
+        {
+          "color": "#100700",
+          "assets": 9,
+          "share": 0.0018831447402875975
+        },
+        {
+          "color": "#290705",
+          "assets": 7,
+          "share": 0.0004986433557862129
+        },
+        {
+          "color": "#1a0d05",
+          "assets": 15,
+          "share": 0.013257227542941829
+        },
+        {
+          "color": "#380702",
+          "assets": 2,
+          "share": 0.000022285736571450857
+        },
+        {
+          "color": "#210f03",
+          "assets": 4,
+          "share": 0.00010585724871439157
+        },
+        {
+          "color": "#290d02",
+          "assets": 3,
+          "share": 0.0000069642926785783925
+        },
+        {
+          "color": "#420605",
+          "assets": 7,
+          "share": 0.0002214645071787929
+        },
+        {
+          "color": "#310c00",
+          "assets": 1,
+          "share": 0.0000069642926785783925
+        },
+        {
+          "color": "#221205",
+          "assets": 19,
+          "share": 0.03905853905853906
+        },
+        {
+          "color": "#301100",
+          "assets": 1,
+          "share": 0.00046382189239332097
+        },
+        {
+          "color": "#391404",
+          "assets": 10,
+          "share": 0.0022522522522522522
+        },
+        {
+          "color": "#321905",
+          "assets": 17,
+          "share": 0.12158819301676445
+        },
+        {
+          "color": "#421600",
+          "assets": 7,
+          "share": 0.00024932167789310644
+        },
+        {
+          "color": "#523730",
+          "assets": 18,
+          "share": 0.20757770757770758
+        },
+        {
+          "color": "#454a50",
+          "assets": 17,
+          "share": 0.121291514148657
+        },
+        {
+          "color": "#794c35",
+          "assets": 13,
+          "share": 0.004881969167683454
+        },
+        {
+          "color": "#58554e",
+          "assets": 17,
+          "share": 0.17013209870352727
+        },
+        {
+          "color": "#685247",
+          "assets": 12,
+          "share": 0.01656108798965942
+        },
+        {
+          "color": "#786151",
+          "assets": 15,
+          "share": 0.005925220210934497
+        },
+        {
+          "color": "#676862",
+          "assets": 17,
+          "share": 0.08586276443419301
+        },
+        {
+          "color": "#74716c",
+          "assets": 16,
+          "share": 0.05798748655891513
+        },
+        {
+          "color": "#8e7161",
+          "assets": 12,
+          "share": 0.0037105751391465678
+        },
+        {
+          "color": "#82847f",
+          "assets": 13,
+          "share": 0.13278120420977563
+        },
+        {
+          "color": "#a97f67",
+          "assets": 9,
+          "share": 0.0035253249538963823
+        },
+        {
+          "color": "#a0827a",
+          "assets": 9,
+          "share": 0.0015655729941444227
+        },
+        {
+          "color": "#a3a09b",
+          "assets": 11,
+          "share": 0.005266398123540981
+        },
+        {
+          "color": "#c89f8b",
+          "assets": 8,
+          "share": 0.0011463225748940035
+        },
+        {
+          "color": "#d2a087",
+          "assets": 4,
+          "share": 0.0005362505362505362
+        }
+      ],
+      "totalPixels": 717948,
+      "opaquePixels": 717989,
+      "offPalette": {
+        "pixels": 41,
+        "share": 0.000057103938918284266,
+        "colors": [
+          {
+            "color": "#714335",
+            "pixels": 6
+          },
+          {
+            "color": "#724439",
+            "pixels": 5
+          },
+          {
+            "color": "#3c0703",
+            "pixels": 5
+          },
+          {
+            "color": "#633c32",
+            "pixels": 4
+          },
+          {
+            "color": "#120202",
+            "pixels": 4
+          },
+          {
+            "color": "#65372a",
+            "pixels": 3
+          },
+          {
+            "color": "#8e6353",
+            "pixels": 2
+          },
+          {
+            "color": "#805347",
+            "pixels": 2
+          }
+        ]
+      }
+    },
+    "layerCoverage": [
+      {
+        "asset": "ruined-city-backdrop",
+        "frame": "ruined-city-backdrop.skyline",
+        "w": 640,
+        "h": 360,
+        "opaque": 230400,
+        "ratio": 1
+      },
+      {
+        "asset": "ruined-city-backdrop",
+        "frame": "ruined-city-backdrop.blocks",
+        "w": 640,
+        "h": 360,
+        "opaque": 204785,
+        "ratio": 0.8888237847222222
+      },
+      {
+        "asset": "ruined-city-backdrop",
+        "frame": "ruined-city-backdrop.street",
+        "w": 640,
+        "h": 360,
+        "opaque": 168406,
+        "ratio": 0.7309288194444444
+      }
+    ],
+    "sourceSizes": [
+      {
+        "id": "hazard-terrain",
+        "unit": "",
+        "source": {
+          "w": 1184,
+          "h": 864,
+          "ar": 1.3703703703703705
+        },
+        "target": {
+          "w": 64,
+          "h": 48,
+          "ar": 1.3333333333333333
+        },
+        "deltaAr": -2.7027027027027195
+      },
+      {
+        "id": "collapsed-floor",
+        "unit": "",
+        "source": {
+          "w": 64,
+          "h": 32,
+          "ar": 2
+        },
+        "target": {
+          "w": 64,
+          "h": 32,
+          "ar": 2
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "tile-floor",
+        "unit": "",
+        "source": {
+          "w": 64,
+          "h": 64,
+          "ar": 1
+        },
+        "target": {
+          "w": 64,
+          "h": 64,
+          "ar": 1
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "metal-platform",
+        "unit": "",
+        "source": {
+          "w": 96,
+          "h": 48,
+          "ar": 2
+        },
+        "target": {
+          "w": 96,
+          "h": 48,
+          "ar": 2
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "vent-duct",
+        "unit": "",
+        "source": {
+          "w": 96,
+          "h": 40,
+          "ar": 2.4
+        },
+        "target": {
+          "w": 96,
+          "h": 40,
+          "ar": 2.4
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "concrete-step",
+        "unit": "",
+        "source": {
+          "w": 64,
+          "h": 48,
+          "ar": 1.3333333333333333
+        },
+        "target": {
+          "w": 64,
+          "h": 48,
+          "ar": 1.3333333333333333
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "wooden-crate",
+        "unit": "",
+        "source": {
+          "w": 48,
+          "h": 48,
+          "ar": 1
+        },
+        "target": {
+          "w": 48,
+          "h": 48,
+          "ar": 1
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "office-debris",
+        "unit": "",
+        "source": {
+          "w": 1248,
+          "h": 832,
+          "ar": 1.5
+        },
+        "target": {
+          "w": 96,
+          "h": 64,
+          "ar": 1.5
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "broken-wall",
+        "unit": "",
+        "source": {
+          "w": 64,
+          "h": 96,
+          "ar": 0.6666666666666666
+        },
+        "target": {
+          "w": 64,
+          "h": 96,
+          "ar": 0.6666666666666666
+        },
+        "deltaAr": 0
+      },
+      {
+        "id": "ruined-city-backdrop",
+        "unit": "skyline",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 640,
+          "h": 360,
+          "ar": 1.7777777777777777
+        },
+        "deltaAr": 1.5873015873015817
+      },
+      {
+        "id": "ruined-city-backdrop",
+        "unit": "blocks",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 640,
+          "h": 360,
+          "ar": 1.7777777777777777
+        },
+        "deltaAr": 1.5873015873015817
+      },
+      {
+        "id": "ruined-city-backdrop",
+        "unit": "street",
+        "source": {
+          "w": 1344,
+          "h": 768,
+          "ar": 1.75
+        },
+        "target": {
+          "w": 640,
+          "h": 360,
+          "ar": 1.7777777777777777
+        },
+        "deltaAr": 1.5873015873015817
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "v1",
+      "kind": "asset-pack"
+    }
+  ]
+}

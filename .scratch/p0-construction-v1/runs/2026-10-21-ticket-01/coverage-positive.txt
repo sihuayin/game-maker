@@ -1,0 +1,4 @@
+10-17d（归档真跑，design+recipe 对齐） => null
+fixtures/e2e/wasteland-platformer => null
+fixtures/upstream/canned.json（canned design vs canned recipe） => null
+EXIT=0

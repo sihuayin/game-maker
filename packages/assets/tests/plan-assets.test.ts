@@ -15,6 +15,29 @@ import { CommandError, planAssets } from "../src/index.js";
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const RECIPE = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/recipes/shift-change.json"), "utf8"));
 
+/** ⚠️ 票 01 的**覆盖闸**：`DESIGN` 四桶里的每个 id 都必须有资产。这份配方夹具是另一个游戏的骨架，
+ *  所以给**测试用的响应**补上四件占位资源 —— 不改夹具文件，也不动任何被测的协议 / 提示词。 */
+const withCoverage = (recipe: unknown): Record<string, unknown> => {
+  const doc = structuredClone(recipe) as {
+    assets: { spec: { id?: string; characterId?: string; [k: string]: unknown }; [k: string]: unknown }[];
+    [k: string]: unknown;
+  };
+  const covered = new Set(
+    doc.assets.flatMap((a) => [a.spec.id, a.spec.characterId]).filter((x): x is string => typeof x === "string"),
+  );
+  for (const id of ["e-drone", "n-trader", "i-terminal", "r-part"]) {
+    if (covered.has(id)) continue;
+    doc.assets.push({
+      spec: {
+        kind: "sprite", id, role: `${id} 的可见形象`, description: `${id} 的占位资源。`,
+        styleId: "style-ref", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true,
+      },
+      source: { kind: "drawlist" },
+    });
+  }
+  return doc;
+};
+
 /** ⚠️ 四个桶**都非空** —— 不然那 12 个 ① 档路径里有几条压根不会出现在提示词里。 */
 const DESIGN: GameDesignSpec = {
   format: "game-design/v1",
@@ -55,7 +78,8 @@ const stage = () => {
 };
 
 /** 记下**发出去的那一发**，并回一个合法的工具调用。 */
-const capture = (input: unknown = RECIPE) => {
+const capture = (raw: unknown = RECIPE) => {
+  const input = withCoverage(raw);
   const seen: Record<string, any>[] = [];
   const f = (async (_url: string, init: RequestInit) => {
     seen.push(JSON.parse(String(init.body)));
@@ -312,6 +336,9 @@ describe("§票 03：planner 的母版兜底 —— 模型漏写也补上", () =
     expect(masters.map((m: any) => m.characterId).sort()).toEqual(["e-drone", "n-trader", "p-scavenger"]);
     expect(new Set(masters.map((m: any) => m.id)).size).toBe(3);
     for (const e of recipe.assets) {
+      // ⚠️ 覆盖闸补进来的那几件占位资源**没有 `characterId`**（道具 / 拾取物本来就不该有母版）——
+      //   本用例问的是「每个**角色**一张母版」，所以这里只走角色资产。
+      if (e.spec.characterId === undefined) continue;
       const m = masters.find((x: any) => x.id === e.spec.masterAsset);
       expect(m, `${e.spec.id} 必须指向一张母版`).toBeDefined();
       expect(m.characterId).toBe(e.spec.characterId);

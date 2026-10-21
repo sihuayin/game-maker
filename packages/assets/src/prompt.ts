@@ -802,7 +802,7 @@ export const PLAN_TOOL_NAME = "emit_asset_recipe";
 export const PLAN_TOOL_DESCRIPTION = `输出一份 AssetRecipe（asset-recipe/v1）—— **要造哪些资源**的完整清单。
 ⚠️ 清单说的是**要什么**，不是**怎么画**：没有颜色、没有像素、没有画面。
 
-七条线形状表达不出来的规矩：
+八条线形状表达不出来的规矩：
 
 1. **策略只有三个值**：\`drawlist\`（画出来的）· \`image\`（生成出来的）· \`import\`（人给的位图）。
    ⚠️ \`character-reference\` / \`image-edit\` / \`procedural\` **不是值**：
@@ -816,6 +816,10 @@ export const PLAN_TOOL_DESCRIPTION = `输出一份 AssetRecipe（asset-recipe/v1
 
 3. \`characterId\` —— **这个资产属于设计层里哪个实体**，取值**照抄设计层的 id**（不许自己起名）。
    只有**属于角色**的资产才写它；木条箱、地面砖、拾取物不写。
+   ⚠️ **覆盖是硬要求（规划期直接拒）**：设计层四桶（\`enemies[]\` / \`npcs[]\` / \`interactables[]\` /
+   \`resources[]\`）里的每个 id，都必须有一件资产的 \`spec.id\` **逐字等于它**，或
+   \`spec.characterId\` **逐字等于它**（角色照旧走 \`characterId\`，道具 / 拾取物走 \`id\`）。
+   **不改名、不省略、不做前缀** —— 漏一个 / 改一个字都会被拒，原样重采样。
 
 4. \`authoring[]\` 是**创作态母版**（\`{id, role, description, source, characterId, size}\`）：
    它**不进交付包**，是给同角色的资产当「参考图」用的。资产的 \`masterAsset\` 指它的 \`id\`。

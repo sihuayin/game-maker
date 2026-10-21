@@ -18,6 +18,7 @@ import {
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
   type AssetPackEntry, type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
+  type GameDesignSpec,
   type AssetSource, type LayerCoverage,
 } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
@@ -36,7 +37,7 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
 import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, layerDrawnSize, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
-export { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
+export { asCommandError, CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
 
@@ -238,6 +239,47 @@ function playerAnimationGate(spec: AssetRecipe, playerId: string): string | null
 }
 
 /**
+ * **设计 → 清单的覆盖闸**（CAP-SPEC-12）。
+ *
+ * 规则只有一条，两个键**都是精确相等** —— 人裁 2026-10-21（票 01）：严格全覆盖、无豁免。
+ *   四桶里的每个 id 都要求某件资产 `spec.id` **逐字**等于它，或 `spec.characterId` **逐字**等于它
+ *   （敌人 / NPC 通常走后者，道具 / 拾取物走前者；两种写法都算覆盖，改名与省略都不算）。
+ *
+ * ⚠️ 精确相等是**故意的**：前缀匹配（`chest-closed` 覆盖 `chest`）会把「改名」一起放过去，
+ *   而「模型可漏 / 改名而不被拒」正是这条 CAP 要抓的东西。缺一个 id 就报一个，名字一字不改地列出来。
+ * ⚠️ 它在**重采样循环里**（与玩家闸门同一档：`schema`）—— 模型看得到自己的清单，三发内可以补；
+ *   三发用完才 `invalid`（退出码 4）。这一层没有「模型说不需要」的豁免。
+ */
+export function designCoverageGate(recipe: AssetRecipe, design: GameDesignSpec): string | null {
+  const byId = new Set(recipe.assets.map((e) => e.spec.id));
+  const byCharacter = new Set(
+    recipe.assets.flatMap((e) => (e.spec.characterId === undefined ? [] : [e.spec.characterId])),
+  );
+  const missing: string[] = [];
+  const needAsset = (bucket: string, ids: readonly string[]) => {
+    for (const id of ids)
+      if (!byId.has(id) && !byCharacter.has(id))
+        missing.push(`${bucket} "${id}" —— 没有一件资产的 \`id\`（或 \`characterId\`）等于它`);
+  };
+  needAsset("enemies[]", design.enemies.map((e) => e.id));
+  needAsset("npcs[]", design.npcs.map((e) => e.id));
+  needAsset("interactables[]", design.interactables.map((e) => e.id));
+  needAsset("resources[]", design.resources.map((e) => e.id));
+  if (missing.length === 0) return null;
+  return "清单没有覆盖设计层的全部实体（资源不完整）：\n"
+    + missing.map((m) => `  · ${m}`).join("\n")
+    + "\n⚠️ 设计层列出的每个 id 都必须有一件资产**逐字**覆盖它（不改名、不省略）；"
+    + "这一层没有「不需要资源」的豁免。请补齐后重出这份清单。";
+}
+
+/** 空色板的**同一句判据**（CAP-SPEC-17）：风格规格与 VWS 两条入口共用这一处。 */
+export function emptyPaletteProblem(palette: readonly string[], what: string): string | null {
+  return palette.length === 0
+    ? `${what}不过业务判据：palette 至少要有一个色（空色板画不出任何颜色）`
+    : null;
+}
+
+/**
  * 规划一份资源清单。**两阶段的第一阶段**（票 28）—— 清单落盘，人过目，再 `pack`。
  *
  * ⚠️ 清单**绝不覆盖**：每次规划写一个新的 `v<N>`（与资源包同一条规矩）。
@@ -271,6 +313,11 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
 
   const design = d.data;
   const world = w.data;
+  // ⚠️ **空色板前移**（CAP-SPEC-17）：单独 `plan` 入口也必须在**下游任何付费调用之前**拒。
+  //   色板非空是业务判据（契约里 `palette` 带 `.default([])`，故意放行缺席）——
+  //   与 `readStyle` 共用 `emptyPaletteProblem`，一处措辞、一处口径。
+  const emptyPalette = emptyPaletteProblem(world.style.palette, "这个世界");
+  if (emptyPalette !== null) throw new CommandError("invalid", emptyPalette);
   const existingInputs = opts.existingAssets ?? [];
   const capabilities = plannerCapabilitiesOf({
     design,
@@ -326,6 +373,34 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
       lastError = `清单不过契约：${truth.errors.slice(0, 4).join("；")}`;
       continue;
     }
+    // ⚠️ **票 02（P0-06）：`frames` 候选不再被静默折叠成 `image`**（CAP-ASSET-01）。
+    //   旧行为：`candidate: entry.source.kind === "frames" ? "image" : …` ⇒ 模型写 `frames`、
+    //   落盘却是 `image`、sidecar 还记成 `candidate:"image"` —— 一次**静默降级**。
+    //   P0 的口径是**明确失败**（人裁 2026-10-21）：不接受模型自己挑这条候选，也不参数化保留它。
+    //   ⚠️ **不重采样**：这是「模型选了这条候选」，不是「形状写坏了」—— 三发盲重采样只会重复同一件事。
+    //   ⚠️ 账**照记这一发的花费**（`spent`）—— 钱是真花了，失败不改变这个事实。
+    //   ⚠️ **只管 `assets[]`**：`authoring[]` 的 `frames` 早就被契约自己拒了
+    //   （「母版是一张位图，不是动画」）—— 这里再写一遍是第二个事实源。
+    const framesEntry = truth.value.assets.find((e) => e.source.kind === "frames");
+    if (framesEntry !== undefined) {
+      call.trip({ spent: once.spent });
+      throw new CommandError(
+        "invalid",
+        `资源 "${framesEntry.spec.id}" 用了 \`source.kind:"frames"\` —— P0 不接受模型自己挑这条候选：`
+        + "规划期会把它改写成 `image`（一图 N 帧），那正是**静默降级**。"
+        + "请改用 `image`；确需逐帧模式（`frames`）请由人改清单，规划期不保留这条候选。",
+        ledgerCarrying(call.record()),
+      );
+    }
+    // ⚠️ **票 01：设计 → 清单的覆盖闸**（CAP-SPEC-12）—— 紧挨 `parseRecipe`：过得了契约、
+    //   但漏了 / 改了设计层某个实体，资源就不完整。与玩家闸门**同一档**（`schema`、重采样），
+    //   不新增错误通路、不动 `CALL_FAILURES` 那个闭集。
+    const coverageError = designCoverageGate(truth.value, design);
+    if (coverageError !== null) {
+      call.trip({ failure: "schema", spent: once.spent });
+      lastError = coverageError;
+      continue;
+    }
     // ⚠️ **票 61：玩家那件资源的闸门**（紧挨 `parseRecipe`，理由见那个函数的头）。
     //   与上一档**同一档**：过得了契约、但这份清单编不出能跑的配置 ⇒ 算**模型没生成好**、重采样。
     //   ⚠️ 三发用尽照旧走下面那条**现成的** `CommandError("invalid")`（退 4），
@@ -369,6 +444,8 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     const existing = existingAssets.find((a) => a.id === entry.spec.id);
     const decision = resolveRoute({
       spec: entry.spec, context: { design, visualWorld: world },
+      // ⚠️ `frames` 在**上面**就拒了（票 02 的明确失败）；这里的三值收窄只是类型需要，
+      //   不是一条还能走到的降级路 —— 别再让任何人从这里读回「frames 会被折成 image」。
       capabilities, existingAssets, candidate: entry.source.kind === "frames" ? "image" : entry.source.kind,
     });
     if (!decision.ok)
@@ -1500,8 +1577,8 @@ function readStyle(p: string): StyleSpec {
   //   不该由某一份清单的引用情况决定它是否合法）。
   //   ⚠️ **不写「不过 schema」**：这一条 schema 是**故意放行**的（R6 钉死 `.default([])`），
   //   照抄那句会让下一个读的人以为契约拒了它。出口仍与兄弟读法同款：`invalid` ⇒ 退出码 4。
-  if (s.data.palette.length === 0)
-    throw new CommandError("invalid", "风格规格不过业务判据：palette 至少要有一个色（空色板画不出任何颜色）");
+  const emptyPalette = emptyPaletteProblem(s.data.palette, "风格规格");
+  if (emptyPalette !== null) throw new CommandError("invalid", emptyPalette);
   return s.data;
 }
 

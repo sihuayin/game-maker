@@ -1,0 +1,6 @@
+
+> game-maker@0.0.0 check:deps /Volumes/shy/some-projects/game-maker
+> node scripts/check-deps.mjs
+
+✅ 依赖图合法（9 个包）
+EXIT=0

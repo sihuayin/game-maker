@@ -61,10 +61,10 @@ const DESIGN: GameDesignSpec = {
   game: { title: "拾荒者", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
   coreLoopSteps: ["探索废墟"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑"], goals: ["在天黑前抵达"] },
-  enemies: [{ id: "e-drone", behavior: "沿月台巡逻", threat: "接触即伤" }],
+  enemies: [],
   npcs: [], interactables: [], resources: [],
   world: { theme: "废土", setting: "废墟", structure: "三段式" },
-  levels: [{ id: "l-1", purpose: "教学", layout: "左到右", entities: ["e-drone"] }],
+  levels: [{ id: "l-1", purpose: "教学", layout: "左到右", entities: [] }],
   progression: { model: "linear", description: "三关" },
   mechanics: [{ id: "m-jump", mechanic: "jump" }],
   winConditions: ["抵达终点"], loseConditions: [], runtimeRequirements: ["input:keyboard"]
