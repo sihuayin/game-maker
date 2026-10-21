@@ -1,0 +1,7 @@
+{
+  "now": 15975,
+  "draws": 0,
+  "scene": {
+    "error": "TypeError: Cannot read properties of undefined (reading '0')"
+  }
+}

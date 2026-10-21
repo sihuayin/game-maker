@@ -1,0 +1,493 @@
+[
+  {
+    "t": 1792575710484,
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "%c %c %c %c %c Phaser v3.90.0 (Canvas | Web Audio) %c https://phaser.io/v390"
+        },
+        {
+          "type": "string",
+          "value": "background: #ff0000"
+        },
+        {
+          "type": "string",
+          "value": "background: #ffff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ffff"
+        },
+        {
+          "type": "string",
+          "value": "color: #ffffff; background: #000000"
+        },
+        {
+          "type": "string",
+          "value": "background: transparent"
+        }
+      ],
+      "executionContextId": 2,
+      "timestamp": 1792575652209.564,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "p",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 75518
+          },
+          {
+            "functionName": "boot",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 76687
+          },
+          {
+            "functionName": "p",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 2,
+            "columnNumber": 916
+          },
+          {
+            "functionName": "initialize",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 76480
+          },
+          {
+            "functionName": "J0",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 96,
+            "columnNumber": 17906
+          }
+        ]
+      }
+    }
+  },
+  {
+    "t": 1792575710484,
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "[shell] v2 · 视口 480×270 · 世界 640×270 · 4 张图集"
+        }
+      ],
+      "executionContextId": 2,
+      "timestamp": 1792575652265.718,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 95,
+            "columnNumber": 75195
+          },
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22897
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22286
+          },
+          {
+            "functionName": "T.50792.s.emit",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 2285
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107505
+          },
+          {
+            "functionName": "fileProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107205
+          },
+          {
+            "functionName": "onProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 99467
+          },
+          {
+            "functionName": "data.onload",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 20,
+            "columnNumber": 1526
+          }
+        ]
+      }
+    }
+  },
+  {
+    "t": 1792575710484,
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "warning",
+      "args": [
+        {
+          "type": "string",
+          "value": "[warning] hud.panel: 这个渲染器不支持九宫格（Phaser 的 nineslice 仅 WebGL）—— 面板退回普通拉伸"
+        }
+      ],
+      "executionContextId": 2,
+      "timestamp": 1792575652270.403,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "addHud",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 96,
+            "columnNumber": 2158
+          },
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 95,
+            "columnNumber": 75638
+          },
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22897
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22286
+          },
+          {
+            "functionName": "T.50792.s.emit",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 2285
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107505
+          },
+          {
+            "functionName": "fileProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107205
+          },
+          {
+            "functionName": "onProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 99467
+          },
+          {
+            "functionName": "data.onload",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 20,
+            "columnNumber": 1526
+          }
+        ]
+      }
+    }
+  },
+  {
+    "t": 1792575710485,
+    "method": "Log.entryAdded",
+    "params": {
+      "entry": {
+        "source": "network",
+        "level": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (File not found)",
+        "timestamp": 1792575652127.981,
+        "url": "http://127.0.0.1:8791/favicon.ico",
+        "networkRequestId": "77166.8"
+      }
+    }
+  },
+  {
+    "t": 1792575710544,
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "%c %c %c %c %c Phaser v3.90.0 (Canvas | Web Audio) %c https://phaser.io/v390"
+        },
+        {
+          "type": "string",
+          "value": "background: #ff0000"
+        },
+        {
+          "type": "string",
+          "value": "background: #ffff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ff00"
+        },
+        {
+          "type": "string",
+          "value": "background: #00ffff"
+        },
+        {
+          "type": "string",
+          "value": "color: #ffffff; background: #000000"
+        },
+        {
+          "type": "string",
+          "value": "background: transparent"
+        }
+      ],
+      "executionContextId": 3,
+      "timestamp": 1792575710544.163,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "p",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 75518
+          },
+          {
+            "functionName": "boot",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 76687
+          },
+          {
+            "functionName": "proto.boot",
+            "scriptId": "11",
+            "url": "",
+            "lineNumber": 13,
+            "columnNumber": 75
+          },
+          {
+            "functionName": "p",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 2,
+            "columnNumber": 916
+          },
+          {
+            "functionName": "initialize",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 76480
+          },
+          {
+            "functionName": "J0",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 96,
+            "columnNumber": 17906
+          }
+        ]
+      }
+    }
+  },
+  {
+    "t": 1792575710549,
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "log",
+      "args": [
+        {
+          "type": "string",
+          "value": "[shell] v2 · 视口 480×270 · 世界 640×270 · 4 张图集"
+        }
+      ],
+      "executionContextId": 3,
+      "timestamp": 1792575710549.096,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 95,
+            "columnNumber": 75195
+          },
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22897
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22286
+          },
+          {
+            "functionName": "T.50792.s.emit",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 2285
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107505
+          },
+          {
+            "functionName": "fileProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107205
+          },
+          {
+            "functionName": "onProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 99467
+          },
+          {
+            "functionName": "data.onload",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 20,
+            "columnNumber": 1526
+          }
+        ]
+      }
+    }
+  },
+  {
+    "t": 1792575710552,
+    "method": "Runtime.consoleAPICalled",
+    "params": {
+      "type": "warning",
+      "args": [
+        {
+          "type": "string",
+          "value": "[warning] hud.panel: 这个渲染器不支持九宫格（Phaser 的 nineslice 仅 WebGL）—— 面板退回普通拉伸"
+        }
+      ],
+      "executionContextId": 3,
+      "timestamp": 1792575710552.466,
+      "stackTrace": {
+        "callFrames": [
+          {
+            "functionName": "addHud",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 96,
+            "columnNumber": 2158
+          },
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 95,
+            "columnNumber": 75638
+          },
+          {
+            "functionName": "create",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22897
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 62,
+            "columnNumber": 22286
+          },
+          {
+            "functionName": "T.50792.s.emit",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 0,
+            "columnNumber": 2285
+          },
+          {
+            "functionName": "loadComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107505
+          },
+          {
+            "functionName": "fileProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 107205
+          },
+          {
+            "functionName": "onProcessComplete",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 17,
+            "columnNumber": 99467
+          },
+          {
+            "functionName": "data.onload",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:8791/site/v3/shell.js",
+            "lineNumber": 20,
+            "columnNumber": 1526
+          }
+        ]
+      }
+    }
+  }
+]

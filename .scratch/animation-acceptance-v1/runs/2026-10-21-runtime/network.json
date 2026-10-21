@@ -1,0 +1,134 @@
+[
+  {
+    "t": 1792575710491,
+    "url": "http://127.0.0.1:8791/site/v3/index.html",
+    "status": 200,
+    "mime": "text/html"
+  },
+  {
+    "t": 1792575710518,
+    "url": "http://127.0.0.1:8791/site/v3/shell.js",
+    "status": 200,
+    "mime": "text/javascript"
+  },
+  {
+    "t": 1792575710539,
+    "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABAQMAAADD8p2OAAAAA1BMVEX/AP804Oa6AAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg==",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710540,
+    "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABAQMAAADD8p2OAAAAA1BMVEX//wCKxvRFAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg==",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710540,
+    "url": "http://127.0.0.1:8791/site/v3/site.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710541,
+    "url": "http://127.0.0.1:8791/pack/v7/manifest.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710541,
+    "url": "http://127.0.0.1:8791/site/v3/game-config.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710544,
+    "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgAQMAAABJtOi3AAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAABVJREFUeF7NwIEAAAAAgKD9qdeocAMAoAABm3DkcAAAAABJRU5ErkJggg==",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710545,
+    "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJ9JREFUeNq01ssOwyAMRFG46v//Mt1ESmgh+DFmE2GPOBARKb2NVjo+17PXLD8a1+pl5+A+wSgFygymWYHBb0FtsKhJDdZlncG2IzJ4ayoMDv20wTmSMzClEgbWYNTAkQ0Z+OJ+A/eWnAaR9+oxCF4Os0H8htsMUp+pwcgBBiMNnAwF8GqIgL2hAzaGFFgZauDPKABmowZ4GL369/0rwACp2yA/ttmvsQAAAABJRU5ErkJggg==",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710545,
+    "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABdJREFUeNpi/P//PwMMMDEgAdwcgAADAJZuAwXJYZOzAAAAAElFTkSuQmCC",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710547,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.backgrounds.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710547,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.sprites.png",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710547,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.animations.png",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710547,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.animations.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710548,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.backgrounds.png",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710548,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.sprites.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710548,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.ui.png",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710548,
+    "url": "http://127.0.0.1:8791/pack/v7/delivery/atlas.ui.json",
+    "status": 200,
+    "mime": "application/json"
+  },
+  {
+    "t": 1792575710549,
+    "url": "blob:http://127.0.0.1:8791/96871e4c-9348-41af-b6c6-e5c7a443cf8e",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710549,
+    "url": "blob:http://127.0.0.1:8791/58cca669-3288-4898-b663-9ea4c4195929",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710549,
+    "url": "blob:http://127.0.0.1:8791/70a9aedc-71fc-4b5e-9b89-4d1d15f12dab",
+    "status": 200,
+    "mime": "image/png"
+  },
+  {
+    "t": 1792575710549,
+    "url": "blob:http://127.0.0.1:8791/b91cc79b-9a14-4f76-ab8e-da40c0a2f39c",
+    "status": 200,
+    "mime": "image/png"
+  }
+]

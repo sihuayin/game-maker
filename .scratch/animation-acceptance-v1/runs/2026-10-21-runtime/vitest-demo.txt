@@ -1,0 +1,11 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/demo/tests/shell-scene-wiring.test.ts (2 tests) 1ms
+ ✓ packages/demo/tests/world.test.ts (23 tests) 24ms
+
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
+   Start at  17:43:34
+   Duration  3.88s (transform 574ms, setup 0ms, collect 1.27s, tests 25ms, environment 0ms, prepare 66ms)
+

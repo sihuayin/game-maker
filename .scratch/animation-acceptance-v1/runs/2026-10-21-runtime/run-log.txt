@@ -1,0 +1,43 @@
+# 票 06 运行时取证 · 命令与结果（2026-10-21，基线 f0dac01）
+
+# 0) 现有站点：不重装、不写 out/
+SITE_ROOT=.scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets
+site/v3/site.json => {"shell":"2","pack":"v7","config":"game-config.json"}
+sha256(site/v3/shell.js) = 620adfa518770facfd8d45216b2eb475fb70ad76f8de26285021ab43456a6860
+sha256(packages/demo/dist/shell.js) = 620adfa518770facfd8d45216b2eb475fb70ad76f8de26285021ab43456a6860  # 逐字节相同
+
+# 1) 静态服务器：HTTP 根 = pack/ 与 site/ 的父目录
+python3 -m http.server 8791 --bind 127.0.0.1 --directory "$SITE_ROOT"
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8791/site/v3/index.html
+=> 200   (exit 0)
+
+# 2) headless Chrome + CDP
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+  --remote-debugging-port=9333 --user-data-dir=/tmp/anim-runtime-chrome \
+  --no-first-run --no-default-browser-check --disable-gpu \
+  --disable-background-timer-throttling --disable-renderer-backgrounding \
+  --window-size=1000,700 --hide-scrollbars about:blank
+=> Chrome/155.0.8059.85 ; /json/version 可读 (exit 0)
+
+# 3) 驱动脚本
+node drive-runtime.mjs http://127.0.0.1:8791/site/v3/index.html .
+=> exit 0 ; 截图 01..05 ; console-events.json / network.json / draw-trace.json(空, hook 过滤条件不对)
+node drive-anim.mjs http://127.0.0.1:8791/site/v3/index.html .
+=> exit 0 ; 捕获 Phaser.Game；截图 10..15 ; samples-idle.json(124 采样) ; draw-trace.json(4501 次 drawImage)
+node drive-input.mjs .
+=> exit 0 ; samples-run.json(66 采样) ; samples-jump.json(90 采样) ; 截图 20..24
+
+# 4) 现有测试（允许：pnpm test 档；只读）
+pnpm exec vitest run packages/demo/tests/world.test.ts packages/demo/tests/shell-scene-wiring.test.ts
+=> exit 0 ; 2 files / 25 tests passed （只断言帧名数量与源码见证，无 fps/loop 运行时断言）
+
+# 5) 非破坏性检查
+find "$SITE_ROOT" -type f -newermt "2026-10-21 00:00:00"
+=> 空输出
+stat: site/v3/* 与 pack/v7/manifest.json 的 mtime 均为 2026-10-20 14:53:15（本轮未改）
+
+# 6) 进程清理
+kill http-server.pid ; kill chrome.pid ; pkill -f user-data-dir=/tmp/anim-runtime-chrome
+lsof -nP -iTCP:8791 -sTCP:LISTEN => 空（8791 closed）
+lsof -nP -iTCP:9333 -sTCP:LISTEN => 空（9333 closed）
+pgrep -fl "anim-runtime-chrome|http.server 8791" => 无

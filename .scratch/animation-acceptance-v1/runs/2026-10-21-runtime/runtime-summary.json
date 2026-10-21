@@ -1,0 +1,160 @@
+{
+  "player-idle": {
+    "manifest_fps": 6,
+    "manifest_loop": true,
+    "runtime_fps": 6,
+    "runtime_repeat": -1,
+    "measured_ms_median": 168.2,
+    "frames": [
+      "scavenger-actor.idle1",
+      "scavenger-actor.idle2",
+      "scavenger-actor.idle3",
+      "scavenger-actor.idle4"
+    ]
+  },
+  "lurker-hang#play": {
+    "manifest_fps": 6,
+    "manifest_loop": true,
+    "runtime_fps": 8,
+    "runtime_repeat": -1,
+    "measured_ms_median": 126.7,
+    "transitions": 22,
+    "frames": [
+      "ceiling-lurker.hang1",
+      "ceiling-lurker.hang2",
+      "ceiling-lurker.hang3",
+      "ceiling-lurker.hang4"
+    ]
+  },
+  "lurker-lunge#play": {
+    "manifest_fps": 14,
+    "manifest_loop": false,
+    "runtime_fps": 8,
+    "runtime_repeat": -1,
+    "measured_ms_median": 126.7,
+    "transitions": 22,
+    "frames": [
+      "ceiling-lurker.lunge1",
+      "ceiling-lurker.lunge2",
+      "ceiling-lurker.lunge3",
+      "ceiling-lurker.lunge4",
+      "ceiling-lurker.lunge5"
+    ]
+  },
+  "extraction#play": {
+    "manifest_fps": 10,
+    "manifest_loop": true,
+    "runtime_fps": 8,
+    "runtime_repeat": -1,
+    "measured_ms_median": 126.7,
+    "transitions": 22,
+    "frames": [
+      "extraction-point.active1",
+      "extraction-point.active2",
+      "extraction-point.active3",
+      "extraction-point.active4",
+      "extraction-point.active5",
+      "extraction-point.active6"
+    ]
+  },
+  "scrap-1#play": {
+    "manifest_fps": 6,
+    "manifest_loop": true,
+    "runtime_fps": 8,
+    "runtime_repeat": -1,
+    "measured_ms_median": 126.7,
+    "transitions": 22,
+    "frames": [
+      "scrap-resource.idle1",
+      "scrap-resource.idle2",
+      "scrap-resource.idle3",
+      "scrap-resource.idle4"
+    ]
+  },
+  "player-run": {
+    "manifest_fps": 12,
+    "manifest_loop": true,
+    "runtime_fps": 10,
+    "runtime_repeat": -1,
+    "measured_ms_median": 101.7,
+    "frames": [
+      "scavenger-actor.idle2",
+      "scavenger-actor.run1",
+      "scavenger-actor.run2",
+      "scavenger-actor.run3",
+      "scavenger-actor.run4",
+      "scavenger-actor.run5",
+      "scavenger-actor.run6",
+      "scavenger-actor.run7",
+      "scavenger-actor.run8"
+    ]
+  },
+  "player-jump": {
+    "manifest_fps": 10,
+    "manifest_loop": false,
+    "runtime_fps": 6,
+    "runtime_repeat": -1,
+    "measured_ms_median": 167.5,
+    "transitions": [
+      [
+        0,
+        1,
+        "scavenger-actor.idle1"
+      ],
+      [
+        34.1,
+        1,
+        "scavenger-actor.jump1"
+      ],
+      [
+        192.6,
+        2,
+        "scavenger-actor.jump2"
+      ],
+      [
+        375.7,
+        3,
+        "scavenger-actor.jump3"
+      ],
+      [
+        543.2,
+        4,
+        "scavenger-actor.jump4"
+      ],
+      [
+        710.9,
+        1,
+        "scavenger-actor.jump1"
+      ],
+      [
+        743.2,
+        1,
+        "scavenger-actor.idle1"
+      ],
+      [
+        909.2,
+        2,
+        "scavenger-actor.idle2"
+      ],
+      [
+        1094.9,
+        3,
+        "scavenger-actor.idle3"
+      ],
+      [
+        1262.4,
+        4,
+        "scavenger-actor.idle4"
+      ],
+      [
+        1430.2,
+        1,
+        "scavenger-actor.idle1"
+      ]
+    ]
+  },
+  "evidence": {
+    "site_shell_sha256": "620adfa518770facfd8d45216b2eb475fb70ad76f8de26285021ab43456a6860",
+    "dist_shell_sha256": "620adfa518770facfd8d45216b2eb475fb70ad76f8de26285021ab43456a6860"
+  }
+}
