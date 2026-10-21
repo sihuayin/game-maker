@@ -1,0 +1,1008 @@
+{
+  "ok": true,
+  "mode": "live",
+  "model": "gemini-3-pro-image",
+  "sends": 10,
+  "maxSends": 20,
+  "characters": [
+    {
+      "key": "scavenger",
+      "label": "scavenger-actor",
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "fps": 6,
+      "frames": [
+        {
+          "name": "scavenger-actor.idle1",
+          "w": 896,
+          "h": 1200,
+          "ms": 27784,
+          "attempts": 1,
+          "bbox": {
+            "x": 114,
+            "y": 66,
+            "w": 527,
+            "h": 1096
+          },
+          "key": [
+            231,
+            40,
+            181
+          ],
+          "trimmedTo": {
+            "w": 461,
+            "h": 1090
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 21,
+            "w": 455,
+            "h": 1122
+          },
+          "baselineKey": [
+            210,
+            60,
+            155
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 240,
+            "boundaryDarkPct": 85.8
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 238,
+            "boundaryDarkPct": 87.4
+          }
+        },
+        {
+          "name": "scavenger-actor.idle2",
+          "w": 896,
+          "h": 1200,
+          "ms": 28406,
+          "attempts": 1,
+          "bbox": {
+            "x": 150,
+            "y": 66,
+            "w": 464,
+            "h": 1094
+          },
+          "key": [
+            215,
+            54,
+            159
+          ],
+          "trimmedTo": {
+            "w": 461,
+            "h": 1090
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 18,
+            "w": 454,
+            "h": 1126
+          },
+          "baselineKey": [
+            211,
+            61,
+            155
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 240,
+            "boundaryDarkPct": 90.4
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 240,
+            "boundaryDarkPct": 89.6
+          }
+        },
+        {
+          "name": "scavenger-actor.idle3",
+          "w": 896,
+          "h": 1200,
+          "ms": 30069,
+          "attempts": 1,
+          "bbox": {
+            "x": 150,
+            "y": 86,
+            "w": 504,
+            "h": 1074
+          },
+          "key": [
+            214,
+            56,
+            157
+          ],
+          "trimmedTo": {
+            "w": 501,
+            "h": 1070
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 16,
+            "w": 455,
+            "h": 1127
+          },
+          "baselineKey": [
+            211,
+            60,
+            155
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 229,
+            "boundaryDarkPct": 90
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 240,
+            "boundaryDarkPct": 87.9
+          }
+        },
+        {
+          "name": "scavenger-actor.idle4",
+          "w": 896,
+          "h": 1200,
+          "ms": 27873,
+          "attempts": 1,
+          "bbox": {
+            "x": 150,
+            "y": 66,
+            "w": 464,
+            "h": 1094
+          },
+          "key": [
+            212,
+            51,
+            156
+          ],
+          "trimmedTo": {
+            "w": 461,
+            "h": 1091
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 18,
+            "w": 455,
+            "h": 1125
+          },
+          "baselineKey": [
+            211,
+            61,
+            156
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 241,
+            "boundaryDarkPct": 82.6
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 239,
+            "boundaryDarkPct": 87.4
+          }
+        }
+      ],
+      "metrics": {
+        "pairs": [
+          {
+            "pair": "idle1~idle2",
+            "alpha": {
+              "alphaDiff": 2,
+              "alphaPct": 0.1,
+              "rgbChanged": 444,
+              "rgbPct": 14.5,
+              "meanL1": 9.83
+            },
+            "widthDiffPct": 13.6,
+            "posDriftPct": 4,
+            "keyL1": 52,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 11,
+                "alphaPct": 0.4,
+                "rgbChanged": 150,
+                "rgbPct": 4.9,
+                "meanL1": 2.53
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "idle1~idle3",
+            "alpha": {
+              "alphaDiff": 297,
+              "alphaPct": 9.7,
+              "rgbChanged": 911,
+              "rgbPct": 29.7,
+              "meanL1": 28.55
+            },
+            "widthDiffPct": 4.6,
+            "posDriftPct": 4,
+            "keyL1": 57,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 11,
+                "alphaPct": 0.4,
+                "rgbChanged": 149,
+                "rgbPct": 4.9,
+                "meanL1": 2.32
+              },
+              "widthDiffPct": 0,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "idle1~idle4",
+            "alpha": {
+              "alphaDiff": 30,
+              "alphaPct": 1,
+              "rgbChanged": 413,
+              "rgbPct": 13.4,
+              "meanL1": 7.68
+            },
+            "widthDiffPct": 13.6,
+            "posDriftPct": 4,
+            "keyL1": 55,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 8,
+                "alphaPct": 0.3,
+                "rgbChanged": 163,
+                "rgbPct": 5.3,
+                "meanL1": 2.6
+              },
+              "widthDiffPct": 0,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "idle2~idle3",
+            "alpha": {
+              "alphaDiff": 297,
+              "alphaPct": 9.7,
+              "rgbChanged": 878,
+              "rgbPct": 28.6,
+              "meanL1": 26.16
+            },
+            "widthDiffPct": 8.6,
+            "posDriftPct": 1.7,
+            "keyL1": 5,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 6,
+                "alphaPct": 0.2,
+                "rgbChanged": 165,
+                "rgbPct": 5.4,
+                "meanL1": 2.76
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "idle2~idle4",
+            "alpha": {
+              "alphaDiff": 30,
+              "alphaPct": 1,
+              "rgbChanged": 549,
+              "rgbPct": 17.9,
+              "meanL1": 13.67
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 9,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 11,
+                "alphaPct": 0.4,
+                "rgbChanged": 211,
+                "rgbPct": 6.9,
+                "meanL1": 3.5
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "idle3~idle4",
+            "alpha": {
+              "alphaDiff": 319,
+              "alphaPct": 10.4,
+              "rgbChanged": 904,
+              "rgbPct": 29.4,
+              "meanL1": 29.16
+            },
+            "widthDiffPct": 8.6,
+            "posDriftPct": 1.7,
+            "keyL1": 8,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 9,
+                "alphaPct": 0.3,
+                "rgbChanged": 148,
+                "rgbPct": 4.8,
+                "meanL1": 2.27
+              },
+              "widthDiffPct": 0,
+              "keyL1": 2
+            }
+          }
+        ],
+        "maxAlphaPct": 10.4,
+        "maxWidthDiffPct": 13.6,
+        "maxPosDriftPct": 4,
+        "maxKeyL1": 57,
+        "minPalette": 21,
+        "maxOffPalette": 0,
+        "minBoundaryDarkPct": 82.6
+      },
+      "tiers": {
+        "alpha": "red",
+        "width": "red",
+        "position": "red",
+        "key": "red",
+        "palette": "green",
+        "offPalette": "green",
+        "boundary": "green"
+      },
+      "mechanicalVerdict": "red"
+    },
+    {
+      "key": "enemy",
+      "label": "wasteland-enemy",
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "fps": 8,
+      "frames": [
+        {
+          "name": "wasteland-enemy.patrol1",
+          "w": 1024,
+          "h": 1024,
+          "ms": 24919,
+          "attempts": 1,
+          "bbox": {
+            "x": 152,
+            "y": 10,
+            "w": 730,
+            "h": 1014
+          },
+          "key": [
+            166,
+            178,
+            166
+          ],
+          "trimmedTo": {
+            "w": 730,
+            "h": 1014
+          },
+          "baselineBbox": {
+            "x": 175,
+            "y": 122,
+            "w": 573,
+            "h": 877
+          },
+          "baselineKey": [
+            192,
+            38,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 250,
+            "boundaryDarkPct": 94.8
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 232,
+            "boundaryDarkPct": 88.8
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol2",
+          "w": 1024,
+          "h": 1024,
+          "ms": 25889,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            191,
+            32,
+            113
+          ],
+          "trimmedTo": {
+            "w": 573,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 197,
+            "y": 13,
+            "w": 570,
+            "h": 986
+          },
+          "baselineKey": [
+            192,
+            37,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 233,
+            "boundaryDarkPct": 90.6
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 233,
+            "boundaryDarkPct": 91.8
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol3",
+          "w": 1024,
+          "h": 1024,
+          "ms": 46976,
+          "attempts": 1,
+          "bbox": {
+            "x": 100,
+            "y": 2,
+            "w": 778,
+            "h": 1022
+          },
+          "key": [
+            253,
+            0,
+            253
+          ],
+          "trimmedTo": {
+            "w": 774,
+            "h": 1020
+          },
+          "baselineBbox": {
+            "x": 172,
+            "y": 22,
+            "w": 573,
+            "h": 976
+          },
+          "baselineKey": [
+            193,
+            37,
+            116
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 252,
+            "boundaryDarkPct": 100
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 233,
+            "boundaryDarkPct": 87.6
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol4",
+          "w": 1024,
+          "h": 1024,
+          "ms": 27917,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            191,
+            32,
+            113
+          ],
+          "trimmedTo": {
+            "w": 573,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 180,
+            "y": 13,
+            "w": 572,
+            "h": 986
+          },
+          "baselineKey": [
+            193,
+            37,
+            116
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 228,
+            "boundaryDarkPct": 90.8
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 231,
+            "boundaryDarkPct": 90.9
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol5",
+          "w": 1024,
+          "h": 1024,
+          "ms": 33695,
+          "attempts": 1,
+          "bbox": {
+            "x": 174,
+            "y": 150,
+            "w": 652,
+            "h": 844
+          },
+          "key": [
+            252,
+            0,
+            251
+          ],
+          "trimmedTo": {
+            "w": 648,
+            "h": 840
+          },
+          "baselineBbox": {
+            "x": 173,
+            "y": 29,
+            "w": 574,
+            "h": 969
+          },
+          "baselineKey": [
+            193,
+            37,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 247,
+            "boundaryDarkPct": 92.3
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 233,
+            "boundaryDarkPct": 88.8
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol6",
+          "w": 1024,
+          "h": 1024,
+          "ms": 25941,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            194,
+            30,
+            113
+          ],
+          "trimmedTo": {
+            "w": 573,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 184,
+            "y": 20,
+            "w": 569,
+            "h": 979
+          },
+          "baselineKey": [
+            192,
+            36,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 231,
+            "boundaryDarkPct": 90.9
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 228,
+            "boundaryDarkPct": 89.5
+          }
+        }
+      ],
+      "metrics": {
+        "pairs": [
+          {
+            "pair": "patrol1~patrol2",
+            "alpha": {
+              "alphaDiff": 593,
+              "alphaPct": 25.7,
+              "rgbChanged": 851,
+              "rgbPct": 36.9,
+              "meanL1": 40.18
+            },
+            "widthDiffPct": 27.2,
+            "posDriftPct": 10.9,
+            "keyL1": 224,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 22,
+                "alphaPct": 1,
+                "rgbChanged": 226,
+                "rgbPct": 9.8,
+                "meanL1": 5.24
+              },
+              "widthDiffPct": 0.5,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "patrol1~patrol3",
+            "alpha": {
+              "alphaDiff": 414,
+              "alphaPct": 18,
+              "rgbChanged": 832,
+              "rgbPct": 36.1,
+              "meanL1": 38.32
+            },
+            "widthDiffPct": 6.6,
+            "posDriftPct": 5.1,
+            "keyL1": 352,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 14,
+                "alphaPct": 0.6,
+                "rgbChanged": 182,
+                "rgbPct": 7.9,
+                "meanL1": 4.23
+              },
+              "widthDiffPct": 0,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "patrol1~patrol4",
+            "alpha": {
+              "alphaDiff": 566,
+              "alphaPct": 24.6,
+              "rgbChanged": 873,
+              "rgbPct": 37.9,
+              "meanL1": 41.39
+            },
+            "widthDiffPct": 27.2,
+            "posDriftPct": 10.9,
+            "keyL1": 224,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 13,
+                "alphaPct": 0.6,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.31
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "patrol1~patrol5",
+            "alpha": {
+              "alphaDiff": 471,
+              "alphaPct": 20.4,
+              "rgbChanged": 678,
+              "rgbPct": 29.4,
+              "meanL1": 29.47
+            },
+            "widthDiffPct": 12,
+            "posDriftPct": 13.7,
+            "keyL1": 349,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 6,
+                "alphaPct": 0.3,
+                "rgbChanged": 149,
+                "rgbPct": 6.5,
+                "meanL1": 3.21
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "patrol1~patrol6",
+            "alpha": {
+              "alphaDiff": 594,
+              "alphaPct": 25.8,
+              "rgbChanged": 850,
+              "rgbPct": 36.9,
+              "meanL1": 40.08
+            },
+            "widthDiffPct": 27.2,
+            "posDriftPct": 10.9,
+            "keyL1": 229,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 25,
+                "alphaPct": 1.1,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.69
+              },
+              "widthDiffPct": 0.7,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "patrol2~patrol3",
+            "alpha": {
+              "alphaDiff": 657,
+              "alphaPct": 28.5,
+              "rgbChanged": 778,
+              "rgbPct": 33.8,
+              "meanL1": 36.3
+            },
+            "widthDiffPct": 35.5,
+            "posDriftPct": 11.7,
+            "keyL1": 234,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 16,
+                "alphaPct": 0.7,
+                "rgbChanged": 235,
+                "rgbPct": 10.2,
+                "meanL1": 6.3
+              },
+              "widthDiffPct": 0.5,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "patrol2~patrol4",
+            "alpha": {
+              "alphaDiff": 27,
+              "alphaPct": 1.2,
+              "rgbChanged": 128,
+              "rgbPct": 5.6,
+              "meanL1": 3.35
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 0,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 19,
+                "alphaPct": 0.8,
+                "rgbChanged": 138,
+                "rgbPct": 6,
+                "meanL1": 3.08
+              },
+              "widthDiffPct": 0.4,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "patrol2~patrol5",
+            "alpha": {
+              "alphaDiff": 772,
+              "alphaPct": 33.5,
+              "rgbChanged": 651,
+              "rgbPct": 28.3,
+              "meanL1": 30.89
+            },
+            "widthDiffPct": 13.6,
+            "posDriftPct": 2.7,
+            "keyL1": 231,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 18,
+                "alphaPct": 0.8,
+                "rgbChanged": 202,
+                "rgbPct": 8.8,
+                "meanL1": 4.78
+              },
+              "widthDiffPct": 0.7,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "patrol2~patrol6",
+            "alpha": {
+              "alphaDiff": 15,
+              "alphaPct": 0.7,
+              "rgbChanged": 123,
+              "rgbPct": 5.3,
+              "meanL1": 3.21
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 5,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 13,
+                "alphaPct": 0.6,
+                "rgbChanged": 186,
+                "rgbPct": 8.1,
+                "meanL1": 4.24
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "patrol3~patrol4",
+            "alpha": {
+              "alphaDiff": 632,
+              "alphaPct": 27.4,
+              "rgbChanged": 790,
+              "rgbPct": 34.3,
+              "meanL1": 36.53
+            },
+            "widthDiffPct": 35.5,
+            "posDriftPct": 11.7,
+            "keyL1": 234,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 5,
+                "alphaPct": 0.2,
+                "rgbChanged": 202,
+                "rgbPct": 8.8,
+                "meanL1": 5.17
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 0
+            }
+          },
+          {
+            "pair": "patrol3~patrol5",
+            "alpha": {
+              "alphaDiff": 429,
+              "alphaPct": 18.6,
+              "rgbChanged": 716,
+              "rgbPct": 31.1,
+              "meanL1": 34.24
+            },
+            "widthDiffPct": 19.3,
+            "posDriftPct": 14.5,
+            "keyL1": 3,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 8,
+                "alphaPct": 0.3,
+                "rgbChanged": 150,
+                "rgbPct": 6.5,
+                "meanL1": 3.58
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "patrol3~patrol6",
+            "alpha": {
+              "alphaDiff": 660,
+              "alphaPct": 28.6,
+              "rgbChanged": 777,
+              "rgbPct": 33.7,
+              "meanL1": 36.49
+            },
+            "widthDiffPct": 35.5,
+            "posDriftPct": 11.7,
+            "keyL1": 229,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 19,
+                "alphaPct": 0.8,
+                "rgbChanged": 202,
+                "rgbPct": 8.8,
+                "meanL1": 5.3
+              },
+              "widthDiffPct": 0.7,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "patrol4~patrol5",
+            "alpha": {
+              "alphaDiff": 745,
+              "alphaPct": 32.3,
+              "rgbChanged": 663,
+              "rgbPct": 28.8,
+              "meanL1": 31.53
+            },
+            "widthDiffPct": 13.6,
+            "posDriftPct": 2.7,
+            "keyL1": 231,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 9,
+                "alphaPct": 0.4,
+                "rgbChanged": 168,
+                "rgbPct": 7.3,
+                "meanL1": 3.71
+              },
+              "widthDiffPct": 0.3,
+              "keyL1": 1
+            }
+          },
+          {
+            "pair": "patrol4~patrol6",
+            "alpha": {
+              "alphaDiff": 30,
+              "alphaPct": 1.3,
+              "rgbChanged": 136,
+              "rgbPct": 5.9,
+              "meanL1": 3.29
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 5,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 22,
+                "alphaPct": 1,
+                "rgbChanged": 187,
+                "rgbPct": 8.1,
+                "meanL1": 4.59
+              },
+              "widthDiffPct": 0.5,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "patrol5~patrol6",
+            "alpha": {
+              "alphaDiff": 775,
+              "alphaPct": 33.6,
+              "rgbChanged": 659,
+              "rgbPct": 28.6,
+              "meanL1": 30.94
+            },
+            "widthDiffPct": 13.6,
+            "posDriftPct": 2.7,
+            "keyL1": 226,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 19,
+                "alphaPct": 0.8,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.76
+              },
+              "widthDiffPct": 0.9,
+              "keyL1": 2
+            }
+          }
+        ],
+        "maxAlphaPct": 33.6,
+        "maxWidthDiffPct": 35.5,
+        "maxPosDriftPct": 14.5,
+        "maxKeyL1": 352,
+        "minPalette": 16,
+        "maxOffPalette": 0,
+        "minBoundaryDarkPct": 90.6
+      },
+      "tiers": {
+        "alpha": "red",
+        "width": "red",
+        "position": "red",
+        "key": "red",
+        "palette": "green",
+        "offPalette": "green",
+        "boundary": "green"
+      },
+      "mechanicalVerdict": "red"
+    }
+  ],
+  "humanVerdict": "pending"
+}

@@ -1,0 +1,218 @@
+{
+  "ok": true,
+  "mode": "dry",
+  "candidates": [
+    {
+      "key": "gemini3pro",
+      "label": "A · Gemini 3 Pro",
+      "sends": 2,
+      "metrics": {
+        "frames": [
+          {
+            "name": "scavenger-actor.idle1",
+            "w": 8,
+            "h": 8,
+            "ms": 805,
+            "attempts": 1,
+            "bbox": {
+              "x": 2,
+              "y": 2,
+              "w": 4,
+              "h": 4
+            },
+            "key": [
+              255,
+              255,
+              255
+            ],
+            "trimmedTo": {
+              "w": 4,
+              "h": 4
+            },
+            "baselineBbox": {
+              "x": 141,
+              "y": 21,
+              "w": 455,
+              "h": 1122
+            },
+            "baselineKey": [
+              210,
+              60,
+              155
+            ]
+          },
+          {
+            "name": "scavenger-actor.idle2",
+            "w": 8,
+            "h": 8,
+            "ms": 794,
+            "attempts": 1,
+            "bbox": {
+              "x": 2,
+              "y": 2,
+              "w": 4,
+              "h": 4
+            },
+            "key": [
+              255,
+              255,
+              255
+            ],
+            "trimmedTo": {
+              "w": 4,
+              "h": 4
+            },
+            "baselineBbox": {
+              "x": 141,
+              "y": 18,
+              "w": 454,
+              "h": 1126
+            },
+            "baselineKey": [
+              211,
+              61,
+              155
+            ]
+          }
+        ],
+        "alpha": {
+          "alphaDiff": 0,
+          "alphaPct": 0,
+          "rgbChanged": 0,
+          "rgbPct": 0,
+          "meanL1": 0
+        },
+        "widthDiffPct": 0,
+        "posDriftPct": 0,
+        "keyL1": 0,
+        "paletteCount": [
+          1,
+          1
+        ],
+        "baseline": {
+          "alpha": {
+            "alphaDiff": 11,
+            "alphaPct": 0.4,
+            "rgbChanged": 150,
+            "rgbPct": 4.9,
+            "meanL1": 2.53
+          },
+          "widthDiffPct": 0.2,
+          "keyL1": 2
+        }
+      },
+      "costEstimate": 0.268,
+      "costNote": "仅输出价；输入另计"
+    },
+    {
+      "key": "openai-relay",
+      "label": "B1 · OpenAI relay",
+      "sends": 2,
+      "metrics": {
+        "frames": [
+          {
+            "name": "scavenger-actor.idle1",
+            "w": 8,
+            "h": 8,
+            "ms": 795,
+            "attempts": 1,
+            "bbox": {
+              "x": 2,
+              "y": 2,
+              "w": 4,
+              "h": 4
+            },
+            "key": [
+              255,
+              255,
+              255
+            ],
+            "trimmedTo": {
+              "w": 4,
+              "h": 4
+            },
+            "baselineBbox": {
+              "x": 141,
+              "y": 21,
+              "w": 455,
+              "h": 1122
+            },
+            "baselineKey": [
+              210,
+              60,
+              155
+            ]
+          },
+          {
+            "name": "scavenger-actor.idle2",
+            "w": 8,
+            "h": 8,
+            "ms": 799,
+            "attempts": 1,
+            "bbox": {
+              "x": 2,
+              "y": 2,
+              "w": 4,
+              "h": 4
+            },
+            "key": [
+              255,
+              255,
+              255
+            ],
+            "trimmedTo": {
+              "w": 4,
+              "h": 4
+            },
+            "baselineBbox": {
+              "x": 141,
+              "y": 18,
+              "w": 454,
+              "h": 1126
+            },
+            "baselineKey": [
+              211,
+              61,
+              155
+            ]
+          }
+        ],
+        "alpha": {
+          "alphaDiff": 0,
+          "alphaPct": 0,
+          "rgbChanged": 0,
+          "rgbPct": 0,
+          "meanL1": 0
+        },
+        "widthDiffPct": 0,
+        "posDriftPct": 0,
+        "keyL1": 0,
+        "paletteCount": [
+          1,
+          1
+        ],
+        "baseline": {
+          "alpha": {
+            "alphaDiff": 11,
+            "alphaPct": 0.4,
+            "rgbChanged": 150,
+            "rgbPct": 4.9,
+            "meanL1": 2.53
+          },
+          "widthDiffPct": 0.2,
+          "keyL1": 2
+        }
+      },
+      "costEstimate": null,
+      "costNote": "relay 计价未验证；未按官方价冒充实际花费"
+    }
+  ],
+  "counters": {
+    "gemini": 2,
+    "openai": 2
+  },
+  "caps": {
+    "gemini": 3,
+    "openai": 4
+  }
+}

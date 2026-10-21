@@ -1,0 +1,113 @@
+{
+  "ok": false,
+  "mode": "live",
+  "candidates": [
+    {
+      "key": "gemini3pro",
+      "label": "A · Gemini 3 Pro",
+      "sends": 2,
+      "metrics": {
+        "frames": [
+          {
+            "name": "scavenger-actor.idle1",
+            "w": 896,
+            "h": 1200,
+            "ms": 26857,
+            "attempts": 1,
+            "bbox": {
+              "x": 150,
+              "y": 68,
+              "w": 464,
+              "h": 1092
+            },
+            "key": [
+              212,
+              52,
+              154
+            ],
+            "trimmedTo": {
+              "w": 461,
+              "h": 1091
+            },
+            "baselineBbox": {
+              "x": 141,
+              "y": 21,
+              "w": 455,
+              "h": 1122
+            },
+            "baselineKey": [
+              210,
+              60,
+              155
+            ]
+          },
+          {
+            "name": "scavenger-actor.idle2",
+            "w": 896,
+            "h": 1200,
+            "ms": 25703,
+            "attempts": 1,
+            "bbox": {
+              "x": 150,
+              "y": 68,
+              "w": 464,
+              "h": 1092
+            },
+            "key": [
+              210,
+              53,
+              154
+            ],
+            "trimmedTo": {
+              "w": 461,
+              "h": 1091
+            },
+            "baselineBbox": {
+              "x": 141,
+              "y": 18,
+              "w": 454,
+              "h": 1126
+            },
+            "baselineKey": [
+              211,
+              61,
+              155
+            ]
+          }
+        ],
+        "alpha": {
+          "alphaDiff": 56,
+          "alphaPct": 1.8,
+          "rgbChanged": 435,
+          "rgbPct": 14.2,
+          "meanL1": 10.2
+        },
+        "widthDiffPct": 0,
+        "posDriftPct": 0,
+        "keyL1": 3,
+        "paletteCount": [
+          22,
+          21
+        ],
+        "baseline": {
+          "alpha": {
+            "alphaDiff": 11,
+            "alphaPct": 0.4,
+            "rgbChanged": 150,
+            "rgbPct": 4.9,
+            "meanL1": 2.53
+          },
+          "widthDiffPct": 0.2,
+          "keyL1": 2
+        }
+      },
+      "costEstimate": 0.268,
+      "costNote": "仅输出价；输入另计"
+    }
+  ],
+  "counters": {
+    "gemini": 2,
+    "openai": 1
+  },
+  "error": "OpenAI 形态生图失败（2 次内）：Unexpected end of JSON input"
+}

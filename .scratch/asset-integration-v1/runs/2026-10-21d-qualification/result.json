@@ -1,0 +1,476 @@
+{
+  "ok": true,
+  "mode": "live",
+  "model": "gemini-3-pro-image",
+  "sends": 6,
+  "maxSends": 12,
+  "characters": [
+    {
+      "key": "scavenger",
+      "label": "scavenger-actor",
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "fps": 6,
+      "frames": [
+        {
+          "name": "scavenger-actor.idle1",
+          "w": 896,
+          "h": 1200,
+          "ms": 43875,
+          "attempts": 1,
+          "bbox": {
+            "x": 149,
+            "y": 67,
+            "w": 465,
+            "h": 1093
+          },
+          "key": [
+            210,
+            54,
+            152
+          ],
+          "trimmedTo": {
+            "w": 461,
+            "h": 1091
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 21,
+            "w": 455,
+            "h": 1122
+          },
+          "baselineKey": [
+            210,
+            60,
+            155
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 239,
+            "boundaryDarkPct": 89.5
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 238,
+            "boundaryDarkPct": 87.4
+          }
+        },
+        {
+          "name": "scavenger-actor.idle2",
+          "w": 896,
+          "h": 1200,
+          "ms": 47027,
+          "attempts": 1,
+          "bbox": {
+            "x": 150,
+            "y": 66,
+            "w": 464,
+            "h": 1094
+          },
+          "key": [
+            211,
+            53,
+            154
+          ],
+          "trimmedTo": {
+            "w": 461,
+            "h": 1091
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 18,
+            "w": 454,
+            "h": 1126
+          },
+          "baselineKey": [
+            211,
+            61,
+            155
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 242,
+            "boundaryDarkPct": 86.4
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 240,
+            "boundaryDarkPct": 89.6
+          }
+        },
+        {
+          "name": "scavenger-actor.idle4",
+          "w": 896,
+          "h": 1200,
+          "ms": 48566,
+          "attempts": 1,
+          "bbox": {
+            "x": 150,
+            "y": 66,
+            "w": 464,
+            "h": 1094
+          },
+          "key": [
+            209,
+            55,
+            153
+          ],
+          "trimmedTo": {
+            "w": 461,
+            "h": 1091
+          },
+          "baselineBbox": {
+            "x": 141,
+            "y": 18,
+            "w": 455,
+            "h": 1125
+          },
+          "baselineKey": [
+            211,
+            61,
+            156
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 240,
+            "boundaryDarkPct": 85.4
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 239,
+            "boundaryDarkPct": 87.4
+          }
+        }
+      ],
+      "metrics": {
+        "pairs": [
+          {
+            "pair": "idle1~idle2",
+            "alpha": {
+              "alphaDiff": 14,
+              "alphaPct": 0.5,
+              "rgbChanged": 336,
+              "rgbPct": 10.9,
+              "meanL1": 6.01
+            },
+            "widthDiffPct": 0.2,
+            "posDriftPct": 0.1,
+            "keyL1": 4,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 11,
+                "alphaPct": 0.4,
+                "rgbChanged": 150,
+                "rgbPct": 4.9,
+                "meanL1": 2.53
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "idle1~idle4",
+            "alpha": {
+              "alphaDiff": 18,
+              "alphaPct": 0.6,
+              "rgbChanged": 418,
+              "rgbPct": 13.6,
+              "meanL1": 9.67
+            },
+            "widthDiffPct": 0.2,
+            "posDriftPct": 0.1,
+            "keyL1": 3,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 8,
+                "alphaPct": 0.3,
+                "rgbChanged": 163,
+                "rgbPct": 5.3,
+                "meanL1": 2.6
+              },
+              "widthDiffPct": 0,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "idle2~idle4",
+            "alpha": {
+              "alphaDiff": 32,
+              "alphaPct": 1,
+              "rgbChanged": 427,
+              "rgbPct": 13.9,
+              "meanL1": 8.31
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 5,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 11,
+                "alphaPct": 0.4,
+                "rgbChanged": 211,
+                "rgbPct": 6.9,
+                "meanL1": 3.5
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 1
+            }
+          }
+        ],
+        "maxAlphaPct": 1,
+        "maxWidthDiffPct": 0.2,
+        "maxPosDriftPct": 0.1,
+        "maxKeyL1": 5,
+        "minPalette": 19,
+        "maxOffPalette": 0,
+        "minBoundaryDarkPct": 85.4
+      },
+      "tiers": {
+        "alpha": "green",
+        "width": "green",
+        "position": "green",
+        "key": "green",
+        "palette": "green",
+        "offPalette": "green",
+        "boundary": "green"
+      },
+      "mechanicalVerdict": "green"
+    },
+    {
+      "key": "enemy",
+      "label": "wasteland-enemy",
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "fps": 8,
+      "frames": [
+        {
+          "name": "wasteland-enemy.patrol1",
+          "w": 1024,
+          "h": 1024,
+          "ms": 37942,
+          "attempts": 1,
+          "bbox": {
+            "x": 70,
+            "y": 18,
+            "w": 804,
+            "h": 1006
+          },
+          "key": [
+            253,
+            0,
+            252
+          ],
+          "trimmedTo": {
+            "w": 799,
+            "h": 999
+          },
+          "baselineBbox": {
+            "x": 175,
+            "y": 122,
+            "w": 573,
+            "h": 877
+          },
+          "baselineKey": [
+            192,
+            38,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 237,
+            "boundaryDarkPct": 94.9
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 232,
+            "boundaryDarkPct": 88.8
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol4",
+          "w": 1024,
+          "h": 1024,
+          "ms": 35122,
+          "attempts": 1,
+          "bbox": {
+            "x": 94,
+            "y": 22,
+            "w": 824,
+            "h": 1002
+          },
+          "key": [
+            252,
+            0,
+            252
+          ],
+          "trimmedTo": {
+            "w": 818,
+            "h": 994
+          },
+          "baselineBbox": {
+            "x": 180,
+            "y": 13,
+            "w": 572,
+            "h": 986
+          },
+          "baselineKey": [
+            193,
+            37,
+            116
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 266,
+            "boundaryDarkPct": 100
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 231,
+            "boundaryDarkPct": 90.9
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol6",
+          "w": 1024,
+          "h": 1024,
+          "ms": 49217,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            191,
+            34,
+            115
+          ],
+          "trimmedTo": {
+            "w": 574,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 184,
+            "y": 20,
+            "w": 569,
+            "h": 979
+          },
+          "baselineKey": [
+            192,
+            36,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 232,
+            "boundaryDarkPct": 89.2
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 228,
+            "boundaryDarkPct": 89.5
+          }
+        }
+      ],
+      "metrics": {
+        "pairs": [
+          {
+            "pair": "patrol1~patrol4",
+            "alpha": {
+              "alphaDiff": 394,
+              "alphaPct": 17.1,
+              "rgbChanged": 968,
+              "rgbPct": 42,
+              "meanL1": 41.12
+            },
+            "widthDiffPct": 2.5,
+            "posDriftPct": 2.3,
+            "keyL1": 1,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 13,
+                "alphaPct": 0.6,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.31
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "patrol1~patrol6",
+            "alpha": {
+              "alphaDiff": 532,
+              "alphaPct": 23.1,
+              "rgbChanged": 1021,
+              "rgbPct": 44.3,
+              "meanL1": 46.28
+            },
+            "widthDiffPct": 40.1,
+            "posDriftPct": 10.2,
+            "keyL1": 233,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 25,
+                "alphaPct": 1.1,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.69
+              },
+              "widthDiffPct": 0.7,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "patrol4~patrol6",
+            "alpha": {
+              "alphaDiff": 722,
+              "alphaPct": 31.3,
+              "rgbChanged": 832,
+              "rgbPct": 36.1,
+              "meanL1": 37.46
+            },
+            "widthDiffPct": 43.6,
+            "posDriftPct": 9.8,
+            "keyL1": 232,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 22,
+                "alphaPct": 1,
+                "rgbChanged": 187,
+                "rgbPct": 8.1,
+                "meanL1": 4.59
+              },
+              "widthDiffPct": 0.5,
+              "keyL1": 3
+            }
+          }
+        ],
+        "maxAlphaPct": 31.3,
+        "maxWidthDiffPct": 43.6,
+        "maxPosDriftPct": 10.2,
+        "maxKeyL1": 233,
+        "minPalette": 14,
+        "maxOffPalette": 0,
+        "minBoundaryDarkPct": 89.2
+      },
+      "tiers": {
+        "alpha": "red",
+        "width": "red",
+        "position": "red",
+        "key": "red",
+        "palette": "green",
+        "offPalette": "green",
+        "boundary": "green"
+      },
+      "mechanicalVerdict": "red"
+    }
+  ],
+  "humanVerdict": "pending"
+}

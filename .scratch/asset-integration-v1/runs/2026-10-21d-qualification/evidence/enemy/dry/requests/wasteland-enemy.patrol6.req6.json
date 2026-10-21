@@ -1,0 +1,24 @@
+{
+  "url": "https://generativelanguage.googleapis.com/v1beta/interactions",
+  "model": "gemini-3-pro-image",
+  "response_format": {
+    "type": "image",
+    "mime_type": "image/jpeg",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "inputs": [
+    {
+      "type": "text",
+      "textLength": 1632
+    },
+    {
+      "type": "image",
+      "mime_type": "image/png"
+    },
+    {
+      "type": "image",
+      "mime_type": "image/png"
+    }
+  ]
+}

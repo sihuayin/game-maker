@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><title>wasteland-enemy qualification preview</title>
+<style>body{font-family:system-ui;background:#1b1b1b;color:#ddd;margin:24px}img{image-rendering:pixelated;background:#333;border:1px solid #555}div{display:inline-block;margin:8px}small{color:#aaa}</style>
+<h2>wasteland-enemy · qualification sample (6 frames, not full loop)</h2>
+<div><div><small>2.5 baseline</small><br><img id="b" width="384" height="384"></div>
+<div><small>3 Pro candidate</small><br><img id="c" width="384" height="384"></div></div>
+<script>
+const b=["baseline-imported/wasteland-enemy.patrol1.png","baseline-imported/wasteland-enemy.patrol2.png","baseline-imported/wasteland-enemy.patrol3.png","baseline-imported/wasteland-enemy.patrol4.png","baseline-imported/wasteland-enemy.patrol5.png","baseline-imported/wasteland-enemy.patrol6.png"];
+const c=["imported/wasteland-enemy.patrol1.png","imported/wasteland-enemy.patrol2.png","imported/wasteland-enemy.patrol3.png","imported/wasteland-enemy.patrol4.png","imported/wasteland-enemy.patrol5.png","imported/wasteland-enemy.patrol6.png"];
+const fps=8; let i=0;
+const bi=document.getElementById('b'), ci=document.getElementById('c');
+const tick=()=>{bi.src=b[i% b.length];ci.src=c[i% c.length];i++;}; tick(); setInterval(tick,1000/fps);
+</script>

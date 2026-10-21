@@ -1,0 +1,243 @@
+{
+  "ok": true,
+  "mode": "live",
+  "model": "gemini-3-pro-image",
+  "sends": 3,
+  "maxSends": 3,
+  "characters": [
+    {
+      "key": "enemy",
+      "label": "wasteland-enemy",
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "fps": 8,
+      "frames": [
+        {
+          "name": "wasteland-enemy.patrol1",
+          "w": 1024,
+          "h": 1024,
+          "ms": 86119,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            192,
+            33,
+            114
+          ],
+          "trimmedTo": {
+            "w": 573,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 175,
+            "y": 122,
+            "w": 573,
+            "h": 877
+          },
+          "baselineKey": [
+            192,
+            38,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 230,
+            "boundaryDarkPct": 90
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 232,
+            "boundaryDarkPct": 88.8
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol4",
+          "w": 1024,
+          "h": 1024,
+          "ms": 94803,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            192,
+            31,
+            113
+          ],
+          "trimmedTo": {
+            "w": 573,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 180,
+            "y": 13,
+            "w": 572,
+            "h": 986
+          },
+          "baselineKey": [
+            193,
+            37,
+            116
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 232,
+            "boundaryDarkPct": 90.5
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 231,
+            "boundaryDarkPct": 90.9
+          }
+        },
+        {
+          "name": "wasteland-enemy.patrol6",
+          "w": 1024,
+          "h": 1024,
+          "ms": 102767,
+          "attempts": 1,
+          "bbox": {
+            "x": 170,
+            "y": 122,
+            "w": 574,
+            "h": 878
+          },
+          "key": [
+            192,
+            31,
+            113
+          ],
+          "trimmedTo": {
+            "w": 574,
+            "h": 876
+          },
+          "baselineBbox": {
+            "x": 184,
+            "y": 20,
+            "w": 569,
+            "h": 979
+          },
+          "baselineKey": [
+            192,
+            36,
+            115
+          ],
+          "analysis": {
+            "offPalette": 0,
+            "boundaryPixels": 233,
+            "boundaryDarkPct": 89.7
+          },
+          "baselineAnalysis": {
+            "offPalette": 0,
+            "boundaryPixels": 228,
+            "boundaryDarkPct": 89.5
+          }
+        }
+      ],
+      "metrics": {
+        "pairs": [
+          {
+            "pair": "patrol1~patrol4",
+            "alpha": {
+              "alphaDiff": 19,
+              "alphaPct": 0.8,
+              "rgbChanged": 104,
+              "rgbPct": 4.5,
+              "meanL1": 2.59
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 3,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 13,
+                "alphaPct": 0.6,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.31
+              },
+              "widthDiffPct": 0.2,
+              "keyL1": 3
+            }
+          },
+          {
+            "pair": "patrol1~patrol6",
+            "alpha": {
+              "alphaDiff": 54,
+              "alphaPct": 2.3,
+              "rgbChanged": 184,
+              "rgbPct": 8,
+              "meanL1": 4.8
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 3,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 25,
+                "alphaPct": 1.1,
+                "rgbChanged": 195,
+                "rgbPct": 8.5,
+                "meanL1": 4.69
+              },
+              "widthDiffPct": 0.7,
+              "keyL1": 2
+            }
+          },
+          {
+            "pair": "patrol4~patrol6",
+            "alpha": {
+              "alphaDiff": 37,
+              "alphaPct": 1.6,
+              "rgbChanged": 167,
+              "rgbPct": 7.2,
+              "meanL1": 4.25
+            },
+            "widthDiffPct": 0,
+            "posDriftPct": 0,
+            "keyL1": 0,
+            "baseline": {
+              "alpha": {
+                "alphaDiff": 22,
+                "alphaPct": 1,
+                "rgbChanged": 187,
+                "rgbPct": 8.1,
+                "meanL1": 4.59
+              },
+              "widthDiffPct": 0.5,
+              "keyL1": 3
+            }
+          }
+        ],
+        "maxAlphaPct": 2.3,
+        "maxWidthDiffPct": 0,
+        "maxPosDriftPct": 0,
+        "maxKeyL1": 3,
+        "minPalette": 17,
+        "maxOffPalette": 0,
+        "minBoundaryDarkPct": 89.7
+      },
+      "tiers": {
+        "alpha": "yellow",
+        "width": "green",
+        "position": "green",
+        "key": "green",
+        "palette": "green",
+        "offPalette": "green",
+        "boundary": "green"
+      },
+      "mechanicalVerdict": "yellow"
+    }
+  ],
+  "humanVerdict": "pending"
+}

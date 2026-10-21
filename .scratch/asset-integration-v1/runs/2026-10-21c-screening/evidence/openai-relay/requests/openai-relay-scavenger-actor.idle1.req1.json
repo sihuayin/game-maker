@@ -1,0 +1,11 @@
+{
+  "url": "https://api-slb.krill-code.net/codex/v1/images/edits",
+  "contentType": "multipart/form-data; boundary=----game-maker-2abb7e49b2dc21a15c77e196",
+  "contentLength": "1490794",
+  "bodyLength": 1490794,
+  "model": "gpt-image-2.5",
+  "n": "1",
+  "size": "1024x1536",
+  "images": 2,
+  "promptLength": 3403
+}
