@@ -45,6 +45,12 @@ Map: ../map.md
 > `CAP-E2E-01`（P0-FINAL 单跑）未完成。**
 > 不得出现无条件的「P0 全部验收通过」。
 
+> **2026-10-22 补记（票 12 裁定 A 后）**：`CAP-ASSET-01` 的完成判据已统一为
+> 「`frames` 明确失败 + 失败消息点名资源 id 与真实候选 `frames`，不落 sidecar」。
+> 按修订口径，该条**记为达成**；非 `CAP-E2E-01` 判据为 **12 / 12**。
+> `CAP-E2E-01` / P0-FINAL 仍未完成——不得无条件宣称 P0 全部验收通过。
+> 裁定与证据见 [票 12](12-cap-asset-01-frames-sidecar.md)。
+
 完整书面总结（含每条的详细证据与残余风险）：
 [`runs/2026-10-22-final/summary.md`](../runs/2026-10-22-final/summary.md)。
 
@@ -83,7 +89,7 @@ Map: ../map.md
 | `CAP-ASSET-06` `verifyPack` 入链、坏包在 config/QA/site 前失败 | **通过** | `create-game.test.ts` 篡改用例、`cli.test.ts` verify 篡改、v7 `verify` |
 | `CAP-SPEC-17` 空色板在下游付费前拒、0 次下游调用 | **通过** | `plan-coverage-gate.test.ts`、`create-game.test.ts` |
 | `CAP-QA-02` 至少一条像素判据能阻断、阈值有依据 + 正负例 | **通过** | `qa/tests/pixel.test.ts`、`create-game.test.ts`；用户裁定两坏例只 observation |
-| `CAP-ASSET-01` `frames` 不静默折叠；sidecar 记录真实候选 | **部分** | 折叠已修 + 测试断言不落 sidecar；§5 的 sidecar 子项未达成；§3/§5 冲突 → 票 12 |
+| `CAP-ASSET-01` `frames` 不静默折叠；失败消息点名真实候选 | **通过**（2026-10-22 票 12 修订口径） | 折叠已修；`plan-frames-candidate.test.ts` 断言 `invalid`/4、消息含资源 id 与 `frames`、一发、零产物；口径见票 12 |
 | `CAP-ENTRY-01/02` MCP 4/3/2；绝对 `stylePath` 同输入同结果 | **通过** | `mcp/tests/error-semantics.test.ts`、`create-game-no-digest.test.ts` |
 | MCP QA 失败路径 `isError` / 4 / 无站点 / 报告在盘 | **通过** | `mcp/tests/create-game-qa-failure.test.ts` |
 
@@ -105,6 +111,8 @@ Map: ../map.md
 1. **`CAP-ASSET-01` 的 sidecar 子项**：`frames` 明确失败时未记录模型真实候选；
    §3「测试」与 §5 判据冲突。已立 **[票 12](12-cap-asset-01-frames-sidecar.md)**（grilling，待裁定），
    本票不修。最小补充见 `summary.md` §4。
+   > **2026-10-22 补记**：票 12 已裁定 A，口径修订为「明确失败 + 失败消息点名真实候选
+   > （`frames`），不落 sidecar」；按修订口径该条记为达成。原文保留，不倒写历史。
 2. **`CAP-E2E-01` / P0-FINAL**：真实单跑未做；另立付费 effort。
 3. `pnpm check` 的 2 条既有断链与 `pnpm test` 的 `gm-cli-accept-findings-*` 泄漏是既有问题，
    已记录 / 本次泄漏已清理，不在 P0 范围。

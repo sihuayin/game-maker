@@ -1,0 +1,238 @@
+diff --git a/.scratch/p0-construction-v1/issues/11-final-validation.md b/.scratch/p0-construction-v1/issues/11-final-validation.md
+index b9c35fd..29197b2 100644
+--- a/.scratch/p0-construction-v1/issues/11-final-validation.md
++++ b/.scratch/p0-construction-v1/issues/11-final-validation.md
+@@ -45,6 +45,12 @@ Map: ../map.md
+ > `CAP-E2E-01`（P0-FINAL 单跑）未完成。**
+ > 不得出现无条件的「P0 全部验收通过」。
+ 
++> **2026-10-22 补记（票 12 裁定 A 后）**：`CAP-ASSET-01` 的完成判据已统一为
++> 「`frames` 明确失败 + 失败消息点名资源 id 与真实候选 `frames`，不落 sidecar」。
++> 按修订口径，该条**记为达成**；非 `CAP-E2E-01` 判据为 **12 / 12**。
++> `CAP-E2E-01` / P0-FINAL 仍未完成——不得无条件宣称 P0 全部验收通过。
++> 裁定与证据见 [票 12](12-cap-asset-01-frames-sidecar.md)。
++
+ 完整书面总结（含每条的详细证据与残余风险）：
+ [`runs/2026-10-22-final/summary.md`](../runs/2026-10-22-final/summary.md)。
+ 
+@@ -83,7 +89,7 @@ Map: ../map.md
+ | `CAP-ASSET-06` `verifyPack` 入链、坏包在 config/QA/site 前失败 | **通过** | `create-game.test.ts` 篡改用例、`cli.test.ts` verify 篡改、v7 `verify` |
+ | `CAP-SPEC-17` 空色板在下游付费前拒、0 次下游调用 | **通过** | `plan-coverage-gate.test.ts`、`create-game.test.ts` |
+ | `CAP-QA-02` 至少一条像素判据能阻断、阈值有依据 + 正负例 | **通过** | `qa/tests/pixel.test.ts`、`create-game.test.ts`；用户裁定两坏例只 observation |
+-| `CAP-ASSET-01` `frames` 不静默折叠；sidecar 记录真实候选 | **部分** | 折叠已修 + 测试断言不落 sidecar；§5 的 sidecar 子项未达成；§3/§5 冲突 → 票 12 |
++| `CAP-ASSET-01` `frames` 不静默折叠；失败消息点名真实候选 | **通过**（2026-10-22 票 12 修订口径） | 折叠已修；`plan-frames-candidate.test.ts` 断言 `invalid`/4、消息含资源 id 与 `frames`、一发、零产物；口径见票 12 |
+ | `CAP-ENTRY-01/02` MCP 4/3/2；绝对 `stylePath` 同输入同结果 | **通过** | `mcp/tests/error-semantics.test.ts`、`create-game-no-digest.test.ts` |
+ | MCP QA 失败路径 `isError` / 4 / 无站点 / 报告在盘 | **通过** | `mcp/tests/create-game-qa-failure.test.ts` |
+ 
+@@ -105,6 +111,8 @@ Map: ../map.md
+ 1. **`CAP-ASSET-01` 的 sidecar 子项**：`frames` 明确失败时未记录模型真实候选；
+    §3「测试」与 §5 判据冲突。已立 **[票 12](12-cap-asset-01-frames-sidecar.md)**（grilling，待裁定），
+    本票不修。最小补充见 `summary.md` §4。
++   > **2026-10-22 补记**：票 12 已裁定 A，口径修订为「明确失败 + 失败消息点名真实候选
++   > （`frames`），不落 sidecar」；按修订口径该条记为达成。原文保留，不倒写历史。
+ 2. **`CAP-E2E-01` / P0-FINAL**：真实单跑未做；另立付费 effort。
+ 3. `pnpm check` 的 2 条既有断链与 `pnpm test` 的 `gm-cli-accept-findings-*` 泄漏是既有问题，
+    已记录 / 本次泄漏已清理，不在 P0 范围。
+diff --git a/.scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md b/.scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md
+index 67add54..cb053b8 100644
+--- a/.scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md
++++ b/.scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md
+@@ -1,8 +1,8 @@
+ # 12. CAP-ASSET-01 · frames 失败时是否记录模型真实候选（§3/§5 冲突）
+ 
+ Type: grilling
+-Status: open
+-Owner: —
++Status: resolved
++Owner: main session · 2026-10-22
+ Blocked by: —
+ Map: ../map.md
+ 
+@@ -36,3 +36,64 @@ Map: ../map.md
+ 
+ - 只做「口径裁定 + 最小补充」；不重开 `frames` 路线、不参数化保留 `frames`、不触碰其他 P2。
+ - 不改 v7 / `fixtures/`；不付费；不提交 / 不推送。
++
++## Answer
++
++**已收口（grilling · Q1 A + Q2 A；Q3–Q5 A）。** 2026-10-22 用户逐字裁定：
++
++| 问题 | 裁定 | 依据与边界 |
++|---|---|---|
++| Q1 P0 验收口径 | **A** | 以 §3「明确失败、不落 sidecar」为准，修订 §3 建议范围、§5 和能力差距表的措辞，统一文档口径；不改契约。 |
++| Q2 模型可见的 `frames` 漂移 | **A** | 本票不修改 `AssetRecipeTool` 契约或提示词，将模型可见的 `frames` 入口记录为 P1 observation。 |
++| Q3 文档修订 | **A** | 按所列四处原位最小修订；保留 `ea53240` 审计证据列原样；追加带日期的裁定注记，不倒写历史。 |
++| Q4 错误消息扩展 | **A** | 不改代码；采用现有 `plan-frames-candidate.test.ts` 作为见证，不为重复覆盖新增测试；不扩展为一次列出全部 `frames` 资源。 |
++| Q5 票 11 历史状态 | **A** | 保留原文，追加日期补记；更新 `CAP-ASSET-01` 的当前判定为「通过（票 12 修订口径）」，并将非 E2E 判据结论更新为 12/12；保留原始收口记录。 |
++
++### 结论
++
++P0 口径统一为：**`frames` 候选 ⇒ `planAssets` 明确 `invalid`（退出码 4）；错误消息点名资源 id 与
++真实候选 `frames`；不落 recipe / sidecar；这一发的花费照记。**
++原 §5「sidecar 记录真实候选」不再作为 P0 判据。
++
++### 为什么不采用 B（失败侧记录）
++
++- `asset-plan/v1` 的 `candidate` 枚举只有 `image | drawlist | import`
++  （`packages/contracts/src/asset-plan.ts:13,47`），`frames` 不是 route；sidecar 的不变量是
++  「规划成功才有」，由路线决策之后的 `decisions` 生成（`packages/assets/src/ops.ts:494-513`）。
++  字面满足 §5 需要新产物 / 契约，不是改一句话。
++- 失败侧记录属于诊断；按 P0-00 §0.1 的 Q1 裁定，诊断类默认 P1/P2。
++- 「模型原选择丢失」已由错误消息承担；票 02 的实现与既有测试已经见证。
++
++### 事实更正
++
++票面原文「包内账记了花费」不准确：单独 `plan` 没有包，账挂在异常上由 CLI/MCP 当场打印
++（`packages/contracts/src/command.ts:167-172`）；`create` 链的 `run/v<N>/ledger.json` 只在成功路径写
++（`packages/pipeline/src/create-game.ts:391,628`）。准确表述：**花费随异常回报；失败不改变
++「钱已花」这一事实。**
++
++### 已执行的修订
++
++1. `docs/v4/P0-00-p0-scope.md` §3 P0-06 建议范围第 1 条、测试第 1 条、§5 `CAP-ASSET-01` 判据与日期注记。
++2. `docs/v4/P0-00-capability-gap-audit.md` `CAP-ASSET-01` 验收条件 + P0 表后日期注记；审计证据列原样保留。
++3. `issues/11-final-validation.md` 顶部日期补记与判据表 `CAP-ASSET-01` 行；
++   `runs/2026-10-22-final/summary.md` §8 补记。原文保留。
++4. 地图追加本票索引；票 11 的索引行补指向本票；头部标记收口。
++
++### 证据
++
++- [`runs/2026-10-22-ticket-12/ruling.md`](../runs/2026-10-22-ticket-12/ruling.md)：裁定原文 + 事实核验。
++- [`runs/2026-10-22-ticket-12/doc-diff.txt`](../runs/2026-10-22-ticket-12/doc-diff.txt)：全部文档改动。
++- [`runs/2026-10-22-ticket-12/check-links.txt`](../runs/2026-10-22-ticket-12/check-links.txt)：
++  `pnpm check:links` exit 1；仅 2 条既有 `.scratch` 断链，本次修订无新增。
++- 见证测试：`packages/assets/tests/plan-frames-candidate.test.ts`（既有；断言 `invalid`/4、
++  消息含资源 id 与 `frames`、一发、账、零产物）。
++
++### 边界
++
++- 不改代码 / 契约 / CLI / MCP / 依赖；不改 `AssetRecipeTool` 或提示词。
++- 不重开 `frames` 路线；不参数化保留；不碰 v7 / `fixtures/`；零付费；不提交 / 不推送。
++
++### P1 observation
++
++- 模型可见面漂移：`PLAN_TOOL_DESCRIPTION` 说「策略只有三个值」，但 `AssetRecipeTool` 的线形状仍允许
++  `frames`（`packages/contracts/src/recipe-tool.ts:128-129`）。本票不改；留给将来统一处理模型可见面时一并裁。
+diff --git a/.scratch/p0-construction-v1/map.md b/.scratch/p0-construction-v1/map.md
+index d6ace1f..06e18f1 100644
+--- a/.scratch/p0-construction-v1/map.md
++++ b/.scratch/p0-construction-v1/map.md
+@@ -8,6 +8,8 @@ Effort: p0-construction-v1
+ > （13 条 CAP / 6 个施工包 / P0-FINAL 另立）。本图**承载施工**（覆盖 wayfinder「只规划」默认）。
+ > 第 1/2 轮裁定 Q1–Q9 全部 A，边界逐字见 Notes。
+ > ⚠️ 本图**不提交、不推送、不付费**；完工停在等待单独授权状态。
++> ✅ **2026-10-22 收口**：01–12 全部 resolved。`CAP-ASSET-01` 按票 12 裁定 A 的口径记为达成；
++> 非 `CAP-E2E-01` 判据 **12 / 12**。**`CAP-E2E-01` / P0-FINAL 未完成**；停在等待提交 / 推送授权。
+ 
+ ## Destination
+ 
+@@ -183,15 +185,22 @@ P0-01…P0-06 六个施工包完成并通过**程序级验收**：13 条 P0 CAP
+   `pnpm check` 仅剩 **2 条既有 `.scratch` 断链**（非本图引入）。12 条非 E2E 判据
+   **11 通过 / 1 部分**：`CAP-ASSET-01` 的「`frames` 不再静默折叠」已达成，但 §5 要求的
+   「sidecar 记录真实候选」未落 —— §3「测试」写「不落 sidecar」、§5 写「记录真实候选」，
+-  文档自相矛盾；已立 [票 12](issues/12-cap-asset-01-frames-sidecar.md)（grilling）待裁定。
++  文档自相矛盾；已立 [票 12](issues/12-cap-asset-01-frames-sidecar.md)（grilling）→ **2026-10-22 裁定 A：按修订口径该条记为达成，非 E2E 判据 12 / 12**；`CAP-E2E-01` / P0-FINAL 仍未完成。
+   工作树：v7 manifest sha `e620cd7e…` / tree `64b74b0e…`、0 个文件晚于 10-21；
+   `fixtures/` 工作树干净（基线以来唯一已批准改动 = `fixtures/upstream/canned.json` 的 `e-drone`）；
+   `game-maker.local.json` / 既有 `CONTEXT.md` 改动均未碰。**`CAP-E2E-01` / P0-FINAL 未完成** ——
+   不得无条件说「P0 全部验收通过」。证据：`runs/2026-10-22-final/summary.md`。
+ 
++- [12. CAP-ASSET-01 · frames 失败时是否记录模型真实候选](issues/12-cap-asset-01-frames-sidecar.md)：
++  **已收口（grilling · 裁定 A + A）** —— 以 §3「测试」为准：`frames` 候选 ⇒ `planAssets` 明确 `invalid`（4）、
++  消息点名资源 id 与真实候选 `frames`、不落 recipe / sidecar、花费随异常回报；§5「sidecar 记录真实候选」
++  不再作为 P0 判据。已原位修订 §3/§5/能力差距表并追加日期注记（审计证据列原样）；票 11 追加补记，
++  非 E2E 判据 **12 / 12**（`CAP-E2E-01` / P0-FINAL 仍未完成）。不改代码 / 契约 / 工具面；
++  模型可见的 `frames` 漂移记为 P1 observation。证据：`runs/2026-10-22-ticket-12/`。
++
+ ## Not yet specified
+ 
+-<!-- 当前没有尚未成票的雾：像素阈值已裁定（票 03）；CAP-ASSET-01 的 §3/§5 冲突已成票 12。前沿见 open 子票。 -->
++<!-- 无。2026-10-22 票 12 收口后，本图无 open 子票；P0-FINAL 在 Out of scope / 另立付费 effort。 -->
+ 
+ ## Out of scope
+ 
+diff --git a/.scratch/p0-construction-v1/runs/2026-10-22-final/summary.md b/.scratch/p0-construction-v1/runs/2026-10-22-final/summary.md
+index 711ec33..b132eb5 100644
+--- a/.scratch/p0-construction-v1/runs/2026-10-22-final/summary.md
++++ b/.scratch/p0-construction-v1/runs/2026-10-22-final/summary.md
+@@ -137,3 +137,12 @@
+   「P0 程序级判据 11/12 通过，CAP-ASSET-01 尚有 sidecar 子项待裁定（票 12）；
+   **单跑 E2E（P0-FINAL）未完成**。」
+ - 本票只验证与记录，未修缺口、未提交、未推送；工作树停在等待单独授权状态。
++
++## 8. 2026-10-22 补记（票 12 裁定 A 后）
++
++- `CAP-ASSET-01` 的完成判据统一为：「`frames` 不再静默折叠；失败消息点名资源 id 与真实候选
++  （`frames`），不落 recipe / sidecar；花费随异常回报。」
++- 按修订口径，**非 `CAP-E2E-01` 判据 = 12 / 12 通过**（上文「11 通过 / 1 部分」是票 11 收口时的
++  原始记录，保留不倒写）。
++- **`CAP-E2E-01` / P0-FINAL 仍未完成**；不得无条件宣称「P0 全部验收通过」。
++- 裁定与证据：`../../issues/12-cap-asset-01-frames-sidecar.md` · `../2026-10-22-ticket-12/`。
+diff --git a/docs/v4/P0-00-capability-gap-audit.md b/docs/v4/P0-00-capability-gap-audit.md
+index a04e9e6..b039e20 100644
+--- a/docs/v4/P0-00-capability-gap-audit.md
++++ b/docs/v4/P0-00-capability-gap-audit.md
+@@ -60,7 +60,7 @@ E0/E1 不得写成已验收。
+ | `CAP-SPEC-01` | `GameConfig.objective.gate` 决定胜利；只有 gate 能触发胜利 | partial | `game-config.ts:184-188,338-339`；`demo/shell/scene.ts:158-162,269-274,26,160` | config → `buildWorld` 给每个 goal 绑 `tryWin()` → overlap → `tryWin()` 只看 `pickupCount`；`this.gate` 赋值后从未读 | `game-config.test.ts:128-135` 只验引用；无「只有 gate 能赢」 | 10-17d config 有 `chest-1` 与 `gate-1` 两个 goal | 任一 goal 都能赢 | 提前胜利；目标语义失效 | 修正 + 补测 | **P0**（Q5） | 两 goal 配置：捡齐后碰非 gate goal 不胜利，碰 gate 才胜利；测试在 `demo/tests` |
+ | `CAP-SPEC-12` | 设计四桶（enemies / npcs / interactables / resources）→ 资源清单的覆盖闸 | absent | `assets/ops.ts:201-238`（只有玩家动画闸）；`planner-masters.ts` 只补母版；无 design→recipe id 对账 | `GameDesignSpec` 四桶 → `assetPlanPrompt` → 模型 recipe；规划期不核对 id 是否被覆盖 | `plan-assets-player-gate.test.ts` 只覆盖玩家 | 10-17d 恰好对齐，但无 gate；10-18a recipe/manifest 不一致只作完整性异常登记 | 模型可漏 / 改名而不被拒 | 资源不完整仍成功 | 新增判据 + 补测 | **P0**（Q7） | 删掉一个敌人资源 ⇒ 规划期拒绝；豁免规则有测试 |
+ | `CAP-SPEC-17` | 空 VWS 色板在下游付费调用前被拒 | partial | `visual-world.ts:199-206`（允许空）；`assets/ops.ts:1503-1504`（pack 才拒）；`ops.ts:249` 入口不查 | `analyzeReference` → 空色板 VWS → 设计 / DNA / 规划已发调用 → `pack` `readStyle` 才抛 | `style-gate.test.ts` 只测 pack 期拒绝 | 无 | gate 后移 | 设计 / 规划的钱已花掉才失败 | 修正（前移 gate） | **P0**（Q7） | `analyzeReference` 产出 VWS 后、下游任何付费调用前拒绝空色板；单独 `planAssets` 入口同样拒绝；测试断言下游调用 0 次 |
+-| `CAP-ASSET-01` | `frames` 候选不再被静默改写成 `image` | partial | `assets/ops.ts:372`；`route.ts:143-155`；`contracts/recipe-tool.ts:128` 允许 `frames`；`prompt.ts:807-810` 只告诉模型三值 | 模型给 `frames` → `planAssets` 映射成 `image` → `sourceForDecision` 写 `{kind:"image"}` → sidecar `candidate:"image"` | `pack-frames.test.ts:37-90` 只直接喂 `buildAssetPack`；无 planner / resolver / sidecar 测试 | 无 `frames` 规划产物 | 静默降级；模型原选择丢失 | 逐帧生成被换成「一图 N 帧」，与「不得静默降级」相抵触 | 修正 + 补测 | **P0**（Q6） | `frames` 候选 ⇒ 明确 `invalid`（推荐）或参数化保留；sidecar 记录真实候选；测试覆盖 planner + sidecar |
++| `CAP-ASSET-01` | `frames` 候选不再被静默改写成 `image` | partial | `assets/ops.ts:372`；`route.ts:143-155`；`contracts/recipe-tool.ts:128` 允许 `frames`；`prompt.ts:807-810` 只告诉模型三值 | 模型给 `frames` → `planAssets` 映射成 `image` → `sourceForDecision` 写 `{kind:"image"}` → sidecar `candidate:"image"` | `pack-frames.test.ts:37-90` 只直接喂 `buildAssetPack`；无 planner / resolver / sidecar 测试 | 无 `frames` 规划产物 | 静默降级；模型原选择丢失 | 逐帧生成被换成「一图 N 帧」，与「不得静默降级」相抵触 | 修正 + 补测 | **P0**（Q6） | `frames` 候选 ⇒ 明确 `invalid`（推荐）或参数化保留；**P0 采用明确失败：消息点名资源与真实候选（`frames`），不落 sidecar**；测试覆盖 planner + 失败消息（2026-10-22 票 12 裁定 A） |
+ | `CAP-ASSET-06` | `runBuild` 在 pack 之后、config / QA / site 之前校验包完整性 | absent | `assets/ops.ts:1662-1730`（`verifyPack`）；`pipeline/create-game.ts:417-551`（`runBuild` 不调用）；`contracts/audit.ts:45-83`（QA 只对账元数据） | `runBuild` → `packAssets` → `compileRuntime` → `qaRunner`；`verifyPack` 只在手动 CLI `verify` | `cli.test.ts:123-138`（verify 命令）；无链上用例 | 手动 `verify pack v7` exit 0（157 checksum） | 链上无 checksum / 文件存在性 | 损坏或缺文件的包可继续到 QA / site | 修正 + 补测 | **P0**（Q7） | 篡改包内文件 ⇒ `runBuild` 在 config / QA / site 前 `invalid`；报告 / 退出码有测试 |
+ | `CAP-QA-01` | QA 跑满 6/6 判据；`incomplete` 不可发布 | partial | `contracts/qa.ts:109`（`QA_JUDGEMENTS`）；`qa/assemble.ts:89`（`layer-coverage: { ran: false }`）；`create-game.ts:215-226`（闸门只看 error） | `qaRunner` → `assemble` → `checked=5/6` → `qaVerdict=incomplete`；闸门忽略 verdict | `create-game.test.ts:575-587` 反而钉住 5/6 | 归档三份 `qa-report` 均 `checked=5` | 一条判据从未跑；`incomplete` 不阻断 | 「QA 通过」语义不完整 | 修正 + 补测 | **P0**（Q4） | 干净包 `checked=6`；`layer-coverage` 有正负例；`incomplete` 阻断发布 |
+ | `CAP-QA-02` | 已读真实像素的完整性指标成为可回归的 QA 判据（阈值化） | partial | `assets/ops.ts:1900-1945`（`inspectPack`）；`pipeline/create-game.ts:509-519`（塞进 `QaContext`）；`qa/assemble.ts:97-100`（只作 observations）；`qa/visual.ts` 不读像素 | `runBuild` → `inspectPack` summary → `QaContext.inspectObservation` → `observations`；三条判据族都不消费 | `inspect.test.ts` 明确「观察，不是判据」；`assemble.test.ts:119-150` 观察不改变裁决 | 真包 `player-scavenger.run` 长宽比差 **+52.4%**、v7 `health-icon` 41 个色板外像素，均 exit 0 | 没有阈值、不阻断 | 明显坏的像素仍被宣告成功 | 修正 + 补测 | **P0**（Q3） | 已知坏统计 fixture ⇒ QA `error`；已接受包 ⇒ 通过；阈值文档化；有新测试 |
+@@ -69,6 +69,10 @@ E0/E1 不得写成已验收。
+ | `CAP-RUNTIME-01` | 危险物重置玩家后物理体与地面关系正确，不软锁 | partial | `demo/shell/scene.ts:264-267`（`hitHazard` 只 `setPosition`，无 `body.reset()` / 速度归零） | hazard overlap → `hitHazard()` → `setPosition(spawn)`；物理体可能在地面以下 | `hazard.test.ts` 只测三角波位置；无 boot / 输入测试 | `hazard-repro-trace.json` + 截图：重置后 y=262.5（地面顶 250）继续下落到 413+ | 重置不重置物理体 | 掉穿地面、不可恢复 | 修正 + 补测 | **P0**（Q5） | 空中/固体上被重置后玩家在地面以上、可继续；重复重置不累积；有测试 |
+ | `CAP-E2E-01` | HEAD 上从「风格图 + 意图」到可玩 Demo 的单跑验收 | absent | 主链存在（见[调用链](P0-00-call-graph.md)） | `create` → `runUnderstanding` → `runBuild` → `assembleSite` | 不适用（真实运行，不属于测试套件） | 归档上游 + HEAD 下游重放；**无 HEAD 单跑** | 没有一次单跑 | 不能宣称端到端验收通过 | 新增（验证能力）+ 付费票 | **P0 最终验收门**（Q8） | 一次真实单跑：记录输入、命令、产物、ledger、截图、玩法轨迹；或记录阻塞与最小补充条件；不得无条件宣称通过 |
+ 
++> **2026-10-22 修订（票 12 裁定 A）**：`CAP-ASSET-01` 的「验收条件」已按票 12 修订为
++> 「明确失败 + 失败消息点名真实候选（`frames`），不落 sidecar」；本表其余列（源码证据 / 调用链 /
++> 测试证据 / 缺口 / 影响）是审计基线 `ea53240` 的证据快照，保持原样，不倒写历史。
++
+ ## 3. P1 能力差距（21 条）
+ 
+ > P1 = 显著影响质量 / 可诊断性 / 维护成本，但有可接受的临时人工步骤。施工顺序见 [P0 范围](P0-00-p0-scope.md) §6。
+diff --git a/docs/v4/P0-00-p0-scope.md b/docs/v4/P0-00-p0-scope.md
+index ed316dc..5bac4e7 100644
+--- a/docs/v4/P0-00-p0-scope.md
++++ b/docs/v4/P0-00-p0-scope.md
+@@ -330,9 +330,9 @@ MCP QA 失败测试（`CAP-QA-08` 的一部分）。
+ **建议范围**：
+ 
+ 1. **`frames` 不再静默折叠**：推荐最小修法是 `planAssets` 对 `frames` 候选明确 `invalid`
+-   （消息说明「请改用 image 或逐帧模式」），并让 sidecar 记录模型真实候选。
+-   若选择参数化保留 `frames`，必须同时改 prompt / tool schema / resolver / sidecar，
+-   工作量更大；P0 默认采用「明确失败」。
++   （消息点名资源 id 与真实候选 `frames`，说明「请改用 image 或逐帧模式」），
++   **不落 recipe / sidecar**，这一发的花费照记。若选择参数化保留 `frames`，
++   必须同时改 prompt / tool schema / resolver / sidecar，工作量更大；P0 默认采用「明确失败」。
+ 2. **MCP 错误翻译**：复用 CLI 的 `asCommandError` 语义（或抽到共享层），使设计拒绝 / 契约错误 /
+    HTTP / timeout 的 `_exitCode` 与 CLI 一致（4 / 3）。
+ 3. **MCP `stylePath` 相对化**：与 CLI `styleRefOf` 同一规则；绝对路径不再被 `StyleReferencePath` 拒。
+@@ -347,7 +347,7 @@ MCP QA 失败测试（`CAP-QA-08` 的一部分）。
+ 
+ **测试**：
+ 
+-1. 模型给 `frames` 候选 ⇒ `planAssets` 明确失败（推荐）且不落 sidecar；或参数化保留时有测试。
++1. 模型给 `frames` 候选 ⇒ `planAssets` 明确失败（推荐）、消息点名资源 id 与 `frames`、且不落 recipe / sidecar；或参数化保留时有测试。
+ 2. 非法 kind / 候选 import / 能力缺失的既有失败行为不变。
+ 3. MCP 设计拒绝 ⇒ `_exitCode=4`；HTTP 失败 ⇒ 3；usage ⇒ 2。
+ 4. MCP 绝对路径 `stylePath` ⇒ 成功（与 CLI 同输入）。
+@@ -406,12 +406,16 @@ P0 不是本审计能宣告完成的；以下是**后续 P0 程序**的完成判
+ - [ ] `CAP-ASSET-06`：`verifyPack` 在 `runBuild` 链上；坏包在 config/QA/site 前失败。
+ - [ ] `CAP-SPEC-17`：空色板在下游付费调用前被拒；0 次下游调用。
+ - [ ] `CAP-QA-02`：至少一条像素完整性判据能阻断；阈值有测量依据与正负例。
+-- [ ] `CAP-ASSET-01`：`frames` 不再静默折叠；sidecar 记录真实候选。
++- [ ] `CAP-ASSET-01`：`frames` 不再静默折叠；失败消息点名真实候选（`frames`）且不落 sidecar。
+ - [ ] `CAP-ENTRY-01/02`：MCP 错误码与绝对 `stylePath` 与 CLI 一致；有测试。
+ - [ ] MCP QA 失败路径有测试（4 / 无站点 / 报告在盘）。
+ - [ ] `pnpm test`、`pnpm typecheck`、`pnpm build` 全绿；`pnpm check` 的既有断链单独记录。
+ - [ ] P0-FINAL 付费单跑完成，或明确记录阻塞与最小补充条件；**未完成不得无条件宣称 P0 全部验收通过**。
+ 
++> **2026-10-22 修订（票 12 裁定 A）**：`CAP-ASSET-01` 原「sidecar 记录真实候选」与 §3「测试」第 1 条不相容；
++> P0 口径统一为「`frames` 明确失败 + 失败消息点名资源 id 与真实候选 `frames`，不落 sidecar」。
++> 理由与边界见 `.scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md`。
++
+ ## 6. P1 / P2 / 暂缓（不进入 P0）
+ 
+ ### 6.1 P1（21 条，质量 / 诊断 / 可复现性）

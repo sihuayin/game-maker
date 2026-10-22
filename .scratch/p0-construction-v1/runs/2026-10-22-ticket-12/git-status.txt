@@ -1,0 +1,57 @@
+ M .scratch/p0-construction-v1/issues/11-final-validation.md
+ M .scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md
+ M .scratch/p0-construction-v1/map.md
+ M .scratch/p0-construction-v1/runs/2026-10-22-final/summary.md
+ M CONTEXT.md
+ M docs/v4/P0-00-capability-gap-audit.md
+ M docs/v4/P0-00-p0-scope.md
+?? .scratch/asset-integration-v1/issues/04-evidence/
+?? .scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/
+?? .scratch/asset-integration-v1/runs/2026-10-20f-lurker/patch/
+?? .scratch/game-maker-v2/experiments/72-two-shell-size/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/plan-2026-10-17a.mjs
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/plan-2026-10-17a.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/plan-2026-10-17a/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17a.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17b.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17c.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17a/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17b/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17c/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/run-2026-10-17a.mjs
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/run-2026-10-17b.mjs
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/run-2026-10-17c.mjs
+?? .scratch/p0-construction-v1/runs/2026-10-22-ticket-12/
+?? .scratch/style-migration-v1/preview/
+?? .scratch/style-migration-v1/runs/2026-10-18a/
+?? .scratch/style-migration-v1/runs/2026-10-18b/
+?? .scratch/style-migration-v1/runs/2026-10-18c/
+?? .scratch/style-migration-v1/runs/2026-10-18d/
+?? .scratch/style-migration-v1/runs/2026-10-18e-dry/
+?? .scratch/style-migration-v1/runs/2026-10-18e-replay-clean/
+?? .scratch/style-migration-v1/runs/2026-10-18e-replay/
+?? .scratch/style-migration-v1/runs/2026-10-18e/
+?? .scratch/style-migration-v1/runs/2026-10-18f-dry/
+?? .scratch/style-migration-v1/runs/2026-10-18f-salvage/
+?? .scratch/style-migration-v1/runs/2026-10-18f/
+?? .scratch/style-migration-v1/runs/2026-10-19b-real/ruin-scavenger-extraction-assets/
+?? .scratch/style-migration-v1/runs/2026-10-19e-smoke-legacy/smoke-interactions/
+?? .scratch/style-migration-v1/runs/2026-10-19f-real-legacy/ruin-scavenger-extraction-assets/
+?? .scratch/style-migration-v1/runs/2026-10-19g-smoke-single-row/master-scavenger-actor.png
+?? .scratch/style-migration-v1/runs/2026-10-19g-smoke-single-row/smoke-single-row/
+?? .scratch/style-migration-v1/runs/2026-10-19h-real-single-row/character-dna.json
+?? .scratch/style-migration-v1/runs/2026-10-19h-real-single-row/imported/
+?? .scratch/style-migration-v1/runs/2026-10-19h-real-single-row/reuse/
+?? .scratch/style-migration-v1/runs/2026-10-19h-real-single-row/ruin-scavenger-extraction-assets/
+?? .scratch/style-migration-v1/runs/2026-10-19h-real-single-row/visual-world.json
+?? .scratch/style-migration-v1/runs/2026-10-19i-real-frames/character-dna.json
+?? .scratch/style-migration-v1/runs/2026-10-19i-real-frames/imported/
+?? .scratch/style-migration-v1/runs/2026-10-19i-real-frames/reuse/
+?? .scratch/style-migration-v1/runs/2026-10-19i-real-frames/ruin-scavenger-extraction-assets/
+?? .scratch/style-migration-v1/runs/2026-10-19i-real-frames/visual-world.json
+?? .scratch/style-migration-v1/runs/2026-10-19j-salvage/character-dna.json
+?? .scratch/style-migration-v1/runs/2026-10-19j-salvage/imported/
+?? .scratch/style-migration-v1/runs/2026-10-19j-salvage/reuse/
+?? .scratch/style-migration-v1/runs/2026-10-19j-salvage/ruin-scavenger-extraction-assets/
+?? .scratch/style-migration-v1/runs/2026-10-19j-salvage/visual-world.json
+?? .scratch/style-migration-v1/runs/2026-10-19k-patch/

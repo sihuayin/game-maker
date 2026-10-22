@@ -8,6 +8,8 @@ Effort: p0-construction-v1
 > （13 条 CAP / 6 个施工包 / P0-FINAL 另立）。本图**承载施工**（覆盖 wayfinder「只规划」默认）。
 > 第 1/2 轮裁定 Q1–Q9 全部 A，边界逐字见 Notes。
 > ⚠️ 本图**不提交、不推送、不付费**；完工停在等待单独授权状态。
+> ✅ **2026-10-22 收口**：01–12 全部 resolved。`CAP-ASSET-01` 按票 12 裁定 A 的口径记为达成；
+> 非 `CAP-E2E-01` 判据 **12 / 12**。**`CAP-E2E-01` / P0-FINAL 未完成**；停在等待提交 / 推送授权。
 
 ## Destination
 
@@ -183,15 +185,22 @@ P0-01…P0-06 六个施工包完成并通过**程序级验收**：13 条 P0 CAP 
   `pnpm check` 仅剩 **2 条既有 `.scratch` 断链**（非本图引入）。12 条非 E2E 判据
   **11 通过 / 1 部分**：`CAP-ASSET-01` 的「`frames` 不再静默折叠」已达成，但 §5 要求的
   「sidecar 记录真实候选」未落 —— §3「测试」写「不落 sidecar」、§5 写「记录真实候选」，
-  文档自相矛盾；已立 [票 12](issues/12-cap-asset-01-frames-sidecar.md)（grilling）待裁定。
+  文档自相矛盾；已立 [票 12](issues/12-cap-asset-01-frames-sidecar.md)（grilling）→ **2026-10-22 裁定 A：按修订口径该条记为达成，非 E2E 判据 12 / 12**；`CAP-E2E-01` / P0-FINAL 仍未完成。
   工作树：v7 manifest sha `e620cd7e…` / tree `64b74b0e…`、0 个文件晚于 10-21；
   `fixtures/` 工作树干净（基线以来唯一已批准改动 = `fixtures/upstream/canned.json` 的 `e-drone`）；
   `game-maker.local.json` / 既有 `CONTEXT.md` 改动均未碰。**`CAP-E2E-01` / P0-FINAL 未完成** ——
   不得无条件说「P0 全部验收通过」。证据：`runs/2026-10-22-final/summary.md`。
 
+- [12. CAP-ASSET-01 · frames 失败时是否记录模型真实候选](issues/12-cap-asset-01-frames-sidecar.md)：
+  **已收口（grilling · 裁定 A + A）** —— 以 §3「测试」为准：`frames` 候选 ⇒ `planAssets` 明确 `invalid`（4）、
+  消息点名资源 id 与真实候选 `frames`、不落 recipe / sidecar、花费随异常回报；§5「sidecar 记录真实候选」
+  不再作为 P0 判据。已原位修订 §3/§5/能力差距表并追加日期注记（审计证据列原样）；票 11 追加补记，
+  非 E2E 判据 **12 / 12**（`CAP-E2E-01` / P0-FINAL 仍未完成）。不改代码 / 契约 / 工具面；
+  模型可见的 `frames` 漂移记为 P1 observation。证据：`runs/2026-10-22-ticket-12/`。
+
 ## Not yet specified
 
-<!-- 当前没有尚未成票的雾：像素阈值已裁定（票 03）；CAP-ASSET-01 的 §3/§5 冲突已成票 12。前沿见 open 子票。 -->
+<!-- 无。2026-10-22 票 12 收口后，本图无 open 子票；P0-FINAL 在 Out of scope / 另立付费 effort。 -->
 
 ## Out of scope
 

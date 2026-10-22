@@ -330,9 +330,9 @@ MCP QA 失败测试（`CAP-QA-08` 的一部分）。
 **建议范围**：
 
 1. **`frames` 不再静默折叠**：推荐最小修法是 `planAssets` 对 `frames` 候选明确 `invalid`
-   （消息说明「请改用 image 或逐帧模式」），并让 sidecar 记录模型真实候选。
-   若选择参数化保留 `frames`，必须同时改 prompt / tool schema / resolver / sidecar，
-   工作量更大；P0 默认采用「明确失败」。
+   （消息点名资源 id 与真实候选 `frames`，说明「请改用 image 或逐帧模式」），
+   **不落 recipe / sidecar**，这一发的花费照记。若选择参数化保留 `frames`，
+   必须同时改 prompt / tool schema / resolver / sidecar，工作量更大；P0 默认采用「明确失败」。
 2. **MCP 错误翻译**：复用 CLI 的 `asCommandError` 语义（或抽到共享层），使设计拒绝 / 契约错误 /
    HTTP / timeout 的 `_exitCode` 与 CLI 一致（4 / 3）。
 3. **MCP `stylePath` 相对化**：与 CLI `styleRefOf` 同一规则；绝对路径不再被 `StyleReferencePath` 拒。
@@ -347,7 +347,7 @@ MCP QA 失败测试（`CAP-QA-08` 的一部分）。
 
 **测试**：
 
-1. 模型给 `frames` 候选 ⇒ `planAssets` 明确失败（推荐）且不落 sidecar；或参数化保留时有测试。
+1. 模型给 `frames` 候选 ⇒ `planAssets` 明确失败（推荐）、消息点名资源 id 与 `frames`、且不落 recipe / sidecar；或参数化保留时有测试。
 2. 非法 kind / 候选 import / 能力缺失的既有失败行为不变。
 3. MCP 设计拒绝 ⇒ `_exitCode=4`；HTTP 失败 ⇒ 3；usage ⇒ 2。
 4. MCP 绝对路径 `stylePath` ⇒ 成功（与 CLI 同输入）。
@@ -406,11 +406,15 @@ P0 不是本审计能宣告完成的；以下是**后续 P0 程序**的完成判
 - [ ] `CAP-ASSET-06`：`verifyPack` 在 `runBuild` 链上；坏包在 config/QA/site 前失败。
 - [ ] `CAP-SPEC-17`：空色板在下游付费调用前被拒；0 次下游调用。
 - [ ] `CAP-QA-02`：至少一条像素完整性判据能阻断；阈值有测量依据与正负例。
-- [ ] `CAP-ASSET-01`：`frames` 不再静默折叠；sidecar 记录真实候选。
+- [ ] `CAP-ASSET-01`：`frames` 不再静默折叠；失败消息点名真实候选（`frames`）且不落 sidecar。
 - [ ] `CAP-ENTRY-01/02`：MCP 错误码与绝对 `stylePath` 与 CLI 一致；有测试。
 - [ ] MCP QA 失败路径有测试（4 / 无站点 / 报告在盘）。
 - [ ] `pnpm test`、`pnpm typecheck`、`pnpm build` 全绿；`pnpm check` 的既有断链单独记录。
 - [ ] P0-FINAL 付费单跑完成，或明确记录阻塞与最小补充条件；**未完成不得无条件宣称 P0 全部验收通过**。
+
+> **2026-10-22 修订（票 12 裁定 A）**：`CAP-ASSET-01` 原「sidecar 记录真实候选」与 §3「测试」第 1 条不相容；
+> P0 口径统一为「`frames` 明确失败 + 失败消息点名资源 id 与真实候选 `frames`，不落 sidecar」。
+> 理由与边界见 `.scratch/p0-construction-v1/issues/12-cap-asset-01-frames-sidecar.md`。
 
 ## 6. P1 / P2 / 暂缓（不进入 P0）
 
