@@ -1,0 +1,40 @@
+
+> game-maker@0.0.0 test:playable /Volumes/shy/some-projects/game-maker
+> pnpm build && node packages/demo/probe/playable-smoke.mjs --negative input --out .scratch/p0-construction-v1/runs/2026-10-22-ticket-10
+
+
+> game-maker@0.0.0 build /Volumes/shy/some-projects/game-maker
+> tsc -b && pnpm -r --if-present bundle
+
+Scope: 9 of 10 workspace projects
+packages/demo bundle$ esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js
+packages/demo bundle:   dist/shell.js  1.5mb ⚠️
+packages/demo bundle: ⚡ Done in 100ms
+packages/demo bundle: Done
+packages/cli bundle$ esbuild src/cli.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/cli.mjs --external:vite --external:phaser
+packages/mcp bundle$ esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser
+packages/mcp bundle:   dist/server.mjs  1.3mb ⚠️
+packages/mcp bundle: ⚡ Done in 21ms
+packages/cli bundle:   dist/cli.mjs  1.4mb ⚠️
+packages/cli bundle: ⚡ Done in 22ms
+packages/mcp bundle: Done
+packages/cli bundle: Done
+Chrome: Google Chrome 155.0.8059.85 (/Applications/Google Chrome.app/Contents/MacOS/Google Chrome)
+包: /Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7
+config: /Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json
+证据: /Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-ticket-10
+
+==============================================================================
+站点装配
+==============================================================================
+   站点：ruin-scavenger-extraction-assets/site/v3（复用已存在的包 ruin-scavenger-extraction-assets/pack/v7）
+   消费：外壳 v2 · 资源包 v7（19 个资源）
+   校验：三族 + 第四族（几何）+ 第五族（HUD 屏幕空间）全过
+   ⚠️ 起服务时 **HTTP server 的根必须是 ruin-scavenger-extraction-assets/** —— 打开 /site/v3/index.html（根指到 site 里面会 404，而 Phaser 静默失败）
+   URL: http://127.0.0.1:63519/site/v3/index.html
+
+==============================================================================
+负例 · 破坏输入
+==============================================================================
+✅ 负例按预期失败（move） · 7.5s · 按预期在 move 阶段失败：超时 7000ms：x=40.0 collected=0/3 won=false
+ ELIFECYCLE  Command failed with exit code 1.

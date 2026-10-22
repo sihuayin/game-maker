@@ -1,0 +1,11 @@
+[positive] chrome=Chrome/155.0.8059.85 url=http://127.0.0.1:63363/site/v1/index.html
+  playable ok=true stage=won durationMs=6612 :: collected=3/3 · x=545.0
+  hazard-reset ok=true stage=reset-floor durationMs=10294 :: 两次重置均在 30 帧内回到 floorY（静止脚线 250.00 / 250.00），collected/won 未变
+  hazard-legacy ok=true stage=reset-floor durationMs=5361 :: 旧实现按预期在 reset-floor 失败：重置后 30 帧内 body.bottom 最大 379.50 > floorY+1 (251.00)；重置后 30 帧内 onFloor 没有变真
+[gate] chrome=Google Chrome 155.0.8059.85 url=-
+  gate ok=true stage=assemble durationMs=6 :: 按预期在装配期拒绝（invalid）：装配期校验不过 —— 硬失败，不产出站点（1 条）：
+  · objective.gate: 找不到 id 为 "no-such-gate-for-p03-negative" 的 goal 实体（现有 goal：extraction）
+[pickup] chrome=Chrome/155.0.8059.85 url=http://127.0.0.1:63457/site/v2/index.html
+  negative-pickup ok=true stage=win durationMs=8427 :: 按预期在 win 阶段失败：已到 gate（x=608.0，gate.x=600）但 won=false；collected=2/3
+[input] chrome=Chrome/155.0.8059.85 url=http://127.0.0.1:63519/site/v3/index.html
+  negative-input ok=true stage=move durationMs=7484 :: 按预期在 move 阶段失败：超时 7000ms：x=40.0 collected=0/3 won=false

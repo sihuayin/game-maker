@@ -165,6 +165,18 @@ P0-01…P0-06 六个施工包完成并通过**程序级验收**：13 条 P0 CAP 
   库调用方不受闸、README fixture 快速开始改 TD（side-scroller 不能直接 site）。证据：
   `runs/2026-10-22-ticket-09/`。
 
+- [10. P0-03 · 可玩性 headless smoke](issues/10-p0-03-headless-playable-smoke.md)：**已收口（施工）** ——
+  新增独立 `pnpm test:playable`（根 `package.json`）+ `packages/demo/probe/playable-smoke.mjs`：
+  Node 22 内置 WebSocket + 系统 Chrome 155 CDP，**零新依赖**；用已验收 v7 包 + 配套 config
+  真实装配站点。状态探针沿用 W6：`window.Phaser` setter 上挂 Proxy ⇒ `window.__gmGame`，
+  读 x/y/body.bottom/onFloor/blockedRight/collected/pickups/hazards/solids；输入全状态驱动。
+  实跑（Chrome 155.0.8059.85）：正例 6.6 s 拾取 3/3 到 gate `won=true`；软锁专项两次
+  「木箱顶起跳 → 空中撞 hazard → 重置」×30 帧采样，`bottom ≤ floorY+1`、`onFloor` 变真、
+  `collected/won` 不变，静止脚线 250.00 / 250.00；旧实现负例按预期红（bottom 379.50）。
+  三类负例各自 exit 1 并报阶段：gate 指错=`assemble`（装配期 invalid）、运行时拿掉 pickup=`win`、
+  破坏输入=`move`。`pnpm test` 1810/119、`pnpm typecheck` 全绿；零付费；未改运行时 / v7 / fixtures；
+  证据 `runs/2026-10-22-ticket-10/run.md`。
+
 ## Not yet specified
 
 <!-- 当前没有尚未成票的雾：像素阈值已裁定并收口（见票 03）；前沿见 open 子票。 -->
