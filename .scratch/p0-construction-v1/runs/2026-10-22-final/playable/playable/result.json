@@ -1,0 +1,7008 @@
+{
+  "ok": true,
+  "stage": "won",
+  "reason": "collected=3/3 · x=548.0",
+  "durationMs": 6449,
+  "floorY": 250,
+  "spawn": {
+    "x": 40,
+    "y": 250
+  },
+  "resets": 0,
+  "final": {
+    "x": 548,
+    "y": 193,
+    "bottom": 193,
+    "top": 129,
+    "left": 524,
+    "right": 572,
+    "vx": 90,
+    "vy": 0,
+    "onFloor": true,
+    "blockedRight": false,
+    "touchingRight": true,
+    "collected": 3,
+    "won": true,
+    "pickups": [
+      {
+        "x": 120,
+        "y": 230,
+        "active": false
+      },
+      {
+        "x": 215,
+        "y": 225,
+        "active": false
+      },
+      {
+        "x": 430,
+        "y": 180,
+        "active": false
+      }
+    ],
+    "hazards": [
+      {
+        "x": 380,
+        "y": 250
+      },
+      {
+        "x": 488.5194666615802,
+        "y": 250
+      }
+    ],
+    "gate": {
+      "x": 600,
+      "y": 250
+    }
+  },
+  "shots": [
+    "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable/playable/00-start.png",
+    "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable/playable/pickup-1.png",
+    "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable/playable/pickup-2.png",
+    "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable/playable/pickup-3.png",
+    "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable/playable/won.png"
+  ],
+  "trace": [
+    {
+      "t": 455,
+      "x": 40,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 16,
+      "right": 64,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 490.821422217136,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 492,
+      "x": 41.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 17.5,
+      "right": 65.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 491.70835555046926,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 529,
+      "x": 44.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 20.5,
+      "right": 68.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 492.59555555046927,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 566,
+      "x": 47.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 23.5,
+      "right": 71.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 493.48302221713595,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 604,
+      "x": 52,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 28,
+      "right": 76,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 494.8145777726915,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 641,
+      "x": 55,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 31,
+      "right": 79,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 495.7023999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 679,
+      "x": 58,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 34,
+      "right": 82,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 496.59004443935817,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 716,
+      "x": 61,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 37,
+      "right": 85,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 497.4776888838026,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 755,
+      "x": 65.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 41.5,
+      "right": 89.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 498.80888888380264,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 791,
+      "x": 68.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 44.5,
+      "right": 92.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 499.69599999491373,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 829,
+      "x": 71.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 47.5,
+      "right": 95.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 500.58311110602483,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 867,
+      "x": 74.5,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 50.5,
+      "right": 98.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 501.47039999491375,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 906,
+      "x": 79,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 55,
+      "right": 103,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 502.80142221713595,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 943,
+      "x": 82,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 58,
+      "right": 106,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": true
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 503.6887111060248,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 981,
+      "x": 85,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 61,
+      "right": 109,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": true,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 504.57599999491373,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1045,
+      "jump": true,
+      "x": 85,
+      "y": 250,
+      "bottom": 250,
+      "onFloor": true
+    },
+    {
+      "t": 1135,
+      "x": 98.5,
+      "y": 230.5,
+      "bottom": 230.5,
+      "top": 166.5,
+      "left": 74.5,
+      "right": 122.5,
+      "vx": 90,
+      "vy": -270,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 508.5697777726915,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1171,
+      "x": 103,
+      "y": 218.5,
+      "bottom": 218.5,
+      "top": 154.5,
+      "left": 79,
+      "right": 127,
+      "vx": 90,
+      "vy": -225,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 509.9015111060248,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1209,
+      "x": 106,
+      "y": 211.75,
+      "bottom": 211.75,
+      "top": 147.75,
+      "left": 82,
+      "right": 130,
+      "vx": 90,
+      "vy": -195,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 510.7891555504693,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1245,
+      "x": 109,
+      "y": 206,
+      "bottom": 206,
+      "top": 142,
+      "left": 85,
+      "right": 133,
+      "vx": 90,
+      "vy": -165,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 511.6769777726915,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1285,
+      "x": 112,
+      "y": 201.25,
+      "bottom": 201.25,
+      "top": 137.25,
+      "left": 88,
+      "right": 136,
+      "vx": 90,
+      "vy": -135,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 512.5647999949138,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1323,
+      "x": 116.5,
+      "y": 196,
+      "bottom": 196,
+      "top": 132,
+      "left": 92.5,
+      "right": 140.5,
+      "vx": 90,
+      "vy": -90,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 513.8959999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1361,
+      "x": 119.5,
+      "y": 193.75,
+      "bottom": 193.75,
+      "top": 129.75,
+      "left": 95.5,
+      "right": 143.5,
+      "vx": 90,
+      "vy": -60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 514.783822217136,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1398,
+      "x": 122.5,
+      "y": 192.5,
+      "bottom": 192.5,
+      "top": 128.5,
+      "left": 98.5,
+      "right": 146.5,
+      "vx": 90,
+      "vy": -30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 515.6716444393583,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1439,
+      "x": 127,
+      "y": 192.5,
+      "bottom": 192.5,
+      "top": 128.5,
+      "left": 103,
+      "right": 151,
+      "vx": 90,
+      "vy": 15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 517.0028444393582,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1476,
+      "x": 130,
+      "y": 193.75,
+      "bottom": 193.75,
+      "top": 129.75,
+      "left": 106,
+      "right": 154,
+      "vx": 90,
+      "vy": 45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 517.8906666615804,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1514,
+      "x": 133,
+      "y": 196,
+      "bottom": 196,
+      "top": 132,
+      "left": 109,
+      "right": 157,
+      "vx": 90,
+      "vy": 75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 518.7781333282471,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1552,
+      "x": 136,
+      "y": 199.25,
+      "bottom": 199.25,
+      "top": 135.25,
+      "left": 112,
+      "right": 160,
+      "vx": 90,
+      "vy": 105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 519.6652444393582,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1590,
+      "x": 140.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 116.5,
+      "right": 164.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 519.0037333384196,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1629,
+      "x": 143.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 119.5,
+      "right": 167.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 518.1162666717529,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1666,
+      "x": 146.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 122.5,
+      "right": 170.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 517.2288000050862,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1702,
+      "x": 149.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 125.5,
+      "right": 173.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 516.3415111161974,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1738,
+      "x": 154,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 130,
+      "right": 178,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 515.0103111161974,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1775,
+      "x": 157,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 133,
+      "right": 181,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 514.1230222273085,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1812,
+      "x": 160,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 136,
+      "right": 184,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 513.2359111161974,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1848,
+      "x": 163,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 139,
+      "right": 187,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 512.3484444495307,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1885,
+      "x": 166,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 142,
+      "right": 190,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 511.46097778286406,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1921,
+      "x": 170.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 146.5,
+      "right": 194.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 510.12977778286404,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1958,
+      "x": 173.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 149.5,
+      "right": 197.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 509.2423111161974,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 1995,
+      "x": 176.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 152.5,
+      "right": 200.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 508.35520000508626,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2032,
+      "x": 179.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 155.5,
+      "right": 203.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 507.46826667175293,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2068,
+      "x": 182.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 158.5,
+      "right": 206.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 506.58133333841965,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2104,
+      "x": 187,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 163,
+      "right": 211,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 505.25057778286407,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2141,
+      "x": 190,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 166,
+      "right": 214,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 504.3632000050863,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2178,
+      "x": 193,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 169,
+      "right": 217,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 503.4751111161974,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2216,
+      "x": 196,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 172,
+      "right": 220,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 502.58666667175294,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2255,
+      "x": 200.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 176.5,
+      "right": 224.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 501.2536000050863,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2293,
+      "x": 203.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 179.5,
+      "right": 227.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 500.3645333384196,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2331,
+      "x": 206.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 182.5,
+      "right": 230.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 499.47546667175294,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2369,
+      "x": 209.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 185.5,
+      "right": 233.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 498.58640000508626,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2407,
+      "x": 214,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 190,
+      "right": 238,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 497.25306667175295,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2445,
+      "x": 217,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 193,
+      "right": 241,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 496.36400000508627,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2483,
+      "x": 220,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 196,
+      "right": 244,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 495.47520000508626,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2522,
+      "x": 224.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 200.5,
+      "right": 248.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 494.1421333384196,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2558,
+      "x": 227.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 203.5,
+      "right": 251.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 493.2533333384196,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2596,
+      "x": 230.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 206.5,
+      "right": 254.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 492.3648000050863,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2633,
+      "x": 233.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 209.5,
+      "right": 257.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 491.47626667175297,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2671,
+      "x": 238,
+      "y": 202.75,
+      "bottom": 202.75,
+      "top": 138.75,
+      "left": 214,
+      "right": 262,
+      "vx": 90,
+      "vy": 30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 490.14293333841965,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2709,
+      "x": 241,
+      "y": 204.5,
+      "bottom": 204.5,
+      "top": 140.5,
+      "left": 217,
+      "right": 265,
+      "vx": 90,
+      "vy": 60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 489.25413333841965,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2747,
+      "x": 244,
+      "y": 207.25,
+      "bottom": 207.25,
+      "top": 143.25,
+      "left": 220,
+      "right": 268,
+      "vx": 90,
+      "vy": 90,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 488.36533333841965,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2785,
+      "x": 247,
+      "y": 211,
+      "bottom": 211,
+      "top": 147,
+      "left": 223,
+      "right": 271,
+      "vx": 90,
+      "vy": 120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 1,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": true
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 487.47626667175297,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2823,
+      "x": 251.5,
+      "y": 218.5,
+      "bottom": 218.5,
+      "top": 154.5,
+      "left": 227.5,
+      "right": 275.5,
+      "vx": 90,
+      "vy": 165,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 486.14293333841965,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2938,
+      "x": 262,
+      "y": 244.75,
+      "bottom": 244.75,
+      "top": 180.75,
+      "left": 238,
+      "right": 286,
+      "vx": 90,
+      "vy": 270,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 483.0320000050863,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 2975,
+      "x": 265,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 241,
+      "right": 289,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 482.14293333841965,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3012,
+      "x": 268,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 244,
+      "right": 292,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 481.253866671753,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3049,
+      "x": 271,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 247,
+      "right": 295,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 480.36506667175297,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3088,
+      "x": 272,
+      "y": 250,
+      "bottom": 250,
+      "top": 186,
+      "left": 248,
+      "right": 296,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 480.968533328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3088,
+      "jump": true,
+      "x": 272,
+      "y": 250,
+      "bottom": 250,
+      "onFloor": true
+    },
+    {
+      "t": 3179,
+      "x": 272,
+      "y": 230.5,
+      "bottom": 230.5,
+      "top": 166.5,
+      "left": 248,
+      "right": 296,
+      "vx": 90,
+      "vy": -270,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 483.1903999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3216,
+      "x": 272,
+      "y": 222.25,
+      "bottom": 222.25,
+      "top": 158.25,
+      "left": 248,
+      "right": 296,
+      "vx": 90,
+      "vy": -240,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 484.07919999491367,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3254,
+      "x": 272,
+      "y": 211.75,
+      "bottom": 211.75,
+      "top": 147.75,
+      "left": 248,
+      "right": 296,
+      "vx": 90,
+      "vy": -195,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 485.41253332824704,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3292,
+      "x": 272,
+      "y": 206,
+      "bottom": 206,
+      "top": 142,
+      "left": 248,
+      "right": 296,
+      "vx": 90,
+      "vy": -165,
+      "onFloor": false,
+      "blockedRight": true,
+      "touchingRight": true,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 486.30133332824704,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3330,
+      "x": 273.5,
+      "y": 201.25,
+      "bottom": 201.25,
+      "top": 137.25,
+      "left": 249.5,
+      "right": 297.5,
+      "vx": 90,
+      "vy": -135,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 487.19013332824704,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3368,
+      "x": 276.5,
+      "y": 197.5,
+      "bottom": 197.5,
+      "top": 133.5,
+      "left": 252.5,
+      "right": 300.5,
+      "vx": 90,
+      "vy": -105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 488.0786666615803,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3406,
+      "x": 281,
+      "y": 193.75,
+      "bottom": 193.75,
+      "top": 129.75,
+      "left": 257,
+      "right": 305,
+      "vx": 90,
+      "vy": -60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 489.41226666158036,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3444,
+      "x": 284,
+      "y": 192.5,
+      "bottom": 192.5,
+      "top": 128.5,
+      "left": 260,
+      "right": 308,
+      "vx": 90,
+      "vy": -30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 490.30106666158036,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3482,
+      "x": 287,
+      "y": 192.25,
+      "bottom": 192.25,
+      "top": 128.25,
+      "left": 263,
+      "right": 311,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 491.19013332824704,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3518,
+      "x": 290,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 266,
+      "right": 314,
+      "vx": 90,
+      "vy": 30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 492.07919999491367,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3556,
+      "x": 294.5,
+      "y": 196,
+      "bottom": 196,
+      "top": 132,
+      "left": 270.5,
+      "right": 318.5,
+      "vx": 90,
+      "vy": 75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 493.41226666158036,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3592,
+      "x": 297.5,
+      "y": 199.25,
+      "bottom": 199.25,
+      "top": 135.25,
+      "left": 273.5,
+      "right": 321.5,
+      "vx": 90,
+      "vy": 105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 494.30106666158036,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3630,
+      "x": 300.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 276.5,
+      "right": 324.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 495.1895999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3668,
+      "x": 303.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 279.5,
+      "right": 327.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 496.0783999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3706,
+      "x": 308,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 284,
+      "right": 332,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 497.411733328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3743,
+      "x": 311,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 287,
+      "right": 335,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 498.3007999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3780,
+      "x": 314,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 290,
+      "right": 338,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 499.1895999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3819,
+      "x": 317,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 293,
+      "right": 341,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 500.0786666615803,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3857,
+      "x": 321.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 297.5,
+      "right": 345.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 501.4119999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3894,
+      "x": 324.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 300.5,
+      "right": 348.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 502.3007999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3932,
+      "x": 327.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 303.5,
+      "right": 351.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 503.18986666158037,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 3969,
+      "x": 330.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 306.5,
+      "right": 354.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 504.0786666615803,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4006,
+      "x": 335,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 311,
+      "right": 359,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 505.4119999949137,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4044,
+      "x": 338,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 314,
+      "right": 362,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 506.300533328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4081,
+      "x": 341,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 317,
+      "right": 365,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 507.18906666158034,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4119,
+      "x": 344,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 320,
+      "right": 368,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 508.07813332824696,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4157,
+      "x": 348.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 324.5,
+      "right": 372.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 509.41146666158033,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4195,
+      "x": 351.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 327.5,
+      "right": 375.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 510.30026666158034,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4233,
+      "x": 354.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 330.5,
+      "right": 378.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 511.189333328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4233,
+      "jump": true,
+      "x": 354.5,
+      "y": 202,
+      "bottom": 202,
+      "onFloor": true
+    },
+    {
+      "t": 4324,
+      "x": 363.5,
+      "y": 178.25,
+      "bottom": 178.25,
+      "top": 114.25,
+      "left": 339.5,
+      "right": 387.5,
+      "vx": 90,
+      "vy": -255,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 513.855733328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4361,
+      "x": 366.5,
+      "y": 170.5,
+      "bottom": 170.5,
+      "top": 106.5,
+      "left": 342.5,
+      "right": 390.5,
+      "vx": 90,
+      "vy": -225,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 514.744533328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4399,
+      "x": 369.5,
+      "y": 163.75,
+      "bottom": 163.75,
+      "top": 99.75,
+      "left": 345.5,
+      "right": 393.5,
+      "vx": 90,
+      "vy": -195,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 515.633333328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4437,
+      "x": 372.5,
+      "y": 158,
+      "bottom": 158,
+      "top": 94,
+      "left": 348.5,
+      "right": 396.5,
+      "vx": 90,
+      "vy": -165,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 516.522133328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4474,
+      "x": 377,
+      "y": 151.25,
+      "bottom": 151.25,
+      "top": 87.25,
+      "left": 353,
+      "right": 401,
+      "vx": 90,
+      "vy": -120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 517.8551999949136,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4511,
+      "x": 380,
+      "y": 148,
+      "bottom": 148,
+      "top": 84,
+      "left": 356,
+      "right": 404,
+      "vx": 90,
+      "vy": -90,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 518.744533328247,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4549,
+      "x": 383,
+      "y": 145.75,
+      "bottom": 145.75,
+      "top": 81.75,
+      "left": 359,
+      "right": 407,
+      "vx": 90,
+      "vy": -60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 519.6330666615803,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4588,
+      "x": 387.5,
+      "y": 144.25,
+      "bottom": 144.25,
+      "top": 80.25,
+      "left": 363.5,
+      "right": 411.5,
+      "vx": 90,
+      "vy": -15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 519.0333333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4626,
+      "x": 390.5,
+      "y": 144.5,
+      "bottom": 144.5,
+      "top": 80.5,
+      "left": 366.5,
+      "right": 414.5,
+      "vx": 90,
+      "vy": 15,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 518.144266671753,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4663,
+      "x": 393.5,
+      "y": 145.75,
+      "bottom": 145.75,
+      "top": 81.75,
+      "left": 369.5,
+      "right": 417.5,
+      "vx": 90,
+      "vy": 45,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 517.255466671753,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4701,
+      "x": 396.5,
+      "y": 148,
+      "bottom": 148,
+      "top": 84,
+      "left": 372.5,
+      "right": 420.5,
+      "vx": 90,
+      "vy": 75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 516.3661333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4739,
+      "x": 401,
+      "y": 153.25,
+      "bottom": 153.25,
+      "top": 89.25,
+      "left": 377,
+      "right": 425,
+      "vx": 90,
+      "vy": 120,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 515.0333333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4778,
+      "x": 404,
+      "y": 158,
+      "bottom": 158,
+      "top": 94,
+      "left": 380,
+      "right": 428,
+      "vx": 90,
+      "vy": 150,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 514.1445333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4815,
+      "x": 407,
+      "y": 163.75,
+      "bottom": 163.75,
+      "top": 99.75,
+      "left": 383,
+      "right": 431,
+      "vx": 90,
+      "vy": 180,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 2,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": true
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 513.2560000050863,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4854,
+      "x": 410,
+      "y": 170.5,
+      "bottom": 170.5,
+      "top": 106.5,
+      "left": 386,
+      "right": 434,
+      "vx": 90,
+      "vy": 210,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": true,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 512.3672000050864,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4960,
+      "x": 420.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 396.5,
+      "right": 444.5,
+      "vx": 90,
+      "vy": 315,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 509.2560000050864,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 4997,
+      "x": 423.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 399.5,
+      "right": 447.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 508.3672000050864,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5034,
+      "x": 426.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 402.5,
+      "right": 450.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 507.47840000508637,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5071,
+      "x": 431,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 407,
+      "right": 455,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 506.14506667175306,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5108,
+      "x": 434,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 410,
+      "right": 458,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 505.25626667175305,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5145,
+      "x": 437,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 413,
+      "right": 461,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 504.3677333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5183,
+      "x": 440,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 416,
+      "right": 464,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 503.47866667175305,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5222,
+      "x": 444.5,
+      "y": 202,
+      "bottom": 202,
+      "top": 138,
+      "left": 420.5,
+      "right": 468.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 502.1456000050864,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5222,
+      "jump": true,
+      "x": 444.5,
+      "y": 202,
+      "bottom": 202,
+      "onFloor": true
+    },
+    {
+      "t": 5312,
+      "x": 452,
+      "y": 182.5,
+      "bottom": 182.5,
+      "top": 118.5,
+      "left": 428,
+      "right": 476,
+      "vx": 90,
+      "vy": -270,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 499.92320000508636,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5350,
+      "x": 455,
+      "y": 174.25,
+      "bottom": 174.25,
+      "top": 110.25,
+      "left": 431,
+      "right": 479,
+      "vx": 90,
+      "vy": -240,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 499.03466667175303,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5389,
+      "x": 459.5,
+      "y": 163.75,
+      "bottom": 163.75,
+      "top": 99.75,
+      "left": 435.5,
+      "right": 483.5,
+      "vx": 90,
+      "vy": -195,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 497.70106667175304,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5426,
+      "x": 462.5,
+      "y": 158,
+      "bottom": 158,
+      "top": 94,
+      "left": 438.5,
+      "right": 486.5,
+      "vx": 90,
+      "vy": -165,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 496.81226667175304,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5462,
+      "x": 465.5,
+      "y": 153.25,
+      "bottom": 153.25,
+      "top": 89.25,
+      "left": 441.5,
+      "right": 489.5,
+      "vx": 90,
+      "vy": -135,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 495.92346667175303,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5500,
+      "x": 468.5,
+      "y": 149.5,
+      "bottom": 149.5,
+      "top": 85.5,
+      "left": 444.5,
+      "right": 492.5,
+      "vx": 90,
+      "vy": -105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 495.03440000508635,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5539,
+      "x": 473,
+      "y": 145.75,
+      "bottom": 145.75,
+      "top": 81.75,
+      "left": 449,
+      "right": 497,
+      "vx": 90,
+      "vy": -60,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 493.70080000508636,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5576,
+      "x": 476,
+      "y": 144.5,
+      "bottom": 144.5,
+      "top": 80.5,
+      "left": 452,
+      "right": 500,
+      "vx": 90,
+      "vy": -30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 492.811466671753,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5614,
+      "x": 479,
+      "y": 144.25,
+      "bottom": 144.25,
+      "top": 80.25,
+      "left": 455,
+      "right": 503,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 491.9229333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5652,
+      "x": 482,
+      "y": 145,
+      "bottom": 145,
+      "top": 81,
+      "left": 458,
+      "right": 506,
+      "vx": 90,
+      "vy": 30,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 491.0341333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5690,
+      "x": 486.5,
+      "y": 148,
+      "bottom": 148,
+      "top": 84,
+      "left": 462.5,
+      "right": 510.5,
+      "vx": 90,
+      "vy": 75,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 489.70106667175304,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5728,
+      "x": 489.5,
+      "y": 151.25,
+      "bottom": 151.25,
+      "top": 87.25,
+      "left": 465.5,
+      "right": 513.5,
+      "vx": 90,
+      "vy": 105,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 488.8125333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5766,
+      "x": 492.5,
+      "y": 155.5,
+      "bottom": 155.5,
+      "top": 91.5,
+      "left": 468.5,
+      "right": 516.5,
+      "vx": 90,
+      "vy": 135,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 487.9240000050864,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5805,
+      "x": 497,
+      "y": 163.75,
+      "bottom": 163.75,
+      "top": 99.75,
+      "left": 473,
+      "right": 521,
+      "vx": 90,
+      "vy": 180,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 486.59066667175307,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5843,
+      "x": 500,
+      "y": 170.5,
+      "bottom": 170.5,
+      "top": 106.5,
+      "left": 476,
+      "right": 524,
+      "vx": 90,
+      "vy": 210,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 485.70186667175307,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5880,
+      "x": 503,
+      "y": 178.25,
+      "bottom": 178.25,
+      "top": 114.25,
+      "left": 479,
+      "right": 527,
+      "vx": 90,
+      "vy": 240,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 484.8128000050864,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5919,
+      "x": 506,
+      "y": 187,
+      "bottom": 187,
+      "top": 123,
+      "left": 482,
+      "right": 530,
+      "vx": 90,
+      "vy": 270,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 483.9237333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5955,
+      "x": 510.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 486.5,
+      "right": 534.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 482.5901333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 5992,
+      "x": 513.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 489.5,
+      "right": 537.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 481.7013333384197,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6030,
+      "x": 516.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 492.5,
+      "right": 540.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 480.81226667175304,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6068,
+      "x": 519.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 495.5,
+      "right": 543.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 480.0762666615803,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6106,
+      "x": 524,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 500,
+      "right": 548,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 481.40906666158025,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6144,
+      "x": 527,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 503,
+      "right": 551,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 482.29786666158026,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6182,
+      "x": 530,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 506,
+      "right": 554,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 483.18693332824694,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6220,
+      "x": 533,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 509,
+      "right": 557,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 484.07546666158026,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6257,
+      "x": 537.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 513.5,
+      "right": 561.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 485.4085333282469,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6295,
+      "x": 540.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 516.5,
+      "right": 564.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 486.2973333282469,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6332,
+      "x": 543.5,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 519.5,
+      "right": 567.5,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 3,
+      "won": false,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 487.1861333282469,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    },
+    {
+      "t": 6370,
+      "x": 548,
+      "y": 193,
+      "bottom": 193,
+      "top": 129,
+      "left": 524,
+      "right": 572,
+      "vx": 90,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": true,
+      "collected": 3,
+      "won": true,
+      "pickups": [
+        {
+          "x": 120,
+          "y": 230,
+          "active": false
+        },
+        {
+          "x": 215,
+          "y": 225,
+          "active": false
+        },
+        {
+          "x": 430,
+          "y": 180,
+          "active": false
+        }
+      ],
+      "hazards": [
+        {
+          "x": 380,
+          "y": 250
+        },
+        {
+          "x": 488.5194666615802,
+          "y": 250
+        }
+      ],
+      "gate": {
+        "x": 600,
+        "y": 250
+      }
+    }
+  ]
+}

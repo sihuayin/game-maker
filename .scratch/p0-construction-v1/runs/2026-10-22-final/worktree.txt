@@ -1,0 +1,120 @@
+== 时间 ==
+2026-10-22T07:46:06Z
+
+== v7 manifest sha256 / mtime ==
+e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326  .scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/manifest.json
+Oct 20 17:17:57 2026 .scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/manifest.json
+Oct 20 17:17:57 2026 .scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7
+Oct 20 17:17:57 2026 .scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/delivery
+
+== v7 files modified during map (newer than 2026-10-21) ==
+(count: 0)
+
+== v7 tree sha256 (sorted per-file sha256) ==
+64b74b0e9cc1765453f62dfbc73f19b90c06060f678a4d4dd52593982f81baff  -
+
+== fixtures worktree status/diff ==
+status-exit=0
+diff-exit=0
+
+== fixtures files modified during map ==
+fixtures/upstream/canned.json
+fixtures/animation-baselines/scavenger-idle/baseline.json
+fixtures/animation-baselines/scavenger-idle/README.md
+fixtures/animation-baselines/scavenger-idle/delivery/scavenger-actor.idle1.png
+fixtures/animation-baselines/scavenger-idle/delivery/scavenger-actor.idle2.png
+fixtures/animation-baselines/scavenger-idle/delivery/scavenger-actor.idle3.png
+fixtures/animation-baselines/scavenger-idle/delivery/scavenger-actor.idle4.png
+fixtures/animation-baselines/scavenger-idle/prompts/actual.idle1.txt
+fixtures/animation-baselines/scavenger-idle/prompts/actual.idle2.txt
+fixtures/animation-baselines/scavenger-idle/prompts/actual.idle3.txt
+fixtures/animation-baselines/scavenger-idle/prompts/actual.idle4.txt
+fixtures/animation-baselines/scavenger-idle/prompts/pack.idle1.txt
+fixtures/animation-baselines/scavenger-idle/prompts/pack.idle2.txt
+fixtures/animation-baselines/scavenger-idle/prompts/pack.idle3.txt
+fixtures/animation-baselines/scavenger-idle/prompts/pack.idle4.txt
+fixtures/animation-baselines/scavenger-idle/raw/scavenger-actor.idle1.png
+fixtures/animation-baselines/scavenger-idle/raw/scavenger-actor.idle2.png
+fixtures/animation-baselines/scavenger-idle/raw/scavenger-actor.idle3.png
+fixtures/animation-baselines/scavenger-idle/raw/scavenger-actor.idle4.png
+(count: 19)
+
+== fixtures changes committed during map (70631af..HEAD) ==
+5a6e77a 按票 01–03 收口：P0-04 资产完整性链 + P0-06 入口语义 + P0-05a 像素指标提案 —— 施工 · 验证 · 部分关票（03 待裁定）
+ fixtures/upstream/canned.json | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+== game-maker.local.json ==
+97ac7e7cad7e246e1295424216708114f0902443db28e58832da40e7a69fa981  game-maker.local.json
+Oct 19 12:44:58 2026 game-maker.local.json
+
+== CONTEXT.md ==
+3ede3deb6264b77864cb27bf034297c6f1c1aa37e533f27f17d9fccc0ea7ee46  CONTEXT.md
+Oct 22 11:03:10 2026 CONTEXT.md
+ CONTEXT.md | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+== worktree status (top) ==
+ M .scratch/p0-construction-v1/issues/11-final-validation.md
+ M CONTEXT.md
+?? .scratch/asset-integration-v1/issues/04-evidence/
+?? .scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/
+?? .scratch/asset-integration-v1/runs/2026-10-20f-lurker/patch/
+?? .scratch/game-maker-v2/experiments/72-two-shell-size/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/plan-2026-10-17a.mjs
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/plan-2026-10-17a.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/plan-2026-10-17a/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17a.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17b.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17c.json
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17a/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17b/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17c/
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/run-2026-10-17a.mjs
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/run-2026-10-17b.mjs
+?? .scratch/game-maker-v2/experiments/e2e-wasteland/run-2026-10-17c.mjs
+?? .scratch/p0-construction-v1/runs/2026-10-22-final/
+?? .scratch/style-migration-v1/preview/
+
+== fixtures 细分 ==
+-- animation-baselines 在 70631af..HEAD 的提交 --
+(end)
+-- animation-baselines / canned 工作树状态 --
+(end)
+-- 70631af..HEAD fixtures 变更 --
+ fixtures/upstream/canned.json | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+-- canned.json 的已批准改动（ticket 01） --
+5a6e77a 按票 01–03 收口：P0-04 资产完整性链 + P0-06 入口语义 + P0-05a 像素指标提案 —— 施工 · 验证 · 部分关票（03 待裁定）
+diff --git a/fixtures/upstream/canned.json b/fixtures/upstream/canned.json
+index f1e88c5..784ee29 100644
+--- a/fixtures/upstream/canned.json
++++ b/fixtures/upstream/canned.json
+@@ -388,6 +388,27 @@
+         "source": {
+           "kind": "drawlist"
+         }
++      },
++      {
++        "spec": {
++          "kind": "sprite",
++          "id": "e-drone",
++          "role": "巡逻无人机",
++          "description": "沿月台往复巡逻的废土无人机，接触即伤。",
++          "styleId": "halt-dusk",
++          "anchor": {
++            "x": 0.5,
++            "y": 1
++          },
++          "size": {
++            "w": 32,
++            "h": 32
++          },
++          "required": true
++        },
++        "source": {
++          "kind": "drawlist"
++        }
+       }
+     ]
+   }

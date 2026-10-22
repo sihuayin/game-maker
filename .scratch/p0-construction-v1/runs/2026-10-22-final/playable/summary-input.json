@@ -1,0 +1,67 @@
+{
+  "startedAt": "2026-10-22T07:49:58.770Z",
+  "mode": "input",
+  "pack": "/Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7",
+  "config": "/Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "chromeVersion": "Chrome/155.0.8059.85",
+  "node": "v22.23.2",
+  "url": "http://127.0.0.1:54133/site/v3/index.html",
+  "scenarios": [
+    {
+      "name": "negative-input",
+      "ok": true,
+      "expected": "fail",
+      "stage": "move",
+      "reason": "按预期在 move 阶段失败：超时 7000ms：x=40.0 collected=0/3 won=false",
+      "durationMs": 7466,
+      "start": {
+        "x": 40,
+        "y": 250,
+        "bottom": 250,
+        "top": 186,
+        "left": 16,
+        "right": 64,
+        "vx": 0,
+        "vy": 0,
+        "onFloor": true,
+        "blockedRight": false,
+        "touchingRight": false,
+        "collected": 0,
+        "won": false,
+        "pickups": [
+          {
+            "x": 120,
+            "y": 230,
+            "active": true
+          },
+          {
+            "x": 215,
+            "y": 225,
+            "active": true
+          },
+          {
+            "x": 430,
+            "y": 180,
+            "active": true
+          }
+        ],
+        "hazards": [
+          {
+            "x": 380,
+            "y": 250
+          },
+          {
+            "x": 481.63253333333336,
+            "y": 250
+          }
+        ],
+        "gate": {
+          "x": 600,
+          "y": 250
+        }
+      }
+    }
+  ]
+}

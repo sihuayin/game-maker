@@ -1,0 +1,8 @@
+结构验收：ruin-scavenger-extraction-assets v7 · 13 个动画 · 0 条 findings
+findings：无
+baseline：无（metrics / verdict 为 null）
+报告：ruin-scavenger-extraction-assets/acceptance/v1/report.json · ruin-scavenger-extraction-assets/acceptance/v1/report.md
+✅ 没有 error findings（warning / info 不阻断）
+→ ruin-scavenger-extraction-assets/acceptance/v1/report.json
+→ ruin-scavenger-extraction-assets/acceptance/v1/report.md
+accept exit=0

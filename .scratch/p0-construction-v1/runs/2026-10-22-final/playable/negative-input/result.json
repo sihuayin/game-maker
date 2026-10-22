@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "expected": "fail",
+  "stage": "move",
+  "reason": "按预期在 move 阶段失败：超时 7000ms：x=40.0 collected=0/3 won=false",
+  "durationMs": 7466,
+  "start": {
+    "x": 40,
+    "y": 250,
+    "bottom": 250,
+    "top": 186,
+    "left": 16,
+    "right": 64,
+    "vx": 0,
+    "vy": 0,
+    "onFloor": true,
+    "blockedRight": false,
+    "touchingRight": false,
+    "collected": 0,
+    "won": false,
+    "pickups": [
+      {
+        "x": 120,
+        "y": 230,
+        "active": true
+      },
+      {
+        "x": 215,
+        "y": 225,
+        "active": true
+      },
+      {
+        "x": 430,
+        "y": 180,
+        "active": true
+      }
+    ],
+    "hazards": [
+      {
+        "x": 380,
+        "y": 250
+      },
+      {
+        "x": 481.63253333333336,
+        "y": 250
+      }
+    ],
+    "gate": {
+      "x": 600,
+      "y": 250
+    }
+  }
+}

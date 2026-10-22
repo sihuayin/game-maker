@@ -1,0 +1,165 @@
+
+> game-maker@0.0.0 test /Volumes/shy/some-projects/game-maker
+> vitest run --passWithNoTests
+
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/assets/tests/model-paint-layers.test.ts (9 tests) 2323ms
+   ✓ 真图回归 · 背景层：**真的走一遍 `buildAssetPack`**（票 38 的 Q1 落地没落地） > ⚠️ 最远层交付态**整帧不透明**、非最远层**确实被抠出了透明**（票 38 的 Q1/Q5）  703ms
+   ✓ 真图回归 · 背景层：**真的走一遍 `buildAssetPack`**（票 38 的 Q1 落地没落地） > ⚠️ **用的是众数色，不是四角取样**：third-run-wasteland-skyline-sky.png  871ms
+ ✓ packages/assets/tests/model-paint.test.ts (8 tests) 2714ms
+   ✓ 真图回归：**5 张已付费的真图**，抠底按实测众数色抠得开（票 37 的 Q5） > 先把清单点清 —— 少一张就等于少一份保证  551ms
+   ✓ 真图回归：**5 张已付费的真图**，抠底按实测众数色抠得开（票 37 的 Q5） > ⚠️ 众数色与声明色**差得很远**（L1 ≥ 100）—— 「差不多」不成立，是**另一个色**  321ms
+   ✓ 真图回归：**真的走一遍 `buildAssetPack`**（不只是量一量） > ⚠️ 单帧真图（`treasure-chest`）⇒ **出得了包**（票 37 之前这一张必挂）  365ms
+   ✓ 真图回归：**真的走一遍 `buildAssetPack`**（不只是量一量） > ⚠️ 多帧真图（`scavenger-idle`，2 格）⇒ 切得出 **2 帧**（抠底没把两格连成一片）  730ms
+ ✓ packages/assets/tests/recipes-sweep.test.ts (10 tests) 2840ms
+   ✓ 9 份手写 fixture：**每一份都过契约、都出得了包**（票 35 的全量校验） > shift-change-image-anim.json  388ms
+   ✓ 9 份手写 fixture：**每一份都过契约、都出得了包**（票 35 的全量校验） > shift-change-master.json  1124ms
+   ✓ 9 份手写 fixture：**每一份都过契约、都出得了包**（票 35 的全量校验） > shift-change-mixed.json  410ms
+ ✓ packages/assets/tests/despill.test.ts (16 tests) 2317ms
+   ✓ § 真图：C / C2 的 6 张（读数钉死） > ⚠️ 红色/棕色像素**一个不少**（判据与暖色正交）  549ms
+ ✓ packages/assets/tests/pack.test.ts (43 tests) 1958ms
+   ✓ ⚠️ 纯导入的包（2026-09-25 抓到的两个 bug） > ① source.ref 相对**配方文件**解析（契约 InputPath 的规则），不是相对 cwd  633ms
+   ✓ ⚠️ 纯导入的包（2026-09-25 抓到的两个 bug） > ③ provenance.mode 是 "imported"，不是 "mixed"（此前契约里根本没有这个值）  535ms
+ ✓ packages/pipeline/tests/palette.test.ts (5 tests) 1570ms
+   ✓ § 真图 24 / 32 色：确定性 + 量化预览 > 三跑逐项相同；长度精确 24 / 32；每个色都在图里  532ms
+   ✓ § 真图 24 / 32 色：确定性 + 量化预览 > 量化预览：32 色的误差不高于 24 色，且两档都在可用范围  340ms
+   ✓ § 链上：同一张参考图跑三次，色板完全一致 > 三次落盘 style.palette 逐字节相同、长度 32、palette:N 全在范围  506ms
+ ✓ packages/cli/tests/cli-create.test.ts (33 tests) 3850ms
+   ✓ §检查点：不带 `--yes` 就停在清单处（票 16 的 Q1/Q2/Q8） > ⚠️ **`ambiguity` 逐条打出来**（票 03 把那个字段的存亡押在这一票上）——`--yes` 时也打  457ms
+   ✓ §`--yes`：一路跑到站点（票 16 的 Q6），三条产物**同一个 N** > run / pack / site 都是 v1，且 `status = complete`  304ms
+   ✓ §⚠️ **两条路的产物等价**（票 16 的 Q9*） > `create --yes` 与「`create` 停住 → 人看 → `build`」：同一批相对路径 + 同一份字节  486ms
+ ✓ packages/assets/tests/pack-selfcheck.test.ts (4 tests) 587ms
+ ✓ packages/mcp/tests/build-pack-stdio.test.ts (3 tests) 1129ms
+ ✓ packages/assets/tests/pack-master.test.ts (17 tests) 6733ms
+   ✓ §母版前段：人作的母版走 `import`（零调用） > ⚠️ 引用母版的那一发**拿到的是那张位图**（832×1248），不引用的那一发**没有参考图**  1098ms
+   ✓ §母版前段：人作的母版走 `import`（零调用） > 母版位图被拷进包里（`authoring/masters/`），并把规范化的相对路径写进清单的出处  839ms
+   ✓ §资产的 DNA：有就**替换**身份那一句，没有就回落（Q3） > 给了 DNA ⇒ 动画那一发是**八个字段**，而 `spec.description` 那一句**不在**里面（替换，不是叠加）  1282ms
+   ✓ §资产的 DNA：有就**替换**身份那一句，没有就回落（Q3） > **没有** DNA 文件 ⇒ 一字不改地回落（磁盘上那 8 份 fixture 与「人给一张图」那条老路）  1145ms
+   ✓ §资产的 DNA：有就**替换**身份那一句，没有就回落（Q3） > 与角色无关的资产（`characterId` 没写）⇒ 落回它自己的 description  1271ms
+ ✓ packages/qa/tests/assemble.test.ts (11 tests) 466ms
+ ✓ packages/assets/tests/animation-baseline.test.ts (7 tests) 1642ms
+   ✓ baseline fixture：scavenger-actor.idle（v7） > 4 张 raw：fixture hash、v7 源 hash、与 19i 现场同字节  572ms
+   ✓ baseline fixture：scavenger-actor.idle（v7） > 期望指标（animation-metrics 复算）在容差内且整体判绿  717ms
+ ✓ packages/assets/tests/import.test.ts (38 tests) 595ms
+ ✓ packages/qa/tests/gameplay.test.ts (12 tests) 333ms
+ ✓ packages/pipeline/tests/create-game.test.ts (49 tests) 5309ms
+   ✓ §invariant 2 · 构建 attempt 的版本 > 首次 attempt 与 run 对齐（`pack/v1`）；**第二次** attempt ⇒ `pack/v2`，而 run 仍是 `v1`  500ms
+   ✓ §两段各报自己那几步（Q6 的进度） > 理解段报 5 步、构建段报 3 步（QA 默认在，所以是 pack → config → qa）  348ms
+ ✓ packages/assets/tests/raster.test.ts (27 tests) 412ms
+ ✓ packages/demo/tests/td-site.test.ts (23 tests) 416ms
+ ✓ packages/mcp/tests/create-game-no-digest.test.ts (1 test) 366ms
+   ✓ §v3 终端摘要 · MCP 输出不变 > create_game 的 content 与 structuredContent 都不出现摘要行  361ms
+ ✓ packages/mcp/tests/create-game-qa-failure.test.ts (1 test) 326ms
+   ✓ §MCP create_game：QA 失败 ⇒ 退 4、站点不产、报告在盘 > reachability error 挡住发布  322ms
+ ✓ packages/assets/tests/ledger.test.ts (10 tests) 232ms
+ ✓ packages/contracts/tests/reachability.test.ts (20 tests) 337ms
+ ✓ packages/assets/tests/inspect.test.ts (9 tests) 310ms
+ ✓ packages/demo/tests/td-winnable.test.ts (8 tests) 298ms
+ ✓ packages/assets/tests/animation-metrics.test.ts (13 tests) 630ms
+   ✓ v7 scavenger-actor idle 4 帧 golden（d 票 §3.3） > 6 个帧对：alpha 掩码差、bbox 宽差、位置漂移、背景 L1  605ms
+ ✓ packages/demo/tests/td-sim.test.ts (19 tests) 149ms
+ ✓ packages/assets/tests/pack-deps.test.ts (5 tests) 245ms
+ ✓ packages/contracts/tests/recipe-tool.test.ts (15 tests) 50ms
+ ✓ packages/demo/tests/site.test.ts (24 tests) 116ms
+ ✓ packages/qa/tests/visual.test.ts (14 tests) 191ms
+ ✓ packages/assets/tests/text-op-ledger.test.ts (12 tests) 227ms
+ ✓ packages/assets/tests/compile-runtime.test.ts (27 tests) 118ms
+ ✓ packages/cli/tests/cli-site-gate.test.ts (8 tests) 117ms
+ ✓ packages/assets/tests/compile-td-game.test.ts (24 tests) 117ms
+ ✓ packages/demo/tests/shell-hud-declared-size.test.ts (8 tests) 132ms
+ ✓ packages/contracts/tests/td-config.test.ts (50 tests) 58ms
+ ✓ packages/assets/tests/image-config.test.ts (10 tests) 136ms
+ ✓ packages/assets/tests/import-fixture.test.ts (1 test) 68ms
+ ✓ packages/assets/tests/plan-assets.test.ts (16 tests) 99ms
+ ✓ packages/assets/tests/pack-ground-band.test.ts (9 tests) 65ms
+ ✓ packages/assets/tests/ops.test.ts (13 tests) 48ms
+ ✓ packages/assets/tests/review.test.ts (11 tests) 92ms
+ ✓ packages/vision/tests/analyze-reference.test.ts (24 tests) 97ms
+ ✓ packages/assets/tests/plan-assets-player-gate.test.ts (9 tests) 86ms
+ ✓ packages/assets/tests/pack-frames.test.ts (1 test) 32ms
+ ✓ packages/assets/tests/plan-sidecar.test.ts (5 tests) 42ms
+ ✓ packages/qa/tests/layers.test.ts (6 tests) 65ms
+ ✓ packages/pipeline/tests/review.test.ts (8 tests) 53ms
+ ✓ packages/demo/tests/world.test.ts (32 tests) 71ms
+ ✓ packages/assets/tests/pack-reuse-threshold.test.ts (4 tests) 91ms
+ ✓ packages/contracts/tests/drawlist.test.ts (25 tests) 14ms
+ ✓ packages/assets/tests/not-sent-bucket.test.ts (11 tests) 37ms
+ ✓ packages/assets/tests/plan-coverage-gate.test.ts (6 tests) 42ms
+ ✓ packages/assets/tests/pack-sheet-grid.test.ts (5 tests) 67ms
+ ✓ packages/mcp/tests/assemble-site-qa-gate.test.ts (6 tests) 62ms
+ ✓ packages/game-design/tests/compile-design.test.ts (16 tests) 62ms
+ ✓ packages/vision/tests/palette.test.ts (7 tests) 35ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts (12 tests) 42ms
+ ✓ packages/demo/tests/td-world.test.ts (19 tests) 53ms
+ ✓ packages/mcp/tests/error-semantics.test.ts (3 tests) 27ms
+ ✓ packages/assets/tests/generate.test.ts (29 tests) 18ms
+ ✓ packages/assets/tests/style-gate.test.ts (14 tests) 58ms
+ ✓ packages/contracts/tests/atlas-json.test.ts (17 tests) 31ms
+ ✓ packages/game-design/tests/compile-character-dna.test.ts (18 tests) 23ms
+ ✓ packages/qa/tests/intent.test.ts (11 tests) 20ms
+ ✓ packages/assets/tests/image-gen.test.ts (39 tests) 24ms
+ ✓ packages/demo/tests/hazard.test.ts (3 tests) 27ms
+ ✓ packages/assets/tests/groundline.test.ts (6 tests) 27ms
+ ✓ packages/contracts/tests/recipe-graph.test.ts (15 tests) 11ms
+ ✓ packages/contracts/tests/asset-spec.test.ts (38 tests) 9ms
+ ✓ packages/contracts/tests/assetpack.test.ts (40 tests) 24ms
+ ✓ packages/contracts/tests/character-dna.test.ts (23 tests) 7ms
+ ✓ packages/assets/tests/compile-td-game-error-class.test.ts (1 test) 13ms
+ ✓ packages/pipeline/tests/run.test.ts (10 tests) 11ms
+ ✓ packages/game-design/tests/analyze-intent.test.ts (13 tests) 20ms
+ ✓ packages/vision/tests/prompts-wire.test.ts (8 tests) 8ms
+ ✓ packages/contracts/tests/recipe.test.ts (30 tests) 20ms
+ ✓ packages/contracts/tests/carried-error.test.ts (14 tests) 14ms
+ ✓ packages/contracts/tests/visual-world-attempts.test.ts (20 tests) 9ms
+ ✓ packages/vision/tests/build-visual-world.test.ts (10 tests) 22ms
+ ✓ packages/assets/tests/planner-masters.test.ts (7 tests) 12ms
+ ✓ packages/assets/tests/plan-frames-candidate.test.ts (1 test) 27ms
+ ✓ packages/contracts/tests/visual-world.test.ts (26 tests) 23ms
+ ✓ packages/contracts/tests/runtime-profile.test.ts (14 tests) 12ms
+ ✓ packages/contracts/tests/qa.test.ts (34 tests) 17ms
+ ✓ packages/contracts/tests/config-tool.test.ts (11 tests) 13ms
+ ✓ packages/game-design/tests/build-design.test.ts (18 tests) 12ms
+ ✓ packages/contracts/tests/structured-call.test.ts (34 tests) 11ms
+ ✓ packages/contracts/tests/game-design-gate.test.ts (18 tests) 33ms
+ ✓ packages/assets/tests/prompt.test.ts (31 tests) 11ms
+ ✓ packages/contracts/tests/animation-acceptance.test.ts (18 tests) 17ms
+ ✓ packages/contracts/tests/intent-coverage.test.ts (11 tests) 8ms
+ ✓ packages/contracts/tests/visual-world-gate.test.ts (8 tests) 8ms
+ ✓ packages/contracts/tests/game-intent-gate.test.ts (24 tests) 9ms
+ ✓ packages/contracts/tests/game-design.test.ts (15 tests) 10ms
+ ✓ packages/contracts/tests/game-config.test.ts (38 tests) 21ms
+ ✓ packages/contracts/tests/image-units.test.ts (9 tests) 6ms
+ ✓ packages/assets/tests/speck.test.ts (4 tests) 4ms
+ ✓ packages/contracts/tests/vocabulary.test.ts (13 tests) 7ms
+ ✓ packages/contracts/tests/game-intent.test.ts (12 tests) 43ms
+ ✓ packages/game-design/tests/build-character-dna.test.ts (22 tests) 42ms
+ ✓ packages/assets/tests/master.test.ts (20 tests) 6ms
+ ✓ packages/contracts/tests/design-attempts.test.ts (15 tests) 12ms
+ ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 15ms
+ ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms
+ ✓ packages/qa/tests/pixel.test.ts (13 tests) 31ms
+ ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 5ms
+ ✓ packages/demo/tests/shell-capability-witness.test.ts (11 tests) 58ms
+ ✓ packages/assets/tests/sheet-grid.test.ts (10 tests) 9ms
+ ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 7ms
+ ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 2ms
+ ✓ packages/vision/tests/prompts.test.ts (9 tests) 3ms
+ ✓ packages/game-design/tests/dna-prompts.test.ts (16 tests) 8ms
+ ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 4ms
+ ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 9ms
+ ✓ packages/game-design/tests/prompts.test.ts (17 tests) 3ms
+ ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 3ms
+ ✓ packages/assets/tests/acceptance.test.ts (18 tests) 18956ms
+   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  18916ms
+ ✓ packages/mcp/tests/server.test.ts (11 tests) 16752ms
+   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  16721ms
+ ✓ packages/cli/tests/cli.test.ts (28 tests) 18589ms
+   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  17111ms
+   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  597ms
+
+ Test Files  119 passed (119)
+      Tests  1810 passed (1810)
+   Start at  15:44:44
+   Duration  24.13s (transform 12.19s, setup 0ms, collect 50.44s, tests 95.91s, environment 11ms, prepare 8.85s)

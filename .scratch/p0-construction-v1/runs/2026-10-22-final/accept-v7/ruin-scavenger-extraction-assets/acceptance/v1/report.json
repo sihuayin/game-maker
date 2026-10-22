@@ -1,0 +1,321 @@
+{
+  "format": "animation-acceptance/v1",
+  "createdAt": "2026-10-22T07:45:55.197Z",
+  "toolVersion": "0.0.0",
+  "pack": {
+    "id": "ruin-scavenger-extraction-assets",
+    "version": 7,
+    "manifestChecksum": "sha256:e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326",
+    "atlases": [
+      {
+        "id": "animations",
+        "imageChecksum": "sha256:a3ecf5294d850678fdcb71295880e0eda4d682d29bca4bc8f3032f1711836735",
+        "metaChecksum": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+      },
+      {
+        "id": "backgrounds",
+        "imageChecksum": "sha256:47af93c9af4bf386c85631186a89579040554d876f0487dedd8774ec52720454",
+        "metaChecksum": "sha256:83841dd9d54a36b2dad52029cc4fcc893adb34e06db94288a82d1efac9edeafe"
+      },
+      {
+        "id": "sprites",
+        "imageChecksum": "sha256:3dff488df20ce4d835691dc95bdb6fbaea29f2c1a9f18cb961b799f52d98c5cc",
+        "metaChecksum": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d"
+      },
+      {
+        "id": "ui",
+        "imageChecksum": "sha256:8414453f2bbfa2c13b837211cee573135bfb3c9a31fccfa68b0d25de7e6f5aa3",
+        "metaChecksum": "sha256:5bb9ec95259fe865283b1ae6f24ce7b0b97ff85a361eca690a71aaee3ecba1fb"
+      }
+    ]
+  },
+  "baseline": null,
+  "animations": [
+    {
+      "assetId": "scavenger-actor",
+      "anim": "idle",
+      "frames": [
+        "scavenger-actor.idle1",
+        "scavenger-actor.idle2",
+        "scavenger-actor.idle3",
+        "scavenger-actor.idle4"
+      ],
+      "declared": {
+        "fps": 6,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "scavenger-actor",
+      "anim": "run",
+      "frames": [
+        "scavenger-actor.run1",
+        "scavenger-actor.run2",
+        "scavenger-actor.run3",
+        "scavenger-actor.run4",
+        "scavenger-actor.run5",
+        "scavenger-actor.run6",
+        "scavenger-actor.run7",
+        "scavenger-actor.run8"
+      ],
+      "declared": {
+        "fps": 12,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "scavenger-actor",
+      "anim": "jump",
+      "frames": [
+        "scavenger-actor.jump1",
+        "scavenger-actor.jump2",
+        "scavenger-actor.jump3",
+        "scavenger-actor.jump4"
+      ],
+      "declared": {
+        "fps": 10,
+        "loop": false
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "wasteland-enemy",
+      "anim": "patrol",
+      "frames": [
+        "wasteland-enemy.patrol1",
+        "wasteland-enemy.patrol2",
+        "wasteland-enemy.patrol3",
+        "wasteland-enemy.patrol4",
+        "wasteland-enemy.patrol5",
+        "wasteland-enemy.patrol6"
+      ],
+      "declared": {
+        "fps": 8,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "wasteland-enemy",
+      "anim": "charge",
+      "frames": [
+        "wasteland-enemy.charge1",
+        "wasteland-enemy.charge2",
+        "wasteland-enemy.charge3",
+        "wasteland-enemy.charge4",
+        "wasteland-enemy.charge5",
+        "wasteland-enemy.charge6"
+      ],
+      "declared": {
+        "fps": 14,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "wasteland-enemy",
+      "anim": "halt",
+      "frames": [
+        "wasteland-enemy.halt1",
+        "wasteland-enemy.halt2",
+        "wasteland-enemy.halt3"
+      ],
+      "declared": {
+        "fps": 8,
+        "loop": false
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "ceiling-lurker",
+      "anim": "hang",
+      "frames": [
+        "ceiling-lurker.hang1",
+        "ceiling-lurker.hang2",
+        "ceiling-lurker.hang3",
+        "ceiling-lurker.hang4"
+      ],
+      "declared": {
+        "fps": 6,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "ceiling-lurker",
+      "anim": "lunge",
+      "frames": [
+        "ceiling-lurker.lunge1",
+        "ceiling-lurker.lunge2",
+        "ceiling-lurker.lunge3",
+        "ceiling-lurker.lunge4",
+        "ceiling-lurker.lunge5"
+      ],
+      "declared": {
+        "fps": 14,
+        "loop": false
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "ceiling-lurker",
+      "anim": "retreat",
+      "frames": [
+        "ceiling-lurker.retreat1",
+        "ceiling-lurker.retreat2",
+        "ceiling-lurker.retreat3",
+        "ceiling-lurker.retreat4"
+      ],
+      "declared": {
+        "fps": 10,
+        "loop": false
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "scrap-resource",
+      "anim": "idle",
+      "frames": [
+        "scrap-resource.idle1",
+        "scrap-resource.idle2",
+        "scrap-resource.idle3",
+        "scrap-resource.idle4"
+      ],
+      "declared": {
+        "fps": 6,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "clean-water",
+      "anim": "idle",
+      "frames": [
+        "clean-water.idle1",
+        "clean-water.idle2",
+        "clean-water.idle3",
+        "clean-water.idle4"
+      ],
+      "declared": {
+        "fps": 6,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "extraction-point",
+      "anim": "standby",
+      "frames": [
+        "extraction-point.standby1",
+        "extraction-point.standby2",
+        "extraction-point.standby3"
+      ],
+      "declared": {
+        "fps": 4,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    },
+    {
+      "assetId": "extraction-point",
+      "anim": "active",
+      "frames": [
+        "extraction-point.active1",
+        "extraction-point.active2",
+        "extraction-point.active3",
+        "extraction-point.active4",
+        "extraction-point.active5",
+        "extraction-point.active6"
+      ],
+      "declared": {
+        "fps": 10,
+        "loop": true
+      },
+      "metrics": null,
+      "verdict": null,
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "human": {
+    "verdict": "pending",
+    "reviewer": null,
+    "reviewedAt": null,
+    "items": [
+      {
+        "key": "identity",
+        "label": "身份 / 轮廓 / 比例",
+        "verdict": "pending",
+        "note": ""
+      },
+      {
+        "key": "pose",
+        "label": "姿势族",
+        "verdict": "pending",
+        "note": ""
+      },
+      {
+        "key": "lighting",
+        "label": "明暗 / 色板",
+        "verdict": "pending",
+        "note": ""
+      },
+      {
+        "key": "loop",
+        "label": "无呼吸 / 跳变",
+        "verdict": "pending",
+        "note": ""
+      },
+      {
+        "key": "alpha",
+        "label": "透明边缘",
+        "verdict": "pending",
+        "note": ""
+      },
+      {
+        "key": "outline",
+        "label": "1px 描边",
+        "verdict": "pending",
+        "note": ""
+      },
+      {
+        "key": "style",
+        "label": "风格一致",
+        "verdict": "pending",
+        "note": ""
+      }
+    ],
+    "evidence": []
+  },
+  "runtime": {
+    "status": "unverified",
+    "evidence": [],
+    "declaredVsActual": []
+  }
+}

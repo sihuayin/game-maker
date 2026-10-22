@@ -1,0 +1,17 @@
+
+> game-maker@0.0.0 build /Volumes/shy/some-projects/game-maker
+> tsc -b && pnpm -r --if-present bundle
+
+Scope: 9 of 10 workspace projects
+packages/demo bundle$ esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js
+packages/demo bundle:   dist/shell.js  1.5mb ⚠️
+packages/demo bundle: ⚡ Done in 314ms
+packages/demo bundle: Done
+packages/cli bundle$ esbuild src/cli.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/cli.mjs --external:vite --external:phaser
+packages/mcp bundle$ esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser
+packages/mcp bundle:   dist/server.mjs  1.3mb ⚠️
+packages/mcp bundle: ⚡ Done in 32ms
+packages/cli bundle:   dist/cli.mjs  1.4mb ⚠️
+packages/cli bundle: ⚡ Done in 32ms
+packages/cli bundle: Done
+packages/mcp bundle: Done

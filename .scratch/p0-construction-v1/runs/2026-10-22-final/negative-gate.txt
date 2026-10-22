@@ -1,0 +1,32 @@
+
+> game-maker@0.0.0 test:playable /Volumes/shy/some-projects/game-maker
+> pnpm build && node packages/demo/probe/playable-smoke.mjs --negative gate --out .scratch/p0-construction-v1/runs/2026-10-22-final/playable
+
+
+> game-maker@0.0.0 build /Volumes/shy/some-projects/game-maker
+> tsc -b && pnpm -r --if-present bundle
+
+Scope: 9 of 10 workspace projects
+packages/demo bundle$ esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js
+packages/demo bundle:   dist/shell.js  1.5mb ⚠️
+packages/demo bundle: ⚡ Done in 365ms
+packages/demo bundle: Done
+packages/mcp bundle$ esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser
+packages/cli bundle$ esbuild src/cli.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/cli.mjs --external:vite --external:phaser
+packages/cli bundle:   dist/cli.mjs  1.4mb ⚠️
+packages/cli bundle: ⚡ Done in 77ms
+packages/mcp bundle:   dist/server.mjs  1.3mb ⚠️
+packages/mcp bundle: ⚡ Done in 77ms
+packages/cli bundle: Done
+packages/mcp bundle: Done
+Chrome: Google Chrome 155.0.8059.85 (/Applications/Google Chrome.app/Contents/MacOS/Google Chrome)
+包: /Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7
+config: /Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json
+证据: /Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable
+
+==============================================================================
+负例 · gate 指错（应在装配期拒绝）
+==============================================================================
+✅ 负例按预期失败（assemble） · 0.0s · 按预期在装配期拒绝（invalid）：装配期校验不过 —— 硬失败，不产出站点（1 条）：
+  · objective.gate: 找不到 id 为 "no-such-gate-for-p03-negative" 的 goal 实体（现有 goal：extraction）
+ ELIFECYCLE  Command failed with exit code 1.

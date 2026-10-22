@@ -177,9 +177,21 @@ P0-01…P0-06 六个施工包完成并通过**程序级验收**：13 条 P0 CAP 
   破坏输入=`move`。`pnpm test` 1810/119、`pnpm typecheck` 全绿；零付费；未改运行时 / v7 / fixtures；
   证据 `runs/2026-10-22-ticket-10/run.md`。
 
+- [11. 最终验证与完工总结](issues/11-final-validation.md)：**已收口（验证）** ——
+  全量命令：`pnpm test` **1810/119**、定向 **186/15**、`typecheck` / `build` / `check:deps` /
+  `test:playable` 正例 exit 0 + 三负例各自 exit 1（`assemble` / `win` / `move`）/ v7 `verify`（157 checksum）/ v7 `accept`（13 动画 · 0 findings）全通过；
+  `pnpm check` 仅剩 **2 条既有 `.scratch` 断链**（非本图引入）。12 条非 E2E 判据
+  **11 通过 / 1 部分**：`CAP-ASSET-01` 的「`frames` 不再静默折叠」已达成，但 §5 要求的
+  「sidecar 记录真实候选」未落 —— §3「测试」写「不落 sidecar」、§5 写「记录真实候选」，
+  文档自相矛盾；已立 [票 12](issues/12-cap-asset-01-frames-sidecar.md)（grilling）待裁定。
+  工作树：v7 manifest sha `e620cd7e…` / tree `64b74b0e…`、0 个文件晚于 10-21；
+  `fixtures/` 工作树干净（基线以来唯一已批准改动 = `fixtures/upstream/canned.json` 的 `e-drone`）；
+  `game-maker.local.json` / 既有 `CONTEXT.md` 改动均未碰。**`CAP-E2E-01` / P0-FINAL 未完成** ——
+  不得无条件说「P0 全部验收通过」。证据：`runs/2026-10-22-final/summary.md`。
+
 ## Not yet specified
 
-<!-- 当前没有尚未成票的雾：像素阈值已裁定并收口（见票 03）；前沿见 open 子票。 -->
+<!-- 当前没有尚未成票的雾：像素阈值已裁定（票 03）；CAP-ASSET-01 的 §3/§5 冲突已成票 12。前沿见 open 子票。 -->
 
 ## Out of scope
 

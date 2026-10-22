@@ -1,0 +1,18 @@
+
+> game-maker@0.0.0 check /Volumes/shy/some-projects/game-maker
+> pnpm check:deps && pnpm check:links && pnpm build
+
+
+> game-maker@0.0.0 check:deps /Volumes/shy/some-projects/game-maker
+> node scripts/check-deps.mjs
+
+✅ 依赖图合法（9 个包）
+
+> game-maker@0.0.0 check:links /Volumes/shy/some-projects/game-maker
+> node scripts/check-links.mjs
+
+❌ 相对链接断了 2 条：
+   · .scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/palette-curation.md:21 → ../issues/04-palette-coat-review.md
+   · .scratch/asset-integration-v1/runs/2026-10-21c-screening/budget-report.md:8 → ../research/alternative-animation-models-2026-10-21.md
+ ELIFECYCLE  Command failed with exit code 1.
+ ELIFECYCLE  Command failed with exit code 1.

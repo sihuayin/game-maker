@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "expected": "fail",
+  "stage": "assemble",
+  "reason": "按预期在装配期拒绝（invalid）：装配期校验不过 —— 硬失败，不产出站点（1 条）：\n  · objective.gate: 找不到 id 为 \"no-such-gate-for-p03-negative\" 的 goal 实体（现有 goal：extraction）",
+  "originalGate": "extraction",
+  "mutatedGate": "no-such-gate-for-p03-negative",
+  "durationMs": 23,
+  "observed": {
+    "rejected": true,
+    "stage": "assemble",
+    "kind": "invalid",
+    "message": "装配期校验不过 —— 硬失败，不产出站点（1 条）：\n  · objective.gate: 找不到 id 为 \"no-such-gate-for-p03-negative\" 的 goal 实体（现有 goal：extraction）"
+  }
+}

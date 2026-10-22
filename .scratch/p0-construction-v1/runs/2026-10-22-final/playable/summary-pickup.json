@@ -1,0 +1,75 @@
+{
+  "startedAt": "2026-10-22T07:49:48.087Z",
+  "mode": "pickup",
+  "pack": "/Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7",
+  "config": "/Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/p0-construction-v1/runs/2026-10-22-final/playable",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "chromeVersion": "Chrome/155.0.8059.85",
+  "node": "v22.23.2",
+  "url": "http://127.0.0.1:54036/site/v2/index.html",
+  "scenarios": [
+    {
+      "name": "negative-pickup",
+      "ok": true,
+      "expected": "fail",
+      "stage": "win",
+      "reason": "按预期在 win 阶段失败：已到 gate（x=608.0，gate.x=600）但 won=false；collected=2/3",
+      "removedPickup": {
+        "where": {
+          "x": 120,
+          "y": 230
+        },
+        "left": 2
+      },
+      "expectedPickups": 3,
+      "durationMs": 8607,
+      "start": {
+        "x": 40,
+        "y": 250,
+        "bottom": 250,
+        "top": 186,
+        "left": 16,
+        "right": 64,
+        "vx": 0,
+        "vy": 0,
+        "onFloor": true,
+        "blockedRight": false,
+        "touchingRight": false,
+        "collected": 0,
+        "won": false,
+        "pickups": [
+          {
+            "x": 120,
+            "y": 230,
+            "active": true
+          },
+          {
+            "x": 215,
+            "y": 225,
+            "active": true
+          },
+          {
+            "x": 430,
+            "y": 180,
+            "active": true
+          }
+        ],
+        "hazards": [
+          {
+            "x": 380,
+            "y": 250
+          },
+          {
+            "x": 481.7296,
+            "y": 250
+          }
+        ],
+        "gate": {
+          "x": 600,
+          "y": 250
+        }
+      }
+    }
+  ]
+}
