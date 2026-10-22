@@ -36,7 +36,7 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, layerDrawnSize, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, backgroundLayerEntries, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { asCommandError, CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = { baseUrl: string; apiKey: string };
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -935,27 +935,6 @@ const DEFAULT_JUMP_SPAN = jumpSpan(DEFAULT_PLAYER_MOVE);   // ⚠️ 同高落�
  *    「人过目」）—— 而 **R9 把人工点收成了唯一一个、且在清单处**，config 那里**已经没有读者**了
  *    ⇒ 「坏配置比没配置更坏」（旧代码自己的注释）这一条终于说了算。
  */
-/**
- * 这份 config 的背景层，拼成 `auditLayerCoverage` 要吃的那几样 primitive（票 65）。
- *
- * ⚠️ **解不到那件资源时一条都不给** —— 「这份 config 指着一个不存在的背景」由
- *   `auditGameConfig` 的**引用族**报（它就在上面那批里）。本判据只回答**几何**那一问
- *   （盖不盖得住世界），不重复回答「这个 id 存不存在」。
- * ⚠️ 而层的名字这里拼成 `${背景 id}.${层名}` —— 契约把帧名**逐字钉死**就是这个形状
- *   （`assetpack.ts` 的 superRefine）⇒ 与站点装配侧读到的 `draw.frame` 是**同一个字符串**，
- *   这正是「两侧 message 逐字相等」那条判据（验收条件 4）站得住的原因。
- */
-function backgroundLayerEntries(config: GameConfig, manifest: AssetPackManifest): LayerCoverageEntry[] {
-  const a = manifest.assets.find((x) => x.id === config.scene.background.asset);
-  if (a === undefined) return [];
-  return (a.layers ?? []).map((l, i) => ({
-    where: `scene.background[${i}]`,
-    name: `${a.id}.${l.name}`,
-    parallax: l.parallax,
-    drawn: layerDrawnSize({ tileable: l.tileable, nominal: a.size }, config.world.size),
-  }));
-}
-
 export async function compileRuntime(opts: CompileRuntimeOptions): Promise<CommandResult> {
   const readJson = (p: string, what: string): unknown => {
     try { return JSON.parse(fs.readFileSync(p, "utf8")); }
@@ -1124,7 +1103,8 @@ ${SKELETON_SHAPE_NOTE}
     ...auditGameConfig(config, manifest),
     ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
       { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
-    ...auditLayerCoverage(vp, config.world.size, backgroundLayerEntries(config, manifest))
+    ...auditLayerCoverage(vp, config.world.size,
+      backgroundLayerEntries(config.scene.background.asset, config.world.size, manifest.assets))
   ];
   const hard = issues.filter((i) => i.severity === "error");
   if (hard.length > 0)

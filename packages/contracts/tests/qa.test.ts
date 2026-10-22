@@ -250,3 +250,26 @@ describe("§它真的是 v4 契约（票 28 定的边界）", () => {
     expect(js["additionalProperties"]).toBe(false);
   });
 });
+
+describe("§`subject`：报告自带包身份（P0-02b · 票 09）", () => {
+  const CHECKSUM = "sha256:" + "0".repeat(64);
+  const withSubject = (subject: unknown) => QAReportSchema.safeParse({ ...report(), subject });
+
+  it("⚠️ 可选：旧的四字段报告**仍能解析**（向后兼容），但发布闸会拒它", () => {
+    expect(QAReportSchema.safeParse(report()).success).toBe(true);
+  });
+
+  it("id / version / 可选 checksum 的形状", () => {
+    expect(withSubject({ packId: "last-train", packVersion: 2 }).success).toBe(true);
+    expect(withSubject({ packId: "last-train", packVersion: 2, manifestChecksum: CHECKSUM }).success).toBe(true);
+  });
+
+  it("⚠️ 变异：缺字段 / 错类型 / 未知键 / 坏 checksum 一律拒", () => {
+    expect(withSubject({ packVersion: 2 }).success).toBe(false);
+    expect(withSubject({ packId: "", packVersion: 2 }).success).toBe(false);
+    expect(withSubject({ packId: "x", packVersion: "2" }).success).toBe(false);
+    expect(withSubject({ packId: "x", packVersion: 0 }).success).toBe(false);
+    expect(withSubject({ packId: "x", packVersion: 1, runVersion: 1 }).success).toBe(false);
+    expect(withSubject({ packId: "x", packVersion: 1, manifestChecksum: "sha256:abc" }).success).toBe(false);
+  });
+});

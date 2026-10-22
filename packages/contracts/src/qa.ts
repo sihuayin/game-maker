@@ -48,23 +48,24 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // 四、自白：**今天恒真的三件事**（票 06 Q17，写法照票 05）
 //
-//   ① ⚠️ **`checked` 今天恒为 5/6，而 `"incomplete"` 是预期**（[票 19] 改准）。
-//      原来的写法是「六条判据今天 6/6 全跑 ⇒ `incomplete` 今天走不到」——
-//      那句话从 [票 17] 那天起就**已经是假的**：`layer-coverage`（层覆盖）**故意不住在 QA 里**，
-//      它由**装配期**的硬失败保证（`pack.ts`），于是没有一族会声明它。
-//      ⇒ 两件事要分开：**判据的全集**（`QA_JUDGEMENTS`，六条）与
-//        **这一次 QA 真跑过的子集**（`checked`，五条）。
-//      ⚠️ 所以**不要**为了让它变成 `pass` 去动 `checked` —— `incomplete` 在这里说的是
-//        **真话**（有判据没由 QA 跑），而 `fail` / `pass` 说的是**跑过的那几条**如何。
-//      ⚠️ **[票 20] 的义务因此收窄**：它**不**要求「六条判据每条恰好被一个族声明一次」
-//        —— 那句在数学上做不到（`layer-coverage` 不属于任何族）。
+//   ① ⚠️ **`checked` 今天恒为 6/6**（2026-10-22 · P0-02a 改准）。
+//      2026-10-09 到 2026-10-21 之间它是 **5/6**：`layer-coverage`（层覆盖）**不住在任何族里**，
+//      它由**装配期**的硬失败保证（`pack.ts`），于是没有一族会声明它；那段时间
+//      `"incomplete"` 是**恒态**、而它说的是真话（有判据没由 QA 跑）。
+//      ⇒ 现在第六条由**合成器自己**跑（`qa/src/layers.ts`）：输入是 `QaContext.viewport`
+//        加已经落盘的 config / manifest，判据本体仍是装配期**同一个** `auditLayerCoverage`。
+//      ⇒ **判据的全集**（六条）与**这一次真跑过的子集**（`checked`）不再天然分开；
+//        `incomplete` 重新成为**信号** —— 它只在真有判据没跑时出现。
+//      ⚠️ 所以**不要**为了让它变成 `pass` 去动 `checked` —— 这条照旧成立；区别只在于
+//        今天「跑满」是**真跑满**，不是把差集删掉。
+//      ⚠️ **[票 20] 的义务**：它**不**要求「六条判据每条恰好被一个族声明一次」
+//        —— 那句在数学上做不到（`layer-coverage` 不属于任何族，由合成器在汇合处直接跑）。
 //   ② **`severity: "warning"` 今天一条都不报**。类型**允许**它（`auditGameConfig`
 //      那一档「精确可算、但不构成判决」的形状一字不改地搬过来），但**哪一条判据
 //      真去报警告**是**装配侧**的事（[票 20] §3），不是本契约的事。
-//   ③ **`checked` 里缺席的两种意思要分得开**：今天缺席**只**能是「这一次没跑」
-//      （暂时只有 `layer-coverage` 那一种，见①），**不是**「这条不归我」——
+//   ③ **`checked` 里缺席的两种意思要分得开**：缺席只能是「这一次没跑」，**不是**「这条不归我」——
 //      后者是**没有那个键**（`QaFamilyResult.judgements` 是 `Partial`，[票 18] 的 R3-Q1）。
-//      类型**允许**缺席，是链的性质让它今天恰好缺一格 ——
+//      类型**允许**缺席；而链上今天**没有** `ran: false` 的来路（见①）——
 //      把「允许」与「今天如此」分开写，是为了让下一个人在链变了的时候**看得见差别**。
 //
 //   ④ ⚠️ **一份「族结果」落盘会过不了本契约**（[票 18] 实测）。`superRefine` ④ 要求
@@ -119,6 +120,9 @@ export const QA_JUDGEMENTS = [
   "constructive-constraint",
   /** **层覆盖**：不平铺的层 ≥ 视口，且**最远那层必须 100%**（视口 480×270 是外壳常量）。
    *  住装配期（`pack.ts` 已经硬失败），`backgroundCoverage` 是**共用的那一个** helper。
+   *  ⚠️ **2026-10-22 起由合成器自己跑这一条**（`qa/src/layers.ts`）：它仍然**不属于任何族**，
+   *    但 `checked` 不再因此恒缺一格。判据本体仍是装配期那一个 `auditLayerCoverage`
+   *    （入参的来路也是共用 `contracts` 的 `backgroundLayerEntries`）。
    *  够得上判据：最远层后面**没有东西**，没画满就是露底 —— 没有「另一条路」这回事。 */
   "layer-coverage",
   /** **引用族**：`hud.panel` 必须是 `ui` · 砖的尺寸必须**正好**等于 `arena.cell` ·
@@ -257,14 +261,28 @@ export type Observation = z.infer<typeof ObservationSchema>;
 
 /** `run/v<N>/qa-report.json`。
  *
- *  ⚠️ **三个字段，没有 `status`、没有 `repairAttempts`、没有 `createdAt`**：
+ *  ⚠️ **没有 `status`、没有 `repairAttempts`、没有 `createdAt`**：
  *    `status`         —— 派生（`qaVerdict`）；给了它就是给一个能被写错的位置。
  *    `repairAttempts` —— 它描述的是**循环**，不是**这一次 QA**：修复循环会让 QA 跑 N+1 次，
  *                        于是 N+1 份报告各自对**同一个字段**报不同的数。⇒ 落点开给票 21。
  *    `createdAt`      —— 「哪一次运行」由**目录**答了（`run/v<N>/`，R8 禁止覆盖）。
+ *
+ *  ⚠️ **`subject` 是可选的身份**（P0-02b · 票 09）：报告必须能回答「我属于哪个包」——
+ *    此前「报告属于谁」只能靠它所在目录猜，而同一个 run 可以有多次 attempt、`pack` 版本
+ *    也不保证跟着 run 版本走。`subject` 缺失的报告**仍可解析**（向后兼容），但**发布闸会拒**：
+ *    没有身份 = 无法证明。
  */
 export const QAReportSchema = z.strictObject({
   format: z.literal(QA_REPORT_FORMAT),
+  /** **这份报告属于哪个包**。⚠️ 可选是因为旧报告要与新契约共存；**发布闸要求它必须存在**。
+   *  `manifestChecksum` 绑住 `manifest.json` 的原始字节（声明 + `files[]` 列表）。 */
+  subject: z.strictObject({
+    packId: z.string().min(1),
+    packVersion: z.number().int().positive(),
+    /** ⚠️ 不复用 `assetpack.ts` 的 `Checksum`：那个文件用的是 `zod`，本文件是 `zod/v4` ——
+     *  跨实例的 schema 在 v4 里会被当成「不是 schema」（2026-10-22 实测）。形状逐字相同。 */
+    manifestChecksum: z.string().regex(/^sha256:[0-9a-f]{64}$/, "形如 sha256:<64 位小写十六进制>").optional(),
+  }).optional(),
   /** 这一次**跑过**哪几条判据。⚠️ **是链报的事实，不是类型的要求** —— 见文件头 §四③。
    *  ⚠️ 它**由装配器投影出来**（`buildQAReport`），**不手打**。 */
   checked: z.array(QAJudgementSchema),
@@ -363,8 +381,9 @@ export type QAVerdict = "pass" | "fail" | "incomplete";
  *   `fail`       —— 有一条 `severity: "error"` 的失败。**它赢过 `incomplete`**：
  *                   已知的阻断是**可行动的**，而「还有一条没查」不会让那次失败消失。
  *   `incomplete` —— 没有 error，但**有判据没跑**（`checked` 不全）。
- *                   今天走不到（文件头 §四①）—— 它存在的理由是**「没查」必须有名字**，
- *                   否则它会读成 `pass`，那是**一行假绿**。
+ *                   2026-10-22 起回到「链上走不到」：六条都由 QA 真跑（文件头 §四①）。
+ *                   它存在的理由是**「没查」必须有名字**，否则它会读成 `pass`，
+ *                   那是**一行假绿**。
  *                   （先例：`PaletteBinding` 的 `unbound` 被专门保留 ——
  *                    「删掉它就等于让这类包**在结构上无法诚实**」。）
  *   `pass`       —— 六条判据全跑，且一条 error 都没有。
@@ -412,8 +431,8 @@ export const QA_JUDGEMENT_LABELS: Record<QAJudgement, string> = {
  *   各声明一次**，并补齐上面 §四④ 那两条观察。本类型**不住 pipeline**：`packages/qa` 的白名单
  *   只有 `contracts`，类型住 pipeline 会逼出一次反向依赖（与 `QaRunner` / `QaContext` 同一条理由）。
  * ⚠️ **它要求的是「不重复」，不是「每条判据恰好被一个族声明一次」**（[票 19] 改准）：
- *   后者**在数学上做不到** —— `layer-coverage`（层覆盖）由**装配期**的硬失败保证，
- *   **不属于任何族**（见文件头四①）。今天三个族加起来声明 5 条，第六条在装配期。
+ *   后者**在数学上做不到** —— `layer-coverage`（层覆盖）**不属于任何族**（见文件头四①）：
+ *   它由**合成器**在汇合处直接跑。今天三个族加起来声明 5 条，第六条由合成器补跑。
  */
 export type QaFamilyResult = {
   judgements: Partial<QAJudgementResults>;
@@ -447,6 +466,14 @@ export type QaContext = {
   /** 已落盘的 `asset-recipe.json` 的绝对路径 —— 视觉族（票 17）要读它。 */
   recipePath: string;
   gameId: string;
+  /**
+   * **外壳视口**（像素）—— 与 `compileRuntime` / 站点装配收到的是**同一个值**（由壳传进来）。
+   *
+   * ⚠️ **为什么不从产物里推**：`game-config` 只带世界尺寸（`world.size`），视口宽不在里面；
+   *   外壳常量住 `demo` / `assets`，而 `packages/qa` 的白名单只有 `contracts`。
+   *   层覆盖（`layer-coverage`）要同时知道「世界多宽」与「视口多大」⇒ 这个值**必须由调用方给**。
+   */
+  viewport: { w: number; h: number };
   /**
    * **上游算好的 `inspect` 观察**（v3 视觉 QA 接口）。
    *

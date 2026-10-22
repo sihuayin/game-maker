@@ -18,6 +18,8 @@ Map: ../map.md
   到达 gate → `won=true`。
 - 用 fixture pack + config（优先 v7 + 已验收 config）离线运行；零付费。
 - 负例：`objective.gate` 指错 / 拿掉一个 pickup / 破坏输入 ⇒ smoke 必须红，并指出失败阶段。
+- **票 07 的软锁专项用例**（票 06 §6.3）：「木箱顶起跳 → 空中撞 hazard → 重置」后连续采样 30 帧，
+  断言 `body.bottom <= floorY + 1`、`onFloor` 变真、`won` / `collected` 不变；**重复触发两次**脚线相同。
 - 命令：新增独立 `pnpm test:playable`（Q8 A）；默认 `pnpm test` 保持无浏览器依赖；
   最终验证票必须跑它。浏览器不可用时**失败并记录**，不得静默跳过成绿。
 

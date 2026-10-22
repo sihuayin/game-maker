@@ -69,25 +69,22 @@ or paste the full `node packages/cli/dist/cli.mjs` invocation each time.
 
 ## Quick start — the fixture path (offline, no API keys)
 
-The repo ships two complete packs, so you can be playing a game without calling a single model.
+The repo ships two complete packs, so you can inspect them — and serve the tower-defense one — without calling a single model:
 
 ```bash
-game-maker verify fixtures/packs/last-train/v2
-game-maker site   fixtures/packs/last-train/v2 --config fixtures/game-configs/last-train.json
-# → out/last-train/site/v<N>  (N is the next unused site version)
-```
+game-maker verify  fixtures/packs/last-train/v2
+game-maker inspect fixtures/packs/last-train/v2
 
-Now serve it. **The HTTP server root must be the parent of `pack/` and `site/`** — that is `out/last-train/`, *not* the site directory itself. Pointing the root inside the site gives 404s, and **Phaser's loader fails silently**, so you get a black canvas and no error.
-
-```bash
-cd out/last-train && python3 -m http.server 8000
-# open http://127.0.0.1:8000/site/v<N>/index.html
-```
-
-The tower-defense variant, same shape:
-
-```bash
+# Tower defense: `site` explicitly skips the publish gate for `td-config/v1` (TD QA is P2)
 game-maker site fixtures/packs/counter-siege/v4 --config fixtures/td-configs/counter-siege.json
+# → out/counter-siege/site/v<N>  (N is the next unused site version)
+```
+
+⚠️ **`site` is a publish path and now requires a QA report for the exact pack** — a `qa-report.json` whose `subject.packId` / `subject.packVersion` match the pack, with all six judgements run and no `error` findings. Packs produced by `create --yes` / `build` carry one in `run/v<N>/qa-report.json`, auto-discovered under `<out>/<packId>/run/v*/`. The fixture packs predate the QA chain and ship without one, so the side-scroller fixture **cannot be served directly**; when a pack lives outside the canonical out tree, point at its report with `--qa-report <path>`.
+
+Now serve it. **The HTTP server root must be the parent of `pack/` and `site/`** — that is `out/counter-siege/`, *not* the site directory itself. Pointing the root inside the site gives 404s, and **Phaser's loader fails silently**, so you get a black canvas and no error.
+
+```bash
 cd out/counter-siege && python3 -m http.server 8000
 # open http://127.0.0.1:8000/site/v<N>/index.html
 ```
@@ -130,7 +127,10 @@ game-maker compile-runtime --design out/<id>/run/v1/game-design.json --pack out/
 game-maker compile-td-game --requirement inputs/counter-siege/PROMPT.md --pack out/<id>/pack/v1
 
 # 4. pack + level config → site
-game-maker site out/<id>/pack/v1 --config out/<id>/game-configs/v1.json
+# ⚠️ `site` now gates on a QA report for **this exact pack**. A pack built by `pack` alone has none;
+# the supported route that produces one is `create --yes` / `build` (QA runs in the build step).
+# If you already have a report for this pack, pass it explicitly:
+game-maker site out/<id>/pack/v1 --config out/<id>/game-configs/v1.json --qa-report <path/to/qa-report.json>
 ```
 
 A level config may also be **hand-written**; [`fixtures/game-configs/last-train.json`](fixtures/game-configs/last-train.json) is exactly that. Both routes stay legal, and they do not always produce the same level — the hand-written config puts all three lost items on the ground line, while the compiled one stacks the second item on top of the luggage pile.
@@ -167,7 +167,7 @@ game-maker plan            --design <game-design.json> --visual-world <visual-wo
 game-maker pack            --recipe <recipe.json> [--visual-world <visual-world.json>] [--version <n>] [--out <dir>] [--concurrency <n>] [--concurrency-image <n>] [--json]
 game-maker compile-runtime --design <game-design.json> --pack <pack dir> [--level <level id>] [--out <dir>] [--json]
 game-maker compile-td-game --requirement <requirement.md> --pack <pack dir> [--out <dir>] [--json]
-game-maker site            <pack dir> --config <level config> [--shell <shell.js>] [--out <dir>] [--json]
+game-maker site            <pack dir> --config <level config> [--qa-report <path>] [--shell <shell.js>] [--out <dir>] [--json]
 game-maker verify          <pack dir> [--json]
 game-maker inspect         <pack dir> [--json]
 ```

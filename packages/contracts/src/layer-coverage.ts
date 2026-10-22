@@ -3,8 +3,9 @@
 // ⚠️ **三个同名邻居，一个都别混**（本仓踩过「两份并存的必然漂移」那笔账）：
 //   · `coverage.ts` 的 `LayerCoverage` —— 交付态**像素比例**（`assetpack-coverage/v1` sidecar）：
 //     这一层画得有多满。吃的是图集像素，算出它在 `pack` 那一步。
-//   · `qa.ts` 的 `layer-coverage` 判决名 —— **有意不在 QA 族里**（`qa.ts:113` · `qa/src/visual.ts:34` ·
-//     `qa/src/assemble.ts:85` 三处写着同一句）。本文件**不碰那三处**。
+//   · `qa.ts` 的 `layer-coverage` 判决名 —— **有意不在 QA 族里**；2026-10-22 起由**合成器
+//     自己**跑（`qa/src/layers.ts`），判据本体仍调**本文件**的 `auditLayerCoverage`。
+//     ⚠️ 「不属于任何族」与「没人跑它」是两件事 —— 以前是后者，现在只是前者。
 //   · **本文件** —— **几何**：视差 p 的层跟着镜头退，镜头走到尽头时它还剩不剩得下一屏。
 //
 // ✅ **它是硬失败**：三个数（世界多宽 · 视口多大 · 每层退多少）都是给定的 ⇒ **精确可算**，
@@ -82,6 +83,48 @@ export type LayerCoverageEntry = {
   /** 由 `layerDrawnSize` 算出来的盒（世界像素）。 */
   drawn: Extent;
 };
+
+/** 背景那一份（`AssetPackManifest.assets[]` 里的一项）—— 只要与本判据有关的两格。
+ *
+ *  ⚠️ 结构化类型（不引 `AssetPackManifest` / `AssetPackEntry`）：与 `Extent` 同一条理由 ——
+ *    本文件要的是**结构**，不是一份待校验的数据。
+ */
+export type BackgroundAssetLayers = {
+  /** 资源 id（帧名前缀）。 */
+  readonly id: string;
+  /** 资源的**标称尺寸**（`AssetPackEntry.size`，票 27 定为必填）。 */
+  readonly size: Extent;
+  /** 背景的层（非背景资源没有这一格）。 */
+  readonly layers?: readonly {
+    readonly name: string;
+    readonly parallax: number;
+    readonly tileable?: { readonly x: boolean; readonly y: boolean } | undefined;
+  }[] | undefined;
+};
+
+/**
+ * 「这份 config 的背景层」→ `auditLayerCoverage` 要吃的那种 primitive。
+ *
+ *  ⚠️ **不做资源解析**：解不到那件背景时**一条都不给** ——「这份 config 指着一个不存在的背景」
+ *    由引用族（`auditReferences`）报，本判据只回答**几何**那一问。
+ *  ⚠️ 层的名字拼成 `${资源 id}.${层名}` —— 契约把帧名**逐字钉死**就是这个形状
+ *    （`assetpack.ts` 的 superRefine）⇒ 与站点装配侧读到的 `draw.frame` 是**同一个字符串**，
+ *    这正是「两侧 message 逐字相等」那条判据（验收条件 4）站得住的原因。
+ *  ⚠️ **config 侧的两个调用者调的是同一个本函数**（`assets` 的 `compile-runtime` 与 `qa` 的
+ *    合成器）—— 规则共用之外，**入参的来路**也共用：那是「不得出现两个事实源」的另一半。
+ */
+export function backgroundLayerEntries(
+  backgroundAssetId: string, worldSize: Extent, assets: readonly BackgroundAssetLayers[],
+): LayerCoverageEntry[] {
+  const a = assets.find((x) => x.id === backgroundAssetId);
+  if (a === undefined) return [];
+  return (a.layers ?? []).map((l, i) => ({
+    where: `scene.background[${i}]`,
+    name: `${a.id}.${l.name}`,
+    parallax: l.parallax,
+    drawn: layerDrawnSize({ tileable: l.tileable, nominal: a.size }, worldSize),
+  }));
+}
 
 /**
  * **层盖不住世界** —— 逐层判，命中即一条 `error`。

@@ -36,13 +36,34 @@ const TOOL_INPUT: Record<string, unknown> = {
  * ⚠️ 按提示词分三种：动画分解图 → N 个分离色块；背景/层 → 整张纯色；单物体 → 纯色底 + 一个块。
  *   这不是判据，只是让 pack 的抠底/分块/量化走通。
  */
+
+/**
+ * **按提示词里要求的比例出图**（票 04：像素阈值要求「源图 → 目标」长宽比一致）。
+ *
+ * ⚠️ 这是**测试夹具**在模仿一个守规矩的上游；生产链不经过这里。
+ *   - 母版：`画布是 W×H 像素`；
+ *   - 单物体 / 动画：`交付管线会把它两方向独立缩放到 W×H 像素`（动画分解图画布是 N 倍宽）；
+ *   - 背景层：`画布长宽比必须精确是 W : H`。
+ *   解析不到 ⇒ 回落到原来的固定尺寸（旧夹具的行为不变）。
+ */
+function targetSizeOf(prompt: string, n: number): { w: number; h: number } | undefined {
+  const master = /画布是 (\d+)×(\d+) 像素/.exec(prompt);
+  if (master) return { w: Number(master[1]), h: Number(master[2]) };
+  const scaled = /交付管线会把它两方向独立缩放到 (\d+)×(\d+) 像素/.exec(prompt);
+  if (scaled) return { w: Number(scaled[1]) * Math.max(1, n), h: Number(scaled[2]) };
+  const ratio = /画布长宽比必须精确是 (\d+) : (\d+)/.exec(prompt);
+  if (ratio) return { w: Number(ratio[1]), h: Number(ratio[2]) };
+  return undefined;
+}
+
 const imageReply = (body: Record<string, any>) => {
   const prompt = String(body?.input?.[0]?.text ?? body?.contents?.[0]?.parts?.[0]?.text ?? "");
   const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
   const anim = n > 0;
   const isBg = !anim && /背景|这一层|层\b/.test(prompt);
-  const w = anim ? Math.max(512, n * 128 + 64) : 480;
-  const h = anim || isBg ? 270 : 256;
+  const target = targetSizeOf(prompt, n) ?? { w: anim ? Math.max(512, n * 128 + 64) : 480, h: anim || isBg ? 270 : 256 };
+  const k = Math.max(1, Math.floor(512 / Math.max(target.w, target.h)));
+  const w = target.w * k, h = target.h * k;
   const data = Buffer.alloc(w * h * 4);
   const fill = (x0: number, y0: number, x1: number, y1: number, c: [number, number, number]) => {
     for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
@@ -51,10 +72,12 @@ const imageReply = (body: Record<string, any>) => {
   };
   fill(0, 0, w, h, isBg ? [90, 80, 70] : [255, 0, 255]);
   if (anim) {
-    const bw = 64, gap = 64;
+    const slot = Math.floor(w / n);
+    const bw = Math.max(1, Math.floor(slot * 0.5)), bh = Math.max(1, Math.floor(h * 0.6));
+    const y0 = Math.floor(h * 0.2);
     for (let k = 0; k < n; k++) {
-      const x0 = gap + k * (bw + gap);
-      fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
+      const x0 = k * slot + Math.floor((slot - bw) / 2);
+      fill(x0, y0, x0 + bw, y0 + bh, [220, 220, 220]);
     }
   } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
   const png64 = encodePNG({ width: w, height: h, data }).toString("base64");

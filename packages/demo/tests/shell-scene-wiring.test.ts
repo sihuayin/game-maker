@@ -39,3 +39,20 @@ describe("票 106：会动的危险物按锚点落位，不做盒心往返", () 
     expect(body).not.toContain("b.reset(");
   });
 });
+
+describe("票 07：胜利只绑 gate；危险物重置同步物理体", () => {
+  it("goal 只在 `wins` 标记的实体上注册 tryWin —— 其他 goal 只是画出来的", () => {
+    const goal = between('case "goal": {', 'case "decor":');
+    expect(goal, "goal 分支没有读世界层的 wins 裁决").toContain("e.wins");
+    expect(goal).toContain("tryWin()");
+    expect(goal.indexOf("e.wins"), "tryWin 注册必须在 wins 守卫之后").toBeLessThan(goal.indexOf("tryWin()"));
+  });
+
+  it("hitHazard 用 body.reset 同步物理体与 prev，并按 floorY 校正脚线", () => {
+    const hit = between("private hitHazard(", "private tryWin(");
+    expect(hit, "必须同步物理体（票 06：只动 GameObject 会叠加上一物理步的位移）").toContain(".reset(");
+    expect(hit, "重置后要用纯层算出的 floorY 校正脚线").toContain("floorY");
+    expect(hit, "`setPosition` 只动 GameObject，body 仍在旧位").not.toContain("setPosition");
+    expect(hit, "`setVelocity(0,0)` 不是修复项：reset 已经 stop()").not.toContain("setVelocity");
+  });
+});

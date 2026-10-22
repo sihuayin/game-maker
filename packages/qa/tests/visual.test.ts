@@ -30,6 +30,8 @@ function stage(): QaContext {
   //   另外两份给了但那份文件**不存在** —— 那正说明**没人读它**（拼错路径当场炸，不是静默）。
   return {
     runDir, packDir, gameId: "last-train",
+    // ⚠️ 本族不读视口；但 `QaContext` 要求它（第六条判据由合成器跑，P0-02a）。
+    viewport: { w: 480, h: 270 },
     configPath: path.join(runDir, "game-config.json"),
     intentPath: path.join(runDir, "game-intent.json"),
     designPath: path.join(runDir, "game-design.json"),
@@ -168,7 +170,7 @@ describe("§故意损坏 ②：色板绑定**真的会响**", () => {
 });
 
 describe("§边界：本包**够不着**的东西，一条都不碰", () => {
-  it("没有 `layer-coverage` —— 它的规则住装配期（那儿已经硬失败）", async () => {
+  it("没有 `layer-coverage` —— 它不属于任何族（P0-02a 起由合成器自己跑）", async () => {
     expect(keys(await run(stage()))).not.toContain("layer-coverage");
   });
 

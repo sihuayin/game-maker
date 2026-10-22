@@ -20,13 +20,34 @@ const CANNED = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/upstream/can
 
 
 /** 假生图回应（v3 票 09）：动画 → N 个分离色块；背景/层 → 纯色；单物体 → 纯色底 + 一个块。 */
+
+/**
+ * **按提示词里要求的比例出图**（票 04：像素阈值要求「源图 → 目标」长宽比一致）。
+ *
+ * ⚠️ 这是**测试夹具**在模仿一个守规矩的上游；生产链不经过这里。
+ *   - 母版：`画布是 W×H 像素`；
+ *   - 单物体 / 动画：`交付管线会把它两方向独立缩放到 W×H 像素`（动画分解图画布是 N 倍宽）；
+ *   - 背景层：`画布长宽比必须精确是 W : H`。
+ *   解析不到 ⇒ 回落到原来的固定尺寸（旧夹具的行为不变）。
+ */
+function targetSizeOf(prompt: string, n: number): { w: number; h: number } | undefined {
+  const master = /画布是 (\d+)×(\d+) 像素/.exec(prompt);
+  if (master) return { w: Number(master[1]), h: Number(master[2]) };
+  const scaled = /交付管线会把它两方向独立缩放到 (\d+)×(\d+) 像素/.exec(prompt);
+  if (scaled) return { w: Number(scaled[1]) * Math.max(1, n), h: Number(scaled[2]) };
+  const ratio = /画布长宽比必须精确是 (\d+) : (\d+)/.exec(prompt);
+  if (ratio) return { w: Number(ratio[1]), h: Number(ratio[2]) };
+  return undefined;
+}
+
 function imageReply(body: Record<string, any>): Response {
   const prompt = String(body?.input?.[0]?.text ?? body?.contents?.[0]?.parts?.[0]?.text ?? "");
   const n = Number(/横向排开 \*\*(\d+) 个\*\*/.exec(prompt)?.[1] ?? 0);
   const anim = n > 0;
   const isBg = !anim && /背景|这一层|层\b/.test(prompt);
-  const w = anim ? Math.max(512, n * 128 + 64) : 480;
-  const h = anim || isBg ? 270 : 256;
+  const target = targetSizeOf(prompt, n) ?? { w: anim ? Math.max(512, n * 128 + 64) : 480, h: anim || isBg ? 270 : 256 };
+  const k = Math.max(1, Math.floor(512 / Math.max(target.w, target.h)));
+  const w = target.w * k, h = target.h * k;
   const data = Buffer.alloc(w * h * 4);
   const fill = (x0: number, y0: number, x1: number, y1: number, c: [number, number, number]) => {
     for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
@@ -35,10 +56,12 @@ function imageReply(body: Record<string, any>): Response {
   };
   fill(0, 0, w, h, isBg ? [90, 80, 70] : [255, 0, 255]);
   if (anim) {
-    const bw = 64, gap = 64;
+    const slot = Math.floor(w / n);
+    const bw = Math.max(1, Math.floor(slot * 0.5)), bh = Math.max(1, Math.floor(h * 0.6));
+    const y0 = Math.floor(h * 0.2);
     for (let k = 0; k < n; k++) {
-      const x0 = gap + k * (bw + gap);
-      fill(x0, 50, x0 + bw, 220, [220, 220, 220]);
+      const x0 = k * slot + Math.floor((slot - bw) / 2);
+      fill(x0, y0, x0 + bw, y0 + bh, [220, 220, 220]);
     }
   } else if (!isBg) fill(Math.floor(w / 3), Math.floor(h / 4), Math.floor((2 * w) / 3), Math.floor((3 * h) / 4), [220, 220, 220]);
   const png64 = encodePNG({ width: w, height: h, data }).toString("base64");
@@ -369,13 +392,14 @@ describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5�
     const r = await runC(create(s, ["--yes", "--json"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.ok);
     const out = jsonOf(r.io);
-    expect(out.data!["qaVerdict"]).toBe("incomplete");      // ⚠️ 恒真：第六条不归 QA，而它**不是**失败
+    expect(out.data!["qaVerdict"]).toBe("pass");            // ⚠️ P0-02a 起六条都真跑；旧断言钉的是 `incomplete`
     expect(String(out.data!["qaReport"])).toBe("wasteland/run/v1/qa-report.json");
     expect(out.artifacts!.some((a) => a.kind === "qa-report")).toBe(true);
 
-    // ⚠️ 那一行要把「跑了五条」与「哪条没跑」**分开说** —— 否则 `incomplete` 会被读成「有问题」
-    expect(r.text()).toMatch(/QA：没有一条判据说不行 · 5\/6 条由 QA 跑过（裁决 incomplete）/);
-    expect(r.text()).toMatch(/没跑的：层覆盖/);
+    // ⚠️ 那一行要把「跑了的那几条怎么样」与「哪条没跑」**分开说**——
+    //   六条都跑满时后半句**不出现**（以前恒 5/6 时它恒出现，那是旧行为）。
+    expect(r.text()).toMatch(/QA：没有一条判据说不行 · 6\/6 条由 QA 跑过（裁决 pass）/);
+    expect(r.text()).not.toMatch(/没跑的：/);
     // ⚠️ 「这一版还没有 QA 实现 —— 票 17-20」**从票 17 起就是假话**，已经删了
     expect(r.text()).not.toMatch(/还没有 QA 实现/);
 

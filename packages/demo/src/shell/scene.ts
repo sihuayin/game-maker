@@ -157,6 +157,9 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
         }
         case "goal": {
           this.physics.add.existing(sprite, true);
+          // ⚠️ **哪个 goal 算赢是纯层的裁决**（票 07）：`wins` 由 `buildWorld` 按
+          //   `objective.gate` 标出，其余 goal 只画不判 —— 否则任何一个 goal 都会假胜利。
+          if (!e.wins) break;
           this.gate = sprite;
           this.physics.add.overlap(this.playerOrStub(), sprite, () => this.tryWin());
           break;
@@ -260,10 +263,22 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
       this.pips.forEach((p, i) => (p as Phaser.GameObjects.Image).setVisible(i < this.collected));
     }
 
-    /** 碰到危险物 → **退回起点、计数保留**（票 09 裁决 12；无血量）。 */
+    /**
+     * 碰到危险物 → **退回起点、计数保留**（票 09 裁决 12；无血量）。
+     *
+     * ⚠️ **必须 `body.reset()` 连物理体一起摆**（票 06 的根因）：`setPosition` 只动
+     *   GameObject，body 与 `prev/prevFrame` 仍在旧位，同帧 `postUpdate` 会把上一物理步的
+     *   位移叠到刚传送的精灵上；下落 ≳225 px/s 时防穿透窗口（`OVERLAP_BIAS=4`）拒绝分离 ⇒ 掉穿。
+     *   第二次 `reset` 用**重置后真实的 `body.bottom`** 对齐纯层算出的 `floorY` ——
+     *   与锚点、取整、body offset 无关，且输入全是不可变数据 ⇒ 重复重置逐像素相同。
+     */
     private hitHazard(): void {
       if (!this.player || this.won) return;
-      this.player.setPosition(world.player.at.x, world.player.at.y).setVelocity(0, 0);
+      const b = this.player.body as Phaser.Physics.Arcade.Body;
+      const { x, y } = world.player.at;
+      b.reset(x, y);
+      const dy = world.player.floorY - b.bottom;
+      if (Math.abs(dy) > 1e-3) b.reset(x, y + dy);
     }
 
     private tryWin(): void {

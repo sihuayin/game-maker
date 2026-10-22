@@ -36,6 +36,11 @@ export type EntityDesc = {
   /** 碰撞/摆放盒（世界像素，左上角）。**由 `at` 与锚点推出来**，不是 `at` 本身。 */
   box: Box;
   draw: Drawn;
+  /**
+   * ⚠️ **胜利目标只有一个**（票 07）：`id === objective.gate` 的那个 goal。
+   *   其余 `kind:"goal"` 实体照画，但壳不给自己绑 `tryWin()` —— 否则任何一个 goal 都是假成功。
+   */
+  wins: boolean;
   /** 若资源是 animation：逐帧名（壳拿去建 Phaser 动画）。 */
   frames?: string[];
   motion?: { axis: "x" | "y"; distance: number; periodMs: number };
@@ -47,6 +52,11 @@ export type PlayerDesc = {
   anims: Record<string, string[]>;
   at: Vec;
   box: Box;
+  /**
+   * ⚠️ **重置时脚底要落到的地面顶边**（票 07；算法见 `floorYOf`）。
+   *   危险物重置用它把物理体摆回可站立位置，而不是只把精灵传回出生点。
+   */
+  floorY: number;
   /** 手感。⚠️ 默认值只有一处来源（票 09 裁决 11）—— 由契约的 `playerMoveOf` 给。 */
   move: { speed: number; jumpVelocity: number; gravity: number };
 };
@@ -77,8 +87,34 @@ function fallbackPlayer(issues: Issue[]): PlayerDesc {
   issues.push({ severity: "error", where: "player", message: `没有 game-config（或它不过 schema）—— 玩家用占位符顶上` });
   return {
     draw: { missing: true, label: "player", reason: "没有 game-config", ...boxToXYWH(box) },
-    anims: {}, at, box, move: { ...DEFAULT_PLAYER_MOVE },
+    anims: {}, at, box, floorY: box.y + box.h, move: { ...DEFAULT_PLAYER_MOVE },
   };
+}
+
+
+/**
+ * ⚠️ **重置点必须是可站立的**（票 07；物理语义见票 06 §5.1）：
+ * 取玩家盒子脚下**最近的一条静态表面顶边**。
+ *
+ * - 用**盒子底**（`boxAt` 已取整）而不是 `at.y` —— 锚点 `{0.5,0.95}` 会差 2.4px；
+ * - 只把**画得出来、且不带 `motion`** 的 `solid` 实体当落点 —— 会动的实体下一秒就不在那了，
+ *   画不出来的那条在外壳里没有碰撞体；
+ * - 允许 **4px 浅埋**（Arcade 的 `OVERLAP_BIAS`），否则出生在浅埋位置时会被拒分离；
+ * - 脚下什么都没有（坑）⇒ 退回作者写的脚线。**这是显式兜底**，静默卡死比这更坏。
+ */
+function floorYOf(box: Box, terrain: Box[], entities: EntityDesc[]): number {
+  const foot = box.y + box.h;
+  const tops = [
+    ...terrain.map((t) => ({ x: t.x, w: t.w, top: t.y })),
+    // ⚠️ `draw.missing` 的 solid 在外壳里**没有碰撞体**（占位符那条直接 return）—— 不能当地面。
+    ...entities.filter((e) => e.kind === "solid" && !e.motion && !e.draw.missing)
+      .map((e) => ({ x: e.box.x, w: e.box.w, top: e.box.y })),
+  ]
+    .filter((s) => s.x < box.x + box.w && s.x + s.w > box.x)   // 水平覆盖玩家盒子
+    .map((s) => s.top)
+    .filter((top) => top >= foot - 4)                          // 脚下（含 4px 浅埋）
+    .sort((a, b) => a - b);
+  return tops[0] ?? foot;
 }
 
 /**
@@ -138,6 +174,7 @@ export function buildWorld(
     const res = resolvePackRef({ asset: e.asset, ...(e.anim ? { anim: e.anim } : {}) }, pack);
     return {
       id: e.id, kind: e.kind, box: boxAt(e.at, size, anchor), draw,
+      wins: e.kind === "goal" && e.id === cfg.objective.gate,
       ...(res.ok && res.frames.length > 1 ? { frames: res.frames.map((f) => f.name) } : {}),
       ...(e.motion ? { motion: e.motion } : {}),
     };
@@ -159,9 +196,11 @@ export function buildWorld(
   const seedRef = seedAction
     ? { asset: cfg.player.asset, anim: cfg.player.anims[seedAction] }
     : { asset: cfg.player.asset };
+  const playerBox = boxAt(cfg.player.at, playerSize, playerAnchor);
   const player: PlayerDesc = {
     draw: resolveDraw(pack, cfg.player.at, seedRef, issues, "player", cfg.player.asset),
-    anims, at: cfg.player.at, box: boxAt(cfg.player.at, playerSize, playerAnchor),
+    anims, at: cfg.player.at, box: playerBox,
+    floorY: floorYOf(playerBox, terrain, entities),
     move: cfg.player.move ?? { ...DEFAULT_PLAYER_MOVE },
   };
 

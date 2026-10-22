@@ -17,15 +17,16 @@
 //     这里的产物**只有**一个 `QAReport` 对象。
 //
 // ─────────────────────────────────────────────────────────────────────────────
-// 二、`layer-coverage` 由**本处**补一条 `ran: false`，而那不是缺口（票 19 改准的那条）
+// 二、`layer-coverage` 由**本处直接跑**（2026-10-22 · P0-02a 改准）
 //
 //   六条判据里，第五条不住在任何族里：**层覆盖**由**装配期**的硬失败保证（`pack.ts`）。
-//   ⇒ `checked` 今天**恒为 5/6**、`qaVerdict` **恒为 `incomplete`**，而那是**说真话**
-//     （有判据没由 QA 跑）—— ⚠️ **不要**为了让它变成 `pass` 去动 `checked`。
-//
-//   ⚠️ `ran: false` 的 `reason` **不落盘**（契约 §三：落盘的形式就是「不在 `checked` 里」）
-//     ⇒ 这里写的那句话是给**产侧**读的，而它**自动**不进 `checked`（`buildQAReport` 只收
-//     `ran: true` 的键）⇒ 5/6 是**结构**给的，不是手打的。
+//   2026-10-09 到 2026-10-21 之间，本处只给它补一条 `ran: false` ⇒ `checked` 恒 5/6、
+//   `qaVerdict` 恒 `incomplete`（那是说真话：有判据没由 QA 跑）。
+//   ⇒ 现在本处**真去跑它**（`layers.ts`）：输入是 `QaContext.viewport` + 已经落盘的
+//     config / manifest，判据本体仍是装配期同一个 `auditLayerCoverage`。
+//   ⚠️ 它**仍然不属于任何族**（`CONTEXT.md` 的「族 ≠ 判据」）—— 直接由汇合处跑，
+//     正是 P0-02 范围文档给的「或在 `assemble.ts` 中真正运行」那条路。
+//   ⚠️ 于是 `checked` 今天**恒为 6/6**（链上），`incomplete` 回到「本该走不到」。
 //
 // ─────────────────────────────────────────────────────────────────────────────
 // 三、观察那一栏：今天两条都是 `unavailable`（票 20 的 Q2，人类裁定）
@@ -62,6 +63,7 @@ import {
 } from "@game-maker/contracts";
 import { gameplayQaRunner } from "./gameplay.js";
 import { intentQaRunner } from "./intent.js";
+import { layerCoverageJudgement } from "./layers.js";
 import { visualQaRunner } from "./visual.js";
 
 /**
@@ -82,11 +84,13 @@ export const qaRunner: QaRunner = async (ctx: QaContext): Promise<QAReport> => {
   //     · 漏写一条 ⇒ **编译错误**（与 `QA_JUDGEMENT_LABELS` 同一条纪律）；
   //     · 一条判据被两个族声明过 ⇒ 这里**读不到**那个重复（各族的键是写死的字面量，
   //       同名键在**它们自己**那里就是编译错误）⇒ 运行时**不需要**再查一遍重复。
+  // ⚠️ 第六条**没有族**（见文件头二）：由本处直接跑。它读的是同一批已经落盘的产物、
+  //   与三个族没有顺序依赖；放在它们之后只是因为它是同步的、便宜，不值得为它再开一路。
+  const layers = layerCoverageJudgement(ctx);
   const judgements: QAJudgementResults = {
     "constructive-constraint": declared(visual, "constructive-constraint"),
     "palette-binding": declared(visual, "palette-binding"),
-    // ⚠️ 这一条**没有族**（见文件头二）：它由装配期的硬失败保证，而报告仍要说得出它没被跑。
-    "layer-coverage": { ran: false, reason: "归装配期硬失败（pack.ts）—— 没有族声明它" },
+    "layer-coverage": layers,
     "reference-resolution": declared(gameplay, "reference-resolution"),
     "reachability": declared(gameplay, "reachability"),
     "intent-coverage": declared(intent, "intent-coverage"),

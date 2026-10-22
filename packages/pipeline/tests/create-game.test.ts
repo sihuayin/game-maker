@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { CommandError, DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, qaVerdict, type AssetRecipe, type AssetSpec, type CharacterDNAFile, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
+import { CommandError, DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, QA_JUDGEMENTS, qaVerdict, type AssetRecipe, type AssetSpec, type CharacterDNAFile, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, decodePNG, encodePNG, framePlan, verifyPack, type DrawListGenerator } from "@game-maker/assets";
 import { createGame, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
@@ -635,17 +635,17 @@ describe("§票 60 · 死在第一步也留现场（`visual-world-attempts.json`
 });
 
 describe("§QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3）", () => {
-  it("⚠️ 不给 ⇒ 跑默认的合成器 —— 而**`incomplete` 不是失败**，它照样不阻断", async () => {
+  it("⚠️ 不给 ⇒ 跑默认的合成器 —— 干净包 6/6、裁决 `pass`", async () => {
     const h = harness();
     const u = await understand(h);
     const b = await build(h, u.run.dir);
-    // ⚠️ 干净的一次运行：五条判据全跑、一条怨言都没有
+    // ⚠️ 干净的一次运行：六条判据全跑、一条怨言都没有
     expect(b.qa?.failures).toEqual([]);
-    // ⚠️ **第六条不归 QA**（层覆盖由装配期的硬失败保证）⇒ `checked` 恒 5/6、裁决恒 `incomplete`
-    //   —— 而**这一次构建成功了**：那正是「闸看 `failures`，不看 `qaVerdict`」的证据。
-    expect(b.qa?.checked).toHaveLength(5);
-    expect(b.qa?.checked).not.toContain("layer-coverage");
-    expect(qaVerdict(b.qa!)).toBe("incomplete");
+    // ⚠️ P0-02a（2026-10-22）起第六条（层覆盖）由合成器**真跑** ⇒ `checked` 是 6/6、
+    //   裁决是 `pass`（以前恒 5/6 / `incomplete`）。⚠️ 而闸**照旧**看 `failures`，不看 verdict。
+    expect(b.qa?.checked).toHaveLength(6);
+    expect(b.qa?.checked).toContain("layer-coverage");
+    expect(qaVerdict(b.qa!)).toBe("pass");
     expect(readJson(runPath(h, "qa-report.json"))["format"]).toBe("qa-report/v1");
     expect(b.paths.qaReport).toBeDefined();
   });
@@ -663,7 +663,8 @@ describe("§QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3）", ()
     const h = harness();
     const u = await understand(h);
     const report: QAReport = {
-      format: "qa-report/v1", checked: [], failures: [],
+      // ⚠️ P0-02b 起 `incomplete` 也阻断发布 ⇒ 这份「注入后应当成功」的报告必须是 6/6。
+      format: "qa-report/v1", checked: [...QA_JUDGEMENTS], failures: [],
       // ⚠️ **每个来源恰好一条**（契约的 `superRefine` ④）—— 少一条，`runBuild` 的契约校验当场拒。
       observations: [
         { source: "inspect", outcome: "unavailable", reason: "测试用：没跑" },
@@ -683,8 +684,13 @@ describe("§QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3）", ()
       },
     });
     expect(saw).toBe("wasteland|true|true|true|true|true");   // ⚠️ QA 看到的是**已经落盘**的那五份产物（外加 `gameId`）
-    expect(b.qa).toEqual(report);
+    // ⚠️ **身份由 pipeline 注入、覆盖 runner 自带的**（P0-02b）：报告与返回里的 `qa` 都带着它。
+    expect(b.qa).toMatchObject({
+      ...report,
+      subject: { packId: "wasteland", packVersion: 1, manifestChecksum: expect.stringMatching(/^sha256:[0-9a-f]{64}$/) },
+    });
     expect(readJson(runPath(h, "qa-report.json"))["format"]).toBe("qa-report/v1");
+    expect(readJson(runPath(h, "qa-report.json"))["subject"]).toMatchObject({ packId: "wasteland", packVersion: 1 });
   });
 
   it("⚠️ 一份**过不了契约**的报告 ⇒ 当场拒（那是**我们自己的 bug**，不是模型没生成好）", async () => {
@@ -720,6 +726,26 @@ describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的
     };
     expect(report.failures.map((f) => f.judgement)).toContain("reachability");
     expect(report.checked).toContain("reachability");      // 跑过才产得出失败（契约的 `superRefine` ③）
+  });
+
+  it("⚠️ incomplete（一条 runner 没跑）⇒ 拒、报告先落盘 —— 「没查」不许读成「通过」", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const partial: QAReport = {
+      format: "qa-report/v1",
+      checked: QA_JUDGEMENTS.filter((j) => j !== "layer-coverage"),
+      failures: [],
+      observations: [
+        { source: "inspect", outcome: "unavailable", reason: "测试用：没跑" },
+        { source: "review", outcome: "unavailable", reason: "测试用：没跑" },
+      ],
+    };
+    const e = await build(h, u.run.dir, { qa: async () => partial }).then((): unknown => undefined, (x: unknown) => x);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect(String((e as Error).message)).toMatch(/QA 没跑全/);
+    expect(String((e as Error).message)).toContain("layer-coverage");
+    // ⚠️ 与 error 同一条顺序：报告是诊断，先落盘再阻断。
+    expect((readJson(runPath(h, "qa-report.json"))["checked"] as string[])).toHaveLength(5);
   });
 
   it("⚠️ 文案里带着**报告路径**与失败详情 —— 走异常那一路也丢不掉它（票 20 的 Q5）", async () => {
@@ -851,8 +877,8 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(b.inspectData!.layerCoverage.length).toBe(1);       // drawlist 背景只有一帧
     expect(b.inspectData!.paletteUsage.offPalette.pixels).toBe(0);
     expect(report.observations.find((o) => o.source === "review")!.outcome).toBe("unavailable");
-    expect(report.checked.sort()).toEqual(["constructive-constraint", "intent-coverage", "palette-binding", "reachability", "reference-resolution"]);
-    expect(qaVerdict(report as never)).toBe("incomplete");
+    expect(report.checked.sort()).toEqual(["constructive-constraint", "intent-coverage", "layer-coverage", "palette-binding", "reachability", "reference-resolution"]);
+    expect(qaVerdict(report as never)).toBe("pass");
   });
 
   it("inspect 抛错：unavailable + build 继续；六判据与 qaVerdict 不变；reason 不带路径", async () => {
@@ -867,7 +893,72 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(inspect.reason).not.toContain("/private/secret/path");
     expect(inspect.lines).toBeUndefined();
     expect(b.inspectData).toBeUndefined();                     // 抛错 ⇒ 没有结构化数据
-    expect(report.checked).toHaveLength(5);
-    expect(qaVerdict(report as never)).toBe("incomplete");
+    expect(report.checked).toHaveLength(6);
+    expect(qaVerdict(report as never)).toBe("pass");
+  });
+});
+
+// ── P0-05b：票 03 裁定的像素阈值进入 QA（本票只负责「QA 能产 error」）────────
+describe("§P0-05b 像素阈值入 QA（票 03 裁定 A+）", () => {
+  const fakeInspect = (data: Record<string, unknown>) => () => ({
+    command: "inspect" as const, summary: ["fake inspect（测试注入）"], data, artifacts: [],
+  });
+  const reportOf = (h: ReturnType<typeof harness>) => readJson(runPath(h, "qa-report.json")) as {
+    observations: { source: string; outcome: string; lines?: string[]; reason?: string }[];
+    checked: string[];
+    failures: { judgement: string; target: string; severity: string; detail: string }[];
+  };
+
+  it("长宽比 52.4% ⇒ constructive-constraint error；发布被拒，报告先落盘", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const e = await build(h, u.run.dir, {
+      inspect: fakeInspect({ sourceSizes: [{ id: "hero", unit: "run", deltaAr: 52.4 }] }),
+    }).then(() => undefined, (x: unknown) => x);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect(String((e as Error).message)).toMatch(/constructive-constraint/);
+    const report = reportOf(h);
+    expect(report.failures).toContainEqual(expect.objectContaining({
+      judgement: "constructive-constraint", target: "hero.run", severity: "error",
+    }));
+    expect(report.failures.map((f) => f.detail).join("\n")).toMatch(/\+52\.4%/);
+  });
+
+  it("色板外 30% ⇒ palette-binding error；发布被拒", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const e = await build(h, u.run.dir, {
+      inspect: fakeInspect({ paletteUsage: { perAsset: [{ id: "bad", opacityPixels: 100, offPalettePixels: 30 }] } }),
+    }).then(() => undefined, (x: unknown) => x);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect(String((e as Error).message)).toMatch(/palette-binding/);
+    expect(reportOf(h).failures).toContainEqual(expect.objectContaining({
+      judgement: "palette-binding", target: "bad", severity: "error",
+    }));
+  });
+
+  it("色板外 16.02% ⇒ 只作 observation：不阻断，报告里看得见", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir, {
+      inspect: fakeInspect({ paletteUsage: { perAsset: [{ id: "health-icon", opacityPixels: 256, offPalettePixels: 41 }] } }),
+    });
+    expect(b.packVersion).toBe(1);
+    const report = reportOf(h);
+    expect(report.failures.filter((f) => f.severity === "error")).toEqual([]);
+    const text = report.observations.find((o) => o.source === "inspect")!.lines!.join("\n");
+    expect(text).toMatch(/health-icon · 色板外 41\/256（16\.02%）/);
+    expect(text).toMatch(/观察（≥10%/);
+  });
+
+  it("无 sourceSizes ⇒ 报告写明「没跑（unavailable）」，不记绿", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir, {
+      inspect: fakeInspect({ paletteUsage: { perAsset: [] }, sourceSizes: [] }),
+    });
+    expect(b.packVersion).toBe(1);
+    const text = reportOf(h).observations.find((o) => o.source === "inspect")!.lines!.join("\n");
+    expect(text).toMatch(/源图 \/ 目标尺寸：没跑（unavailable）/);
   });
 });

@@ -587,11 +587,22 @@ packages/contracts/src/qa.ts
 ```ts
 QAReport {
   format: "qa-report/v1";     // 判别式
+  subject?: {                 // P0-02b：这份报告属于哪个包（旧报告可缺，发布闸要求必须有）
+    packId: string;
+    packVersion: number;
+    manifestChecksum?: string; // sha256(manifest.json 原始字节)
+  };
   checked: QAJudgement[];     // 这一次**跑过**哪几条判据
   failures: QAFailure[];      // 判据的全部结论。**空 = 通过**
   observations: Observation[]; // 只报，不阻断、不打分
 }
 ```
+
+⚠️ **`subject` 是发布闸的身份依据**（P0-02b）：`create --yes` / `build` 由 pipeline 注入它；
+所有发布入口（CLI `site`、MCP `assemble_site` / `create_game`、`build`）在装配站点之前校验
+`packId + packVersion`（以及存在时的 `manifestChecksum`），并拒绝 `error` 与 `incomplete`。
+没有 `subject` 的旧报告**仍可解析**，但**不能用于发布** —— 没有身份 = 无法证明它属于当前包。
+塔防（`td-config/v1`）今天显式跳过该闸（P2）。
 
 ⚠️ **`status` 不是字段** —— 它是 `qaVerdict(report)` 派生的三值
 （`"pass"` / `"fail"` / `"incomplete"`）。

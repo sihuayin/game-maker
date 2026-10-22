@@ -3,7 +3,7 @@
 // ⚠️ 这一份里有**两条跟着出口搬过来的断言**（票 17 原来在 `visual.test.ts` 上断的，
 //   出口改成「族结果」之后它们**没有家**了：族结果里既没有 `format` 也没有裁决）：
 //     · 「`format` 是契约那份」—— 整份报告才算得出来；
-//     · 「裁决是 `incomplete`」—— `qaVerdict` 吃的是**整份报告**。
+//     · 「裁决是 `pass`」—— `qaVerdict` 吃的是**整份报告**（P0-02a 起六条都真跑）。
 //   它们归本票**重写**（票 18 的交接单第 ③ 条）。
 //
 // ⚠️ 夹具是三份**真产物**拼起来的（与票 17/18/19 同一批 fixture），而不是手搓的小对象：
@@ -46,6 +46,8 @@ function stage(): QaContext {
   write(runDir, "game-design.json", CANNED.design);
   return {
     runDir, packDir, gameId: "last-train",
+    // ⚠️ 第六条判据（层覆盖）要它（P0-02a）：合成器把视口原样交给 `auditLayerCoverage`。
+    viewport: { w: 480, h: 270 },
     recipePath: path.join(runDir, "asset-recipe.json"),
     configPath: path.join(runDir, "game-config.json"),
     intentPath: path.join(runDir, "game-intent.json"),
@@ -58,8 +60,8 @@ function write(runDir: string, name: string, body: unknown): void {
 const run = (ctx: QaContext): Promise<QAReport> => qaRunner(ctx);
 const bySource = (r: QAReport, s: string) => r.observations.find((o) => o.source === s);
 
-/** 五条 —— 六条判据里**第六条不归任何族**（层覆盖由装配期的硬失败保证）。 */
-const FIVE = ["constructive-constraint", "palette-binding", "reference-resolution", "reachability", "intent-coverage"];
+/** 六条 —— 三条族各声明自己那几条，第六条（层覆盖）由**合成器自己**跑（P0-02a）。 */
+const SIX = ["constructive-constraint", "palette-binding", "layer-coverage", "reference-resolution", "reachability", "intent-coverage"];
 
 describe("§干净的真现场：三族都跑、合成一份**过得了契约**的报告", () => {
   it("⚠️ `format` 是契约那份、整份报告过 schema（票 17 搬过来那两条断言的第一条）", async () => {
@@ -68,22 +70,43 @@ describe("§干净的真现场：三族都跑、合成一份**过得了契约**�
     expect(QAReportSchema.safeParse(r).success).toBe(true);   // ⚠️ 族结果落盘**过不了**（票 18 实测）—— 合成器补的就是这一条
   });
 
-  it("⚠️ `checked` 恰好是那**五条**，`layer-coverage` **不在**里面 —— 而裁决因此是 `incomplete`", async () => {
+  it("⚠️ `checked` 是**六条**、含 `layer-coverage` —— 干净包裁决 `pass`", async () => {
     const r = await run(stage());
-    expect([...r.checked].sort()).toEqual([...FIVE].sort());
-    expect(r.checked).not.toContain("layer-coverage");
-    // ⚠️ **那不是缺口，是实话**：有判据没由 QA 跑。⇒ 不许为了让它变成 `pass` 去动 `checked`。
-    expect(qaVerdict(r)).toBe("incomplete");
-    // ⚠️ 判据的全集与「这一次真跑过的子集」是两件事（契约 §四①）
+    expect([...r.checked].sort()).toEqual([...SIX].sort());
+    expect(r.checked).toContain("layer-coverage");
+    // ⚠️ 以前这里是 `incomplete`（第六条没由 QA 跑、`checked` 恒 5/6）；P0-02a 起第六条**真跑**。
+    expect(qaVerdict(r)).toBe("pass");
     expect(QA_JUDGEMENTS).toHaveLength(6);
-    expect(r.checked).toHaveLength(5);
+    expect(r.checked).toHaveLength(6);
+    expect(r.failures).toEqual([]);
   });
 
-  it("⚠️ 补进去的那条 `ran:false` **不落盘**（落盘的形式就是「不在 `checked` 里」）", async () => {
-    const r = await run(stage());
-    // 合成器给 `layer-coverage` 写了一句理由，而它**一个字都不该出现在产物里**
-    expect(JSON.stringify(r)).not.toContain("没有族声明它");
-    expect(r.failures).toEqual([]);
+  it("⚠️ 阴性：包里有一层盖不住世界 ⇒ `layer-coverage` **error**（防「假 6/6」）", async () => {
+    const ctx = stage();
+    // 把最远那层（不平铺、宽 480）的视差改成 0.5 ⇒ 镜头走到 1440−480=960 的尽头时退掉 480
+    const mp = path.join(ctx.packDir, "manifest.json");
+    const m = JSON.parse(fs.readFileSync(mp, "utf8")) as {
+      assets: { id: string; layers?: { name: string; parallax: number }[] }[];
+    };
+    m.assets.find((a) => a.id === "bg-dusk-halt")!.layers!.find((l) => l.name === "sky")!.parallax = 0.5;
+    fs.writeFileSync(mp, JSON.stringify(m, null, 2) + "\n");
+
+    const r = await run(ctx);
+    // ⚠️ 跑了、响了 —— 而不是「补一条 `ran:false`、checked 少一格」
+    expect(r.checked).toContain("layer-coverage");
+    expect(r.failures).toContainEqual(expect.objectContaining({
+      judgement: "layer-coverage", target: "bg-dusk-halt.sky", severity: "error",
+    }));
+    expect(qaVerdict(r)).toBe("fail");
+    expect(QAReportSchema.safeParse(r).success).toBe(true);
+  });
+
+  it("⚠️ 见证：合成器**真的**调了第六条 runner（删掉那一行 ⇒ 这条红）", () => {
+    // ⚠️ 这是「防假 6/6」的结构见证：把 `layerCoverageJudgement(ctx)` 那一行删掉，
+    //   正例可以靠 `ran:true, findings:[]` 假绿，而这条会当场红（源码级的钉子）。
+    const src = fs.readFileSync(new URL("../src/assemble.ts", import.meta.url), "utf8");
+    expect(src).toMatch(/layerCoverageJudgement\(ctx\)/);
+    expect(src).toMatch(/"layer-coverage":\s*layers/);
   });
 
   it("两条观察：`inspect` / `review` 各一条；standalone 没给 inspect ⇒ 都是 `unavailable`", async () => {
@@ -122,7 +145,7 @@ describe("§R3 那条底线：**观察不许影响 status**", () => {
 
   it("⚠️ 观察换成任意内容（包括「拿到了、有话说」），裁决**一个字不变**", async () => {
     const clean = await run(stage());
-    expect(qaVerdict(clean)).toBe("incomplete");
+    expect(qaVerdict(clean)).toBe("pass");
     const chatty: Observation[] = [
       { source: "inspect", outcome: "ok", lines: ["色板 16 色 · 交付态用了 9 色", "背景层画满 100%"] },
       { source: "review", outcome: "ok", lines: ["不像：这一版的金属偏暖", "两处轮廓丢了"] },
@@ -142,8 +165,8 @@ describe("§R3 那条底线：**观察不许影响 status**", () => {
     const bad = await run(ctx);
     expect(qaVerdict(bad)).toBe("fail");
     expect(bad.failures.map((f) => f.judgement)).toContain("reference-resolution");
-    // ⚠️ `checked` 仍然是**五条**：跑了、响了，与跑了几条是两件事
-    expect([...bad.checked].sort()).toEqual([...FIVE].sort());
+    // ⚠️ `checked` 仍然是**六条**：跑了、响了，与跑了几条是两件事
+    expect([...bad.checked].sort()).toEqual([...SIX].sort());
     // ⚠️ 观察那一栏与干净那次**逐字节相同** —— 它不看 `failures`
     const clean = await run(stage());
     expect(bad.observations).toEqual(clean.observations);

@@ -12,7 +12,7 @@ import {
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
-import { runBuild, runUnderstanding, styleRefOf } from "@game-maker/pipeline";
+import { assertPublishableQa, runBuild, runUnderstanding, styleRefOf } from "@game-maker/pipeline";
 import path from "node:path";
 import fs from "node:fs";
 
@@ -36,8 +36,10 @@ function readIntent(v: string): string {
  * 与上面 `readIntent` 的注释同一条理由。**改的时候两处一起改。**）
  *
  * ⚠️ 裁决**不在这里判**：`qaVerdict()` 是契约里那**一处**（`ledger.ts` 尾注那条纪律）。
- * ⚠️ **`incomplete` 不是失败**，而它今天**恒真**（`checked` 恒 5/6）⇒ 把「跑了的那几条怎么样」
- *   与「哪几条没跑」**分开说**，否则那一行会被读成「有问题」。
+ * ⚠️ **`incomplete` 不是失败**：它回答「查得全不全」，不是「查出来的东西行不行」。
+ *   P0-02a（2026-10-22）之前它**恒真**（`checked` 恒 5/6）；现在六条都真跑，它只在
+ *   **真有判据没跑**时出现。⇒ 仍把「跑了的那几条怎么样」与「哪几条没跑」**分开说**，
+ *   否则那一行会被读成「有问题」。
  * ⚠️ **观察不打**：今天两条都是 `unavailable`（链上还没接采集），打出来只是噪声。
  * ⚠️ **判据失败那一路不在这里**：`runBuild` 在硬失败上**抛**，文案与报告路径都在那个异常里。
  */
@@ -199,12 +201,16 @@ const TOOLS = [
       "站点 = 三份数据 + 一份共用 bundle（index.html / shell.js / site.json / game-config.json），绝不覆盖，每次写新的 v<N>。\n" +
       "何时用：已经有了一个校验通过的游戏配置，想把它跑起来。\n" +
       "**起服务时 HTTP server 的根必须是 <out>/<gameId>/**（pack/ 与 site/ 的父目录）—— 根指到 site 里面会 404，而 Phaser 静默失败。\n" +
-      "会失败的情况：包或配置不过 schema、**装配期校验不过**（引用/自洽/可通关/几何/HUD 屏幕空间），这些都**硬失败**、不产出站点。",
+      "⚠️ **发布闸**：需要一份**属于当前包**的 QA 报告（报告里的 subject 与包的 id/version 对得上，且六条判据全跑、无 error）；" +
+      "缺报告 / 旧包 / error / incomplete 都拒绝，且不产出站点。规范 out 树会自动查找 <out>/<packId>/run/v*/qa-report.json；" +
+      "包在 out 树之外时用 qaReportPath 指一份属于它的报告。⚠️ 塔防（td-config/v1）今天显式跳过（P2）。\n" +
+      "会失败的情况：包或配置不过 schema、**装配期校验不过**（引用/自洽/可通关/几何/HUD 屏幕空间）、**QA 报告缺失或不合格**，这些都**硬失败**、不产出站点。",
     inputSchema: {
       type: "object",
       properties: {
         packDir: { type: "string", description: "资源包目录（含 manifest.json 的那种目录）" },
         configPath: { type: "string", description: "game-config JSON 的路径" },
+        qaReportPath: { type: "string", description: "这份包的 QA 报告路径（规范 out 树可省略，自动查找 <out>/<packId>/run/v*/qa-report.json）" },
         shellPath: { type: "string", description: "外壳 bundle 的路径，默认 packages/demo/dist/shell.js" },
         outDir: { type: "string", description: "产物根目录，默认 ./out。回报的路径都相对于它" },
         gameId: { type: "string", description: "站点目录名，默认取资源包自己的 id" },
@@ -355,6 +361,13 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               viewport: VIEWPORT,
               onProgress: (p) => tick(0.7, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),
             });
+            // ⚠️ **发布闸**（P0-02b · 票 09）：与 CLI 同一个函数，**在 `assembleSite` 之前**。
+            //   `runBuild` 已挡住 error / incomplete；这里复核报告属于这个包，并挡掉「QA 缺席」。
+            assertPublishableQa({
+              packDir: built.paths.packDir, configPath: built.paths.config,
+              outRoot: String(args.outDir ?? "out"),
+              ...(built.paths.qaReport === undefined ? {} : { qaReportPath: built.paths.qaReport }),
+            });
             const site = assembleSite({
               packDir: built.paths.packDir, configPath: built.paths.config,
               shellJsPath: defaultShellPath("", process.cwd()),
@@ -387,6 +400,13 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             break;
           }
           case "assemble_site":
+            // ⚠️ **发布闸**（P0-02b · 票 09）：缺报告 / 旧包 / error / incomplete 时
+            //   `site/v<N>` 一个字节都不该出现 ⇒ 闸在 `assembleSite` 之前。
+            assertPublishableQa({
+              packDir: String(args.packDir), configPath: String(args.configPath),
+              outRoot: String(args.outDir ?? "out"),
+              ...(args.qaReportPath === undefined ? {} : { qaReportPath: String(args.qaReportPath) }),
+            });
             result = assembleSite({
               packDir: String(args.packDir), configPath: String(args.configPath),
               shellJsPath: String(args.shellPath ?? "packages/demo/dist/shell.js"),

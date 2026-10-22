@@ -39,6 +39,8 @@ function stage(): QaContext {
   write(runDir, "game-design.json", CANNED.design);
   return {
     runDir, gameId: "wasteland",
+    // ⚠️ 本族不读视口；但 `QaContext` 要求它（第六条判据由合成器跑，P0-02a）。
+    viewport: { w: 480, h: 270 },
     packDir: nowhere,
     configPath: path.join(nowhere, "game-config.json"),
     recipePath: path.join(nowhere, "asset-recipe.json"),

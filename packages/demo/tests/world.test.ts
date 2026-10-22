@@ -253,3 +253,75 @@ describe("外壳常量", () => {
     expect(build(valid()).shellVersion).toBe(SHELL_VERSION);
   });
 });
+
+describe("票 07：胜利只认 objective.gate，重置点可站立", () => {
+  /** 在 last-train 上再加一个 goal —— 旧代码两个都会绑 `tryWin()`（假胜利）。 */
+  const twoGoals = () => {
+    const c = structuredClone(BASE) as Record<string, any>;
+    c.entities.push({ id: "decoy-goal", kind: "goal", at: { x: 900, y: 250 }, asset: "signal-endlight", anim: "red" });
+    return c;
+  };
+
+  it("单个 goal 的旧 config：行为不变 —— 它就是 gate，也是唯一赢家", () => {
+    const w = build(valid());
+    expect(w.entities.filter((e) => e.wins).map((e) => e.id)).toEqual(["signal"]);
+  });
+
+  it("两个 goal：只有 gate 那一个被标成胜利目标", () => {
+    const w = build(twoGoals());
+    expect(w.entities.filter((e) => e.kind === "goal").map((e) => e.id)).toEqual(["signal", "decoy-goal"]);
+    expect(w.entities.filter((e) => e.wins).map((e) => e.id)).toEqual(["signal"]);
+  });
+
+  it("gate 指向哪个 goal，哪个才赢（不是「第一个」也不是「最后一个」）", () => {
+    const c = twoGoals();
+    c.objective.gate = "decoy-goal";
+    const w = build(c);
+    expect(w.entities.filter((e) => e.wins).map((e) => e.id)).toEqual(["decoy-goal"]);
+  });
+
+  it("gate 指向不存在的 id：一个都不标，上游仍留 error", () => {
+    const c = twoGoals();
+    c.objective.gate = "__没有__";
+    const w = build(c);
+    expect(w.entities.filter((e) => e.kind === "goal").map((e) => e.wins)).toEqual([false, false]);
+    expect(w.issues.map((i) => `${i.where}: ${i.message}`).join("\n"))
+      .toMatch(/objective\.gate: 找不到 id 为 "__没有__" 的 goal 实体/);
+  });
+
+  it("可站立点：last-train 的盒子底 252 被抬回地面 250（锚点 .95 的取整差）", () => {
+    const w = build(valid());
+    expect(w.player.floorY).toBe(250);
+  });
+
+  it("可站立点：出生在箱顶就落在箱顶，而不是穿过箱子落到地面", () => {
+    const c = valid() as Record<string, any>;
+    c.entities.push({ id: "crate", kind: "solid", at: { x: 40, y: 250 }, asset: "prop-luggage-pile" });
+    c.player.at = { x: 40, y: 210 };
+    const w = build(c);
+    expect(w.player.floorY).toBe(210);
+  });
+
+  it("可站立点：画不出来的 solid 不当地面（外壳没给它碰撞体）", () => {
+    const c = valid() as Record<string, any>;
+    c.entities.push({ id: "ghost-crate", kind: "solid", at: { x: 40, y: 250 }, asset: "__没有__" });
+    c.player.at = { x: 40, y: 210 };
+    const w = build(c);
+    expect(w.entities.find((e) => e.id === "ghost-crate")!.draw.missing).toBe(true);
+    expect(w.player.floorY).toBe(250);
+  });
+
+  it("可站立点：浅埋（盒子底在地面下 ≤4px）被抬回地面", () => {
+    const c = valid() as Record<string, any>;
+    c.player.at = { x: 40, y: 252 };   // 盒子底 254，地面 250
+    const w = build(c);
+    expect(w.player.floorY).toBe(250);
+  });
+
+  it("可站立点：脚下没有任何东西（坑）时退回作者写的脚线，不抛", () => {
+    const c = valid() as Record<string, any>;
+    c.terrain = [];
+    const w = build(c);
+    expect(w.player.floorY).toBe(w.player.box.y + w.player.box.h);
+  });
+});

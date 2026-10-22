@@ -30,6 +30,8 @@ function stage(): QaContext {
   //   那正说明**没人读它**（票 19 的 Q4/Q11 把四份路径都摆出来，读错哪份当场炸）。
   return {
     runDir, packDir, gameId: "last-train",
+    // ⚠️ 本族不读视口；但 `QaContext` 要求它（第六条判据由合成器跑，P0-02a）。
+    viewport: { w: 480, h: 270 },
     configPath: path.join(runDir, "game-config.json"),
     intentPath: path.join(runDir, "game-intent.json"),
     designPath: path.join(runDir, "game-design.json"),

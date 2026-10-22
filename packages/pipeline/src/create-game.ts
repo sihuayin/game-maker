@@ -16,7 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
-  parseGameConfig, parseRecipe, QAReportSchema, qaVerdict,
+  parseGameConfig, parseRecipe, QA_JUDGEMENTS, QAReportSchema, qaVerdict,
   RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
   type CommandResult, type GameIntentSpec, type LedgerCall, type MasterRatio, type Observation,
@@ -24,13 +24,14 @@ import {
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, inspectPack, nextPackVersion, packAssets, planAssets, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
+import { DEFAULT_VIEWPORT, compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, inspectPack, nextPackVersion, packAssets, planAssets, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
-import { qaRunner } from "@game-maker/qa";
+import { pixelIntegrity, qaRunner, withPixelFindings } from "@game-maker/qa";
 import { RUN_ARTIFACT, flattenPlannerOutput, injectCharacterRef, jstr, readRunJson, writeIntentMd, writeJson, writeVisualWorld } from "./artifacts.js";
 import { abandonRun, commitRun, openRun, parseRunVersion, type RunIdentity } from "./run.js";
+import { manifestChecksumOf } from "./publish-gate.js";
 
 /** 两个上下游的口子（与各步自己的形状一致：`{baseUrl, apiKey}`）。 */
 export type Transport = { baseUrl: string; apiKey: string };
@@ -207,12 +208,11 @@ const qaRunnerOf = (q: QaOption | undefined): QaRunner | undefined =>
   q === null ? undefined : q ?? qaRunner;
 
 /**
- * **判据失败 ⇒ 阻断**（R3 · 票 20 的 Q4）。
+ * **判据失败或不完整 ⇒ 阻断**（R3 · 票 20 的 Q4；P0-02b · 票 09 补上 incomplete）。
  *
- * ⚠️ 闸看的是 **`failures` 里的 `error`**，**不是 `qaVerdict`** —— 后者今天**恒为
- *   `incomplete`**（`checked` 恒 5/6：第六条「层覆盖」不属于任何族，它由装配期的硬失败保证，
- *   见契约 §四①）。拿 `verdict !== "pass"` 当闸，会让**每一次**运行都红，
- *   而那不是判据响了 —— 是「还有一条没查」被读成了失败。⚠️ 它**不是**失败：那是**说真话**。
+ * ⚠️ 闸看的是 **`failures` 里的 `error`** 与 **`checked` 是否满六条**，**不是 `qaVerdict`**
+ *   （票 20 的 Q4 定的形状）：`qaVerdict` 是派生量，只用来把「跑了不行」与「没跑全」分成两句话。
+ *   2026-10-22 票 09 裁定：**`incomplete` 也阻断发布** —— 「没查」不等于「通过」。
  *
  * ⚠️ 文案里**不能**出现「再抽一次」：判据说的是**产物**的问题（设计 / 清单 / 包 / 配置），
  *   而重抽一次改不了那些事实（与 `compileRuntime` 的业务校验同一条纪律）。
@@ -220,14 +220,28 @@ const qaRunnerOf = (q: QaOption | undefined): QaRunner | undefined =>
  */
 function assertQaPassed(report: QAReport, reportPath: string): void {
   const hard = report.failures.filter((f) => f.severity === "error");
-  if (hard.length === 0) return;
+  // ⚠️ **incomplete 也拒**（P0-02b · 票 09）：`checked` 不满六条 = 「没查全」，
+  //   而「没查」不等于「通过」（`qaVerdict` 的第三态存在的理由就是这个）。
+  //   ⚠️ 错误仍然**赢过**缺跑：已知的阻断是可行动的，它不会因为还有一条没查而消失。
+  const missing = QA_JUDGEMENTS.filter((j) => !report.checked.includes(j));
+  if (hard.length === 0 && missing.length === 0) return;
+  // ⚠️ **报告先落盘、再走到这里**（票 20 的 Q4）：判据说不行了，正是最该读它的时候。
+  const reportNote = `\n⚠️ 报告已经落盘：${reportPath} —— 那是这一次运行的**诊断**`;
+  if (hard.length > 0)
+    throw new CommandError(
+      "invalid",
+      `QA 判据没过（${hard.length} 条硬失败，${qaVerdict(report)}）：\n`
+      + hard.slice(0, 8).map((f) => `  · [${f.judgement}] ${f.target}：${f.detail.replace(/\n/g, "\n      ")}`).join("\n")
+      + (missing.length === 0 ? "" : `\n⚠️ 另有 ${missing.length} 条判据没跑：${missing.join(" · ")}`)
+      + reportNote + "，不是「再抽一次」的理由："
+      + "判据说的是**产物**的问题，重抽改不了那些事实。\n"
+      + "   要去的地方：设计层 / 资源清单 / 包（不是上游模型）。",
+    );
   throw new CommandError(
     "invalid",
-    `QA 判据没过（${hard.length} 条硬失败，${qaVerdict(report)}）：\n`
-    + hard.slice(0, 8).map((f) => `  · [${f.judgement}] ${f.target}：${f.detail.replace(/\n/g, "\n      ")}`).join("\n")
-    + `\n⚠️ 报告已经落盘：${reportPath} —— 那是这一次运行的**诊断**，不是「再抽一次」的理由：`
-    + "判据说的是**产物**的问题，重抽改不了那些事实。\n"
-    + "   要去的地方：设计层 / 资源清单 / 包（不是上游模型）。",
+    `QA 没跑全（${report.checked.length}/${QA_JUDGEMENTS.length}）—— 没跑的：${missing.join(" · ")}。\n`
+    + "**没查不等于通过**：发布闸拒绝一份不完整的 QA。\n"
+    + reportNote + "；要让发布继续，得先把那几条判据真正跑起来（不是绕过闸门）。",
   );
 }
 
@@ -551,28 +565,49 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     // ⚠️ **免费 inspect 观察**（v3 视觉 QA 接口）：pack 已经落盘；只报数、不判。
     //   抛错 ⇒ unavailable + build 继续（观察不阻断；绝不伪装成 ok）。
     let inspectObservation: Observation;
+    // ⚠️ **票 04**：像素阈值只吃 `inspectPack` 已经算好的度量（不重扫 PNG、不加字段）。
+    //   没拿到结构化数据 ⇒ 长宽比在观察里写「没跑（unavailable）」，不冒充通过。
+    let pixel = pixelIntegrity({});
     try {
       const inspected = (input.inspect ?? inspectPack)({ packDir });
-      inspectObservation = { source: "inspect", outcome: "ok", lines: inspected.summary };
       inspectData = inspectDataOf(inspected.data);
+      pixel = pixelIntegrity(inspectData ?? {});
+      // ⚠️ 观察行**追加**在 inspect 自己的摘要之后：原摘要（含色板外原始读数）一个字不改。
+      inspectObservation = {
+        source: "inspect", outcome: "ok",
+        lines: [...inspected.summary, ...pixel.observationLines],
+      };
     } catch (e) {
       inspectObservation = { source: "inspect", outcome: "unavailable", reason: inspectUnavailableReason(e, packDir) };
     }
     // ⚠️ **四份产物的路径逐个传**（票 19 的 Q4/Q11）：QA 不自己拼文件名 ——
     //   那九个名字的家是本模块的 `RUN_ARTIFACT`，而 `packages/qa` 的白名单只有 `contracts`。
-    const produced = await runner({
+    const produced = withPixelFindings(await runner({
       runDir, packDir, gameId,
+      // ⚠️ **外壳视口与 `compileRuntime` 同值**（P0-02a）：层覆盖判据要它，而 QA 推不出来。
+      //   默认值也只在这里取一次 —— 与上面 config 那一步读的是同一个 `input.viewport ?? DEFAULT_VIEWPORT`。
+      viewport: input.viewport ?? DEFAULT_VIEWPORT,
       configPath: path.join(runDir, RUN_ARTIFACT.config),
       intentPath: path.join(runDir, RUN_ARTIFACT.gameIntent),
       designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
       recipePath: path.join(runDir, RUN_ARTIFACT.recipe),
       inspectObservation,
-    });
+    }), pixel.findings);
     // ⚠️ **先过一遍它自己的契约**（票 20 的 Q4 的第 2 步）：落一份**过不了 schema** 的报告，
     //   等于让下游（修复循环）拿到它解析不了的东西 —— 而今天不炸，只因为没人 parse 它。
     //   ⚠️ 这一条**不是**给模型兜底的：报告是我们自己拼的 ⇒ 不过就是**我们的 bug**，
     //     所以文案里不说「再去抽一次」。
-    const checkedReport = QAReportSchema.safeParse(produced);
+    // ⚠️ **报告自带包身份**（P0-02b · 票 09）：由 pipeline 注入，**覆盖** runner 自带的
+    //   任何 `subject` —— 身份只有一个来源，就是这里读回来的那份 manifest。
+    //   `manifestChecksum` 绑住 `manifest.json` 的原始字节（声明 + `files[]` 列表）。
+    const checkedReport = QAReportSchema.safeParse({
+      ...produced,
+      subject: {
+        packId: manifest.value.id,
+        packVersion: manifest.value.version,
+        manifestChecksum: manifestChecksumOf(packDir),
+      },
+    });
     if (!checkedReport.success)
       throw new CommandError("invalid",
         "装配出来的 QA 报告过不了 `qa-report/v1` —— ⚠️ 这是本仓库自己的 bug，不是模型的："

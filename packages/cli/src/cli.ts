@@ -14,7 +14,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { reviewRun, runBuild, runUnderstanding, styleRefOf, type CreateStep } from "@game-maker/pipeline";
+import { assertPublishableQa, reviewRun, runBuild, runUnderstanding, styleRefOf, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -26,7 +26,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker pack   --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
   game-maker compile-runtime --design <game-design.json> --pack <资源包目录> [--out <目录>] [--json]
   game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
-  game-maker site   <资源包目录> --config <关卡配置> [--shell <shell.js>] [--out <目录>] [--json]
+  game-maker site   <资源包目录> --config <关卡配置> [--qa-report <报告路径>] [--shell <shell.js>] [--out <目录>] [--json]
   game-maker verify <资源包目录> [--json]
   game-maker inspect <资源包目录> [--json]
   game-maker accept <资源包目录> [--baseline <baseline 目录>] [--out <目录>] [--json]
@@ -51,8 +51,12 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
     \`game-maker build <那个 run 目录>\` 接着往下。
   · 带 \`--yes\` ⇒ 一路跑到底：生图 → 配置 → QA → 站点（**等于跳过那个检查点**）。
   ⚠️ 两条路的产物**逐字节等价** —— 只是分两次跑、还是连着跑。
-  ⚠️ **QA 判据硬失败 ⇒ 退出码 4、且站点不产** —— 报告**已经落在** \`run/v<N>/qa-report.json\`
+  ⚠️ **QA 判据硬失败或不完整 ⇒ 退出码 4、且站点不产** —— 报告**已经落在** \`run/v<N>/qa-report.json\`
      （判据说的是**产物**的问题，重抽一次改不了它 ⇒ 要去的地方是设计 / 清单 / 包）。
+  ⚠️ **所有发布路径都过同一把闸**：\`site\` 要求一份**属于当前包**的 QA 报告（报告里的 \`subject\`
+     必须与包的 id / version 对得上），缺报告 / 旧包 / error / incomplete 都拒绝。
+     规范 out 树会自动找 \`<out>/<packId>/run/v*/qa-report.json\`；包在 out 树之外时用
+     \`--qa-report <路径>\` 指一份属于它的报告。⚠️ 塔防（td-config/v1）今天显式跳过（P2）。
 
 通用选项：
   --out <目录>   产物根。默认 ./out。**所有回报的路径都相对于它**。
@@ -93,6 +97,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "style", "intent", "style-id", "version",
     // 票 06：`accept` 的可选冻结基准
     "baseline",
+    // 票 09（P0-02b）：`site` 的显式 QA 报告（外部包 / 非规范 out 树）
+    "qa-report",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -214,6 +220,14 @@ async function buildAndSite(o: {
     onProgress: progressTo(o.io),
   });
   const raw = JSON.parse(fs.readFileSync(built.paths.config, "utf8")) as unknown;
+  // ⚠️ **发布闸**（P0-02b · 票 09）：`runBuild` 已经在 QA 那一步挡住了 error / incomplete，
+  //   这里再过一次**同一把闸** —— 它同时复核「报告确实属于这个包」，并把「QA 被关掉」
+  //   （`paths.qaReport` 缺席）这类路径也挡在站点之前。**必须在 `assembleFromConfig` 之前**：
+  //   失败时一个站点目录都不该被创建。
+  assertPublishableQa({
+    packDir: built.paths.packDir, configPath: built.paths.config, outRoot: o.outRoot,
+    ...(built.paths.qaReport === undefined ? {} : { qaReportPath: built.paths.qaReport }),
+  });
   const site = assembleFromConfig({
     packDir: built.paths.packDir, configPath: built.paths.config,
     shellJsPath: o.shellJsPath ?? defaultShellPath(detectFormat(raw) ?? "", o.cwd),
@@ -367,9 +381,10 @@ export function renderHuman(r: CommandResult): string {
  * **QA 那一份回报**（票 20 的 Q5）—— `create --yes` 与 `build` 共用这一份。
  *
  * ⚠️ 裁决**不在这里判**：`qaVerdict()` 是契约里那**一处**（`ledger.ts` 尾注那条纪律）。
- * ⚠️ **`incomplete` 不是失败**，而它今天**恒真**（`checked` 恒 5/6 —— 第六条「层覆盖」由
- *   装配期的硬失败保证，不归任何族，见票 19）。⇒ 这里把「跑了的那几条怎么样」与
- *   「哪几条没跑」**分开说**，否则那一行会被读成「有问题」。
+ * ⚠️ **`incomplete` 不是失败**：它回答「查得全不全」，不是「查出来的东西行不行」。
+ *   P0-02a（2026-10-22）之前它**恒真**（`checked` 恒 5/6）；现在六条都真跑，它只在
+ *   **真有判据没跑**时出现。⇒ 渲染仍把「跑了的那几条怎么样」与「哪几条没跑」**分开说**，
+ *   否则那一行会被读成「有问题」。
  * ⚠️ **inspect 观察打摘要**（v3 终端摘要）：聚合数据来自 pipeline 收窄好的 `InspectData`，
  *   不解析 `qa-report` 里那几行文本；inspect 不可用 ⇒ 一行同源原因；`review` 仍不打。
  * ⚠️ **判据失败那一路不在这里**：`runBuild` 在硬失败上**抛**（报告先落盘、再抛），
@@ -604,6 +619,14 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         const shell = typeof flags.shell === "string"
           ? path.resolve(flags.shell)
           : defaultShellPath(detectFormat(readJsonOrUndefined(configPath)) ?? "", process.cwd());
+        // ⚠️ **发布闸**（P0-02b · 票 09）：在 `assembleFromConfig` **之前** ——
+        //   缺报告 / 旧包 / error / incomplete 时，`site/v<N>` 一个字节都不该出现。
+        //   规范 out 树自动查找；外部包用 `--qa-report` 指一份属于它的报告。
+        //   ⚠️ 塔防由闸显式跳过（P2），这里不另写一份判断。
+        assertPublishableQa({
+          packDir: path.resolve(dir), configPath, outRoot,
+          ...(typeof flags["qa-report"] === "string" ? { qaReportPath: path.resolve(flags["qa-report"]) } : {}),
+        });
         result = assembleFromConfig({
           packDir: path.resolve(dir),
           configPath,
