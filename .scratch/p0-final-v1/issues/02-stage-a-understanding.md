@@ -79,3 +79,38 @@ node packages/cli/dist/cli.mjs create \
 
 - 未自动重试、未换模型、未改代码 / 契约 / config、未进入 Stage B、未提交 / 未推送。
 - 临时代理进程已停止（pid 已记录在 `preflight/proxy.pid`）。
+
+## Answer（Stage A 重跑 · 2026-10-22 · R12 拒绝）
+
+**结果：exit 4，卡在 `compile-design` 的 R12。文本上游已修复，这是新的语义阻塞。**
+
+### 命令与结果
+
+```bash
+node packages/cli/dist/cli.mjs create \
+  --style fixtures/e2e/wasteland-platformer/style.png \
+  --intent fixtures/e2e/wasteland-platformer/intent.md \
+  --out .scratch/p0-final-v1/runs/2026-10-22-stage-a-rerun --json
+```
+
+- 进度：`visual-world` ✓ → `intent` ✓ → `design` ✗。3 步全 HTTP 200、`model=deepseek-v4-pro`、零 `empty-input`。
+- 拒绝：R12 `intent-mechanic-missing` ×2 —— 意图机制「开启宝箱」（`open-chest`）「躲避危险」（`avoid-danger`）
+  在设计层没有对家（外壳封闭机制仅 `run/jump/gravity/collide-terrain/collect-pickup/moving-platform/hazard-contact/reach-goal`）。
+- 现场：`.scratch/p0-final-v1/runs/2026-10-22-stage-a-rerun/.failed-2026-10-22T14-45-55-457Z/`
+  （含 `design-attempts.json` / `game-intent.json` / `visual-world.json`）。
+
+### 账（重跑）
+
+| step | attempts | model | usage | 费用 |
+|---|---|---|---|---|
+| visual-world | 1 | deepseek-v4-pro | 2632/1838 | $0.0029952 |
+| intent | 1 | deepseek-v4-pro | 3198/639 | $0.0017262 |
+| compile-design | 1 | deepseek-v4-pro | 4784/1041 | $0.0026844 |
+| **合计** | | | | **$0.0074058** |
+
+### 结论
+
+- **文本上游已修复**（`text-upstream-v1` 收口），`empty-input` 不再复现。
+- **新阻塞 = R12**：意图 fixture 要的「宝箱 / 躲避危险」超出外壳能表达的机制，R12 在生图前正确拒绝（不悄悄做丢）。
+- **最终裁定（用户 2026-10-22 · 选 A）**：记作 P0-FINAL 的真实阻塞；不重试、不换 provider 掩盖；
+  flash vs v4-pro 差异留待后续只读调查。

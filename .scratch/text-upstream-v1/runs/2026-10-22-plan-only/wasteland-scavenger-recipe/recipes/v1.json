@@ -1,0 +1,251 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-recipe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "player",
+        "description": "三到四头身方块剪影的拾荒者：方头方身直腿，头大身短，头顶小帽檐、背部小背包凸起，厚外套+腰带+深色长裤，腰带金属扣为暖色重音；正面中性站姿，手臂贴身体两侧",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 64
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "scavenger-hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-wasteland",
+        "role": "enemy",
+        "description": "废土巡逻敌人：方头方身短腿的方块剪影，深灰蓝布质外壳带锈棕饰条，头顶天线凸起，中性四角踱步姿态",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "enemy-wasteland",
+        "masterAsset": "enemy-wasteland-master",
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-wasteland",
+        "role": "interactable",
+        "description": "废弃站房前的旧木宝箱，箱体为旧木板配锈金属包角，箱盖可翻开；关闭状态的中性外形",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-wasteland-open",
+        "role": "interactable-state",
+        "description": "开启后的空箱：箱盖向后翻开，箱内空无一物，作为开箱后的状态",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 24
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-wasteland"
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "scrap-resource",
+        "role": "pickup",
+        "description": "散落在轨道与瓦砾上的废料：一小堆锈金属碎片与散落罐件，中性静止",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "bg-ruined-station",
+        "role": "level-background",
+        "description": "废都站台横版背景：黄昏深色天空上一处太阳圆盘；大面积建筑立面横带带窗洞、招牌框与大坡屋顶；中景长椅、路灯、悬挂招牌与瓦砾堆；底层贯穿全宽的碎石地面与旧铁轨",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 1280,
+          "h": 720
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0
+          },
+          {
+            "name": "far-buildings",
+            "parallax": 0.2,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "rooftops",
+            "parallax": 0.4,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "midground",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "ground",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-hero-master",
+      "role": "character-master",
+      "description": "拾荒者角色母版：方头方身直腿的四头身方块剪影，头顶帽檐、背部背包凸起，厚外套+腰带+深色长裤，正面中性站姿",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 32,
+        "h": 64
+      }
+    },
+    {
+      "id": "enemy-wasteland-master",
+      "role": "character-master",
+      "description": "废土巡逻敌人母版：方头方身短腿的方块剪影，深灰蓝布质外壳带锈棕饰条，头顶天线凸起，中性站立姿态",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy-wasteland",
+      "size": {
+        "w": 32,
+        "h": 48
+      }
+    }
+  ]
+}

@@ -28,6 +28,19 @@ Effort: p0-final-v1
 > **恢复路径**：切换 cc-switch provider（MiniMax-M2.7 / 千问 qwen3.8-max）→ 探针 → plan-only →
 > 重跑 Stage A → Stage B → 结论（票 04）。详见 [票 05](issues/05-fix-text-upstream.md)。
 > 见 [票 05](issues/05-fix-text-upstream.md)。
+>
+> ✅ **2026-10-22 文本上游已修复**（`text-upstream-v1` 收口）：根因 = DeepSeek 卡 `ANTHROPIC_MODEL`
+> 兜底把字面 `deepseek-v4-pro` 降级成 `deepseek-flash`；改回 `deepseek-v4-pro` 后探针 + plan-only 双过。
+>
+> ⚠️ **2026-10-22 Stage A 重跑（已授权）**：文本上游已正常（3 步全 HTTP 200、`model=deepseek-v4-pro`、
+> 零 `empty-input`），但卡在 **compile-design 的 R12**：`intent-mechanic-missing` —— 意图里的「开启宝箱」
+> （`open-chest`）「躲避危险」（`avoid-danger`）在设计层没有对家（外壳封闭机制只有 8 条，无 open-chest /
+> avoid-danger）。exit 4，0 生图。现场 `.scratch/p0-final-v1/runs/2026-10-22-stage-a-rerun/.failed-2026-10-22T14-45-55-457Z/`。
+>
+> 🛑 **2026-10-22 最终裁定（用户 · 选 A）**：**P0-FINAL 的真实阻塞 = R12 intent-mechanic-missing**
+> （语义契约缺口：意图 fixture 要的机制超出外壳能力）。**不通过重试 / 换 provider 掩盖**；flash 与 v4-pro 的
+> 差异留待后续**只读调查**，本轮不展开。`CAP-E2E-01` / P0-FINAL 仍**未完成**。
+> **累计文本** ≈ $0.0371（Stage A 首次 $0.0188 + 探针 $0.0001 + plan-only $0.0108 + Stage A 重跑 $0.0074）；生图 $0。
 
 
 

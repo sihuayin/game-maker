@@ -1,0 +1,103 @@
+{
+  "format": "asset-plan/v1",
+  "recipeId": "wasteland-scavenger-recipe",
+  "recipeVersion": 1,
+  "plannerVersion": "1",
+  "capabilities": {
+    "routes": {
+      "image": true,
+      "drawlist": true,
+      "import": false
+    },
+    "runtime": {
+      "profile": "platformer",
+      "version": "1",
+      "capabilities": [
+        "input:keyboard",
+        "camera:side-scroll",
+        "camera:parallax",
+        "collision:aabb",
+        "motion:cyclic",
+        "objective:collect-then-reach",
+        "hud:screen-space",
+        "coord:delivery-pixels"
+      ]
+    }
+  },
+  "inputs": {
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png"
+  },
+  "assets": [
+    {
+      "id": "scavenger-hero",
+      "route": "image",
+      "reason": {
+        "code": "image:character",
+        "text": "角色资源（characterId）"
+      },
+      "inputs": {
+        "masterAsset": "scavenger-hero-master"
+      },
+      "candidate": "image",
+      "participated": false
+    },
+    {
+      "id": "enemy-wasteland",
+      "route": "image",
+      "reason": {
+        "code": "image:character",
+        "text": "角色资源（characterId）"
+      },
+      "inputs": {
+        "masterAsset": "enemy-wasteland-master"
+      },
+      "candidate": "image",
+      "participated": false
+    },
+    {
+      "id": "chest-wasteland",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "chest-wasteland-open",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "scrap-resource",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "bg-ruined-station",
+      "route": "image",
+      "reason": {
+        "code": "image:background",
+        "text": "背景资源（kind: background）"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": false
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "format": "run-design-attempts/v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "rejected",
+      "detail": "意图里的机制「开启宝箱」（`open-chest`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）；意图里的机制「躲避危险」（`avoid-danger`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
+      "rejections": [
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「开启宝箱」（`open-chest`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        },
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「躲避危险」（`avoid-danger`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        }
+      ],
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "废土拾荒者",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "控制拾荒者在废弃城市的瓦砾与残骸间左右移动探索",
+          "跳跃跨越高低落差平台，攀上断裂楼宇骨架搜寻资源",
+          "拾取散落的资源补给并开启宝箱获取宝藏",
+          "躲避巡逻敌人的威胁与地面危险，存活到抵达出口"
+        ],
+        "player": {
+          "id": "scavenger-hero",
+          "role": "一名在废土废墟中谨慎拾荒求生的拾荒者",
+          "abilities": [
+            "左右横版移动跑动",
+            "跳跃越过裂隙与登上平台",
+            "拾取资源与开启宝箱"
+          ],
+          "goals": [
+            "探索废弃城市寻找资源与宝箱",
+            "躲避危险与敌人以存活下去"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "enemy-wasteland",
+            "behavior": "在可通行地面上沿固定路线来回巡逻，遇玩家方向回头",
+            "threat": "与拾荒者碰撞会造成伤害或致死，迫使其绕避时机"
+          }
+        ],
+        "npcs": [],
+        "interactables": [
+          {
+            "id": "chest",
+            "type": "宝箱",
+            "behavior": "靠近后开启，释放内含的宝藏资源"
+          }
+        ],
+        "resources": [
+          {
+            "id": "resource-pickup",
+            "purpose": "拾取后补充拾荒者的生存所需（水/零件/废料），维持续航"
+          }
+        ],
+        "world": {
+          "theme": "荒凉而危险的后启示录废土",
+          "setting": "半塌楼宇骨架、断裂墙、锈蚀梁柱与废弃车辆外壳，瓦砾地面与高低落差平台，油桶、箱子、路牌、管道、垃圾堆散落，低饱和度灰黄空气感中点缀暖色宝箱重音",
+          "structure": "前景为靠近镜头的残骸、垃圾堆与半截墙壁构成剪影，增加景深；中景为玩家活动层，包含可通行地面、跳跃平台、敌人、宝箱与资源；远层为断裂楼宇、锈塔与风沙天空形成的视差天际，缓慢移动"
+        },
+        "levels": [
+          {
+            "id": "wasteland-1",
+            "purpose": "引导玩家在一个平缓废土街区掌握移动、跳跃、拾取与开箱，并首次学会绕开巡逻敌人",
+            "layout": "从左端残骸入口起步，先经过一段瓦砾平路，遇到第一个低矮障碍需跳跃跨过；随后散落 resource-pickup 与一个 chest；中途一段地面由 enemy-wasteland 来回巡逻，玩家需等待机会绕过；最后抵达右端半塌楼架作为出口",
+            "entities": [
+              "scavenger-hero",
+              "enemy-wasteland",
+              "chest",
+              "resource-pickup"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "逐关推进，收集的资源与开启的宝箱计数累积，解锁更危险、落差更大的后续废墟区域",
+          "description": "玩家通过完成当前废墟区域的探索与收集抵达出口，进入下一关卡；区域复杂度、敌人数量与地形落差逐步提升"
+        },
+        "mechanics": [
+          {
+            "id": "horizontal-movement",
+            "mechanic": "run"
+          },
+          {
+            "id": "jump",
+            "mechanic": "jump"
+          },
+          {
+            "id": "collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "avoid-enemy",
+            "mechanic": "hazard-contact"
+          }
+        ],
+        "winConditions": [
+          "抵达关卡右端出口并成功离开当前废墟区域"
+        ],
+        "loseConditions": [
+          "被巡逻敌人碰撞导致生命耗尽而死亡"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "camera:parallax",
+          "collision:aabb",
+          "motion:cyclic",
+          "hud:screen-space"
+        ]
+      }
+    }
+  ]
+}
