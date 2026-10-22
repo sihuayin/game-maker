@@ -1,0 +1,20 @@
+{
+  "http": 200,
+  "requested": "deepseek-v4-pro",
+  "model": "deepseek-flash",
+  "stop_reason": "tool_use",
+  "content_types": [
+    "tool_use"
+  ],
+  "tool_input": {
+    "ok": true
+  },
+  "usage": {
+    "input_tokens": 291,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 33,
+    "service_tier": "standard"
+  },
+  "ok": true
+}

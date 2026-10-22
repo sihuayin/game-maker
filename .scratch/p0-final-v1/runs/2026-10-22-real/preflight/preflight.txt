@@ -1,0 +1,12 @@
+P0-FINAL preflight · 2026-10-22T08:15:25Z
+node: v22.23.2
+pnpm: 10.7.1
+chrome: Google Chrome 155.0.8059.85 
+disk: /dev/disk6s1   931Gi   426Gi   506Gi    46%    5.0M  4.3G    0%   /Volumes/shy
+port 9098: closed
+port 7890: open
+port 15721: open
+76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0  fixtures/e2e/wasteland-platformer/style.png
+314efbd6b46b3b899b38de35c8bba89dc0ea01e5bb66c2791dabf309f40b7eb1  fixtures/e2e/wasteland-platformer/intent.md
+text env: ANTHROPIC_BASE_URL=set ANTHROPIC_AUTH_TOKEN=set
+archived fixture imageCallsOf: {"total":11,"breakdown":{"animation":4,"single":1,"background":4,"master":2}}

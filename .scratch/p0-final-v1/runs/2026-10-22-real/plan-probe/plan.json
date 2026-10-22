@@ -1,0 +1,24 @@
+{
+  "command": "plan",
+  "error": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。",
+  "exitCode": 4,
+  "ledger": [
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 32597,
+      "attempts": 3,
+      "failures": [
+        "empty-input",
+        "schema",
+        "empty-input"
+      ],
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 217,
+        "outputTokens": 2753
+      }
+    }
+  ]
+}

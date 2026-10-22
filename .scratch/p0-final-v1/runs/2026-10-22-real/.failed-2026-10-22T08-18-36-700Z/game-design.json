@@ -1,0 +1,131 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废都拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的铁轨与站台间向右横版前进，随时留意可搜刮的角落",
+    "跳跃跨越塌陷的路面、瓦砾堆与断开的站台边缘",
+    "靠近并打开沿路废弃站房旁的宝箱，取出里面的废土资源",
+    "把散落在地上的废料与补给拾取进背包",
+    "绕开或跳过巡逻的废土敌人与危险地形，保住自己继续往前"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "一名独自深入废弃城市的拾荒者，靠搜刮废墟中的资源与宝箱活下来",
+    "abilities": [
+      "左右横版移动，沿轨道与站台不断向前探索",
+      "跳跃，跨过瓦砾、塌陷路面和断开的站台缝隙",
+      "在宝箱前停下并打开它，取出箱内资源",
+      "走过去拾取地面上的散落资源并记入背包",
+      "通过跳跃与走位绕开敌人和危险区域，不与它们正面相撞"
+    ],
+    "goals": [
+      "在废弃城市中找到资源与宝箱",
+      "躲开危险和敌人，活下去",
+      "尽可能多地搜刮这座废墟城市"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在站台与铁轨间的一小段范围里左右来回巡逻，遇到地形边缘会折返，不追击也不跳跃",
+      "threat": "撞到玩家即造成伤害并打断当前搜刮，玩家必须绕开走或跳跃越过它"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest-wasteland",
+      "type": "可开启容器",
+      "behavior": "玩家贴近并按下交互键后开启，箱盖翻开，吐出其中的废土资源，箱子变为空箱不再响应"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scrap-resource",
+      "purpose": "散落在轨道与瓦砾上的废料，拾取后计入背包，作为本次拾荒的收获与通关计数依据"
+    }
+  ],
+  "world": {
+    "theme": "黄昏暖光下的低分辨率像素废土城市，扁平色块、粗颗粒抖动、锈棕与灰蓝为主调",
+    "setting": "废弃的近郊城市与铁路站台：低矮的站房与厂房立面、大坡屋顶、矩形窗洞与招牌框，地面铺满碎石与贯穿全宽的旧铁轨",
+    "structure": "纵向分四层色带：最顶端是几乎纯色的深色天空，只挂一处太阳圆盘；天与地之间是横贯全宽的大面积建筑立面横带，带窗洞、招牌与坡屋顶，尺度远大于角色；再下一层是中景的长椅、路灯、悬挂招牌与瓦砾堆，与角色互动尺度一致；最底层是贯穿全宽的地面与铁轨碎石带，承载玩家与敌人。物件沿水平线等距稀疏分布，大面积平色留白，角色为三到四头身方块剪影，头大身短、脚部独立成块。"
+  },
+  "levels": [
+    {
+      "id": "level-ruined-station",
+      "purpose": "开场关：教玩家横版前进、跳跃、开箱与拾取，并在开阔处第一次面对巡逻敌人",
+      "layout": "从最左侧的站台残端出发，沿铁轨向右；起步处一段平地上散着废料，接着一道断裂的站台缝需跳过去；中段是一座废弃站房，门前摆着宝箱，站房前后各有一段瓦砾堆要跳上跳下；再往右是开阔的轨道区间，一个敌人在此左右巡逻，需绕行或跳过；末端是塌了一角的站台平台，作为本关的尽头",
+      "entities": [
+        "scavenger-hero",
+        "chest-wasteland",
+        "scrap-resource",
+        "enemy-wasteland"
+      ]
+    },
+    {
+      "id": "level-collapsed-platform",
+      "purpose": "第二关：拉长横向探索距离，把开箱与躲敌人串成连续压力，逼迫玩家在贪心搜刮与保命之间取舍",
+      "layout": "从左侧破旧的候车长廊起始，先是连续几段高矮不一的碎石台阶，需要逐级跳上；中段是断成两截的高架站台，中间缺口较宽，需借边缘起跳越过；缺口对面停着一只宝箱，箱子所在的平台有一名敌人在来回踱步，开箱前必须先避过它；越过之后是一长段平直轨道，零星散落废料；最右端是一座半塌的站房立面收尾",
+      "entities": [
+        "scavenger-hero",
+        "chest-wasteland",
+        "scrap-resource",
+        "enemy-wasteland"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性关卡推进",
+    "description": "按关卡顺序从左向右单向深入废弃城市，每关末尾抵达新的站台或站房区域即进入下一关；难度靠更宽的跳跃缺口、更长的敌人巡逻区间与更分散的资源摆放递增，玩家本身的能力不成长，成长感来自搜刮到的资源数量。"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "collide-terrain"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "avoid-enemy",
+      "mechanic": "hazard-contact"
+    }
+  ],
+  "winConditions": [
+    "拾取到足够数量的废土资源（含宝箱内取得的资源）后抵达关卡尽头的站台区域即通关"
+  ],
+  "loseConditions": [
+    "被巡逻敌人撞到次数累计达到上限，拾荒者倒下，本次拾荒失败",
+    "跌入站台裂缝或塌陷缺口中，本次拾荒失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}
