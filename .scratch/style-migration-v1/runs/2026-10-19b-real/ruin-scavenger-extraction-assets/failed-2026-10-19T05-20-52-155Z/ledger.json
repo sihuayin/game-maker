@@ -1,0 +1,112 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-19T05:20:52.000Z",
+  "run": {
+    "wallClockMs": 184724,
+    "byStep": {
+      "master": {
+        "calls": 3,
+        "attempts": 3
+      },
+      "image": {
+        "calls": 3,
+        "attempts": 3
+      },
+      "drawlist": {
+        "calls": 3,
+        "attempts": 3
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 73481,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "master-wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 83370,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "master-ceiling-lurker",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 72186,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scrap-resource",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 55790,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "clean-water",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 101082,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "hazard-terrain",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 65930,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "health-icon",
+      "upstream": "messages",
+      "ms": 3356,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1419,
+        "outputTokens": 643
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "scrap-icon",
+      "upstream": "messages",
+      "ms": 4298,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1418,
+        "outputTokens": 871
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 5172,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1532,
+        "outputTokens": 1425
+      }
+    }
+  ]
+}

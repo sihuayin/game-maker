@@ -1,0 +1,117 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "锈城拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市废墟中从左向右横向移动探索",
+    "翻找瓦砾与宝箱寻找资源和宝藏",
+    "躲避敌人巡逻与危险机关",
+    "收集到足够资源后抵达关卡终点完成撤离"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "一名在废土城市中求生的拾荒者，头戴宽檐帽、身背背包",
+    "abilities": [
+      "在瓦砾与断墙间横向奔跑移动",
+      "跳跃跨越坑洼、碎石堆与断裂路面",
+      "打开宝箱拾取其中的资源与宝藏"
+    ],
+    "goals": [
+      "寻找并收集散布在废墟中的资源",
+      "打开宝箱获取宝藏",
+      "躲避危险与敌人并安全抵达关卡终点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在限定区域内沿地面巡逻游走，接近玩家时加速追击",
+      "threat": "接触玩家会对其造成伤害，迫使玩家绕路或把握时机穿过"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "treasure-chest",
+      "type": "containers",
+      "behavior": "按交互键打开，释放其中的资源和宝藏供拾取"
+    },
+    {
+      "id": "hazard",
+      "type": "hazard",
+      "behavior": "接触会造成伤害或即死，玩家必须跳跃或绕行躲避"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-item",
+      "purpose": "被玩家拾取后计入收集进度，作为通往关卡终点的达成条件之一"
+    }
+  ],
+  "world": {
+    "theme": "废土末日后启示录，荒凉、危险、需要探索的废弃城市",
+    "setting": "坍塌混凝土楼体、裸露钢筋、断墙残柱；破碎柏油路面、瓦砾碎石堆；锈蚀路灯、废弃车辆、铁丝网与管道散落其间，阴天漫射光下冷灰与暖锈色对比",
+    "structure": "前景为可交互的宝箱、资源道具、敌人与角色所在的一层；中景为坍塌建筑、残墙、锈蚀管道与路灯等碰撞地形；背景为废弃天际线与阴天氛围的多层视差剪影，地面由瓦砾与碎石铺就"
+  },
+  "levels": [
+    {
+      "id": "ruined-city-1",
+      "purpose": "学会横移、跳跃与开宝箱，并在躲避危险与敌人的同时完成资源收集以抵达终点",
+      "layout": "玩家从画面左侧破败街道路面出发，向右跨越碎石堆与坑洼，途中经过一两个可打开的宝箱与散布的资源罐，绕开巡逻敌人与地面危险，最终抵达右端的撤离点",
+      "entities": [
+        "scavenger-hero",
+        "treasure-chest",
+        "resource-item",
+        "enemy-wasteland",
+        "hazard"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "linear",
+    "description": "按关卡顺序依次推进，完成当前关卡的收集与抵达终点的目标后解锁进入下一处废墟区域，环境逐渐更深、危险更密集"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "集齐关卡内要求的资源并打开宝箱后，抵达终点撤离点即获胜"
+  ],
+  "loseConditions": [
+    "被敌人接触或触碰到危险机关时耗尽生命即失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

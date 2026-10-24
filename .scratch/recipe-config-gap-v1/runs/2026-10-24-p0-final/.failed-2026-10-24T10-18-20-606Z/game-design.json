@@ -1,0 +1,122 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废城拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的瓦砾与残破建筑间探索前行",
+    "寻找并收集散落的资源罐与补给",
+    "发现并打开宝箱获取稀有奖励",
+    "躲避巡逻的敌人与危险的地形",
+    "在生存压力下谨慎推进，抵达安全出口"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "身背背包与工具的拾荒者，在荒芜废城中谨慎穿行搜寻物资",
+    "abilities": [
+      "在地面与小平台间横向奔跑移动",
+      "跳跃越过瓦砾堆与沟壑",
+      "触碰并拾取资源罐与补给",
+      "打开宝箱获取奖励",
+      "躲避敌人与危险地形以免丧命"
+    ],
+    "goals": [
+      "寻找并收集资源与补给",
+      "发现并打开宝箱",
+      "在废弃城市中生存并躲避危险与敌人"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "wasteland-enemy",
+      "behavior": "在固定巡逻路线上往复移动，警觉地向拾荒者逼近",
+      "threat": "碰到拾荒者即造成伤害或致命"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "宝箱",
+      "behavior": "走近后可打开，获得资源或稀有奖励"
+    },
+    {
+      "id": "hazard-wire",
+      "type": "危险机关",
+      "behavior": "生锈管道上带电的裸露线缆，接触即受伤"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-pickup",
+      "purpose": "可拾取的资源罐，用于补充生存物资与记分"
+    }
+  ],
+  "world": {
+    "theme": "末日废土中的废弃城市，暗色基调、锈蚀金属、荒芜危险",
+    "setting": "废弃高楼残骸、倾斜钢梁、生锈管道、开裂沥青路、瓦砾堆与报废车辆构成的毁灭后城市",
+    "structure": "前景为地面、瓦砾、警示牌与可交互物件（宝箱、资源），角色在此活动；中景为残破建筑、废墟堆与生锈管道构成的可穿行平台层；远景为灰暗天空与远处废弃城市剪影，分多层视差；纵向分为地面层、低平台层、高平台层三段"
+  },
+  "levels": [
+    {
+      "id": "level-1",
+      "purpose": "引导玩家掌握移动、跳跃、收集与躲避的基础，在谨慎探索中通往出口",
+      "layout": "从最左侧地面出发向右，跨越瓦砾堆与沟壑，攀上低平台收集资源，躲开巡逻的敌人，在中段高平台处打开宝箱，继续向右直至安全出口",
+      "entities": [
+        "scavenger-hero",
+        "resource-pickup",
+        "chest",
+        "wasteland-enemy",
+        "hazard-wire"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "关卡制",
+    "description": "通关一关后进入下一关，敌人密度与地形危险逐步增加，资源分布逐步稀疏"
+  },
+  "mechanics": [
+    {
+      "id": "move-horizontal",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "evade-danger",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "抵达关底的安全出口"
+  ],
+  "loseConditions": [
+    "被敌人接触或触碰危险机关导致生命耗尽"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

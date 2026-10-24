@@ -1,0 +1,148 @@
+{
+  "ok": true,
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v3",
+  "verify": {
+    "packId": "ruin-scavenger-extraction-assets",
+    "version": 3,
+    "ok": true,
+    "problems": [],
+    "provenanceMode": "mixed"
+  },
+  "imageCalls": 0,
+  "ledgerCalls": 0,
+  "palette": {
+    "size": 33,
+    "values": [
+      "#000000",
+      "#080000",
+      "#180000",
+      "#200000",
+      "#100700",
+      "#290705",
+      "#1a0d05",
+      "#380702",
+      "#210f03",
+      "#290d02",
+      "#420605",
+      "#310c00",
+      "#221205",
+      "#301100",
+      "#391404",
+      "#321905",
+      "#421600",
+      "#523730",
+      "#454a50",
+      "#794c35",
+      "#58554e",
+      "#685247",
+      "#786151",
+      "#676862",
+      "#74716c",
+      "#8e7161",
+      "#82847f",
+      "#a97f67",
+      "#a0827a",
+      "#a3a09b",
+      "#c89f8b",
+      "#d2a087",
+      "#59503b"
+    ]
+  },
+  "assets": [
+    {
+      "id": "scavenger-actor",
+      "kind": "animation",
+      "frames": 16
+    },
+    {
+      "id": "wasteland-enemy",
+      "kind": "animation",
+      "frames": 15
+    },
+    {
+      "id": "ceiling-lurker",
+      "kind": "animation",
+      "frames": 13
+    },
+    {
+      "id": "scrap-resource",
+      "kind": "animation",
+      "frames": 4
+    },
+    {
+      "id": "clean-water",
+      "kind": "animation",
+      "frames": 4
+    },
+    {
+      "id": "hazard-terrain",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "collapsed-floor",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "extraction-point",
+      "kind": "animation",
+      "frames": 9
+    },
+    {
+      "id": "tile-floor",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "metal-platform",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "vent-duct",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "concrete-step",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "wooden-crate",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "office-debris",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "broken-wall",
+      "kind": "sprite",
+      "frames": 1
+    },
+    {
+      "id": "ruined-city-backdrop",
+      "kind": "background",
+      "frames": 3
+    },
+    {
+      "id": "hud-panel",
+      "kind": "ui",
+      "frames": 1
+    },
+    {
+      "id": "scrap-icon",
+      "kind": "ui",
+      "frames": 1
+    },
+    {
+      "id": "health-icon",
+      "kind": "ui",
+      "frames": 1
+    }
+  ]
+}

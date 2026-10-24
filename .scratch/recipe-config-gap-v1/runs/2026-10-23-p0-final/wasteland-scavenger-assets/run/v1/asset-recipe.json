@@ -1,0 +1,398 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "hero",
+        "role": "玩家角色",
+        "description": "身背负重麻袋、身形佝偻的拾荒者，五头身左右，多层破旧布料与轻甲、绑带与废旧零件装饰，紧绷前倾的姿态",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "hero",
+        "masterAsset": "hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "sheet": {
+              "columns": 2,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "enemy-scavenger",
+        "role": "敌人",
+        "description": "低矮或长臂的敌对拾荒者，剪影易辨认，多层旧布料与轻甲、废旧零件装饰，身体前倾带敌意",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "size": {
+          "w": 32,
+          "h": 40
+        },
+        "required": true,
+        "characterId": "enemy-scavenger",
+        "masterAsset": "enemy-scavenger-master"
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest",
+        "role": "宝箱",
+        "description": "一处可开启的宝箱，包装金属亮色点缀在灰土中，带锁扣与磨损锈迹，同角色尺度保持可读",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 26,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-item",
+        "role": "可拾取物",
+        "description": "散落的资源罐，包装金属亮色在灰土中醒目，带磨损锈迹，同角色尺度可读",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 12,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "ruined-city-1-bg",
+        "role": "多层视差背景",
+        "description": "烈日下废弃城市的多层视差：远处楼宇轮廓、锈蚀广告牌、倾斜电线杆逐层变亮变灰",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "far",
+            "parallax": 0,
+            "description": "最远处城市楼宇轮廓与倾斜电线杆剪影，变亮发灰"
+          },
+          {
+            "name": "mid",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "中景锈蚀广告牌、断裂墙面与残破楼宇"
+          },
+          {
+            "name": "near",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "近景半塌楼宇、锈蚀钢架与破损招牌，细节丰富"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-tile",
+        "role": "可平铺的地面砖",
+        "description": "破碎街道地面砖，开裂风化的混凝土与沙土堆积，表面砖缝裂缝沙尘",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "rubble-pile",
+        "role": "碎石堆",
+        "description": "可踩踏的瓦砾堆与碎石块，近景剪影压暗增强纵深，外露钢筋与沙土缓坡",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.85
+        },
+        "size": {
+          "w": 64,
+          "h": 40
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "broken-wall",
+        "role": "断墙台阶",
+        "description": "断裂墙面与残破混凝土墙，可作为踩踏平台与台阶",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.85
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "cracked-plate",
+        "role": "开裂钢板地面（危险）",
+        "description": "开裂的钢板地面，可用于跨越或标记危险区域",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 48,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "exit-gate",
+        "role": "逃生出口",
+        "description": "关卡高处的逃生出口，锈蚀的门框与发光标示",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.3
+        },
+        "size": {
+          "w": 40,
+          "h": 48
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "oil-drum",
+        "role": "油桶环境道具",
+        "description": "锈蚀油桶，作为废墟中的环境点缀",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.85
+        },
+        "size": {
+          "w": 20,
+          "h": 28
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wrecked-vehicle",
+        "role": "废弃车辆环境道具",
+        "description": "废弃车辆的剪影，倾覆于破碎街道，作为前景或中景点缀",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.3
+        },
+        "size": {
+          "w": 80,
+          "h": 40
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "HUD 面板",
+        "description": "屏幕空间 HUD 面板底板，锈蚀金属质感，可被拉伸到任意尺寸",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-pip",
+        "role": "HUD 图标",
+        "description": "屏幕空间 HUD 点亮图标，固定尺寸，与资源罐尺寸一致的小圆点指示符",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "hero-master",
+      "role": "角色母版",
+      "description": "拾荒者角色母版，身背负重麻袋佝偻前倾，五头身，多层旧布料与轻甲、绑带废旧零件，作为 hero 各动画的参考图",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "hero",
+      "size": {
+        "w": 32,
+        "h": 48
+      }
+    },
+    {
+      "id": "enemy-scavenger-master",
+      "role": "敌人母版",
+      "description": "敌对拾荒者母版，低矮或长臂剪影易辨认，旧布料与轻甲、废旧零件，作为 enemy-scavenger 的参考图",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy-scavenger",
+      "size": {
+        "w": 32,
+        "h": 40
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

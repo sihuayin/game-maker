@@ -1,0 +1,12 @@
+{
+ "code": 0,
+ "ms": 29217,
+ "text": "{\n  \"command\": \"create\",\n  \"summary\": [\n    \"理解层跑完了 —— 这次运行：wasteland-scavenger-assets/run/v1（v1 · wasteland-scavenger-assets）\",\n    \"清单：10 个资源（animation×2 · sprite×5 · background×1 · ui×2）—— ⚠️ **预计 11 次生图调用**（动画 4 次 · 单帧 1 次 · 背景层 4 层 · 母版 2 张）\",\n    \"↑ 这是**清单完整派发时的上限** —— 依赖或母版失败时那几笔不会发出去，实际会更少；`game-maker build` 那一步才花钱\",\n    \"⚠️ **用户没说清的地方**：title：用户没有给游戏起名\",\n    \"⚠️ **用户没说清的地方**：winConditions：需求只写了“最终目标”，没说明具体是什么目标\",\n    \"⚠️ **用户没说清的地方**：loseConditions：需求没提失败条件，暂按被敌人或危险伤到就会失败来推\",\n    \"⚠️ **用户没说清的地方**：mechanics：需求没提战斗方式，玩家是否攻击敌人不明\",\n    \"⚠️ **用户没说清的地方**：progression：需求没提进阶或关卡推进方式\",\n    \"⚠️ **用户没说清的地方**：challenge：需求没提难度来源与数值\",\n    \"⚠️ **用户没说清的地方**：entities：需求没说明敌人种类、资源种类与宝箱数量\",\n    \"下一步：看一眼、或直接改那份清单（wasteland-scavenger-assets/run/v1/asset-recipe.json），然后跑：game-maker build wasteland-scavenger-assets/run/v1\",\n    \"或者一开始就加 --yes —— 它会把生图、配置、站点一路做完（等于跳过这里）。\"\n  ],\n  \"data\": {\n    \"status\": \"awaiting\",\n    \"gameId\": \"wasteland-scavenger-assets\",\n    \"runVersion\": 1,\n    \"runDir\": \"wasteland-scavenger-assets/run/v1\",\n    \"recipe\": \"wasteland-scavenger-assets/run/v1/asset-recipe.json\",\n    \"assetCount\": 10,\n    \"imageCalls\": 11,\n    \"imageCallBreakdown\": {\n      \"animation\": 4,\n      \"single\": 1,\n      \"background\": 4,\n      \"master\": 2\n    },\n    \"kinds\": {\n      \"animation\": 2,\n      \"sprite\": 5,\n      \"background\": 1,\n      \"ui\": 2\n    },\n    \"ambiguity\": [\n      \"title：用户没有给游戏起名\",\n      \"winConditions：需求只写了“最终目标”，没说明具体是什么目标\",\n      \"loseConditions：需求没提失败条件，暂按被敌人或危险伤到就会失败来推\",\n      \"mechanics：需求没提战斗方式，玩家是否攻击敌人不明\",\n      \"progression：需求没提进阶或关卡推进方式\",\n      \"challenge：需求没提难度来源与数值\",\n      \"entities：需求没说明敌人种类、资源种类与宝箱数量\"\n    ]\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"wasteland-scavenger-assets/run/v1\",\n      \"kind\": \"run\"\n    },\n    {\n      \"path\": \"wasteland-scavenger-assets/run/v1/asset-recipe.json\",\n      \"kind\": \"asset-recipe\"\n    }\n  ]\n}\n  · visual-world\n  · intent\n  · design\n  · character-dna\n  · recipe\n",
+ "steps": [
+  "  · visual-world\n",
+  "  · intent\n",
+  "  · design\n",
+  "  · character-dna\n",
+  "  · recipe\n"
+ ]
+}

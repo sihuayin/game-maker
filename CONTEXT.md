@@ -416,6 +416,9 @@ Game Config 里**只有碰撞、没有画面**的那部分（地面线、关卡�
 ⚠️ **它不带数量** —— 那个数由拾取物实体的条数**派生**，HUD 的槽位数是**同一个数**；
 重复声明会让「改了实体忘了改数字」成为一类静默错误。
 ⚠️ 它与画面是**同一个决定的两种表达**：终点的红/绿就是「是否已捡齐」的显示。
+⚠️ **2026-10-23（票 13）**：那个数从「拾取物条数」扩成「拾取物 + 宝箱条数」——
+`open-chest` 的奖励并入同一条 collect-then-reach 计数（宝箱是「有 open 状态、近距触发、一次性」
+的加强版 pickup），不另造奖励系统。
 
 ---
 
@@ -575,6 +578,32 @@ Phaser 只负责把那份描述画出来，**函数里不许出现 Phaser** —�
 ⚠️ **它不是「外壳能力」的全集** —— 一份外壳带两种玩法（[[Runtime Shell]]），
 而第一阶段只有横版那一代；塔防那一代**不进新链**。
 _避免_：拿它当「这个游戏是什么类型」用 —— 那是设计层的字段，不是外壳的事实。
+
+**机制状态（Mechanic Status）** —— ⚠️ **2026-10-23 新词**（票 12）
+一条机制在「这一代外壳**真能做**吗」上的三档：`experimental` / `supported` / `deprecated`。
+⚠️ **`supported` 不是手写宣称，是「推导」**：由「运行时实现」这条**见证**推导而来 ——
+「设计表达」「config 表达」两条腿恒真（机制词表本来就是从 `game-config/v1` 反推的，
+进 [[RuntimeProfile]] 那天就带了 config、枚举里就带了设计）；
+⚠️ **「QA probe」是独立一层，不进 status**（票 06/15 裁定）：status 只答「运行时实现有没有」，
+probe 答「行为级证过没有」，两层由 [[机制覆盖报告]] 合并、由门禁强制，**不并进** `deriveMechanicStatus`。
+⚠️ **事实性由测试保证，不由类型保证**：`RUNTIME_IMPLEMENTED_MECHANICS` 是**带行号的转录**，
+真伪由 `packages/demo/tests/shell-mechanic-witness.test.ts` 逐条读外壳源码断言（删掉实现 ⇒ 当场响）。
+⚠️ **它是硬约束**：设计层引用非 `supported` 的机制，R12 以 `mechanic-experimental` 拒绝 ——
+**声明了 ≠ 真能用**。今天的反例是 `moving-platform`：`Motion` 在 config 里正交于 `kind`，
+但渲染器只在 `case "hazard"` 读 `motion`，带 motion 的 solid 从不移动 ⇒ `experimental`。
+_避免_：把它当「这一代打算做哪些机制」用 —— 那是 `RuntimeProfile.mechanics`（**全集**）的活；
+状态说的是「其中哪些**真的跑得起来**」。
+
+**机制覆盖报告（Mechanic Coverage）** —— ⚠️ **2026-10-23 新词**（票 07）
+每条**设计声明要做的机制**，在三层上各落一个状态：`design`（[[机制状态]]，R12 那条硬约束的结果）·
+`runtime`（运行时实现见证）· `qa`（行为级 probe 过没过）。合并成 `mechanic-coverage/v1`。
+⚠️ **它不是第 7 条判据**（`QA_JUDGEMENTS` 仍是 6 条）：判据是**产物级**，这是**机制级**端到端能力。
+⚠️ **门禁语义**：`missing / unsupported / failed` 阻断，**`not-tested` 不阻断**（基线机制靠 witness +
+既有测试金字塔盖住，不是「查漏了」）；`verdict` 是「无阻断」不是「大多数」—— 单条失败不被总体掩盖。
+⚠️ 它活在**门禁那一环**（QA 之后，R12 已保证「意图 ⊆ 设计」），所以输入只有 `design`；
+「必须有通过的 probe」由**免费验收**（`pnpm test:acceptance` 对 `QA_PROBED_MECHANICS` 全绿）强制。
+_避免_：把它当 [[意图覆盖]] 用 —— 那个是「意图的实体/机制**在设计里有没有对家**」（集合差），
+这个是「对家的那几条机制**端到端齐不齐**」（三层）。
 
 **Viewport（视口）**
 相机一次能看到的世界区域。**它是 [[Runtime Shell]] 的常量，不是数据** ——

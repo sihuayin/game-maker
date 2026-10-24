@@ -1,0 +1,177 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "残城拾荒：撤离线",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "拾荒者从废墟入口出发，持续向右推进，穿过断裂的楼层与管道通道",
+    "在破碎瓷砖地面与箱柜上方拾取散落的废料与净水，衡量背包里还能带多少",
+    "跳过塌陷坑洞、绕开尖刺与泄漏的辐射蒸汽，避免受伤",
+    "躲避或越过在废墟中巡逻与伏击的敌人，不与它们正面纠缠",
+    "带着收集到的资源抵达城市尽头的撤离点，触发撤离、逃出生天"
+  ],
+  "player": {
+    "id": "scavenger-actor",
+    "role": "一名独自在废弃城市中行走的拾荒者，背包与破旧外套构成不对称轮廓，靠谨慎与取舍求生",
+    "abilities": [
+      "向右奔跑移动，也可减速慢步贴近危险边缘",
+      "跳跃越过坑洞、台阶与低矮障碍",
+      "拾取地面与平台上的散落资源并计入背包",
+      "受伤后短暂硬直，需要停下恢复再继续前进"
+    ],
+    "goals": [
+      "收集散落在废弃城市各处的资源",
+      "在危险地形与敌人的夹缝中活下来",
+      "抵达城市尽头的撤离点并完成撤离"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "wasteland-enemy",
+      "behavior": "在废墟通道的地面段来回巡逻，进入一定距离后向拾荒者加速冲来，遇到高差会停下",
+      "threat": "接触即造成伤害与硬直，可能把拾荒者撞下坑洞或推回危险地形方向"
+    },
+    {
+      "id": "ceiling-lurker",
+      "behavior": "倒挂在通风管道与天花板下，拾荒者从下方经过时落下并短距离扑击，随后回到原位",
+      "threat": "从上方突然袭击，压缩玩家的反应时间，逼迫玩家选择绕行或快速通过"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "hazard-terrain",
+      "type": "environment-hazard",
+      "behavior": "塌陷坑洞、裸露钢筋与辐射蒸汽区，接触即造成伤害；坑洞会直接让拾荒者坠落"
+    },
+    {
+      "id": "extraction-point",
+      "type": "goal-terminal",
+      "behavior": "城市尽头的撤离信号终端，拾荒者抵达并停留后触发撤离结算"
+    },
+    {
+      "id": "collapsed-floor",
+      "type": "fragile-platform",
+      "behavior": "踩上去后短暂塌落的水泥楼板，必须在塌落前跳向下一处平台"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scrap-resource",
+      "purpose": "散落在废墟各处的金属废料，是本次撤离的核心收获，计数决定撤离评价"
+    },
+    {
+      "id": "clean-water",
+      "purpose": "偶发在旧厨房与储水罐旁的净水，拾取后恢复拾荒者一部分伤势"
+    }
+  ],
+  "world": {
+    "theme": "低分辨率像素、抖动上色的后启示录废墟写实：脏污材质、划痕锈斑与积尘覆盖每一处表面，暗色轮廓与内阴影区分前后",
+    "setting": "被遗弃的废弃城市：破碎瓷砖与水泥地面、混凝土台阶、金属平台与栏杆、通风管道、床架与办公桌椅散落其间，远处是断墙与雾霭中的废墟天际线",
+    "structure": "三段纵深：前景是偶发的碎墙、杂草与栏杆剪影，用于遮挡与制造纵深；中景是可通行地面、平台、管道、箱柜与障碍物，玩家只在此层活动，道具与角色保持真人尺度；背景是低对比度压暗的废墟天际线与雾霭。纵向自下而上分三层——地下车库与管沟、主街面与楼层平台、屋顶与通风管顶，靠跳跃与坠落连接。画面中等偏密，地面与墙面散布小件杂物与碎屑"
+  },
+  "levels": [
+    {
+      "id": "level-01-collapsed-street",
+      "purpose": "教会玩家向右推进、跳跃与拾取，在低风险的单一路线上熟悉废墟地形",
+      "layout": "从街道塌陷处左侧开始，一路向右：先是碎裂的水泥地面与小件废料，接着一处需要跳跃的小坑洞，再爬上箱柜与混凝土台阶到略高的平台，平台上方悬挂着通风管道，末端是一段较长的平地走廊",
+      "entities": [
+        "scavenger-actor",
+        "scrap-resource",
+        "hazard-terrain",
+        "clean-water"
+      ]
+    },
+    {
+      "id": "level-02-collapsing-floors",
+      "purpose": "引入会塌落的楼板与巡逻敌人，要求玩家在移动中判断跳跃时机并绕开威胁",
+      "layout": "从倒塌楼体的二层入口进入，向右连续跨越数块踩踏即碎的水泥楼板，中间夹着一段金属平台与栏杆；中段地面出现巡逻的敌人，玩家可选高处管道从上方绕过；落回主街面后进入一间散落办公桌椅的房间，拾取废料与净水",
+      "entities": [
+        "scavenger-actor",
+        "scrap-resource",
+        "hazard-terrain",
+        "collapsed-floor",
+        "wasteland-enemy",
+        "clean-water"
+      ]
+    },
+    {
+      "id": "level-03-extraction-run",
+      "purpose": "把前面所有机制压进一段紧张的路程，最后抵达撤离点，兑现逃出生天的解脱感",
+      "layout": "从通风管顶开始，向下穿过泄漏辐射蒸汽的管沟，再爬上破损的屋顶避开上方伏击者；屋顶之间有间断的间隙需要连续跳跃，碎墙与栏杆在前景遮挡视线；最后一段沿栏杆走到城市尽头的高台，撤离终端就在那里",
+      "entities": [
+        "scavenger-actor",
+        "scrap-resource",
+        "hazard-terrain",
+        "collapsed-floor",
+        "wasteland-enemy",
+        "ceiling-lurker",
+        "extraction-point"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性关卡推进＋资源评价",
+    "description": "三关沿废弃城市由街道、倒塌楼体到城市尽头的屋顶依次推进，关卡内不设成长树；拾荒者的存活能力只靠拾到的净水临时恢复伤势，收集到的废料数量决定到达撤离点时得到的撤离评价，越贪心靠近危险资源点，风险越高"
+  },
+  "difficulty": {
+    "model": "分段递增＋收集风险自选",
+    "description": "第一关只考验移动与跳跃，威胁密度低；第二关加塌落平台与巡逻敌人，节奏加快；第三关叠加上方伏击与辐射蒸汽，间隙更密。可拾取资源多放在危险边缘，玩家自行决定是否为了评价多冒一次险；倒下后从本关起点重来，已拾取的资源保留在关卡进度内不展开"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-hazard",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "avoid-enemy",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "gravity-fall",
+      "mechanic": "gravity"
+    },
+    {
+      "id": "terrain-collision",
+      "mechanic": "collide-terrain"
+    },
+    {
+      "id": "extraction-arrival",
+      "mechanic": "reach-goal"
+    }
+  ],
+  "winConditions": [
+    "拾荒者抵达城市尽头的撤离点并停留完成撤离，即取得胜利"
+  ],
+  "loseConditions": [
+    "拾荒者的伤势耗尽后倒下，本次拾荒失败",
+    "拾荒者坠入塌陷坑洞且无法返回路线"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

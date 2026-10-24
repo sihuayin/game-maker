@@ -910,6 +910,11 @@ export function assetPlanPrompt(input: {
 
 # 要做的是一个什么样的游戏（GameDesignSpec）
 ${designBrief(design)}
+${design.runtimeRequirements.includes("hud:screen-space") ? `
+⚠️ **本代外壳有屏幕空间 HUD**（\`runtimeRequirements\` 含 \`hud:screen-space\`）—— 清单**必须**产出两件 \`kind:"ui"\` 资源：
+1. 一件**带 \`ninePatch\`** 的 ui **面板**（HUD 面板要能被拉伸到任意尺寸）；
+2. 一件**不带 \`ninePatch\`** 的 ui **图标**（点亮 pip，固定尺寸、与资源尺寸一致）。
+缺它们，config 那一步只能拿 sprite 顶 HUD、必被「要的是 ui」拒收。` : ""}
 
 # 这个世界长什么样（VisualWorldSpec）
 ⚠️ 「该造哪些东西、它们该有什么气质」**照它写** —— 尤其是**空间分层**（背景几层、每层是什么）
@@ -962,6 +967,10 @@ ${worldBrief(vws)}
 ⚠️ 四个槽的 \`id\` **沿用上面设计层给的那些 id**（一个字都不许改）；设计层没点名、但**设计说得出**
 的东西可以新加，给它们起新 id。
 ⚠️ 背景层：**层数按画面需要定**（三层的写法：由远到近，一层一段描述），**没有「必须三层」这回事**。
+⚠️ **地形/台阶**（recipe-config-gap-v1 票 05）：平台关的 \`solid\` 实体**只能引用 \`sprite\`** ——
+若这一关的 layout 需要**看得见的静态碰撞体**（地面砖 / 台阶 / 碎石堆 / 斜坡），产出一件对应的 \`sprite\`
+（role 写「可平铺的地面砖」/「台阶」/「碎石堆」这类），config 那一步才有 sprite 可引；不产它，关卡就只剩
+看不见的地面线。
 
 ${recipeShapeSpec()}
 

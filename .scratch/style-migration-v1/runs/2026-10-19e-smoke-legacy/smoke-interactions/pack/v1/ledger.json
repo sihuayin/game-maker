@@ -1,0 +1,26 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "smoke-interactions",
+  "packVersion": 1,
+  "createdAt": "2026-10-19T05:56:17.000Z",
+  "run": {
+    "wallClockMs": 21073,
+    "byStep": {
+      "image": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "image",
+      "target": "office-debris",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 18353,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

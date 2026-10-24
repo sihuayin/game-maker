@@ -25,6 +25,18 @@ import { formatIssues } from "./zod-issues.js";
 export const STRUCTURED_CALL_ATTEMPTS = 3;
 
 /**
+ * `empty-input`（上游把 `tool_use.input` 丢了，见 `parseToolUse`）的**单独重试地板**。
+ *
+ * ⚠️ 与 `STRUCTURED_CALL_ATTEMPTS` 分开的理由是**病因不同**：`empty-input` 是**瞬态数据丢失**
+ *   （上游烧了输出 token、入参没了），重试**常在几发内恢复**；而 `schema` 是「模型没过契约」、
+ *   重试大概率没用。二者混在同一个分母里，`empty-input` 会白白吃掉「模型还有第二次机会」的预算。
+ * ⚠️ 依据 = `recipe-config-gap-v1` 票 07 诊断（`proxy_request_logs` 已证请求未截断、
+ *   empty-input 占 plan-assets 失败的 5/6）。**当前只被 `plan-assets` 使用**（票 13 裁定），
+ *   其余结构化调用暂维持 `STRUCTURED_CALL_ATTEMPTS`。
+ */
+export const EMPTY_INPUT_ATTEMPTS = 6;
+
+/**
  * **一次上游调用最多等多久**（毫秒）。⚠️ **全仓只有这一个数**。
  *
  * ⚠️ **2026-10-03 从 `packages/assets/src/generate.ts` 搬进 `contracts`**（票 08 的 R2-Q3）。

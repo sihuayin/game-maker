@@ -1,0 +1,117 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "锈城拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市街道中横向移动探索，穿越坍塌楼板与瓦砾",
+    "跳跃越过断缝、管道与沙土斜坡等障碍",
+    "观察并规避巡逻的敌人与危险区域",
+    "搜寻散落地面的资源并打开宝箱获取补给"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "在废弃城市中搜寻资源与宝箱的拾荒者",
+    "abilities": [
+      "横向奔跑移动",
+      "跳跃越过障碍",
+      "持续受重力下落并落到地面"
+    ],
+    "goals": [
+      "在废弃城市中寻找并收集资源",
+      "打开宝箱获取宝物",
+      "躲避危险与敌人存活下来"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在地面巡逻段上来回巡逻，朝玩家方向缓慢逼近",
+      "threat": "接触玩家会对其造成伤害，需跳跃或绕行回避"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "可开启的宝箱",
+      "behavior": "玩家靠近并接触时打开，获得其中的资源与宝藏"
+    },
+    {
+      "id": "hazard-spike",
+      "type": "地面障碍尖刺",
+      "behavior": "玩家踩踏或接触时会受到伤害，需跳跃越过"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-item",
+      "purpose": "可拾取的资源，收集后累积玩家的寻宝成果"
+    }
+  ],
+  "world": {
+    "theme": "荒凉危险的末世废土，废弃城市中的寻宝冒险",
+    "setting": "坍塌的混凝土楼板、锈蚀钢架、半倒电线杆、瓦砾垃圾堆与断裂柏油路构成的废弃城市；高对比偏冷环境光配暖色重音",
+    "structure": "多层视差滚动：近地面碎石/管道/植被构成前景遮挡层；主角、敌人、宝箱与资源所在的可玩层；废弃城市天际线与坍塌建筑轮廓构成的远景稀疏层"
+  },
+  "levels": [
+    {
+      "id": "level-1-ruined-street",
+      "purpose": "教学关：让玩家在废弃街道学会移动、跳跃、拾取资源与打开宝箱，并初步学会躲避敌人与尖刺",
+      "layout": "从左到右：玩家在断裂柏油路起点出发，先跨越一道断缝与碎石堆，经过散落的 resource-item，再跳到一块沙土斜坡上越过 hazard-spike，随后遇到来回巡逻的 enemy-wasteland，绕行或跳跃越过它，最后在街道尽头找到 chest 并打开",
+      "entities": [
+        "scavenger-hero",
+        "resource-item",
+        "hazard-spike",
+        "enemy-wasteland",
+        "chest"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "按关卡推进",
+    "description": "玩家收集资源并打开宝箱，抵达关卡终点后进入下一区域，逐关解锁更复杂的地形与更多敌人"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-movement",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "search-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "收集到本关的资源并打开宝箱"
+  ],
+  "loseConditions": [
+    "受到敌人或危险障碍的伤害导致生命耗尽"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

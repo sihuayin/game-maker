@@ -1,0 +1,298 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "counter-siege",
+  "packVersion": 4,
+  "createdAt": "2026-09-29T11:56:02.000Z",
+  "run": {
+    "wallClockMs": 17579,
+    "byStep": {
+      "derive": {
+        "calls": 0,
+        "attempts": 0
+      },
+      "drawlist": {
+        "calls": 21,
+        "attempts": 22
+      },
+      "image": {
+        "calls": 0,
+        "attempts": 0
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "drawlist",
+      "target": "tile-shelf",
+      "upstream": "messages",
+      "ms": 2429,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 148,
+        "outputTokens": 599
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tile-floor",
+      "upstream": "messages",
+      "ms": 2550,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 543,
+        "outputTokens": 701
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tile-wall",
+      "upstream": "messages",
+      "ms": 2746,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 143,
+        "outputTokens": 708
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tile-walk",
+      "upstream": "messages",
+      "ms": 2885,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 569,
+        "outputTokens": 735
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "slot-ring",
+      "upstream": "messages",
+      "ms": 2108,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 145,
+        "outputTokens": 569
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tile-door",
+      "upstream": "messages",
+      "ms": 3196,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 134,
+        "outputTokens": 980
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tower-nailgun",
+      "upstream": "messages",
+      "ms": 3003,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 139,
+        "outputTokens": 721
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "slot-socket",
+      "upstream": "messages",
+      "ms": 3382,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 146,
+        "outputTokens": 1078
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tower-shock",
+      "upstream": "messages",
+      "ms": 2989,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 146,
+        "outputTokens": 826
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "tower-floodlight",
+      "upstream": "messages",
+      "ms": 3228,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 139,
+        "outputTokens": 839
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "proj-beam",
+      "upstream": "messages",
+      "ms": 2172,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 246,
+        "outputTokens": 487
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "proj-nail",
+      "upstream": "messages",
+      "ms": 4167,
+      "attempts": 2,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 134,
+        "outputTokens": 421
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "fx-shock",
+      "upstream": "messages",
+      "ms": 5046,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 209,
+        "outputTokens": 1537
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "enemy-scavenger",
+      "upstream": "messages",
+      "ms": 3807,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 224,
+        "outputTokens": 1227
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "enemy-drone",
+      "upstream": "messages",
+      "ms": 2787,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 216,
+        "outputTokens": 813
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "enemy-brute",
+      "upstream": "messages",
+      "ms": 4802,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 229,
+        "outputTokens": 1651
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-btn",
+      "upstream": "messages",
+      "ms": 2290,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 230,
+        "outputTokens": 530
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-hud-bar",
+      "upstream": "messages",
+      "ms": 2575,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 246,
+        "outputTokens": 749
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "core-counter",
+      "upstream": "messages",
+      "ms": 4689,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 161,
+        "outputTokens": 1554
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-icon-scrap",
+      "upstream": "messages",
+      "ms": 2682,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 242,
+        "outputTokens": 589
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-icon-life",
+      "upstream": "messages",
+      "ms": 2377,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 237,
+        "outputTokens": 549
+      }
+    }
+  ]
+}

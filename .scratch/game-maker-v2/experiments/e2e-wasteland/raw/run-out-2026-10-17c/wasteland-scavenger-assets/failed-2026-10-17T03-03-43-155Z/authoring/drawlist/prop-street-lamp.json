@@ -1,0 +1,155 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "prop-street-lamp",
+  "frame": "prop-street-lamp",
+  "viewBox": [
+    0,
+    0,
+    16,
+    64
+  ],
+  "expectedSize": [
+    16,
+    64
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 7,
+      "y": 8,
+      "w": 2,
+      "h": 55
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "opacity": 0.35,
+      "x": 7,
+      "y": 8,
+      "w": 2,
+      "h": 55
+    },
+    {
+      "op": "dither",
+      "x": 8,
+      "y": 8,
+      "w": 1,
+      "h": 55,
+      "colors": [
+        "palette:6",
+        "palette:4"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 7,
+      "y": 60,
+      "w": 2,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 5,
+      "y": 62,
+      "w": 6,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 3,
+      "y": 62,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 11,
+      "y": 62,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 3,
+      "y": 9,
+      "w": 10,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 3,
+      "y": 9,
+      "w": 10,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 2,
+      "y": 7,
+      "w": 4,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 3,
+      "y": 7,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "circle",
+      "fill": "palette:3",
+      "cx": 4,
+      "cy": 8,
+      "r": 1
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 7,
+      "w": 4,
+      "h": 3,
+      "colors": [
+        "palette:3",
+        "palette:1"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 1,
+      "y": 6,
+      "w": 6,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 5,
+      "y": 10,
+      "w": 1,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 2,
+      "y": 9,
+      "w": 1,
+      "h": 2
+    }
+  ]
+}

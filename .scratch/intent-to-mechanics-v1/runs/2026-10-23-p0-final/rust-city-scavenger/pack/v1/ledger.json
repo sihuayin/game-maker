@@ -1,0 +1,129 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "rust-city-scavenger",
+  "packVersion": 1,
+  "createdAt": "2026-10-23T09:38:03.000Z",
+  "run": {
+    "wallClockMs": 159350,
+    "byStep": {
+      "master": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "image": {
+        "calls": 11,
+        "attempts": 11
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "scavenger-hero-master",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 17213,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14646,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "enemy-wasteland",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 7812,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "chest",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 41123,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "hazard-spike",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 30814,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "resource-item",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 80590,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-street-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 9890,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-street-fg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 25202,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 32140,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-street-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 32938,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 45689,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-street-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 41126,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    }
+  ]
+}

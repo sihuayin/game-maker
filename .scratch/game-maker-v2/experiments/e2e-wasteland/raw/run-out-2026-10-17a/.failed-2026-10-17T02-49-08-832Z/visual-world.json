@@ -1,0 +1,184 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "扁平矢量",
+      "像素化几何",
+      "横版卷轴",
+      "极简色块",
+      "废土黄昏"
+    ],
+    "description": "以纯色块与硬边几何构成的扁平横版世界：所有物体都被简化为矩形、三角与圆形，无描边、无渐变、无纹理噪点；天空、建筑、地面按水平色带分层堆叠，形成舞台式的侧面剖面感。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "正交",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "无透视的纯正侧面剪影"
+  },
+  "composition": {
+    "foreground": "最底部的轨道与地面条带，角色站在其上方",
+    "midground": "建筑立面组成的整块横向墙面，其上开洞挂物",
+    "background": "厚重色带天空，顶部一条更深的暗色横带",
+    "objectScale": "背景物件大而平，可交互物件小而居中",
+    "characterScale": "角色高度约占画面的三分之一，居中偏左，是视觉焦点",
+    "density": "极稀疏，大片留白墙面色块"
+  },
+  "palette": {
+    "primary": [
+      "palette:0"
+    ],
+    "secondary": [
+      "palette:1"
+    ],
+    "accent": [
+      "palette:2",
+      "palette:3"
+    ],
+    "background": [
+      "palette:4",
+      "palette:5"
+    ],
+    "shadow": [
+      "palette:6"
+    ],
+    "highlight": [
+      "palette:3",
+      "palette:7"
+    ]
+  },
+  "lighting": {
+    "direction": "正前方均匀照明",
+    "softness": "无阴影、无渐变，只有平面色",
+    "contrast": "低，仅靠色阶区分层次",
+    "mood": "黄昏的荒败与静默"
+  },
+  "materials": {
+    "wastelandWall": {
+      "appearance": "大面积哑光土褐色墙面，无纹理",
+      "texture": "pure flat",
+      "color": [
+        "palette:0"
+      ]
+    },
+    "groundRail": {
+      "appearance": "灰色地面条带与深色轨枕重复排列",
+      "texture": "纯色几何重复",
+      "color": [
+        "palette:5",
+        "palette:6"
+      ]
+    },
+    "glowObject": {
+      "appearance": "发光的光源、指示牌与宝箱高光，边缘干净",
+      "texture": "solid glow, no blur",
+      "color": [
+        "palette:3"
+      ]
+    },
+    "darkBlock": {
+      "appearance": "剪影级的深色构件，角色服装与三角屋顶",
+      "texture": "pure flat",
+      "color": [
+        "palette:7"
+      ]
+    },
+    "rustAccent": {
+      "appearance": "锈橘色的废墟点缀与裸露砖块",
+      "texture": "pure flat",
+      "color": [
+        "palette:2"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "矮小方正的方块人，头身比约 1:1.5",
+    "silhouette": "棱角分明的矩形剪影，帽子与躯干均为块状",
+    "poseLanguage": "正面站立的静态剪影，肢体为直角折线",
+    "clothing": "深色制服外套配一条发光的横向腰带",
+    "faceAbstraction": "面部仅两块白色方块眼睛，无五官细节"
+  },
+  "environment": {
+    "architecture": "单层平顶建筑立面，矩形门窗洞口，三角屋顶剪影",
+    "terrain": "水平条带地面，下方重复的轨枕与轨道线",
+    "props": "画框、壁灯、小挂牌、灯柱、长凳等方块状小物件",
+    "textureDensity": "零纹理，仅纯色填充"
+  },
+  "shapeLanguage": [
+    "矩形与弧角矩形为主",
+    "等腰三角形作屋顶与山形",
+    "圆形仅用于太阳与光源",
+    "硬边、无描边、无圆角过渡",
+    "所有形状按水平/垂直轴对齐"
+  ],
+  "constraints": [
+    "所有元素必须是纯色填充，禁止渐变、噪点、纹理贴图",
+    "禁止使用描边或轮廓线，形与形之间靠色值区分",
+    "物体边缘必须水平或垂直对齐，仅圆形与三角屋顶例外",
+    "保持正侧面正交视角，不得引入透视或斜视",
+    "每个物体最多由 3 到 4 个色块构成，禁止细节堆叠",
+    "可交互对象（宝箱、资源、敌人）必须用高亮暖色与深色背景形成强对比",
+    "不使用抗锯齿外的任何柔化，阴影以整块纯色表现"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "扁平纯色块矢量风",
+      "极简几何像素化",
+      "横版舞台式剖面构图"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面视角",
+      "angle": "平视，无仰俯",
+      "perspective": "无透视平面投影"
+    },
+    "composition": {
+      "layout": "水平分层：天空带—建筑带—地面带",
+      "anchor": "角色居中偏左，背景大色块将其框住"
+    },
+    "palette": [
+      "#6b4a2f",
+      "#c9a882",
+      "#e8bc5a",
+      "#f2d98c",
+      "#3c4a5a",
+      "#8e8e94",
+      "#2b2f3a",
+      "#1c2430"
+    ],
+    "lighting": {
+      "type": "平坦均光",
+      "shadow": "无投影，仅有暗部色块"
+    },
+    "shapeLanguage": [
+      "矩形",
+      "三角形",
+      "圆"
+    ],
+    "material": [
+      "哑光纯色",
+      "无纹理"
+    ],
+    "environment": [
+      "废土城市立面",
+      "轨道地面"
+    ],
+    "characterStyle": [
+      "方块人",
+      "白色方块眼",
+      "深色制服"
+    ],
+    "constraints": [
+      "禁止渐变",
+      "禁止描边",
+      "禁止纹理"
+    ],
+    "confidence": 0.86
+  }
+}

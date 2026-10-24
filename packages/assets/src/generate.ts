@@ -55,11 +55,14 @@ export type GenerateOptions = {
    */
   onCall?: (c: LedgerCall) => void;
   /**
-   * 最多试几次。默认 **2**。
+   * 最多试几次。默认 **4**。
    *
    * 实测：同一份 prompt 三次里有一次返回**不合法 JSON**（票 01 记的是「9/9 通过」，
    * 但那是 9 次）。一次偶发失败不该让整包构建挂掉。
    *
+   * ⚠️ recipe-config-gap-v1 票 08：九宫格 ui 面板的 drawlist **天然偏长**（~6KB 纹理 op），
+   *   「锈蚀金属质感 + dither + 至少 10 op」把模型推向长输出，偶发**截断**（探针证伪传输/预算，
+   *   是模型侧随机截断，`attempts=2` 时 2/2 全栽过）⇒ 默认提到 4，把失败率压下去。
    * ⚠️ 这**不是**修复循环（R2 砍掉的那个）：重试只是**重采样**，不把错误喂回去，
    * 模型不会被引导去改上一次的结果。
    */
@@ -102,7 +105,7 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
   const endpoint = opts.endpoint ?? "messages";
   const doFetch = opts.fetchImpl ?? fetch;
 
-  const attempts = Math.max(1, opts.attempts ?? 2);
+  const attempts = Math.max(1, opts.attempts ?? 4);
 
   const once = async (spec: AssetSpec, style: StyleSpec): Promise<{ frames: DrawList[]; usage?: LedgerUsage; servedModel?: string }> => {
     const plan = framePlan(spec);

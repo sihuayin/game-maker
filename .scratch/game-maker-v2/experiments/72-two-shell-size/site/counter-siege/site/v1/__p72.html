@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh"><head><script>
+window.__P72__={ctx:[],draws:[],seen:{},err:[]};
+(function(){
+  var og=HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext=function(t){ try{window.__P72__.ctx.push(String(t));}catch(e){} return og.apply(this,arguments); };
+  var di=CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage=function(img){
+    try{
+      var a=arguments;
+      if(img&&img.width){
+        var r={n:a.length,iw:img.width,ih:img.height,
+          cv:(this.canvas?(this.canvas.width+'x'+this.canvas.height):'?'),
+          main:(this.canvas===document.querySelector('canvas')),
+          tf:(function(){try{return this.getTransform?[this.getTransform().a,this.getTransform().d,this.getTransform().e,this.getTransform().f]:null;}catch(e){return null;}}).call(this)};
+        if(a.length>=9){r.sx=a[1];r.sy=a[2];r.sw=a[3];r.sh=a[4];r.dx=a[5];r.dy=a[6];r.dw=a[7];r.dh=a[8];}
+        else if(a.length>=5){r.dx=a[1];r.dy=a[2];r.dw=a[3];r.dh=a[4];}
+        else {r.dx=a[1];r.dy=a[2];}
+        var k=[r.n,r.iw,r.ih,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh,r.cv,r.main,JSON.stringify(r.tf)].join(',');
+        window.__P72__.count=(window.__P72__.count||0)+1;
+        if(!window.__P72__.seen[k]&&window.__P72__.draws.length<4000){window.__P72__.seen[k]=1;r.n_hits=1;window.__P72__.draws.push(r);}
+        else if(window.__P72__.seen[k]===1){window.__P72__.seen[k]=2;for(var i=0;i<window.__P72__.draws.length;i++){var d=window.__P72__.draws[i];if([d.n,d.iw,d.ih,d.sx,d.sy,d.sw,d.sh,d.dx,d.dy,d.dw,d.dh].join(',')===k){d.n_hits=2;break;}}}
+      }
+    }catch(e){}
+    return di.apply(this,arguments);
+  };
+  addEventListener('error',function(e){window.__P72__.err.push(String((e&&e.message)||e));},true);
+})();
+</script><meta charset="utf-8"><title>counter-siege</title>
+<style>html,body{margin:0;height:100%;background:#101014;display:grid;place-items:center}</style>
+</head><body><div id="game"></div>
+<script src="./shell.js"></script>
+<script>
+(function(){
+  var best=-1;
+  var snap=function(){
+    var p=window.__P72__||{};
+    var t=p.count||0;
+    if(t>best){
+      best=t;
+      document.documentElement.setAttribute('data-p72',JSON.stringify({
+        ctx:p.ctx, draws:p.draws, errors:p.err, totalDraws:t,
+        canvases:document.querySelectorAll('canvas').length,
+        canvasSize:(function(){var c=document.querySelector('canvas');return c?{w:c.width,h:c.height,cssW:c.clientWidth,cssH:c.clientHeight}:null;})(),
+        tdState:(function(){var v=document.documentElement.getAttribute('data-td-state');return v?v.slice(0,160):null;})(),
+      }));
+    }
+    if(t>300) clearInterval(iv);
+  };
+  var iv=setInterval(snap,200);
+  setTimeout(function(){clearInterval(iv);snap();},26000);
+})();
+</script></body></html>

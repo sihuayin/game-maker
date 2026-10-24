@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-10-23T08:46:52.221Z",
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance",
+  "allOk": true,
+  "checks": [
+    {
+      "name": "vitest",
+      "ok": true
+    },
+    {
+      "name": "mechanic-probe",
+      "ok": true
+    },
+    {
+      "name": "mechanic-coverage",
+      "ok": true,
+      "verdict": "satisfied"
+    }
+  ]
+}

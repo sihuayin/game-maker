@@ -360,3 +360,36 @@ describe("§票 03：planner 的母版兜底 —— 模型漏写也补上", () =
     expect(text).not.toContain("只有真给了母版才写");
   });
 });
+
+describe("§票 13：empty-input（上游丢参）单独重试档", () => {
+  it("5 发 empty-input 后第 6 发成功 —— 独立 6 发预算（旧代码 3 发就放弃）", async () => {
+    const d = stage();
+    const input = withCoverage(RECIPE);
+    let n = 0;
+    const f = (async (_url: string, init: RequestInit) => {
+      n += 1;
+      // ⚠️ 前 5 发把入参丢了（`input: {}`），第 6 发才给合法入参。
+      const block = n <= 5 ? {} : input;
+      return new Response(
+        JSON.stringify({ content: [{ type: "tool_use", name: "emit_asset_recipe", input: block }], stop_reason: "tool_use", model: "m" }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    await run(d, f); // 不抛 = 成功（第 6 发才成）
+    expect(n).toBe(6);
+  });
+
+  it("6 发全 empty-input → 报 invalid，不无限重试", async () => {
+    const d = stage();
+    let n = 0;
+    const f = (async (_url: string, init: RequestInit) => {
+      n += 1;
+      return new Response(
+        JSON.stringify({ content: [{ type: "tool_use", name: "emit_asset_recipe", input: {} }], stop_reason: "tool_use", model: "m" }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    await expect(run(d, f)).rejects.toThrow();
+    expect(n).toBe(6); // empty-input 封顶 6 发，不是无限
+  });
+});

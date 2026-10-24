@@ -1,0 +1,111 @@
+{
+  "frames": {
+    "ruined-street-bg.midground": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 640,
+        "h": 360
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 640,
+        "h": 360
+      },
+      "sourceSize": {
+        "w": 640,
+        "h": 360
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ruined-street-bg.sky": {
+      "frame": {
+        "x": 0,
+        "y": 360,
+        "w": 640,
+        "h": 360
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 640,
+        "h": 360
+      },
+      "sourceSize": {
+        "w": 640,
+        "h": 360
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ruined-street-bg.skyline": {
+      "frame": {
+        "x": 0,
+        "y": 720,
+        "w": 640,
+        "h": 360
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 640,
+        "h": 360
+      },
+      "sourceSize": {
+        "w": 640,
+        "h": 360
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ruined-street-fg.foreground": {
+      "frame": {
+        "x": 0,
+        "y": 1080,
+        "w": 640,
+        "h": 120
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 640,
+        "h": 120
+      },
+      "sourceSize": {
+        "w": 640,
+        "h": 120
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.backgrounds.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 640,
+      "h": 1200
+    },
+    "scale": 1
+  }
+}

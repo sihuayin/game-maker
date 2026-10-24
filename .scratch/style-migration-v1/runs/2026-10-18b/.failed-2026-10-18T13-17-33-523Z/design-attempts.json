@@ -1,0 +1,407 @@
+{
+  "format": "run-design-attempts/v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "schema",
+      "detail": "工具入参不过契约：player.goals: Invalid input: expected array, received undefined",
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "废城拾荒者",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "在废弃城市的横向街区中向左向右移动探索，沿断裂台阶与堆叠箱柜深入",
+          "跳跃越过瓦砾、缝隙与断裂台阶构成的地形障碍",
+          "拾取散落在瓷砖地面与平台上的废料与净水",
+          "发现藏在箱柜堆与管道后的宝箱并将其打开",
+          "躲开在街道上巡逻的危险敌人，被抓到就结束",
+          "继续向城市深处推进，直到集齐物资抵达出口"
+        ],
+        "player": {
+          "id": "scavenger-player",
+          "role": "一名背负外凸背包、在废土废弃城市中活动的拾荒者，靠徒步横穿街区寻找可带走的物资",
+          "abilities": [
+            "左右奔跑移动，控制探索节奏",
+            "起跳越过瓦砾、台阶落差与地面缝隙",
+            "走到资源上方触发拾取，把废料与净水装进背包",
+            "贴近宝箱并将其打开，取出里面的物资",
+            "在敌人巡逻空档中穿行、靠跳跃和走位躲避接触"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "enemy-wasteland",
+            "behavior": "沿瓷砖街道在固定的两段地面之间来回巡逻，遇到地面尽头或墙脚线时掉头",
+            "threat": "身体接触就会让拾荒者受伤即失败，玩家必须等它转身或跳跃越过其巡逻段"
+          }
+        ],
+        "npcs": [
+          {
+            "id": "scavenger-player",
+            "role": "玩家控制的废土拾荒者本人，背负外凸背包、肩带与口袋轮廓清晰",
+            "interaction": "由玩家键盘直接操控移动、跳跃、拾取与开箱，不与非玩家角色对话"
+          }
+        ],
+        "interactables": [
+          {
+            "id": "chest-wasteland",
+            "type": "宝箱",
+            "behavior": "静置在箱柜堆或管道后的平台上，玩家贴近接触后开启并一次性取出其中的物资"
+          },
+          {
+            "id": "pipe-vent-wasteland",
+            "type": "危险管道通风口",
+            "behavior": "横跨数个瓦片的锈蚀管道，开口处周期性喷出热汽，接触即受伤"
+          }
+        ],
+        "resources": [
+          {
+            "id": "resource-scrap",
+            "purpose": "散落在废弃城市中的金属废料，拾取后计入本关收集进度，集齐后开放通往深层街区的出口"
+          },
+          {
+            "id": "resource-water",
+            "purpose": "稀缺的净水补给，拾取后计入收集进度，是拾荒者继续深入所需的生存物资"
+          }
+        ],
+        "world": {
+          "theme": "废土废弃城市拾荒：低分辨率像素画但单像素层级细节极高，水泥、瓷砖、锈铁、木板材质，冷灰环境光靠明暗分层与脏污、血迹塑造体积",
+          "setting": "废弃城市的内部与街道：瓷砖地面、混凝土台阶、锈蚀栏杆、通风口与墙脚线，平铺地砖与断裂台阶构成多层可站立平台，缝隙里塞着瓦砾，木箱、铁柜、床架、病床推车、办公椅、管道与碎石堆成组堆放",
+          "structure": "纵向分三层：前景放稀疏的碎裂石块、瓦砾与小件杂物做遮挡与纵深提示；中景是可通行的地面、楼梯、平台与堆叠的箱柜管道，是玩法主体所在；远景是低饱和灰死的废弃城市轮廓与破碎墙体，细节稀薄、明度压低。道具与瓦片同尺度，箱柜略高于角色，管道横跨数个瓦片；细节密集但分区清晰，可交互物与装饰物的视觉密度明显拉开差距"
+        },
+        "levels": [
+          {
+            "id": "level-abandoned-street",
+            "purpose": "开场街区：教会玩家横版移动、跳跃越障与拾取资源的基本循环",
+            "layout": "从左侧街区入口起步，脚下是平铺地砖；向右遇到第一处瓦砾缝需要起跳越过，随后是一段断裂台阶形成的高低地面；中段散落三份废料与两份净水，右侧堆叠的箱柜旁放着一只宝箱，街道尽头是通往下一层的破碎墙体缺口",
+            "entities": [
+              "scavenger-player",
+              "resource-scrap",
+              "resource-water",
+              "chest-wasteland",
+              "enemy-wasteland"
+            ]
+          },
+          {
+            "id": "level-flooded-corridor",
+            "purpose": "深处走廊：在敌人巡逻与热汽管道的双重威胁下穿行，考验躲避与节奏判断",
+            "layout": "从左侧混凝土楼梯口进入狭窄走廊，中段地面被敌人巡逻的两段街区夹住，玩家需在其转身空档穿过；走廊上方有横跨数个瓦片的管道通风口周期性喷汽，需借堆叠箱柜起跳绕过；右端放着一只藏在管道后的宝箱，出口在走廊尽头的锈蚀栏杆缺口处",
+            "entities": [
+              "scavenger-player",
+              "resource-scrap",
+              "resource-water",
+              "chest-wasteland",
+              "pipe-vent-wasteland",
+              "enemy-wasteland"
+            ]
+          },
+          {
+            "id": "level-rooftop-exit",
+            "purpose": "收尾区：集齐物资后向上攀爬至城市轮廓之上的出口，完成一次拾荒",
+            "layout": "从左下角墙脚线出发，沿断裂台阶与堆叠铁柜连续向上跳跃攀升，中途有几份废料摆在平台边缘做诱饵、下方有敌人巡逻；顶层平台是低饱和城市轮廓前的最后一段平铺地砖，右端即净水消耗点兼出口",
+            "entities": [
+              "scavenger-player",
+              "resource-scrap",
+              "enemy-wasteland",
+              "chest-wasteland"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "线性关卡 + 收集解锁",
+          "description": "三关依次推进：第一关教会移动、跳跃与拾取，第二关加入敌人巡逻与热汽管道逼迫玩家权衡节奏，第三关把跳跃与躲避叠加到纵向攀爬上。每一关内通过拾取废料与净水累积收集进度，集齐后开放通往下一关的出口，物资越多深入越远。"
+        },
+        "difficulty": {
+          "model": "接触即失败 + 递增的躲避压力",
+          "description": "难度来自躲避而非战斗：敌人巡逻段与热汽管道逐渐变密、起跳落点逐渐变窄，被抓到或被喷到立刻失败重来，玩家的容错空间随关卡推移被压缩。"
+        },
+        "mechanics": [
+          {
+            "id": "side-scroll-move",
+            "mechanic": "run"
+          },
+          {
+            "id": "jump",
+            "mechanic": "jump"
+          },
+          {
+            "id": "collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "avoid-enemy",
+            "mechanic": "hazard-contact"
+          }
+        ],
+        "winConditions": [
+          "在最后一关的顶层出口处集齐所需废料与净水后抵达出口，完成一次拾荒"
+        ],
+        "loseConditions": [
+          "被巡逻敌人身体接触到即失败",
+          "被管道通风口喷出的热汽接触到即失败"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "camera:parallax",
+          "collision:aabb",
+          "motion:cyclic",
+          "objective:collect-then-reach",
+          "hud:screen-space",
+          "coord:delivery-pixels"
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "outcome": "schema",
+      "detail": "工具入参不过契约：mechanics: Invalid input: expected array, received undefined；winConditions: Invalid input: expected array, received undefined；loseConditions: Invalid input: expected array, received undefined；runtimeRequirements: Invalid input: expected array, received undefined",
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "废城拾荒：锈与灰",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "在废弃城市的横版街道与楼层中左右移动，推进探索范围",
+          "跳跃越过断裂台阶、瓦砾堆与堆叠的箱柜管道",
+          "拾取散落地面的废料等资源，累加拾荒成果",
+          "发现并打开城市角落里的宝箱，取得其中的收获",
+          "察觉巡逻敌人后选择避开其视线或路线，绕过危险区域",
+          "在避开敌人的前提下继续向城市深处推进"
+        ],
+        "player": {
+          "id": "scavenger-player",
+          "role": "在废土废弃城市中活动的拾荒者，背着外凸背包、可在横版场景中奔跑与跳跃",
+          "abilities": [
+            "左右奔跑移动，可在街道与楼层平台上行走",
+            "跳跃越过台阶、碎石与箱柜等高度障碍",
+            "接触资源即可拾取，接触宝箱即可打开",
+            "通过走位与跳跃避开巡逻敌人的接触范围"
+          ],
+          "goals": [
+            "在废弃城市中横向探索，走得更深",
+            "寻找并拾取散落的资源",
+            "找到并打开沿途的宝箱",
+            "全程不被危险敌人碰到"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "enemy-wasteland",
+            "behavior": "在固定的一段街道或走廊上来回巡逻，走到巡逻段两端即转向，移动速度恒定且不追逐玩家",
+            "threat": "接触玩家即造成失败；其巡逻路线横跨主通行道，玩家必须看准其背向时机跳过或从平台上层绕过"
+          }
+        ],
+        "npcs": [
+          {
+            "id": "scavenger-player",
+            "role": "玩家控制的拾荒者本人，横版场景中的主角",
+            "interaction": "由键盘左右键与跳跃键直接操控，无对话交互"
+          }
+        ],
+        "interactables": [
+          {
+            "id": "chest-wasteland",
+            "type": "宝箱",
+            "behavior": "玩家接触即打开，箱盖弹起并给出收获提示，之后保持已开启状态不再重复计数"
+          }
+        ],
+        "resources": [
+          {
+            "id": "resource-scrap",
+            "purpose": "废料，散落在街道与平台上的基础拾荒物，接触即收集，累计计入本关拾取数量"
+          }
+        ],
+        "world": {
+          "theme": "低分辨率像素画风的高细节废土拾荒：冷灰基调、均匀环境光，靠明暗分层与脏污锈斑塑造体积，点缀稀疏暖色重音",
+          "setting": "废弃城市的街道与建筑内部：瓷砖地面、混凝土台阶、锈蚀栏杆、通风口与墙脚线，散放木箱、铁柜、床架与管道，缝隙中积着瓦砾",
+          "structure": "三层纵深：前景放稀疏碎裂石块、瓦砾与小件杂物做遮挡与纵深提示；中景为可通行的地面、楼梯、平台与堆叠的箱柜管道，是玩法主体；远景为低饱和灰死的废弃城市轮廓与破碎墙体，细节稀薄、明度压低。纵向分三段：底层街道地面、中层断裂台阶与堆叠箱柜平台、上层管道与屋架通道，各段之间靠跳跃衔接，平台间留出缝隙与断口"
+        },
+        "levels": [
+          {
+            "id": "level-abandoned-street",
+            "purpose": "教学并建立节奏：在街道地面学会移动、跳跃与拾取，遇到第一个宝箱与第一只巡逻敌人",
+            "layout": "从左端街道地面开始，向右行经一段平铺地砖，中途有瓦砾堆与矮箱需跳跃越过；地面散布废料可拾取；中段靠墙处放置宝箱；宝箱之后地面有一段断裂台阶向上通向中层平台，平台上再散布一组废料；平台下方街道上敌人来回巡逻，玩家需在其背向时下跳通过；最右端以破墙缺口作为深入点",
+            "entities": [
+              "scavenger-player",
+              "resource-scrap",
+              "chest-wasteland",
+              "enemy-wasteland"
+            ]
+          },
+          {
+            "id": "level-collapsed-interior",
+            "purpose": "加难：把拾荒与躲避叠在一起，路径更窄、敌人巡逻段横跨必经通道",
+            "layout": "从左侧通风口入口进入建筑内部，先沿狭窄走廊向右推进，走廊上有连续两处断口需起跳；走廊尽头向上爬三级混凝土台阶到中层，中层由堆叠木箱与铁柜组成高低平台链，宝箱藏在平台链末端，废料沿跳跃路径分散放置；敌人在地面走廊与平台之间来回巡逻，逼玩家在平台层与地面层之间择时切换；最右侧以管道口作为出口",
+            "entities": [
+              "scavenger-player",
+              "resource-scrap",
+              "chest-wasteland",
+              "enemy-wasteland"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "linear-level",
+          "description": "两关线性推进：第一关废弃街道教会移动、跳跃、拾取、开箱与避开巡逻敌人的全部动作；第二关进入建筑内部，地形断口更密、平台链更长，敌人巡逻段压在必经路线上，依靠玩家的时机判断而非数值成长变难"
+        },
+        "difficulty": {
+          "model": "fixed-layout-hazard-contact",
+          "description": "难度来自地形断口与巡逻敌人的时机叠加：地形固定不可变，敌人沿固定巡逻段匀速往返，玩家必须在其背向窗口内通过；碰到敌人立即失败，因此越深处的窄走廊与必经道越紧张"
+        }
+      }
+    },
+    {
+      "attempt": 3,
+      "outcome": "schema",
+      "detail": "工具入参不过契约：npcs[0].id: `npcs[0].id` 与 `player` 重复 —— 同一个 id 只能指向一个实体（意图层按 `type` 只认一个桶，而 `player` 与四桶里的东西在下游是**同一族角色实体**：DNA 与 `characterId` 一律靠 id 命中）",
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "锈城拾荒者",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "在废弃城市的瓷砖地面与断裂台阶上横向移动探索，观察前方地形与敌人位置",
+          "跳过碎石堆、断墙缺口与堆叠的箱柜管道，抵达更高的平台",
+          "拾取散落在瓦砾缝与地面上的废料资源，累积收益",
+          "靠近成组堆放的木箱铁柜，打开宝箱取走里面的东西",
+          "察觉巡逻敌人的移动轨迹，后退、蹲守或借平台高度绕开它",
+          "穿过打开的通道继续向城市更深处推进，寻找下一个宝箱"
+        ],
+        "player": {
+          "id": "scavenger-player",
+          "role": "一名背着外凸背包、在废土废弃城市中活动的拾荒者，靠探索与拾取维持生存",
+          "abilities": [
+            "横版左右移动，可停下脚步观察地形与敌人动向",
+            "跳跃，能越过碎石堆、断墙缺口与低矮障碍",
+            "拾取地面上的废料资源并计入携带",
+            "靠近宝箱时打开它并取走箱内之物",
+            "察觉敌人巡逻轨迹后选择后退或绕行躲避"
+          ],
+          "goals": [
+            "在废弃城市中横向探索，一直深入到城市更深处",
+            "寻找并拾取散落在各处的废料资源",
+            "发现并打开城市中隐藏的宝箱",
+            "避开巡逻在城市中的危险敌人，不被其碰到"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "enemy-wasteland",
+            "behavior": "在固定的地面段落上左右匀速来回巡逻，走到段落边缘即折返，不会跳跃也不会追出该段落",
+            "threat": "与拾荒者身体接触即造成伤害并宣告失败，因此它封锁的那段地面必须靠跳跃越过或等它走远再通过"
+          }
+        ],
+        "npcs": [
+          {
+            "id": "scavenger-player",
+            "role": "玩家控制的拾荒者（意图层登记的玩家实体，保留）",
+            "interaction": "由玩家直接操控移动、跳跃、拾取与开箱，不与其他角色对话"
+          }
+        ],
+        "interactables": [
+          {
+            "id": "chest-wasteland",
+            "type": "宝箱",
+            "behavior": "放在平台或墙角处，玩家贴近后触发开启，箱盖弹开并显示已打开状态，吐出一份资源后即视为已取空"
+          }
+        ],
+        "resources": [
+          {
+            "id": "resource-scrap",
+            "purpose": "废料，散落在瓦砾缝与地砖上的可拾取物，拾取后计入随身携带量，作为拾荒行为的直接收获与深入探索的计数凭据"
+          }
+        ],
+        "world": {
+          "theme": "废土废弃城市的拾荒：水泥、瓷砖、锈铁与木板构成的高密度像素细节，冷灰基调配稀疏暖色重音，脏污与血迹点缀",
+          "setting": "一栋被废弃多年的城市建筑内部与其街道：平铺瓷砖地面、断裂的混凝土台阶、锈蚀栏杆、通风口与墙脚线，缝隙中积着瓦砾，木箱、铁柜、床架、病床推车、办公椅与管道成组散落堆放",
+          "structure": "三层纵深：前景放稀疏的碎裂石块、瓦砾与小件杂物做遮挡与纵深提示；中景为可通行的地面、楼梯、平台与堆叠的箱柜管道，是玩法主体所在；远景为低饱和灰死的废弃城市轮廓与破碎墙体，细节稀薄、明度压低。纵向由地面层、中层台阶段与上层平台三段组成，道具与瓦片同尺度，箱柜略高于角色，管道横跨数个瓦片；细节密集但分区清晰，可交互物与装饰物在视觉密度上刻意拉开差距"
+        },
+        "levels": [
+          {
+            "id": "level-street-entry",
+            "purpose": "入门段：教会横版移动、跳跃越障与拾取废料，并第一次见到巡逻敌人",
+            "layout": "从城市街道入口开始，玩家在瓷砖地面上向右走，先遇到低矮碎石堆需跳过一次，接着是几处散落的废料；中段地面出现一段断裂缺口要跳过，缺口右侧一段平地被一名巡逻敌人来回封锁；再往右是堆叠木箱构成的矮台阶，跳上后取得一个宝箱，最后从右侧打开的通道继续深入",
+            "entities": [
+              "scavenger-player",
+              "enemy-wasteland",
+              "chest-wasteland",
+              "resource-scrap"
+            ]
+          },
+          {
+            "id": "level-collapsed-hall",
+            "purpose": "展开段：多层台阶上下交错，敌人把守地面要道，迫使玩家用平台高度绕行并寻找上层宝箱",
+            "layout": "从断裂的混凝土台阶向上爬升至中层平台，平台上散落废料；平台右端有缺口，需跳过；落下后是一条长走廊，一名敌人贴着走廊地面巡逻，玩家须趁其走远时跳上左侧的铁柜台面绕行；绕行线尽头有横跨数个瓦片的管道作为上层通路，通往一个墙角的宝箱；取宝后从管道右端落下到地面，向右进入更深处的通道口",
+            "entities": [
+              "scavenger-player",
+              "enemy-wasteland",
+              "chest-wasteland",
+              "resource-scrap"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "线性关卡推进 + 收集计数",
+          "description": "以关卡为单位线性向右推进：第一关教会移动、跳跃、拾取与躲避的基本操作，第二关在同一套操作上加长平台段落并要求用高度绕开巡逻敌人；玩家在关卡中收集的废料与开箱数作为进度凭据，决定他是否已把这一关卡「搜刮干净」，通过关卡末端的通道口进入下一关"
+        },
+        "difficulty": {
+          "model": "地形与巡逻时机",
+          "description": "难度来自两块：地形上缺口与高差逐渐增多，要求跳跃时机更准；敌人上巡逻段落逐渐卡在必经的窄地面上，玩家必须观察它的往返节奏、选择后退等待或借平台高度绕行；碰到敌人即结束本次游玩"
+        },
+        "mechanics": [
+          {
+            "id": "side-scroll-move",
+            "mechanic": "run"
+          },
+          {
+            "id": "jump",
+            "mechanic": "jump"
+          },
+          {
+            "id": "collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "avoid-enemy",
+            "mechanic": "hazard-contact"
+          }
+        ],
+        "winConditions": [
+          "抵达关卡最右侧的通道口并进入，即完成本关的深入探索"
+        ],
+        "loseConditions": [
+          "与巡逻敌人发生身体接触即失败，本次游玩结束"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "camera:parallax",
+          "collision:aabb",
+          "objective:collect-then-reach",
+          "hud:screen-space",
+          "coord:delivery-pixels"
+        ]
+      }
+    }
+  ]
+}

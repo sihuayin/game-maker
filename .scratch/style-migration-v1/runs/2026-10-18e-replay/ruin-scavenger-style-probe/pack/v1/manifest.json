@@ -1,0 +1,226 @@
+{
+  "format": "assetpack/v4",
+  "id": "ruin-scavenger-style-probe",
+  "version": 1,
+  "createdAt": "2026-10-18T13:34:36.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 16,
+    "values": [
+      "#3a3f2e",
+      "#4b4a3c",
+      "#6b6a5c",
+      "#8c8d85",
+      "#b5b5ad",
+      "#5a4a33",
+      "#7a6a4a",
+      "#8f3a2e",
+      "#5e2a24",
+      "#2b2d2a",
+      "#40453a",
+      "#5a5f57",
+      "#1e1f1d",
+      "#2f3a3a",
+      "#d6d6cc",
+      "#c49a7a"
+    ],
+    "coverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 48,
+        "h": 832
+      },
+      "frames": 13,
+      "assets": [
+        "scavenger-actor"
+      ],
+      "checksum": "sha256:6cd0741158e639c01d57d7bec580db6316963facac15661c75d1ffe352c9d040"
+    }
+  ],
+  "assets": [
+    {
+      "id": "scavenger-actor",
+      "kind": "animation",
+      "role": "玩家拾荒者，侧视四头身，背包与破旧外套构成不对称轮廓",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scavenger-actor.idle1"
+        },
+        {
+          "name": "scavenger-actor.idle2"
+        },
+        {
+          "name": "scavenger-actor.idle3"
+        },
+        {
+          "name": "scavenger-actor.idle4"
+        },
+        {
+          "name": "scavenger-actor.run1"
+        },
+        {
+          "name": "scavenger-actor.run2"
+        },
+        {
+          "name": "scavenger-actor.run3"
+        },
+        {
+          "name": "scavenger-actor.run4"
+        },
+        {
+          "name": "scavenger-actor.run5"
+        },
+        {
+          "name": "scavenger-actor.run6"
+        },
+        {
+          "name": "scavenger-actor.run7"
+        },
+        {
+          "name": "scavenger-actor.run8"
+        },
+        {
+          "name": "scavenger-actor.run9"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "scavenger-actor.idle1",
+            "scavenger-actor.idle2",
+            "scavenger-actor.idle3",
+            "scavenger-actor.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "scavenger-actor.run1",
+            "scavenger-actor.run2",
+            "scavenger-actor.run3",
+            "scavenger-actor.run4",
+            "scavenger-actor.run5",
+            "scavenger-actor.run6",
+            "scavenger-actor.run7",
+            "scavenger-actor.run8",
+            "scavenger-actor.run9"
+          ],
+          "fps": 12,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.idle.png",
+          "original": "生图 · 2 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run.png",
+          "original": "生图 · 2 次调用"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/generated/scavenger-actor.idle.png",
+      "bytes": 1252609,
+      "checksum": "sha256:7d6db4f63321baf5555508e6a235264681933d9b2b1c3cd98c4460affb283ed6"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle.prompt.txt",
+      "bytes": 4349,
+      "checksum": "sha256:b85be090f7612070633748429cad04135e06e6563dc30f9b441c720aad26bd6e"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run.png",
+      "bytes": 1034493,
+      "checksum": "sha256:43d725ac1b2ddc99ad6c3f23d227fdff5fdfe8277608db74184ab15a5aaf60b3"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run.prompt.txt",
+      "bytes": 4347,
+      "checksum": "sha256:b6353ff3d4123ec8ce3221631e8b064754248167d9bbff5dec615c3c80f74f40"
+    },
+    {
+      "path": "authoring/masters/master-probe-player.png",
+      "bytes": 1318500,
+      "checksum": "sha256:97ef076d44fd69779773a27e94f50dce0e349f6c325c3490357f544e5a48eb78"
+    },
+    {
+      "path": "authoring/masters/master-probe-player.prompt.txt",
+      "bytes": 4785,
+      "checksum": "sha256:5d13147fb5b5e91f8c157e7a6814be787f68e2e5f0f8eef4680081777a0d2c0a"
+    },
+    {
+      "path": "authoring/masters/master-probe-player.ratio.json",
+      "bytes": 443,
+      "checksum": "sha256:9e98befe81bc17875484e4dce856d65f7c2645d6036cda8f7eee360ac356f5b0"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1595,
+      "checksum": "sha256:68fbdedb35adac4c5cbf9bfbb7372a4c29a9603638abf0b16e4f98e2c31280fd"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 118,
+      "checksum": "sha256:0d91b193ed27c87874f2d4e0bbadf50d172191e66cbba9ec945bba6354b0f356"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5452,
+      "checksum": "sha256:ed43e379fb9e2d36b8bd764f07b8d0d3ece4e848f06a46a17c4f34f6097f506c"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 16395,
+      "checksum": "sha256:6cd0741158e639c01d57d7bec580db6316963facac15661c75d1ffe352c9d040"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 966,
+      "checksum": "sha256:93eb3d55f183880ecc9ef2db527fa63f727bcc3e31c645119c656d231e806fab"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 443,
+      "checksum": "sha256:9e98befe81bc17875484e4dce856d65f7c2645d6036cda8f7eee360ac356f5b0"
+    }
+  ]
+}

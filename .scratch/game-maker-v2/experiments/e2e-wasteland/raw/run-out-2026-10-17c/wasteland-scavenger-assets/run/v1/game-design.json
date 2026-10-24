@@ -1,0 +1,123 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废都拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "横向向右移动探索废弃城市的街区与屋顶边缘",
+    "跳过地形缺口与路障，落到下一段地面",
+    "拾取散落在街面上的废料资源",
+    "打开路边的宝箱取得其中的宝物",
+    "躲避巡逻敌人的接触与街上的危险区域，受伤即失去机会"
+  ],
+  "player": {
+    "id": "player-scavenger",
+    "role": "一名在废弃城市中搜寻物资的拾荒者",
+    "abilities": [
+      "左右横向奔跑移动",
+      "跳跃跨越缺口与矮障碍",
+      "接触拾取散落的资源",
+      "打开宝箱获取宝物"
+    ],
+    "goals": [
+      "在废弃城市中不断向右探索新的街区",
+      "收集资源与宝箱中的宝物",
+      "躲开敌人与危险区域，保全自己"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在固定的地面区间内来回巡逻，走到区段两端就折返，不跳跃、不追击",
+      "threat": "接触玩家即造成伤害并结束本关；玩家必须靠跳跃越过它或等它走开再通过"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest-ruined-city",
+      "type": "宝箱",
+      "behavior": "玩家接触即打开，箱盖弹起并从中爆出宝物计入收集，宝箱随后保持开启状态"
+    },
+    {
+      "id": "hazard-spike-rubble",
+      "type": "危险区域（碎石尖刺带）",
+      "behavior": "贴在地面的一段尖锐瓦砾带，玩家接触即受伤并结束本关，需要跳过它"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scrap-resource",
+      "purpose": "散落在街道与平台上的可拾取废料，接触即计入资源数量，用于推进本关的收集目标和进度"
+    }
+  ],
+  "world": {
+    "theme": "极简扁平像素风的废土荒凉都市",
+    "setting": "废弃城市的横向带状街区：纯色大块建筑立面、平顶与三角屋顶、贯穿全宽的地面与轨道条带，天空为大块色域，点缀路灯、长椅、窗格等几何小道具",
+    "structure": "由下至上三段：最底部是贯穿全宽的横向地面与轨道条带（可行走层），中央是占据画面主体的建筑立面与远景体块（背景层），顶部是大块天空色域、其下压一条极窄的亮色地平线带；前景只有少量道具剪影，元素稀疏、留白多，靠色阶差区分层次"
+  },
+  "levels": [
+    {
+      "id": "level-downtown-ruins",
+      "purpose": "教学与第一段探索：让玩家学会横移、跳跃越过瓦砾与敌人、拾取废料并打开第一个宝箱",
+      "layout": "从画面最左侧的地面起点出发向右——先是一段平坦街道，摆着第一堆废料；接着一道碎石尖刺瓦砾带需要跳过；落地后一只巡逻敌人横穿该段，踩准它折返的空隙跃过；再往前是一小截地面缺口，跳过去后道路右侧停着第一个宝箱；箱后接一段较长的平路，路上散落最后一批废料，走到右端即抵达本关终点",
+      "entities": [
+        "player-scavenger",
+        "scrap-resource",
+        "chest-ruined-city",
+        "enemy-wasteland",
+        "hazard-spike-rubble"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性单关推进",
+    "description": "关卡是一条从左到右的连续街道，进度由横向位置与收集数量共同表示：越过一段危险、拾取一批废料、打开一个宝箱，关卡依次解锁下一段路，走到最右端的终点即完成本关"
+  },
+  "difficulty": {
+    "model": "固定难度 · 接触即失败",
+    "description": "难度全部来自敌人与危险区域的位置摆放：巡逻敌人的折返区段与尖刺瓦砾带交替出现，留给玩家起跳的窗口逐步收紧；没有任何数值成长，一次接触伤害即判本关失败，靠观察节奏与时机通过"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resources",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    }
+  ],
+  "winConditions": [
+    "走到关卡最右端的地面终点即完成本关",
+    "打开街道上的宝箱并取得其中的宝物"
+  ],
+  "loseConditions": [
+    "接触到巡逻敌人的身体",
+    "接触到碎石尖刺瓦砾带等危险区域"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

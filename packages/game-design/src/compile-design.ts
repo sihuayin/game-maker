@@ -289,6 +289,13 @@ export async function compileDesign(input: CompileDesignInput): Promise<CompileD
       attempts.push({ attempt, outcome: "rejected", detail: once.detail, rejections: once.rejections, raw: once.raw });
       // ⚠️ **这一发成功了**：`trip` 只带 `spent`，**不带 failure** —— 账上因此没有失败痕迹。
       call.trip({ spent: once.spent });
+      // ⚠️ **R12 的两类**（recipe-config-gap-v1 票 07 暴露）：`intent-*`（机制/实体在设计层漏写）是
+      //   **采样失误** —— 机制/实体都在封闭枚举里、只是模型这一发漏了，重采样可能补上 ⇒ 与 schema 失败同档、重试；
+      //   `*-unsupported` / `mechanic-experimental`（外壳真做不了）是**确定性** —— 重采样无用 ⇒ 立即抛。
+      const resampleable = once.rejections.every(
+        (r) => r.reason === "intent-mechanic-missing" || r.reason === "intent-entity-missing",
+      );
+      if (resampleable && attempt < STRUCTURED_CALL_ATTEMPTS) continue;
       const ledger = call.record();
       raise(new DesignRejectedError(
         once.rejections,

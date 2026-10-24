@@ -1,7 +1,7 @@
 # 05. 修复文本上游并验证强制工具调用
 
 Type: task
-Status: paused
+Status: resolved
 Owner: main session · 2026-10-22
 Blocked by: —
 Map: ../map.md
@@ -125,3 +125,10 @@ node packages/cli/dist/cli.mjs plan \
 > **暂时停止。** 当前停在「切换 provider」这一步；恢复时按上文「下一步」继续：
 > 切换 → 探针（< $0.01，需授权）→ plan-only 重试（< $0.01，需授权）→ Stage A 重跑 → Stage B。
 > 已发生文本 ≈ $0.0297、生图 $0；无残留进程（9098 转发已停）。不提交 / 不推送。
+
+## 收尾（2026-10-24）
+
+文本上游已修复并验证，本票 resolve：根因 = DeepSeek 卡 `ANTHROPIC_MODEL` 兜底把字面
+`deepseek-v4-pro` 降级成 `deepseek-flash`；改回 `deepseek-v4-pro` 后探针 + plan-only 双过
+（见 `text-upstream-v1` 收口）。Stage A 重跑验证：3 步全 HTTP 200、`model=deepseek-v4-pro`、
+零 `empty-input` —— 但随即暴露新阻塞 R12（见 [02](02-stage-a-understanding.md)）。

@@ -1,0 +1,5 @@
+{
+ "code": 0,
+ "ms": 8426,
+ "text": "{\n  \"command\": \"plan\",\n  \"summary\": [\n    \"清单已落盘：ruined-street-assets/recipes/v1.json\",\n    \"13 个资源（animation×2 · sprite×8 · background×1 · ui×2）\"\n  ],\n  \"data\": {\n    \"recipeId\": \"ruined-street-assets\",\n    \"version\": 1,\n    \"assetCount\": 13,\n    \"kinds\": {\n      \"animation\": 2,\n      \"sprite\": 8,\n      \"background\": 1,\n      \"ui\": 2\n    },\n    \"ledger\": [\n      {\n        \"step\": \"plan-assets\",\n        \"target\": \"recipe\",\n        \"upstream\": \"messages\",\n        \"ms\": 8420,\n        \"attempts\": 1,\n        \"model\": \"deepseek-flash\",\n        \"usage\": {\n          \"inputTokens\": 226,\n          \"outputTokens\": 2196\n        }\n      }\n    ]\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"ruined-street-assets/recipes/v1.json\",\n      \"kind\": \"asset-recipe\"\n    }\n  ]\n}\n"
+}

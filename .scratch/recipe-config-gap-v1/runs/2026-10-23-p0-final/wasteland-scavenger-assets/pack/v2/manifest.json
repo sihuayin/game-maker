@@ -1,0 +1,900 @@
+{
+  "format": "assetpack/v4",
+  "id": "wasteland-scavenger-assets",
+  "version": 2,
+  "createdAt": "2026-10-24T02:12:24.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 16,
+    "values": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "coverage": {
+      "exact": 1,
+      "composited": 1,
+      "quantized": 12,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 32,
+        "h": 480
+      },
+      "frames": 10,
+      "assets": [
+        "hero"
+      ],
+      "checksum": "sha256:232dc2e6a8d6ee4e56a0acd24ac0300be3676c0614d862b7a8ba290756abd581"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 480,
+        "h": 810
+      },
+      "frames": 3,
+      "assets": [
+        "ruined-city-1-bg"
+      ],
+      "checksum": "sha256:1a3c80eedf8de9fab25998010704dfd49151b3d217e4b02c504d35b101a63d2e"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 80,
+        "h": 248
+      },
+      "frames": 10,
+      "assets": [
+        "broken-wall",
+        "chest",
+        "cracked-plate",
+        "enemy-scavenger",
+        "exit-gate",
+        "ground-tile",
+        "oil-drum",
+        "resource-item",
+        "rubble-pile",
+        "wrecked-vehicle"
+      ],
+      "checksum": "sha256:595c217a4e9f6722fba4fdc95976dde511092163451ca7c423f7a10ea3316cdb"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 32,
+        "h": 44
+      },
+      "frames": 2,
+      "assets": [
+        "hud-panel",
+        "hud-pip"
+      ],
+      "checksum": "sha256:68e2d142c10cbc3ba2fe1e81afcdf674de9bfe97d6c6a86f7c8ffcaac69923b2"
+    }
+  ],
+  "assets": [
+    {
+      "id": "hero",
+      "kind": "animation",
+      "role": "玩家角色",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "hero.idle1"
+        },
+        {
+          "name": "hero.idle2"
+        },
+        {
+          "name": "hero.idle3"
+        },
+        {
+          "name": "hero.idle4"
+        },
+        {
+          "name": "hero.run1"
+        },
+        {
+          "name": "hero.run2"
+        },
+        {
+          "name": "hero.run3"
+        },
+        {
+          "name": "hero.run4"
+        },
+        {
+          "name": "hero.jump1"
+        },
+        {
+          "name": "hero.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "hero.idle1",
+            "hero.idle2",
+            "hero.idle3",
+            "hero.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "hero.run1",
+            "hero.run2",
+            "hero.run3",
+            "hero.run4"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "hero.jump1",
+            "hero.jump2"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/hero.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/hero.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/hero.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "enemy-scavenger",
+      "kind": "sprite",
+      "role": "敌人",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "enemy-scavenger"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-scavenger.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "kind": "sprite",
+      "role": "宝箱",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 26,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "resource-item",
+      "kind": "sprite",
+      "role": "可拾取物",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "resource-item"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/resource-item.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "ruined-city-1-bg",
+      "kind": "background",
+      "role": "多层视差背景",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 480,
+        "h": 270
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "layers": [
+        {
+          "name": "far",
+          "parallax": 0
+        },
+        {
+          "name": "mid",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "near",
+          "parallax": 1,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "ruined-city-1-bg.far"
+        },
+        {
+          "name": "ruined-city-1-bg.mid"
+        },
+        {
+          "name": "ruined-city-1-bg.near"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-city-1-bg.far.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-city-1-bg.mid.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-city-1-bg.near.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "ground-tile",
+      "kind": "sprite",
+      "role": "可平铺的地面砖",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "ground-tile"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ground-tile.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "rubble-pile",
+      "kind": "sprite",
+      "role": "碎石堆",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "rubble-pile"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/rubble-pile.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "broken-wall",
+      "kind": "sprite",
+      "role": "断墙台阶",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "broken-wall"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/broken-wall.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "cracked-plate",
+      "kind": "sprite",
+      "role": "开裂钢板地面（危险）",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "cracked-plate"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/cracked-plate.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "exit-gate",
+      "kind": "sprite",
+      "role": "逃生出口",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 40,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "exit-gate"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/exit-gate.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "oil-drum",
+      "kind": "sprite",
+      "role": "油桶环境道具",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 20,
+        "h": 28
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "oil-drum"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/oil-drum.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "wrecked-vehicle",
+      "kind": "sprite",
+      "role": "废弃车辆环境道具",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 80,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "wrecked-vehicle"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wrecked-vehicle.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "hud-panel",
+      "kind": "ui",
+      "role": "HUD 面板",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-panel"
+        }
+      ],
+      "scale9Borders": {
+        "x": 8,
+        "y": 8,
+        "w": 16,
+        "h": 16
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-panel.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-pip",
+      "kind": "ui",
+      "role": "HUD 图标",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-pip"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-pip.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/hud-panel.json",
+      "bytes": 5762,
+      "checksum": "sha256:653ebb1f9abc7f28dbbcb9464626d207239e65f4f8da8a3c74660798fe5be9cb"
+    },
+    {
+      "path": "authoring/drawlist/hud-pip.json",
+      "bytes": 2193,
+      "checksum": "sha256:b85d0e5e9fa8d0134144ddae2c26553b7483151cd727e8322a16ab086a1bf2d0"
+    },
+    {
+      "path": "authoring/generated/broken-wall.png",
+      "bytes": 1275744,
+      "checksum": "sha256:8992fe8d33f951e163b646b4c583da8e608df3c7de3cef6bf75ed75f5cffc4d5"
+    },
+    {
+      "path": "authoring/generated/broken-wall.prompt.txt",
+      "bytes": 1970,
+      "checksum": "sha256:8504f395f44c504ef5579b13eb3a3231f9656bec5dd61e185e8725728261449d"
+    },
+    {
+      "path": "authoring/generated/chest.png",
+      "bytes": 1482912,
+      "checksum": "sha256:e9bfd3911a6617c1868627ea8dc285a54e05c53537a6ab19d2bf93d0353c120d"
+    },
+    {
+      "path": "authoring/generated/chest.prompt.txt",
+      "bytes": 2018,
+      "checksum": "sha256:be444910f85f563ae904c5d2c823c180b82292260ee92fe0f4b68dc16d3d88ca"
+    },
+    {
+      "path": "authoring/generated/cracked-plate.png",
+      "bytes": 1752372,
+      "checksum": "sha256:03c63f4d8bfc1020361aa727e6fb9d16736807b2f67ab8e9e95ea875d1e74149"
+    },
+    {
+      "path": "authoring/generated/cracked-plate.prompt.txt",
+      "bytes": 1982,
+      "checksum": "sha256:12fd9e56aeb2fe89bce95368fedf21433ef0efe3be0ed9c19f957752a875ba8c"
+    },
+    {
+      "path": "authoring/generated/enemy-scavenger.png",
+      "bytes": 1200615,
+      "checksum": "sha256:50ada72bceacc6e98fc3a0029eecc644035680b6afff03c758040944f8e9ac5d"
+    },
+    {
+      "path": "authoring/generated/enemy-scavenger.prompt.txt",
+      "bytes": 2021,
+      "checksum": "sha256:bf22a1f2637003df58fb717ebf46924a61c9cf56904fe4c5cc7c2c8b80ef9f2d"
+    },
+    {
+      "path": "authoring/generated/exit-gate.png",
+      "bytes": 1385187,
+      "checksum": "sha256:7517c28717c0c3f2b1f01f7d8872a70f3f031ebbcc315605a4cbdde6e26db335"
+    },
+    {
+      "path": "authoring/generated/exit-gate.prompt.txt",
+      "bytes": 1964,
+      "checksum": "sha256:be94a98d0ec66b61017f54816b9744ed20b627331b86bc5ec7b3f4758cbe8cbf"
+    },
+    {
+      "path": "authoring/generated/ground-tile.png",
+      "bytes": 2050237,
+      "checksum": "sha256:c208310664420ed12aca54de1548f77c93b84c0ca35d90b885ebca8f4ef3a5d4"
+    },
+    {
+      "path": "authoring/generated/ground-tile.prompt.txt",
+      "bytes": 2003,
+      "checksum": "sha256:3262b7c92fddbd64d230440725c38f0e695c0748c639b0dbcb1b6f5219c2aec1"
+    },
+    {
+      "path": "authoring/generated/hero.idle.png",
+      "bytes": 1705019,
+      "checksum": "sha256:4deafc78bc8cca9995138603df5d46ce9f34e259056f09b9689a26ae58a9d06b"
+    },
+    {
+      "path": "authoring/generated/hero.idle.prompt.txt",
+      "bytes": 5107,
+      "checksum": "sha256:682da931d404037f62cdd164cc0ccf07720c3e66715ad76b2578a0040b0b4e8e"
+    },
+    {
+      "path": "authoring/generated/hero.jump.png",
+      "bytes": 1208617,
+      "checksum": "sha256:f55eefe89289de4809bd5e549e67469f4998b6f14c22eeb75936b96afcc97a1a"
+    },
+    {
+      "path": "authoring/generated/hero.jump.prompt.txt",
+      "bytes": 5107,
+      "checksum": "sha256:59034585793a2f5cea15a391e508724e7c0e576c0834f081db98fa0fd3fe4303"
+    },
+    {
+      "path": "authoring/generated/hero.run.png",
+      "bytes": 1319936,
+      "checksum": "sha256:60ade09b9a685988898cded831d766e66ec482e6d21182d0c07d9bef40316a06"
+    },
+    {
+      "path": "authoring/generated/hero.run.prompt.txt",
+      "bytes": 5105,
+      "checksum": "sha256:0e402e6517d6a6720db448663d4c85e0c6bfb2b8cd628b9ed1023a412782014f"
+    },
+    {
+      "path": "authoring/generated/oil-drum.png",
+      "bytes": 1645934,
+      "checksum": "sha256:4bf2ee7eeb890159ec53850332046cb1974925dcc350bb5748a646da0344083f"
+    },
+    {
+      "path": "authoring/generated/oil-drum.prompt.txt",
+      "bytes": 1955,
+      "checksum": "sha256:5cb2e78102894359f5a6eb31ce37b0d17fe705369bdc18f9fa3a0ac39702b054"
+    },
+    {
+      "path": "authoring/generated/resource-item.png",
+      "bytes": 1058808,
+      "checksum": "sha256:3aeb4b1d238c25e23798bac846d6ebcc4f8403b28821446a43a5a7327465a793"
+    },
+    {
+      "path": "authoring/generated/resource-item.prompt.txt",
+      "bytes": 2003,
+      "checksum": "sha256:c6fabfbc278146d318049f15aa9d46efcce2d6532c94e1032989f31d8e75efec"
+    },
+    {
+      "path": "authoring/generated/rubble-pile.png",
+      "bytes": 1250009,
+      "checksum": "sha256:7050f977ac384736f89cbbf33ff3114434c12307dc0554d0c723d82e9558ccd6"
+    },
+    {
+      "path": "authoring/generated/rubble-pile.prompt.txt",
+      "bytes": 1997,
+      "checksum": "sha256:9647bba6258540144647fb2fe2edee81443cc1de86e39957dad0f32828497b40"
+    },
+    {
+      "path": "authoring/generated/ruined-city-1-bg.far.png",
+      "bytes": 559351,
+      "checksum": "sha256:7bc15e1d1f68ca64e3295eb62f46c102e43b92038ea97bd9d6cb6169d7bad9c1"
+    },
+    {
+      "path": "authoring/generated/ruined-city-1-bg.far.prompt.txt",
+      "bytes": 2047,
+      "checksum": "sha256:b365c263fd8f85756d985ce5bc844fc8cc42f960e6e3d49dc8a8b01f7ef02c69"
+    },
+    {
+      "path": "authoring/generated/ruined-city-1-bg.mid.png",
+      "bytes": 1235593,
+      "checksum": "sha256:72630ca322e39081f48363464799112b46e62aba3741488f7e6b47a15cf75e71"
+    },
+    {
+      "path": "authoring/generated/ruined-city-1-bg.mid.prompt.txt",
+      "bytes": 1920,
+      "checksum": "sha256:c8ccf806b02453617671e2fedd8d73c4c27aa239a03e57275ca52b671be6aa06"
+    },
+    {
+      "path": "authoring/generated/ruined-city-1-bg.near.png",
+      "bytes": 2039836,
+      "checksum": "sha256:d19276db09ee5e298e2d343afa3d5232331f976e2ffc36fd6c16297047024c9b"
+    },
+    {
+      "path": "authoring/generated/ruined-city-1-bg.near.prompt.txt",
+      "bytes": 1933,
+      "checksum": "sha256:571894845ae150860b76be6e1ba3ed04e92d2b96909e42e4678cf23fa816f368"
+    },
+    {
+      "path": "authoring/generated/wrecked-vehicle.png",
+      "bytes": 1072511,
+      "checksum": "sha256:2ae65e47d0722582d3b18eb4945b9a8f0fd2b62782d4013bae8038a5128cd71f"
+    },
+    {
+      "path": "authoring/generated/wrecked-vehicle.prompt.txt",
+      "bytes": 1991,
+      "checksum": "sha256:09dd43cfe56fc2e581b09fa6de9e8b60484a4dc530d70b122c18c6d41778001d"
+    },
+    {
+      "path": "authoring/masters/enemy-scavenger-master.png",
+      "bytes": 1269652,
+      "checksum": "sha256:62c8c6248b3196565fae7c2ef4d069374af1d52979aabb08fa269be4909b8396"
+    },
+    {
+      "path": "authoring/masters/enemy-scavenger-master.prompt.txt",
+      "bytes": 4488,
+      "checksum": "sha256:e7855089edceece309ce1d9bab3039e859607d3e238b810d4ef8476d0c5e317b"
+    },
+    {
+      "path": "authoring/masters/enemy-scavenger-master.ratio.json",
+      "bytes": 443,
+      "checksum": "sha256:ed6b3a82912f2afcd485a250c710f174d8011b678d154c71f4551495ea7c39ee"
+    },
+    {
+      "path": "authoring/masters/hero-master.png",
+      "bytes": 1367953,
+      "checksum": "sha256:faf1ebf0f2b70e2d33fa756c84fda177134808362606cc1929c5565ab22a0184"
+    },
+    {
+      "path": "authoring/masters/hero-master.prompt.txt",
+      "bytes": 4619,
+      "checksum": "sha256:153b4b5ea94601dc55c3ffe0782cda253c0c4ad7d95c89c80130227fb56b17ad"
+    },
+    {
+      "path": "authoring/masters/hero-master.ratio.json",
+      "bytes": 448,
+      "checksum": "sha256:f44bf372478afadc61b3ec716e624cb6c36142cbfcd40070579c1626cda6d968"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1637,
+      "checksum": "sha256:593972dea03f68eb1f0b6a72e713f24bac9b357acdb16fc8d9c5eb25fb26c466"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 7101,
+      "checksum": "sha256:edbb420797b65af1ed9ed6de5db3bf43706954bf830ba94a92e7bbd21bf9044f"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 634,
+      "checksum": "sha256:fd1d334237c77ce4d0d34a6509bc52b55fe957c13a72fe84fd4ce66f2be4551a"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 4164,
+      "checksum": "sha256:f88367dfa66988473d45546ea4fdd7522961fcb30bbd0e74d08df53ca2b9540e"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 7639,
+      "checksum": "sha256:232dc2e6a8d6ee4e56a0acd24ac0300be3676c0614d862b7a8ba290756abd581"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1434,
+      "checksum": "sha256:fdf8b85aee1464439a1780d493322402b93ede5df0dfce51bb7c2c6bff400689"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 57412,
+      "checksum": "sha256:1a3c80eedf8de9fab25998010704dfd49151b3d217e4b02c504d35b101a63d2e"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 4172,
+      "checksum": "sha256:a2a427376a31e692f13afcabc9b05bd0cce4a2cdcba814dec44da284906f6cb4"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 8555,
+      "checksum": "sha256:595c217a4e9f6722fba4fdc95976dde511092163451ca7c423f7a10ea3316cdb"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1081,
+      "checksum": "sha256:a20ec875c97f7ee0e4abcd4f139542d0cc24268a89f18acd33c48176eb3dac97"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 327,
+      "checksum": "sha256:68e2d142c10cbc3ba2fe1e81afcdf674de9bfe97d6c6a86f7c8ffcaac69923b2"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 5105,
+      "checksum": "sha256:29e06d72b75cb0f2b0bd412992c4bca43075b4e0f684dcc05deb064e5fadafb4"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 765,
+      "checksum": "sha256:230d78fc298cbe1920bb98f9c4318994b4964135be008c1c992cd34bd28398ca"
+    }
+  ]
+}

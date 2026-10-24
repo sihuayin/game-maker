@@ -1,0 +1,31 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 3,
+  "layers": [
+    {
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.skyline",
+      "w": 640,
+      "h": 360,
+      "opaque": 230400,
+      "ratio": 1
+    },
+    {
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.blocks",
+      "w": 640,
+      "h": 360,
+      "opaque": 204785,
+      "ratio": 0.8888237847222222
+    },
+    {
+      "asset": "ruined-city-backdrop",
+      "frame": "ruined-city-backdrop.street",
+      "w": 640,
+      "h": 360,
+      "opaque": 168406,
+      "ratio": 0.7309288194444444
+    }
+  ]
+}

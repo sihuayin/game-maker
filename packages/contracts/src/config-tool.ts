@@ -28,14 +28,21 @@ const MotionShape = z.strictObject({
   periodMs: z.number().int().positive()
 });
 
+const StrikeShape = z.strictObject({
+  periodMs: z.number().int().positive(),
+  activeMs: z.number().int().positive()
+});
+
 const EntityShape = z.strictObject({
   id: z.string().min(1),
-  kind: z.enum(["solid", "pickup", "hazard", "goal", "decor"]),
+  kind: z.enum(["solid", "pickup", "hazard", "goal", "chest", "danger", "decor"]),
   at: PointShape,
   asset: z.string().min(1),
   anim: z.string().min(1).optional(),
   body: SizeShape.optional(),
-  motion: MotionShape.optional()
+  motion: MotionShape.optional(),
+  range: z.number().int().nonnegative().optional(),
+  strike: StrikeShape.optional()
 });
 
 /** ⚠️ 速度/重力**不是整数**（`z.number().positive()`）—— 「坐标一律整数」管的是**位置与尺寸**。 */

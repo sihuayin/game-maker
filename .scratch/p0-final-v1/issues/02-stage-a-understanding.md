@@ -1,7 +1,7 @@
 # 02. Stage A · 理解层单跑（create，不带 --yes）
 
 Type: task
-Status: blocked
+Status: resolved
 Owner: main session · 2026-10-22
 Blocked by: 01
 Map: ../map.md
@@ -114,3 +114,7 @@ node packages/cli/dist/cli.mjs create \
 - **新阻塞 = R12**：意图 fixture 要的「宝箱 / 躲避危险」超出外壳能表达的机制，R12 在生图前正确拒绝（不悄悄做丢）。
 - **最终裁定（用户 2026-10-22 · 选 A）**：记作 P0-FINAL 的真实阻塞；不重试、不换 provider 掩盖；
   flash vs v4-pro 差异留待后续只读调查。
+
+## 收尾（2026-10-24）
+
+本票 resolve：Stage A 两次失败，真实阻塞 = R12 `intent-mechanic-missing`。结论见 [04](04-verdict.md)。

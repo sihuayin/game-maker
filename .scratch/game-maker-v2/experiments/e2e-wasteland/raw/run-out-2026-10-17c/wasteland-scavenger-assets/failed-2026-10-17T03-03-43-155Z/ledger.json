@@ -1,0 +1,202 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-17T03:03:43.000Z",
+  "run": {
+    "wallClockMs": 157489,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "image": {
+        "calls": 9,
+        "attempts": 12
+      },
+      "drawlist": {
+        "calls": 6,
+        "attempts": 6
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 24651,
+      "requestedSize": "aspect 2:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "master",
+      "target": "master-enemy-wasteland",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 17059,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 3,
+      "upstream": "gemini",
+      "ms": 29936,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "enemy-wasteland",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 27929,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "scrap-resource",
+      "upstream": "messages",
+      "ms": 1898,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1281,
+        "outputTokens": 516
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-street-lamp",
+      "upstream": "messages",
+      "ms": 1972,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1268,
+        "outputTokens": 504
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "prop-bench",
+      "upstream": "messages",
+      "ms": 2100,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1265,
+        "outputTokens": 648
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hazard-spike-rubble",
+      "upstream": "messages",
+      "ms": 2598,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 1284,
+        "outputTokens": 830
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-scrap-counter",
+      "upstream": "messages",
+      "ms": 2102,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 623,
+        "outputTokens": 615
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-scrap-icon",
+      "upstream": "messages",
+      "ms": 2037,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 496,
+        "outputTokens": 465
+      }
+    },
+    {
+      "step": "image",
+      "target": "chest-ruined-city",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 19291,
+      "requestedSize": "aspect 5:4",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "level-downtown-ruins",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 30511,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 19276,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "level-downtown-ruins",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 30291,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 29821,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "level-downtown-ruins",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14593,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "level-downtown-ruins",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 22996,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

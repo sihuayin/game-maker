@@ -41,6 +41,10 @@ Effort: p0-final-v1
 > （语义契约缺口：意图 fixture 要的机制超出外壳能力）。**不通过重试 / 换 provider 掩盖**；flash 与 v4-pro 的
 > 差异留待后续**只读调查**，本轮不展开。`CAP-E2E-01` / P0-FINAL 仍**未完成**。
 > **累计文本** ≈ $0.0371（Stage A 首次 $0.0188 + 探针 $0.0001 + plan-only $0.0108 + Stage A 重跑 $0.0074）；生图 $0。
+>
+> ✅ **2026-10-24 收尾闭环**：票面状态对齐到最终裁定。票 02 resolve（Stage A 失败·R12）、
+> 票 03 划出范围（无 run 可 build）、票 04 resolve（结论 = 失败·未完成）、票 05 resolve（上游已修）。
+> `CAP-E2E-01` / P0-FINAL 仍**未完成**；R12 语义契约缺口另开 effort（本图 Out of scope）。
 
 
 
@@ -69,11 +73,14 @@ QA 报告、截图、玩法轨迹、失败与重试。成功 ⇒ 可宣告「单
 
 <!-- the index: one line per closed ticket, enough to judge relevance, then zoom the link for the detail the ticket holds -->
 
-（无）
+- [01. P0-FINAL 书面预算与付费授权](issues/01-budget-and-authorization.md)：逐字授权 —— Stage A ≤15 文本请求 / Stage B ≤4×imageCalls / 生图费用 ≤$2.00 / 文本 ≤40 请求 / 墙钟 75 分钟 / 无隐藏重试。
+- [02. Stage A · 理解层单跑](issues/02-stage-a-understanding.md)：两次失败 —— 首次 `empty-input`（上游 flash 降级）；修上游后 R12 `intent-mechanic-missing`。真实阻塞 = R12，未产出 recipe。
+- [05. 修复文本上游并验证强制工具调用](issues/05-fix-text-upstream.md)：已修（`text-upstream-v1` 收口）—— 根因 `ANTHROPIC_MODEL` 兜底降级 flash，改回 `deepseek-v4-pro` 后探针 + plan-only 双过。
+- [04. P0-FINAL 结论与收口](issues/04-verdict.md)：结论 **失败**（未完成）—— `CAP-E2E-01` 未完成；文本 ≈$0.0371 / 生图 $0；最小补充条件 = 扩展外壳封闭机制（另开 effort）。
 
 ## Not yet specified
 
-（无。处置已裁定 B：修文本上游 → 探针 → 重跑 Stage A；见票 05。）
+（无。本图已收口：失败结论落票 04。）
 
 ## Out of scope
 
@@ -81,3 +88,4 @@ QA 报告、截图、玩法轨迹、失败与重试。成功 ⇒ 可宣告「单
 - **自动修复 / 自动重生成 / 隐藏重试**：失败即保存现场、登记缺口。
 - **修改 `game-maker.local.json`**：凭证 / 模型配置只读。
 - **提交 / 推送**：每次单独授权。
+- [03. Stage B · 构建 / 站点 / smoke / 人工检查](issues/03-stage-b-build-site-smoke.md)：Stage A 失败（R12）无 run 目录，Stage B 无法 build —— 划出范围，不续跑。

@@ -1,0 +1,121 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "enemy-drone",
+  "frame": "hover1",
+  "viewBox": [
+    0,
+    0,
+    12,
+    12
+  ],
+  "expectedSize": [
+    12,
+    12
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x": 2,
+      "y": 2,
+      "w": 8,
+      "h": 8
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 3,
+      "w": 6,
+      "h": 6,
+      "colors": [
+        "palette:0",
+        "palette:2"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 5,
+      "y": 1,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 5,
+      "y": 2,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 5,
+      "y": 2,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 2,
+      "y1": 2,
+      "x2": 0,
+      "y2": 0
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 9,
+      "y1": 2,
+      "x2": 11,
+      "y2": 0
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 2,
+      "y1": 9,
+      "x2": 0,
+      "y2": 11
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 9,
+      "y1": 9,
+      "x2": 11,
+      "y2": 11
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 6,
+      "y": 6,
+      "w": 1,
+      "h": 1
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 5,
+      "w": 1,
+      "h": 2,
+      "colors": [
+        "palette:1",
+        "palette:3"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    }
+  ]
+}

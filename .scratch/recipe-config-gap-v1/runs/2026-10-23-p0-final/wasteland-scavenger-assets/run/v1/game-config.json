@@ -1,0 +1,199 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 1440,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "ruined-city-1-bg"
+    }
+  },
+  "player": {
+    "asset": "hero",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 250
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 250,
+      "w": 1440,
+      "h": 20
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "w": 20,
+      "h": 270
+    },
+    {
+      "x": 1420,
+      "y": 0,
+      "w": 20,
+      "h": 270
+    }
+  ],
+  "entities": [
+    {
+      "id": "pickup-1",
+      "kind": "pickup",
+      "at": {
+        "x": 260,
+        "y": 250
+      },
+      "asset": "resource-item"
+    },
+    {
+      "id": "pickup-2",
+      "kind": "pickup",
+      "at": {
+        "x": 360,
+        "y": 210
+      },
+      "asset": "resource-item"
+    },
+    {
+      "id": "pickup-3",
+      "kind": "pickup",
+      "at": {
+        "x": 560,
+        "y": 190
+      },
+      "asset": "resource-item"
+    },
+    {
+      "id": "wall-1",
+      "kind": "solid",
+      "at": {
+        "x": 300,
+        "y": 250
+      },
+      "asset": "broken-wall"
+    },
+    {
+      "id": "rubble-1",
+      "kind": "solid",
+      "at": {
+        "x": 470,
+        "y": 250
+      },
+      "asset": "rubble-pile"
+    },
+    {
+      "id": "enemy-1",
+      "kind": "hazard",
+      "at": {
+        "x": 760,
+        "y": 250
+      },
+      "asset": "enemy-scavenger",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 160,
+        "periodMs": 3600
+      }
+    },
+    {
+      "id": "plate-1",
+      "kind": "solid",
+      "at": {
+        "x": 820,
+        "y": 250
+      },
+      "asset": "cracked-plate"
+    },
+    {
+      "id": "plate-2",
+      "kind": "solid",
+      "at": {
+        "x": 880,
+        "y": 250
+      },
+      "asset": "cracked-plate"
+    },
+    {
+      "id": "chest-1",
+      "kind": "chest",
+      "at": {
+        "x": 1040,
+        "y": 250
+      },
+      "asset": "chest"
+    },
+    {
+      "id": "pickup-4",
+      "kind": "pickup",
+      "at": {
+        "x": 1090,
+        "y": 250
+      },
+      "asset": "resource-item"
+    },
+    {
+      "id": "rubble-2",
+      "kind": "solid",
+      "at": {
+        "x": 1160,
+        "y": 250
+      },
+      "asset": "rubble-pile"
+    },
+    {
+      "id": "wall-2",
+      "kind": "solid",
+      "at": {
+        "x": 1260,
+        "y": 250
+      },
+      "asset": "broken-wall"
+    },
+    {
+      "id": "gate",
+      "kind": "goal",
+      "at": {
+        "x": 1390,
+        "y": 200
+      },
+      "asset": "exit-gate"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "hud-panel",
+      "at": {
+        "x": 72,
+        "y": 238
+      },
+      "size": {
+        "w": 72,
+        "h": 32
+      }
+    },
+    "pip": {
+      "asset": "hud-pip",
+      "at": {
+        "x": 12,
+        "y": 250
+      },
+      "step": {
+        "x": 20,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "gate"
+  }
+}

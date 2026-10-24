@@ -1,0 +1,22 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "rust-city-scavenger",
+  "packVersion": 1,
+  "masters": [
+    {
+      "master": "scavenger-hero-master",
+      "requested": {
+        "w": 48,
+        "h": 48
+      },
+      "returned": {
+        "w": 1024,
+        "h": 1024
+      },
+      "requestedRatio": 1,
+      "returnedRatio": 1,
+      "ratioDelta": 0,
+      "match": true
+    }
+  ]
+}

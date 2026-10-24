@@ -1,0 +1,266 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "低分辨率废土像素画",
+    "keywords": [
+      "低分辨率像素画",
+      "高细节层级",
+      "废土末日",
+      "后启示录",
+      "粗糙沙砾质感",
+      "手绘像素",
+      "dithering抖动过渡",
+      "斑驳做旧",
+      "冷灰与暖锈色对比"
+    ],
+    "description": "低分辨率像素画，但细节层级高：每颗像素都有意义，善用抖动与点阵表现沙砾、锈迹、混凝土斑驳。题材为废土末日拾荒，材质粗糙做旧、表面有锈蚀与积灰，光照为阴天漫射光加局部暖色发光重音。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic",
+    "angle": 0,
+    "perspective": "侧视横版"
+  },
+  "composition": {
+    "foreground": "地面瓦砾、碎石、废弃车辆与拾荒者角色",
+    "midground": "坍塌建筑、残墙、锈蚀管道与路灯等可交互背景",
+    "background": "远景废弃天际线与阴天氛围，多层视差剪影",
+    "objectScale": "宝箱与资源道具为小型可拾取物，敌人与角色同级",
+    "characterScale": "角色占屏幕高度约1/5到1/6",
+    "density": "中高密度，细节集中在近景与中景"
+  },
+  "palette": {
+    "primary": [
+      "palette:10",
+      "palette:9",
+      "palette:9",
+      "palette:6"
+    ],
+    "secondary": [
+      "palette:5",
+      "palette:5",
+      "palette:5",
+      "palette:8"
+    ],
+    "accent": [
+      "palette:12",
+      "palette:5",
+      "palette:12",
+      "palette:12"
+    ],
+    "background": [
+      "palette:0",
+      "palette:1",
+      "palette:4",
+      "palette:9"
+    ],
+    "shadow": [
+      "palette:3",
+      "palette:0",
+      "palette:0"
+    ],
+    "highlight": [
+      "palette:11",
+      "palette:10",
+      "palette:11",
+      "palette:15"
+    ]
+  },
+  "lighting": {
+    "direction": "顶部偏斜的阴天漫射光，低角度穿透",
+    "softness": "漫射为主，硬边阴影辅助",
+    "contrast": "中高对比，暗部厚重",
+    "mood": "压抑阴郁，局部暖色发光点缀"
+  },
+  "materials": {
+    "concreteRubble": {
+      "appearance": "碎裂混凝土，斑驳灰白，边缘带裂痕",
+      "texture": "点阵噪点",
+      "color": [
+        "palette:9",
+        "palette:9",
+        "palette:3"
+      ]
+    },
+    "rustedMetal": {
+      "appearance": "深色金属，表面橘红锈蚀与积灰",
+      "texture": "锈斑与划痕",
+      "color": [
+        "palette:6",
+        "palette:5",
+        "palette:5"
+      ]
+    },
+    "weatheredWood": {
+      "appearance": "风化木板，开裂褪色，边缘破损",
+      "texture": "木纹与裂痕",
+      "color": [
+        "palette:5",
+        "palette:5"
+      ]
+    },
+    "sandDirt": {
+      "appearance": "沙土碎石地面，颗粒感粗糙",
+      "texture": "沙砾点阵",
+      "color": [
+        "palette:8",
+        "palette:4",
+        "palette:0"
+      ]
+    },
+    "glowingTech": {
+      "appearance": "发光屏幕与指示灯，暖色与外层暗部",
+      "texture": "发光像素与光晕",
+      "color": [
+        "palette:12",
+        "palette:12",
+        "palette:12"
+      ]
+    },
+    "skinFlesh": {
+      "appearance": "拾荒者皮肤与暖色重音，做旧",
+      "texture": "肤色高光",
+      "color": [
+        "palette:10",
+        "palette:10"
+      ]
+    },
+    "scrapMetal": {
+      "appearance": "废金属外壳，多色混锈拼接",
+      "texture": "金属反光",
+      "color": [
+        "palette:11",
+        "palette:11",
+        "palette:15"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "像素小人，头身比约1:1.5，突出轮廓辨识度",
+    "silhouette": "宽檐帽破衣，背包与肩带轮廓，简洁清晰可读",
+    "poseLanguage": "横版奔跑与跳跃的动态帧，重心前倾",
+    "clothing": "破旧外套、围巾、护目镜、废土拾荒装备",
+    "faceAbstraction": "护目镜遮挡，面部以护目镜片发光点简化"
+  },
+  "environment": {
+    "architecture": "坍塌混凝土楼体、裸露钢筋、断墙残柱",
+    "terrain": "破碎柏油路面、沙土坑洼、瓦砾碎石堆",
+    "props": "锈蚀路灯、废弃车辆、铁丝网、管道、宝箱与资源罐",
+    "textureDensity": "中高，细节集中于墙体裂痕与地面砂砾"
+  },
+  "shapeLanguage": [
+    "锯齿状断裂边缘",
+    "斜切瓦砾块",
+    "圆润锈蚀的罐体",
+    "方正带缺口的楼体剪影",
+    "尖锐铁丝与钢筋细线"
+  ],
+  "constraints": [
+    "生成新资源时必须保持低分辨率像素画风，所有像素整齐对齐网格",
+    "表面做旧：混凝土、金属、木头均需带斑驳积灰或锈蚀纹理，不可干净光滑",
+    "暗部要厚重，善用抖动(dithering)过渡而非大面积纯色块",
+    "暖色重音（发光屏、指示灯、锈红、皮肤）必须保留，用于打破整体冷灰",
+    "每个物体的轮廓都要清晰可读，尤其角色与敌人剪影",
+    "颜色必须从既有32色色板中取用，不得发明新色"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素画",
+      "高细节层级",
+      "废土末日",
+      "后启示录拾荒",
+      "粗糙沙砾做旧质感",
+      "阴天漫射光照",
+      "冷灰与暖锈对比"
+    ],
+    "camera": {
+      "mode": "side",
+      "projection": "orthographic",
+      "perspective": "侧视横版",
+      "angle": "平视"
+    },
+    "composition": {
+      "background": "远景天际线与阴天氛围多层视差",
+      "midground": "坍塌建筑残墙锈蚀管道",
+      "foreground": "瓦砾碎石与主角角色",
+      "characterScale": "约占屏幕高度1/5",
+      "density": "中高",
+      "objectScale": "道具小型，敌人与角色同级"
+    },
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {
+      "direction": "顶部偏斜阴天漫射光",
+      "mood": "压抑阴郁，局部暖色发光",
+      "contrast": "中高",
+      "softness": "漫射为主硬边辅助"
+    },
+    "shapeLanguage": [
+      "锯齿断裂",
+      "斜切瓦砾",
+      "圆润罐体",
+      "方正缺角楼体",
+      "尖锐铁丝"
+    ],
+    "material": [
+      "粗糙做旧",
+      "锈蚀斑驳",
+      "沙砾质感",
+      "抖动过渡",
+      "发光重音",
+      "破损缺角"
+    ],
+    "environment": [
+      "破碎柏油路面",
+      "沙土坑洼",
+      "瓦砾碎石",
+      "坍塌混凝土楼体",
+      "裸露钢筋",
+      "断墙残柱",
+      "锈蚀路灯",
+      "废弃车辆",
+      "铁丝网",
+      "管道",
+      "宝箱与资源罐"
+    ],
+    "characterStyle": [
+      "像素小人",
+      "头身比1:1.5",
+      "宽檐帽破衣背包轮廓",
+      "护目镜遮挡面部",
+      "横版奔跑跳跃动态",
+      "重心前倾"
+    ],
+    "constraints": [
+      "保持低分辨率像素画风，像素对齐网格",
+      "表面做旧带斑驳积灰或锈蚀，不可干净光滑",
+      "暗部厚重，善用抖动过渡",
+      "暖色重音需保留打破冷灰",
+      "轮廓清晰可读",
+      "颜色从32色色板取用"
+    ],
+    "confidence": 0.9
+  }
+}

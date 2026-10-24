@@ -156,6 +156,42 @@ describe("正常数据：last-train 装配正确", () => {
 });
 
 /**
+ * 票 13 / 14：chest 与 danger 在纯层各带出自己的参数（`range` / `strike`）。
+ * ⚠️ 夹具包（last-train）里没有这两类资源，所以故意用假 asset —— 它们会 draw.missing，
+ *   但 `kind` / `range` / `strike` 照实搬（映射不依赖资源解得到）。
+ */
+describe("chest / danger 映射（票 13 / 14）", () => {
+  const withEntities = () => valid({
+    entities: [
+      ...valid().entities,
+      { id: "chest-1", kind: "chest", at: { x: 600, y: 240 }, asset: "没有这件", range: 12 },
+      { id: "danger-1", kind: "danger", at: { x: 650, y: 240 }, asset: "也没有这件", strike: { periodMs: 2000, activeMs: 500 } },
+    ],
+  });
+
+  it("`range` 缺省 0（交互区 = 实体盒子本身），给了就照实带", () => {
+    const w = build(withEntities());
+    const chest = w.entities.find((e) => e.id === "chest-1")!;
+    expect(chest.kind).toBe("chest");
+    expect(chest.range).toBe(12);
+    expect(chest.draw.missing).toBe(true);   // 假 asset，映射照样搬 kind/range
+  });
+
+  it("`strike` 带出 periodMs / activeMs（映射不依赖资源解得到）", () => {
+    const w = build(withEntities());
+    const danger = w.entities.find((e) => e.id === "danger-1")!;
+    expect(danger.kind).toBe("danger");
+    expect(danger.strike).toEqual({ periodMs: 2000, activeMs: 500 });
+  });
+
+  it("`pickupCount` 数到 chest —— objective 与 HUD 槽位同源（票 13）", () => {
+    const w = build(withEntities());
+    expect(w.objective.pickupCount).toBe(4);   // 3 个 pickup + 1 个 chest
+    expect(w.hud.pips).toHaveLength(4);
+  });
+});
+
+/**
  * 票 104：背景**按资源自己声明的锚点**落位 —— 不是一律钉在左上角。
  *
  * ⚠️ 现场：e2e 的 `level-downtown-ruins` 是 1920×540、锚点 `{0,1}`（左下），世界高 270。

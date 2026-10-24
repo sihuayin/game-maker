@@ -1,0 +1,39 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "rust-city-scavenger",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "ruined-street-bg",
+      "frame": "ruined-street-bg.sky",
+      "w": 640,
+      "h": 360,
+      "opaque": 230400,
+      "ratio": 1
+    },
+    {
+      "asset": "ruined-street-bg",
+      "frame": "ruined-street-bg.skyline",
+      "w": 640,
+      "h": 360,
+      "opaque": 114203,
+      "ratio": 0.49567274305555553
+    },
+    {
+      "asset": "ruined-street-bg",
+      "frame": "ruined-street-bg.midground",
+      "w": 640,
+      "h": 360,
+      "opaque": 66116,
+      "ratio": 0.28696180555555556
+    },
+    {
+      "asset": "ruined-street-fg",
+      "frame": "ruined-street-fg.foreground",
+      "w": 640,
+      "h": 120,
+      "opaque": 76800,
+      "ratio": 1
+    }
+  ]
+}

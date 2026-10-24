@@ -1,0 +1,226 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-19T10:37:13.000Z",
+  "run": {
+    "wallClockMs": 105768,
+    "byStep": {
+      "master": {
+        "calls": 3,
+        "attempts": 3
+      },
+      "image": {
+        "calls": 15,
+        "attempts": 15
+      },
+      "drawlist": {
+        "calls": 3,
+        "attempts": 3
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14289,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "master",
+      "target": "master-wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 12930,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "master",
+      "target": "master-ceiling-lurker",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 11979,
+      "requestedSize": "aspect 4:5",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 18146,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 16642,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ceiling-lurker",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14708,
+      "requestedSize": "aspect 4:5",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "scrap-icon",
+      "upstream": "messages",
+      "ms": 2578,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 138,
+        "outputTokens": 701
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "health-icon",
+      "upstream": "messages",
+      "ms": 2785,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 139,
+        "outputTokens": 757
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 4026,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 252,
+        "outputTokens": 1325
+      }
+    },
+    {
+      "step": "image",
+      "target": "scrap-resource",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 15871,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "clean-water",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 17200,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "hazard-terrain",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 13213,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "extraction-point",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 15714,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "office-debris",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 12577,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-city-backdrop",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14330,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ceiling-lurker",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 19650,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 17037,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "extraction-point",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14135,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-city-backdrop",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 14029,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ceiling-lurker",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 16454,
+      "requestedSize": "aspect 4:5",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-city-backdrop",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 12168,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

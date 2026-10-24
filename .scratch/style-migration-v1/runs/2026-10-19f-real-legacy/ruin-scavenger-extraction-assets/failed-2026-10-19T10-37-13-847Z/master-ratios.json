@@ -1,0 +1,52 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 1,
+  "masters": [
+    {
+      "master": "master-scavenger-actor",
+      "requested": {
+        "w": 48,
+        "h": 64
+      },
+      "returned": {
+        "w": 864,
+        "h": 1184
+      },
+      "requestedRatio": 0.75,
+      "returnedRatio": 0.7297297297297297,
+      "ratioDelta": -0.027027027027027046,
+      "match": false
+    },
+    {
+      "master": "master-wasteland-enemy",
+      "requested": {
+        "w": 48,
+        "h": 48
+      },
+      "returned": {
+        "w": 1024,
+        "h": 1024
+      },
+      "requestedRatio": 1,
+      "returnedRatio": 1,
+      "ratioDelta": 0,
+      "match": true
+    },
+    {
+      "master": "master-ceiling-lurker",
+      "requested": {
+        "w": 48,
+        "h": 56
+      },
+      "returned": {
+        "w": 896,
+        "h": 1152
+      },
+      "requestedRatio": 0.8571428571428571,
+      "returnedRatio": 0.7777777777777778,
+      "ratioDelta": -0.09259259259259253,
+      "match": false
+    }
+  ]
+}

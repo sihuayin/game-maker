@@ -1,0 +1,141 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-pip",
+  "frame": "hud-pip",
+  "viewBox": [
+    0,
+    0,
+    12,
+    12
+  ],
+  "expectedSize": [
+    12,
+    12
+  ],
+  "ops": [
+    {
+      "op": "circle",
+      "fill": "palette:12",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "cx": 6,
+      "cy": 6,
+      "r": 4
+    },
+    {
+      "op": "circle",
+      "fill": "palette:14",
+      "cx": 6,
+      "cy": 6,
+      "r": 2
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 3,
+      "w": 2,
+      "h": 2,
+      "colors": [
+        "palette:15",
+        "palette:12"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 7,
+      "y": 3,
+      "w": 2,
+      "h": 2,
+      "colors": [
+        "palette:14",
+        "palette:12"
+      ],
+      "ratio": 0.4,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 7,
+      "w": 2,
+      "h": 2,
+      "colors": [
+        "palette:12",
+        "palette:10"
+      ],
+      "ratio": 0.6,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 7,
+      "y": 7,
+      "w": 2,
+      "h": 2,
+      "colors": [
+        "palette:10",
+        "palette:12"
+      ],
+      "ratio": 0.5,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "line",
+      "stroke": "palette:15",
+      "strokeWidth": 1,
+      "x1": 4,
+      "y1": 5,
+      "x2": 5,
+      "y2": 4
+    },
+    {
+      "op": "line",
+      "stroke": "palette:14",
+      "strokeWidth": 1,
+      "x1": 7,
+      "y1": 4,
+      "x2": 8,
+      "y2": 5
+    },
+    {
+      "op": "poly",
+      "fill": "palette:10",
+      "points": [
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          8
+        ]
+      ]
+    },
+    {
+      "op": "circle",
+      "fill": "palette:15",
+      "cx": 6,
+      "cy": 6,
+      "r": 1
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 4,
+      "w": 4,
+      "h": 4,
+      "colors": [
+        "palette:15",
+        "palette:14"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    }
+  ]
+}

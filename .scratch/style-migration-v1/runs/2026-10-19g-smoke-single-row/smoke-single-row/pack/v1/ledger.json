@@ -1,0 +1,26 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "smoke-single-row",
+  "packVersion": 1,
+  "createdAt": "2026-10-19T10:46:34.000Z",
+  "run": {
+    "wallClockMs": 21925,
+    "byStep": {
+      "image": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "image",
+      "target": "scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 17270,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

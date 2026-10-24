@@ -14,7 +14,7 @@ import {
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
   parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
   PLAYER_ACTION_NAMES,
-  RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, STRUCTURED_CALL_ATTEMPTS,
+  RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, EMPTY_INPUT_ATTEMPTS, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
   type AssetPackEntry, type AssetPackManifest, type AssetRecipe, type CallFailure, type CharacterDNAFile, type ConfigIssue, type GameConfig, type LayerCoverageEntry, type LedgerCall,
   type LedgerStep, type LedgerUsage, type MasterRatio, type StructuredSchema, type StyleSpec, type VisualWorldSpec,
@@ -31,6 +31,7 @@ import { ensureCharacterMasters } from "./planner-masters.js";
 import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
+import { DESPILL_THRESHOLDS, dominantOpaqueColor } from "./import.js";
 import { plannerCapabilitiesOf, resolveRoute, sourceForDecision, type ExistingAsset } from "./route.js";
 import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, designBrief, drawListFewShot, drawListOpsSpec, paletteLine, PLAN_TOOL_DESCRIPTION, PLAN_TOOL_NAME, recipeShapeSpec, SKELETON_SHAPE_HEADING, SKELETON_SHAPE_NOTE, styleBrief, tdConfigPrompt } from "./prompt.js";
 
@@ -272,6 +273,34 @@ export function designCoverageGate(recipe: AssetRecipe, design: GameDesignSpec):
     + "这一层没有「不需要资源」的豁免。请补齐后重出这份清单。";
 }
 
+/**
+ * **HUD ui 资源闸**（recipe-config-gap-v1 票 04）：platformer/v1 的 config **结构上必填** hud
+ *   （`game-config.ts:217` `hud: Hud` 无 `.optional()`），`hud.panel` / `hud.pip` 的 asset 都必须是
+ *   `kind:"ui"`（`game-config.ts:361-362`）。清单若没有这两类 ui 资源，config 那一步只能拿 sprite 顶，
+ *   必被「是 sprite，这里要的是 ui」拒收（付费重跑 5 条硬失败的 3 条就是这么来的）。
+ *
+ * ⚠️ **只当设计声明 `hud:screen-space` 时触发**（`runtimeRequirements` 含它）—— 设计没要 HUD 的清单
+ *   不硬塞 ui（config 结构上要 hud 与设计层「要不要 HUD」是两个事实，这里以设计为准）。
+ * ⚠️ 判据是**两类各 ≥1**：面板要 `ninePatch`（九宫格才允许「声明尺寸 ≠ 资源尺寸」、把面板拉到能装下
+ *   N 个 pip 槽；非九宫格时 `auditPanelSize` 要求两数相等、没法放大），pip 是固定尺寸图标、不要 `ninePatch`。
+ * ⚠️ 与覆盖闸 / 玩家闸**同一档**（`schema`、重采样）：缺了算「模型没生成好」，三发内可补。
+ */
+function hudUiGate(recipe: AssetRecipe, design: GameDesignSpec): string | null {
+  if (!design.runtimeRequirements.includes("hud:screen-space")) return null;
+  const uis = recipe.assets.flatMap((e) => (e.spec.kind === "ui" ? [e.spec] : []));
+  const panel = uis.filter((u) => u.ninePatch !== undefined);
+  const pip = uis.filter((u) => u.ninePatch === undefined);
+  const missing: string[] = [];
+  if (panel.length === 0)
+    missing.push("一件带 `ninePatch` 的 `ui` 面板（HUD 面板要能被拉到任意尺寸；非九宫格时「声明尺寸」必须等于资源尺寸、没法放大）");
+  if (pip.length === 0)
+    missing.push("一件不带 `ninePatch` 的 `ui` 图标（点亮 pip，固定尺寸、与资源尺寸一致）");
+  if (missing.length === 0) return null;
+  return "清单缺 HUD 用的 `ui` 资源（本代外壳有屏幕空间 HUD，`hud.panel` 与 `hud.pip` 的 asset 都必须 `kind:\"ui\"`）：\n"
+    + missing.map((m) => `  · ${m}`).join("\n")
+    + "\n⚠️ 缺它们，config 那一步只能拿 sprite 顶 HUD（会被「是 sprite，这里要的是 ui」拒收）。请补这两类 ui 资源后重出清单。";
+}
+
 /** 空色板的**同一句判据**（CAP-SPEC-17）：风格规格与 VWS 两条入口共用这一处。 */
 export function emptyPaletteProblem(palette: readonly string[], what: string): string | null {
   return palette.length === 0
@@ -349,7 +378,10 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
   const call = spentCall("plan-assets", "recipe");
   let checked: ReturnType<typeof parseRecipe> | null = null;
   let lastError = "";
-  for (let attempt = 0; attempt < STRUCTURED_CALL_ATTEMPTS; attempt++) {
+  // ⚠️ 票 13：`empty-input`（上游丢参、瞬态）单独 6 发；其余坏档（schema 等）维持 3 发。
+  let emptyInputs = 0;
+  let others = 0;
+  while (emptyInputs < EMPTY_INPUT_ATTEMPTS && others < STRUCTURED_CALL_ATTEMPTS) {
     const once = await onceThroughTool({
       transport: opts.transport, body, tool: PLAN_TOOL_NAME, schema: RecipeToolSchema,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
@@ -365,12 +397,14 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     if (once.kind === "bad") {
       call.trip({ failure: once.failure, spent: once.spent });
       lastError = once.detail;
+      if (once.failure === "empty-input") emptyInputs++; else others++;
       continue;
     }
     const truth = parseRecipe(once.result.value);
     if (!truth.ok) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = `清单不过契约：${truth.errors.slice(0, 4).join("；")}`;
+      others++;
       continue;
     }
     // ⚠️ **票 02（P0-06）：`frames` 候选不再被静默折叠成 `image`**（CAP-ASSET-01）。
@@ -399,6 +433,17 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     if (coverageError !== null) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = coverageError;
+      others++;
+      continue;
+    }
+    // ⚠️ **票 04（recipe-config-gap-v1）：HUD ui 资源闸** —— 与覆盖闸 / 玩家闸同一档（`schema`、重采样）。
+    //   设计声明 `hud:screen-space` 时，清单必须有带 ninePatch 的 ui 面板 + 不带 ninePatch 的 ui 图标；
+    //   否则 config 那一步只能拿 sprite 顶 HUD、必被拒。缺了算「模型没生成好」，三发内可补。
+    const hudErr = hudUiGate(truth.value, design);
+    if (hudErr !== null) {
+      call.trip({ failure: "schema", spent: once.spent });
+      lastError = hudErr;
+      others++;
       continue;
     }
     // ⚠️ **票 61：玩家那件资源的闸门**（紧挨 `parseRecipe`，理由见那个函数的头）。
@@ -409,6 +454,7 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     if (playerErr !== null) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = playerErr;
+      others++;
       continue;
     }
     call.trip({ spent: once.spent });
@@ -935,6 +981,26 @@ const DEFAULT_JUMP_SPAN = jumpSpan(DEFAULT_PLAYER_MOVE);   // ⚠️ 同高落�
  *    「人过目」）—— 而 **R9 把人工点收成了唯一一个、且在清单处**，config 那里**已经没有读者**了
  *    ⇒ 「坏配置比没配置更坏」（旧代码自己的注释）这一条终于说了算。
  */
+/**
+ * **确定性钳位**（recipe-config-gap-v1 票 13）：compile-runtime 的模型常把实体摆出界（底边超世界高、
+ * 右边超世界宽），而提示词再怎么写它也 3/3 照旧。这里**不靠模型自觉**，产出后把超界的实体**钳回世界内**
+ * （底边对齐世界底、右边对齐世界右），把「模型错」变成「构建期自动修正」。
+ *
+ * ⚠️ 只钳「底边 / 右边」这两条 —— `auditGameConfig` 的 `inWorld` 也只查这两条（`b.y+b.h > H`、`b.x+b.w > W`）。
+ * ⚠️ 与 `auditGameConfig` 的 `boxOf` 同一条公式（`entityBox` + 资源级 size/anchor，兜底 anchor `{0.5,1}`）。
+ */
+function clampToWorld(config: GameConfig, manifest: AssetPackManifest): void {
+  const { w: W, h: H } = config.world.size;
+  for (const e of config.entities) {
+    const asset = manifest.assets.find((a) => a.id === e.asset);
+    const size = e.body ?? asset?.size ?? { w: 1, h: 1 };
+    const anchor = asset?.anchor ?? { x: 0.5, y: 1 };
+    const box = entityBox(e.at, size, anchor);
+    if (box.y + box.h > H) e.at.y -= box.y + box.h - H;
+    if (box.x + box.w > W) e.at.x -= box.x + box.w - W;
+  }
+}
+
 export async function compileRuntime(opts: CompileRuntimeOptions): Promise<CommandResult> {
   const readJson = (p: string, what: string): unknown => {
     try { return JSON.parse(fs.readFileSync(p, "utf8")); }
@@ -994,11 +1060,17 @@ export async function compileRuntime(opts: CompileRuntimeOptions): Promise<Comma
 3. ⚠️ **\`at\` 是「资源锚点落在的那个点」，不是左上角。** 本包的锚点含义见下面每条清单。
    最要命的一条：**底边中心的资源（角色、道具、危险物），站在地面线上的写法是 \`at.y = 地面线的 y\`**，
    **不是** \`地面线 − 高\`。写成后者，整个世界的道具都会浮在半空。
+   ⚠️ **anchor 不是底边的资源**（清单里 \`锚点 {x, y}\` 的 \`y < 1\`）：站在地面线上时，\`at.y\` 要**往上挪**，
+   让盒子的**底边**落在/不超地面线 —— \`at.y = 地面线 − (1 − anchor.y) × 高\`。
+   例如锚点 y=0.3、高 40 的资源站在地面上，\`at.y = 地面线 − 28\`，**不是** \`地面线\`（否则底边会伸出地面线 28px、被判「落在世界之外」）。
 4. \`world.size.h\` **必须等于视口高 ${vp.h}**（这个游戏单屏高，只横向滚动；视口是 ${vp.w}×${vp.h}）。
    \`world.size.w\` 自己定（横向滚多远）。
 5. \`kind\` ∈ \`solid\` / \`pickup\` / \`hazard\` / \`goal\` / \`decor\`。
    **看得见的静态碰撞体（行李堆、台阶）写 \`solid\` 实体**；\`terrain\` 只放**看不见的**碰撞
    （地面线、关卡边界、隐形墙）。
+   ⚠️ **\`solid\` 实体只能引用 \`sprite\` 资源** —— **禁止拿玩家角色（animation）或任何动画资源当地形**
+   （校验器会拒「是 animation，这里要的是 sprite」）。清单里**没有** sprite 地形资源时，地面用
+   \`terrain\`（看不见的碰撞）搭，**不要硬造 solid 块**。⚠️ \`decor\`（纯装饰）可以是 sprite / animation / ui。
 6. \`objective\` **不带数量**：\`{"kind":"collect-then-reach","gate":"<某个 goal 实体的 id>"}\`。
    要捡几件由 \`kind:"pickup"\` 的实体条数**派生** —— 多写一个数就拒。
 7. \`gate\` 必须指向一个**真的存在**且 \`kind:"goal"\` 的实体；实体 id **不得重复**；**至少要有 1 个 pickup**。
@@ -1078,6 +1150,23 @@ ${SKELETON_SHAPE_NOTE}
       lastError = `配置不过契约：${truth.errors.slice(0, 4).join("；")}`;
       continue;
     }
+    // ⚠️ **recipe-config-gap-v1 票 13**：确定性钳位 —— 模型把实体摆出界是**系统性的**（提示词救不了），
+    //   这里把底边/右边超世界的实体钳回世界内，再交给下面的业务校验。
+    clampToWorld(truth.value, manifest);
+    // ⚠️ **recipe-config-gap-v1 票 10**：业务校验里「模型错」那一族（引用 + 自洽 + HUD 屏幕空间）
+    //   移进**重采样循环** —— 与 schema 失败同档，模型下一发可能写对。而「层盖不住世界」那一条
+    //   （由背景资源尺寸 + world.size 决定）**不**移进来，仍是确定性失败（见循环后那一段）。
+    const modelHard = [
+      ...auditGameConfig(truth.value, manifest),
+      ...auditScreenSpace(vp, gameHudScreenItems(truth.value, manifest,
+        { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
+    ].filter((i) => i.severity === "error");
+    if (modelHard.length > 0) {
+      call.trip({ spent: once.spent });
+      lastError = `配置过不了业务校验（模型错，${STRUCTURED_CALL_ATTEMPTS} 发重采样后仍没写对，最后一次）：\n` +
+        modelHard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n");
+      continue;
+    }
     call.trip({ spent: once.spent });
     checked = truth;
     break;
@@ -1086,19 +1175,12 @@ ${SKELETON_SHAPE_NOTE}
 
   const config = checked.value;
 
-  // ── ⚠️ **业务校验：确定性失败，不重采样、不落盘**（票 14 的 Q5 裁定）────────────
+  // ── ⚠️ **确定性校验：层覆盖，不重采样、不落盘**（票 65 提前到这里的「层盖不住世界」）────
   //
-  // ⚠️ 这里跑的是 `site` 要跑的同一批校验（**减去第四族里那些要世界描述的** —— 见下）。
-  //   **同一份实现，不抄第二份**。
-  // ⚠️ **「层盖不住世界」这一条 2026-10-13 从装配期提前到了这里**（票 65）：
-  //   第十五跑的段 B 花了 11 张图、跑完全链，最后**死在站点装配期**才发现世界宽 1440 而
-  //   两层不平铺的背景**盖不住**（各剩 384 / 96px）。⚠️ **它一分钱也省不下**（`config` 在
-  //   `pack` 之后，图已经买完）—— 提前的价值是**失败点前移**（从最后一步到第二段的第一步）、
-  //   **判据与真实渲染语义同源**、**失败账目分得开**（几何不成立 ⇒ `failures: []` · `attempts: 1`，
-  //   不像契约没过那样被记成 `schema`）。
-  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**
-  //   ⇒ 两侧不会再各说各话。⚠️ 而这一批里**只多这一条** —— 第四族另外那两条 coverage 判据
-  //   吃 `coverage.json` 的像素比例（那要 PNG 解码器），**仍然只有装配期能跑**。
+  //   ⚠️ 引用族 / 自洽族 / HUD 屏幕空间那几条「模型错」已经在**重采样循环里**判了（票 10）；
+  //   这里只剩「层盖不住世界」这一条**确定性**判据 —— 它由「背景资源尺寸 + world.size」决定，
+  //   **重抽 config 改不了**（config 在 pack 之后，图已经买完），所以仍不重采样、不落盘。
+  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**。
   const issues: ConfigIssue[] = [
     ...auditGameConfig(config, manifest),
     ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
@@ -1111,10 +1193,8 @@ ${SKELETON_SHAPE_NOTE}
     throw new CommandError("invalid",
       `编译出来的配置**过不了校验**（${hard.length} 条硬失败）：\n` +
       hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
-      "\n⚠️ **这不是模型没生成好** —— 一份过得了契约、过不了业务校验的配置，说明是**这份设计配这个包**" +
-      "做不出合法的关卡（引用解不到 / 东西摆在世界外 / HUD 跑出屏幕）⇒ **不重采样、也不落盘**：" +
-      "重抽一次改不了这些事实，而落一份坏配置比不落更坏。\n" +
-      "   要去的地方：设计层或资源清单（不是再抽一次）。",
+      "\n⚠️ **层盖不住世界是确定性的** —— 由背景资源尺寸 + world.size 决定，重抽 config 改不了，也不落盘。" +
+      "要去的地方：资源清单（换一个盖得住世界的背景），不是再抽一次 config。",
       ledgerCarrying(call.record()));
 
   const dir = path.join(opts.outRoot, manifest.id, "game-configs");
@@ -1907,11 +1987,32 @@ export type InspectData = {
 function sourceSizeObservations(packDir: string, m: AssetPackManifest): { lines: string[]; entries: SourceSizeEntry[] } {
   const entries: SourceSizeEntry[] = [];
   const ar = (s: { w: number; h: number }) => s.w / s.h;
-  const add = (id: string, unit: string, raw: string, target: { w: number; h: number }) => {
+  // ⚠️ **recipe-config-gap-v1 票 11**：动画片的「源图」是**固定 aspect 表**出的整片（如 16:9），
+  //   四周带背景留白 —— 拿整片 AR 比「N×W:H」会**虚高**（hero 片 8:3 被比成 +48.8%）。这里对动画片
+  //   裁到**前景墨迹包围盒**（离众数色 L1 > 30 的像素）再比，得到的是「实际画的内容」的 AR（≈ +24.9%）。
+  const contentSize = (img: { width: number; height: number; data: Buffer }, tolerance = 30): { w: number; h: number } => {
+    const bg = dominantOpaqueColor(img).color;
+    const t = DESPILL_THRESHOLDS;
+    const isBackground = (r: number, g: number, b: number) => {
+      const d = Math.abs(r - bg[0]) + Math.abs(g - bg[1]) + Math.abs(b - bg[2]);
+      if (d <= tolerance) return true;
+      return r > t.rMin && g < t.gMax && b > t.bMin && r - g > t.rgMin && b - g > t.bgMin;
+    };
+    let minX = img.width, minY = img.height, maxX = -1, maxY = -1;
+    for (let y = 0; y < img.height; y++) for (let x = 0; x < img.width; x++) {
+      const s = (y * img.width + x) * 4;
+      if (isBackground(img.data[s]!, img.data[s + 1]!, img.data[s + 2]!)) continue;
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+    }
+    return maxX < 0 ? { w: img.width, h: img.height } : { w: maxX - minX + 1, h: maxY - minY + 1 };
+  };
+  const add = (id: string, unit: string, raw: string, target: { w: number; h: number }, trim = false) => {
     const file = path.join(packDir, raw);
     if (!fs.existsSync(file)) return;
     const img = decodePNG(fs.readFileSync(file));
-    const source = { w: img.width, h: img.height, ar: img.width / img.height };
+    const s = trim ? contentSize(img) : { w: img.width, h: img.height };
+    const source = { w: s.w, h: s.h, ar: s.w / s.h };
     const t = { ...target, ar: ar(target) };
     entries.push({ id, unit, source, target: t, deltaAr: (t.ar / source.ar - 1) * 100 });
   };
@@ -1922,7 +2023,7 @@ function sourceSizeObservations(packDir: string, m: AssetPackManifest): { lines:
     if (a.kind === "animation" && a.animations) {
       for (const anim of a.animations) {
         const raw = find(`${a.id}.${anim.name}.png`);
-        if (raw !== undefined) add(a.id, anim.name, raw, { w: a.size.w * anim.frames.length, h: a.size.h });
+        if (raw !== undefined) add(a.id, anim.name, raw, { w: a.size.w * anim.frames.length, h: a.size.h }, true);
       }
     } else if (a.kind === "background" && a.layers) {
       for (const layer of a.layers) {

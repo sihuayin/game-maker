@@ -1,0 +1,142 @@
+{
+  "format": "assetpack/v4",
+  "id": "smoke-interactions",
+  "version": 1,
+  "createdAt": "2026-10-19T05:56:17.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 32,
+    "values": [
+      "#000000",
+      "#080000",
+      "#180000",
+      "#200000",
+      "#100700",
+      "#290705",
+      "#1a0d05",
+      "#380702",
+      "#210f03",
+      "#290d02",
+      "#420605",
+      "#310c00",
+      "#221205",
+      "#301100",
+      "#391404",
+      "#321905",
+      "#421600",
+      "#523730",
+      "#454a50",
+      "#794c35",
+      "#58554e",
+      "#685247",
+      "#786151",
+      "#676862",
+      "#74716c",
+      "#8e7161",
+      "#82847f",
+      "#a97f67",
+      "#a0827a",
+      "#a3a09b",
+      "#c89f8b",
+      "#d2a087"
+    ],
+    "coverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 96,
+        "h": 64
+      },
+      "frames": 1,
+      "assets": [
+        "office-debris"
+      ],
+      "checksum": "sha256:c946b80c8344d212faf3fe7f641471833b603b060bc21e6092be1f9ae0b5d96a"
+    }
+  ],
+  "assets": [
+    {
+      "id": "office-debris",
+      "kind": "sprite",
+      "role": "办公室房间里的桌椅、床架等散落家具",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "office-debris"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/office-debris.png",
+          "original": "生图"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/generated/office-debris.png",
+      "bytes": 1107329,
+      "checksum": "sha256:1d143d11f1f2eab73f6ff3ebd8a408d082f1075f4846085048d593d66a2fa5f8"
+    },
+    {
+      "path": "authoring/generated/office-debris.prompt.txt",
+      "bytes": 2153,
+      "checksum": "sha256:d44cbf7262dcb1f88e0dfe68411de592d72c4cc0e3abd55db833b4976ceef59b"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1835,
+      "checksum": "sha256:3e2f30955ab483891eb74eeaac437f637fd27e00438f5e9d8a86df3929c64ef4"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 110,
+      "checksum": "sha256:776a6b854cd6b494c27159753a1b0ddd75f2d86498913259990c273f220c2fdd"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 602,
+      "checksum": "sha256:d33aac68a78c781eaf4b2df4ca051c165641d32ecd80e93b35f961004b6eddb0"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 3136,
+      "checksum": "sha256:c946b80c8344d212faf3fe7f641471833b603b060bc21e6092be1f9ae0b5d96a"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 506,
+      "checksum": "sha256:654a96339881c8cdaf845b079cc3b6b632d922f55a545366d23e1dfcc9bfba9d"
+    }
+  ]
+}

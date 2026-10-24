@@ -1,0 +1,67 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruin-scavenger-style-probe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "authoring": [
+    {
+      "id": "master-probe-player",
+      "role": "玩家角色母版（拾荒者）—— C 阶段风格探针",
+      "description": "四头身偏瘦的拾荒者：左肩被鼓起的帆布背囊压低，右肩空荡；帽檐阴影盖住上半脸，眼睛是两点偏亮像素，嘴一条干裂短线；褪色旧外套袖子过长，肘部破洞露内衬，短裤膝盖有干泥与旧血迹，铁丝绑过的靴子；背囊侧袋塞满玻璃瓶与线缆卷，腰侧短柄撬棍，颈上脏布口罩；深色单像素描边，抖动上色，脏旧磨损。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-actor",
+      "size": {
+        "w": 48,
+        "h": 64
+      }
+    }
+  ],
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-actor",
+        "role": "玩家拾荒者，侧视四头身，背包与破旧外套构成不对称轮廓",
+        "description": "一名低饱和脏旧外套、短裤、靴子与背囊的拾荒者，身体前倾行走，轻微起伏；站立时略喘、奔跑时大步前倾、跳跃时收腿抬臂",
+        "styleId": "style-ref-clean",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 64
+        },
+        "required": true,
+        "characterId": "scavenger-actor",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 8,
+            "fps": 12,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ],
+        "masterAsset": "master-probe-player"
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

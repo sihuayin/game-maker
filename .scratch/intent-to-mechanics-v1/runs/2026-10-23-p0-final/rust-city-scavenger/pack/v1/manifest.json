@@ -1,0 +1,613 @@
+{
+  "format": "assetpack/v4",
+  "id": "rust-city-scavenger",
+  "version": 1,
+  "createdAt": "2026-10-23T09:38:03.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 16,
+    "values": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "coverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 7,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 48,
+        "h": 672
+      },
+      "frames": 14,
+      "assets": [
+        "scavenger-hero"
+      ],
+      "checksum": "sha256:3bdf74c0a474d045181c7e874b8b8a1c56ef9027977a48cb806d9875cbbf1982"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 640,
+        "h": 1200
+      },
+      "frames": 4,
+      "assets": [
+        "ruined-street-bg",
+        "ruined-street-fg"
+      ],
+      "checksum": "sha256:b30b0c7fc8791cd47f58e7eab7e71b971296d09c9a31e7d34e54708e222a1636"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 48,
+        "h": 88
+      },
+      "frames": 4,
+      "assets": [
+        "chest",
+        "enemy-wasteland",
+        "hazard-spike",
+        "resource-item"
+      ],
+      "checksum": "sha256:86ac376266fe974e13ff13a8be3e5b21c52b577509b286634fe2b3edb810d718"
+    }
+  ],
+  "assets": [
+    {
+      "id": "scavenger-hero",
+      "kind": "animation",
+      "role": "player-character",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scavenger-hero.idle1"
+        },
+        {
+          "name": "scavenger-hero.idle2"
+        },
+        {
+          "name": "scavenger-hero.idle3"
+        },
+        {
+          "name": "scavenger-hero.idle4"
+        },
+        {
+          "name": "scavenger-hero.run1"
+        },
+        {
+          "name": "scavenger-hero.run2"
+        },
+        {
+          "name": "scavenger-hero.run3"
+        },
+        {
+          "name": "scavenger-hero.run4"
+        },
+        {
+          "name": "scavenger-hero.run5"
+        },
+        {
+          "name": "scavenger-hero.run6"
+        },
+        {
+          "name": "scavenger-hero.jump1"
+        },
+        {
+          "name": "scavenger-hero.jump2"
+        },
+        {
+          "name": "scavenger-hero.jump3"
+        },
+        {
+          "name": "scavenger-hero.jump4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "scavenger-hero.idle1",
+            "scavenger-hero.idle2",
+            "scavenger-hero.idle3",
+            "scavenger-hero.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "scavenger-hero.run1",
+            "scavenger-hero.run2",
+            "scavenger-hero.run3",
+            "scavenger-hero.run4",
+            "scavenger-hero.run5",
+            "scavenger-hero.run6"
+          ],
+          "fps": 10,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "scavenger-hero.jump1",
+            "scavenger-hero.jump2",
+            "scavenger-hero.jump3",
+            "scavenger-hero.jump4"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "enemy-wasteland",
+      "kind": "sprite",
+      "role": "enemy",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "enemy-wasteland"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-wasteland.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "kind": "sprite",
+      "role": "interactable",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "hazard-spike",
+      "kind": "sprite",
+      "role": "hazard",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hazard-spike"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/hazard-spike.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "resource-item",
+      "kind": "sprite",
+      "role": "pickup",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.7
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "resource-item"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/resource-item.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "ruined-street-bg",
+      "kind": "background",
+      "role": "background",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 640,
+        "h": 360
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0
+        },
+        {
+          "name": "skyline",
+          "parallax": 0.3,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "midground",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "ruined-street-bg.sky"
+        },
+        {
+          "name": "ruined-street-bg.skyline"
+        },
+        {
+          "name": "ruined-street-bg.midground"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-street-bg.sky.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-street-bg.skyline.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-street-bg.midground.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "ruined-street-fg",
+      "kind": "background",
+      "role": "foreground-occlusion",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 640,
+        "h": 120
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      },
+      "layers": [
+        {
+          "name": "foreground",
+          "parallax": 1.4,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "ruined-street-fg.foreground"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-street-fg.foreground.png",
+          "original": "生图"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/generated/chest.png",
+      "bytes": 1341625,
+      "checksum": "sha256:70b1f26a6b6e65aa707f310dee1cf4c35952f0e158b0e6f1371e54ed7e2a81bd"
+    },
+    {
+      "path": "authoring/generated/chest.prompt.txt",
+      "bytes": 1951,
+      "checksum": "sha256:5b78ac492503a0ef2d3f8ba0b03ba601fb1954e490e75dd8b7f9c53dad8dd852"
+    },
+    {
+      "path": "authoring/generated/enemy-wasteland.png",
+      "bytes": 1216665,
+      "checksum": "sha256:66981e83df1a28ad8d0407f3ab5a02a1f701d4176955a96beb03bce34c3f9035"
+    },
+    {
+      "path": "authoring/generated/enemy-wasteland.prompt.txt",
+      "bytes": 1968,
+      "checksum": "sha256:55dae756dc1219c0d811f064b95a3a1a50cfa036f55c00327d104fa7d4549994"
+    },
+    {
+      "path": "authoring/generated/hazard-spike.png",
+      "bytes": 999545,
+      "checksum": "sha256:48200136a8f0d4387756fed7339e6445f60203e6feb0bfbad9990949a416fe4f"
+    },
+    {
+      "path": "authoring/generated/hazard-spike.prompt.txt",
+      "bytes": 1942,
+      "checksum": "sha256:b5183ffa923d2cc0081ec7ed0dd2db51492f9e0fd0d6d8670dac169495066f0b"
+    },
+    {
+      "path": "authoring/generated/resource-item.png",
+      "bytes": 914202,
+      "checksum": "sha256:636804907ef1f1ceff2a982981122f986b76748163ec5d7b9675e43c1cbf6424"
+    },
+    {
+      "path": "authoring/generated/resource-item.prompt.txt",
+      "bytes": 1949,
+      "checksum": "sha256:2d95f2e493d5f6375018297d62f8807d05e935588ef06298e851524557930885"
+    },
+    {
+      "path": "authoring/generated/ruined-street-bg.midground.png",
+      "bytes": 1014862,
+      "checksum": "sha256:4e45272431bcac6ae3280b8f89282551f149209ddc2e3d9b22c27ed5637ec8e8"
+    },
+    {
+      "path": "authoring/generated/ruined-street-bg.midground.prompt.txt",
+      "bytes": 1944,
+      "checksum": "sha256:6818b6b0d71a89cfe0b729d7267cf3f265edc215206a32cb249eb0bf842ad349"
+    },
+    {
+      "path": "authoring/generated/ruined-street-bg.sky.png",
+      "bytes": 695286,
+      "checksum": "sha256:e320d2b5924d6af3f7e918497dda8dd6590a2604f74b4cc40312721b961e4cda"
+    },
+    {
+      "path": "authoring/generated/ruined-street-bg.sky.prompt.txt",
+      "bytes": 2050,
+      "checksum": "sha256:756d9b2a291df8239c9ae17db1f9ae6be5656872eb3c8cf0df6c145599ff8546"
+    },
+    {
+      "path": "authoring/generated/ruined-street-bg.skyline.png",
+      "bytes": 1463903,
+      "checksum": "sha256:51e62d42906cbf05149e0ac0fc00807eb02185a0d6175fe55a85cfe664aebcc5"
+    },
+    {
+      "path": "authoring/generated/ruined-street-bg.skyline.prompt.txt",
+      "bytes": 1942,
+      "checksum": "sha256:a722385462d411a64dc2d128a673dfe65d7b1d7c2762d6a7a39eb56d1162e6e1"
+    },
+    {
+      "path": "authoring/generated/ruined-street-fg.foreground.png",
+      "bytes": 684442,
+      "checksum": "sha256:3c028512990f0ed3023e9abb80dd9f06ffa9dbeefe7a306b23001928f4e3f907"
+    },
+    {
+      "path": "authoring/generated/ruined-street-fg.foreground.prompt.txt",
+      "bytes": 2189,
+      "checksum": "sha256:f49521ce9491af562f2a0b78375d2102929bc2ab04c9e2e296246aae9fce01c2"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.idle.png",
+      "bytes": 1200849,
+      "checksum": "sha256:15f421ae1d7270c7a691f99b1e43f4121fd3f57accb1c529199253759d11777d"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.idle.prompt.txt",
+      "bytes": 5291,
+      "checksum": "sha256:df24076d78a96f550704b00bef57ffd434b3917a9898f7911b82983263585220"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.jump.png",
+      "bytes": 1156455,
+      "checksum": "sha256:44fed0f2cc682f58203a8551ec9bc4aadbf73236d1b0e282fd21e11546cb610f"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.jump.prompt.txt",
+      "bytes": 5291,
+      "checksum": "sha256:d51b8eab38c48062d42cc8055b6db127f825206e4b41f9ea6a457418f2193cb7"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.run.png",
+      "bytes": 1307186,
+      "checksum": "sha256:7ae5c28afca0e86735067951d0657ca02fbf490778c21d0219858899811f2ccf"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.run.prompt.txt",
+      "bytes": 5428,
+      "checksum": "sha256:b7645a5a512e667c9ec4c728c7e8530fc051feacb18effdc5d38563d75ce51dc"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.png",
+      "bytes": 935517,
+      "checksum": "sha256:3a806bcb252f7a4a96dce46df668baa32760a05b284beb1a8e896c93e7cba127"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.prompt.txt",
+      "bytes": 4980,
+      "checksum": "sha256:bf0f1bddc127bc6ac86ac55faf8ebe311da77b0923dbbd019b2de84168788f68"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.ratio.json",
+      "bytes": 398,
+      "checksum": "sha256:edfcc5332c7868c97894a9d4ad0458551b4ea404640a4b421ebf8382322530d3"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1808,
+      "checksum": "sha256:5219fe432bd58426a6a0ea2a70996dcddc0c6cb21537a2b94becf294303134fe"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 7062,
+      "checksum": "sha256:cf34eae1b0cdd3a90fac495ed4ad1fe417a5ff4b433efe6fdc061e992533c53e"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 804,
+      "checksum": "sha256:a37d8764034737cf6cd8ea24fa016c9fb3e5de6a447407ecc92b287b398da4f0"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5872,
+      "checksum": "sha256:04a83c2975e39093080ebf4ccd6bee58049deb2981a535911c27b430e348344b"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 14135,
+      "checksum": "sha256:3bdf74c0a474d045181c7e874b8b8a1c56ef9027977a48cb806d9875cbbf1982"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1876,
+      "checksum": "sha256:0a5917659b18d1fa7799ec806575bcaa864cedf4c403897d319ae6ff6292bd2e"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 70727,
+      "checksum": "sha256:b30b0c7fc8791cd47f58e7eab7e71b971296d09c9a31e7d34e54708e222a1636"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 1790,
+      "checksum": "sha256:878231badfa5c720776992de57fa8239649c5ece0543a17ee1bfce050c9071e0"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 2927,
+      "checksum": "sha256:86ac376266fe974e13ff13a8be3e5b21c52b577509b286634fe2b3edb810d718"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 3114,
+      "checksum": "sha256:94d0fbc23ee49c7c885c38501d36ee7c952782a33cade016e3100e4a7477151d"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 398,
+      "checksum": "sha256:edfcc5332c7868c97894a9d4ad0458551b4ea404640a4b421ebf8382322530d3"
+    }
+  ]
+}

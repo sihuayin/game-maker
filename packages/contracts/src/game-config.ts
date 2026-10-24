@@ -47,7 +47,7 @@ export const Rect = z.object({ x: Coord, y: Coord, w: z.number().int().positive(
  * ⚠️ 与 [[地形]] 的分工：**看不见的碰撞进 `terrain`，看得见的进 `entities`**。
  * 所以一块看得见的静态碰撞体（一摞行李、一段台阶）是 `solid`，**只写一次**。
  */
-export const EntityKind = z.enum(["solid", "pickup", "hazard", "goal", "decor"]);
+export const EntityKind = z.enum(["solid", "pickup", "hazard", "goal", "chest", "danger", "decor"]);
 
 /**
  * 实体怎么动。**它与 `kind` 正交** —— `kind` 说**碰到会怎样**，`motion` 说**它怎么动**。
@@ -62,6 +62,21 @@ export const Motion = z.object({
   /** 单程行程（像素）。从 `at` 起沿 `axis` 走这么远，然后折回，周期 `periodMs`。 */
   distance: z.number().int().positive(),
   periodMs: z.number().int().positive(),
+}).strict();
+
+/**
+ * `danger` 的定时打击（票 05 / 14）—— **激活周期**，不是位置周期。
+ *
+ * ⚠️ 与 [[Motion]] 正交：`Motion` 说「它**怎么动**」（位置周期），`strike` 说「它**何时喷发**」
+ *   （idle ↔ active 状态周期）。danger 是**静止区 + 激活周期**；将来若要「移动的定时打击」，
+ *   再把两者组合（本票不做）。打击区 = 实体盒子（`body` / asset size）。
+ * ⚠️ `periodMs` 是**安全窗口时长**（两次喷发之间的间隔），`activeMs` 是**喷发时长**；
+ *   完整周期 = `periodMs + activeMs`，喷发落在周期的**最后** `activeMs`（t=0 从 idle 开始，
+ *   给玩家一个安全窗口）。「规避」= 掐在 idle 窗口穿过。
+ */
+export const Strike = z.object({
+  periodMs: z.number().int().positive(),
+  activeMs: z.number().int().positive(),
 }).strict();
 
 /**
@@ -80,6 +95,10 @@ export const Entity = z.object({
   anim: z.string().min(1).optional(),
   body: Size.optional(),
   motion: Motion.optional(),
+  /** `kind:"chest"` 的交互外扩（像素）—— 交互区 = 实体盒子外扩 `range`；缺省 0 = 就用盒子本身。 */
+  range: z.number().int().nonnegative().optional(),
+  /** `kind:"danger"` 的定时打击参数。danger **必须**带（见 superRefine）。 */
+  strike: Strike.optional(),
 }).strict();
 
 /**
@@ -202,6 +221,10 @@ export const GameConfigSchema = z.object({
   for (const e of c.entities) {
     if (seen.has(e.id)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `实体 id 重复："${e.id}"`, path: ["entities"] });
     seen.add(e.id);
+    // ⚠️ danger 没有 strike = 永不喷发，`avoid-danger` 名存实亡（票 14）。这是**结构不变量**，
+    //   不该留到 audit 阶段再发现 —— parse 时就得拦。
+    if (e.kind === "danger" && !e.strike)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `danger 实体 "${e.id}" 缺 strike（定时打击参数）`, path: ["entities"] });
   }
 });
 
@@ -209,11 +232,15 @@ export type GameConfig = z.infer<typeof GameConfigSchema>;
 export type GameEntity = z.infer<typeof Entity>;
 export type EntityKind = z.infer<typeof EntityKind>;
 export type Motion = z.infer<typeof Motion>;
+export type Strike = z.infer<typeof Strike>;
 export type Hud = z.infer<typeof Hud>;
 export type Objective = z.infer<typeof Objective>;
 
-/** 「要捡几件」= `kind:"pickup"` 的实体条数。**不重复声明**（票 09 裁决 8）。 */
-export const pickupCount = (c: GameConfig): number => c.entities.filter((e) => e.kind === "pickup").length;
+/** 「要捡/开的件数」= `kind:"pickup"` + `kind:"chest"` 的实体条数。**不重复声明**（票 09 裁决 8）。
+ *  ⚠️ 票 04/13：宝箱是「有 open 状态、近距触发、一次性」的加强版 pickup —— 奖励并入同一条
+ *   collect-then-reach 计数，不另造奖励系统。所以「捡齐」这个数要数到 chest。 */
+export const pickupCount = (c: GameConfig): number =>
+  c.entities.filter((e) => e.kind === "pickup" || e.kind === "chest").length;
 
 /** 玩家实际生效的手感参数 —— 只此一处回落到默认值，校验与外壳共用。 */
 export const playerMoveOf = (c: GameConfig) => c.player.move ?? DEFAULT_PLAYER_MOVE;
@@ -330,7 +357,13 @@ export function auditReferences(config: GameConfig, manifest: AssetPackManifest)
       );
     }
   }
-  for (const e of config.entities) ref(`entity "${e.id}"`, { asset: e.asset, ...(e.anim ? { anim: e.anim } : {}) });
+  // ⚠️ **recipe-config-gap-v1 票 05**：`solid` 是**可见的静态碰撞体**（地形块/台阶），只能引用 `sprite` ——
+  //   加 kind 锁把「拿玩家动画当地形」从「多动画缺 anim」这种间接失败变成「是 animation，这里要的是 sprite」
+  //   的**构建期 kind 拒绝**（与 player/hud 同口径）。⚠️ `decor` **不加锁**：它是纯装饰，动画（吊着的
+  //   lurker）与 ui（血条图标）都是合法引用（v7 真配置就这么用）。
+  for (const e of config.entities)
+    ref(`entity "${e.id}"`, { asset: e.asset, ...(e.anim ? { anim: e.anim } : {}) },
+      e.kind === "solid" ? ["sprite"] : undefined);
   ref("hud.panel", { asset: config.hud.panel.asset }, ["ui"]);
   ref("hud.pip", { asset: config.hud.pip.asset }, ["ui"]);
 
@@ -339,7 +372,7 @@ export function auditReferences(config: GameConfig, manifest: AssetPackManifest)
   if (!gate) err("objective.gate", `找不到 id 为 "${config.objective.gate}" 的 goal 实体（现有 goal：${gates.map((e) => e.id).join(", ") || "无"}）`);
 
   if (pickupCount(config) === 0)
-    err("entities", "一个 pickup 都没有 —— 而 objective 是「捡齐 N 件再到达终点」，N = 0 让这一关没有内容");
+    err("entities", "一个 pickup 或 chest 都没有 —— 而 objective 是「捡齐 N 件再到达终点」，N = 0 让这一关没有内容");
 
   return out;
 }

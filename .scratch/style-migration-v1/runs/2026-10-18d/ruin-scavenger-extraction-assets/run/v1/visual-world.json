@@ -1,0 +1,223 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "低分辨率像素画",
+      "精细抖动上色",
+      "废墟写实",
+      "后启示录",
+      "脏污材质",
+      "侧视2D"
+    ],
+    "description": "低分辨率像素画，但细节层级高：每个物件用有限调色板通过抖动与描边塑造体积，表面布满划痕、锈斑、积尘与污渍。题材为废弃城市/设施的后启示录拾荒，材质以混凝土、镀锌铁皮、旧木、玻璃瓷砖为主，光照为均匀的环境漫射，靠暗色轮廓与内阴影区分前后。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "正交侧视",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "无透视，平视横版卷轴"
+  },
+  "composition": {
+    "foreground": "偶发的近景剪影（碎墙、杂草、栏杆）用于遮挡与纵深",
+    "midground": "可通行地面、平台、管道、箱柜与障碍物，玩家在此层活动",
+    "background": "远处的废墟天际线、断墙与雾霭，低对比度压暗",
+    "objectScale": "道具与角色比例一致，家具与管道贴近真人尺度",
+    "characterScale": "角色约两格高，占屏高比例小，环境主导画面",
+    "density": "中等偏密，地面与墙面上散布小件杂物与碎屑"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1",
+      "palette:2"
+    ],
+    "secondary": [
+      "palette:3",
+      "palette:4",
+      "palette:5"
+    ],
+    "accent": [
+      "palette:6",
+      "palette:7",
+      "palette:8"
+    ],
+    "background": [
+      "palette:9",
+      "palette:10",
+      "palette:11"
+    ],
+    "shadow": [
+      "palette:12",
+      "palette:13"
+    ],
+    "highlight": [
+      "palette:14",
+      "palette:15"
+    ]
+  },
+  "lighting": {
+    "direction": "顶部偏左的柔和环境光",
+    "softness": "硬边像素阴影与单像素过渡并存",
+    "contrast": "中低对比，暗部保留细节不压死",
+    "mood": "灰暗、潮湿、破败而安静"
+  },
+  "materials": {
+    "concrete": {
+      "appearance": "粗糙水泥与抹灰墙面，带裂缝与脱落",
+      "texture": "颗粒抖动与细裂纹",
+      "color": [
+        "palette:0",
+        "palette:1"
+      ]
+    },
+    "rustedMetal": {
+      "appearance": "镀锌板、锈蚀钢架与通风口",
+      "texture": "竖向锈痕与铆钉点",
+      "color": [
+        "palette:3",
+        "palette:13"
+      ]
+    },
+    "oldWood": {
+      "appearance": "旧木家具与木箱，边角磨损",
+      "texture": "木纹横线与缺口",
+      "color": [
+        "palette:5",
+        "palette:4"
+      ]
+    },
+    "tileGlass": {
+      "appearance": "脏污的瓷砖地面与碎裂玻璃",
+      "texture": "网格缝与污渍斑点",
+      "color": [
+        "palette:2",
+        "palette:14"
+      ]
+    },
+    "bloodDirt": {
+      "appearance": "干涸血迹、泥尘与碎屑堆",
+      "texture": "不规则飞溅与斑驳",
+      "color": [
+        "palette:7",
+        "palette:8"
+      ]
+    },
+    "fabricSkin": {
+      "appearance": "角色衣物布料与裸露皮肤",
+      "texture": "褶皱阴影与柔和渐变",
+      "color": [
+        "palette:6",
+        "palette:15"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "约四头身，头部略大，四肢细长",
+    "silhouette": "背包与外套形成不对称轮廓，步态清晰",
+    "poseLanguage": "连续行走帧，身体前倾，轻微起伏",
+    "clothing": "脏旧外套、短裤、靴子与背囊，颜色低饱和",
+    "faceAbstraction": "极小像素面部，仅以数点表示眼与阴影"
+  },
+  "environment": {
+    "architecture": "混凝土台阶、金属平台、栏杆与通风管道构成的废墟通道",
+    "terrain": "破碎瓷砖与水泥地面，夹杂裂缝、碎石与血污",
+    "props": "床架、办公桌椅、木箱、管道、通风口、碎裂杂物",
+    "textureDensity": "高密度小细节，每格都布满磨损与污点"
+  },
+  "shapeLanguage": [
+    "矩形与直线的机械感结构",
+    "单像素轮廓勾边",
+    "方形与圆角混合的小道具",
+    "破损边缘与缺角打破规整"
+  ],
+  "constraints": [
+    "所有物体必须带可见磨损、污渍或锈迹，不得呈现崭新状态",
+    "轮廓使用比填充色更深的单像素描边，保证与背景分离",
+    "同一物体最多 3–4 级明暗，以抖动过渡而非渐变",
+    "保留暖色重音（皮肤、旧木、锈、干血）用于角色与关键道具",
+    "背景层必须整体降低饱和度与对比度以退后",
+    "地形边缘与平台需有明确的站立面与危险面视觉区分"
+  ],
+  "styleReferences": [
+    {
+      "path": "style-ref-clean.png"
+    }
+  ],
+  "style": {
+    "id": "style-ref-clean",
+    "identity": [
+      "低分辨率像素画，但细节层级高",
+      "抖动上色，有限调色板",
+      "废墟写实后启示录",
+      "脏污与磨损材质"
+    ],
+    "camera": {
+      "mode": "正交2D横版侧视",
+      "angle": "平视",
+      "perspective": "无透视"
+    },
+    "composition": {
+      "layout": "横向卷轴，玩家偏左，右侧为探索方向",
+      "layers": "远景废墟—中景地形道具—近景遮挡",
+      "scale": "角色小而环境大"
+    },
+    "palette": [
+      "#3a3f2e",
+      "#4b4a3c",
+      "#6b6a5c",
+      "#8c8d85",
+      "#b5b5ad",
+      "#5a4a33",
+      "#7a6a4a",
+      "#8f3a2e",
+      "#5e2a24",
+      "#2b2d2a",
+      "#40453a",
+      "#5a5f57",
+      "#1e1f1d",
+      "#2f3a3a",
+      "#d6d6cc",
+      "#c49a7a"
+    ],
+    "lighting": {
+      "direction": "顶光偏左",
+      "contrast": "中低",
+      "mood": "阴冷破败",
+      "softness": "硬边像素阴影"
+    },
+    "shapeLanguage": [
+      "矩形结构",
+      "单像素描边",
+      "破损缺角",
+      "方形小道具"
+    ],
+    "material": [
+      "混凝土",
+      "锈蚀镀锌铁",
+      "旧木",
+      "脏瓷砖与玻璃",
+      "干血与泥尘"
+    ],
+    "environment": [
+      "混凝土台阶与平台",
+      "金属栏杆与格栅",
+      "通风管道",
+      "废弃家具与木箱",
+      "裂缝碎石地面"
+    ],
+    "characterStyle": [
+      "四头身小人",
+      "行走循环帧",
+      "背包剪影",
+      "低饱和衣物"
+    ],
+    "constraints": [
+      "必须带污渍与磨损",
+      "深色单像素描边",
+      "抖动而非渐变",
+      "暖色重音用于角色与关键道具"
+    ],
+    "confidence": 0.86
+  }
+}

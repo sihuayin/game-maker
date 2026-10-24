@@ -17,7 +17,7 @@ import path from "node:path";
 import {
   carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
   parseGameConfig, parseRecipe, QA_JUDGEMENTS, QAReportSchema, qaVerdict,
-  RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
+  buildMechanicCoverage, mechanicCoverageProblem, RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
   type CommandResult, type GameIntentSpec, type LedgerCall, type MasterRatio, type Observation,
   type QAReport, type QaRunner, type RunLedger, type RuntimeProfileRef, type VisualWorldSpec,
@@ -619,6 +619,14 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     const qaReportPath = path.join(runDir, RUN_ARTIFACT.qaReport);
     writeJson(qaReportPath, qa);
     assertQaPassed(qa, rel(input.outRoot, qaReportPath));
+
+    // ── 机制覆盖门禁（票 08）：六判据是**产物级**，这一条是**机制级**端到端能力 ——
+    //   每条设计声明要做的机制，设计/运行时/QA 三层缺一即拒（FR-07 末：单条失败不被总体掩盖）。
+    //   ⚠️ 接在 `assertQaPassed` 之后：六判据先放行，再查「机制齐不齐」。
+    const coverage = buildMechanicCoverage(designParsed.data);
+    const coverageProblem = mechanicCoverageProblem(coverage);
+    if (coverageProblem !== undefined)
+      throw new CommandError("invalid", coverageProblem);
   }
 
   // ⚠️ **链级并集**（Q14）：理解段那几发 ∪ 这一次构建的（包 + 配置）。

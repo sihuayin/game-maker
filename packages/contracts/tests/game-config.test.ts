@@ -112,6 +112,12 @@ describe("形状：一份真配置能过，逃生舱全被堵死", () => {
     expect(maxJumpHeight(DEFAULT_PLAYER_MOVE)).toBeCloseTo(60.5, 1);
   });
 
+  it("票 13：`pickupCount` 数 pickup **和** chest（宝箱是「加强版 pickup」）", () => {
+    const c = base();
+    c.entities.push({ id: "chest-1", kind: "chest", at: { x: 600, y: 240 }, asset: "pickup-suitcase", range: 12 });
+    expect(pickupCount(c)).toBe(4);
+  });
+
   it("⚠️ 票 21：`jumpSpan` 是**一次跳跃的水平跨度** —— 同高 66px，落点越低越远（同一条抛物线）", () => {
     // 滞空 `2v/g` = 2×330÷900 = 0.7333s ⇒ 90 × 0.7333 = 66px。
     expect(jumpSpan(DEFAULT_PLAYER_MOVE)).toBeCloseTo(66, 1);
@@ -147,16 +153,43 @@ describe("引用族（硬失败）", () => {
     expect(errs(c2).map((i) => i.message).join()).toMatch(/是 animation，这里要的是 ui/);
   });
 
+  it("recipe-config-gap-v1 票 05：solid 实体只能引用 sprite —— 拿玩家动画当地形被拒", () => {
+    const c = base();
+    c.entities.push({ id: "block-1", kind: "solid", at: { x: 200, y: 220 }, asset: "player-traveler" });
+    expect(errs(c).map((i) => i.message).join()).toMatch(/是 animation，这里要的是 sprite/);
+  });
+
+  it("recipe-config-gap-v1 票 05：decor 不加锁 —— 动画装饰（lurker 类）仍是合法引用", () => {
+    const c = base();
+    c.entities.push({ id: "d-anim", kind: "decor", at: { x: 200, y: 220 }, asset: "hazard-sweeping-carriage", anim: "sweep" });
+    expect(errs(c).map((i) => i.message).join()).not.toMatch(/这里要的是 sprite/);
+  });
+
   it("**动作名逐个解** —— 一个把走路叫 `walk` 的包在构建期就被挡住，而不是运行时静默用错", () => {
     const c = base();
     c.player = { ...c.player, anims: { ...c.player.anims, run: "walk" } };
     expect(errs(c).map(line).join()).toMatch(/player\.anims\.run/);
   });
 
-  it("一个 pickup 都没有 → 目标「捡齐 N 件」就没有内容", () => {
+  it("一个 pickup / chest 都没有 → 目标「捡齐 N 件」就没有内容", () => {
     const c = base();
     c.entities = c.entities.filter((e) => e.kind !== "pickup");
-    expect(errs(c).map((i) => i.message).join()).toMatch(/一个 pickup 都没有/);
+    expect(errs(c).map((i) => i.message).join()).toMatch(/一个 pickup 或 chest 都没有/);
+  });
+
+  it("票 14：`danger` 缺 `strike` 被拒（结构不变量，parse 时就拦）", () => {
+    const c = base();
+    c.entities.push({ id: "danger-1", kind: "danger", at: { x: 600, y: 240 }, asset: "pickup-suitcase" });
+    const r = GameConfigSchema.safeParse(c);
+    expect(r.success).toBe(false);
+    if (!r.success) expect(r.error.issues.map((i) => i.message).join()).toMatch(/缺 strike/);
+  });
+
+  it("票 13/14：`chest`（带 range）与 `danger`（带 strike）都能过 schema", () => {
+    const c = base();
+    c.entities.push({ id: "chest-1", kind: "chest", at: { x: 600, y: 240 }, asset: "pickup-suitcase", range: 12 });
+    c.entities.push({ id: "danger-1", kind: "danger", at: { x: 650, y: 240 }, asset: "pickup-suitcase", strike: { periodMs: 2000, activeMs: 500 } });
+    expect(GameConfigSchema.safeParse(c).success).toBe(true);
   });
 });
 

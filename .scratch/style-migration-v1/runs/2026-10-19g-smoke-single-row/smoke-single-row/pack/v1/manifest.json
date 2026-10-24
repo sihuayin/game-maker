@@ -1,0 +1,180 @@
+{
+  "format": "assetpack/v4",
+  "id": "smoke-single-row",
+  "version": 1,
+  "createdAt": "2026-10-19T10:46:34.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 32,
+    "values": [
+      "#000000",
+      "#080000",
+      "#180000",
+      "#200000",
+      "#100700",
+      "#290705",
+      "#1a0d05",
+      "#380702",
+      "#210f03",
+      "#290d02",
+      "#420605",
+      "#310c00",
+      "#221205",
+      "#301100",
+      "#391404",
+      "#321905",
+      "#421600",
+      "#523730",
+      "#454a50",
+      "#794c35",
+      "#58554e",
+      "#685247",
+      "#786151",
+      "#676862",
+      "#74716c",
+      "#8e7161",
+      "#82847f",
+      "#a97f67",
+      "#a0827a",
+      "#a3a09b",
+      "#c89f8b",
+      "#d2a087"
+    ],
+    "coverage": {
+      "exact": 0,
+      "composited": 0,
+      "quantized": 1,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 48,
+        "h": 512
+      },
+      "frames": 8,
+      "assets": [
+        "scavenger-actor"
+      ],
+      "checksum": "sha256:b031ee7e9e4ef4cbce4a1d93a64d66e138bae2cea58c9203cfbf8995ba7f8c75"
+    }
+  ],
+  "assets": [
+    {
+      "id": "scavenger-actor",
+      "kind": "animation",
+      "role": "玩家拾荒者，侧视四头身，背包与破旧外套构成不对称轮廓",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scavenger-actor.run1"
+        },
+        {
+          "name": "scavenger-actor.run2"
+        },
+        {
+          "name": "scavenger-actor.run3"
+        },
+        {
+          "name": "scavenger-actor.run4"
+        },
+        {
+          "name": "scavenger-actor.run5"
+        },
+        {
+          "name": "scavenger-actor.run6"
+        },
+        {
+          "name": "scavenger-actor.run7"
+        },
+        {
+          "name": "scavenger-actor.run8"
+        }
+      ],
+      "animations": [
+        {
+          "name": "run",
+          "frames": [
+            "scavenger-actor.run1",
+            "scavenger-actor.run2",
+            "scavenger-actor.run3",
+            "scavenger-actor.run4",
+            "scavenger-actor.run5",
+            "scavenger-actor.run6",
+            "scavenger-actor.run7",
+            "scavenger-actor.run8"
+          ],
+          "fps": 12,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run.png",
+          "original": "生图"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/generated/scavenger-actor.run.png",
+      "bytes": 1057953,
+      "checksum": "sha256:a420b6c96e4266789f7a7fa560bcf9dadf9414da49cda1223f82368269eba236"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run.prompt.txt",
+      "bytes": 3238,
+      "checksum": "sha256:1e38758626a9a5bc72b27a1cde516503191966561c6e2e90d724c5fe964b7b46"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1835,
+      "checksum": "sha256:3e2f30955ab483891eb74eeaac437f637fd27e00438f5e9d8a86df3929c64ef4"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 108,
+      "checksum": "sha256:780ea3764265f00ed6492bd2c78d873b4b172c769fc7531db6f2f7bdc61a4172"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 3433,
+      "checksum": "sha256:447a448273801173f835e6b7c2fe9307c154bc5550baa46052368238594ad957"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 9191,
+      "checksum": "sha256:b031ee7e9e4ef4cbce4a1d93a64d66e138bae2cea58c9203cfbf8995ba7f8c75"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 507,
+      "checksum": "sha256:e31a4ee839f0fe114378567b84a4ba718af53c35524db4a5463194312cd1e241"
+    }
+  ]
+}

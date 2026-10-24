@@ -117,7 +117,7 @@ describe("编译：一次调用 → 一份落盘的配置", () => {
   });
 });
 
-describe("⚠️ **业务校验不过 ⇒ 抛、且不落盘**（票 14 的 Q5 裁定：那是**确定性**失败，不是模型没生成好）", () => {
+describe("⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档）", () => {
   it("引用了包里没有的资源 → `invalid`，而且**一个字节都没落**", async () => {
     const d = tmp();
     const bad = structuredClone(GOOD);
@@ -131,12 +131,12 @@ describe("⚠️ **业务校验不过 ⇒ 抛、且不落盘**（票 14 的 Q5 �
     expect(fs.existsSync(path.join(d, "out")), "坏配置比没配置更坏").toBe(false);
   });
 
-  it("消息要点出「**这不是模型没生成好**」—— 两类失败必须分得开", async () => {
+  it("消息要点出「**模型错、重采样后仍没写对**」—— 与「层覆盖是确定性的」分得开", async () => {
     const d = tmp();
     const bad = structuredClone(GOOD);
     (bad.entities as Record<string, unknown>[])[0]!.asset = "__没有这个__";
     const e = await run(d, bad).catch((x: unknown) => x);
-    expect((e as CommandError).message).toMatch(/不是模型没生成好/);
+    expect((e as CommandError).message).toMatch(/模型错/);
   });
 
   it("**模型拿世界坐标写 HUD** → 抓出来（世界宽 1440，屏幕只有 480）—— 它最容易犯的错", async () => {
@@ -155,6 +155,16 @@ describe("⚠️ **业务校验不过 ⇒ 抛、且不落盘**（票 14 的 Q5 �
     const r = await run(d, bad); // 过得了 ⇒ 它会成功落盘
     expect(r.data.ok).toBe(true);
   });
+
+  it("recipe-config-gap-v1 票 13：实体底边摆出界 ⇒ 确定性钳回世界内、照常出包", async () => {
+    const d = tmp();
+    const bad = structuredClone(GOOD);
+    (bad.entities as Record<string, unknown>[])[0]!.at = { x: 300, y: 290 };
+    const r = await run(d, bad);
+    expect(r.data.ok).toBe(true);
+    const written = JSON.parse(fs.readFileSync(fileOf(d), "utf8"));
+    expect(written.entities[0].at.y).toBeLessThan(290);
+  });
 });
 
 describe("失败的路", () => {
@@ -168,14 +178,35 @@ describe("失败的路", () => {
     expect(ledger[0]!.failures).toEqual(Array(STRUCTURED_CALL_ATTEMPTS).fill("schema"));
   });
 
-  it("⚠️ 而**业务校验不过只试一次** —— 那不是重采样能救的事（账上就一趟往返）", async () => {
+  it("⚠️ **模型错（引用/自洽/HUD）才重采样**：引用解不到 ⇒ 三发重采样，账上三趟都记着（票 10）", async () => {
     const d = tmp();
     const bad = structuredClone(GOOD);
     (bad.entities as Record<string, unknown>[])[0]!.asset = "__没有这个__";
     const e = await run(d, bad).catch((x: unknown) => x);
     const ledger = (e as CommandError).ledger as { attempts: number; failures?: string[] }[];
-    expect(ledger[0]!.attempts, "只发了一趟").toBe(1);
-    expect(ledger[0]!.failures, "而这一趟是**成功**的（入参过完了契约）").toBeUndefined();
+    expect(ledger[0]!.attempts, "模型错重采样三发").toBe(STRUCTURED_CALL_ATTEMPTS);
+    expect(ledger[0]!.failures, "而每一趟都是**成功**的（入参过完了契约）").toBeUndefined();
+  });
+
+  it("模型错**第一发、第二发写对** ⇒ `attempts: 2`、出包（票 10 的重采样收口）", async () => {
+    const d = tmp();
+    const bad = structuredClone(GOOD);
+    (bad.entities as Record<string, unknown>[])[0]!.asset = "__没有这个__";
+    let n = 0;
+    const fetchImpl = (async () => {
+      const input = n++ === 0 ? bad : GOOD;
+      return new Response(JSON.stringify({
+        content: [{ type: "tool_use", name: "emit_game_config", input }],
+        stop_reason: "tool_use", model: "deepseek-flash", usage: { output_tokens: 1500 },
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }) as unknown as typeof fetch;
+    const r = await compileRuntime({
+      designPath: path.join(d, "game-design.json"), packDir: PACK, outRoot: path.join(d, "out"),
+      transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl,
+    });
+    const ledger = r.data.ledger as { attempts: number }[];
+    expect(ledger[0]!.attempts).toBe(2);
+    expect(fs.existsSync(fileOf(d))).toBe(true);
   });
 
   it("没有文本上游 → upstream", async () => {

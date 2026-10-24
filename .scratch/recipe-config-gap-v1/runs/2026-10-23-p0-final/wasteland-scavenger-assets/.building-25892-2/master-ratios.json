@@ -1,0 +1,37 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 2,
+  "masters": [
+    {
+      "master": "hero-master",
+      "requested": {
+        "w": 32,
+        "h": 48
+      },
+      "returned": {
+        "w": 848,
+        "h": 1264
+      },
+      "requestedRatio": 0.6666666666666666,
+      "returnedRatio": 0.6708860759493671,
+      "ratioDelta": 0.006329113924050722,
+      "match": false
+    },
+    {
+      "master": "enemy-scavenger-master",
+      "requested": {
+        "w": 32,
+        "h": 40
+      },
+      "returned": {
+        "w": 928,
+        "h": 1152
+      },
+      "requestedRatio": 0.8,
+      "returnedRatio": 0.8055555555555556,
+      "ratioDelta": 0.00694444444444442,
+      "match": false
+    }
+  ]
+}

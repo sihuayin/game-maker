@@ -1,0 +1,354 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-recipe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "玩家角色拾荒者",
+        "description": "含背包与工具的拾荒者小人，头身比约1:3，破旧斗篷/背心配护目镜与工具带，四肢粗短，像素轮廓可辨识",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "scavenger-hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "wasteland-enemy",
+        "role": "巡逻敌人",
+        "description": "废土巡逻敌人，警觉逼近的敌对单位，锈蚀金属质感，像素小人，动作帧清晰",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "size": {
+          "w": 32,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "wasteland-enemy",
+        "masterAsset": "wasteland-enemy-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest",
+        "role": "宝箱可交互物",
+        "description": "老旧带污渍可打开的宝箱，略小于角色，深褐色木箱配锈蚀金属包边",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.8
+        },
+        "size": {
+          "w": 24,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-pickup",
+        "role": "资源罐可拾取物",
+        "description": "可拾取的资源罐，带高饱和警示色的补给罐，略小于角色",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.8
+        },
+        "size": {
+          "w": 12,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-wire",
+        "role": "危险机关带电裸线",
+        "description": "生锈管道上带电的裸露线缆，接触即受伤，带高饱和警示色闪光",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 24,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-tile",
+        "role": "可平铺地面砖",
+        "description": "开裂沥青路地面砖，灰色带尘埃，可横向平铺的静态碰撞地形",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "platform-slab",
+        "role": "可平铺平台砖",
+        "description": "残破水泥与锈蚀金属构成的可穿行平台砖，可横向平铺",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "rubble-pile",
+        "role": "瓦砾堆",
+        "description": "建筑残骸与沙土构成的瓦砾堆，可作台阶的静态碰撞体",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.9
+        },
+        "size": {
+          "w": 48,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "warning-sign",
+        "role": "警示牌前景杂物",
+        "description": "高饱和橙黄警示牌，前景杂物用于提示危险",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.9
+        },
+        "size": {
+          "w": 16,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "wasteland-bg",
+        "role": "废城多层视差背景",
+        "description": "远景灰暗天空与远处废弃城市剪影，中景残破建筑废墟与生锈管道，近景废墟剪影，多层视差",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 640,
+          "h": 360
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0
+          },
+          {
+            "name": "city-silhouette",
+            "parallax": 0.4,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "ruins",
+            "parallax": 0.7,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "HUD面板",
+        "description": "可拉伸到任意尺寸的HUD面板，暗色锈蚀金属底板，四边保留、中央平坦可重复",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 4,
+          "right": 4,
+          "top": 4,
+          "bottom": 4
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-pip",
+        "role": "HUD指示灯图标",
+        "description": "固定尺寸的HUD指示灯pip，与资源尺寸一致的点亮图标",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-hero-master",
+      "role": "玩家角色母版",
+      "description": "拾荒者角色参考母版，含背包与工具、斗篷、护目镜、工具带，头身比1:3",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 32,
+        "h": 48
+      }
+    },
+    {
+      "id": "wasteland-enemy-master",
+      "role": "敌人母版",
+      "description": "废土巡逻敌人参考母版，锈蚀金属质感，敌对姿态",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "wasteland-enemy",
+      "size": {
+        "w": 32,
+        "h": 48
+      }
+    }
+  ]
+}

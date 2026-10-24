@@ -1,0 +1,1 @@
+本帧不是生成的：由 2026-10-19k-patch 的原 raw 整图 180° 旋转（见 rotation-notes.txt）。

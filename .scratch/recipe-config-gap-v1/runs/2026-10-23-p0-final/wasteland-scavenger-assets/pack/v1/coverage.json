@@ -1,0 +1,31 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "ruined-city-1-bg",
+      "frame": "ruined-city-1-bg.far",
+      "w": 480,
+      "h": 270,
+      "opaque": 129600,
+      "ratio": 1
+    },
+    {
+      "asset": "ruined-city-1-bg",
+      "frame": "ruined-city-1-bg.mid",
+      "w": 480,
+      "h": 270,
+      "opaque": 70803,
+      "ratio": 0.5463194444444445
+    },
+    {
+      "asset": "ruined-city-1-bg",
+      "frame": "ruined-city-1-bg.near",
+      "w": 480,
+      "h": 270,
+      "opaque": 98955,
+      "ratio": 0.7635416666666667
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废城拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的横版街道上左右移动，跳过断裂的地面与碎石堆",
+    "探索废墟深处，在楼层与钢架平台之间攀爬寻找资源与宝箱",
+    "拾取散落的废料资源，靠近宝箱并按交互键打开它拿到收获",
+    "遇到游荡的敌人与坍塌危险区时绕行、拉开距离或用跳跃越过",
+    "带着收获继续向城市深处推进，直到抵达撤离点"
+  ],
+  "player": {
+    "id": "player-scavenger",
+    "role": "一名独自在废城中翻找物资的废土拾荒者",
+    "abilities": [
+      "左右横版移动，可加速奔跑",
+      "原地与跑动中跳跃，越过裂缝与低矮残骸",
+      "站在地面与平台边缘时不会坠落穿过地形",
+      "靠近资源时自动拾取，靠近宝箱时按键打开",
+      "受到敌人或危险伤害后短暂无敌并轻微后退"
+    ],
+    "goals": [
+      "在废弃城市中寻找并收集资源与宝箱里的收获",
+      "躲避危险地形与敌人的接触，活着走出废城"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在固定的一段废墟街道上左右来回巡逻，发现玩家后加速直线冲撞",
+      "threat": "接触玩家即造成伤害，把玩家撞退并扣减生命，迫使玩家绕开或跳上平台避开"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest-wasteland",
+      "type": "宝箱容器",
+      "behavior": "玩家贴近并按下交互键后箱盖打开，弹出收获物并永久标记为已开启"
+    },
+    {
+      "id": "rubble-hazard",
+      "type": "危险地形/坍塌废墟",
+      "behavior": "地面塌陷口与掉落碎石区，玩家踩入或触碰即受伤并被弹回安全位置"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scrap-resource",
+      "purpose": "散落在城市各处的可拾取废料，是主要的收集收获，累计计数并计入通关所需数量"
+    }
+  ],
+  "world": {
+    "theme": "低分辨率像素风废土废墟：少量像素块与深色描边，表面覆盖污渍、锈迹与裂纹，暖灰与暗绿的有限色调",
+    "setting": "被遗弃的城市街区——倒塌的楼体、阶梯残段、钢架与门框全部断裂不对称，地面由碎裂地砖、碎石堆与裂缝组成，其间散落床架、桌椅柜、木箱、管道、通风口与推车等可拆解家具",
+    "structure": "三层纵深：前景叠加碎砖与杂物以增加景深；中景是可站立的地面与可攀爬的平台，构成实际可行走路径；远景为平涂明度低、细节少的废墟剪影与破损墙体。垂直分三段——地面街道、中层断裂楼板与钢架、低矮屋顶残段，道具按瓦片网格对齐，密度中等偏密但物件间保留可通行间隙"
+  },
+  "levels": [
+    {
+      "id": "level-street-entry",
+      "purpose": "教学段：让玩家熟悉横版移动、跳跃与拾取资源的基本节奏",
+      "layout": "从最左侧的破墙缺口出发，沿街道向右穿过零散碎石与两处小裂缝，中段有一段阶梯残段需起跳上台，台上放着一堆废料资源；再往右地面出现第一处塌陷口，需跳过；最右端接上中层楼板入口",
+      "entities": [
+        "player-scavenger",
+        "scrap-resource",
+        "rubble-hazard"
+      ]
+    },
+    {
+      "id": "level-collapsed-mall",
+      "purpose": "探索段：在多层楼板间寻找宝箱，同时首次面对敌人威胁",
+      "layout": "从左侧中层楼板进入坍塌的商场，横穿断裂的地砖走廊，中途需借助钢架与木箱平台上下跳跃；二层右侧的通风口旁藏有一只宝箱；走廊尽头一名敌人来回巡逻，玩家可选择从上方平台越过或在间隙处躲过；出口在最右端的破窗处",
+      "entities": [
+        "player-scavenger",
+        "chest-wasteland",
+        "scrap-resource",
+        "enemy-wasteland",
+        "rubble-hazard"
+      ]
+    },
+    {
+      "id": "level-rooftop-exit",
+      "purpose": "收尾段：把收集与躲避的压力叠加，最终抵达撤离点",
+      "layout": "从中层楼板爬升至低矮屋顶残段，屋顶之间是断续的钢架与断墙跳台，需连续跳跃前进；下方街道有两名敌人来回巡逻，玩家可下到地面快速拾取成堆废料再爬回去；路线最右端设有一处大塌陷口需最后一段跳跃越过，越过即抵达撤离点",
+      "entities": [
+        "player-scavenger",
+        "scrap-resource",
+        "chest-wasteland",
+        "enemy-wasteland",
+        "rubble-hazard"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性关卡推进 + 关卡内收集计数",
+    "description": "游戏由三段连续街区组成，从左到右依次通过，抵达每关最右端的撤离点即进入下一段；关卡内累计拾取的废料与开箱数量记录在屏幕 HUD 上，越往后的街区地形落差更大、塌陷口更密、敌人数量与巡逻范围更广"
+  },
+  "difficulty": {
+    "model": "固定难度，随关卡段位递进的复合压力",
+    "description": "难度来自三方面叠加：地形跳跃间距逐段变宽、塌陷危险区密度上升、敌人数量与追赶速度上升；玩家没有攻击能力，只能靠绕行、拉距离与跳跃平台来规避，因此容错主要落在跳跃精度与路线选择上"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "evade-enemy",
+      "mechanic": "hazard-contact"
+    }
+  ],
+  "winConditions": [
+    "收集到足够数量的废料与宝箱收获后抵达最后一段街区最右端的撤离点"
+  ],
+  "loseConditions": [
+    "生命值因敌人接触或塌陷危险扣减至零时失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "ruin-scavenger-style-probe",
+  "packVersion": 1,
+  "masters": [
+    {
+      "master": "master-probe-player",
+      "requested": {
+        "w": 48,
+        "h": 64
+      },
+      "returned": {
+        "w": 864,
+        "h": 1184
+      },
+      "requestedRatio": 0.75,
+      "returnedRatio": 0.7297297297297297,
+      "ratioDelta": -0.027027027027027046,
+      "match": false
+    }
+  ]
+}

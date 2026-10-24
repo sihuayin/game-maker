@@ -1,0 +1,48 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "ruin-scavenger-style-probe",
+  "packVersion": 1,
+  "createdAt": "2026-10-18T13:35:02.000Z",
+  "run": {
+    "wallClockMs": 274,
+    "byStep": {
+      "master": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "image": {
+        "calls": 2,
+        "attempts": 2
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-probe-player",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 0,
+      "requestedSize": "48x64",
+      "requestedModel": "replay"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 0,
+      "requestedSize": "192x64",
+      "requestedModel": "replay"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 0,
+      "requestedSize": "432x64",
+      "requestedModel": "replay"
+    }
+  ]
+}

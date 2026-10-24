@@ -1,0 +1,224 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "fx-shock",
+  "frame": "zap3",
+  "viewBox": [
+    0,
+    0,
+    24,
+    24
+  ],
+  "expectedSize": [
+    24,
+    24
+  ],
+  "ops": [
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 0,
+      "w": 24,
+      "h": 24,
+      "colors": [
+        "palette:0",
+        "palette:2"
+      ],
+      "ratio": 0,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "circle",
+      "fill": "palette:0",
+      "cx": 12,
+      "cy": 12,
+      "r": 11
+    },
+    {
+      "op": "circle",
+      "fill": "palette:2",
+      "cx": 12,
+      "cy": 12,
+      "r": 10
+    },
+    {
+      "op": "circle",
+      "fill": "palette:1",
+      "cx": 12,
+      "cy": 12,
+      "r": 9
+    },
+    {
+      "op": "circle",
+      "fill": "palette:0",
+      "cx": 12,
+      "cy": 12,
+      "r": 8
+    },
+    {
+      "op": "circle",
+      "fill": "palette:1",
+      "cx": 12,
+      "cy": 12,
+      "r": 7
+    },
+    {
+      "op": "circle",
+      "fill": "palette:0",
+      "cx": 12,
+      "cy": 12,
+      "r": 6
+    },
+    {
+      "op": "poly",
+      "fill": "palette:5",
+      "points": [
+        [
+          3,
+          2
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          10,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:5",
+      "points": [
+        [
+          21,
+          2
+        ],
+        [
+          19,
+          6
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          14,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:5",
+      "points": [
+        [
+          2,
+          20
+        ],
+        [
+          5,
+          17
+        ],
+        [
+          3,
+          14
+        ],
+        [
+          7,
+          13
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:5",
+      "points": [
+        [
+          22,
+          20
+        ],
+        [
+          19,
+          17
+        ],
+        [
+          21,
+          14
+        ],
+        [
+          17,
+          13
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:0",
+      "points": [
+        [
+          0,
+          10
+        ],
+        [
+          3,
+          12
+        ],
+        [
+          1,
+          15
+        ],
+        [
+          4,
+          16
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:0",
+      "points": [
+        [
+          24,
+          10
+        ],
+        [
+          21,
+          12
+        ],
+        [
+          23,
+          15
+        ],
+        [
+          20,
+          16
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 2,
+      "w": 20,
+      "h": 20,
+      "colors": [
+        "palette:0",
+        "palette:2"
+      ],
+      "ratio": 0.7,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "circle",
+      "fill": "palette:2",
+      "cx": 12,
+      "cy": 12,
+      "r": 4
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "format": "run-design-attempts/v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "rejected",
+      "detail": "意图里的机制「寻找并打开宝箱」（`open-chest`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
+      "rejections": [
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「寻找并打开宝箱」（`open-chest`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        }
+      ],
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "锈城拾荒",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "在废弃城市的楼层剖面中横向移动，穿过残墙、碎石堆与门槛高差",
+          "跳跃越过倒塌家具、断裂地砖与裂隙，抵达新的房间与楼层",
+          "搜寻散落的废料与净水，收进背包",
+          "靠近宝箱并打开，取得里面的物资",
+          "察觉前方的敌人与积水带电区域，选择绕行、躲避或等它离开",
+          "攒够物资后继续向右深入，抵达本关终点"
+        ],
+        "player": {
+          "id": "hero-scavenger",
+          "role": "一名背着鼓胀背包、裹着脏围巾的拾荒者，在废弃楼层里翻找残余物资",
+          "abilities": [
+            "横向跑动，能在残墙与箱柜之间穿行",
+            "跳跃越过障碍与塌陷的地砖缺口",
+            "贴近宝箱与资源时可拾取/打开，物资收进背包",
+            "与敌人保持距离并能从其巡逻路线绕开，不做正面交战"
+          ],
+          "goals": [
+            "在废弃城市中横向探索并打开宝箱",
+            "收集废料与净水等残余资源",
+            "避开敌人与危险区域，活着走到本关终点"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "wasteland-enemy",
+            "behavior": "在固定的一段楼层平台上左右徘徊，走到边缘或残墙处掉头，看到拾荒者会加速逼近",
+            "threat": "贴身碰撞即造成伤害并击退，逼玩家让出通道或跳上高一层平台"
+          }
+        ],
+        "npcs": [
+          {
+            "id": "scavenger-player",
+            "role": "玩家控制的拾荒者本人（意图层登记的实体，保留在册）",
+            "interaction": "由玩家直接操控移动与跳跃，不做对话交互"
+          }
+        ],
+        "interactables": [
+          {
+            "id": "wasteland-chest",
+            "type": "宝箱",
+            "behavior": "靠近并触发后箱盖打开，掉出一份物资计入背包，箱子变为已开启状态"
+          },
+          {
+            "id": "vending-machine",
+            "type": "废弃自动售货机",
+            "behavior": "碰触后掉出一份净水补给，一次性，掉落即失效"
+          }
+        ],
+        "resources": [
+          {
+            "id": "scrap-resource",
+            "purpose": "场景中散落的金属废料，拾取后累积为计分与推进条件"
+          },
+          {
+            "id": "clean-water",
+            "purpose": "从售货机或宝箱中获得的净水，拾取后累积为计分与推进条件"
+          }
+        ],
+        "world": {
+          "theme": "废土生存：灰橄榄与脏褐为主调的低分辨率像素荒芜都市，水泥、锈铁、旧木材与脏玻璃",
+          "setting": "一座被遗弃的城市楼层剖面：完整与碎裂的地砖、断墙、楼梯段、钢架平台、通风口、推拉门与倒塌的家具，处处是碎石堆与积水洼",
+          "structure": "横向卷轴三层纵深：前景是压暗的破栏杆、垂落管线与近景框边，做遮挡；中景是可玩楼层剖面，地砖地面、残墙、楼梯与钢架平台按真实比例与角色对应，可跨越物件高度统一；背景是低饱和低对比的废弃城市天际线与雾霾层，带轻微视差。纵向分三段：低层地面带积水与碎石、中层钢架与箱柜平台、高层通风口与断楼板"
+        },
+        "levels": [
+          {
+            "id": "level-01-collapsed-lobby",
+            "purpose": "教会横向移动、跳跃与拾取：在一层塌陷的大厅里找到第一只宝箱",
+            "layout": "从左侧破损门口出发，沿完整地砖向右，经碎石堆小跳上钢架平台绕过一堵断墙；平台尽头落下回到地面，途中散落废料；右侧是敌人徘徊的一段走廊，需在其转身间隙通过；最右端木桌旁放着宝箱，开启后终点门打开",
+            "entities": [
+              "hero-scavenger",
+              "scavenger-player",
+              "scrap-resource",
+              "wasteland-enemy",
+              "wasteland-chest"
+            ]
+          },
+          {
+            "id": "level-02-flooded-stairwell",
+            "purpose": "把躲避与高危区域放大：在带电积水与楼梯段落间上下穿行，凑齐物资后抵达上层出口",
+            "layout": "从下层积水走廊向右，踩箱柜跳过一段带电积水洼；沿楼梯段向上爬两层，中间夹一段由倒塌文件柜构成的窄平台；上层通风口下方有售货机可敲出净水；顶部走廊尽头敌人来回巡逻，最后一段钢架平台通向右侧出口",
+            "entities": [
+              "hero-scavenger",
+              "scavenger-player",
+              "scrap-resource",
+              "clean-water",
+              "vending-machine",
+              "wasteland-enemy",
+              "wasteland-chest"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "关卡推进 + 收集门槛",
+          "description": "线性关卡序列，逐关向右深入废弃城市的不同楼层；每关需收集到最低数量的废料/净水并开启宝箱，右侧终点才开启，进入下一层楼。难度靠敌人巡逻密度、缺口跨度与危险区域叠加逐关抬升，不引入角色数值成长。"
+        },
+        "difficulty": {
+          "model": "固定关卡难度曲线",
+          "description": "第一关以单敌人、单段缺口和开阔留白教学；第二关同时施加带电积水、狭窄平台与多段楼梯，敌人巡逻路线与缺口位置重叠，逼玩家在移动中判断回避时机。失败即从本关起点重来，不接受额外惩罚叠加。"
+        },
+        "mechanics": [
+          {
+            "id": "side-scroll-move",
+            "mechanic": "run"
+          },
+          {
+            "id": "jump",
+            "mechanic": "jump"
+          },
+          {
+            "id": "collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "avoid-danger-enemy",
+            "mechanic": "hazard-contact"
+          }
+        ],
+        "winConditions": [
+          "在每一关中收集到最低数量的废料与净水，并开启该关的宝箱，右侧终点即开启",
+          "走到最后一层楼的出口，即完成本次拾荒"
+        ],
+        "loseConditions": [
+          "与敌人贴身接触受到伤害，生命耗尽即本关失败",
+          "跌入塌陷的地砖缺口或带电积水区域受到伤害，生命耗尽即本关失败"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "camera:parallax",
+          "collision:aabb",
+          "objective:collect-then-reach",
+          "hud:screen-space",
+          "coord:delivery-pixels"
+        ]
+      }
+    }
+  ]
+}

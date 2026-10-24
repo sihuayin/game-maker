@@ -14,7 +14,7 @@
 //   `failures[]` 里**不留痕**（那一发上游调用是**成功**的）。
 //   把它和 `schema` 那些混在一个桶里，就是票 27 的 Q4(ii) 立 `CALL_FAILURES` 要治的病。
 import {
-  auditIntentCoverage, GameDesignSpecSchema,
+  auditIntentCoverage, deriveMechanicStatus, GameDesignSpecSchema,
   type Capability, type GameDesignSpec, type GameIntentSpec, type RuntimeProfile, type VisualWorldSpec,
 } from "@game-maker/contracts";
 
@@ -41,6 +41,7 @@ export const REJECT_REASONS = [
   "intent-mechanic-missing", // 意图里的机制在设计层没有对家 —— R12 今天最常响的那一档
   "camera-unsupported",      // 参考图的视角，这一代外壳承载不了
   "mechanic-unsupported",    // 设计层填了一条 profile 没有的机制（今天恒空）
+  "mechanic-experimental",   // 设计层填了一条 profile 声明了、但状态非 supported 的机制（票 12）
   "capability-unsupported"   // 设计层要了一条 profile 没有的能力（今天恒空）
 ] as const;
 export type RejectReason = (typeof REJECT_REASONS)[number];
@@ -130,13 +131,28 @@ function cameraSupported(profile: RuntimeProfile, vws: VisualWorldSpec): Rejecti
   }];
 }
 
-/** 两条差集。⚠️ **今天恒空**（票 05 的自白）—— 写下来是**给第二个成员留的位**。 */
+/** 两条差集 + 一条状态硬约束。
+ *  ⚠️ 两条差集**今天恒空**（票 05 的自白）—— 写下来是**给第二个成员留的位**。
+ *  状态硬约束（票 12）**不是**恒空：`moving-platform` 在词表与 profile 里、却没运行时实现，
+ *  设计一引用它就在这一条上被拒。 */
 function profileDifferences(design: GameDesignSpec, profile: RuntimeProfile): Rejection[] {
   const out: Rejection[] = [];
   const mechs = new Set<string>(profile.mechanics);
-  for (const m of design.mechanics)
-    if (!mechs.has(m.mechanic))
+  for (const m of design.mechanics) {
+    if (!mechs.has(m.mechanic)) {
       out.push({ reason: "mechanic-unsupported", detail: `设计里填了 \`${m.mechanic}\`，而 ${profile.id}/v${profile.version} 不做这条机制` });
+      continue;
+    }
+    // ⚠️ 票 12：profile **声明**了它 ≠ 它真能用 —— status 由运行时实现见证推导，
+    //   非 `supported`（experimental / deprecated）就不能拿它做正式游戏。
+    const status = deriveMechanicStatus(m.mechanic);
+    if (status !== "supported")
+      out.push({
+        reason: "mechanic-experimental",
+        detail: `设计里填了 \`${m.mechanic}\`，但它的状态是 \`${status}\`（不是 \`supported\`）—— ` +
+          `${profile.id}/v${profile.version} 只是**声明**了它，端到端能力不齐（缺运行时实现或 QA probe），不能拿它做正式游戏`
+      });
+  }
   const caps = new Set<string>(profile.capabilities);
   for (const c of design.runtimeRequirements)
     if (!caps.has(c))

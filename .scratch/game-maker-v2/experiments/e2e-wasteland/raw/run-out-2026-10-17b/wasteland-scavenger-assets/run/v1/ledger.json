@@ -1,0 +1,97 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "wasteland-scavenger-assets",
+  "runVersion": 1,
+  "createdAt": "2026-10-17T02:54:17.101Z",
+  "run": {
+    "wallClockMs": 29214,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 7247,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 200,
+        "outputTokens": 1454
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 2833,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 243,
+        "outputTokens": 651
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 6895,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2225,
+        "outputTokens": 1317
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 4613,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2136,
+        "outputTokens": 686
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 7408,
+      "attempts": 1,
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 2916,
+        "outputTokens": 1947
+      }
+    }
+  ]
+}

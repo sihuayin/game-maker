@@ -1,0 +1,186 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-19T11:00:30.000Z",
+  "run": {
+    "wallClockMs": 85929,
+    "byStep": {
+      "image": {
+        "calls": 14,
+        "attempts": 18
+      },
+      "drawlist": {
+        "calls": 3,
+        "attempts": 3
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "image",
+      "target": "scavenger-actor",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 18899,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-enemy",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 18850,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ceiling-lurker",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 19277,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "health-icon",
+      "upstream": "messages",
+      "ms": 2584,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 139,
+        "outputTokens": 611
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "scrap-icon",
+      "upstream": "messages",
+      "ms": 2607,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 138,
+        "outputTokens": 755
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 4590,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-flash",
+      "usage": {
+        "inputTokens": 252,
+        "outputTokens": 1568
+      }
+    },
+    {
+      "step": "image",
+      "target": "scrap-resource",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 15492,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "clean-water",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 15863,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "hazard-terrain",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 12293,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "extraction-point",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 13682,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "office-debris",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 19584,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-city-backdrop",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 15302,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 18256,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "extraction-point",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 16665,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-city-backdrop",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 14788,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 16105,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-city-backdrop",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 12040,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-2.5-flash-image"
+    }
+  ]
+}

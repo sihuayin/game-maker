@@ -95,16 +95,29 @@ describe("成功那一趟", () => {
   });
 });
 
-describe("⚠️ R12 的拒绝：**不重采样、不进 `failures[]`**（Q3c）", () => {
-  it("意图里有条机制没做成 ⇒ `DesignRejectedError`，**只走一趟**，账上**没有失败痕迹**", async () => {
+describe("⚠️ R12 的拒绝：`intent-*` 重采样、`*-unsupported` 不重采样、都不进 `failures[]`", () => {
+  it("意图里有条机制没做成（`intent-mechanic-missing`）⇒ 重采样三发后仍是 `DesignRejectedError`，账上**没有失败痕迹**", async () => {
     const s = stage([res(reply(designFromModel({ mechanics: [{ id: "m-jump", mechanic: "jump" }] })))]);
     const err = await compileDesign(input({ fetchImpl: s.f })).catch((e) => e);
     expect(err).toBeInstanceOf(DesignRejectedError);
     expect(err.rejections.map((x: { reason: string }) => x.reason)).toEqual(["intent-mechanic-missing"]);
     expect(err.message).toContain("二段跳");
-    expect(s.calls()).toBe(1);                       // ⚠️ 重抽同一份意图抽一百次也还是做不出来
-    expect(err.ledger![0]!.attempts).toBe(1);
-    expect(err.ledger![0]!.failures).toBeUndefined();  // ⚠️ 那一发上游调用是**成功**的
+    // ⚠️ `intent-*` 是**采样失误**：机制在封闭枚举里、模型这一发漏了，重采样可能补上 ⇒ 与 schema 失败同档、重试
+    expect(s.calls()).toBe(STRUCTURED_CALL_ATTEMPTS);
+    expect(err.ledger![0]!.attempts).toBe(STRUCTURED_CALL_ATTEMPTS);
+    expect(err.ledger![0]!.failures).toBeUndefined();  // ⚠️ 每一发上游调用都是**成功**的（只是模型漏写）
+  });
+
+  it("`intent-mechanic-missing` 第一发漏、第二发补上 ⇒ `attempts: 2`，不抛拒绝", async () => {
+    const s = stage([
+      res(reply(designFromModel({ mechanics: [{ id: "m-jump", mechanic: "jump" }] }))),
+      res(reply(designFromModel())),
+    ]);
+    const r = await compileDesign(input({ fetchImpl: s.f }));
+    expect(r.spec.mechanics).toHaveLength(2);
+    expect(s.calls()).toBe(2);
+    expect(r.ledger![0]!.attempts).toBe(2);
+    expect(r.ledger![0]!.failures).toBeUndefined();
   });
 
   // ── 票 74 · 空 `mechanics` 从 gate ④ 移出之后，**它落在这里**（人裁 Q1 = (a)）──────────
@@ -115,7 +128,7 @@ describe("⚠️ R12 的拒绝：**不重采样、不进 `failures[]`**（Q3c）
   // ⚠️ 移出**之后**：当场 parse 得过 ⇒ 撞 R12 那句**逐条点名**（带用户原话）· **只走一趟** · 账上无失败痕迹。
   //   ⇒ 下面这条钉的正是**那三样**，与契约那一侧（`contracts/tests/game-design-gate.test.ts` 的
   //   「`mechanics: []` 不再是这条 gate 的事」）**各看各的一半**。
-  it("⚠️ 空 `mechanics` ⇒ `DesignRejectedError`、**逐条**点名意图里每一条机制、**只走一趟**、账上无失败痕迹", async () => {
+  it("⚠️ 空 `mechanics` ⇒ 重采样三发后仍是 `DesignRejectedError`、**逐条**点名、账上无失败痕迹", async () => {
     const s = stage([res(reply(designFromModel({ mechanics: [] })))]);
     const err = await compileDesign(input({ fetchImpl: s.f })).catch((e) => e);
     expect(err).toBeInstanceOf(DesignRejectedError);
@@ -124,9 +137,9 @@ describe("⚠️ R12 的拒绝：**不重采样、不进 `failures[]`**（Q3c）
       .toEqual(INTENT.mechanics.map(() => "intent-mechanic-missing"));
     // 点名：每一条的**用户原话**都要报出来（那是给人改需求用的）
     for (const m of INTENT.mechanics) expect(err.message).toContain(m.name);
-    expect(s.calls(), "移出之前是 `STRUCTURED_CALL_ATTEMPTS` 发盲重采样").toBe(1);
-    expect(err.ledger![0]!.attempts).toBe(1);
-    expect(err.ledger![0]!.failures, "那一发上游调用是成功的，账上不许留失败痕迹").toBeUndefined();
+    expect(s.calls()).toBe(STRUCTURED_CALL_ATTEMPTS);
+    expect(err.ledger![0]!.attempts).toBe(STRUCTURED_CALL_ATTEMPTS);
+    expect(err.ledger![0]!.failures, "每一发上游调用都是成功的，账上不许留失败痕迹").toBeUndefined();
   });
 
   it("相机承载不了 ⇒ 也是拒绝那一档（不是 `CompileDesignError`）", async () => {

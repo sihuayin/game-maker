@@ -20,7 +20,7 @@ import {
 import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
-import { dominantOpaqueColor, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
+import { DESPILL_THRESHOLDS, despillMagenta, dominantOpaqueColor, edgeConnectedBackground, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
 import { auditSheetCells, bottomBand, cropAboveBand, segmentRowCells, sliceGridCells, type SheetCellIssue } from "./sheet.js";
 import { animationFramePrompt, framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioReading } from "./master.js";
@@ -832,7 +832,18 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           //   它没有 `layer.index` 可读，但它就是最远（也是唯一）的那一层，必须按「不抠」处理；
           //   否则整张图会被众数色抠空，站点的「最远层必须画满」会把它判死。
           const farthest = isBg && (u.layer === undefined || u.layer.index === 0);
-          const keyedProbe = farthest ? null : keyBackground(image, { tolerance: bgOpt.tolerance, colors: [unitKey] });
+          const keyedProbe = farthest ? null : (() => {
+            const k = keyBackground(image, { tolerance: bgOpt.tolerance, colors: [unitKey] });
+            // ⚠️ **recipe-config-gap-v1 票 09**：gemini 底色是**渐变**（绿通道漂），单色抠除盖不住 ⇒
+            //   despill 从「边缘清理」提为「主抠的一部分」，让 `>0.5` 判据看到 keyBackground+despill 合起来的覆盖率。
+            //   ⚠️ 与 `import.ts` 的 `prepareFrame` 同一条自动门：只有「品红家族」底色才跑（天空层等不误伤）。
+            const magentaKey = k.backgroundColors.some((c) =>
+              c[0] > DESPILL_THRESHOLDS.rMin && c[1] < DESPILL_THRESHOLDS.gMax && c[2] > DESPILL_THRESHOLDS.bMin &&
+              c[0] - c[1] > DESPILL_THRESHOLDS.rgMin && c[2] - c[1] > DESPILL_THRESHOLDS.bgMin);
+            if (!magentaKey) return k;
+            const d = despillMagenta(k.image);
+            return { image: d.image, backgroundColors: k.backgroundColors, keyedPixels: k.keyedPixels + d.removedPixels };
+          })();
           /** 这张图的像素总数（判据的分母）。 */
           const pixels = image.width * image.height;
 
@@ -870,29 +881,24 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
           //   **众数色本身不是成功判据** —— 主体占多数时众数**就是主体**，按它抠 = 把主体当底抠掉。
           //   实测那 9 张的主体只占 10~20%（这个风格「大片留白」的巧合，**不是通用保证**）。
           if (!isBg && u.frames === 1) {
-            // ⚠️ 这一支必然抠过底（`!isBg` ⇒ 不是最远层 ⇒ `keyedProbe` 非空）。
-            const keyed = keyedProbe!;
-            const keyedRatio = keyed.keyedPixels / pixels;
-            // ① 抠掉的是不是**多数**（= 那个众数色确实在扮演"背景"）。
-            if (keyedRatio <= 0.5)
-              throw new Error(
-                `资源 "${spec.id}" 的底色判据没过：按**实测众数色**抠，只抠掉 **${(keyedRatio * 100).toFixed(1)}%**` +
-                ` 的像素（要求**超过一半**）。${colourReport(measured, keyed.keyedPixels, pixels)}。\n` +
-                `⚠️ 一种可能是**主体自己就占了多数** —— 那时"众数色"就是主体，按它抠是把主体当底抠掉；\n` +
-                `⚠️ 另一种可能是模型画的底**根本不是平涂**（渐变色带 / 噪点），单色众数只覆盖它的一部分。\n` +
-                NOT_A_RETRY);
-            // ② 剩下的墨有没有被抠碎 —— 主体应当还是**一块**。
+            // ⚠️ **recipe-config-gap-v1 票 09**：把「抠掉 >50%」这条固定比例判据，换成**空间连续性**判据。
+            //   旧判据「背景要占多数」与提示词「占满整个画面、四周窄边」**自相矛盾**（gemini-3.1-flash-lite-image
+            //   照做了提示词、主体 54%，于是背景 46% 被判死）。新判据：从四边 flood-fill 众数色（+ despill 邻域）
+            //   得到**连通背景**，剩下的墨应当还是**一块**（主体没被抠穿/抠碎）。
+            //   主体占多数（众数=主体）时，flood-fill 会连主体一起抠掉 ⇒ 剩下 0 块 ⇒ 被下面「碎成了」抓住；
+            //   而「主体 54%、背景 46% 的宝箱」背景连续贴边、主体是完整一块 ⇒ 通过。
             //    ⚠️ 那条线取 0.6 是**量出来的**，不是拍的：真图 `treasure-chest` 抠完剩**两块**
             //    （主体 156660px + 模型自己画的一圈洋红描边 40289px）⇒ 最大那块占 **79.6%**。
-            //    照字面写「块数 === 1」会把这张**真图判成不合格** —— 下一跑当场白花钱。
-            //    （边界见票 37 §8：**判据要挡得住真的错，不许把真图判死**。）
-            const blocks = foregroundBlocks(keyed.image);
+            const connected = edgeConnectedBackground(image, {
+              tolerance: bgOpt.tolerance, colors: [unitKey], despill: DESPILL_THRESHOLDS,
+            });
+            const blocks = foregroundBlocks(connected.image);
             const minLargestShare = imageSrc?.minLargestShare ?? 0.6;
             if (blocks.largestShare < minLargestShare)
               throw new Error(
-                `资源 "${spec.id}" 的底色判据没过：按**实测众数色**抠完，剩下的墨**碎成了 ${blocks.areas.length} 块**，` +
+                `资源 "${spec.id}" 的底色判据没过：按**边缘连通背景**抠完，剩下的墨**碎成了 ${blocks.areas.length} 块**，` +
                 `最大的一块只占 ${(blocks.largestShare * 100).toFixed(1)}%（要求 ≥ ${(minLargestShare * 100).toFixed(0)}%）—— 主体多半被抠穿了。\n` +
-                `${colourReport(measured, keyed.keyedPixels, pixels)}。\n` + NOT_A_RETRY);
+                `${colourReport(measured, connected.count, pixels)}。\n` + NOT_A_RETRY);
           }
           const cells: RasterImage[] = [];
 

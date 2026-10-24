@@ -1,0 +1,255 @@
+{
+  "frames": {
+    "broken-wall": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    "exit-gate": {
+      "frame": {
+        "x": 0,
+        "y": 48,
+        "w": 40,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3
+      }
+    },
+    "enemy-scavenger": {
+      "frame": {
+        "x": 40,
+        "y": 48,
+        "w": 32,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "rubble-pile": {
+      "frame": {
+        "x": 0,
+        "y": 96,
+        "w": 64,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    "wrecked-vehicle": {
+      "frame": {
+        "x": 0,
+        "y": 136,
+        "w": 80,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.3
+      }
+    },
+    "ground-tile": {
+      "frame": {
+        "x": 0,
+        "y": 176,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "oil-drum": {
+      "frame": {
+        "x": 32,
+        "y": 176,
+        "w": 20,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 28
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.85
+      }
+    },
+    "cracked-plate": {
+      "frame": {
+        "x": 0,
+        "y": 208,
+        "w": 48,
+        "h": 24
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 24
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "chest": {
+      "frame": {
+        "x": 48,
+        "y": 208,
+        "w": 26,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 20
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "resource-item": {
+      "frame": {
+        "x": 0,
+        "y": 232,
+        "w": 12,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.sprites.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 80,
+      "h": 248
+    },
+    "scale": 1
+  }
+}

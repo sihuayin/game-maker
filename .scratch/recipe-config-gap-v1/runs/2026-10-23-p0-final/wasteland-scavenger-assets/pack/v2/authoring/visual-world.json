@@ -1,0 +1,241 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "低分辨率废土像素画",
+    "keywords": [
+      "横版平台",
+      "废土",
+      "后末日",
+      "拾荒者",
+      "低分辨率像素画",
+      "高细节层级",
+      "锈蚀金属",
+      "荒漠",
+      "剪影层次"
+    ],
+    "description": "低分辨率像素画，但细节层级高：每个像素都为塑造锈蚀金属、开裂混凝土与荒漠植被服务。题材是烈日下的废弃城市废土，光照强烈、阴影硬朗，物体边缘用深色描边与暗部下沉来强调体积。角色与道具轮廓清晰、比例可信，表面有颗粒噪点与磨损感。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "正交",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "无透视，横版侧面"
+  },
+  "composition": {
+    "foreground": "可踩踏的废墟残骸与碎石块，作为近景剪影压在画面前方，增强纵深",
+    "midground": "玩家角色与宝箱、资源、敌人所在的互动层，为主要游戏区域",
+    "background": "多层视差背景：远处楼宇轮廓、锈蚀广告牌、倾斜的电线杆，逐层变亮变灰",
+    "objectScale": "宝箱、资源罐、敌人与角色同尺度，保持可读性",
+    "characterScale": "角色约占屏幕高度1/5至1/4，为像素画平台跳跃的常见比例",
+    "density": "中高密度，废土细节丰富但不拥挤"
+  },
+  "palette": {
+    "primary": [
+      "palette:2",
+      "palette:2",
+      "palette:5",
+      "palette:2"
+    ],
+    "secondary": [
+      "palette:5",
+      "palette:8",
+      "palette:8",
+      "palette:10"
+    ],
+    "accent": [
+      "palette:12",
+      "palette:12",
+      "palette:8",
+      "palette:12"
+    ],
+    "background": [
+      "palette:9",
+      "palette:13",
+      "palette:13",
+      "palette:13"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:0",
+      "palette:2",
+      "palette:5"
+    ],
+    "highlight": [
+      "palette:15",
+      "palette:15",
+      "palette:1",
+      "palette:4"
+    ]
+  },
+  "lighting": {
+    "direction": "顶光偏侧，烈日从上方斜照",
+    "softness": "硬朗，边缘阴影锐利不柔化",
+    "contrast": "高对比，亮部发白、阴影接近纯黑",
+    "mood": "干燥、炙热、残酷的午后废土"
+  },
+  "materials": {
+    "rustedMetal": {
+      "appearance": "斑驳锈蚀的铁皮，表面有剥落与磨损，边缘氧化发暗",
+      "texture": "颗粒噪点+锈斑块",
+      "color": [
+        "palette:2",
+        "palette:2",
+        "palette:5"
+      ]
+    },
+    "concrete": {
+      "appearance": "开裂风化的混凝土，表面粗糙起砂",
+      "texture": "细裂纹与坑洼",
+      "color": [
+        "palette:9",
+        "palette:13",
+        "palette:13"
+      ]
+    },
+    "sandDust": {
+      "appearance": "干涸的沙土与尘土堆积，细碎颗粒",
+      "texture": "颗粒状",
+      "color": [
+        "palette:13",
+        "palette:13",
+        "palette:0"
+      ]
+    },
+    "glowScreen": {
+      "appearance": "破损但仍在发光的屏幕/招牌，散发育光",
+      "texture": "发光像素块",
+      "color": [
+        "palette:12",
+        "palette:12",
+        "palette:15"
+      ]
+    },
+    "lootMetal": {
+      "appearance": "宝箱与资源罐的包装金属，亮色点缀在灰土中",
+      "texture": "光泽高光",
+      "color": [
+        "palette:12",
+        "palette:8",
+        "palette:12"
+      ]
+    },
+    "flesh": {
+      "appearance": "拾荒者与敌人的皮肤、破布，暖色重音",
+      "texture": "粗糙布料+肤色",
+      "color": [
+        "palette:8",
+        "palette:12",
+        "palette:5"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "五头身左右的像素角色，四肢分明但偏紧凑",
+    "silhouette": "拾荒者身形佝偻、背有负重麻袋；敌人轮廓低矮或长臂，剪影易辨认",
+    "poseLanguage": "紧绷前倾的姿态，随时准备奔跑或翻找",
+    "clothing": "多层破旧布料与轻甲，绑带与废旧零件装饰",
+    "faceAbstraction": "面部简约，以阴影与少量像素强调眼窝或发光护目镜"
+  },
+  "environment": {
+    "architecture": "倾斜半塌的多层楼宇、断裂的墙面、锈蚀的钢架结构",
+    "terrain": "破碎街道、瓦砾堆、外露的钢筋与沙土缓坡",
+    "props": "废弃车辆、彩钢棚、破损招牌、油桶、电线杆与爬藤",
+    "textureDensity": "细节丰富，表面堆叠砖缝、锈迹、裂缝与沙尘"
+  },
+  "shapeLanguage": [
+    "破碎锐利的多边形与锯齿边缘",
+    "倾斜失衡的结构",
+    "锈蚀金属的块面感",
+    "尖锐的钢条与倒塌的直角",
+    "废旧机械的几何残骸"
+  ],
+  "constraints": [
+    "所有新资源必须以低分辨率像素画细绘，禁止矢量平滑或渐变",
+    "物体与角色边缘使用深色描边或暗部下沉来明确轮廓",
+    "保持锈蚀金属、开裂混凝土、发白阳光三种材质语言一致",
+    "角色皮肤与暖色重音必须出现，避免全灰配色",
+    "背景层按视差逐层变亮变灰，前景剪影最暗",
+    "金属高光用冷白亮色，阴影用接近黑的深色，形成硬朗对比"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素画但细节层级高",
+      "横版废土后末日",
+      "锈蚀金属与开裂混凝土材质",
+      "烈日硬朗顶光",
+      "粒子噪点与磨损表面"
+    ],
+    "camera": {
+      "mode": "2D正交侧面视角",
+      "angle": "平视",
+      "projection": "正交无透视"
+    },
+    "composition": {
+      "layer": "前景剪影/中景互动层/多层视差背景",
+      "parallax": "背景逐层滚动形成纵深",
+      "subject": "角色居中偏下，强化平台跳跃可读性",
+      "density": "中等偏高，细节丰富不拥挤"
+    },
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {
+      "contrast": "高",
+      "direction": "顶光偏侧烈日",
+      "softness": "硬",
+      "mood": "炙热残酷午后"
+    },
+    "shapeLanguage": [
+      "破碎锐利多边形",
+      "倾斜失衡结构",
+      "锈蚀块面",
+      "尖锐钢条",
+      "几何残骸"
+    ],
+    "material": [
+      "锈蚀斑驳铁皮",
+      "开裂风化混凝土",
+      "干涸沙土",
+      "发光破损屏幕",
+      "亮色包装金属",
+      "破旧布料与肤色"
+    ],
+    "environment": [
+      "破碎街道瓦砾",
+      "倾斜半塌楼宇",
+      "废弃车辆油桶",
+      "锈蚀钢架",
+      "沙土缓坡与爬藤"
+    ],
+    "characterStyle": [
+      "五头身紧凑比例",
+      "佝偻负重剪影",
+      "发光护目镜点缀",
+      "多层破布轻甲"
+    ],
+    "constraints": [],
+    "confidence": 0.82
+  }
+}

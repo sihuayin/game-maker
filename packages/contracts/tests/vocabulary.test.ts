@@ -13,8 +13,9 @@
 //     才验得了（`shell/scene.ts` import 了 Phaser，node 里 import 不动，票 05 Q11）。
 import { describe, expect, it } from "vitest";
 import {
-  CAPABILITIES, CapabilitySchema, ENTITY_BUCKETS, INTENT_ENTITY_TYPES, IntentEntityTypeSchema,
-  MECHANICS, MechanicSchema,
+  CAPABILITIES, CapabilitySchema, DEPRECATED_MECHANICS, deriveMechanicStatus, ENTITY_BUCKETS,
+  INTENT_ENTITY_TYPES, IntentEntityTypeSchema, MECHANICS, MechanicSchema, MechanicStatusSchema,
+  QA_PROBED_MECHANICS, RUNTIME_IMPLEMENTED_MECHANICS,
 } from "../src/vocabulary.js";
 import { EntityKind } from "../src/game-config.js";
 import { GameDesignSpecSchema } from "../src/game-design.js";
@@ -27,6 +28,8 @@ const ENTITY_KIND_FATE: Record<string, string | null> = {
   pickup: "collect-pickup",
   hazard: "hazard-contact",
   goal: "reach-goal",
+  chest: "open-chest",
+  danger: "avoid-danger",
   decor: null // 装饰：不可交互，没有机制。null 是**表态**，不是遗漏。
 };
 
@@ -102,5 +105,30 @@ describe("§桶对齐：意图层的 type 与设计层四个数组一一对应",
     };
     expect(GameDesignSpecSchema.safeParse({ ...legal, enemies: [{ id: "e", behavior: "b", threat: "t" }] }).success, "带 id 应当过").toBe(true);
     expect(GameDesignSpecSchema.safeParse({ ...legal, enemies: [{ behavior: "b", threat: "t" }] }).success, "缺 id 应当不过").toBe(false);
+  });
+});
+
+describe("§机制状态：`supported` 由运行时实现见证推导（票 12）", () => {
+  it("`RUNTIME_IMPLEMENTED_MECHANICS` / `DEPRECATED_MECHANICS` 都 ⊆ 词表（不许引用词表外的名字）", () => {
+    for (const m of RUNTIME_IMPLEMENTED_MECHANICS) expect(MECHANICS).toContain(m);
+    for (const m of DEPRECATED_MECHANICS) expect(MECHANICS).toContain(m);
+  });
+
+  it("`QA_PROBED_MECHANICS` ⊆ 词表，且两条新机制（open-chest / avoid-danger）都有 probe", () => {
+    for (const m of QA_PROBED_MECHANICS) expect(MECHANICS).toContain(m);
+    expect(QA_PROBED_MECHANICS).toContain("open-chest");
+    expect(QA_PROBED_MECHANICS).toContain("avoid-danger");
+  });
+
+  it("有运行时实现的 ⇒ `supported`；今天**只有** `moving-platform` 是 `experimental`", () => {
+    for (const m of RUNTIME_IMPLEMENTED_MECHANICS) expect(deriveMechanicStatus(m)).toBe("supported");
+    expect(MECHANICS.filter((m) => deriveMechanicStatus(m) === "experimental")).toEqual(["moving-platform"]);
+  });
+
+  it("状态是**封闭**的：表外的值解析不过", () => {
+    expect(MechanicStatusSchema.safeParse("blessed").success).toBe(false);
+    expect(MechanicStatusSchema.safeParse("supported").success).toBe(true);
+    expect(MechanicStatusSchema.safeParse("experimental").success).toBe(true);
+    expect(MechanicStatusSchema.safeParse("deprecated").success).toBe(true);
   });
 });

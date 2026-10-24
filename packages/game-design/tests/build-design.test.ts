@@ -163,7 +163,7 @@ describe("R12 ②：相机 —— 参考图的视角这一代承载得了吗", (
 
 describe("R12 ③：两条差集 —— 今天恒空，是**给第二个成员留的位**（票 05 的自白）", () => {
   it("在真的 `PLATFORMER_V1` 上，一份合法设计两条差集**恒空** ⇒ 放行", () => {
-    expect(PLATFORMER_V1.mechanics).toHaveLength(8);
+    expect(PLATFORMER_V1.mechanics).toHaveLength(10);   // 票 13/14 加了 open-chest / avoid-danger
     expect(PLATFORMER_V1.capabilities).toHaveLength(8);
     expect(build().ok).toBe(true);
   });
@@ -183,6 +183,29 @@ describe("R12 ③：两条差集 —— 今天恒空，是**给第二个成员�
     const r = build({}, { profile: p });
     expect(r.ok).toBe(false);
     if (!r.ok && r.kind === "rejected") expect(r.rejections.map((x) => x.reason)).toEqual(["capability-unsupported"]);
+  });
+});
+
+describe("R12 ③b：机制状态硬约束 —— 声明了 ≠ 真能用（票 12）", () => {
+  it("设计引用 `moving-platform`（词表与 profile 都有、却没运行时实现）⇒ `mechanic-experimental`", () => {
+    // ⚠️ `moving-platform` 是意图没点名的**补全**（合法，覆盖不查「多」），但它的 status 是
+    //   experimental —— 单这一条就该拒，不掺别的理由。
+    const r = build({
+      mechanics: [
+        { id: "m-jump", mechanic: "jump" },
+        { id: "m-double-jump", mechanic: "jump" },
+        { id: "m-plat", mechanic: "moving-platform" }
+      ]
+    });
+    expect(r.ok).toBe(false);
+    if (r.ok || r.kind !== "rejected") return;
+    expect(r.rejections.map((x) => x.reason)).toEqual(["mechanic-experimental"]);
+    expect(r.rejections[0]!.detail).toContain("moving-platform");
+    expect(r.rejections[0]!.detail).toContain("experimental");
+  });
+
+  it("只引用 supported 机制 ⇒ 放行（负判据不许误伤正例）", () => {
+    expect(build().ok).toBe(true);
   });
 });
 

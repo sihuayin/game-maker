@@ -7,7 +7,7 @@
 //   那是渲染器自己的事，与数据无关。
 import Phaser from "phaser";
 import { BACKDROP, formatIssue, type Box, type Drawn, type WorldDescription } from "../world.js";
-import { hazardAnchor } from "../hazard.js";
+import { dangerState, hazardAnchor } from "../hazard.js";
 
 /** 占位符的纹理名。**品红/黑棋盘** —— 票 32 裁决 3 要的是「刺眼」，不是好看。 */
 const PLACEHOLDER = "__placeholder__";
@@ -23,6 +23,8 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
     private keys?: Record<string, Phaser.Input.Keyboard.Key>;
     private hazards: { sprite: Phaser.GameObjects.Image; start: number; axis: "x" | "y"; distance: number; periodMs: number; t0: number }[] = [];
     private pickups: Phaser.GameObjects.Image[] = [];
+    private chests: { sprite: Phaser.GameObjects.Image; box: Box; range: number; openFrame?: string; opened: boolean }[] = [];
+    private dangers: { sprite: Phaser.GameObjects.Image; box: Box; idleFrame: string; activeFrame?: string; periodMs: number; activeMs: number; t: number; state: "idle" | "active"; hits: number; hitThisWindow: boolean }[] = [];
     private gate?: Phaser.GameObjects.Image;
     private pips: Phaser.GameObjects.GameObject[] = [];
     private collected = 0;
@@ -76,6 +78,8 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
 
     update(_time: number, delta: number): void {
       this.advanceHazards(delta);
+      this.advanceDangers(delta);
+      this.advanceChests();
       if (!this.player) return;
       const m = world.player.move;
       const left = this.cursors?.left.isDown || this.keys?.A?.isDown;
@@ -133,8 +137,9 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
 
       // ⚠️ 用 `sprite` 不用 `image` —— 带帧的实体要能 `play`（`Sprite extends Image`）
       const sprite = this.add.sprite(d.at.x, d.at.y, d.atlas, d.frame).setOrigin(d.anchor.x, d.anchor.y).setDepth(DEPTH_ENTITY);
-      // 若资源是 animation：用**清单给的帧名**建一个动画并播上（壳不解析帧名的含义）
-      if (e.frames && e.frames.length > 1) {
+      // 若资源是 animation：用**清单给的帧名**建一个动画并播上（壳不解析帧名的含义）。
+      // ⚠️ chest / danger 各自用状态机切帧（打开 / 喷发），不走循环动画。
+      if (e.frames && e.frames.length > 1 && e.kind !== "chest" && e.kind !== "danger") {
         const key = `${e.id}#play`;
         if (!this.anims.exists(key))
           this.anims.create({ key, frames: e.frames.map((f) => ({ key: d.atlas, frame: f })), frameRate: 8, repeat: -1 });
@@ -162,6 +167,27 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
           if (!e.wins) break;
           this.gate = sprite;
           this.physics.add.overlap(this.playerOrStub(), sprite, () => this.tryWin());
+          break;
+        }
+        case "chest": {
+          // ⚠️ 近距自动触发（票 04）：不进 physics overlap，`advanceChests` 每帧算
+          //   玩家盒子 × 交互区（实体盒子外扩 `range`）的相交 —— 这样「范围外不触发」是
+          //   几何事实，不是 overlap 的副产品。
+          this.chests.push({
+            sprite, box: e.box, range: e.range ?? 0,
+            openFrame: e.frames && e.frames.length > 1 ? e.frames[e.frames.length - 1] : undefined,
+            opened: false,
+          });
+          break;
+        }
+        case "danger": {
+          // ⚠️ 定时打击（票 05）：状态周期由纯函数 `dangerState` 给，这里只把 idle/active 帧摆上。
+          this.dangers.push({
+            sprite, box: e.box, idleFrame: d.frame,
+            activeFrame: e.frames && e.frames.length > 1 ? e.frames[e.frames.length - 1] : undefined,
+            periodMs: e.strike?.periodMs ?? 1000, activeMs: e.strike?.activeMs ?? 200,
+            t: 0, state: "idle", hits: 0, hitThisWindow: false,
+          });
           break;
         }
         case "decor": break;
@@ -236,7 +262,7 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
       }
     }
 
-    // ── 玩法：三条写死的规则（票 32 的成分清单）────────────────────────────
+    // ── 玩法：五条写死的规则（票 32 的成分清单 + 票 13/14 的 chest/danger）─────
 
     private advanceHazards(delta: number): void {
       for (const h of this.hazards) {
@@ -249,6 +275,57 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
         else h.sprite.setPosition(h.sprite.x, p);
         (h.sprite.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject();
       }
+    }
+
+    /**
+     * danger 的定时打击（票 05 / 14）：状态周期由纯函数 `dangerState` 给（idle ↔ active），
+     * 这里只切帧 + 在 active 窗口判命中。命中复用 `hitHazard` 复位。
+     */
+    private advanceDangers(delta: number): void {
+      for (const d of this.dangers) {
+        d.t += delta;
+        const state = dangerState(d.periodMs, d.activeMs, d.t);
+        if (state !== d.state) {
+          d.state = state;
+          d.sprite.setFrame(state === "active" && d.activeFrame ? d.activeFrame : d.idleFrame);
+          // 进入新喷发窗口：重置「本次窗口已记」标记 —— `hits` 记的是**离散的喷发窗口**，
+          // 不是帧数（否则 active 窗口内每帧 +1，会把 400ms 的喷发数成 ~24 次）。
+          if (state === "active") d.hitThisWindow = false;
+        }
+      }
+      if (!this.player || this.won) return;
+      const b = this.player.body as Phaser.Physics.Arcade.Body;
+      const pr = { left: b.left, top: b.top, right: b.right, bottom: b.bottom };
+      for (const d of this.dangers) {
+        if (d.state !== "active") continue;
+        if (pr.left < d.box.x + d.box.w && pr.right > d.box.x && pr.top < d.box.y + d.box.h && pr.bottom > d.box.y) {
+          if (!d.hitThisWindow) { d.hitThisWindow = true; d.hits += 1; }
+          this.hitHazard();
+        }
+      }
+    }
+
+    /**
+     * chest 的近距自动触发（票 04 / 13）：玩家盒子与「交互区」（实体盒子外扩 `range`）
+     * 相交 → 打开（closed→open 视觉）+ 奖励 `collected+1`；一次性、范围外不触发。
+     */
+    private advanceChests(): void {
+      if (!this.player || this.won) return;
+      const b = this.player.body as Phaser.Physics.Arcade.Body;
+      const pr = { left: b.left, top: b.top, right: b.right, bottom: b.bottom };
+      for (const c of this.chests) {
+        if (c.opened) continue;
+        const left = c.box.x - c.range, right = c.box.x + c.box.w + c.range;
+        const top = c.box.y - c.range, bottom = c.box.y + c.box.h + c.range;
+        if (pr.left < right && pr.right > left && pr.top < bottom && pr.bottom > top) this.openChest(c);
+      }
+    }
+
+    private openChest(c: { sprite: Phaser.GameObjects.Image; openFrame?: string; opened: boolean }): void {
+      c.opened = true;
+      if (c.openFrame) c.sprite.setFrame(c.openFrame);
+      this.collected += 1;
+      this.refreshPips();
     }
 
     private collect(sprite: Phaser.GameObjects.Image): void {

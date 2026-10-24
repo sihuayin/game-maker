@@ -1,0 +1,376 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "ruined-street-assets",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-player",
+        "role": "玩家角色",
+        "description": "一名背着行囊、戴着块状帽子的拾荒者，矮小方正的方块人剪影，深色制服外套配一条发光的横向腰带，肢体为直角折线",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 64
+        },
+        "required": true,
+        "characterId": "scavenger-player",
+        "masterAsset": "scavenger-player-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "fps": 10,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-wasteland",
+        "role": "巡逻敌人",
+        "description": "与玩家同语法的小型方块敌人，深色制服剪影、块状帽与一条暗红横向腰带，在固定区间内来回匀速巡逻",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 64
+        },
+        "required": true,
+        "characterId": "enemy-wasteland",
+        "masterAsset": "enemy-wasteland-master",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 6,
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "scrap-resource",
+        "role": "可拾取废料",
+        "description": "巴掌大的锈橘色几何废料块，由几块矩形错位叠成，浮在街面上方一点",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-loot",
+        "role": "宝箱稀有物件",
+        "description": "从宝箱中取出的发光小方块物件，边缘干净的高光块，体积比普通废料大一圈",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 20,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-wasteland",
+        "role": "宝箱（关闭态）",
+        "description": "半人宽的小方块宝箱，扁平硬边几何箱体加一道箱盖接缝，正面带一块发光的高光小面",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest-wasteland-open",
+        "role": "宝箱（已开启空箱）",
+        "description": "同一只方块宝箱，箱盖向上翻开的空箱状态，内部为一块暗色平涂，高光熄灭",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 40
+        },
+        "required": true,
+        "dependsOn": [
+          "chest-wasteland"
+        ]
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "rubble-block",
+        "role": "瓦砾障碍块",
+        "description": "半人高的瓦砾堆积，由若干错位矩形与三角碎块叠成的硬边堆体，顶端不平整",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 40,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "broken-floor",
+        "role": "地面断口",
+        "description": "地面条带缺失的一段，两侧露出断面的深色缺口，下方是向下延伸的坠落空隙",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0
+        },
+        "size": {
+          "w": 64,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "exit-beacon",
+        "role": "撤离点灯柱",
+        "description": "街区尽头的方块灯柱，竖直柱体顶端一块发光的方形灯头，柱身有横向分隔色带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 96
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wall-sign",
+        "role": "墙上小挂牌",
+        "description": "挂在建筑立面上的小方块挂牌，矩形底板加两根短吊线，极简硬边",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": false
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "level-ruined-street-bg",
+        "role": "废弃街区横向舞台背景",
+        "description": "三层横向堆叠的废土黄昏街区：厚重色带天空与顶部暗带、建筑立面整块墙面、轨道与地面条带",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 960,
+          "h": 540
+        },
+        "required": true,
+        "characterId": "level-ruined-street",
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0,
+            "description": "整幅厚重纯色天空，顶边压一条更深的暗色横带，无云无渐变"
+          },
+          {
+            "name": "wall",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "整块横向建筑立面墙面色块，开矩形门窗洞口，三角屋顶剪影沿横向排开，大片留白，稀疏挂画框、壁灯与小挂牌"
+          },
+          {
+            "name": "ground",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "水平地面条带，条带下方重复排列的深色轨枕与轨道线"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-scrap-counter",
+        "role": "行囊废料计数条",
+        "description": "屏幕左上角的状态条底板，左侧一块方形图标位、右侧为可延伸的计数区，纯色硬边",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 160,
+          "h": 40
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 12,
+          "right": 12,
+          "top": 10,
+          "bottom": 10
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-scrap-icon",
+        "role": "废料计数图标",
+        "description": "与街面废料同形的小几何废料块图标，按原尺寸绘制",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": false
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-player-master",
+      "role": "玩家角色创作态母版",
+      "description": "拾荒者正面站立静态剪影：块状帽子、矮小方正躯干、深色制服外套、发光横向腰带、背后行囊，肢体为直角折线",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-player",
+      "size": {
+        "w": 48,
+        "h": 64
+      }
+    },
+    {
+      "id": "enemy-wasteland-master",
+      "role": "巡逻敌人创作态母版",
+      "description": "与玩家同语法的小型方块敌人正面站立剪影：块状帽、方正躯干、深色制服、横向腰带，与玩家保持头身比一致",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy-wasteland",
+      "size": {
+        "w": 48,
+        "h": 64
+      }
+    }
+  ]
+}

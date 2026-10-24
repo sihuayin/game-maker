@@ -1,0 +1,386 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-panel",
+  "frame": "hud-panel",
+  "viewBox": [
+    0,
+    0,
+    32,
+    32
+  ],
+  "expectedSize": [
+    32,
+    32
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x": 1,
+      "y": 1,
+      "w": 30,
+      "h": 30
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 8,
+      "y": 8,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 2,
+      "y": 2,
+      "w": 28,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 2,
+      "y": 24,
+      "w": 28,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 2,
+      "y": 2,
+      "w": 6,
+      "h": 28
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 24,
+      "y": 2,
+      "w": 6,
+      "h": 28
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 2,
+      "y": 2,
+      "w": 28,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 2,
+      "y": 28,
+      "w": 28,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 2,
+      "y": 2,
+      "w": 2,
+      "h": 28
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 28,
+      "y": 2,
+      "w": 2,
+      "h": 28
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 3,
+      "w": 26,
+      "h": 5,
+      "colors": [
+        "palette:5",
+        "palette:6"
+      ],
+      "ratio": 0.4,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 24,
+      "w": 26,
+      "h": 5,
+      "colors": [
+        "palette:5",
+        "palette:6"
+      ],
+      "ratio": 0.4,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 3,
+      "y": 3,
+      "w": 5,
+      "h": 26,
+      "colors": [
+        "palette:5",
+        "palette:6"
+      ],
+      "ratio": 0.4,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 24,
+      "y": 3,
+      "w": 5,
+      "h": 26,
+      "colors": [
+        "palette:5",
+        "palette:6"
+      ],
+      "ratio": 0.4,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 8,
+      "y": 8,
+      "w": 4,
+      "h": 16,
+      "colors": [
+        "palette:6",
+        "palette:2"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "dither",
+      "x": 20,
+      "y": 8,
+      "w": 4,
+      "h": 16,
+      "colors": [
+        "palette:6",
+        "palette:2"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "dither",
+      "x": 8,
+      "y": 8,
+      "w": 16,
+      "h": 4,
+      "colors": [
+        "palette:6",
+        "palette:2"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "dither",
+      "x": 8,
+      "y": 20,
+      "w": 16,
+      "h": 4,
+      "colors": [
+        "palette:6",
+        "palette:2"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "dither",
+      "x": 12,
+      "y": 12,
+      "w": 8,
+      "h": 8,
+      "colors": [
+        "palette:3",
+        "palette:2"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "line",
+      "stroke": "palette:15",
+      "strokeWidth": 1,
+      "x1": 0,
+      "y1": 0,
+      "x2": 32,
+      "y2": 0
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 0,
+      "y1": 31,
+      "x2": 32,
+      "y2": 31
+    },
+    {
+      "op": "line",
+      "stroke": "palette:15",
+      "strokeWidth": 1,
+      "x1": 0,
+      "y1": 0,
+      "x2": 0,
+      "y2": 32
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 31,
+      "y1": 0,
+      "x2": 31,
+      "y2": 32
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "points": [
+        [
+          2,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          2,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "points": [
+        [
+          29,
+          2
+        ],
+        [
+          24,
+          2
+        ],
+        [
+          29,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "points": [
+        [
+          2,
+          29
+        ],
+        [
+          7,
+          29
+        ],
+        [
+          2,
+          24
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "points": [
+        [
+          29,
+          29
+        ],
+        [
+          24,
+          29
+        ],
+        [
+          29,
+          24
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 5,
+      "y": 5,
+      "w": 22,
+      "h": 2,
+      "colors": [
+        "palette:7",
+        "palette:3"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 5,
+      "y": 25,
+      "w": 22,
+      "h": 2,
+      "colors": [
+        "palette:7",
+        "palette:3"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 5,
+      "y": 5,
+      "w": 2,
+      "h": 22,
+      "colors": [
+        "palette:7",
+        "palette:3"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "dither",
+      "x": 25,
+      "y": 5,
+      "w": 2,
+      "h": 22,
+      "colors": [
+        "palette:7",
+        "palette:3"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    }
+  ]
+}

@@ -110,9 +110,19 @@ describe("有界重试", () => {
     await expect(g(PLAYER, STYLE)).resolves.toHaveLength(3);
   });
 
-  it("两次都失败 → 报出来试了几次", async () => {
+  it("recipe-config-gap-v1 票 08：默认 4 次 —— 前三次坏、第四次正常 → 成功", async () => {
+    const g = gen(fakeFetch([
+      { body: { content: [{ type: "text", text: "{坏了" }], stop_reason: "end_turn" } },
+      { body: { content: [{ type: "text", text: "{坏了" }], stop_reason: "end_turn" } },
+      { body: { content: [{ type: "text", text: "{坏了" }], stop_reason: "end_turn" } },
+      { body: okBody(3) },
+    ]));
+    await expect(g(PLAYER, STYLE)).resolves.toHaveLength(3);
+  });
+
+  it("四次都失败 → 报出来试了几次", async () => {
     await expect(gen(fakeFetch([{ body: { content: [{ type: "text", text: "{坏了" }], stop_reason: "end_turn" } }]))(PLAYER, STYLE))
-      .rejects.toThrow(/2 次都没成功/);
+      .rejects.toThrow(/4 次都没成功/);
   });
 
   it("attempts=1 时只试一次", async () => {

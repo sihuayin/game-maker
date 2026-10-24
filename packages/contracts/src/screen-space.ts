@@ -7,7 +7,7 @@
 //
 // ⚠️ **它只管屏幕空间**：世界坐标系那一半归各自配置的 `inWorld`，**尺子不同**
 //   （世界可以宽 1440，而屏幕只有 480）。
-import { entityBox, type ConfigIssue, type GameConfig } from "./game-config.js";
+import { entityBox, pickupCount, type ConfigIssue, type GameConfig } from "./game-config.js";
 import type { TdConfig } from "./td-config.js";
 import type { AssetPackManifest } from "./assetpack.js";
 
@@ -95,7 +95,7 @@ export function gameHudScreenItems(
   });
   const pipSize = sizeOf(manifest, config.hud.pip.asset);
   const pipAnchor = anchorOf(manifest, config.hud.pip.asset);
-  const pickups = config.entities.filter((e) => e.kind === "pickup").length;
+  const pickups = pickupCount(config);
   for (let i = 0; i < pickups; i++) {
     const at = { x: config.hud.pip.at.x + i * config.hud.pip.step.x, y: config.hud.pip.at.y + i * config.hud.pip.step.y };
     items.push({ where: `hud.pip[${i}]`, at, box: entityBox(at, pipSize, pipAnchor) });

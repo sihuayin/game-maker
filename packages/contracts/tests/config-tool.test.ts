@@ -73,12 +73,20 @@ describe("§镜像与契约**行为一致**（漂移测试）", () => {
 });
 
 describe("⚠️ **明示例外**：只被 v3 的 refine 拒的输入，镜像放行", () => {
-  // 今天只有一条：**实体 id 不得重复**（`GameConfigSchema` 的顶层 `superRefine`）。
-  // ⚠️ 它**不是**漂移，是分工：镜像管线形状，契约判成立与否 —— 而 `toJSONSchema` 反正会把
+  // 有两条：① **实体 id 不得重复**；② **danger 缺 strike**（票 14）—— 都是
+  //   `GameConfigSchema` 顶层 `superRefine` 的判据。
+  // ⚠️ 它们**不是**漂移，是分工：镜像管线形状，契约判成立与否 —— 而 `toJSONSchema` 反正会把
   //   那几条 refine 静默丢掉（票 08 实测），所以模型看见的两份是一样的。
   it("实体 id 重复 ⇒ 契约拒、镜像放行", () => {
     const c = clone();
     (c.entities as unknown[]).push(structuredClone(c.entities[0]));
+    expect(v3(c)).toBe(false);
+    expect(v4(c)).toBe(true);
+  });
+
+  it("票 14：danger 缺 strike ⇒ 契约拒、镜像放行", () => {
+    const c = clone();
+    c.entities.push({ id: "danger-1", kind: "danger", at: { x: 600, y: 240 }, asset: "pickup-suitcase" });
     expect(v3(c)).toBe(false);
     expect(v4(c)).toBe(true);
   });

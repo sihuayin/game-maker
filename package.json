@@ -12,6 +12,8 @@
     "check": "pnpm check:deps && pnpm check:links && pnpm build",
     "test": "vitest run --passWithNoTests",
     "test:playable": "pnpm build && node packages/demo/probe/playable-smoke.mjs",
+    "test:mechanic": "pnpm build && node packages/demo/probe/mechanic-probe.mjs",
+    "test:acceptance": "pnpm build && node packages/demo/probe/free-acceptance.mjs",
     "typecheck": "tsc -b && pnpm -r --if-present typecheck"
   },
   "devDependencies": {

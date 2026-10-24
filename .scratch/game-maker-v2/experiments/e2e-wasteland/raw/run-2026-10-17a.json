@@ -1,0 +1,12 @@
+{
+ "code": 4,
+ "ms": 57498,
+ "text": "{\n  \"command\": \"create\",\n  \"error\": \"工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。\",\n  \"exitCode\": 4,\n  \"ledger\": [\n    {\n      \"step\": \"plan-assets\",\n      \"target\": \"recipe\",\n      \"upstream\": \"messages\",\n      \"ms\": 29692,\n      \"attempts\": 3,\n      \"failures\": [\n        \"empty-input\",\n        \"empty-input\",\n        \"empty-input\"\n      ],\n      \"model\": \"deepseek-flash\",\n      \"usage\": {\n        \"inputTokens\": 226,\n        \"outputTokens\": 2449\n      }\n    }\n  ]\n}\n  · visual-world\n  · intent\n  · design\n  · character-dna\n  · recipe\n",
+ "steps": [
+  "  · visual-world\n",
+  "  · intent\n",
+  "  · design\n",
+  "  · character-dna\n",
+  "  · recipe\n"
+ ]
+}

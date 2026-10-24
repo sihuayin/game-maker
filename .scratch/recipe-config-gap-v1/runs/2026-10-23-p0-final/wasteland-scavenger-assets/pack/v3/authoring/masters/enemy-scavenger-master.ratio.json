@@ -1,0 +1,22 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 3,
+  "masters": [
+    {
+      "master": "enemy-scavenger-master",
+      "requested": {
+        "w": 32,
+        "h": 40
+      },
+      "returned": {
+        "w": 928,
+        "h": 1152
+      },
+      "requestedRatio": 0.8,
+      "returnedRatio": 0.8055555555555556,
+      "ratioDelta": 0.00694444444444442,
+      "match": false
+    }
+  ]
+}

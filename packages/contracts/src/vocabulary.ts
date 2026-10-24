@@ -15,12 +15,16 @@ import { z } from "zod/v4";
 // 一、`MECHANICS` —— 玩法机制
 //
 // ⚠️ **这张表不是我发明的，是从 `game-config/v1` 反推的**（R12：`RuntimeProfile` 是
-//   **外壳能力的事实投影**，不是一张许愿单）。它比想象的小得多 —— 四条构造，八个机制：
+//   **外壳能力的事实投影**，不是一张许愿单）。它比想象的小得多 —— 四个构造，十个机制：
 //
-//     EntityKind = "solid" | "pickup" | "hazard" | "goal" | "decor"   game-config.ts:40
-//     Motion     = { kind: "cycle", axis, distance, periodMs }         game-config.ts:49
-//     PlayerMove = { speed, jumpVelocity, gravity }                    game-config.ts:105
-//     Objective  = { kind: "collect-then-reach" }                      game-config.ts:154
+//     EntityKind = "solid" | "pickup" | "hazard" | "goal" | "chest" | "danger" | "decor"   game-config.ts:40
+//     Motion     = { kind: "cycle", axis, distance, periodMs }                              game-config.ts:49
+//     PlayerMove = { speed, jumpVelocity, gravity }                                         game-config.ts:105
+//     Objective  = { kind: "collect-then-reach" }                                           game-config.ts:154
+//
+//   ⚠️ `chest` 与 `danger` 是 2026-10-23（票 13 / 14）加的：`open-chest`（近距自动触发、
+//   一次性奖励并入收集计数）与 `avoid-danger`（定时打击 + 安全窗口）。两者都进了
+//   `RUNTIME_IMPLEMENTED_MECHANICS`，所以是 `supported`。
 //
 // ⚠️ **`double-jump` / `attack` / `health` / `enemy-ai` / `dialogue` 全都不在表里** ——
 //   而它们正是用户最常要的。这不是漏了，**这正是这张表存在的理由**：
@@ -47,11 +51,71 @@ export const MECHANICS = [
   /** `EntityKind = "hazard"`（:40）—— 碰到就输。 */
   "hazard-contact",
   /** `EntityKind = "goal"`（:40）＋ `Objective = "collect-then-reach"`（:154）。 */
-  "reach-goal"
+  "reach-goal",
+  /** `EntityKind = "chest"`（:40）＋ 可选 `range` —— 近距自动触发、一次性奖励并入收集计数（票 04 / 13）。 */
+  "open-chest",
+  /** `EntityKind = "danger"`（:40）＋ `strike{periodMs,activeMs}` —— 定时打击 + 安全窗口（票 05 / 14）。 */
+  "avoid-danger"
 ] as const;
 
 export const MechanicSchema = z.enum(MECHANICS);
 export type Mechanic = z.infer<typeof MechanicSchema>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 一·补、`MECHANIC_STATUS` —— 机制状态（票 12 · 意图→机制契约）
+//
+// ⚠️ **不是手写宣称，是「推导」**：`supported` 由「运行时实现」这条见证推导而来。
+//   「设计表达」与「config 表达」两条腿是**恒真**的 —— `MECHANICS` 本来就是从
+//   `game-config/v1` 反推的（文件头 §一），进表的那天就带了 config，枚举里就带了设计；
+//   真正会**漏**的是「运行时实现」：`moving-platform` 就是那个反例（见下）。
+//   「QA probe」那条腿依赖票 06，落地前不计 —— 手写一张 `Record<Mechanic, Status>` 就是
+//   票 01 禁掉的「手写宣称」：删掉 `scene.ts` 的一行实现，那张表照样躺在那儿说它 supported。
+//
+// ⚠️ **事实性由测试保证，不由类型保证**（`runtime-profile.ts` §一②③ 同款）：这里的
+//   `RUNTIME_IMPLEMENTED_MECHANICS` 是**带行号的转录**，真伪由
+//   `packages/demo/tests/shell-mechanic-witness.test.ts` 逐条读外壳源码断言（删实现 ⇒ 当场响）。
+export const MECHANIC_STATUSES = ["experimental", "supported", "deprecated"] as const;
+export const MechanicStatusSchema = z.enum(MECHANIC_STATUSES);
+export type MechanicStatus = z.infer<typeof MechanicStatusSchema>;
+
+/** 生命周期手标（`deprecated`）—— **不是**能力推导出来的：它是一句「别再用了」的人话。
+ *  ⚠️ 今天为空 —— 没有哪条机制到了要退役的地步。 */
+export const DEPRECATED_MECHANICS: readonly Mechanic[] = [];
+
+/** **运行时实现**见证（转录）：哪几条机制在外壳里真有运行时行为。
+ *  ⚠️ `moving-platform` 刻意**不在** —— `Motion` 在 `game-config/v1` 里是正交于 `kind` 的
+ *   （`vocabulary.ts` 上面那句注释），但渲染器只在 `case "hazard"` 读 `motion`
+ *   （`shell/scene.ts`），带 motion 的 solid 是静态体、从不移动。 */
+export const RUNTIME_IMPLEMENTED_MECHANICS: readonly Mechanic[] = [
+  "run",
+  "jump",
+  "gravity",
+  "collide-terrain",
+  "collect-pickup",
+  "hazard-contact",
+  "reach-goal",
+  "open-chest",
+  "avoid-danger"
+];
+
+/** 推导机制状态：`deprecated`（手标）→ `supported`（有运行时实现）→ `experimental`（其余）。
+ *  ⚠️ 只收 `Mechanic`（封闭枚举），所以「不在词表里」不归它管 —— 那是 profile 差集的活。 */
+export function deriveMechanicStatus(mechanic: Mechanic): MechanicStatus {
+  if (DEPRECATED_MECHANICS.includes(mechanic)) return "deprecated";
+  return RUNTIME_IMPLEMENTED_MECHANICS.includes(mechanic) ? "supported" : "experimental";
+}
+
+/** **QA probe** 见证（转录）：哪几条机制有**会过的运行时 probe**（票 15）。
+ *  ⚠️ 与 `RUNTIME_IMPLEMENTED_MECHANICS` **不是一回事**（票 06 裁定）：`status` 是「运行时层」
+ *   （有实现 ⇒ supported），probe 是**独立 QA 覆盖层**（行为级验证），**不进** `deriveMechanicStatus`。
+ *  ⚠️ 事实性由 `packages/demo/probe/mechanic-probe.mjs` 保证：它读这张表，要求**每条都有 probe 且
+ *   每条都过** —— 删掉一条 probe 实现、或某条 probe 在真 Chrome 里红了，`pnpm test:mechanic` 当场非 0。
+ *   ⇒ 「声明了有 probe」与「probe 真过」由同一条命令钉住，不靠人记。 */
+export const QA_PROBED_MECHANICS: readonly Mechanic[] = [
+  "collect-pickup",
+  "open-chest",
+  "avoid-danger"
+];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 二、`CAPABILITIES` —— 外壳能力（**机制以下的那一层**：输入、相机、坐标、碰撞）

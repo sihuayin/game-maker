@@ -1,0 +1,126 @@
+{
+  "format": "run-design-attempts/v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "rejected",
+      "detail": "意图里的机制「躲避危险」（`avoid-danger`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
+      "rejections": [
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「躲避危险」（`avoid-danger`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        }
+      ],
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "锈城寻宝人",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "在废弃城市废墟中横向探索移动，寻找可拾取的资源与可打开的宝箱",
+          "留意锈蚀管线、坍塌砖墙与游荡敌人，躲避危险与敌人以保全自身",
+          "收集资源并开启宝箱，向更深处推进直至抵达终点"
+        ],
+        "player": {
+          "id": "scavenger-hero",
+          "role": "背负行囊、驼背持械的废土拾荒者",
+          "abilities": [
+            "横向移动与跳跃穿越废墟地形",
+            "可在接近时打开宝箱",
+            "可拾取散落在废墟中的资源"
+          ],
+          "goals": [
+            "寻找并收集废土资源与宝箱",
+            "躲避危险与敌人存活下去",
+            "抵达关卡终点"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "enemy-wasteland",
+            "behavior": "在行进线附近固定区域内来回巡逻，见到玩家即改变方向逼近",
+            "threat": "接触玩家会直接造成伤害，迫使玩家绕行或跳跃躲避"
+          }
+        ],
+        "npcs": [],
+        "interactables": [
+          {
+            "id": "chest",
+            "type": "宝箱",
+            "behavior": "玩家靠近后打开，释放内含的资源或奖励"
+          }
+        ],
+        "resources": [
+          {
+            "id": "scrap-resource",
+            "purpose": "可拾取的废料资源，作为关卡内收集物计数，是达成胜利目标的一部分"
+          }
+        ],
+        "world": {
+          "theme": "低分辨率像素画废土后末日，硬朗黑色勾边与三级明暗塑形，浊冷底色点缀锈红、琥珀、管黄暖色重音",
+          "setting": "阴天散光下的废弃城市：残破混凝土与钢架建筑、悬垂管线、破碎柏油与碎石路面、坑洼积水、废弃汽车油桶路牌与倾倒电线杆",
+          "structure": "前景杂物稀疏以保可读，中景密集铺陈废墟环境，远景为低饱和雾化的废弃城市剪影多层视差；地面废墟、碎石与资源堆贴合行进线，破损建筑、残墙、倒伏路牌与管道错落分布，宝箱与资源明显大于环境杂物以突出可收集性"
+        },
+        "levels": [
+          {
+            "id": "level-1",
+            "purpose": "教学玩家基础移动、跳跃、收集与躲避的入门关卡",
+            "layout": "从左向右推进：起点为平坦柏油路面，途中散落 scrap-resource 与一个 chest，中段有一处坑洼需跳跃通过，enemy-wasteland 在行进线附近巡逻需躲避，末端为终点",
+            "entities": [
+              "scavenger-hero",
+              "chest",
+              "scrap-resource",
+              "enemy-wasteland"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "linear",
+          "description": "关卡线性推进，玩家从起点穿越废墟、收集资源、躲避敌人并抵达终点后进入下一关"
+        },
+        "mechanics": [
+          {
+            "id": "side-scroll-move",
+            "mechanic": "run"
+          },
+          {
+            "id": "jump",
+            "mechanic": "jump"
+          },
+          {
+            "id": "open-chest",
+            "mechanic": "open-chest"
+          },
+          {
+            "id": "find-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "avoid-enemy",
+            "mechanic": "avoid-danger"
+          }
+        ],
+        "winConditions": [
+          "抵达关卡终点"
+        ],
+        "loseConditions": [
+          "被敌人接触受到致命伤害"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "camera:parallax",
+          "collision:aabb",
+          "objective:collect-then-reach",
+          "hud:screen-space"
+        ]
+      }
+    }
+  ]
+}

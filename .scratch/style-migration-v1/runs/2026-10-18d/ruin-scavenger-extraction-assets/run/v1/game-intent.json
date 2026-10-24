@@ -1,0 +1,86 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版废土探索",
+  "subgenre": "横版动作探索（拾荒生存）",
+  "camera": "横版侧视角，画面随拾荒者向右推进",
+  "targetExperience": "荒凉压抑的废土中孤独前行，靠谨慎与取舍求生，最终抵达撤离点时获得逃出生天的解脱感",
+  "coreLoopSteps": [
+    "向右探索废弃城市",
+    "收集散落的资源",
+    "躲避危险地形与敌人",
+    "抵达撤离点"
+  ],
+  "player": {
+    "role": "一名在废弃城市中行走的拾荒者",
+    "goals": [
+      "收集散落的资源",
+      "在危险地形与敌人之间活下去",
+      "抵达撤离点"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒凉、破败、危机四伏"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "name": "横版移动（向右探索）"
+    },
+    {
+      "id": "jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "collect-resource",
+      "name": "收集散落的资源"
+    },
+    {
+      "id": "avoid-hazard",
+      "name": "躲避危险地形"
+    },
+    {
+      "id": "avoid-enemy",
+      "name": "躲避敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "scrap-resource",
+      "type": "resource",
+      "role": "散落在废弃城市各处、可被拾荒者拾取的资源"
+    },
+    {
+      "id": "hazard-terrain",
+      "type": "interactable",
+      "role": "需要躲避的危险地形"
+    },
+    {
+      "id": "wasteland-enemy",
+      "type": "enemy",
+      "role": "在废弃城市中活动、需要躲避的敌人"
+    },
+    {
+      "id": "extraction-point",
+      "type": "interactable",
+      "role": "城市尽头可抵达的撤离点"
+    }
+  ],
+  "winConditions": [
+    "最终抵达撤离点"
+  ],
+  "loseConditions": [
+    "被敌人或危险地形击中而失败"
+  ],
+  "ambiguity": [
+    "mechanics：需求只说躲避危险和敌人，没提是否可以攻击或反击",
+    "mechanics：需求没提被击中几次算失败、是否有生命值",
+    "entities：需求没提敌人具体有几种、分别是什么形态",
+    "entities：需求没提危险地形具体是什么（尖刺、坑洞、辐射区等）",
+    "resource：需求没提资源的具体种类、数量与用途",
+    "progression：需求没提关卡分段或角色成长",
+    "challenge：需求没提难度曲线与死亡惩罚",
+    "title：需求没给游戏名字"
+  ]
+}

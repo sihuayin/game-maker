@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>Style Migration · 最新资源包预览</title>
+<style>
+  :root { --bg:#14161a; --panel:#1d2026; --line:#2c313a; --fg:#e8e6e3; --dim:#9aa0a6; --accent:#d2a087; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; }
+  header { padding:24px 28px 12px; border-bottom:1px solid var(--line); }
+  h1 { margin:0 0 6px; font-size:20px; letter-spacing:.02em; }
+  .sub { color:var(--dim); }
+  .stats { margin-top:12px; color:var(--dim); }
+  .note { margin:12px 28px 0; padding:10px 12px; border:1px solid #5a3b2a; background:#241a14; color:#e6c7b0; border-radius:8px; }
+  main { padding:20px 28px 60px; }
+  section { margin:26px 0 0; }
+  h2 { font-size:15px; margin:0 0 12px; color:var(--accent); letter-spacing:.04em; }
+  .grid { display:flex; flex-wrap:wrap; gap:14px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; }
+  .card .id { font-size:12px; color:var(--dim); margin-bottom:6px; white-space:nowrap; }
+  .checker { background-image:linear-gradient(45deg,#23262c 25%,transparent 25%),linear-gradient(-45deg,#23262c 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#23262c 75%),linear-gradient(-45deg,transparent 75%,#23262c 75%); background-size:16px 16px; background-position:0 0,0 8px,8px -8px,-8px 0; background-color:#191b20; border-radius:6px; padding:4px; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; image-rendering:pixelated; }
+  .meta { color:var(--dim); font-size:11px; margin-top:5px; }
+  .bgwrap { position:relative; width:640px; height:360px; overflow:hidden; border-radius:6px; background:#000; }
+  .bgwrap canvas { position:absolute; left:0; top:0; }
+  .err { color:#ff8a80; }
+  footer { color:var(--dim); padding:0 28px 40px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Style Migration · 最新资源包预览</h1>
+  <div class="sub" id="packline">加载中…</div>
+  <div class="stats" id="stats"></div>
+</header>
+<div class="note">
+  <b>已知内容瑕疵</b>：潜伏者 hang/lunge/retreat 的倒挂/站立语义混用；多帧脚下有地面线；32 色把外套的绿量化成棕。
+  结构 / 帧数 / <code>verifyPack</code> 均已通过。
+</div>
+<main id="main"></main>
+<footer>静态预览 · 直接读取 pack/v1 的 manifest 与图集</footer>
+<script>
+const PACK = '../runs/2026-10-19l-salvage-standby3/ruin-scavenger-extraction-assets/pack/v1/';
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const n=document.createElement(tag); if(cls) n.className=cls; if(text!==undefined) n.textContent=text; return n; };
+
+async function load() {
+  const manifest = await (await fetch(PACK + 'manifest.json')).json();
+  $('packline').textContent = `${manifest.id} · v${manifest.version} · provenance ${manifest.provenance?.mode ?? '?'}`;
+  const counts = {};
+  for (const a of manifest.assets) counts[a.kind] = (counts[a.kind] ?? 0) + 1;
+  $('stats').textContent = `资源 ${manifest.assets.length} · ` + Object.entries(counts).map(([k,v])=>`${k} ${v}`).join(' · ') +
+    ` · 图集 ${manifest.atlases.length}`;
+
+  const atlases = new Map();
+  for (const a of manifest.atlases) {
+    const meta = await (await fetch(PACK + a.meta)).json();
+    const img = new Image();
+    img.src = PACK + a.image;
+    await img.decode();
+    atlases.set(a.id, { meta, img });
+  }
+
+  const main = $('main');
+  // Animations
+  const animSection = el('section'); animSection.appendChild(el('h2', null, '动画（逐帧）'));
+  const animGrid = el('div','grid'); animSection.appendChild(animGrid); main.appendChild(animSection);
+  // Sprites / backgrounds / UI
+  const stillSection = el('section'); stillSection.appendChild(el('h2', null, '精灵 / 背景 / UI'));
+  const stillGrid = el('div','grid'); stillSection.appendChild(stillGrid); main.appendChild(stillSection);
+
+  const drawFrame = (ctx, img, f) => {
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.drawImage(img, f.frame.x, f.frame.y, f.frame.w, f.frame.h, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  };
+  const makeCanvas = (w,h,scale, parent) => {
+    const c=el('canvas'); c.width=w*scale; c.height=h*scale;
+    const wrap=el('div','checker'); wrap.appendChild(c);
+    const card=el('div','card'); card.appendChild(wrap); parent.appendChild(card);
+    return { card, canvas:c, ctx:c.getContext('2d') };
+  };
+
+  for (const asset of manifest.assets) {
+    const atlas = atlases.get(asset.atlasId);
+    if (!atlas) continue;
+    if (asset.kind === 'animation' && asset.animations?.length) {
+      for (const anim of asset.animations) {
+        const scale = asset.size.w <= 24 ? 6 : 4;
+        const { card, ctx, canvas } = makeCanvas(asset.size.w, asset.size.h, scale, animGrid);
+        card.querySelector('.card') ;
+        const label = el('div','id', `${asset.id} · ${anim.name}`);
+        card.insertBefore(label, card.firstChild);
+        card.appendChild(el('div','meta', `${anim.frames.length} 帧 · ${anim.fps ?? '?'} fps · ${asset.size.w}×${asset.size.h}`));
+        const frames = anim.frames.map(n => atlas.meta.frames[n]).filter(Boolean);
+        let i=0;
+        const tick=()=>{ if (!frames.length) return; drawFrame(ctx, atlas.img, frames[i%frames.length]); i++; };
+        tick(); setInterval(tick, Math.max(40, 1000/(anim.fps ?? 8)));
+      }
+    } else if (asset.kind === 'background') {
+      // individual layers + composite
+      const layers = asset.frames.map(f => atlas.meta.frames[f.name]).filter(Boolean);
+      for (let li = 0; li < layers.length; li++) {
+        const { card, ctx } = makeCanvas(asset.size.w, asset.size.h, 0.75, stillGrid);
+        const short = asset.frames[li].name.split('.').pop();
+        card.insertBefore(el('div','id', `${asset.id} · ${short}`), card.firstChild);
+        card.appendChild(el('div','meta', `layer ${li + 1}/${layers.length} · ${asset.size.w}×${asset.size.h}`));
+        drawFrame(ctx, atlas.img, layers[li]);
+      }
+      const compCard = el('div','card');
+      compCard.appendChild(el('div','id', `${asset.id} · 合成（远→近）`));
+      const wrap = el('div','bgwrap'); compCard.appendChild(wrap);
+      for (const f of layers) {
+        const c=el('canvas'); c.width=640; c.height=360; c.style.width='640px'; c.style.height='360px';
+        const ctx=c.getContext('2d'); drawFrame(ctx, atlas.img, f);
+        wrap.appendChild(c);
+      }
+      compCard.appendChild(el('div','meta', 'skyline → blocks → street（近层在上）'));
+      stillGrid.appendChild(compCard);
+    } else {
+      const scale = asset.kind === 'ui' ? 6 : 4;
+      const { card, ctx } = makeCanvas(asset.size.w, asset.size.h, scale, stillGrid);
+      card.insertBefore(el('div','id', asset.id), card.firstChild);
+      card.appendChild(el('div','meta', `${asset.kind} · ${asset.size.w}×${asset.size.h}${asset.paletteBinding ? ' · ' + asset.paletteBinding : ''}`));
+      const f = atlas.meta.frames[asset.frames[0].name];
+      if (f) drawFrame(ctx, atlas.img, f);
+    }
+  }
+}
+load().catch(e => { $('main').innerHTML = `<p class="err">加载失败：${e.message}</p>`; console.error(e); });
+</script>
+</body>
+</html>

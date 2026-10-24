@@ -19,7 +19,7 @@ import {
   type ShellBase, type Size, type Vec,
 } from "./draw.js";
 import {
-  DEFAULT_PLAYER_MOVE, gameHudScreenItems, parseAssetPack, parseGameConfig, resolvePackRef,
+  DEFAULT_PLAYER_MOVE, gameHudScreenItems, parseAssetPack, parseGameConfig, pickupCount, resolvePackRef,
   type AssetPackManifest, type GameConfig,
 } from "@game-maker/contracts";
 
@@ -32,7 +32,7 @@ export {
 
 export type EntityDesc = {
   id: string;
-  kind: "solid" | "pickup" | "hazard" | "goal" | "decor";
+  kind: "solid" | "pickup" | "hazard" | "goal" | "chest" | "danger" | "decor";
   /** 碰撞/摆放盒（世界像素，左上角）。**由 `at` 与锚点推出来**，不是 `at` 本身。 */
   box: Box;
   draw: Drawn;
@@ -44,6 +44,10 @@ export type EntityDesc = {
   /** 若资源是 animation：逐帧名（壳拿去建 Phaser 动画）。 */
   frames?: string[];
   motion?: { axis: "x" | "y"; distance: number; periodMs: number };
+  /** `kind:"chest"` 的交互外扩（px），缺省 0 = 交互区就是实体盒子（票 04 / 13）。 */
+  range?: number;
+  /** `kind:"danger"` 的定时打击参数（票 05 / 14）。 */
+  strike?: { periodMs: number; activeMs: number };
 };
 
 export type PlayerDesc = {
@@ -68,7 +72,7 @@ export type HudDesc = {
    *   而那两处必须用**同一个盒子**，否则「校验过的」与「画出来的」又是两份。
    */
   panel: { draw: Drawn; box: Box };
-  /** 一个拾取物一个槽 —— 槽位数 = `pickupCount`（**同一个数**，票 09 裁决 8）。 */
+  /** 一个拾取物/宝箱一个槽 —— 槽位数 = `pickupCount`（**同一个数**，票 09 裁决 8；票 13 数到 chest）。 */
   pips: { draw: Drawn; at: Vec; box: Box }[];
 };
 
@@ -177,6 +181,8 @@ export function buildWorld(
       wins: e.kind === "goal" && e.id === cfg.objective.gate,
       ...(res.ok && res.frames.length > 1 ? { frames: res.frames.map((f) => f.name) } : {}),
       ...(e.motion ? { motion: e.motion } : {}),
+      ...(e.kind === "chest" ? { range: e.range ?? 0 } : {}),
+      ...(e.kind === "danger" && e.strike ? { strike: e.strike } : {}),
     };
   });
 
@@ -205,7 +211,7 @@ export function buildWorld(
   };
 
   // ── HUD ─────────────────────────────────────────────────────────────────
-  const pickups = cfg.entities.filter((e) => e.kind === "pickup").length;
+  const pickups = pickupCount(cfg);
   const panelSize = cfg.hud.panel.size;
   const hudPanel = resolveDraw(pack, cfg.hud.panel.at, { asset: cfg.hud.panel.asset },
     issues, "hud.panel", cfg.hud.panel.asset, panelSize);

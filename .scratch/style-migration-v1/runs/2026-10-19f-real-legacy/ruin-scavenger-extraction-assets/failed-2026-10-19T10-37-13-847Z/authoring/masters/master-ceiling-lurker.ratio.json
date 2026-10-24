@@ -1,0 +1,22 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "ruin-scavenger-extraction-assets",
+  "packVersion": 1,
+  "masters": [
+    {
+      "master": "master-ceiling-lurker",
+      "requested": {
+        "w": 48,
+        "h": 56
+      },
+      "returned": {
+        "w": 896,
+        "h": 1152
+      },
+      "requestedRatio": 0.8571428571428571,
+      "returnedRatio": 0.7777777777777778,
+      "ratioDelta": -0.09259259259259253,
+      "match": false
+    }
+  ]
+}

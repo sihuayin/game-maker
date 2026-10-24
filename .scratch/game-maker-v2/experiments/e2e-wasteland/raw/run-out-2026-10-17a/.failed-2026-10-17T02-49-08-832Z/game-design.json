@@ -1,0 +1,155 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废都拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的横版街区里向右推进，观察前方的断口、瓦砾与敌人巡逻",
+    "跳跃跨越断口、瓦砾堆与低矮路障，落在安全的房梁与地面条带上",
+    "在街面上拾取散落的废料资源，记入随身行囊",
+    "靠近小型方块宝箱并打开它，取出里面藏着的补给与稀有物件",
+    "识破敌人的来回巡逻路线，趁间隙穿过或绕开，避免与它接触",
+    "攒够足够的废料后抵达街区尽头的撤离点，完成本段探索"
+  ],
+  "player": {
+    "id": "scavenger-player",
+    "role": "一名背着行囊、戴着块状帽子的拾荒者，在废弃城市的街区里小心摸索前进",
+    "abilities": [
+      "左右横版移动，速度恒定、可在半途立刻反向或停步",
+      "在站地时起跳，越过断口、瓦砾与低矮路障",
+      "站在地面条带、屋顶与建筑墙面上，受重力下落并被地形挡住",
+      "走近废料即可拾取，计入行囊计数",
+      "贴近宝箱并触发后可打开，取出箱内物品",
+      "可以停在原地不动，等敌人巡逻走远再继续前进"
+    ],
+    "goals": [
+      "在废弃城市中探索整段街区",
+      "寻找并拾取散落的废料资源",
+      "找到并打开街区中的宝箱",
+      "躲开巡逻的敌人与危险地带，不受伤地穿过",
+      "攒够废料后抵达街区尽头的撤离点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在地面条带上一段固定区间内左右匀速来回巡逻，到边界即折返，不会跳跃也不会追击",
+      "threat": "与玩家身体接触即判定玩家受伤失败；它压住的路段只能靠跳上屋顶或等它走远后穿过"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest-wasteland",
+      "type": "宝箱",
+      "behavior": "玩家贴近并触发后箱盖弹开，向玩家行囊里追加一份稀有物件与额外废料，箱子变为已开启的空箱，不能再次获取"
+    },
+    {
+      "id": "rubble-block",
+      "type": "地形障碍块",
+      "behavior": "半人高的瓦砾堆积，玩家撞上会被挡住，必须起跳跳过才能继续向右"
+    },
+    {
+      "id": "broken-floor",
+      "type": "地面断口",
+      "behavior": "地面条带缺失的一段，玩家走到边缘会受重力坠落，坠到画面底部即判定失败"
+    },
+    {
+      "id": "exit-beacon",
+      "type": "撤离点灯柱",
+      "behavior": "街区尽头的方块灯柱，行囊废料达到要求时触碰即完成本段探索"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scrap-resource",
+      "purpose": "街面上散落的废料，拾取后计入行囊，作为打开宝箱与抵达撤离点的筹码"
+    },
+    {
+      "id": "chest-loot",
+      "purpose": "从宝箱中取出的稀有物件，价值高于普通废料，一次抵上数份废料，用于凑齐撤离所需数量"
+    }
+  ],
+  "world": {
+    "theme": "扁平矢量废土黄昏：纯色块与硬边几何构成，无描边、无渐变、无纹理",
+    "setting": "一座荒废的黄昏城市街区，低平的单层建筑立面与三角屋顶剪影沿横向排开，地面是水平条带加重复轨枕与轨道线",
+    "structure": "三层横向堆叠：最底部是轨道与地面条带，角色站在其上方，条带上有断口与瓦砾；中层是建筑立面组成的整块横向墙面，上面开矩形门窗洞口并挂画框、壁灯、小挂牌等方块小物件，屋顶面可站立；最上层是厚重色带天空，顶部压一条更深的暗色横带。背景物件大而平、极稀疏，大片留白墙面色块；可交互物件小而居中，浮在墙面之前"
+  },
+  "levels": [
+    {
+      "id": "level-ruined-street",
+      "purpose": "教学与第一次完整循环：让玩家学会横版移动、跳跃跨障、拾取废料、开箱与躲开巡逻敌人",
+      "layout": "玩家从街区最左端的地面条带出发向右走，先遇到一小段散落的废料可连续拾取；接着一道半人高瓦砾块挡路，需起跳越过；随后地面条带出现断口，需要跳过去落回对面条带；中段一个小宝箱放在墙上小挂牌下方，靠近即可打开；宝箱右侧一段平路上有敌人在固定区间来回巡逻，玩家可跳上低平屋顶绕过或等它折返后穿过；最后一段是通向街区右端的平路与撤离灯柱",
+      "entities": [
+        "scavenger-player",
+        "enemy-wasteland",
+        "chest-wasteland",
+        "scrap-resource",
+        "chest-loot",
+        "rubble-block",
+        "broken-floor",
+        "exit-beacon"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "单段街区的线性推进 + 行囊数量门槛",
+    "description": "整关沿一条从左到右的街区推进，不设等级与技能成长；推进感来自行囊废料数的累积——拾取的废料与开箱得到的稀有物件不断加数，只有攒够数量后街尾的撤离灯柱才会响应，否则触碰无效，玩家必须回头把遗漏的废料与宝箱补齐"
+  },
+  "mechanics": [
+    {
+      "id": "side-scroll-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "gravity-fall",
+      "mechanic": "gravity"
+    },
+    {
+      "id": "collide-terrain",
+      "mechanic": "collide-terrain"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "reach-exit",
+      "mechanic": "reach-goal"
+    }
+  ],
+  "winConditions": [
+    "行囊中的废料数量达到要求后，触碰街区尽头的撤离灯柱即通过本关"
+  ],
+  "loseConditions": [
+    "身体接触到巡逻中的敌人即判定失败",
+    "从地面条带的断口坠落到底部即判定失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

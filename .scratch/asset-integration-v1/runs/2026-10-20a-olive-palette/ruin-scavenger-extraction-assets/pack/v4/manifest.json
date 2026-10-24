@@ -1,0 +1,2121 @@
+{
+  "format": "assetpack/v4",
+  "id": "ruin-scavenger-extraction-assets",
+  "version": 4,
+  "createdAt": "2026-10-20T00:00:00.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "mixed"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 34,
+    "values": [
+      "#000000",
+      "#080000",
+      "#180000",
+      "#200000",
+      "#100700",
+      "#290705",
+      "#1a0d05",
+      "#380702",
+      "#210f03",
+      "#290d02",
+      "#420605",
+      "#310c00",
+      "#221205",
+      "#301100",
+      "#391404",
+      "#321905",
+      "#421600",
+      "#523730",
+      "#454a50",
+      "#794c35",
+      "#58554e",
+      "#685247",
+      "#786151",
+      "#676862",
+      "#74716c",
+      "#8e7161",
+      "#82847f",
+      "#a97f67",
+      "#a0827a",
+      "#a3a09b",
+      "#c89f8b",
+      "#d2a087",
+      "#59503b",
+      "#50432b"
+    ],
+    "coverage": {
+      "exact": 2,
+      "composited": 1,
+      "quantized": 16,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 256,
+        "h": 760
+      },
+      "frames": 61,
+      "assets": [
+        "ceiling-lurker",
+        "clean-water",
+        "extraction-point",
+        "scavenger-actor",
+        "scrap-resource",
+        "wasteland-enemy"
+      ],
+      "checksum": "sha256:89027f911a0b8038b4c875e048571f115aba10a2dba69dc1ce0e299a5906733a"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 640,
+        "h": 1080
+      },
+      "frames": 3,
+      "assets": [
+        "ruined-city-backdrop"
+      ],
+      "checksum": "sha256:47af93c9af4bf386c85631186a89579040554d876f0487dedd8774ec52720454"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 96,
+        "h": 488
+      },
+      "frames": 9,
+      "assets": [
+        "broken-wall",
+        "collapsed-floor",
+        "concrete-step",
+        "hazard-terrain",
+        "metal-platform",
+        "office-debris",
+        "tile-floor",
+        "vent-duct",
+        "wooden-crate"
+      ],
+      "checksum": "sha256:3dff488df20ce4d835691dc95bdb6fbaea29f2c1a9f18cb961b799f52d98c5cc"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "frames": 3,
+      "assets": [
+        "health-icon",
+        "hud-panel",
+        "scrap-icon"
+      ],
+      "checksum": "sha256:8414453f2bbfa2c13b837211cee573135bfb3c9a31fccfa68b0d25de7e6f5aa3"
+    }
+  ],
+  "assets": [
+    {
+      "id": "scavenger-actor",
+      "kind": "animation",
+      "role": "玩家拾荒者，侧视四头身，背包与破旧外套构成不对称轮廓",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scavenger-actor.idle1"
+        },
+        {
+          "name": "scavenger-actor.idle2"
+        },
+        {
+          "name": "scavenger-actor.idle3"
+        },
+        {
+          "name": "scavenger-actor.idle4"
+        },
+        {
+          "name": "scavenger-actor.run1"
+        },
+        {
+          "name": "scavenger-actor.run2"
+        },
+        {
+          "name": "scavenger-actor.run3"
+        },
+        {
+          "name": "scavenger-actor.run4"
+        },
+        {
+          "name": "scavenger-actor.run5"
+        },
+        {
+          "name": "scavenger-actor.run6"
+        },
+        {
+          "name": "scavenger-actor.run7"
+        },
+        {
+          "name": "scavenger-actor.run8"
+        },
+        {
+          "name": "scavenger-actor.jump1"
+        },
+        {
+          "name": "scavenger-actor.jump2"
+        },
+        {
+          "name": "scavenger-actor.jump3"
+        },
+        {
+          "name": "scavenger-actor.jump4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "scavenger-actor.idle1",
+            "scavenger-actor.idle2",
+            "scavenger-actor.idle3",
+            "scavenger-actor.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "scavenger-actor.run1",
+            "scavenger-actor.run2",
+            "scavenger-actor.run3",
+            "scavenger-actor.run4",
+            "scavenger-actor.run5",
+            "scavenger-actor.run6",
+            "scavenger-actor.run7",
+            "scavenger-actor.run8"
+          ],
+          "fps": 12,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "scavenger-actor.jump1",
+            "scavenger-actor.jump2",
+            "scavenger-actor.jump3",
+            "scavenger-actor.jump4"
+          ],
+          "fps": 10,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.idle1.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.idle2.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.idle3.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.idle4.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run1.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run2.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run3.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run4.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run5.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run6.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run7.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.run8.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.jump1.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.jump2.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.jump3.png",
+          "original": "生图 · 16 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-actor.jump4.png",
+          "original": "生图 · 16 次调用"
+        }
+      ]
+    },
+    {
+      "id": "wasteland-enemy",
+      "kind": "animation",
+      "role": "地面巡逻敌人，进入距离后加速冲向玩家",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "wasteland-enemy.patrol1"
+        },
+        {
+          "name": "wasteland-enemy.patrol2"
+        },
+        {
+          "name": "wasteland-enemy.patrol3"
+        },
+        {
+          "name": "wasteland-enemy.patrol4"
+        },
+        {
+          "name": "wasteland-enemy.patrol5"
+        },
+        {
+          "name": "wasteland-enemy.patrol6"
+        },
+        {
+          "name": "wasteland-enemy.charge1"
+        },
+        {
+          "name": "wasteland-enemy.charge2"
+        },
+        {
+          "name": "wasteland-enemy.charge3"
+        },
+        {
+          "name": "wasteland-enemy.charge4"
+        },
+        {
+          "name": "wasteland-enemy.charge5"
+        },
+        {
+          "name": "wasteland-enemy.charge6"
+        },
+        {
+          "name": "wasteland-enemy.halt1"
+        },
+        {
+          "name": "wasteland-enemy.halt2"
+        },
+        {
+          "name": "wasteland-enemy.halt3"
+        }
+      ],
+      "animations": [
+        {
+          "name": "patrol",
+          "frames": [
+            "wasteland-enemy.patrol1",
+            "wasteland-enemy.patrol2",
+            "wasteland-enemy.patrol3",
+            "wasteland-enemy.patrol4",
+            "wasteland-enemy.patrol5",
+            "wasteland-enemy.patrol6"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "charge",
+          "frames": [
+            "wasteland-enemy.charge1",
+            "wasteland-enemy.charge2",
+            "wasteland-enemy.charge3",
+            "wasteland-enemy.charge4",
+            "wasteland-enemy.charge5",
+            "wasteland-enemy.charge6"
+          ],
+          "fps": 14,
+          "loop": true
+        },
+        {
+          "name": "halt",
+          "frames": [
+            "wasteland-enemy.halt1",
+            "wasteland-enemy.halt2",
+            "wasteland-enemy.halt3"
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol1.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol2.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol3.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol4.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol5.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol6.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.charge1.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.charge2.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.charge3.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.charge4.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.charge5.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.charge6.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.halt1.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.halt2.png",
+          "original": "生图 · 15 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.halt3.png",
+          "original": "生图 · 15 次调用"
+        }
+      ]
+    },
+    {
+      "id": "ceiling-lurker",
+      "kind": "animation",
+      "role": "倒挂在天花板与通风管下的伏击敌人，落下扑击后回位",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 56
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "ceiling-lurker.hang1"
+        },
+        {
+          "name": "ceiling-lurker.hang2"
+        },
+        {
+          "name": "ceiling-lurker.hang3"
+        },
+        {
+          "name": "ceiling-lurker.hang4"
+        },
+        {
+          "name": "ceiling-lurker.lunge1"
+        },
+        {
+          "name": "ceiling-lurker.lunge2"
+        },
+        {
+          "name": "ceiling-lurker.lunge3"
+        },
+        {
+          "name": "ceiling-lurker.lunge4"
+        },
+        {
+          "name": "ceiling-lurker.lunge5"
+        },
+        {
+          "name": "ceiling-lurker.retreat1"
+        },
+        {
+          "name": "ceiling-lurker.retreat2"
+        },
+        {
+          "name": "ceiling-lurker.retreat3"
+        },
+        {
+          "name": "ceiling-lurker.retreat4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "hang",
+          "frames": [
+            "ceiling-lurker.hang1",
+            "ceiling-lurker.hang2",
+            "ceiling-lurker.hang3",
+            "ceiling-lurker.hang4"
+          ],
+          "fps": 6,
+          "loop": true
+        },
+        {
+          "name": "lunge",
+          "frames": [
+            "ceiling-lurker.lunge1",
+            "ceiling-lurker.lunge2",
+            "ceiling-lurker.lunge3",
+            "ceiling-lurker.lunge4",
+            "ceiling-lurker.lunge5"
+          ],
+          "fps": 14,
+          "loop": false
+        },
+        {
+          "name": "retreat",
+          "frames": [
+            "ceiling-lurker.retreat1",
+            "ceiling-lurker.retreat2",
+            "ceiling-lurker.retreat3",
+            "ceiling-lurker.retreat4"
+          ],
+          "fps": 10,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.hang1.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.hang2.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.hang3.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.hang4.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.lunge1.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.lunge2.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.lunge3.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.lunge4.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.lunge5.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.retreat1.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.retreat2.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.retreat3.png",
+          "original": "生图 · 13 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ceiling-lurker.retreat4.png",
+          "original": "生图 · 13 次调用"
+        }
+      ]
+    },
+    {
+      "id": "scrap-resource",
+      "kind": "animation",
+      "role": "可拾取的金属废料，撤离评价的计数依据",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scrap-resource.idle1"
+        },
+        {
+          "name": "scrap-resource.idle2"
+        },
+        {
+          "name": "scrap-resource.idle3"
+        },
+        {
+          "name": "scrap-resource.idle4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "scrap-resource.idle1",
+            "scrap-resource.idle2",
+            "scrap-resource.idle3",
+            "scrap-resource.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scrap-resource.idle1.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scrap-resource.idle2.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scrap-resource.idle3.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scrap-resource.idle4.png",
+          "original": "生图 · 4 次调用"
+        }
+      ]
+    },
+    {
+      "id": "clean-water",
+      "kind": "animation",
+      "role": "可拾取的净水，恢复拾荒者部分伤势",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "clean-water.idle1"
+        },
+        {
+          "name": "clean-water.idle2"
+        },
+        {
+          "name": "clean-water.idle3"
+        },
+        {
+          "name": "clean-water.idle4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "clean-water.idle1",
+            "clean-water.idle2",
+            "clean-water.idle3",
+            "clean-water.idle4"
+          ],
+          "fps": 6,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/clean-water.idle1.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/clean-water.idle2.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/clean-water.idle3.png",
+          "original": "生图 · 4 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/clean-water.idle4.png",
+          "original": "生图 · 4 次调用"
+        }
+      ]
+    },
+    {
+      "id": "hazard-terrain",
+      "kind": "sprite",
+      "role": "环境危害：塌陷坑洞、裸露钢筋与辐射蒸汽区",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hazard-terrain"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/hazard-terrain.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "collapsed-floor",
+      "kind": "sprite",
+      "role": "踩踏即短暂塌落的水泥楼板，玩家必须在塌落前跳走",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "collapsed-floor"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/collapsed-floor.png",
+          "original": "imported/collapsed-floor.png"
+        }
+      ]
+    },
+    {
+      "id": "extraction-point",
+      "kind": "animation",
+      "role": "城市尽头的撤离信号终端，抵达并停留后触发撤离",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 96
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "extraction-point.standby1"
+        },
+        {
+          "name": "extraction-point.standby2"
+        },
+        {
+          "name": "extraction-point.standby3"
+        },
+        {
+          "name": "extraction-point.active1"
+        },
+        {
+          "name": "extraction-point.active2"
+        },
+        {
+          "name": "extraction-point.active3"
+        },
+        {
+          "name": "extraction-point.active4"
+        },
+        {
+          "name": "extraction-point.active5"
+        },
+        {
+          "name": "extraction-point.active6"
+        }
+      ],
+      "animations": [
+        {
+          "name": "standby",
+          "frames": [
+            "extraction-point.standby1",
+            "extraction-point.standby2",
+            "extraction-point.standby3"
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        {
+          "name": "active",
+          "frames": [
+            "extraction-point.active1",
+            "extraction-point.active2",
+            "extraction-point.active3",
+            "extraction-point.active4",
+            "extraction-point.active5",
+            "extraction-point.active6"
+          ],
+          "fps": 10,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.standby1.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.standby2.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.standby3.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.active1.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.active2.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.active3.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.active4.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.active5.png",
+          "original": "生图 · 9 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/extraction-point.active6.png",
+          "original": "生图 · 9 次调用"
+        }
+      ]
+    },
+    {
+      "id": "tile-floor",
+      "kind": "sprite",
+      "role": "破碎瓷砖与水泥地面，可平铺的地面砖",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "tile-floor"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/tile-floor.png",
+          "original": "imported/tile-floor.png"
+        }
+      ]
+    },
+    {
+      "id": "metal-platform",
+      "kind": "sprite",
+      "role": "可站立的金属平台与栏杆段",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "metal-platform"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/metal-platform.png",
+          "original": "imported/metal-platform.png"
+        }
+      ]
+    },
+    {
+      "id": "vent-duct",
+      "kind": "sprite",
+      "role": "横贯上方的通风管道，可作通道与悬挂巢穴",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "vent-duct"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/vent-duct.png",
+          "original": "imported/vent-duct.png"
+        }
+      ]
+    },
+    {
+      "id": "concrete-step",
+      "kind": "sprite",
+      "role": "混凝土台阶与可攀爬的高低差",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "concrete-step"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/concrete-step.png",
+          "original": "imported/concrete-step.png"
+        }
+      ]
+    },
+    {
+      "id": "wooden-crate",
+      "kind": "sprite",
+      "role": "散落的木箱，可站上也可作障碍",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "wooden-crate"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/wooden-crate.png",
+          "original": "imported/wooden-crate.png"
+        }
+      ]
+    },
+    {
+      "id": "office-debris",
+      "kind": "sprite",
+      "role": "办公室房间里的桌椅、床架等散落家具",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 96,
+        "h": 64
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "office-debris"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/office-debris.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "broken-wall",
+      "kind": "sprite",
+      "role": "前景剪影与场景中的断墙残壁",
+      "origin": "imported",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 96
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "broken-wall"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/imported/broken-wall.png",
+          "original": "imported/broken-wall.png"
+        }
+      ]
+    },
+    {
+      "id": "ruined-city-backdrop",
+      "kind": "background",
+      "role": "三层纵深的废墟城市背景：天际线雾霭 / 断墙街区 / 近景地面层",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 640,
+        "h": 360
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "layers": [
+        {
+          "name": "skyline",
+          "parallax": 0
+        },
+        {
+          "name": "blocks",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "street",
+          "parallax": 1,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "ruined-city-backdrop.skyline"
+        },
+        {
+          "name": "ruined-city-backdrop.blocks"
+        },
+        {
+          "name": "ruined-city-backdrop.street"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-city-backdrop.skyline.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-city-backdrop.blocks.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ruined-city-backdrop.street.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "hud-panel",
+      "kind": "ui",
+      "role": "屏幕角落的状态面板底板，显示背包与生命",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-panel"
+        }
+      ],
+      "scale9Borders": {
+        "x": 8,
+        "y": 8,
+        "w": 32,
+        "h": 32
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-panel.json"
+        }
+      ]
+    },
+    {
+      "id": "scrap-icon",
+      "kind": "ui",
+      "role": "HUD 上的废料计数图标",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "scrap-icon"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/scrap-icon.json"
+        }
+      ]
+    },
+    {
+      "id": "health-icon",
+      "kind": "ui",
+      "role": "HUD 上的生命 / 伤势图标",
+      "origin": "generated",
+      "paletteBinding": "composited",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "health-icon"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/health-icon.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/health-icon.json",
+      "bytes": 4034,
+      "checksum": "sha256:e08cc63b4d07124af04e82adb353ce715ba5ccca90625102457051b7ec33dea8"
+    },
+    {
+      "path": "authoring/drawlist/hud-panel.json",
+      "bytes": 5428,
+      "checksum": "sha256:b242eea058267b63efb52b14b54f4afe51158251f2eef100f1d092c2ecee8f9d"
+    },
+    {
+      "path": "authoring/drawlist/scrap-icon.json",
+      "bytes": 3644,
+      "checksum": "sha256:2156dd5dc2533052fd65032642bc6d6993acac38d22bed85d94fbed3bf964bd5"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang1.png",
+      "bytes": 1025936,
+      "checksum": "sha256:529d62b4d814e1210e5ad389aef72b7a0c753572bed68fcead8caa00b5616d3c"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang1.prompt.txt",
+      "bytes": 3083,
+      "checksum": "sha256:596752f1ed527970c41e3a26794bde890efc3864525d805d95e3d4d11eddae20"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang2.png",
+      "bytes": 1056058,
+      "checksum": "sha256:89e7a99218afd1e9556078cacab89684e3625d88c15ca0b805f98a09904fe736"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang2.prompt.txt",
+      "bytes": 3083,
+      "checksum": "sha256:c2a42c463c9b7db0d7e33a5be2bd2c0bd7b2fd28a1d777e72ab11d6b722484b5"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang3.png",
+      "bytes": 1057847,
+      "checksum": "sha256:c8a1c8ac646b5cf8a09e601981218a4616d740e8838d144748f156abb0d9721c"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang3.prompt.txt",
+      "bytes": 3083,
+      "checksum": "sha256:c9f8d2ad5d76becfd9d9160642dd1482f4e74befa2860a6825df319eacd80603"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang4.png",
+      "bytes": 1082766,
+      "checksum": "sha256:0c80f94ba0ba71e14b80b38a32a9cef165b326f099a25fb2218523fb19b5118a"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.hang4.prompt.txt",
+      "bytes": 3083,
+      "checksum": "sha256:9f64b9e1dba950b36d05a4b895d5d955da6466773161e17a80f3d1e521fb9bdc"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge1.png",
+      "bytes": 1181514,
+      "checksum": "sha256:a572f0bbc93cbb4c045e66b10a12cd0da00a72f2e2cb06cc3e47d6170aba48e6"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge1.prompt.txt",
+      "bytes": 3084,
+      "checksum": "sha256:1aa251043ea486f6b6b02be72bcdfbeaeb059ce9fb403ac3151905a557217afd"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge2.png",
+      "bytes": 1104756,
+      "checksum": "sha256:53e4069805fd1a4c3e067f3774056c924299f9bea188cc831a2c26f9d444caaa"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge2.prompt.txt",
+      "bytes": 3084,
+      "checksum": "sha256:623446e573183da0a7a8558f25d6a3a24d89d0b01c3bc0d4b730c2caea67e85a"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge3.png",
+      "bytes": 1047795,
+      "checksum": "sha256:b39f3bb036e5ce951a53e655850b1f646701f8f960db27cfb53be962817a613e"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge3.prompt.txt",
+      "bytes": 3084,
+      "checksum": "sha256:fe7fd9eb7f91b6899ca1f0c791a0b836c8fa0b40d5398354cbcec0b67c2f1f58"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge4.png",
+      "bytes": 1079348,
+      "checksum": "sha256:3239a144c7c4e6abc82474e8ec33759bd74c155874008a67b01698ffde721d98"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge4.prompt.txt",
+      "bytes": 3084,
+      "checksum": "sha256:cd2ca9a218b9e35e9d9924bb1cf74b2a67c2452924873bef6cfbd7030594ec4c"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge5.png",
+      "bytes": 1195089,
+      "checksum": "sha256:0bb0ff674a284c5ecc74ce38bf757341eed92162795d03fc9b4aa3255103c80b"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.lunge5.prompt.txt",
+      "bytes": 3084,
+      "checksum": "sha256:f47a144a7e9fe7129a1f21d2415b72d3826a3fc674042c3df993d0380a403bbf"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat1.png",
+      "bytes": 1031248,
+      "checksum": "sha256:4b6f1d18b6361cc7a0edf44692f96f0fc27fe9b3474565aa30c29f050f1bea2d"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat1.prompt.txt",
+      "bytes": 3086,
+      "checksum": "sha256:a18245291fb1467d39cc46f57c809216bda23cf942afa8681726865c964744bf"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat2.png",
+      "bytes": 1054773,
+      "checksum": "sha256:0a3c86d32f3c3d0a322adca5afe1796ecbb262b5aa742c489f358ceecf5d78bc"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat2.prompt.txt",
+      "bytes": 3086,
+      "checksum": "sha256:fa8cc72c379428aaf5f4ab5d05f3b0a212bcd84c398d5b63cbe5c6f73c535d68"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat3.png",
+      "bytes": 1215284,
+      "checksum": "sha256:bfc8fec599a4501b62a280c84b06097d8f73141de2f3673d7a5261b94cf46452"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat3.prompt.txt",
+      "bytes": 3086,
+      "checksum": "sha256:9c8070354e73b09e36a68ae28384dfa22a4b83edc274cac6b5cbdc9fc536fbb7"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat4.png",
+      "bytes": 1122335,
+      "checksum": "sha256:9929267ee6df6b2e10a8df9683a6036a261f94a486919ade3874d73d3b7463d9"
+    },
+    {
+      "path": "authoring/generated/ceiling-lurker.retreat4.prompt.txt",
+      "bytes": 3086,
+      "checksum": "sha256:f758d0fbfecca720403c5b78f74b7f8b8b0cfe4df77ce84f54abf14e42a831a2"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle1.png",
+      "bytes": 1168344,
+      "checksum": "sha256:e35f7ca6319999edb19f54e2d868510179224845cb25776ed89edd83594e4520"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle1.prompt.txt",
+      "bytes": 1812,
+      "checksum": "sha256:90330c5e0c09679b2dfcd9f066184cd7dc72fa173b64ca2ac22316b1c40afa1f"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle2.png",
+      "bytes": 1202258,
+      "checksum": "sha256:fe5d7b1068b7d413c3c517f52b9a0f4790211b046ea338682dd2f8cd5619cec6"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle2.prompt.txt",
+      "bytes": 1812,
+      "checksum": "sha256:4ad0b4becc38a9bf554af2e3fe720c4cb62eab9bb4381d8df99e94873935cb56"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle3.png",
+      "bytes": 969044,
+      "checksum": "sha256:5ad936bbc9d609d36f4cadadacc4be0c58b3ae7f93653d610a56ccbbd696cc26"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle3.prompt.txt",
+      "bytes": 1812,
+      "checksum": "sha256:bd7f9f6c056b85207de84b3a45d3f3a3de1d6c155a8162fd6d9f48a04194e25b"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle4.png",
+      "bytes": 1084117,
+      "checksum": "sha256:f27a6c8ae348ef5af6c163f466ddf49139e3f2c333279158e0fa58c5765cc74f"
+    },
+    {
+      "path": "authoring/generated/clean-water.idle4.prompt.txt",
+      "bytes": 1812,
+      "checksum": "sha256:dce1098ac9a64d568f381c6c51de66a64076a34a6a1fb3b36fe8166f7e644459"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active1.png",
+      "bytes": 1715266,
+      "checksum": "sha256:58e76b94b29324bca17078f78275c0d86d23092961dd61696982c67477427f27"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active1.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:f4d99bd6b7c273456c7e6eacf4a9e70574e71cd332c0225954a15df8b00cba2a"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active2.png",
+      "bytes": 1809342,
+      "checksum": "sha256:8a108b47876ed751f953fb33de2b2260dc27ba180f641b3204188f544b785b6a"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active2.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:ec36398096520b20dc88e82b79324fd7744e57461525d8eaf163fb407e8496fe"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active3.png",
+      "bytes": 1525705,
+      "checksum": "sha256:f50cc3f2b3c1948639f5c9a50c719e48929be957b821a939fa6bf42fb2c64128"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active3.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:0defb92a83f396eeb04f0be22c891c94dcf7a9ad04ee9d1f83e382360ff35931"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active4.png",
+      "bytes": 1613468,
+      "checksum": "sha256:0479e127cab2c6c6ed9ddcd8af9566a5155dab136ee2ecf879e893c9e8e69289"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active4.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:d79549248747d602150f3c7deccfeacf222b92a9d0f8161e581c18e48125741e"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active5.png",
+      "bytes": 1090793,
+      "checksum": "sha256:977a9ee19012aef5e9444f552059f1340db85d5f6e8e28e400dd0483861cc3c4"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active5.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:136febef15d825197457141c848e30047d7e4fc34a13d501e474090f8e43b9c2"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active6.png",
+      "bytes": 1111787,
+      "checksum": "sha256:1207c6e92ceb8f0e538da5eb1383227d0125a30f852773093a8e32017b068295"
+    },
+    {
+      "path": "authoring/generated/extraction-point.active6.prompt.txt",
+      "bytes": 1907,
+      "checksum": "sha256:113033416746e27bc59b8e5d9a25896a60763fdbb8cc2c742e73d74bc2f9c988"
+    },
+    {
+      "path": "authoring/generated/extraction-point.standby1.png",
+      "bytes": 1163057,
+      "checksum": "sha256:82ad7569b1abae5676157601d14cefa6956e5908b38832dd5419662d5c7a9442"
+    },
+    {
+      "path": "authoring/generated/extraction-point.standby1.prompt.txt",
+      "bytes": 1908,
+      "checksum": "sha256:03070eaec5cc94a9e0b0f843cce1b21d6872764f44cf7aefc69e0cb370791664"
+    },
+    {
+      "path": "authoring/generated/extraction-point.standby2.png",
+      "bytes": 1179126,
+      "checksum": "sha256:95e7b9e7df70bda345847177205868f5c4baeeb64432b96a98b0a34f4a591e82"
+    },
+    {
+      "path": "authoring/generated/extraction-point.standby2.prompt.txt",
+      "bytes": 1908,
+      "checksum": "sha256:f5ee10f56e41b13cdf48b86d349bfb5d851bb5c23d5f6ef0d776d928ab31156c"
+    },
+    {
+      "path": "authoring/generated/extraction-point.standby3.png",
+      "bytes": 1545168,
+      "checksum": "sha256:15f58e376550bbdb5e3f53d229f518176d4253c2d4df776bc6e5a6519ecd7c0f"
+    },
+    {
+      "path": "authoring/generated/extraction-point.standby3.prompt.txt",
+      "bytes": 1908,
+      "checksum": "sha256:49ff359e7c9083d49e59b5fa51dcc147c0e91a49d79f37aac662dfa32f9d1220"
+    },
+    {
+      "path": "authoring/generated/hazard-terrain.png",
+      "bytes": 1293221,
+      "checksum": "sha256:7d5307b9d11edb0064e317a1f6c6f01ec8f1561eaf56746045aca54a566bee91"
+    },
+    {
+      "path": "authoring/generated/hazard-terrain.prompt.txt",
+      "bytes": 2207,
+      "checksum": "sha256:5ec06e969882d8bfa835e7aae9612ab9f2c60d625ab1f9882cb7e0c6884e308d"
+    },
+    {
+      "path": "authoring/generated/office-debris.png",
+      "bytes": 988950,
+      "checksum": "sha256:6b84381538eab9d6e0f01d5c6b7c35b125497a1ec378c9e8039d3c95d05fb8a5"
+    },
+    {
+      "path": "authoring/generated/office-debris.prompt.txt",
+      "bytes": 2171,
+      "checksum": "sha256:16055a153a5191a41861de1a3459414991f2494662f2ef2a80cb539d340f7466"
+    },
+    {
+      "path": "authoring/generated/ruined-city-backdrop.blocks.png",
+      "bytes": 1913036,
+      "checksum": "sha256:955fa3497a9088c9a917a4288c62e41183c5ec62adb492f5ca5b8b3ee72a8277"
+    },
+    {
+      "path": "authoring/generated/ruined-city-backdrop.blocks.prompt.txt",
+      "bytes": 2055,
+      "checksum": "sha256:0114c37ba8f08a6ff104b9cd48d0f3f28c255db8b371dd09996dba68f0ebeeed"
+    },
+    {
+      "path": "authoring/generated/ruined-city-backdrop.skyline.png",
+      "bytes": 1347085,
+      "checksum": "sha256:47371aa669938ea35a017f4ea3bb56d529961faa54a1c96a5ed2338cdb21cb16"
+    },
+    {
+      "path": "authoring/generated/ruined-city-backdrop.skyline.prompt.txt",
+      "bytes": 2180,
+      "checksum": "sha256:4e22c3fb95a1695c10adf908f85891d219c558a1ffaa30535c72b428631f51c5"
+    },
+    {
+      "path": "authoring/generated/ruined-city-backdrop.street.png",
+      "bytes": 2165226,
+      "checksum": "sha256:16f982371fbc5ef889318997492bf812f6f75f540d926d75c49d411b4b9a41b7"
+    },
+    {
+      "path": "authoring/generated/ruined-city-backdrop.street.prompt.txt",
+      "bytes": 2070,
+      "checksum": "sha256:e0a5a2a132c59bd2d75ad77925f58e07887a66eea16474e25ec6db0ed0d98065"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle1.png",
+      "bytes": 1372137,
+      "checksum": "sha256:068ee2d78df156fd92afddbd6d257ffe4b109db8da5ebc077bb3b421192c0ebd"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle1.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:e0dc4b842eadcb2ae741187bad28a3f1bb3e03c17ea976de50c730d709595791"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle2.png",
+      "bytes": 1396433,
+      "checksum": "sha256:617b75aa427ca81b8e5073e797f52bc13ef0ed23e61fa29de0097dd3ba00642b"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle2.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:849c5565a22079974fe3fbc5d29c17a5bc19e000f646609755c578a8b1d7e87c"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle3.png",
+      "bytes": 1387272,
+      "checksum": "sha256:44255922f326b8029e7846674b626c58ef8599c342ea2ac9c8cc3e70a57b33b3"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle3.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:ebdf0d56ee4f651fe414955969e07ce3c70e52384c6d65d1521aff6c1b4529e0"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle4.png",
+      "bytes": 1394387,
+      "checksum": "sha256:a8de40a37e2e3e036a674cbd77ebdaaf5f5c920f7ca02a63e4917c776e04ec47"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.idle4.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:64cffc619f928ebeb044398a4400eda2a75e032baa75e8e5968e163bc6a84f6a"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump1.png",
+      "bytes": 1279615,
+      "checksum": "sha256:48b072d52de11af123a611146c4f15845c9004e1c65c0d961082cfb924c0d86a"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump1.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:0e3d4ebef7e2e020d1a1fa6e3734f60445c7b16e41bc35db04b3ecee8facd773"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump2.png",
+      "bytes": 1285343,
+      "checksum": "sha256:cb39c5069977bc6b200b1132fe09830fd18bcdc82672eca571ee7449ec1a1340"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump2.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:aba3db8a19386e1ff3cc249ecfb5dec0b75dea6359450c1575b427d5594dbba5"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump3.png",
+      "bytes": 1431174,
+      "checksum": "sha256:be8109830dfe4ec6f36bf5299d6ddc3ecdef03269828a678313718508febeef0"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump3.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:961a5f1724e8e467d42b2206b10ca176394c04c28f2b054dcea64032914dfd19"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump4.png",
+      "bytes": 1324914,
+      "checksum": "sha256:e0513f0051c6929d88b57c5ca72dc03c6636d17af39cdaf31c1e5773c5ec80d0"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.jump4.prompt.txt",
+      "bytes": 3404,
+      "checksum": "sha256:80aa0d1722d10b4ec61c6e47daaba4db960115c14234601f035d3702cc5eeb9e"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run1.png",
+      "bytes": 1474716,
+      "checksum": "sha256:b7394ef91171fc873652a0542114c5be3a8381434f0b585ce9ff0a5f4e28782c"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run1.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:24dd0584f44c407c3686bd0bcb5dc0d09faccbe6288bc4b103bd1b7356a00a8c"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run2.png",
+      "bytes": 1532887,
+      "checksum": "sha256:69ba3f7fe9070b4ea2d2389aedf2c1d54019bac96d0a194c699e511d338429c8"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run2.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:db9e967f1d581ee65e9a8d64b7beb39aa7ed101eade89618ef5345511451cda7"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run3.png",
+      "bytes": 1482278,
+      "checksum": "sha256:2b88412577b9bc48bb35f684fdf47aaea7e8da9aa550593240fffb37a92e8d0e"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run3.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:f8d03bb73851c25738300c9627506eed670bd779071d7c06cf824cb3cdb0c524"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run4.png",
+      "bytes": 1498026,
+      "checksum": "sha256:7184f0a57e3b2a135e2391cedae71b883970fa2bc163c5b6f8e604edd2638810"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run4.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:d4134d7c6ef5e46d0a8eea951bacf5bf792f5ad1956729495089819a3dc26c74"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run5.png",
+      "bytes": 1533504,
+      "checksum": "sha256:0ce62402a69871aeee8f9c80d416982429792291d86328f6042074c11bc18fb8"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run5.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:728c0a03a69a4d4964b7bf7fb7c295138d1276538053073446de6b3851c03613"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run6.png",
+      "bytes": 1498810,
+      "checksum": "sha256:49bef4b155017805521d6d59dea8ccac1b61f0b07cfc18593cd52ab6fa16afff"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run6.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:bae5f127cd0ae1758f14a6649e98bcc1c11291781aeada6ffba5b1eee7a8a09a"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run7.png",
+      "bytes": 1528907,
+      "checksum": "sha256:b8b75b0606c6873bd15f7642dcbcf9217901f8940924e854b8481bbd8c0e2131"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run7.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:f7e43a5e2ed890e5680cf930030544ca59bc0a7b8141d30666731d0a3cccdeac"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run8.png",
+      "bytes": 1552306,
+      "checksum": "sha256:31d06c4ee797b12fe25cb26cf339898f9ab19f51b248a674359259024d96a8ad"
+    },
+    {
+      "path": "authoring/generated/scavenger-actor.run8.prompt.txt",
+      "bytes": 3403,
+      "checksum": "sha256:cf244a628cbab72dbe37c41d1dbb3b06e34d830e33538b0fc7f4d393043daa74"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle1.png",
+      "bytes": 833303,
+      "checksum": "sha256:4c17d9ab7e9c373b6a303875ef021c610057aefe33ae065a18a8df2c4f118c2d"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle1.prompt.txt",
+      "bytes": 1839,
+      "checksum": "sha256:5b980cf793ce87771193f5bcbd190d4d3b563137033035621e4da80144b683cd"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle2.png",
+      "bytes": 973004,
+      "checksum": "sha256:871b56f05234a765a263e98858cdddf5ffb5dbfc5ef2c151a66d85e2a3b48cce"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle2.prompt.txt",
+      "bytes": 1839,
+      "checksum": "sha256:e10b5ff9a5485645829d5c9f9b927871eae17d6531ee697f0cda9a1dbf2cd94d"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle3.png",
+      "bytes": 820154,
+      "checksum": "sha256:466987d5daca1ee4e47fdd263485bb4019b2e40da1d212de124c0fbdfa42af09"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle3.prompt.txt",
+      "bytes": 1839,
+      "checksum": "sha256:689c86314ac4ff7f2bba5576a30790c6edfeeff97a7a833a96de8c7b3f716b58"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle4.png",
+      "bytes": 805800,
+      "checksum": "sha256:cf0b3fea98dafbb527460eefd0ef98a6e1e06795b0dff3be88c2bb91a0aaf4cd"
+    },
+    {
+      "path": "authoring/generated/scrap-resource.idle4.prompt.txt",
+      "bytes": 1839,
+      "checksum": "sha256:e5e5ecfcf75f69f1ee6e18033cdf4d74f9048165342b8f07369c16c61c660297"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge1.png",
+      "bytes": 1523915,
+      "checksum": "sha256:08e1a76faba15c91fc60cded4b207182977e45b293823fc77c62de376caf1f1d"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge1.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:b728513bdd8d9e1e5ff83ab458d67f862e648d02ea53f880451432e7cc17e3af"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge2.png",
+      "bytes": 1560694,
+      "checksum": "sha256:39635d6d0b78c8c02035338c786b0e47a367b1a115aad90d1046902abf69cc7f"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge2.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:40935aaaac87e84ba9ab65058d7354e385d81c00d31f66cafdf2836a5121cce7"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge3.png",
+      "bytes": 1542208,
+      "checksum": "sha256:8f366e6b2cfbd3edc18dd41974a4988db7b30d7289fb0331b6ce84406db0796b"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge3.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:e241bceafad9e8af2ff5696ba732907b6ee8e942e8c267e73ca4fb11c0f62746"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge4.png",
+      "bytes": 1584754,
+      "checksum": "sha256:3933fc4b6274dcd6b85cd098bb68441f6ac5a57bbe7689902f3720f79315f7a7"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge4.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:3c4c9829e20441afbda9d9b915df96fba79f2044780e9b5af5be566222e3a2b3"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge5.png",
+      "bytes": 1557972,
+      "checksum": "sha256:b413999dc18498235d3606e47e83e13143e4a38f29e60b692d02a7053051472e"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge5.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:e1c298086b916177db1a2de26aeecff343a3702a4e8b5c1d9a15b7aefda20ed3"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge6.png",
+      "bytes": 1467077,
+      "checksum": "sha256:94514a7c3add3b010ba65bc004f3dbf24965c398a99add2b221a4d70d7f5b33e"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.charge6.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:548b1ca122c6a7178ccf52148ee44ab82d4092b43b95781849b310dd01b65273"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.halt1.png",
+      "bytes": 1558863,
+      "checksum": "sha256:dc1f2d6b47fc91564e7ce8e1e650cd2486648f7051edfcf61bd7ee16ebc0c943"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.halt1.prompt.txt",
+      "bytes": 3096,
+      "checksum": "sha256:a5cbdf5dec9523731a1d3152ab1380cf7f8d169957719286f96448764a78e991"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.halt2.png",
+      "bytes": 1529946,
+      "checksum": "sha256:80b7c3d6ab736e4c4df9e6ced0ec89b14baf9e642001a171be8bb2180c43fefa"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.halt2.prompt.txt",
+      "bytes": 3096,
+      "checksum": "sha256:c0db2ae513280011dd490e7a6c90359535bee5a1f30cfb7257cf5cebb4fc2111"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.halt3.png",
+      "bytes": 1556198,
+      "checksum": "sha256:4a6f3e57c587be81c9a0b098bb514d93fd7f52297ddbf68922cb922824ec0f93"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.halt3.prompt.txt",
+      "bytes": 3096,
+      "checksum": "sha256:9f83c6e8e9fa522a47f631d9a4445e2405c91b14f96361b4ea98953a2daf204e"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol1.png",
+      "bytes": 1534411,
+      "checksum": "sha256:e384768b81e5c4df9545a292608741fd21c8a4f63e4c454b5d341296dd0299ce"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol1.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:6175b9f1392542fd23a98ee7e331aef39b2c00d2c3c7abb607bf5384c7c04e19"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol2.png",
+      "bytes": 1542808,
+      "checksum": "sha256:1306ad827535eea475abcb129fa38e73e6c1e0219b8a9b5ef72f3c4d117686e1"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol2.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:7204afb840c7cdabf33fe88fecb33665e476a42bb543221ba40580e0b593306e"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol3.png",
+      "bytes": 1519471,
+      "checksum": "sha256:1216d60cfd2aef8e4e1484dc1acf8d9e1ecb0901dbf3d6d7d07e73809f1f9428"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol3.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:95e27aa77425a909968d3cd890ad3ae4d012d36e3103e1e057ed5383991eef52"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol4.png",
+      "bytes": 1520718,
+      "checksum": "sha256:b1818b567dde3da03ca5d67213731c0555911cbd9e19b56459d0dc7608111b0e"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol4.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:28df4d6338f67e98d330145fa41c0d6821059917e2ce2edebbc60de200f1c497"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol5.png",
+      "bytes": 1542011,
+      "checksum": "sha256:e2bab16dad35915340ab4a959bfb3bb301927aa886f0997096e072e453e56b8f"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol5.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:9ae0b9ef935996aa3a5daa94d472f9a9385681260360321e6e3a8b00b3850dd4"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol6.png",
+      "bytes": 1539462,
+      "checksum": "sha256:f58a7d0a8229bd212948a8e9dba191841f531a5ae173eb3c6b699c171d8204a6"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol6.prompt.txt",
+      "bytes": 3098,
+      "checksum": "sha256:c3e860299b1d25d7961fd4c8459fc866878ca29708e712e1a4df9ed85f3bb6c1"
+    },
+    {
+      "path": "authoring/imported/broken-wall.png",
+      "bytes": 17988,
+      "checksum": "sha256:057c55a5ca665353059a315d9d6c18e0e7f9c807e16450db15ce92a482f751b6"
+    },
+    {
+      "path": "authoring/imported/collapsed-floor.png",
+      "bytes": 5621,
+      "checksum": "sha256:780e4a59c4e89781f735c7761d36489e8d73ba61a4745778ad69460dfa05f882"
+    },
+    {
+      "path": "authoring/imported/concrete-step.png",
+      "bytes": 5392,
+      "checksum": "sha256:e0e20380225bc95df33f05d8394b739abe7318897efa1e2129c1c28d3bde2267"
+    },
+    {
+      "path": "authoring/imported/metal-platform.png",
+      "bytes": 11051,
+      "checksum": "sha256:d2b4646bb6dedf269497421033d1289a787453eb99977d7c5f53a02eec191cfb"
+    },
+    {
+      "path": "authoring/imported/tile-floor.png",
+      "bytes": 11951,
+      "checksum": "sha256:c787a2b9f07d948bb2798ca315240933bac890a6f4e60b38aabdfe442aefee39"
+    },
+    {
+      "path": "authoring/imported/vent-duct.png",
+      "bytes": 7179,
+      "checksum": "sha256:a0e0b1d7445cfea91c5b6826d8044820c7af249f5d491d84ed96ec476d786fed"
+    },
+    {
+      "path": "authoring/imported/wooden-crate.png",
+      "bytes": 6566,
+      "checksum": "sha256:01295b7414d6de5813f3e726c3e056cf138d09dde338a886362e03c5af6e8c51"
+    },
+    {
+      "path": "authoring/masters/master-ceiling-lurker.png",
+      "bytes": 882144,
+      "checksum": "sha256:0c20afb7ac945e23c799eee4bb215ebd71249e57a4bfb249cdda27363676b58a"
+    },
+    {
+      "path": "authoring/masters/master-scavenger-actor.png",
+      "bytes": 1212702,
+      "checksum": "sha256:5b264bbdd9c5ad7b0f1e547865b70e239182adf2a14461624767b04175b6cac8"
+    },
+    {
+      "path": "authoring/masters/master-wasteland-enemy.png",
+      "bytes": 1413088,
+      "checksum": "sha256:3b16b57cd2767d3423a760546c51fc17db295d14abba5cabe3ed097facdea07f"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1865,
+      "checksum": "sha256:c97744b41189efe6237a16bd1d8d710a763ca58ca18cbd2bf32ff6eb16201fc4"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 6779,
+      "checksum": "sha256:c284935b273ccfbb6ab53aff916e15e817e408ae2a15dc1dc591da11f4db8040"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 674,
+      "checksum": "sha256:69864ebc002a29778286a588f1374fed8a4c872bdf940b081e85f3c38a36ecec"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 24966,
+      "checksum": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 92010,
+      "checksum": "sha256:89027f911a0b8038b4c875e048571f115aba10a2dba69dc1ce0e299a5906733a"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1462,
+      "checksum": "sha256:83841dd9d54a36b2dad52029cc4fcc893adb34e06db94288a82d1efac9edeafe"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 156004,
+      "checksum": "sha256:47af93c9af4bf386c85631186a89579040554d876f0487dedd8774ec52720454"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 3768,
+      "checksum": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 17184,
+      "checksum": "sha256:3dff488df20ce4d835691dc95bdb6fbaea29f2c1a9f18cb961b799f52d98c5cc"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1484,
+      "checksum": "sha256:5bb9ec95259fe865283b1ae6f24ce7b0b97ff85a361eca690a71aaee3ecba1fb"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 737,
+      "checksum": "sha256:8414453f2bbfa2c13b837211cee573135bfb3c9a31fccfa68b0d25de7e6f5aa3"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 223,
+      "checksum": "sha256:73c325fe110afea55795f2e12d974497406046553c5e37512886e898213b215f"
+    }
+  ]
+}

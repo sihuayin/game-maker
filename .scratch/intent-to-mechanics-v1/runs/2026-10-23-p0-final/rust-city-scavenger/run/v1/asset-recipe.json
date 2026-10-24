@@ -1,0 +1,243 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "rust-city-scavenger",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "player-character",
+        "description": "拾荒者主角，破旧兜帽、绑带、护肩与背囊形成的不对称鼓包轮廓，身体前倾重心低",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.9
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "scavenger-hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "sheet": {
+              "columns": 3,
+              "rows": 2
+            },
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image",
+        "minLargestShare": 0.35
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "enemy-wasteland",
+        "role": "enemy",
+        "description": "废土巡逻敌人，锈蚀金属外壳、佝偻前倾姿态，四肢短但可读，缓慢逼近的威胁感",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.9
+        },
+        "size": {
+          "w": 48,
+          "h": 48
+        },
+        "required": true,
+        "characterId": "enemy-wasteland"
+      },
+      "source": {
+        "kind": "image",
+        "minLargestShare": 0.35
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest",
+        "role": "interactable",
+        "description": "可开启的宝箱，塑料箱壳带磨损伤痕与锈蚀锁扣，体积小细节密",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.7
+        },
+        "size": {
+          "w": 32,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "minLargestShare": 0.4
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-spike",
+        "role": "hazard",
+        "description": "地面障碍尖刺，锈蚀金属尖角斜出地面，剪影可读的危险警示",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.85
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "minLargestShare": 0.4
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-item",
+        "role": "pickup",
+        "description": "可拾取的资源堆，闪烁的金属碎片/罐壳小堆，暖色微光提示可收集",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.7
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image",
+        "minLargestShare": 0.4
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "ruined-street-bg",
+        "role": "background",
+        "description": "废弃城市天际线与坍塌建筑轮廓构成远景稀疏层，高对比偏冷环境光",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 640,
+          "h": 360
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0
+          },
+          {
+            "name": "skyline",
+            "parallax": 0.3,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "midground",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "ruined-street-fg",
+        "role": "foreground-occlusion",
+        "description": "近地面碎石、管道、植被构成的薄层前景遮挡",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.95
+        },
+        "size": {
+          "w": 640,
+          "h": 120
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "foreground",
+            "parallax": 1.4,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-hero-master",
+      "role": "player-master",
+      "description": "拾荒者主角母版参考图，破旧兜帽、绑带、护肩、背囊的不对称鼓包轮廓，小头身约3-4头高",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 48,
+        "h": 48
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

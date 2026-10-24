@@ -1,0 +1,211 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "像素艺术",
+      "废土",
+      "拾荒",
+      "低分辨率",
+      "脏旧质感",
+      "侧视平台跳跃"
+    ],
+    "description": "低分辨率像素风的废墟世界：角色与道具都以少量像素块与深色描边构成，表面覆盖污渍、锈迹与裂纹，用有限的暖灰与暗绿调描绘一个被遗弃的城市。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "2D 正交侧面投影",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "正交平视，无透视收缩"
+  },
+  "composition": {
+    "foreground": "前景可叠加碎砖与杂物以增加纵深",
+    "midground": "中景为可站立的地面与可攀爬的平台",
+    "background": "远景为平涂的废墟剪影与破损墙体，明度低、细节少",
+    "objectScale": "道具按网格对齐，尺寸为瓦片的整数倍",
+    "characterScale": "角色约占 1.5~2 个格子高，与门、箱子形成可读的比例关系",
+    "density": "中等偏密，物件之间留有可通行间隙"
+  },
+  "palette": {
+    "primary": [
+      "palette:0",
+      "palette:1"
+    ],
+    "secondary": [
+      "palette:2",
+      "palette:3"
+    ],
+    "accent": [
+      "palette:4",
+      "palette:5"
+    ],
+    "background": [
+      "palette:6",
+      "palette:7"
+    ],
+    "shadow": [
+      "palette:8",
+      "palette:9"
+    ],
+    "highlight": [
+      "palette:10",
+      "palette:11"
+    ]
+  },
+  "lighting": {
+    "direction": "环境光均匀漫射，光源不明确",
+    "softness": "硬边像素块，无渐变",
+    "contrast": "低到中等对比，暗部不死黑",
+    "mood": "阴郁、潮湿、被遗弃"
+  },
+  "materials": {
+    "concrete": {
+      "appearance": "开裂的混凝土墙与地砖，边缘崩缺",
+      "texture": "像素颗粒噪点与深色裂缝",
+      "color": [
+        "palette:2",
+        "palette:1"
+      ]
+    },
+    "rust metal": {
+      "appearance": "锈蚀的钢管、通风口与栏杆",
+      "texture": "垂直锈痕与斑驳脱落的漆面",
+      "color": [
+        "palette:3",
+        "palette:9"
+      ]
+    },
+    "wood": {
+      "appearance": "钉板与木箱，表面有划痕",
+      "texture": "横向木板纹与深色钉线",
+      "color": [
+        "palette:5",
+        "palette:12"
+      ]
+    },
+    "dried blood": {
+      "appearance": "地面上的暗红污渍，边缘不规则",
+      "texture": "成片飞溅与拖拽痕",
+      "color": [
+        "palette:4"
+      ]
+    },
+    "cloth": {
+      "appearance": "拾荒者的旧外套与背包",
+      "texture": "色块拼接，少量褶皱点",
+      "color": [
+        "palette:13",
+        "palette:14"
+      ]
+    },
+    "glass": {
+      "appearance": "脏污的窗格与碎玻璃",
+      "texture": "细碎高光与裂线",
+      "color": [
+        "palette:7",
+        "palette:10"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "三头身，头大身短",
+    "silhouette": "清晰的深色外轮廓，装备轮廓可从体型上分辨",
+    "poseLanguage": "侧面行走序列帧，步幅夸张、身体前倾",
+    "clothing": "磨损的夹克、长裤与大背包，颜色低饱和",
+    "faceAbstraction": "仅用两三个像素点表示眼睛，无嘴鼻细节"
+  },
+  "environment": {
+    "architecture": "倒塌的楼体、阶梯残段、钢架与门框，全部断裂且不对称",
+    "terrain": "瓦片式地面，含碎裂地砖、碎石堆与裂缝",
+    "props": "床架、桌椅柜、木箱、管道、通风口、推车等可拆解的日常家具",
+    "textureDensity": "纹理密集但分辨率低，每块表面 1~2 像素级细节"
+  },
+  "shapeLanguage": [
+    "矩形与方格为基础的模块化块面",
+    "硬直角，少量斜切表示破损",
+    "整体由瓦片拼接构成，边界清晰"
+  ],
+  "constraints": [
+    "所有资源必须遵循同一像素网格与统一的像素密度，不得混入高分辨率插画元素",
+    "物件轮廓外缘加一圈深色描边以与背景分离",
+    "禁止使用平滑渐变、模糊或抗锯齿，只允许抖动或色阶并列",
+    "保持正交侧视，不得出现透视消失点",
+    "角色与道具必须能站在统一瓦片地形的格子上",
+    "同一材质需在所有资源中保持一致的画法与色阶用法",
+    "避免纯白与纯黑，最亮与最暗均使用色板内的对应色"
+  ],
+  "styleReferences": [
+    {
+      "path": "style-ref-clean.png"
+    }
+  ],
+  "style": {
+    "id": "style-ref-clean",
+    "identity": [
+      "低分辨率像素游戏美术",
+      "废土废墟",
+      "脏旧表面与锈斑",
+      "模块化瓦片素材"
+    ],
+    "camera": {
+      "mode": "2D 正交侧面视角",
+      "angle": "平视",
+      "projection": "无透视正交"
+    },
+    "composition": {
+      "layout": "素材表式排布，物件彼此分离并对齐网格",
+      "grounding": "物件位于统一底线上"
+    },
+    "palette": [
+      "#2a2d26",
+      "#4a4e44",
+      "#6b6f63",
+      "#8a8b7c",
+      "#8c2b28",
+      "#6a4a32",
+      "#9a9a8e",
+      "#b8b6a8",
+      "#1c1e1a",
+      "#3b3f38",
+      "#cfcec2",
+      "#e4e2d6",
+      "#a07b4e",
+      "#5a6b52",
+      "#2f3a2e"
+    ],
+    "lighting": {
+      "direction": "漫射环境光",
+      "contrast": "中等偏低",
+      "softness": "硬边无色阶过渡"
+    },
+    "shapeLanguage": [
+      "方块与矩形",
+      "硬直边缘",
+      "瓦片化拼接"
+    ],
+    "material": [
+      "混凝土",
+      "锈金属",
+      "旧木材",
+      "织物",
+      "脏玻璃"
+    ],
+    "environment": [
+      "废弃城市",
+      "残破墙体与阶梯",
+      "散落的家具与管道"
+    ],
+    "characterStyle": [
+      "三头身像素小人",
+      "侧面行走帧",
+      "深色描边",
+      "低饱和服装"
+    ],
+    "constraints": [
+      "限制在有限色板内取色",
+      "不使用渐变与模糊",
+      "统一像素尺寸"
+    ],
+    "confidence": 0.92
+  }
+}

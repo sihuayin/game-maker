@@ -1,0 +1,189 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-pip",
+  "frame": "hud-pip",
+  "viewBox": [
+    0,
+    0,
+    12,
+    12
+  ],
+  "expectedSize": [
+    12,
+    12
+  ],
+  "ops": [
+    {
+      "op": "circle",
+      "fill": "palette:1",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "cx": 6,
+      "cy": 6,
+      "r": 5
+    },
+    {
+      "op": "circle",
+      "fill": "palette:3",
+      "cx": 6,
+      "cy": 6,
+      "r": 4
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "points": [
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          5,
+          5
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 4,
+      "y": 4,
+      "w": 4,
+      "h": 4,
+      "colors": [
+        "palette:4",
+        "palette:3"
+      ],
+      "ratio": 0.45,
+      "pattern": "checker"
+    },
+    {
+      "op": "poly",
+      "fill": "palette:12",
+      "points": [
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          4,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:14",
+      "points": [
+        [
+          8,
+          6
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 3,
+      "y1": 6,
+      "x2": 4,
+      "y2": 7
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 8,
+      "y1": 6,
+      "x2": 7,
+      "y2": 7
+    },
+    {
+      "op": "poly",
+      "fill": "palette:13",
+      "points": [
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          6,
+          8
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 5,
+      "y": 8,
+      "w": 2,
+      "h": 2,
+      "colors": [
+        "palette:5",
+        "palette:1"
+      ],
+      "ratio": 0.5,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "circle",
+      "fill": "palette:15",
+      "opacity": 0.8,
+      "cx": 5,
+      "cy": 5,
+      "r": 1
+    },
+    {
+      "op": "circle",
+      "fill": "palette:14",
+      "opacity": 0.6,
+      "cx": 7,
+      "cy": 5,
+      "r": 1
+    }
+  ]
+}

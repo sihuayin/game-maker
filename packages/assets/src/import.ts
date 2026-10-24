@@ -123,6 +123,59 @@ export function despillMagenta(
 }
 
 /**
+ * 从四边 flood-fill 出的「与画布边缘**连通**」的背景（recipe-config-gap-v1 票 09）。
+ *
+ * 与 `keyBackground` 的**全局比色**不同：它只算**与边缘连通**的同族像素 —— 主体内部的同色大块
+ * **不算**背景（它不贴边）。这是「空间连续性」判据的实现：背景可以 < 50%，只要它围绕主体、
+ * 从四边连成一片，就仍是可抠图资源。
+ *
+ * ⚠️ `match` = 在 `colors` 容差内**或**命中品红 despill 判据（两把尺子同一族，见 `despillMagenta`）。
+ * 返回：`image`（连通背景置透明）+ `count`（连通背景像素数）。
+ */
+export function edgeConnectedBackground(
+  img: RasterImage,
+  { tolerance, colors, despill }: {
+    tolerance: number;
+    colors: readonly [number, number, number][];
+    despill?: DespillThresholds;
+  },
+): { image: RasterImage; count: number } {
+  const { width: w, height: h, data } = img;
+  const matches = (i: number): boolean => {
+    const s = i * 4;
+    if (data[s + 3]! < 128) return false;
+    const r = data[s]!, g = data[s + 1]!, b = data[s + 2]!;
+    let best = Infinity;
+    for (const c of colors) {
+      const d = Math.abs(r - c[0]) + Math.abs(g - c[1]) + Math.abs(b - c[2]);
+      if (d < best) best = d;
+    }
+    if (best <= tolerance) return true;
+    if (despill !== undefined && r > despill.rMin && g < despill.gMax && b > despill.bMin &&
+        r - g > despill.rgMin && b - g > despill.bgMin) return true;
+    return false;
+  };
+  const visited = new Uint8Array(w * h);
+  const stack: number[] = [];
+  const seed = (i: number) => { if (matches(i) && visited[i] === 0) { visited[i] = 1; stack.push(i); } };
+  for (let x = 0; x < w; x++) { seed(x); seed((h - 1) * w + x); }
+  for (let y = 0; y < h; y++) { seed(y * w); seed(y * w + (w - 1)); }
+  let count = 0;
+  while (stack.length > 0) {
+    const i = stack.pop()!;
+    count++;
+    const x = i % w, y = (i / w) | 0;
+    if (x + 1 < w) seed(i + 1);
+    if (x > 0) seed(i - 1);
+    if (y + 1 < h) seed(i + w);
+    if (y > 0) seed(i - w);
+  }
+  const out: RasterImage = { width: w, height: h, data: Buffer.from(data) };
+  for (let i = 0; i < w * h; i++) if (visited[i] === 1) out.data[i * 4 + 3] = 0;
+  return { image: out, count };
+}
+
+/**
  * 这张图**实际交付**的底色：不透明像素里出现次数最多的那个颜色（**票 37 的 Q1**）。
  *
  * ⚠️ **为什么不能继续用「我们声明的那个颜色」抠底**：第三次真跑那 **9/9** 张在容差 30 下
