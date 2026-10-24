@@ -126,6 +126,12 @@ export * from "./visual-world-attempts.js";
 // ── 一次操作的对外回报形状（两个壳与所有 core 操作用同一份）────────────────
 export * from "./command.js";
 
+// ── V2 的视觉构图中间层（Visual Design Compiler 旁轨，票 visual-design-impl-v1 01）──
+// ⚠️ 确定性布局的输出契约（`visual-design/v1`）。它的 `role` 复用 `EntityKind`（v3 的 `.options`
+//   派生，单一来源）；`fill` 用 `PaletteRefShape`（v4 镜像）。SVG（票 05）由它派生、GameConfig 由它
+//   交叉验证（票 07）。消费者是 `packages/visual-design` 与 `packages/qa`，两者都只依赖本包（R11）。
+export * from "./visual-design.js";
+
 // ── 游戏配置：AI 与手写 runtime 之间唯一的语义接口 ─────────────────────────
 // ⚠️ **两个变体、两个 format 串**（2026-09-29）：`game-config/v1` 是横版，
 // `td-config/v1` 是塔防。它们是**平级的兄弟格式**，不是同一份 schema 的 v1/v2 ——

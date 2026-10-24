@@ -62,7 +62,7 @@ Effort: visual-design-impl-v1
 
 <!-- the index: one line per closed ticket, enough to judge relevance, then zoom the link for the detail the ticket holds -->
 
-（无。本图刚开，未认领任何票。）
+- [01 Visual Design Spec 契约 schema 落码](issues/01-vds-contract-schema.md)：`contracts/src/visual-design.ts` 落码（zod/v4）—— `format:"visual-design/v1"` + `viewport`（只验形状，值注入）+ `style`（仅 `visualWorldFormat` 出处指针）+ `objects`（min(1)）；object `{id,role,bounds,layer,fill:PaletteRefShape,sourceIntent?}`；`role` 从 `EntityKind.options` 派生（单一来源，漂移测试盯着）。唯一 superRefine = id 不重复；跨文件悬空引用（palette 越界 / sourceIntent 悬空）归装配/QA 步（票 07）。14/14 测试 + 全仓 typecheck 绿。
 
 ## Not yet specified
 
