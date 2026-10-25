@@ -604,6 +604,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
       intentPath: path.join(runDir, RUN_ARTIFACT.gameIntent),
       designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
       recipePath: path.join(runDir, RUN_ARTIFACT.recipe),
+      vdsPath: path.join(runDir, RUN_ARTIFACT.visualDesign),
       inspectObservation,
     }), pixel.findings);
     // ⚠️ **先过一遍它自己的契约**（票 20 的 Q4 的第 2 步）：落一份**过不了 schema** 的报告，

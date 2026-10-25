@@ -60,9 +60,9 @@
 //        今天「跑满」是**真跑满**，不是把差集删掉。
 //      ⚠️ **[票 20] 的义务**：它**不**要求「六条判据每条恰好被一个族声明一次」
 //        —— 那句在数学上做不到（`layer-coverage` 不属于任何族，由合成器在汇合处直接跑）。
-//   ② **`severity: "warning"` 今天一条都不报**。类型**允许**它（`auditGameConfig`
-//      那一档「精确可算、但不构成判决」的形状一字不改地搬过来），但**哪一条判据
-//      真去报警告**是**装配侧**的事（[票 20] §3），不是本契约的事。
+//   ② **`severity: "warning"` 只由视觉族的几何观察报**（visual-design-impl-v1 票 07）：
+//      `visual-config-coherence` 的「尺寸漂移」走 `warning`，不阻断（`qaVerdict` 只看 `error`）。
+//      其余判据今天一条 warning 都不报。
 //   ③ **`checked` 里缺席的两种意思要分得开**：缺席只能是「这一次没跑」，**不是**「这条不归我」——
 //      后者是**没有那个键**（`QaFamilyResult.judgements` 是 `Partial`，[票 18] 的 R3-Q1）。
 //      类型**允许**缺席；而链上今天**没有** `ran: false` 的来路（见①）——
@@ -148,7 +148,14 @@ export const QA_JUDGEMENTS = [
    *    ⇒ **砍掉**，而且不是降成 warning。理由与测量全在 `intent-coverage.ts` 的头一。
    *  够得上判据：它是**可减的集合**，且「用户点名要的东西被丢了 / 串了桶」
    *  **错的一定不是设计**。 */
-  "intent-coverage"
+  "intent-coverage",
+  /** **VDS ↔ GameConfig 交叉验证**（visual-design-impl-v1 票 07）：VDS 里带 `sourceIntent` 的实体，
+   *  它的**设计桶**（GameDesignSpec 落桶）与 GameConfig 的 `kind` 必须**家族兼容**，且必须在 config 里**存在**。
+   *  ⚠️ identity 用**设计桶**（真值），不用 VDS 的 `role` —— 确定性布局给的 role 是**视觉分组默认**，
+   *    不是身份断言（wasteland 真夹具里 `interactables` 一桶既有 chest 又有 hazard，桶→EntityKind 不是 1:1）。
+   *  几何漂移（VDS bounds vs config 几何）走 `warning`、不阻断。
+   *  够得上判据：串桶（资源当危险物 / 非敌当敌人）错的一定不是设计。 */
+  "visual-config-coherence"
 ] as const;
 
 export const QAJudgementSchema = z.enum(QA_JUDGEMENTS);
@@ -405,7 +412,8 @@ export const QA_JUDGEMENT_LABELS: Record<QAJudgement, string> = {
   "layer-coverage": "层覆盖",
   "reference-resolution": "引用族",
   "reachability": "可达性（boot → spawn → goal）",
-  "intent-coverage": "意图覆盖（集合差）"
+  "intent-coverage": "意图覆盖（集合差）",
+  "visual-config-coherence": "视觉设计↔配置一致性（设计桶↔kind）"
 };
 
 // ── QA 的**扩展点**（票 15 的 Q12）──────────────────────────────────────────
@@ -465,6 +473,8 @@ export type QaContext = {
   designPath: string;
   /** 已落盘的 `asset-recipe.json` 的绝对路径 —— 视觉族（票 17）要读它。 */
   recipePath: string;
+  /** 已落盘的 `visual-design.json` 的绝对路径 —— 视觉族（VDS↔GameConfig 交叉验证）要读它。 */
+  vdsPath: string;
   gameId: string;
   /**
    * **外壳视口**（像素）—— 与 `compileRuntime` / 站点装配收到的是**同一个值**（由壳传进来）。

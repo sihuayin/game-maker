@@ -36,6 +36,7 @@ function stage(viewport = { w: 480, h: 270 }): QaContext {
     intentPath: path.join(runDir, "game-intent.json"),
     designPath: path.join(runDir, "game-design.json"),
     recipePath: path.join(runDir, "asset-recipe.json"),
+    vdsPath: path.join(runDir, "visual-design.json"),
   };
 }
 

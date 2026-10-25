@@ -1,8 +1,8 @@
 # 07. VDS ↔ GameConfig 交叉验证（第 7 判据）
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-25 · resolved)
 Blocked by: 01, 06
 Map: ../map.md
 
@@ -36,3 +36,20 @@ Map: ../map.md
 
 **测试**（TDD）：同 id 角色一致/不一致（串桶）各一条；`sourceIntent` 缺失判据；几何漂移只出观察不出判据；
 `assertQaPassed`（`create-game.ts:226`）自动把第 7 条未查判据当阻断。
+
+## Answer
+
+已落码（2026-10-25）：
+
+- **第 7 判据挂名** `visual-config-coherence`：`QA_JUDGEMENTS` 6→7 + `QA_JUDGEMENT_LABELS` + `QaContext.vdsPath`；
+  合成器 `assemble.ts` 加第 7 个 key；`runBuild` 传 `vdsPath`（`create-game.ts:598-608`）。
+- **identity 用设计桶，不用 VDS role**（票 02 Q1）：`qa/src/visual.ts` 的 `visualConfigCoherence` 读 VDS +
+  GameDesignSpec + GameConfig，按 `sourceIntent` 查**设计桶**，查 GameConfig `kind` 是否在**精确允许集合**：
+  `enemies→{hazard,danger}` · `npcs→{decor}` · `interactables→{chest,pickup,goal,hazard,danger,solid}` · `resources→{pickup}`。
+  `player` 不进对账（GameConfig 顶层字段）；悬空 `sourceIntent` 归票 04 覆盖。串桶 / 缺失 = **error**（定位到实体 id）；
+  几何漂移（VDS bounds vs `entityBox`）= **warning**（只报不阻断；每实体至多一条 finding，避免 `(judgement,target)` 重复）。
+- **夹具修正（连带）**：`CANNED.gameConfig` 补 `e-drone`（设计有、config 没有 —— 真实跑里 config 由 design 派生、
+  不会缺；交叉验证当场把夹具的不一致照出来了）。5 个 QA 测试补 `vdsPath`（visual/assemble 用无 sourceIntent 的合成
+  VDS + 真 config/design）；6→7 断言（qa/create-game/cli-create/assemble）。
+- **验证**：`assemble.test.ts` **15/15**（含 4 条交叉验证：一致 · 串桶 error · 缺失 error · 几何 warning + 裁决 pass）；
+  全仓 **1926/1926**；`build` + `typecheck` 绿。

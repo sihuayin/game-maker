@@ -68,6 +68,7 @@ Effort: visual-design-impl-v1
 - [04 PNG 渲染 + 与 SVG 的一致性证明](issues/04-png-render-consistency.md)：`instructions.ts` 共享指令流（`deriveRectInstructions`）—— `serializeVds` 与 `renderVds` 都从它派生（**结构性同一**）。`render.ts` 复用 `rasterize`/`encodePNG`（visual-design 因此加 `→ assets` 依赖边）。6/6 测试 + 全仓 1913/1913。
 - [05 VDC 自有确定性 validator](issues/05-vdc-validator.md)：`validator.ts` 落码——`validateVds(vds,palette,svg,png)` 七条判据（语法+白名单**前置门** → 画布 → id 唯一 → fill 界内 → 边界 round-trip → PNG 尺寸），返回 `VdcIssue[]` 定位到「阶段+对象」。「文件清单」归票 06。8/8 测试 + 全仓 1921/1921。
 - [06 管线接线 + compile 入口](issues/06-pipeline-wiring.md)：`compile.ts` 编排四步（纯计算，validator 失败抛 `CommandError("invalid")`）；create-game 在 character-dna 后插 visual-design 步（`UNDERSTANDING_STEPS` 5→6），写 `visual-design.json` + `visual-design/{svg,preview}/`；`pipeline → visual-design` 依赖边；`RUN_ARTIFACT` 加 `visualDesign` 键。全仓 1922/1922。
+- [07 VDS↔GameConfig 交叉验证](issues/07-qa-crosscheck.md)：第 7 判据 `visual-config-coherence`（`QA_JUDGEMENTS` 6→7 + 标签 + `QaContext.vdsPath`）。identity 用**设计桶↔kind 家族**（精确枚举），串桶/缺失=error、几何漂移=warning。合成器加 key、pipeline 传 vdsPath。夹具修 `CANNED.gameConfig` 补 e-drone。15/15 assemble + 全仓 1926/1926。
 
 ## Not yet specified
 

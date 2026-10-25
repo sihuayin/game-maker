@@ -58,8 +58,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  auditAssetSpec, parseAssetPack, parseDrawList, parseRecipe,
-  type AssetPackEntry, type AssetPackManifest, type AssetSpec, type DrawList, type JudgementResult,
+  auditAssetSpec, entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, parseAssetPack, parseDrawList,
+  parseGameConfig, parseRecipe, VisualDesignSpecSchema,
+  type AssetPackEntry, type AssetPackManifest, type AssetSpec, type DrawList, type GameConfig, type JudgementResult,
   type QAFinding, type QaContext, type QaFamilyResult, type QaFamilyRunner,
 } from "@game-maker/contracts";
 
@@ -87,12 +88,15 @@ export const visualQaRunner: QaFamilyRunner = async (ctx: QaContext): Promise<Qa
   if (!recipe.ok) throw new Error(`清单读不回来或不过契约：${recipe.errors.slice(0, 4).join("；")}`);
   const manifest = parseAssetPack(read(path.join(ctx.packDir, "manifest.json"), "包清单"));
   if (!manifest.ok) throw new Error(`包清单读不回来或不过契约：${manifest.errors.slice(0, 4).join("；")}`);
+  const config = parseGameConfig(read(ctx.configPath, "游戏配置"));
+  if (!config.ok) throw new Error(`游戏配置读不回来或不过契约：${config.errors.slice(0, 4).join("；")}`);
 
-  // ⚠️ **只放自己那两条**（其余四条缺席 = 不归我，见文件头四）。
+  // ⚠️ **只放自己那三条**（其余四条缺席 = 不归我，见文件头四）。
   return {
     judgements: {
       "constructive-constraint": constructiveConstraint(recipe.value.assets, manifest.value, ctx.packDir),
-      "palette-binding": paletteBinding(manifest.value)
+      "palette-binding": paletteBinding(manifest.value),
+      "visual-config-coherence": visualConfigCoherence(ctx, config.value, manifest.value),
     },
     // ⚠️ **观察那一栏空着**（见文件头五）。
     observations: []
@@ -171,5 +175,77 @@ function paletteBinding(manifest: AssetPackManifest): JudgementResult {
     findings.push({ target: "recipe", severity: "error",
       detail: `\`palette.ref\` 指的那份色板不在 \`files[]\` 里（"${refPath}"）—— ⚠️ 那意味着它**在 checksum 覆盖之外**` });
 
+  return ran(findings);
+}
+
+/**
+ * 设计桶 → 允许的 GameConfig `EntityKind` 集合（visual-design-impl-v1 票 02 Q1 的**精确枚举**）。
+ * ⚠️ `interactables` 是 EntityKind **除 `decor`** —— `decor` 是纯装饰，若交互物被做成 `decor`
+ *   = 丢了交互 = 串桶。`player` 不在表里（GameConfig 里是顶层字段、非 entity，不进对账）。
+ */
+const DESIGN_BUCKET_KINDS: Readonly<Record<string, readonly string[]>> = {
+  enemies: ["hazard", "danger"],
+  npcs: ["decor"],
+  interactables: ["chest", "pickup", "goal", "hazard", "danger", "solid"],
+  resources: ["pickup"],
+};
+
+/**
+ * **VDS ↔ GameConfig 交叉验证**（visual-design-impl-v1 票 07）。
+ *
+ * ⚠️ identity 用**设计桶**（`sourceIntent` 落在 GameDesignSpec 哪个桶），**不用 VDS 的 `role`** ——
+ *   确定性布局给的 role 是**视觉分组默认**，不是身份断言（wasteland 真夹具里 `interactables`
+ *   一桶既有 chest 又有 hazard，桶→EntityKind 不是 1:1）。允许集合见上面 `DESIGN_BUCKET_KINDS`。
+ * ⚠️ **player 不进对账**：GameConfig 里它是顶层字段、不是 `entities[]` 条目（覆盖走票 04）。
+ * ⚠️ **悬空 `sourceIntent`**（设计里没有的 id）归票 04 的覆盖，不在这里判。
+ * ⚠️ 几何漂移走 `warning`（只报、不阻断）；**每个实体至多一条 finding**（同 `(judgement,target)`
+ *   不许重复 ⇒ 串桶 error 优先，跳过该实体的几何观察）。
+ */
+function visualConfigCoherence(ctx: QaContext, config: GameConfig, manifest: AssetPackManifest): JudgementResult {
+  const vds = VisualDesignSpecSchema.safeParse(read(ctx.vdsPath, "视觉设计规格"));
+  if (!vds.success) throw new Error(`视觉设计规格读不回来或不过契约：${formatIssues(vds.error).slice(0, 4).join("；")}`);
+  const design = GameDesignSpecSchema.safeParse(read(ctx.designPath, "游戏设计"));
+  if (!design.success) throw new Error(`游戏设计读不回来或不过契约：${formatIssues(design.error).slice(0, 4).join("；")}`);
+
+  // 设计实体 id → 桶
+  const bucketOf = new Map<string, string>();
+  bucketOf.set(design.data.player.id, "player");
+  for (const e of design.data.enemies) bucketOf.set(e.id, "enemies");
+  for (const e of design.data.npcs) bucketOf.set(e.id, "npcs");
+  for (const e of design.data.interactables) bucketOf.set(e.id, "interactables");
+  for (const e of design.data.resources) bucketOf.set(e.id, "resources");
+
+  const entityOf = new Map(config.entities.map((e) => [e.id, e]));
+  const sizeOf = (assetId: string) => manifest.assets.find((a) => a.id === assetId)?.size ?? null;
+  const anchorOf = (assetId: string) => manifest.assets.find((a) => a.id === assetId)?.anchor ?? FALLBACK_ANCHOR;
+
+  const findings: QAFinding[] = [];
+  for (const obj of vds.data.objects) {
+    if (obj.sourceIntent === undefined) continue;
+    const bucket = bucketOf.get(obj.sourceIntent);
+    if (bucket === undefined || bucket === "player") continue;
+    const allowed = DESIGN_BUCKET_KINDS[bucket];
+    if (allowed === undefined) continue;
+    const ent = entityOf.get(obj.sourceIntent);
+    if (ent === undefined) {
+      findings.push({ target: obj.sourceIntent, severity: "error",
+        detail: `VDS 里 "${obj.sourceIntent}"（${bucket} 桶）在 GameConfig 里**不存在** —— 视觉设计画了、配置没做` });
+      continue;
+    }
+    if (!allowed.includes(ent.kind)) {
+      findings.push({ target: obj.sourceIntent, severity: "error",
+        detail: `设计桶 ${bucket} 的实体 "${obj.sourceIntent}" 在 GameConfig 里是 kind "${ent.kind}"，` +
+          `不在允许集合 {${allowed.join(", ")}} —— ⚠️ 串桶` });
+      continue; // error 优先，跳过该实体的几何观察（避免 (judgement,target) 重复）
+    }
+    // 几何观察（只报、不阻断）：只比尺寸 w/h，无阈值，措辞描述性
+    const size = ent.body ?? sizeOf(ent.asset);
+    if (size === null) continue;
+    const box = entityBox(ent.at, size, anchorOf(ent.asset));
+    if (box.w !== obj.bounds.w || box.h !== obj.bounds.h)
+      findings.push({ target: obj.sourceIntent, severity: "warning",
+        detail: `视觉设计里 "${obj.sourceIntent}" 的构图为 ${obj.bounds.w}×${obj.bounds.h}，` +
+          `配置几何为 ${box.w}×${box.h} —— 尺寸有差（只报、不阻断）` });
+  }
   return ran(findings);
 }

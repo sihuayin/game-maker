@@ -45,7 +45,8 @@ function stage(): QaContext {
     configPath: path.join(nowhere, "game-config.json"),
     recipePath: path.join(nowhere, "asset-recipe.json"),
     intentPath: path.join(runDir, "game-intent.json"),
-    designPath: path.join(runDir, "game-design.json")
+    designPath: path.join(runDir, "game-design.json"),
+    vdsPath: path.join(runDir, "visual-design.json")
   };
 }
 function write(runDir: string, name: string, body: unknown): void {

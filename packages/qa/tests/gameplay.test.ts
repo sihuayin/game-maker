@@ -35,7 +35,8 @@ function stage(): QaContext {
     configPath: path.join(runDir, "game-config.json"),
     intentPath: path.join(runDir, "game-intent.json"),
     designPath: path.join(runDir, "game-design.json"),
-    recipePath: path.join(runDir, "asset-recipe.json")
+    recipePath: path.join(runDir, "asset-recipe.json"),
+    vdsPath: path.join(runDir, "visual-design.json")
   };
 }
 const run = (ctx: QaContext): Promise<QaFamilyResult> => gameplayQaRunner(ctx);

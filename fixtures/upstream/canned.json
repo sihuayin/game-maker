@@ -240,6 +240,15 @@
         "asset": "ui-pip"
       },
       {
+        "id": "e-drone",
+        "kind": "hazard",
+        "at": {
+          "x": 240,
+          "y": 230
+        },
+        "asset": "e-drone"
+      },
+      {
         "id": "e-goal",
         "kind": "goal",
         "at": {

@@ -44,6 +44,12 @@ function stage(): QaContext {
   fs.copyFileSync(CONFIG, path.join(runDir, "game-config.json"));
   write(runDir, "game-intent.json", CANNED.intent);
   write(runDir, "game-design.json", CANNED.design);
+  // ⚠️ 票 07 起视觉族也读 VDS（交叉验证）。合成 VDS（无 sourceIntent）⇒ 交叉验证没有实体可查、恒过。
+  write(runDir, "visual-design.json", {
+    format: "visual-design/v1", viewport: { w: 480, h: 270 },
+    style: { visualWorldFormat: "visual-world/v1" },
+    objects: [{ id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" }],
+  });
   return {
     runDir, packDir, gameId: "last-train",
     // ⚠️ 第六条判据（层覆盖）要它（P0-02a）：合成器把视口原样交给 `auditLayerCoverage`。
@@ -52,6 +58,7 @@ function stage(): QaContext {
     configPath: path.join(runDir, "game-config.json"),
     intentPath: path.join(runDir, "game-intent.json"),
     designPath: path.join(runDir, "game-design.json"),
+    vdsPath: path.join(runDir, "visual-design.json"),
   };
 }
 function write(runDir: string, name: string, body: unknown): void {
@@ -60,8 +67,8 @@ function write(runDir: string, name: string, body: unknown): void {
 const run = (ctx: QaContext): Promise<QAReport> => qaRunner(ctx);
 const bySource = (r: QAReport, s: string) => r.observations.find((o) => o.source === s);
 
-/** 六条 —— 三条族各声明自己那几条，第六条（层覆盖）由**合成器自己**跑（P0-02a）。 */
-const SIX = ["constructive-constraint", "palette-binding", "layer-coverage", "reference-resolution", "reachability", "intent-coverage"];
+/** 七条 —— 视觉族三条 + 玩法族两条 + 意图族一条 + 合成器自己跑的层覆盖一条（P0-02a）。 */
+const SEVEN = ["constructive-constraint", "palette-binding", "visual-config-coherence", "layer-coverage", "reference-resolution", "reachability", "intent-coverage"];
 
 describe("§干净的真现场：三族都跑、合成一份**过得了契约**的报告", () => {
   it("⚠️ `format` 是契约那份、整份报告过 schema（票 17 搬过来那两条断言的第一条）", async () => {
@@ -70,14 +77,14 @@ describe("§干净的真现场：三族都跑、合成一份**过得了契约**�
     expect(QAReportSchema.safeParse(r).success).toBe(true);   // ⚠️ 族结果落盘**过不了**（票 18 实测）—— 合成器补的就是这一条
   });
 
-  it("⚠️ `checked` 是**六条**、含 `layer-coverage` —— 干净包裁决 `pass`", async () => {
+  it("⚠️ `checked` 是**七条**、含 `layer-coverage` —— 干净包裁决 `pass`", async () => {
     const r = await run(stage());
-    expect([...r.checked].sort()).toEqual([...SIX].sort());
+    expect([...r.checked].sort()).toEqual([...SEVEN].sort());
     expect(r.checked).toContain("layer-coverage");
     // ⚠️ 以前这里是 `incomplete`（第六条没由 QA 跑、`checked` 恒 5/6）；P0-02a 起第六条**真跑**。
     expect(qaVerdict(r)).toBe("pass");
-    expect(QA_JUDGEMENTS).toHaveLength(6);
-    expect(r.checked).toHaveLength(6);
+    expect(QA_JUDGEMENTS).toHaveLength(7);
+    expect(r.checked).toHaveLength(7);
     expect(r.failures).toEqual([]);
   });
 
@@ -165,8 +172,8 @@ describe("§R3 那条底线：**观察不许影响 status**", () => {
     const bad = await run(ctx);
     expect(qaVerdict(bad)).toBe("fail");
     expect(bad.failures.map((f) => f.judgement)).toContain("reference-resolution");
-    // ⚠️ `checked` 仍然是**六条**：跑了、响了，与跑了几条是两件事
-    expect([...bad.checked].sort()).toEqual([...SIX].sort());
+    // ⚠️ `checked` 仍然是**七条**：跑了、响了，与跑了几条是两件事
+    expect([...bad.checked].sort()).toEqual([...SEVEN].sort());
     // ⚠️ 观察那一栏与干净那次**逐字节相同** —— 它不看 `failures`
     const clean = await run(stage());
     expect(bad.observations).toEqual(clean.observations);
@@ -184,5 +191,56 @@ describe("§「该跑却跑不了」是**抛**，不是一份半截报告（票 
     const ctx = stage();
     write(ctx.runDir, "game-design.json", { format: "game-design/v1" });   // 缺一大半字段
     await expect(run(ctx)).rejects.toThrow(/不过契约/);
+  });
+});
+
+describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）", () => {
+  // 设计（CANNED.design）的 enemies 桶里有 e-drone；这里给 config 造一个 id 相同的实体。
+  const ID = "e-drone";
+  const drone = { id: ID, role: "hazard", bounds: { x: 100, y: 200, w: 16, h: 16 }, layer: 10, fill: "palette:0", sourceIntent: ID };
+  const vds = (objects: unknown[]) => ({
+    format: "visual-design/v1", viewport: { w: 480, h: 270 },
+    style: { visualWorldFormat: "visual-world/v1" }, objects,
+  });
+  /** 真 config（last-train）+ 可选一个 id=ID 的实体（kind 由参数给；null = 不加 ⇒ 制造「缺失」）。 */
+  const configWith = (kind: string | null) => {
+    const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
+    if (kind !== null) c.entities.push({ id: ID, kind, at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
+    return c;
+  };
+  const vcFindings = (r: QAReport) => r.failures.filter((f) => f.judgement === "visual-config-coherence");
+
+  it("一致：敌人桶实体在 config 里是 hazard ⇒ 无 error（几何漂移只 warning）", async () => {
+    const ctx = stage();
+    write(ctx.runDir, "game-config.json", configWith("hazard"));
+    write(ctx.runDir, "visual-design.json", vds([drone]));
+    expect(vcFindings(await run(ctx)).filter((f) => f.severity === "error")).toEqual([]);
+  });
+
+  it("⚠️ 串桶：敌人桶实体在 config 里是 decor ⇒ error（target = 实体 id）", async () => {
+    const ctx = stage();
+    write(ctx.runDir, "game-config.json", configWith("decor"));
+    write(ctx.runDir, "visual-design.json", vds([drone]));
+    const f = vcFindings(await run(ctx)).find((x) => x.severity === "error");
+    expect(f?.target).toBe(ID);
+    expect(f?.detail).toMatch(/不在允许集合/);
+  });
+
+  it("⚠️ 缺失：VDS 画了、config 没有 ⇒ error", async () => {
+    const ctx = stage();
+    write(ctx.runDir, "game-config.json", configWith(null));
+    write(ctx.runDir, "visual-design.json", vds([drone]));
+    const f = vcFindings(await run(ctx)).find((x) => x.severity === "error");
+    expect(f?.target).toBe(ID);
+    expect(f?.detail).toMatch(/不存在/);
+  });
+
+  it("几何漂移：只出 warning、不阻断（裁决仍 pass）", async () => {
+    const ctx = stage();
+    write(ctx.runDir, "game-config.json", configWith("hazard"));
+    write(ctx.runDir, "visual-design.json", vds([drone]));
+    const r = await run(ctx);
+    expect(vcFindings(r).some((f) => f.severity === "warning")).toBe(true);
+    expect(qaVerdict(r)).toBe("pass");
   });
 });

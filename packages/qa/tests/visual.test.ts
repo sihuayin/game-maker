@@ -13,9 +13,15 @@ import { visualQaRunner } from "../src/index.js";
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const PACK = path.join(ROOT, "fixtures/packs/last-train/v2");
 const RECIPE = path.join(ROOT, "fixtures/recipes/last-train.json");
+const CONFIG = path.join(ROOT, "fixtures/game-configs/last-train.json");
+const CANNED = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/upstream/canned.json"), "utf8")) as {
+  design: Record<string, unknown>;
+};
 
 const dirs: string[] = [];
 afterAll(() => { for (const d of dirs) fs.rmSync(d, { recursive: true, force: true }); });
+const writeJson = (dir: string, name: string, body: unknown): void =>
+  fs.writeFileSync(path.join(dir, name), JSON.stringify(body, null, 2) + "\n");
 
 /** 一次「运行目录 + 包目录」的现场。⚠️ 它把 fixture **拷**出来 —— 损坏那几条不能动真 fixture。 */
 function stage(): QaContext {
@@ -26,16 +32,23 @@ function stage(): QaContext {
   fs.mkdirSync(runDir, { recursive: true });
   fs.cpSync(PACK, packDir, { recursive: true });
   fs.copyFileSync(RECIPE, path.join(runDir, "asset-recipe.json"));
-  // ⚠️ 四份路径**都摆出来**（票 19 的 Q4/Q11）：本族只读 `recipePath` 与 `packDir`，
-  //   另外两份给了但那份文件**不存在** —— 那正说明**没人读它**（拼错路径当场炸，不是静默）。
+  // ⚠️ 票 07 起本族**也读** config / design / vds（交叉验证）：三份都要在。
+  fs.copyFileSync(CONFIG, path.join(runDir, "game-config.json"));
+  writeJson(runDir, "game-design.json", CANNED.design);
+  // 合成 VDS（无 sourceIntent）：交叉验证没有实体可查 ⇒ 恒过，让本条专注构造性/色板两条。
+  writeJson(runDir, "visual-design.json", {
+    format: "visual-design/v1", viewport: { w: 480, h: 270 },
+    style: { visualWorldFormat: "visual-world/v1" },
+    objects: [{ id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" }],
+  });
   return {
     runDir, packDir, gameId: "last-train",
-    // ⚠️ 本族不读视口；但 `QaContext` 要求它（第六条判据由合成器跑，P0-02a）。
     viewport: { w: 480, h: 270 },
     configPath: path.join(runDir, "game-config.json"),
     intentPath: path.join(runDir, "game-intent.json"),
     designPath: path.join(runDir, "game-design.json"),
-    recipePath: path.join(runDir, "asset-recipe.json")
+    recipePath: path.join(runDir, "asset-recipe.json"),
+    vdsPath: path.join(runDir, "visual-design.json"),
   };
 }
 const manifestPath = (ctx: QaContext) => path.join(ctx.packDir, "manifest.json");
@@ -54,10 +67,10 @@ const flat = (r: QaFamilyResult) => Object.entries(r.judgements)
 const keys = (r: QaFamilyResult) => Object.keys(r.judgements).sort();
 type AnyManifest = { assets: { id: string; size: { w: number; h: number }; paletteBinding: string }[]; palette: { size: number; ref: string; coverage: { exact: number } } };
 
-describe("§干净的真包：两条判据都跑、都没有怨言", () => {
-  it("⚠️ **只声明自己那两条** —— 另外四条**缺席**，不是 `ran:false`（票 18 的 R3-Q1：缺席 = 不归我）", async () => {
+describe("§干净的真包：三条判据都跑、都没有怨言", () => {
+  it("⚠️ **只声明自己那三条** —— 另外四条**缺席**，不是 `ran:false`（票 18 的 R3-Q1：缺席 = 不归我）", async () => {
     const r = await run(stage());
-    expect(keys(r)).toEqual(["constructive-constraint", "palette-binding"]);
+    expect(keys(r)).toEqual(["constructive-constraint", "palette-binding", "visual-config-coherence"]);
     expect(flat(r)).toEqual([]);
   });
 

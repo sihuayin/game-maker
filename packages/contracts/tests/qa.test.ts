@@ -51,11 +51,11 @@ const report = (results = allPass(), observations: unknown[] = OBSERVATIONS) =>
   buildQAReport(results, observations as Observation[]);
 
 describe("§一个枚举两用：判据名只有一处（票 06 Q2 / Q10）", () => {
-  it("`QA_JUDGEMENTS` 恰好六条 —— 判据表几条，这里就几个值", () => {
-    expect(QA_JUDGEMENTS).toHaveLength(6);
+  it("`QA_JUDGEMENTS` 恰好七条 —— 判据表几条，这里就几个值", () => {
+    expect(QA_JUDGEMENTS).toHaveLength(7);
     expect([...QA_JUDGEMENTS].sort()).toEqual([
       "constructive-constraint", "intent-coverage", "layer-coverage",
-      "palette-binding", "reachability", "reference-resolution"
+      "palette-binding", "reachability", "reference-resolution", "visual-config-coherence"
     ]);
   });
 
@@ -219,7 +219,7 @@ describe("§`qaVerdict` 的三态（票 06 Q7 / Q15）", () => {
 describe("§`buildQAReport` 是**投影**，不是第二份真相（票 06 Q13 / Q19）", () => {
   it("`checked` 只含**真跑过**的判据", () => {
     const r = buildQAReport(ranButNotChecked("reachability"), OBSERVATIONS);
-    expect(r.checked).toHaveLength(5);
+    expect(r.checked).toHaveLength(6);
     expect(r.checked).not.toContain("reachability");
   });
 

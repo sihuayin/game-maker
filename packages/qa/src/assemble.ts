@@ -90,6 +90,7 @@ export const qaRunner: QaRunner = async (ctx: QaContext): Promise<QAReport> => {
   const judgements: QAJudgementResults = {
     "constructive-constraint": declared(visual, "constructive-constraint"),
     "palette-binding": declared(visual, "palette-binding"),
+    "visual-config-coherence": declared(visual, "visual-config-coherence"),
     "layer-coverage": layers,
     "reference-resolution": declared(gameplay, "reference-resolution"),
     "reachability": declared(gameplay, "reachability"),

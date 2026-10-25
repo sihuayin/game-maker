@@ -641,15 +641,15 @@ describe("§票 60 · 死在第一步也留现场（`visual-world-attempts.json`
 });
 
 describe("§QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3）", () => {
-  it("⚠️ 不给 ⇒ 跑默认的合成器 —— 干净包 6/6、裁决 `pass`", async () => {
+  it("⚠️ 不给 ⇒ 跑默认的合成器 —— 干净包 7/7、裁决 `pass`", async () => {
     const h = harness();
     const u = await understand(h);
     const b = await build(h, u.run.dir);
-    // ⚠️ 干净的一次运行：六条判据全跑、一条怨言都没有
-    expect(b.qa?.failures).toEqual([]);
-    // ⚠️ P0-02a（2026-10-22）起第六条（层覆盖）由合成器**真跑** ⇒ `checked` 是 6/6、
+    // ⚠️ 干净的一次运行：七条判据全跑、**没有 error**（几何漂移是 warning，只报不阻断 —— 见票 07）。
+    expect(b.qa?.failures.filter((f) => f.severity === "error")).toEqual([]);
+    // ⚠️ P0-02a（2026-10-22）起第六条（层覆盖）由合成器**真跑** ⇒ `checked` 是 7/7、
     //   裁决是 `pass`（以前恒 5/6 / `incomplete`）。⚠️ 而闸**照旧**看 `failures`，不看 verdict。
-    expect(b.qa?.checked).toHaveLength(6);
+    expect(b.qa?.checked).toHaveLength(7);
     expect(b.qa?.checked).toContain("layer-coverage");
     expect(qaVerdict(b.qa!)).toBe("pass");
     expect(readJson(runPath(h, "qa-report.json"))["format"]).toBe("qa-report/v1");
@@ -751,7 +751,7 @@ describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的
     expect(String((e as Error).message)).toMatch(/QA 没跑全/);
     expect(String((e as Error).message)).toContain("layer-coverage");
     // ⚠️ 与 error 同一条顺序：报告是诊断，先落盘再阻断。
-    expect((readJson(runPath(h, "qa-report.json"))["checked"] as string[])).toHaveLength(5);
+    expect((readJson(runPath(h, "qa-report.json"))["checked"] as string[])).toHaveLength(6);
   });
 
   it("⚠️ 文案里带着**报告路径**与失败详情 —— 走异常那一路也丢不掉它（票 20 的 Q5）", async () => {
@@ -867,7 +867,7 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     checked: string[]; failures: unknown[];
   };
 
-  it("成功：inspect ok（含源图/目标尺寸段），review unavailable；六判据与 qaVerdict 不变", async () => {
+  it("成功：inspect ok（含源图/目标尺寸段），review unavailable；七判据与 qaVerdict 不变", async () => {
     const h = harness();
     const u = await understand(h);
     const b = await build(h, u.run.dir);
@@ -883,11 +883,11 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(b.inspectData!.layerCoverage.length).toBe(1);       // drawlist 背景只有一帧
     expect(b.inspectData!.paletteUsage.offPalette.pixels).toBe(0);
     expect(report.observations.find((o) => o.source === "review")!.outcome).toBe("unavailable");
-    expect(report.checked.sort()).toEqual(["constructive-constraint", "intent-coverage", "layer-coverage", "palette-binding", "reachability", "reference-resolution"]);
+    expect(report.checked.sort()).toEqual(["constructive-constraint", "intent-coverage", "layer-coverage", "palette-binding", "reachability", "reference-resolution", "visual-config-coherence"]);
     expect(qaVerdict(report as never)).toBe("pass");
   });
 
-  it("inspect 抛错：unavailable + build 继续；六判据与 qaVerdict 不变；reason 不带路径", async () => {
+  it("inspect 抛错：unavailable + build 继续；七判据与 qaVerdict 不变；reason 不带路径", async () => {
     const h = harness();
     const u = await understand(h);
     const b = await build(h, u.run.dir, { inspect: () => { throw new Error("boom /private/secret/path"); } });
@@ -899,7 +899,7 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(inspect.reason).not.toContain("/private/secret/path");
     expect(inspect.lines).toBeUndefined();
     expect(b.inspectData).toBeUndefined();                     // 抛错 ⇒ 没有结构化数据
-    expect(report.checked).toHaveLength(6);
+    expect(report.checked).toHaveLength(7);
     expect(qaVerdict(report as never)).toBe("pass");
   });
 });

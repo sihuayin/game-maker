@@ -396,9 +396,10 @@ describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5�
     expect(String(out.data!["qaReport"])).toBe("wasteland/run/v1/qa-report.json");
     expect(out.artifacts!.some((a) => a.kind === "qa-report")).toBe(true);
 
-    // ⚠️ 那一行要把「跑了的那几条怎么样」与「哪条没跑」**分开说**——
-    //   六条都跑满时后半句**不出现**（以前恒 5/6 时它恒出现，那是旧行为）。
-    expect(r.text()).toMatch(/QA：没有一条判据说不行 · 6\/6 条由 QA 跑过（裁决 pass）/);
+    // ⚠️ 那一行要把「跑了的那几条怎么样」与「哪条没跑」**分开说**——七条都跑满时后半句**不出现**。
+    //   ⚠️ 票 07 起几何漂移（VDS 占位 16×16 vs 真实资产尺寸）是 **warning** ⇒ 摘要走「没有一条 error，但有 N 条警告」那支。
+    expect(r.text()).toMatch(/QA：没有一条 error/);
+    expect(r.text()).toMatch(/7\/7 条由 QA 跑过（裁决 pass）/);
     expect(r.text()).not.toMatch(/没跑的：/);
     // ⚠️ 「这一版还没有 QA 实现 —— 票 17-20」**从票 17 起就是假话**，已经删了
     expect(r.text()).not.toMatch(/还没有 QA 实现/);
