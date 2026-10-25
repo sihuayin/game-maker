@@ -451,14 +451,22 @@ describe("⚠️ `hud.panel.size` 的例外**以九宫格为条件**（票 63）
 //
 // ⚠️ 只验「身份在不在」，不验 kind 对不对（那归 QA 的 visual-config-coherence）。
 describe("auditEntityIdentity：设计↔配置的 sourceIntent 对账", () => {
-  /** 只造四桶 —— auditEntityIdentity 只读这四桶；player 是顶层字段不进 coverage。 */
-  const d = (buckets: Partial<Record<"enemies" | "npcs" | "interactables" | "resources", string[]>>): GameDesignSpec =>
-    ({
-      enemies: (buckets.enemies ?? []).map((id) => ({ id, behavior: "", threat: "" })),
-      npcs: (buckets.npcs ?? []).map((id) => ({ id, role: "", interaction: "" })),
-      interactables: (buckets.interactables ?? []).map((id) => ({ id, type: "", behavior: "" })),
-      resources: (buckets.resources ?? []).map((id) => ({ id, purpose: "" })),
-    }) as unknown as GameDesignSpec;
+  /** 只造四桶 + 默认单关（`level-1` 的 `entities` = 四桶全部 id）——
+   *  auditEntityIdentity 只读四桶 + `levels[].entities[]`；player 是顶层字段不进 coverage。 */
+  const d = (
+    buckets: Partial<Record<"enemies" | "npcs" | "interactables" | "resources", string[]>>,
+    levels?: { id: string; entities: string[] }[],
+  ): GameDesignSpec => {
+    const enemies = (buckets.enemies ?? []).map((id) => ({ id, behavior: "", threat: "" }));
+    const npcs = (buckets.npcs ?? []).map((id) => ({ id, role: "", interaction: "" }));
+    const interactables = (buckets.interactables ?? []).map((id) => ({ id, type: "", behavior: "" }));
+    const resources = (buckets.resources ?? []).map((id) => ({ id, purpose: "" }));
+    const all = [...enemies, ...npcs, ...interactables, ...resources].map((e) => e.id);
+    return {
+      enemies, npcs, interactables, resources,
+      levels: levels ?? [{ id: "level-1", purpose: "", layout: "", entities: all }],
+    } as unknown as GameDesignSpec;
+  };
 
   it("coverage：设计实体在 config 里没有对应 sourceIntent → error", () => {
     const c = base();
@@ -488,5 +496,138 @@ describe("auditEntityIdentity：设计↔配置的 sourceIntent 对账", () => {
     const c = base();
     c.entities[0] = { ...c.entities[0]!, sourceIntent: "p-postman" };
     expect(auditEntityIdentity(d({}), c).map((i) => i.message).join()).toMatch(/p-postman.*不存在/);
+  });
+
+  // ── entity-identity-v1.1 票 02（C 路线）：编译期跨桶兼容性 ──────────────
+  // 只拦可严格证明的**跨桶**错误；同桶（interactables 内 goal↔chest）不在此射程。
+  it("兼容：跨桶可证明 —— enemy 被做成 pickup → error", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, sourceIntent: "enemy-1" };  // suitcase-1(pickup) 冒充 enemy
+    expect(auditEntityIdentity(d({ enemies: ["enemy-1"] }), c).map((i) => i.message).join())
+      .toMatch(/enemy-1.*pickup.*不在允许集合/);
+  });
+
+  it("兼容：跨桶可证明 —— resource 被做成 hazard → error", () => {
+    const c = base();
+    c.entities[4] = { ...c.entities[4]!, sourceIntent: "r-lost" };  // carriage(hazard) 冒充 resource
+    expect(auditEntityIdentity(d({ resources: ["r-lost"] }), c).map((i) => i.message).join())
+      .toMatch(/r-lost.*hazard.*不在允许集合/);
+  });
+
+  it("兼容：桶内合法 —— interactable → 六种 kind 都通过", () => {
+    for (const kind of ["chest", "pickup", "goal", "hazard", "danger", "solid"] as const) {
+      const c = base();
+      c.entities[0] = { ...c.entities[0]!, kind, sourceIntent: "chest" };
+      expect(auditEntityIdentity(d({ interactables: ["chest"] }), c)).toEqual([]);
+    }
+  });
+
+  it("兼容：已知限制 —— interactable → goal（gate→chest）不拦，同桶无法严格区分", () => {
+    const c = base();
+    c.entities[5] = { ...c.entities[5]!, sourceIntent: "chest" };  // signal(goal) 归属 interactable
+    expect(auditEntityIdentity(d({ interactables: ["chest"] }), c)).toEqual([]);
+  });
+
+  it("兼容：两个 enemy 同源 1:N（hazard + danger）→ 不报", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, kind: "hazard", sourceIntent: "enemy-1" };
+    c.entities[1] = { ...c.entities[1]!, kind: "danger", sourceIntent: "enemy-1" };
+    expect(auditEntityIdentity(d({ enemies: ["enemy-1"] }), c)).toEqual([]);
+  });
+
+  it("兼容：goal / solid 孤儿不带 sourceIntent → 不因归属规则被拒", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, kind: "chest", sourceIntent: "chest" };  // 合法 chest
+    // luggage(solid) 与 signal(goal) 仍是无 sourceIntent 的孤儿
+    expect(auditEntityIdentity(d({ interactables: ["chest"] }), c)).toEqual([]);
+  });
+});
+
+// ── entity-identity-v1.1 票 05（Phase 2）：关卡作用域 ──────────────────────────
+describe("auditEntityIdentity：关卡作用域（票 03 B1/B4 + 票 05）", () => {
+  /** 最小 config —— auditEntityIdentity 只读 entities 的 sourceIntent / kind / id。 */
+  const cfg = (entities: { id: string; kind: string; sourceIntent?: string }[]): GameConfig =>
+    ({ entities } as unknown as GameConfig);
+  /** 四桶 + 显式 levels → 设计对象（只留 auditEntityIdentity 读的字段）。 */
+  const designOf = (
+    buckets: Partial<Record<"enemies" | "npcs" | "interactables" | "resources", string[]>>,
+    levels: { id: string; entities: string[] }[],
+  ): GameDesignSpec =>
+    ({
+      enemies: (buckets.enemies ?? []).map((id) => ({ id, behavior: "", threat: "" })),
+      npcs: (buckets.npcs ?? []).map((id) => ({ id, role: "", interaction: "" })),
+      interactables: (buckets.interactables ?? []).map((id) => ({ id, type: "", behavior: "" })),
+      resources: (buckets.resources ?? []).map((id) => ({ id, purpose: "" })),
+      levels: levels.map((l) => ({ id: l.id, purpose: "", layout: "", entities: l.entities })),
+    }) as unknown as GameDesignSpec;
+  /** 两关设计：四桶里两关各有两个实体，每关 `entities[]` 只点自己那两件。 */
+  const two = () => designOf(
+    { enemies: ["enemy-a", "enemy-b"], resources: ["res-a", "res-b"] },
+    [
+      { id: "level-a", entities: ["enemy-a", "res-a"] },
+      { id: "level-b", entities: ["enemy-b", "res-b"] },
+    ],
+  );
+
+  it("单关卡合法映射仍通过：唯一那关就是作用域（不显式传 levelId）", () => {
+    const single = designOf(
+      { enemies: ["enemy-1"], resources: ["res-1"] },
+      [{ id: "level-1", entities: ["enemy-1", "res-1"] }],
+    );
+    const c = cfg([
+      { id: "e1", kind: "hazard", sourceIntent: "enemy-1" },
+      { id: "r1", kind: "pickup", sourceIntent: "res-1" },
+    ]);
+    expect(auditEntityIdentity(single, c)).toEqual([]);
+  });
+
+  it("两关各不同必需实体：A 只覆盖自己那两件、不要求 B 的 → 通过", () => {
+    const c = cfg([
+      { id: "ea", kind: "hazard", sourceIntent: "enemy-a" },
+      { id: "ra", kind: "pickup", sourceIntent: "res-a" },
+    ]);
+    expect(auditEntityIdentity(two(), c, "level-a")).toEqual([]);
+  });
+
+  it("A 缺自身必需实体（res-a）→ coverage 失败，且不误报 B 的实体缺失", () => {
+    const c = cfg([{ id: "ea", kind: "hazard", sourceIntent: "enemy-a" }]);
+    const issues = auditEntityIdentity(two(), c, "level-a");
+    expect(issues.map((i) => i.message).join()).toMatch(/res-a.*没有对应实体/);
+    expect(issues.map((i) => i.message).join()).not.toMatch(/enemy-b|res-b/);
+  });
+
+  it("B 的实体被 A 引用 → wrong-scope 拒绝，且不报「B 实体缺失」", () => {
+    const c = cfg([
+      { id: "ea", kind: "hazard", sourceIntent: "enemy-a" },
+      { id: "ra", kind: "pickup", sourceIntent: "res-a" },
+      { id: "eb", kind: "hazard", sourceIntent: "enemy-b" }, // B 的敌人被 A 引用
+    ]);
+    const issues = auditEntityIdentity(two(), c, "level-a");
+    expect(issues.map((i) => i.message).join()).toMatch(/enemy-b.*wrong-scope/);
+    expect(issues.filter((i) => i.message.includes("没有对应实体"))).toEqual([]);
+  });
+
+  it("wrong-scope 与兼容分开：越界实体即使 kind 也跨桶，只报 wrong-scope、不重复报兼容", () => {
+    const c = cfg([
+      { id: "ea", kind: "hazard", sourceIntent: "enemy-a" },
+      { id: "ra", kind: "pickup", sourceIntent: "res-a" },
+      { id: "eb", kind: "pickup", sourceIntent: "enemy-b" }, // 越界 + 跨桶（enemies 不允许 pickup）
+    ]);
+    const issues = auditEntityIdentity(two(), c, "level-a");
+    expect(issues.map((i) => i.message).join()).toMatch(/enemy-b.*wrong-scope/);
+    expect(issues.map((i) => i.message).join()).not.toMatch(/不在允许集合/);
+  });
+
+  it("缺关卡上下文（多关不传 levelId）→ 报 scope error，不静默回退全局覆盖", () => {
+    const c = cfg([{ id: "ea", kind: "hazard", sourceIntent: "enemy-a" }]);
+    const issues = auditEntityIdentity(two(), c);
+    expect(issues[0]?.severity).toBe("error");
+    expect(issues.map((i) => i.message).join()).toMatch(/作用域|levelId/);
+  });
+
+  it("levelId 指向不存在的关卡 → 报 scope error（调用方错，不猜）", () => {
+    const c = cfg([{ id: "ea", kind: "hazard", sourceIntent: "enemy-a" }]);
+    expect(auditEntityIdentity(two(), c, "level-none").map((i) => i.message).join())
+      .toMatch(/level-none.*没有对应关卡/);
   });
 });

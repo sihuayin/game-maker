@@ -58,9 +58,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  auditAssetSpec, entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, parseAssetPack, parseDrawList,
+  auditAssetSpec, DESIGN_BUCKET_KINDS, entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, parseAssetPack, parseDrawList,
   parseGameConfig, parseRecipe, VisualDesignSpecSchema,
-  type AssetPackEntry, type AssetPackManifest, type AssetSpec, type DrawList, type GameConfig, type JudgementResult,
+  type AssetPackEntry, type AssetPackManifest, type AssetSpec, type DesignBucket, type DrawList, type GameConfig, type JudgementResult,
   type QAFinding, type QaContext, type QaFamilyResult, type QaFamilyRunner,
 } from "@game-maker/contracts";
 
@@ -179,23 +179,12 @@ function paletteBinding(manifest: AssetPackManifest): JudgementResult {
 }
 
 /**
- * 设计桶 → 允许的 GameConfig `EntityKind` 集合（visual-design-impl-v1 票 02 Q1 的**精确枚举**）。
- * ⚠️ `interactables` 是 EntityKind **除 `decor`** —— `decor` 是纯装饰，若交互物被做成 `decor`
- *   = 丢了交互 = 串桶。`player` 不在表里（GameConfig 里是顶层字段、非 entity，不进对账）。
- */
-const DESIGN_BUCKET_KINDS: Readonly<Record<string, readonly string[]>> = {
-  enemies: ["hazard", "danger"],
-  npcs: ["decor"],
-  interactables: ["chest", "pickup", "goal", "hazard", "danger", "solid"],
-  resources: ["pickup"],
-};
-
-/**
  * **VDS ↔ GameConfig 交叉验证**（visual-design-impl-v1 票 07）。
  *
  * ⚠️ identity 用**设计桶**（`sourceIntent` 落在 GameDesignSpec 哪个桶），**不用 VDS 的 `role`** ——
  *   确定性布局给的 role 是**视觉分组默认**，不是身份断言（wasteland 真夹具里 `interactables`
- *   一桶既有 chest 又有 hazard，桶→EntityKind 不是 1:1）。允许集合见上面 `DESIGN_BUCKET_KINDS`。
+ *   一桶既有 chest 又有 hazard，桶→EntityKind 不是 1:1）。允许集合见 `DESIGN_BUCKET_KINDS`
+ *   （contracts 单一来源，entity-identity-v1.1 票 02）。
  * ⚠️ **player 不进对账**：GameConfig 里它是顶层字段、不是 `entities[]` 条目（覆盖走票 04）。
  * ⚠️ **悬空 `sourceIntent`**（设计里没有的 id）归票 04 的覆盖，不在这里判。
  * ⚠️ 几何漂移走 `warning`（只报、不阻断）；**每个实体至多一条 finding**（同 `(judgement,target)`
@@ -208,7 +197,7 @@ function visualConfigCoherence(ctx: QaContext, config: GameConfig, manifest: Ass
   if (!design.success) throw new Error(`游戏设计读不回来或不过契约：${formatIssues(design.error).slice(0, 4).join("；")}`);
 
   // 设计实体 id → 桶
-  const bucketOf = new Map<string, string>();
+  const bucketOf = new Map<string, DesignBucket | "player">();
   bucketOf.set(design.data.player.id, "player");
   for (const e of design.data.enemies) bucketOf.set(e.id, "enemies");
   for (const e of design.data.npcs) bucketOf.set(e.id, "npcs");
@@ -233,7 +222,6 @@ function visualConfigCoherence(ctx: QaContext, config: GameConfig, manifest: Ass
     const bucket = bucketOf.get(obj.sourceIntent);
     if (bucket === undefined || bucket === "player") continue;
     const allowed = DESIGN_BUCKET_KINDS[bucket];
-    if (allowed === undefined) continue;
     const ents = bySource.get(obj.sourceIntent);
     if (ents === undefined || ents.length === 0) {
       findings.push({ target: obj.sourceIntent, severity: "error",

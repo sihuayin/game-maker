@@ -535,3 +535,77 @@ describe("⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 
     expect(fs.existsSync(fileOf(d)), "过了就得照常落盘").toBe(true);
   });
 });
+
+// ── entity-identity-v1.1 票 06（Phase 3 E2E）：真实 pack + 注入映射 → 编译期身份验真 ──
+//
+// ⚠️ 这里走的是**真实 `compileRuntime` 全路径**（真 pack `last-train/v2` + 真设计 + 重采样循环 +
+//   业务校验），只把上游 LLM 换成 mock fetch —— 所以能证「身份错误在**下游资源生成之前**被拒」，
+//   而**一分钱不花**（compile-runtime 不生成图片；`create` 链的生图才是付费步骤）。
+describe("entity-identity-v1.1 票 06：错误归属拒绝 + 关卡作用域（编译期、零付费）", () => {
+  it("E2E-A：跨桶兼容错误（enemy 被做成 pickup）→ 模型错、重采样、不落盘、不触下游", async () => {
+    const d = tmp();
+    const bad = structuredClone(GOOD);
+    // 追加一条 pickup 却把 sourceIntent 指到 enemies 桶的 `e-dog`（enemies 只允许 hazard/danger）
+    // —— 覆盖 / 悬空都过（e-dog 仍由 carriage 覆盖），只有**兼容**这一条该响。
+    bad.entities.push({
+      id: "stray-pickup", kind: "pickup", sourceIntent: "e-dog",
+      at: { x: 900, y: 240 }, asset: "pickup-suitcase",
+    });
+    const e = await run(d, bad).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect((e as CommandError).message).toMatch(/不在允许集合/);  // 兼容错误：kind 不在设计桶允许集
+    expect((e as CommandError).message).toMatch(/e-dog/);          // 指出被误归属的设计实体
+    expect(fs.existsSync(path.join(d, "out")), "坏配置比没配置更坏").toBe(false);
+  });
+
+  // ── 两关设计：level-a = {e-a, res-a}，level-b = {e-b, res-b}。 ──
+  const MULTI: GameDesignSpec = {
+    format: "game-design/v1",
+    game: { title: "双关拾荒", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
+    coreLoopSteps: ["捡", "跑"],
+    player: { id: "p", role: "拾荒者", abilities: ["跑"], goals: ["过关"] },
+    enemies: [{ id: "e-a", behavior: "b", threat: "t" }, { id: "e-b", behavior: "b", threat: "t" }],
+    npcs: [], interactables: [],
+    resources: [{ id: "res-a", purpose: "p" }, { id: "res-b", purpose: "p" }],
+    world: { theme: "t", setting: "s", structure: "st" },
+    levels: [
+      { id: "level-a", purpose: "p", layout: "l", entities: ["e-a", "res-a"] },
+      { id: "level-b", purpose: "p", layout: "l", entities: ["e-b", "res-b"] },
+    ],
+    progression: { model: "linear", description: "d" },
+    mechanics: [{ id: "m-jump", mechanic: "jump" }],
+    winConditions: ["w"], loseConditions: [], runtimeRequirements: ["input:keyboard"],
+  };
+  const tmpM = () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), "gm-multi-"));
+    fs.writeFileSync(path.join(d, "game-design.json"), JSON.stringify(MULTI));
+    return d;
+  };
+  /** 一份覆盖 level-a（res-a 1:N → suitcase-*，e-a → carriage）的配置，其余实体孤儿。 */
+  const levelAConfig = () => {
+    const c = structuredClone(GOOD);
+    for (const e of c.entities) delete e.sourceIntent;
+    for (const e of c.entities) if (e.id.startsWith("suitcase")) e.sourceIntent = "res-a";
+    (c.entities.find((e: { id: string }) => e.id === "carriage")!).sourceIntent = "e-a";
+    return c;
+  };
+
+  it("E2E-C：level-a 只覆盖本关 e-a/res-a（不要求 level-b 的 e-b/res-b）→ 通过", async () => {
+    const d = tmpM();
+    const r = await run(d, levelAConfig(), { levelId: "level-a" });
+    expect(r.data.ok).toBe(true);
+    expect(r.data.levelId).toBe("level-a");
+    expect(fs.existsSync(fileOf(d))).toBe(true);
+  });
+
+  it("E2E-C：同一份配置编 level-b → 覆盖失败（e-b/res-b 缺失）+ wrong-scope（e-a/res-a 越界）", async () => {
+    const d = tmpM();
+    const e = await run(d, levelAConfig(), { levelId: "level-b" }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect((e as CommandError).message).toMatch(/没有对应实体/);  // level-b 的 e-b/res-b 未覆盖
+    expect((e as CommandError).message).toMatch(/wrong-scope/);    // 本关 config 引用了 level-a 的实体
+    expect(fs.existsSync(path.join(d, "out"))).toBe(false);
+  });
+});

@@ -516,34 +516,104 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
 }
 
 /**
+ * 设计桶名 —— 身份 / 一致性对账用到的四桶（player 是 config 顶层字段、不是 entity，不进对账）。
+ */
+export type DesignBucket = "enemies" | "npcs" | "interactables" | "resources";
+
+/**
+ * 设计桶 → 允许的运行时 `EntityKind` 集合。**单一来源**（entity-identity-v1.1 票 02）：
+ * 编译期 `auditEntityIdentity` 与 QA `visual-config-coherence` **共用这一份**，不得各写一份漂移。
+ *
+ * ⚠️ 票 02 **C 路线**：只收进**可严格证明**的跨桶规则（`enemies`/`npcs`/`resources` 的桶语义
+ *   天然封死），`interactables` **保持原样**（除 `decor` 外全部允许 —— `decor` 是纯装饰
+ *   = 丢了交互 = 串桶，visual-design-impl-v1 票 02）。
+ * ⚠️ **同桶误归属不在本矩阵射程内**：`interactables` 内部「信号灯→goal 对 / 宝箱→goal 错」
+ *   靠 `type`/`behavior` 开放文本区分，票 01 已证不可靠 ⇒ 记录为已知限制，不靠摘 `goal`/`solid`
+ *   制造误拒来假装解决（真实夹具 `i-signal`(信号灯)→goal 会因此被误拒，Phase 1 全仓实测 16 处）。
+ */
+export const DESIGN_BUCKET_KINDS: Readonly<Record<DesignBucket, readonly EntityKind[]>> = {
+  enemies: ["hazard", "danger"],
+  npcs: ["decor"],
+  interactables: ["chest", "pickup", "goal", "hazard", "danger", "solid"],
+  resources: ["pickup"],
+};
+
+/**
  * 实体身份验真（entity-identity-v1 Q2=(c) 的后半）：设计实体 ↔ 配置实体的 `sourceIntent` 对账。
  *
- * ⚠️ **只查「身份在不在」，不查「kind 对不对」** —— 后者归 QA 的 `visual-config-coherence`（票 04）。
- *   两条规则都是**模型错**（`compile-runtime` 下一发能写对，进重采样循环）：
- *   ① **coverage**：每个设计实体（四桶，**player 除外** —— 它是 config 顶层字段、不是 entity）都要有
- *      **至少一个** config entity 的 `sourceIntent` 指向它；
- *   ② **悬空**：每个 config entity 的非空 `sourceIntent` 都要指向设计里真实存在的四桶实体 id。
- *   ⚠️ **孤儿合法**：没有 `sourceIntent` 的 config entity（地面 solid / 终点 goal，无设计对位）**不报**。
+ * ⚠️ 四条规则都是**模型错**（`compile-runtime` 下一发能写对，进重采样循环）：
+ *   ① **coverage**：**当前关卡**（`levelId`）必需的每个设计实体（四桶，**player 除外** —— 它是
+ *     config 顶层字段、不是 entity）都要有**至少一个** config entity 的 `sourceIntent` 指向它；
+ *   ② **悬空**：每个 config entity 的非空 `sourceIntent` 都要指向设计里真实存在的四桶实体 id；
+ *   ③ **越界**（entity-identity-v1.1 票 03 B4）：`sourceIntent` 指向有效四桶 id 但**不属于当前关卡**
+ *     → `wrong-scope`（配置多出了别的关卡的实体，覆盖循环只能发现「缺失」，须单独遍历 `config.entities[]`）；
+ *   ④ **兼容**（entity-identity-v1.1 票 02，C 路线）：`sourceIntent` 指向真实且在**当前关卡**的设计实体时，
+ *     运行时 `kind` 必须落在该设计桶的允许集合里 —— 只拦**可严格证明的跨桶错误**；同桶误归属见
+ *     `DESIGN_BUCKET_KINDS` 注释。
+ *
+ * ⚠️ **关卡作用域**（票 03 B1/B4 + 票 05）：`levelId` 显式传入；**不默认取第一关、也不回退全局覆盖** ——
+ *   多关不传 `levelId` = 缺上下文，报 `scope` error（不静默通过）。单关（`design.levels` 恰一条）时
+ *   那条就是作用域，免显式传（票 03 B3 单关卡兼容，现有单关 fixture 不被破坏）。
+ * ⚠️ **孤儿合法**：没有 `sourceIntent` 的 config entity（地面 solid / 终点 goal，无设计对位）**不报**。
  */
-export function auditEntityIdentity(design: GameDesignSpec, config: GameConfig): ConfigIssue[] {
-  const valid = new Set<string>();
-  for (const e of design.enemies) valid.add(e.id);
-  for (const e of design.npcs) valid.add(e.id);
-  for (const e of design.interactables) valid.add(e.id);
-  for (const e of design.resources) valid.add(e.id);
+export function auditEntityIdentity(design: GameDesignSpec, config: GameConfig, levelId?: string): ConfigIssue[] {
+  const bucketOf = new Map<string, DesignBucket>();
+  for (const e of design.enemies) bucketOf.set(e.id, "enemies");
+  for (const e of design.npcs) bucketOf.set(e.id, "npcs");
+  for (const e of design.interactables) bucketOf.set(e.id, "interactables");
+  for (const e of design.resources) bucketOf.set(e.id, "resources");
 
   const out: ConfigIssue[] = [];
-  // ① coverage：每个设计实体都至少有一个 config entity 的 sourceIntent 指向它
-  for (const e of [...design.enemies, ...design.npcs, ...design.interactables, ...design.resources]) {
-    if (!config.entities.some((c) => c.sourceIntent === e.id))
-      out.push({ severity: "error", where: `entity "${e.id}"`,
-        message: `设计实体 "${e.id}" 在配置里没有对应实体 —— 缺一个 sourceIntent 指向它的 entity` });
+
+  // ── 关卡作用域（票 03 B1/B4）：覆盖只查**当前关卡**必需的四桶实体，不查全局 ──
+  //   ⚠️ 不默认取第一关、也不回退全局覆盖 —— 多关不传 levelId 就是「缺上下文」，报 scope error。
+  const levels = design.levels ?? [];
+  const level = levelId !== undefined
+    ? levels.find((l) => l.id === levelId)
+    : (levels.length === 1 ? levels[0] : undefined);
+  if (level === undefined) {
+    out.push({ severity: "error", where: "scope",
+      message: levelId !== undefined
+        ? `levelId "${levelId}" 在设计里没有对应关卡（现有：${levels.map((l) => l.id).join(" / ") || "无"}）`
+        : `关卡作用域缺失 —— 设计有 ${levels.length} 关，必须显式传 levelId（不默认取第一关、也不回退全局覆盖）` });
+    return out;
+  }
+  // 当前关卡必需实体（四桶；`player` 是顶层字段、不是 entity，不进 coverage —— gate ⑥ 已保证
+  // `levels[].entities[]` 只含 player + 四桶，这里再用 `bucketOf` 滤掉 player）。
+  const scope = new Set(level.entities.filter((id) => bucketOf.has(id)));
+
+  // ① coverage：当前关卡每个必需四桶实体都要有 ≥1 个 config entity 的 sourceIntent 指向它
+  for (const id of scope) {
+    if (!config.entities.some((c) => c.sourceIntent === id))
+      out.push({ severity: "error", where: `entity "${id}"`,
+        message: `设计实体 "${id}" 在关卡 "${level.id}" 里没有对应实体 —— 缺一个 sourceIntent 指向它的 entity` });
   }
   // ② 悬空：config 的 sourceIntent 必须指向真实设计实体（四桶）
   for (const e of config.entities) {
-    if (e.sourceIntent !== undefined && !valid.has(e.sourceIntent))
+    if (e.sourceIntent !== undefined && !bucketOf.has(e.sourceIntent))
       out.push({ severity: "error", where: `entity "${e.id}"`,
         message: `sourceIntent "${e.sourceIntent}" 指向设计里不存在的实体` });
+  }
+  // ③ 越界（票 03 B4）：sourceIntent 指向有效四桶 id 但**不在当前关卡** entities[] → wrong-scope。
+  //   ⚠️ 必须单独遍历 config.entities[]（覆盖循环只能发现「缺失」，发现不了「配置多出别的关卡的实体」）。
+  for (const e of config.entities) {
+    if (e.sourceIntent === undefined) continue;
+    if (!bucketOf.has(e.sourceIntent)) continue; // 悬空（② 已报）不重复
+    if (!scope.has(e.sourceIntent))
+      out.push({ severity: "error", where: `entity "${e.id}"`,
+        message: `sourceIntent "${e.sourceIntent}" 不在关卡 "${level.id}" 的必需实体里（wrong-scope）—— 属于别的关卡或未归属本关` });
+  }
+  // ④ 兼容（票 02 C 路线）：只查「sourceIntent 有效且在本关」的实体 —— 悬空（②）/ 越界（③）已分别报，
+  //   不重复报。同桶（interactables 内 goal↔chest）不在此射程。
+  for (const e of config.entities) {
+    if (e.sourceIntent === undefined) continue;
+    const bucket = bucketOf.get(e.sourceIntent);
+    if (bucket === undefined) continue;
+    if (!scope.has(e.sourceIntent)) continue;
+    const allowed = DESIGN_BUCKET_KINDS[bucket];
+    if (!allowed.includes(e.kind))
+      out.push({ severity: "error", where: `entity "${e.id}"`,
+        message: `sourceIntent "${e.sourceIntent}" 指向 ${bucket} 桶，但运行时 kind "${e.kind}" 不在允许集合 {${allowed.join(", ")}} —— 语义不兼容（归属错误）` });
   }
   return out;
 }

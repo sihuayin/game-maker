@@ -1163,7 +1163,7 @@ ${SKELETON_SHAPE_NOTE}
     //   （由背景资源尺寸 + world.size 决定）**不**移进来，仍是确定性失败（见循环后那一段）。
     const modelHard = [
       ...auditGameConfig(truth.value, manifest),
-      ...auditEntityIdentity(design, truth.value),
+      ...auditEntityIdentity(design, truth.value, level.id),
       ...auditScreenSpace(vp, gameHudScreenItems(truth.value, manifest,
         { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
     ].filter((i) => i.severity === "error");
@@ -1189,7 +1189,7 @@ ${SKELETON_SHAPE_NOTE}
   //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**。
   const issues: ConfigIssue[] = [
     ...auditGameConfig(config, manifest),
-    ...auditEntityIdentity(design, config),
+    ...auditEntityIdentity(design, config, level.id),
     ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
       { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
     ...auditLayerCoverage(vp, config.world.size,
