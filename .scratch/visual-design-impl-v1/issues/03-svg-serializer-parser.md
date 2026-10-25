@@ -1,8 +1,8 @@
 # 03. SVG 序列化 + 最小白名单解析器
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-25 · resolved)
 Blocked by: 01
 Map: ../map.md
 
@@ -28,3 +28,20 @@ Map: ../map.md
 **测试**（TDD）：serialize 的确定性（同 VDS 逐字节同 SVG）；parse 对合法白名单 SVG 正确取 viewport+rects；
 对重复属性/非法结构/转义/外部实体给出确定拒绝；round-trip（serialize 后 parse 回，rects 与 VDS 一致）。
 资产参考 `../visual-design-v1/assets/05-svg-derived-view-whitelist.md`（白名单清单）。
+
+## Answer
+
+已落码（2026-10-25）：`packages/visual-design/src/svg.ts`，`index.ts` re-export。
+
+- **`serializeVds(vds, palette)`**：确定性 —— 排序 = `layer` 升序（稳定），`fill` 经 `paletteColor`（唯一解析处）→ hex，
+  id 转义（`&<>"` → 实体），`fill` 越界抛错。同 VDS（+ 同色板）逐字节同 SVG。
+- **`parseWhitelistedSvg(svg)`**：**字符级状态机**（约束 #1，非 regex）—— 正确处理 XML 基本语法、属性解析
+  （单/双引号、`&amp;/&lt;/&gt;/&quot;/&apos;` + 数字引用）、**重复属性**、**非法结构**（未闭合/不匹配标签、
+  自闭合 `<g>`、`<rect>` 带子节点、多根、非空白文本、DOCTYPE）。
+- **白名单**：元素 `<svg>/<g>/<rect>`；属性 `xmlns/width/height/viewBox`(svg) + `id`(g) + `x/y/width/height/fill`(rect)
+  = **10 个**。其余全拒 ⇒ PRD §6.3 禁项（JS/`foreignObject`/外部引用/外部字体/动态内容）自动落白名单外；
+  `onclick`/`href`/`xmlns:xlink`/`<script>`/`<style>` 都进不来。
+- **验证**：`svg.test.ts` **24/24**（round-trip · 确定性 · id 转义还原 · 20+ 恶意/畸变拒绝）；visual-design 全套
+  **35/35**；typecheck + build 绿。
+- **实现注记**：`err`（`never` 返回）在这份 `noUncheckedIndexedAccess` 配置下**没触发控制流收窄**，遂在
+  `rects.push`/`return` 处用 `!`（运行时检查就在紧邻几行，诚实断言非空）。
