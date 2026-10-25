@@ -186,7 +186,10 @@ function paletteBinding(manifest: AssetPackManifest): JudgementResult {
  *   一桶既有 chest 又有 hazard，桶→EntityKind 不是 1:1）。允许集合见 `DESIGN_BUCKET_KINDS`
  *   （contracts 单一来源，entity-identity-v1.1 票 02）。
  * ⚠️ **player 不进对账**：GameConfig 里它是顶层字段、不是 `entities[]` 条目（覆盖走票 04）。
- * ⚠️ **悬空 `sourceIntent`**（设计里没有的 id）归票 04 的覆盖，不在这里判。
+ * ⚠️ **VDS↔design 覆盖 S=D**（visual-design-v1 票 04 契约，visual-semantics-verification-v1 票 02
+ *   补漏）：缺失 `D∖S`（设计四桶实体没进 VDS）与悬空 `S∖D`（VDS 的 `sourceIntent` 指向设计里
+ *   没有的 id）都是 error —— `D`=四桶（player/mechanics 不进）、`S`=带 `sourceIntent` 的 VDS id 集、
+ *   **全设计口径**（不分关卡，与 `auditEntityIdentity` 的关卡作用域是两把尺子）。
  * ⚠️ 几何漂移走 `warning`（只报、不阻断）；**每个实体至多一条 finding**（同 `(judgement,target)`
  *   不许重复 ⇒ 串桶 error 优先，跳过该实体的几何观察）。
  */
@@ -217,10 +220,34 @@ function visualConfigCoherence(ctx: QaContext, config: GameConfig, manifest: Ass
   const anchorOf = (assetId: string) => manifest.assets.find((a) => a.id === assetId)?.anchor ?? FALLBACK_ANCHOR;
 
   const findings: QAFinding[] = [];
+
+  // ⚠️ VDS↔design 覆盖 S=D（visual-design-v1 票 04 契约，visual-semantics-verification-v1 票 02 补漏）：
+  //   `D`=四桶设计实体（player/mechanics 不进）、`S`=带 `sourceIntent` 的 VDS id 集、全设计口径。
+  const vdsSource = new Set<string>();
+  for (const obj of vds.data.objects) if (obj.sourceIntent !== undefined) vdsSource.add(obj.sourceIntent);
+
+  // D∖S 缺失：设计实体没进 VDS = error（此前无人查这一方向）。
+  for (const id of [
+    ...design.data.enemies.map((e) => e.id),
+    ...design.data.npcs.map((e) => e.id),
+    ...design.data.interactables.map((e) => e.id),
+    ...design.data.resources.map((e) => e.id),
+  ]) {
+    if (!vdsSource.has(id))
+      findings.push({ target: id, severity: "error",
+        detail: `设计实体 "${id}" 在 VDS 里**没有**带其 \`sourceIntent\` 的 object —— 视觉设计漏画了` });
+  }
+
   for (const obj of vds.data.objects) {
     if (obj.sourceIntent === undefined) continue;
     const bucket = bucketOf.get(obj.sourceIntent);
-    if (bucket === undefined || bucket === "player") continue;
+    // S∖D 悬空：`sourceIntent` 指向设计里没有的 id = error（票 04 承诺，此前静默跳过）。
+    if (bucket === undefined) {
+      findings.push({ target: obj.sourceIntent, severity: "error",
+        detail: `VDS object "${obj.id}" 的 \`sourceIntent\` "${obj.sourceIntent}" 指向设计里**不存在**的实体 —— 悬空` });
+      continue;
+    }
+    if (bucket === "player") continue;
     const allowed = DESIGN_BUCKET_KINDS[bucket];
     const ents = bySource.get(obj.sourceIntent);
     if (ents === undefined || ents.length === 0) {

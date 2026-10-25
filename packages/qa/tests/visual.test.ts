@@ -34,12 +34,22 @@ function stage(): QaContext {
   fs.copyFileSync(RECIPE, path.join(runDir, "asset-recipe.json"));
   // ⚠️ 票 07 起本族**也读** config / design / vds（交叉验证）：三份都要在。
   fs.copyFileSync(CONFIG, path.join(runDir, "game-config.json"));
+  // ⚠️ 票 02 起交叉验证**真的对账**（D∖S/S∖D）：给 config 里 `carriage`(hazard) 补上设计实体
+  //   `e-drone` 的 `sourceIntent`（enemies→hazard 兼容），再让 VDS 覆盖它 ⇒ 一条合法 S=D。
+  const configPath = path.join(runDir, "game-config.json");
+  const cfg = JSON.parse(fs.readFileSync(configPath, "utf8")) as { entities: { id: string; sourceIntent?: string }[] };
+  cfg.entities.find((e) => e.id === "carriage")!.sourceIntent = "e-drone";
+  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2) + "\n");
   writeJson(runDir, "game-design.json", CANNED.design);
-  // 合成 VDS（无 sourceIntent）：交叉验证没有实体可查 ⇒ 恒过，让本条专注构造性/色板两条。
+  // 合成 VDS：background（无 sourceIntent，装饰不参与）+ e-drone（sourceIntent，bounds 与
+  //   carriage 的 box 同尺寸 64×48，几何观察不响）。
   writeJson(runDir, "visual-design.json", {
     format: "visual-design/v1", viewport: { w: 480, h: 270 },
     style: { visualWorldFormat: "visual-world/v1" },
-    objects: [{ id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" }],
+    objects: [
+      { id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" },
+      { id: "e-drone", role: "hazard", bounds: { x: 768, y: 202, w: 64, h: 48 }, layer: 10, fill: "palette:1", sourceIntent: "e-drone" },
+    ],
   });
   return {
     runDir, packDir, gameId: "last-train",
@@ -196,5 +206,53 @@ describe("§边界：本包**够不着**的东西，一条都不碰", () => {
     const ctx = stage();
     fs.writeFileSync(path.join(ctx.runDir, "asset-recipe.json"), "{ 不是 JSON }");
     await expect(run(ctx)).rejects.toThrowError(/清单读不出来/);
+  });
+});
+
+describe("§VDS↔design 覆盖 S=D（票 04 契约，票 02 补漏）", () => {
+  const vdsPath = (ctx: QaContext) => path.join(ctx.runDir, "visual-design.json");
+  const readVds = (ctx: QaContext) => JSON.parse(fs.readFileSync(vdsPath(ctx), "utf8")) as { objects: Record<string, unknown>[] };
+  const writeVds = (ctx: QaContext, vds: unknown) => fs.writeFileSync(vdsPath(ctx), JSON.stringify(vds, null, 2) + "\n");
+  /** 只留 `visual-config-coherence` 那一条的 findings。 */
+  const coherence = (r: QaFamilyResult) => flat(r).filter((f) => f.judgement === "visual-config-coherence");
+
+  it("合法 S=D：装饰 background 无 sourceIntent、e-drone 被覆盖 ⇒ 零 finding", async () => {
+    expect(coherence(await run(stage()))).toEqual([]);
+  });
+
+  it("S∖D 悬空：VDS object 的 sourceIntent 指向设计里没有的 id ⇒ error", async () => {
+    const ctx = stage();
+    const vds = readVds(ctx);
+    vds.objects.push({ id: "ghost", role: "decor", bounds: { x: 10, y: 10, w: 16, h: 16 }, layer: 10, fill: "palette:0", sourceIntent: "ghost" });
+    writeVds(ctx, vds);
+    const f = coherence(await run(ctx)).find((x) => x.target === "ghost")!;
+    expect(f.severity).toBe("error");
+    expect(f.detail).toMatch(/不存在/);
+  });
+
+  it("D∖S 缺失：设计实体没进 VDS ⇒ error", async () => {
+    const ctx = stage();
+    const vds = readVds(ctx);
+    vds.objects = vds.objects.filter((o) => o.id !== "e-drone");
+    writeVds(ctx, vds);
+    const f = coherence(await run(ctx)).find((x) => x.target === "e-drone")!;
+    expect(f.severity).toBe("error");
+    expect(f.detail).toMatch(/漏画/);
+  });
+
+  it("无 sourceIntent 的装饰 object 不参与 S=D", async () => {
+    const ctx = stage();
+    const vds = readVds(ctx);
+    vds.objects.push({ id: "ui-panel", role: "ui-panel", bounds: { x: 0, y: 0, w: 480, h: 40 }, layer: 100, fill: "palette:0" });
+    writeVds(ctx, vds);
+    expect(coherence(await run(ctx))).toEqual([]);
+  });
+
+  it("⚠️ 真实现场：VDS 含 player object（sourceIntent = player.id）⇒ 不算 S∖D 悬空、player 也不进 D∖S", async () => {
+    const ctx = stage();
+    const vds = readVds(ctx);
+    vds.objects.push({ id: "player-viz", role: "player", bounds: { x: 10, y: 200, w: 24, h: 40 }, layer: 10, fill: "palette:0", sourceIntent: "p-scavenger" });
+    writeVds(ctx, vds);
+    expect(coherence(await run(ctx))).toEqual([]);
   });
 });

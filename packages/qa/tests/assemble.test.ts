@@ -42,13 +42,23 @@ function stage(): QaContext {
   fs.cpSync(PACK, packDir, { recursive: true });
   fs.copyFileSync(RECIPE, path.join(runDir, "asset-recipe.json"));
   fs.copyFileSync(CONFIG, path.join(runDir, "game-config.json"));
+  // ⚠️ 票 02 起交叉验证**真的对账**（D∖S/S∖D）：给 config 里 `carriage`(hazard) 补上设计实体
+  //   `e-drone` 的 `sourceIntent`（enemies→hazard 兼容），再让 VDS 覆盖它 ⇒ 一条合法 S=D。
+  const configPath = path.join(runDir, "game-config.json");
+  const cfg = JSON.parse(fs.readFileSync(configPath, "utf8")) as { entities: { id: string; sourceIntent?: string }[] };
+  cfg.entities.find((e) => e.id === "carriage")!.sourceIntent = "e-drone";
+  write(runDir, "game-config.json", cfg);
   write(runDir, "game-intent.json", CANNED.intent);
   write(runDir, "game-design.json", CANNED.design);
-  // ⚠️ 票 07 起视觉族也读 VDS（交叉验证）。合成 VDS（无 sourceIntent）⇒ 交叉验证没有实体可查、恒过。
+  // 合成 VDS：background（无 sourceIntent，装饰不参与）+ e-drone（sourceIntent，bounds 与
+  //   carriage 的 box 同尺寸 64×48，几何观察不响）。
   write(runDir, "visual-design.json", {
     format: "visual-design/v1", viewport: { w: 480, h: 270 },
     style: { visualWorldFormat: "visual-world/v1" },
-    objects: [{ id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" }],
+    objects: [
+      { id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" },
+      { id: "e-drone", role: "hazard", bounds: { x: 768, y: 202, w: 64, h: 48 }, layer: 10, fill: "palette:1", sourceIntent: "e-drone" },
+    ],
   });
   return {
     runDir, packDir, gameId: "last-train",
