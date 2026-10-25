@@ -1,0 +1,240 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "低分辨率像素画",
+      "高细节层级",
+      "废土末日",
+      "后启示录",
+      "横版卷轴",
+      "厚重质感",
+      "颗粒噪点",
+      "暗色调"
+    ],
+    "description": "低分辨率像素画的横版废土世界，但细节层级很高：材质有厚重涂装感与颗粒噪点，金属、混凝土、皮革、枯萎植被都经过精细的小像素刻画。题材是后启示录废土寻宝，光照昏暗但方向感明确，靠暖色重音（火、灯、铜锈、皮肤）点亮暗色环境。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic",
+    "perspective": "parallax"
+  },
+  "composition": {
+    "foreground": "前景为地面与可交互物（宝箱、资源、敌人），角色居中偏下",
+    "midground": "中景为废弃建筑废墟、倾斜电线杆、堆积瓦砾，视差滚动",
+    "background": "远景为昏暗天空、剪影式残破摩天楼与电塔，远景雾气重",
+    "objectScale": "宝箱与资源物尺寸近人膝盖到胸口高度，敌人略大",
+    "characterScale": "角色约占屏幕高度1/5到1/4，主体醒目",
+    "density": "中景废墟密集但前景保持可读，留出移动与跳跃空间"
+  },
+  "palette": {
+    "primary": [
+      "palette:5",
+      "palette:5",
+      "palette:5",
+      "palette:5"
+    ],
+    "secondary": [
+      "palette:2",
+      "palette:5",
+      "palette:8",
+      "palette:6"
+    ],
+    "accent": [
+      "palette:8",
+      "palette:10",
+      "palette:12",
+      "palette:10"
+    ],
+    "background": [
+      "palette:0",
+      "palette:0",
+      "palette:0",
+      "palette:2"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:2",
+      "palette:2",
+      "palette:0"
+    ],
+    "highlight": [
+      "palette:8",
+      "palette:10",
+      "palette:10",
+      "palette:12"
+    ]
+  },
+  "lighting": {
+    "direction": "偏侧光，从画面一侧打来，形成长投影",
+    "softness": "硬边光源，像素边缘清晰",
+    "contrast": "高对比，暗部深重，高光集中在小面积",
+    "mood": "昏暗压抑但有暖色点光源（火把、油灯、信号灯）"
+  },
+  "materials": {
+    "concrete": {
+      "appearance": "破碎灰混凝土，颗粒与裂纹",
+      "texture": "灰暗颗粒噪点、剥落层次",
+      "color": [
+        "palette:5",
+        "palette:5",
+        "palette:0"
+      ]
+    },
+    "metal": {
+      "appearance": "锈蚀与划痕的铁皮、钢架",
+      "texture": "锈斑、暗红铜绿、条形划痕",
+      "color": [
+        "palette:5",
+        "palette:6",
+        "palette:8"
+      ]
+    },
+    "wood": {
+      "appearance": "风化陈旧木板",
+      "texture": "干裂木纹、褪色",
+      "color": [
+        "palette:5",
+        "palette:8",
+        "palette:2"
+      ]
+    },
+    "leather": {
+      "appearance": "做旧皮革，主角装备",
+      "texture": "磨损边缘、缝线",
+      "color": [
+        "palette:8",
+        "palette:2"
+      ]
+    },
+    "vegetation": {
+      "appearance": "枯萎杂草与干灌木",
+      "texture": "干枯叶簇、稀疏",
+      "color": [
+        "palette:2",
+        "palette:5"
+      ]
+    },
+    "ember": {
+      "appearance": "火光、油灯、发光屏、铜锈重音",
+      "texture": "暖色发光、点状闪烁",
+      "color": [
+        "palette:10",
+        "palette:12",
+        "palette:10"
+      ]
+    },
+    "skin": {
+      "appearance": "拾荒者皮肤暖色",
+      "texture": "哑光暖色",
+      "color": [
+        "palette:10",
+        "palette:10"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "偏矮壮、头略大的拾荒者，像素比例清晰",
+    "silhouette": "背包鼓起的驼背轮廓，易识别",
+    "poseLanguage": "弯腰潜行、警惕，随时准备跳跃",
+    "clothing": "皮革护具、破布围巾、金属护片",
+    "faceAbstraction": "脸部抽象，少量像素点出五官"
+  },
+  "environment": {
+    "architecture": "残破混凝土楼、折断钢架、倾斜电线杆",
+    "terrain": "碎石地面、开裂柏油、沙土斜坡",
+    "props": "宝箱、油桶、罐头、轮胎、废料堆、发光残骸",
+    "textureDensity": "中高密度，废墟细节丰富但前景可读"
+  },
+  "shapeLanguage": [
+    "锯齿状破碎边缘",
+    "不对称倒塌轮廓",
+    "方硬金属块面",
+    "斜向支撑杆线与倾斜结构"
+  ],
+  "constraints": [
+    "所有物体轮廓用像素硬边，不做柔和渐变",
+    "金属与混凝土表面保留颗粒噪点纹理",
+    "用暖色重音（火光/铜锈/皮肤）点亮暗色主体",
+    "材质至少分三级明暗，高光集中小面积",
+    "废墟轮廓保持锯齿破碎感与倾斜动势",
+    "前景可交互物与背景废墟在明度上拉开层次"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素画，高细节层级",
+      "后启示录废土",
+      "厚重颗粒质感材质",
+      "昏暗高对比光照加暖色点光源"
+    ],
+    "camera": {
+      "mode": "2D正交侧面视角",
+      "angle": "平视",
+      "scroll": "横版视差滚动"
+    },
+    "composition": {
+      "depth": "远景剪影、中景废墟、前景交互物三层",
+      "parallax": "多层视差滚动增强纵深感",
+      "subject": "角色居中偏下，宝箱与敌人散布前景",
+      "readability": "前景保持可读，留出移动跳跃空间"
+    },
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {
+      "key": "侧向硬边主光，长投影",
+      "accentLight": "暖色点光源（火把/油灯/发光屏）",
+      "contrast": "高对比，暗部深重"
+    },
+    "shapeLanguage": [
+      "锯齿破碎",
+      "不对称倒塌",
+      "方硬金属块面",
+      "斜向支撑结构"
+    ],
+    "material": [
+      "厚重涂装质感",
+      "颗粒噪点纹理",
+      "锈蚀金属",
+      "破碎混凝土"
+    ],
+    "environment": [
+      "残破混凝土与钢架废墟",
+      "碎石与沙土",
+      "枯萎植被"
+    ],
+    "characterStyle": [
+      "矮壮拾荒者",
+      "驼背鼓包轮廓",
+      "皮革护具与破布围巾",
+      "脸部像素抽象"
+    ],
+    "constraints": [
+      "废墟轮廓保持锯齿破碎与倾斜动势",
+      "金属与混凝土保留颗粒噪点纹理",
+      "用暖色重音点亮暗色主体",
+      "材质分三级明暗，高光集中小面积"
+    ],
+    "confidence": 0.82
+  }
+}

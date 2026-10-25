@@ -25,6 +25,7 @@
 //     ⚠️ **票 14 给这条禁令补了一条判据**（`tests/game-config.test.ts`）—— 在那之前它**只有**结构性保证。
 import { z } from "zod";
 import { resolvePackRef, type AssetPackEntry, type AssetPackManifest } from "./assetpack.js";
+import type { GameDesignSpec } from "./game-design.js";
 
 export const GAME_CONFIG_FORMAT = "game-config/v1" as const;
 
@@ -88,6 +89,11 @@ export const Strike = z.object({
  */
 export const Entity = z.object({
   id: z.string().min(1),
+  /** ⚠️ 设计实体身份回指（entity-identity-v1 Q1）：GameDesignSpec 四桶实体的稳定 id。
+   *  `id` 是**运行时**唯一身份，`sourceIntent` 是**设计**身份 —— 1:N（一个 resource 派生多个
+   *  pickup）共享同一个 `sourceIntent`；孤儿实体（地面 solid、终点 goal，无设计对位）**不带**。
+   *  可空但**不唯一**（id 唯一检查只看 `id`）；**不跨文件查**设计 id —— 悬空归编译期验真 / QA。 */
+  sourceIntent: z.string().min(1).optional(),
   kind: EntityKind,
   at: Point,
   asset: z.string().min(1),
@@ -506,6 +512,39 @@ export function auditGameConfig(config: GameConfig, manifest: AssetPackManifest)
     if (end > limit) warn(`entity "${e.id}"`, `周期运动的行程走到 ${end}，越出了世界的 ${e.motion.axis} 边界 ${limit}`);
   }
 
+  return out;
+}
+
+/**
+ * 实体身份验真（entity-identity-v1 Q2=(c) 的后半）：设计实体 ↔ 配置实体的 `sourceIntent` 对账。
+ *
+ * ⚠️ **只查「身份在不在」，不查「kind 对不对」** —— 后者归 QA 的 `visual-config-coherence`（票 04）。
+ *   两条规则都是**模型错**（`compile-runtime` 下一发能写对，进重采样循环）：
+ *   ① **coverage**：每个设计实体（四桶，**player 除外** —— 它是 config 顶层字段、不是 entity）都要有
+ *      **至少一个** config entity 的 `sourceIntent` 指向它；
+ *   ② **悬空**：每个 config entity 的非空 `sourceIntent` 都要指向设计里真实存在的四桶实体 id。
+ *   ⚠️ **孤儿合法**：没有 `sourceIntent` 的 config entity（地面 solid / 终点 goal，无设计对位）**不报**。
+ */
+export function auditEntityIdentity(design: GameDesignSpec, config: GameConfig): ConfigIssue[] {
+  const valid = new Set<string>();
+  for (const e of design.enemies) valid.add(e.id);
+  for (const e of design.npcs) valid.add(e.id);
+  for (const e of design.interactables) valid.add(e.id);
+  for (const e of design.resources) valid.add(e.id);
+
+  const out: ConfigIssue[] = [];
+  // ① coverage：每个设计实体都至少有一个 config entity 的 sourceIntent 指向它
+  for (const e of [...design.enemies, ...design.npcs, ...design.interactables, ...design.resources]) {
+    if (!config.entities.some((c) => c.sourceIntent === e.id))
+      out.push({ severity: "error", where: `entity "${e.id}"`,
+        message: `设计实体 "${e.id}" 在配置里没有对应实体 —— 缺一个 sourceIntent 指向它的 entity` });
+  }
+  // ② 悬空：config 的 sourceIntent 必须指向真实设计实体（四桶）
+  for (const e of config.entities) {
+    if (e.sourceIntent !== undefined && !valid.has(e.sourceIntent))
+      out.push({ severity: "error", where: `entity "${e.id}"`,
+        message: `sourceIntent "${e.sourceIntent}" 指向设计里不存在的实体` });
+  }
   return out;
 }
 

@@ -1,0 +1,222 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "低分辨率废土像素画",
+    "keywords": [
+      "低分辨率像素画",
+      "高细节层级",
+      "废土",
+      "末世",
+      "沙土色系",
+      "点阵高光",
+      "暗调与大颗粒像素"
+    ],
+    "description": "低分辨率像素画，但每格像素都被当作独立形状来经营，细节层级高；废土末世题材，沙尘黄褐为主、辅以锈橙与冷钢灰蓝点缀；光照为强方向性硬光，明暗分级清晰，硬阴影，轮廓粗粝不圆滑。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic",
+    "perspective": "side-scroll"
+  },
+  "composition": {
+    "foreground": "可通行的地面平台、瓦砾堆与互动物件",
+    "midground": "倒塌建筑骨架、残墙与高架残骸，承担氛围与遮挡",
+    "background": "多层远景废墟剪影，视差滚动，远层最淡",
+    "objectScale": "宝箱与资源道具小于角色，醒目但仍属前景",
+    "characterScale": "角色约占屏高四分之一到三分之一，为横版动作主体",
+    "density": "中高密度，前景通行区留空，细节堆在背景与平台边缘"
+  },
+  "palette": {
+    "primary": [
+      "palette:5",
+      "palette:8",
+      "palette:10",
+      "palette:13"
+    ],
+    "secondary": [
+      "palette:9",
+      "palette:5",
+      "palette:9",
+      "palette:8"
+    ],
+    "accent": [
+      "palette:8",
+      "palette:10",
+      "palette:7",
+      "palette:9"
+    ],
+    "background": [
+      "palette:0",
+      "palette:5",
+      "palette:2",
+      "palette:6"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:2",
+      "palette:2",
+      "palette:2"
+    ],
+    "highlight": [
+      "palette:13",
+      "palette:15",
+      "palette:11",
+      "palette:15"
+    ]
+  },
+  "lighting": {
+    "direction": "顶侧强方向光，低角度斜照",
+    "softness": "硬边，几乎无柔和过渡",
+    "contrast": "高对比，硬阴影",
+    "mood": "荒凉干燥的午后逆光"
+  },
+  "materials": {
+    "rustyMetal": {
+      "appearance": "碎裂氧化金属，锈斑层叠",
+      "texture": "点阵锈蚀噪点",
+      "color": [
+        "palette:5",
+        "palette:8",
+        "palette:9"
+      ]
+    },
+    "concrete": {
+      "appearance": "碎裂混凝土，剥落粉化",
+      "texture": "横向细裂纹",
+      "color": [
+        "palette:8",
+        "palette:10",
+        "palette:2"
+      ]
+    },
+    "dust": {
+      "appearance": "浮尘颗粒与沙土",
+      "texture": "稀疏散点高光",
+      "color": [
+        "palette:13",
+        "palette:13"
+      ]
+    },
+    "glass": {
+      "appearance": "破碎玻璃/发光屏",
+      "texture": "点阵辉光",
+      "color": [
+        "palette:10",
+        "palette:7",
+        "palette:11"
+      ]
+    },
+    "vegetation": {
+      "appearance": "枯黄杂草与荆棘",
+      "texture": "细碎叶簇",
+      "color": [
+        "palette:8",
+        "palette:9"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "三四头身的简练像素小人，动作可读",
+    "silhouette": "斗篷加背包，轮廓饱满有辨识度",
+    "poseLanguage": "低蹲搜索、扛袋、攀爬、疾跑",
+    "clothing": "破旧斗篷、护目镜、皮质背带、缠布护腕",
+    "faceAbstraction": "无具体五官，像素点暗示阴影面"
+  },
+  "environment": {
+    "architecture": "倒塌的混凝土楼、锈蚀钢架、高架残骸",
+    "terrain": "沙土荒地、碎石坡、干裂地面",
+    "props": "瓦砾堆、倒塌电线杆、废弃车辆残骸、油桶",
+    "textureDensity": "背景稀疏，前景物件细节集中"
+  },
+  "shapeLanguage": [
+    "方形与梯形为主的粗粝几何",
+    "锯齿状断裂边缘",
+    "三角残片与斜切面"
+  ],
+  "constraints": [
+    "所有物体用硬边像素块塑造，避免柔和渐变",
+    "用像素点阵而非线条来暗示纹理与锈斑",
+    "明暗分三级以上，硬阴影方向一致",
+    "废土物件的边缘保持锯齿与不规整，拒绝光滑圆角",
+    "发光部件与皮肤/暖色重音不可省略",
+    "背景比前景更淡、细节更少，以拉开层次",
+    "角色与道具轮廓清晰、剪影可读"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素画，但细节层级高",
+      "废土末世题材",
+      "硬方向光、硬阴影、高对比",
+      "沙尘黄褐为主、锈橙与冷钢灰蓝点缀"
+    ],
+    "camera": {
+      "mode": "2D正交侧面视角",
+      "angle": "平视侧向"
+    },
+    "composition": {
+      "depthLayers": "远景/中景/前景三层视差",
+      "subject": "角色居中偏下，横版移动",
+      "negativeSpace": "前景通行区留空"
+    },
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {
+      "key": "高对比顶侧硬光",
+      "shadow": "硬边不柔和",
+      "mood": "干燥荒凉的午后"
+    },
+    "shapeLanguage": [
+      "方形梯形粗粝几何",
+      "锯齿断裂边缘",
+      "三角残片"
+    ],
+    "material": [
+      "氧化锈蚀金属",
+      "碎裂混凝土",
+      "沙土浮尘",
+      "破碎玻璃辉光",
+      "枯黄杂草"
+    ],
+    "environment": [
+      "沙土荒地",
+      "倒塌混凝土楼",
+      "锈蚀钢架",
+      "废弃车辆残骸"
+    ],
+    "characterStyle": [
+      "斗篷护目镜拾荒者",
+      "三四头身像素小人",
+      "剪影饱满"
+    ],
+    "constraints": [
+      "硬边像素块，避免柔和渐变",
+      "明暗三级以上，硬阴影方向一致",
+      "发光部件与暖色重音不可省略",
+      "背景淡于前景、细节更少",
+      "剪影清晰可读"
+    ],
+    "confidence": 0.9
+  }
+}

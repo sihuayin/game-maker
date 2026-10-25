@@ -1,0 +1,113 @@
+{
+  "format": "visual-design/v1",
+  "viewport": {
+    "w": 480,
+    "h": 270
+  },
+  "style": {
+    "visualWorldFormat": "visual-world/v1"
+  },
+  "objects": [
+    {
+      "id": "background",
+      "role": "background",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 270
+      },
+      "layer": 0,
+      "fill": "palette:11"
+    },
+    {
+      "id": "scavenger-hero",
+      "role": "player",
+      "bounds": {
+        "x": 8,
+        "y": 190,
+        "w": 24,
+        "h": 40
+      },
+      "layer": 10,
+      "fill": "palette:6",
+      "sourceIntent": "scavenger-hero"
+    },
+    {
+      "id": "enemy-wasteland",
+      "role": "hazard",
+      "bounds": {
+        "x": 100,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 11,
+      "fill": "palette:5",
+      "sourceIntent": "enemy-wasteland"
+    },
+    {
+      "id": "chest",
+      "role": "pickup",
+      "bounds": {
+        "x": 192,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 12,
+      "fill": "palette:8",
+      "sourceIntent": "chest"
+    },
+    {
+      "id": "hazard-spikes",
+      "role": "pickup",
+      "bounds": {
+        "x": 284,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 13,
+      "fill": "palette:8",
+      "sourceIntent": "hazard-spikes"
+    },
+    {
+      "id": "resource-item",
+      "role": "pickup",
+      "bounds": {
+        "x": 376,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 14,
+      "fill": "palette:8",
+      "sourceIntent": "resource-item"
+    },
+    {
+      "id": "ui-panel",
+      "role": "ui-panel",
+      "bounds": {
+        "x": 8,
+        "y": 8,
+        "w": 160,
+        "h": 24
+      },
+      "layer": 100,
+      "fill": "palette:15"
+    },
+    {
+      "id": "ui-pip",
+      "role": "ui-pip",
+      "bounds": {
+        "x": 16,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "layer": 110,
+      "fill": "palette:15"
+    }
+  ]
+}

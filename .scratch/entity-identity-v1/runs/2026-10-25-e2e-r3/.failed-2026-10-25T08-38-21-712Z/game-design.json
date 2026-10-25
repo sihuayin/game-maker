@@ -1,0 +1,137 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市废墟中谨慎向前探索",
+    "搜寻散布在残垣与平台间的资源罐与废料堆",
+    "发现并打开宝箱，获取寻宝目标",
+    "躲避游荡的敌人与危险地形，保住性命",
+    "带着收获抵达关卡终点，完成寻宝目标"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "一名在废土中讨生活的拾荒者，背着破旧背包、穿戴护具，谨慎穿梭于废墟间",
+    "abilities": [
+      "在地面与平台间奔跑移动",
+      "跳跃越过障碍与缺口",
+      "俯身拾取散落的资源与打开宝箱"
+    ],
+    "goals": [
+      "唤醒并逃脱游荡的敌人",
+      "收集足够多的资源与宝箱",
+      "安全抵达关卡终点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在固定平台或地面范围内来回巡逻，玩家靠近时加快逼近玩家当前位置",
+      "threat": "接触玩家会使其受伤，迫使玩家绕路或跨越躲避"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "宝箱",
+      "behavior": "玩家靠近即可打开，打开后获得寻宝目标，是通关的必需之物"
+    },
+    {
+      "id": "hazard-pit",
+      "type": "危险地形",
+      "behavior": "崩裂的缺口或带电残骸，踩入会受伤或致玩家坠落丧命"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-item",
+      "purpose": "可拾取的废料与资源罐，收集计分，是搜集目标的一部分"
+    }
+  ],
+  "world": {
+    "theme": "废土后启示录的废弃工业城市",
+    "setting": "崩坏的混凝土建筑与裸露钢筋、碎石地面、破损道路与金属平台，宝箱、资源罐、废料堆、发光屏与警示物散布其间，暗环境中点缀暖色重音与霓虹发光",
+    "structure": "前景为地面与遮挡物营造深度与视差；中景为可交互的残垣、地面残骸、资源与宝箱分布层，纵向分地面层与空中平台层；远景为破损天际线与暗色天空，前方有层次化废墟剪影，整体中高密度但不拥挤"
+  },
+  "levels": [
+    {
+      "id": "level-1",
+      "purpose": "教学式引入：教会玩家移动、跳跃、拾取资源、打开宝箱并躲避敌人",
+      "layout": "从左侧起点出发，沿地面平台向右前行，途中经过一段孤立的资源罐与废料堆，越过一处缺口后遇到第一只巡逻敌人，可选择绕行或择机跳跃跨越，继续向右在一处高台附近找到宝箱，打开后抵达右侧终点",
+      "entities": [
+        "scavenger-hero",
+        "enemy-wasteland",
+        "chest",
+        "resource-item",
+        "hazard-pit"
+      ]
+    },
+    {
+      "id": "level-2",
+      "purpose": "提升密度与紧张感：多层平台、更多敌人与危险地形，考验谨慎探索",
+      "layout": "地面层与空中平台层交错，需跳跃跨越更大的缺口并避开多处危险地形，多只敌人在不同平台间巡逻，玩家须在高台间寻找宝箱与资源，最终抵达最右侧的终点",
+      "entities": [
+        "scavenger-hero",
+        "enemy-wasteland",
+        "chest",
+        "resource-item",
+        "hazard-pit"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "关卡制线性推进",
+    "description": "玩家完成当前关卡的寻宝目标并抵达终点后解锁下一关，关卡逐步增加敌人数量、危险地形密度与平台复杂度"
+  },
+  "mechanics": [
+    {
+      "id": "horizontal-movement",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "search-resources",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "avoid-enemy",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "打开关卡中指定的宝箱并抵达关卡终点"
+  ],
+  "loseConditions": [
+    "被敌人接触而耗尽生命",
+    "坠入危险地形或缺口而丧命"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

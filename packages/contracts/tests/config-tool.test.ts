@@ -67,6 +67,16 @@ describe("§镜像与契约**行为一致**（漂移测试）", () => {
     expect(v3(c)).toBe(true);
   });
 
+  it("entity-identity-v1 票 02：`sourceIntent` 在 v4 镜像里同步 —— 带与不带两份都同意", () => {
+    const withRef = clone();
+    withRef.entities[0] = { ...withRef.entities[0]!, sourceIntent: "resource-pickup" };
+    expect(v3(withRef)).toBe(true);
+    expect(v4(withRef)).toBe(true);
+    expect(agree(withRef)).toBe(true);
+    // 不带（孤儿）两份也同意 —— 可选性一致。
+    expect(agree(clone())).toBe(true);
+  });
+
   it("两份对**垃圾输入**的口径一致（`null` / 数字 / 字符串 / 数组 / 空对象）", () => {
     for (const junk of [null, 1, "x", [], {}, { format: "game-config/v1" }]) expect(agree(junk)).toBe(true);
   });

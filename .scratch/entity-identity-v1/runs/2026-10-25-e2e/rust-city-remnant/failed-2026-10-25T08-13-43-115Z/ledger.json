@@ -1,0 +1,91 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "rust-city-remnant",
+  "packVersion": 1,
+  "createdAt": "2026-10-25T08:13:43.000Z",
+  "run": {
+    "wallClockMs": 8832,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 8
+      },
+      "image": {
+        "calls": 3,
+        "attempts": 12
+      },
+      "drawlist": {
+        "calls": 2,
+        "attempts": 2
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "scavenger-hero-master",
+      "attempts": 4,
+      "upstream": "gemini",
+      "ms": 11,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "enemy-in-city-master",
+      "attempts": 4,
+      "upstream": "gemini",
+      "ms": 5,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruin-ground-tile",
+      "attempts": 4,
+      "upstream": "gemini",
+      "ms": 25,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruin-step",
+      "attempts": 4,
+      "upstream": "gemini",
+      "ms": 20,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "rubble-pile",
+      "attempts": 4,
+      "upstream": "gemini",
+      "ms": 16,
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-pip",
+      "upstream": "messages",
+      "ms": 5650,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 1365,
+        "outputTokens": 633
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 8778,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 1470,
+        "outputTokens": 1315
+      }
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "拾荒者：废土寻踪",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市中向左右探索，穿过废墟与瓦砾",
+    "搜寻散落的补给资源与隐藏的宝箱",
+    "在敌人巡逻路线间穿行并及时躲避危险"
+  ],
+  "player": {
+    "id": "scavenger",
+    "role": "玩家控制的拾荒者，背着鼓起的行囊在废土中搜寻资源与宝箱",
+    "abilities": [
+      "在废墟地面上左右移动",
+      "跳跃跨越瓦砾与坑洼",
+      "接触并拾取补给资源",
+      "打开宝箱收取战利品"
+    ],
+    "goals": [
+      "找到并打开所有宝箱",
+      "尽可能多地收集补给资源",
+      "避开敌人与危险存活下来"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "沿地面在固定路径上往返巡逻，遇到障碍时折返",
+      "threat": "接触会对玩家造成伤害，是必须躲避的活体危险"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest-scavenge",
+      "type": "宝箱",
+      "behavior": "可被玩家接触并打开，打开后给予战利品"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-scavenge",
+      "purpose": "可拾取的补给资源，用于维持拾荒者的生存并量化探索成果"
+    }
+  ],
+  "world": {
+    "theme": "荒芜废弃、危险潜伏的后启示录废土",
+    "setting": "被遗弃的混凝土城市，倾斜电线杆、折断钢架与堆积瓦砾之间散落着宝箱、废料堆与补给资源",
+    "structure": "前景为地面与可交互物（宝箱、资源、敌人），角色居中偏下；中景为废弃建筑废墟、倾斜电线杆与堆积瓦砾，作视差滚动；远景为昏暗天空下剪影式残破摩天楼与电塔，雾气浓重。前景保持可读并留出移动与跳跃空间"
+  },
+  "levels": [
+    {
+      "id": "wasteland-scavenge-1",
+      "purpose": "引导玩家在首个废土街区中运动、拾取资源并打开宝箱，同时学会躲避巡逻的敌人",
+      "layout": "从左到右的横向街道：起点在左侧碎柏油路面，向右经过开裂沙土斜坡与瓦砾堆，途中散落 resource-scavenge 与一处 chest-scavenge，enemy-wasteland 在中段地面往返巡逻，终点在右侧一扇残破门洞",
+      "entities": [
+        "scavenger",
+        "enemy-wasteland",
+        "resource-scavenge",
+        "chest-scavenge"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "玩家依次通过各关卡，逐步收集更多资源与宝箱，掌握更复杂的躲避路线",
+    "description": "关卡难度随废墟更密集、敌人配置更复杂而递增，玩家在掌握移动与跳跃后进入更多危险的街区"
+  },
+  "mechanics": [
+    {
+      "id": "horizontal-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "找到并打开散布在废土中的全部宝箱"
+  ],
+  "loseConditions": [
+    "被敌人接触而失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "hud:screen-space"
+  ]
+}

@@ -1,0 +1,794 @@
+{
+  "format": "assetpack/v4",
+  "id": "wasteland-scavenger-recipe",
+  "version": 1,
+  "createdAt": "2026-10-25T08:32:21.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 16,
+    "values": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "coverage": {
+      "exact": 2,
+      "composited": 0,
+      "quantized": 9,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 32,
+        "h": 464
+      },
+      "frames": 12,
+      "assets": [
+        "enemy-wasteland",
+        "scavenger-hero"
+      ],
+      "checksum": "sha256:0c2dce636859c43d1a373d767466a81d2635eafcbada593cfa84c1e5cad50127"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 480,
+        "h": 810
+      },
+      "frames": 3,
+      "assets": [
+        "wasteland-bg"
+      ],
+      "checksum": "sha256:d0d899041e38c1ff9d10571da7aa7d155e57c645c141ae6e5fb89e4336ac3266"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 128,
+        "h": 56
+      },
+      "frames": 6,
+      "assets": [
+        "chest",
+        "ground-tile",
+        "hazard-spikes",
+        "resource-item",
+        "rubble-pile",
+        "step-block"
+      ],
+      "checksum": "sha256:b0bea1e420e45b9eddcf8a2945507db656babc61aded61c37d82be9a53f4286a"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 32,
+        "h": 46
+      },
+      "frames": 2,
+      "assets": [
+        "hud-panel",
+        "hud-pip"
+      ],
+      "checksum": "sha256:35e361262e4ff3d6f820be97aee307931017d59ee0ba72fa52039a96a6c800c9"
+    }
+  ],
+  "assets": [
+    {
+      "id": "ground-tile",
+      "kind": "sprite",
+      "role": "可平铺的地面砖",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "ground-tile"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/ground-tile.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "step-block",
+      "kind": "sprite",
+      "role": "台阶",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 48,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "step-block"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/step-block.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "rubble-pile",
+      "kind": "sprite",
+      "role": "碎石堆",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 64,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "rubble-pile"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/rubble-pile.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "scavenger-hero",
+      "kind": "animation",
+      "role": "玩家角色",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scavenger-hero.idle1"
+        },
+        {
+          "name": "scavenger-hero.idle2"
+        },
+        {
+          "name": "scavenger-hero.run1"
+        },
+        {
+          "name": "scavenger-hero.run2"
+        },
+        {
+          "name": "scavenger-hero.run3"
+        },
+        {
+          "name": "scavenger-hero.run4"
+        },
+        {
+          "name": "scavenger-hero.jump1"
+        },
+        {
+          "name": "scavenger-hero.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "scavenger-hero.idle1",
+            "scavenger-hero.idle2"
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "scavenger-hero.run1",
+            "scavenger-hero.run2",
+            "scavenger-hero.run3",
+            "scavenger-hero.run4"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "scavenger-hero.jump1",
+            "scavenger-hero.jump2"
+          ],
+          "fps": 6,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "enemy-wasteland",
+      "kind": "animation",
+      "role": "敌人",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 36
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "enemy-wasteland.run1"
+        },
+        {
+          "name": "enemy-wasteland.run2"
+        },
+        {
+          "name": "enemy-wasteland.run3"
+        },
+        {
+          "name": "enemy-wasteland.run4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "run",
+          "frames": [
+            "enemy-wasteland.run1",
+            "enemy-wasteland.run2",
+            "enemy-wasteland.run3",
+            "enemy-wasteland.run4"
+          ],
+          "fps": 8,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/enemy-wasteland.run.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "kind": "sprite",
+      "role": "宝箱",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 28,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "chest"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/chest.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "resource-item",
+      "kind": "sprite",
+      "role": "可拾取物",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 14,
+        "h": 14
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "resource-item"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/resource-item.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "hazard-spikes",
+      "kind": "sprite",
+      "role": "危险地形",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "hazard-spikes"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/hazard-spikes.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "wasteland-bg",
+      "kind": "background",
+      "role": "背景",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 480,
+        "h": 270
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0
+        },
+        {
+          "name": "far",
+          "parallax": 0.3,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "mid",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "wasteland-bg.sky"
+        },
+        {
+          "name": "wasteland-bg.far"
+        },
+        {
+          "name": "wasteland-bg.mid"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-bg.sky.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-bg.far.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-bg.mid.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "hud-panel",
+      "kind": "ui",
+      "role": "HUD面板",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-panel"
+        }
+      ],
+      "scale9Borders": {
+        "x": 8,
+        "y": 8,
+        "w": 16,
+        "h": 16
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-panel.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-pip",
+      "kind": "ui",
+      "role": "HUD图标",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 14,
+        "h": 14
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-pip"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-pip.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/hud-panel.json",
+      "bytes": 5264,
+      "checksum": "sha256:7b73520afbf83e8ea505137f3bcb6bc624f99ec8447c8c0dfe564ef21fd1b515"
+    },
+    {
+      "path": "authoring/drawlist/hud-pip.json",
+      "bytes": 3151,
+      "checksum": "sha256:cf5b562cdf899b64c3e356d078e67f9c9a43c36bffd6782d3526fec0e69466e7"
+    },
+    {
+      "path": "authoring/generated/chest.png",
+      "bytes": 1277906,
+      "checksum": "sha256:60074075154b30649d9d5427a4203fd59d5cb0c66a69440b4e2573e1e1dbdd44"
+    },
+    {
+      "path": "authoring/generated/chest.prompt.txt",
+      "bytes": 1988,
+      "checksum": "sha256:e56814d05e940692e195b27637839c7d38df3ed2d16f97d3e0728abcdb29b8ad"
+    },
+    {
+      "path": "authoring/generated/enemy-wasteland.run.png",
+      "bytes": 1270628,
+      "checksum": "sha256:b8408aa21a07c41d2e9571092c970622d18643d986e5b2c59382a6e956ae2308"
+    },
+    {
+      "path": "authoring/generated/enemy-wasteland.run.prompt.txt",
+      "bytes": 4998,
+      "checksum": "sha256:6612847dc4c3ce2fb15ead0efa8402cd36913c213263873020a14fcf3c73e326"
+    },
+    {
+      "path": "authoring/generated/ground-tile.png",
+      "bytes": 1444775,
+      "checksum": "sha256:c161f33fa67618e0313992b3183d1928903d047c3c2e44b05484f82035404b33"
+    },
+    {
+      "path": "authoring/generated/ground-tile.prompt.txt",
+      "bytes": 2015,
+      "checksum": "sha256:9d078556b9737d036593205e28236fe359d5998d54336ee6a0317b0e07372542"
+    },
+    {
+      "path": "authoring/generated/hazard-spikes.png",
+      "bytes": 1373821,
+      "checksum": "sha256:b4493b25bd2b5495f960f4c6eb7f186c6f2d0e5640c9c7c9c57774b3c504ca4e"
+    },
+    {
+      "path": "authoring/generated/hazard-spikes.prompt.txt",
+      "bytes": 1976,
+      "checksum": "sha256:bb93d137e02c33183cc1faa80aba31e15681827f53bf512ca44e9ef4db4ce2b4"
+    },
+    {
+      "path": "authoring/generated/resource-item.png",
+      "bytes": 1186781,
+      "checksum": "sha256:7cfddbfe43b6cd16b36e9d79f8d0809a450c252ca52074f1be0d7a055cfbd840"
+    },
+    {
+      "path": "authoring/generated/resource-item.prompt.txt",
+      "bytes": 1985,
+      "checksum": "sha256:1353dc08935cae25c4e674431e11080e90952a236f485fad059ec025d2480842"
+    },
+    {
+      "path": "authoring/generated/rubble-pile.png",
+      "bytes": 1596919,
+      "checksum": "sha256:80b0af491bddb3a477a9c32392cf41e1437830003c7c69071823ba3742c8e782"
+    },
+    {
+      "path": "authoring/generated/rubble-pile.prompt.txt",
+      "bytes": 1983,
+      "checksum": "sha256:abf3919ec61f85ee824517cc7444fcad0d6ad0f62005ec0f60f6090edb25f9ef"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.idle.png",
+      "bytes": 1509770,
+      "checksum": "sha256:a7bf2a73c59cbc588c11659d6c20abac9f7b280166c2dbc3413f73715417d1d1"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.idle.prompt.txt",
+      "bytes": 5249,
+      "checksum": "sha256:ec1fa0be22681f092f444a33a7c056fd3817fea7ee8e205b087f099422207a63"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.jump.png",
+      "bytes": 1337816,
+      "checksum": "sha256:8b66ee2ca5247f91f30df38309291075f247936cb3ed24b906cc1d5e82992959"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.jump.prompt.txt",
+      "bytes": 5249,
+      "checksum": "sha256:7fc86eeeada76be4388f3aba60c09767b708afafe3aa0ddf83b089d3134e7b80"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.run.png",
+      "bytes": 1263971,
+      "checksum": "sha256:595ee162ed15ff0159b4d093ea35c66bb07d1e30924eaa3254188a54b39bd1f5"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.run.prompt.txt",
+      "bytes": 5247,
+      "checksum": "sha256:db2c5761c2ecaef142864a2bf927255326058dd797f3ae05e315d69c471bfdde"
+    },
+    {
+      "path": "authoring/generated/step-block.png",
+      "bytes": 1677908,
+      "checksum": "sha256:af29f766e768b46c2ebe40fb1c85a7998a007b2bc9ad074d1f1ca350199682de"
+    },
+    {
+      "path": "authoring/generated/step-block.prompt.txt",
+      "bytes": 1965,
+      "checksum": "sha256:4267a3e3cddb08cb23ef0fab99f2f841586ab4fe66e3eb5f2a860c997c750d09"
+    },
+    {
+      "path": "authoring/generated/wasteland-bg.far.png",
+      "bytes": 1477214,
+      "checksum": "sha256:e71070662ad24da111e8905097bbf96086f8dae162f1ab5d05f55cb0783fcba9"
+    },
+    {
+      "path": "authoring/generated/wasteland-bg.far.prompt.txt",
+      "bytes": 1932,
+      "checksum": "sha256:78b75d395eee6324b527a610870757b603f945083b8ca2b68bc9650c2aa8ab26"
+    },
+    {
+      "path": "authoring/generated/wasteland-bg.mid.png",
+      "bytes": 2132075,
+      "checksum": "sha256:21d024e8dc857bd171c9aa3d35563b291245433808e062a250a0f40c2802015b"
+    },
+    {
+      "path": "authoring/generated/wasteland-bg.mid.prompt.txt",
+      "bytes": 1932,
+      "checksum": "sha256:634c4e596f1c8bb4fc20cbcf865e1375406c3998cd37a8a610a94c7035d34113"
+    },
+    {
+      "path": "authoring/generated/wasteland-bg.sky.png",
+      "bytes": 1063650,
+      "checksum": "sha256:d83179fa9222e56382dab200cf18c4e45ef8fb2d3f073511b7768607cd80bb55"
+    },
+    {
+      "path": "authoring/generated/wasteland-bg.sky.prompt.txt",
+      "bytes": 2044,
+      "checksum": "sha256:4cba9f7916efec45cff799c0695f0828704fdb7bee2d5cd86f2686fef3b63fd7"
+    },
+    {
+      "path": "authoring/masters/enemy-wasteland-master.png",
+      "bytes": 1466809,
+      "checksum": "sha256:5bc570e8ba4fa933261b85b9bca4801797b6059831f994848ff01cacee443e6a"
+    },
+    {
+      "path": "authoring/masters/enemy-wasteland-master.prompt.txt",
+      "bytes": 4649,
+      "checksum": "sha256:9ec35719ec0d8fc71552541a743f76da00bc485cf530bf5fab3470723f2b2716"
+    },
+    {
+      "path": "authoring/masters/enemy-wasteland-master.ratio.json",
+      "bytes": 459,
+      "checksum": "sha256:9577da456f7059c7c80577e5d6156b97ddca750a4327c08f4b93826c3955caa4"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.png",
+      "bytes": 1343996,
+      "checksum": "sha256:01e0fdcae53b781abefc5a0bd1564b645834b1294bafe2c21bb068c41c028873"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.prompt.txt",
+      "bytes": 4979,
+      "checksum": "sha256:1b6b52817ae0c8171b2d792ef7a49b443e8597521e78453ee7e613dde36c66c8"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.ratio.json",
+      "bytes": 442,
+      "checksum": "sha256:12d60d00d960bcf04e9fdd2d56bfe37ee1ba713b924516acd90b8a5d270d0a48"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1877,
+      "checksum": "sha256:b0a65f4266f8152c0a9d0dddf9c7403a28d91d21042cd28a6fbe8462b8354646"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 7072,
+      "checksum": "sha256:f35042e57617ab2fbaa00d7a75a412c239e2496e9c7940ffc6041f8c8f40dbf9"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 608,
+      "checksum": "sha256:c0fdd46135cfe2644eb72d5c9024aaf249b943572dbc678b3766f3f23bfb173b"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5040,
+      "checksum": "sha256:d096a9557046f2ea2ce89b1a1ceb6fa6381b8f864aed9cc7a0081e12b4c2d019"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 9294,
+      "checksum": "sha256:0c2dce636859c43d1a373d767466a81d2635eafcbada593cfa84c1e5cad50127"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1433,
+      "checksum": "sha256:5f9e43c1873b3b883c52defe6c2c16d2c0be852d0120eafd9deae3ec5fea0bc1"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 88371,
+      "checksum": "sha256:d0d899041e38c1ff9d10571da7aa7d155e57c645c141ae6e5fb89e4336ac3266"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 2567,
+      "checksum": "sha256:56afddb630694cec16278afad8226bfedf93c81e7d0af6c42a5aedaeeeea2122"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 4103,
+      "checksum": "sha256:b0bea1e420e45b9eddcf8a2945507db656babc61aded61c37d82be9a53f4286a"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1085,
+      "checksum": "sha256:62f8fa97fdfe0d7f5cd338f0d8165562ba0d8fa258ed7349279f2dccd03267be"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 375,
+      "checksum": "sha256:35e361262e4ff3d6f820be97aee307931017d59ee0ba72fa52039a96a6c800c9"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 4446,
+      "checksum": "sha256:6c8b7ffd936a1a36bab4a702a0741aed95b82f3a4875eb87e347e7344553508b"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 775,
+      "checksum": "sha256:e15e3863764ca6d4f9b484e021ac3091e15b063d2e0f45a8ea29e696a15b0020"
+    }
+  ]
+}

@@ -35,6 +35,7 @@ const StrikeShape = z.strictObject({
 
 const EntityShape = z.strictObject({
   id: z.string().min(1),
+  sourceIntent: z.string().min(1).optional(),
   kind: z.enum(["solid", "pickup", "hazard", "goal", "chest", "danger", "decor"]),
   at: PointShape,
   asset: z.string().min(1),

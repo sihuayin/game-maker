@@ -1,0 +1,124 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土拾荒记",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的街道与废墟平台上横向探索移动",
+    "寻找并拾取散落的资源物，搜寻可以打开的宝箱",
+    "提防危险地形与游走的敌人，及时躲避",
+    "集齐资源并抵达关卡终点的撤离目标"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "一名背负重物、略驼背的拾荒者，在废土城市中搜寻资源与宝物",
+    "abilities": [
+      "在废墟地面与平台上左右移动",
+      "跳跃跨越瓦砾堆与断裂路面",
+      "拾取资源物、打开宝箱"
+    ],
+    "goals": [
+      "拾取散落的资源",
+      "打开找到的宝箱",
+      "躲开危险地形与敌人",
+      "抵达关卡终点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在地面与平台间沿固定路线来回游走巡逻，靠近时加速逼近玩家",
+      "threat": "与玩家碰撞会使其失去生命，迫使玩家保持距离或跳越躲避"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "chest",
+      "behavior": "玩家靠近后可以打开，释放其中的宝物（计入收集目标）"
+    },
+    {
+      "id": "hazard-spikes",
+      "type": "hazard",
+      "behavior": "废墟中裸露的钢筋尖刺与碎玻璃，玩家触碰到会造成伤害"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-item",
+      "purpose": "可拾取的废料与净水，作为计数收集品，集齐后可达成撤离条件"
+    }
+  ],
+  "world": {
+    "theme": "荒凉、危险的末世废墟",
+    "setting": "被烈日顶光照亮的废弃城市遗迹，锈蚀金属、混凝土残块、沙土与帆布构成破败街景",
+    "structure": "前景是玩家可踩踏的地面、平台与废墟碎块，主体（角色、宝箱、资源）位于此层；中景是残破街道、坍塌结构与半掩埋车辆瓦砾；远景为倾斜建筑剪影与尘土弥漫的天空，呈现多级视差分层，纵向前中后三段"
+  },
+  "levels": [
+    {
+      "id": "level-1",
+      "purpose": "教学探索：在开阔的废墟街区中学习移动、跳跃与拾取，初步接触敌人",
+      "layout": "从左往右：起点是一段平坦瓦砾街道，右侧有低矮混凝土平台可跳上，中段放置资源物，随后一道断裂路面需跳跃跨越，末端有一处宝箱与一名巡逻敌人，抵达最右端撤离点",
+      "entities": [
+        "scavenger-hero",
+        "resource-item",
+        "chest",
+        "enemy-wasteland",
+        "hazard-spikes"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性关卡推进",
+    "description": "依次通过多个结构递进的废墟关卡，每关完成收集并抵达终点后进入下一关"
+  },
+  "mechanics": [
+    {
+      "id": "move-horizontal",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "search-resources",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "search-chests",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "hazard-contact"
+    },
+    {
+      "id": "avoid-enemies",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "拾取本关全部资源物并打开宝箱后，抵达关卡终点的撤离目标"
+  ],
+  "loseConditions": [
+    "玩家生命耗尽（被敌人碰撞或触碰危险地形次数过多）"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

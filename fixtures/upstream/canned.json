@@ -241,6 +241,7 @@
       },
       {
         "id": "e-drone",
+        "sourceIntent": "e-drone",
         "kind": "hazard",
         "at": {
           "x": 240,

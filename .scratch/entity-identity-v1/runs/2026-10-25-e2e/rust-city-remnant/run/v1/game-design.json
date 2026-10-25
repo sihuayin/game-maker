@@ -1,0 +1,120 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "锈城余生",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在倒塌楼宇与瓦砾间左右探索移动，辨认可通行的平台与遮挡物",
+    "躲避巡逻的敌人与地面危险物，控制移动节奏寻找安全路径",
+    "拾取散落的资源并打开宝箱收集宝藏",
+    "攒足宝藏后抵达关卡尽头的撤离点达成最终目标"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "拾荒者：一名背着大包的幸存者，在废弃城市中搜寻资源与宝藏",
+    "abilities": [
+      "横向奔跑移动，可跨过地面落差",
+      "跳跃，跃上平台或越过瓦砾与坑洞",
+      "接近宝箱将其打开收集宝藏",
+      "接近资源道具将其拾取"
+    ],
+    "goals": [
+      "在废弃城市中探索安全路线",
+      "收集资源与宝藏宝箱",
+      "躲避敌人与危险继续前进",
+      "抵达关卡尽头的撤离点达成目标"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-in-city",
+      "behavior": "在指定平台区间左右巡逻，转身时短暂停顿，不会跳跃",
+      "threat": "与玩家接触即造成失败，迫使玩家观察巡逻节奏并绕开"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "treasure-chest",
+      "type": "宝箱",
+      "behavior": "玩家走近接触即打开，吐出宝藏供收集"
+    },
+    {
+      "id": "ground-hazard",
+      "type": "危险机关",
+      "behavior": "地面上周期性翻起或闪动的地刺/断钢，接触即失败，需要把握时机越过"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-item",
+      "purpose": "可拾取的废料与净水，作为探索中的补给与收集目标"
+    }
+  ],
+  "world": {
+    "theme": "荒凉、危险、充满未知的废土末世",
+    "setting": "废弃城市：倒塌的混凝土楼、锈蚀钢架、高架残骸、瓦砾堆、废弃车辆与油桶，沙尘黄褐与锈橙为主、冷钢灰蓝点缀",
+    "structure": "空间分三层：前景是可通行的地面平台、瓦砾堆与宝箱资源等互动物件，通行区留空；中景是倒塌建筑骨架、残墙与高架残骸，承担遮挡与半围合；背景是多层远景废墟剪影做视差滚动，远层最淡。纵向约分地面层、矮平台层、高架层三段，玩家主要在地面与矮平台间跳跃移动。"
+  },
+  "levels": [
+    {
+      "id": "ruin-outskirts",
+      "purpose": "教学关：让玩家熟悉横向移动、跳跃、拾取资源与打开宝箱，体验废土探索的收获感",
+      "layout": "从左到右：开局一段平坦地面放置 resource-item 引导拾取；随后一处断层需要跳跃越过；中层平台放置第一个 treasure-chest；再往前一段瓦砾坡地上是 enemy-in-city 巡逻区，需观察节奏通过；接近尽头的撤离点前有一小片 ground-hazard 需把握时机跳越，抵达最右端撤离点。",
+      "entities": [
+        "scavenger-hero",
+        "resource-item",
+        "treasure-chest",
+        "enemy-in-city",
+        "ground-hazard"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性关卡推进",
+    "description": "打通当前关卡、在撤离点达成目标后进入下一处废墟区域，难度与宝藏密度逐步提升，没有数值成长系统"
+  },
+  "mechanics": [
+    {
+      "id": "side-movement",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "avoid-danger",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "抵达关卡尽头的撤离点并达成目标"
+  ],
+  "loseConditions": [
+    "与敌人或地面危险物接触而失败"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版废土寻宝游戏",
+  "targetExperience": "在废弃城市中探索、搜寻并躲避危险，营造紧张而带有发现感的寻宝体验",
+  "coreLoopSteps": [
+    "探索废弃城市",
+    "寻找资源和宝箱",
+    "躲避危险和敌人"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "寻找资源",
+      "寻找宝箱",
+      "躲避危险和敌人"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒芜废弃、危险潜伏"
+  },
+  "mechanics": [
+    {
+      "id": "horizontal-move",
+      "name": "横版移动"
+    },
+    {
+      "id": "jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "collect-resource",
+      "name": "寻找资源"
+    },
+    {
+      "id": "open-chest",
+      "name": "寻找宝箱"
+    },
+    {
+      "id": "avoid-danger",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "chest-scavenge",
+      "type": "interactable",
+      "role": "可寻找并打开的宝箱"
+    },
+    {
+      "id": "resource-scavenge",
+      "type": "resource",
+      "role": "可拾取补给资源"
+    },
+    {
+      "id": "enemy-wasteland",
+      "type": "enemy",
+      "role": "需要躲避的敌人"
+    }
+  ],
+  "winConditions": [],
+  "loseConditions": [],
+  "ambiguity": [
+    "title：需求没提",
+    "camera：需求没提，暂按横版默认",
+    "winConditions：需求只提到有最终目标，但未具体说明",
+    "loseConditions：需求没提是否会失败或死亡",
+    "subgenre：需求没细说，未填",
+    "progression：需求没提",
+    "challenge：需求没提具体难度来源"
+  ]
+}

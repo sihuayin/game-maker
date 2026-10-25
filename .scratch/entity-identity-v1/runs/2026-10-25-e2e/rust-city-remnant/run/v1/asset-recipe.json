@@ -1,0 +1,344 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "rust-city-remnant",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "玩家角色",
+        "description": "拾荒者小人：破旧斗篷、护目镜、皮质背带、大背包，三四头身可读动作的像素小人",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.85
+        },
+        "size": {
+          "w": 32,
+          "h": 40
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "scavenger-hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 6,
+            "sheet": {
+              "columns": 6,
+              "rows": 1
+            },
+            "fps": 10,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-in-city",
+        "role": "敌人",
+        "description": "城市巡逻的敌对单位，废土侦察形态，粗粝轮廓、可读的左右巡逻转身动作",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.85
+        },
+        "size": {
+          "w": 32,
+          "h": 36
+        },
+        "required": true,
+        "characterId": "enemy-in-city",
+        "masterAsset": "enemy-in-city-master",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ruin-ground-tile",
+        "role": "可平铺的地面砖",
+        "description": "碎裂混凝土地面砖，剥落粉化边缘，可横向平铺",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ruin-step",
+        "role": "台阶",
+        "description": "碎石坡/台阶形状的静态碰撞块，可见地形",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "rubble-pile",
+        "role": "碎石堆",
+        "description": "瓦砾碎砖堆，前景通行区的可见障碍/平台",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.75
+        },
+        "size": {
+          "w": 48,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "ruin-outskirts-bg",
+        "role": "多层远景废墟背景",
+        "description": "废弃城市远景：远层淡焦的多层废墟剪影与倒塌天际线，做视差滚动",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 320,
+          "h": 180
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0
+          },
+          {
+            "name": "far-ruins",
+            "parallax": 0.4,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "mid-ruins",
+            "parallax": 0.7,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "treasure-chest",
+        "role": "宝箱交互物",
+        "description": "生锈金属宝箱，箱盖带锈点高光，小于角色、醒目",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.75
+        },
+        "size": {
+          "w": 24,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-hazard",
+        "role": "地面危险机关",
+        "description": "周期性翻起的地刺/断钢危险物，冷钢灰蓝警示轮廓",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 20
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-item",
+        "role": "可拾取资源",
+        "description": "废料与净水补给道具，小于角色、醒目可收集",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "HUD 面板",
+        "description": "屏幕空间 HUD 状态面板底板，可拉伸到任意尺寸，中央平坦无图案",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 6,
+          "right": 6,
+          "top": 6,
+          "bottom": 6
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-pip",
+        "role": "HUD 图标/点亮指示符",
+        "description": "屏幕空间 HUD 的小型点亮 pip/图标，固定尺寸照亮指示",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-hero-master",
+      "role": "玩家角色母版",
+      "description": "拾荒者角色母版：破旧斗篷、护目镜、皮质背带、大背包，三四头身饱满轮廓",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 32,
+        "h": 40
+      }
+    },
+    {
+      "id": "enemy-in-city-master",
+      "role": "敌人母版",
+      "description": "城市巡逻敌人母版，粗粝轮廓、废土侦察形态",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy-in-city",
+      "size": {
+        "w": 32,
+        "h": 36
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

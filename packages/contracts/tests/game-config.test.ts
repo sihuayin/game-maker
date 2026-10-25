@@ -3,8 +3,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_HUD_LINE_HEIGHT, DEFAULT_PLAYER_MOVE, GameConfigSchema, PLAYER_ACTION_NAMES, Player as PlayerSchema,
-  auditGameConfig, auditScreenSpace, gameHudScreenItems, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
-  parseAssetPack, type AssetPackManifest, type GameConfig, type ConfigIssue,
+  auditEntityIdentity, auditGameConfig, auditScreenSpace, gameHudScreenItems, jumpSpan, maxJumpHeight, parseGameConfig, pickupCount, playerMoveOf,
+  parseAssetPack, type AssetPackManifest, type GameConfig, type ConfigIssue, type GameDesignSpec,
 } from "../src/index.js";
 
 /** ⚠️ 夹具是**真跑出来的包**（票 40），不是现造的 —— 票 37 立的规矩：
@@ -97,6 +97,31 @@ describe("形状：一份真配置能过，逃生舱全被堵死", () => {
     const r = GameConfigSchema.safeParse(c);
     expect(r.success).toBe(false);
     if (!r.success) expect(r.error.issues.map((i) => i.message).join()).toMatch(/id 重复/);
+  });
+
+  // ── entity-identity-v1 票 01：sourceIntent 回指设计实体 id ─────────────────
+  it("`sourceIntent` 可带可省 —— 带 = 指设计实体，省 = 孤儿（地面/终点无设计对位）", () => {
+    const withRef = base();
+    withRef.entities[0] = { ...withRef.entities[0]!, sourceIntent: "enemy-wasteland" };
+    expect(GameConfigSchema.safeParse(withRef).success).toBe(true);
+    // base() 里六个实体**全不带** sourceIntent（孤儿），照过。
+    expect(GameConfigSchema.safeParse(base()).success).toBe(true);
+  });
+
+  it("1:N 共享同一 sourceIntent 不报 id 重复 —— id 唯一只看 id，不看 sourceIntent", () => {
+    const c = base();
+    // 三个 pickup 都指同一个设计 resource（票 01 裁定的 1:N），id 仍各不相同。
+    c.entities[0] = { ...c.entities[0]!, sourceIntent: "resource-pickup" };
+    c.entities[1] = { ...c.entities[1]!, sourceIntent: "resource-pickup" };
+    c.entities[2] = { ...c.entities[2]!, sourceIntent: "resource-pickup" };
+    const r = GameConfigSchema.safeParse(c);
+    expect(r.success, r.success ? "" : r.error.issues.map((i) => i.message).join(" / ")).toBe(true);
+  });
+
+  it("空串 `sourceIntent` 被 `min(1)` 拒 —— 悬空/空回指不是合法形状", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, sourceIntent: "" };
+    expect(GameConfigSchema.safeParse(c).success).toBe(false);
   });
 
   it("`player.move` 可省 —— 省了就用外壳的默认值（**默认值只有一处来源**）", () => {
@@ -419,5 +444,49 @@ describe("⚠️ `hud.panel.size` 的例外**以九宫格为条件**（票 63）
 
   it("非九宫格 + 声明 == 包 ⇒ **也不报**（这条判据只在两个数打架时说话）", () => {
     expect(panelErrs({ asset: "hud-pip", at: { x: 8, y: 262 }, size: { w: 12, h: 12 } })).toEqual([]);
+  });
+});
+
+// ── entity-identity-v1 票 03：auditEntityIdentity（coverage + 悬空）────────────────
+//
+// ⚠️ 只验「身份在不在」，不验 kind 对不对（那归 QA 的 visual-config-coherence）。
+describe("auditEntityIdentity：设计↔配置的 sourceIntent 对账", () => {
+  /** 只造四桶 —— auditEntityIdentity 只读这四桶；player 是顶层字段不进 coverage。 */
+  const d = (buckets: Partial<Record<"enemies" | "npcs" | "interactables" | "resources", string[]>>): GameDesignSpec =>
+    ({
+      enemies: (buckets.enemies ?? []).map((id) => ({ id, behavior: "", threat: "" })),
+      npcs: (buckets.npcs ?? []).map((id) => ({ id, role: "", interaction: "" })),
+      interactables: (buckets.interactables ?? []).map((id) => ({ id, type: "", behavior: "" })),
+      resources: (buckets.resources ?? []).map((id) => ({ id, purpose: "" })),
+    }) as unknown as GameDesignSpec;
+
+  it("coverage：设计实体在 config 里没有对应 sourceIntent → error", () => {
+    const c = base();
+    const issues = auditEntityIdentity(d({ resources: ["resource-pickup"] }), c);
+    expect(issues.map((i) => i.message).join()).toMatch(/resource-pickup.*没有对应实体/);
+  });
+
+  it("1:N：一个设计实体多个 config entity 共享 sourceIntent → 不报", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, sourceIntent: "resource-pickup" };
+    c.entities[1] = { ...c.entities[1]!, sourceIntent: "resource-pickup" };
+    c.entities[2] = { ...c.entities[2]!, sourceIntent: "resource-pickup" };
+    expect(auditEntityIdentity(d({ resources: ["resource-pickup"] }), c)).toEqual([]);
+  });
+
+  it("悬空：config sourceIntent 指向设计里不存在的 id → error", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, sourceIntent: "ghost" };
+    expect(auditEntityIdentity(d({}), c).map((i) => i.message).join()).toMatch(/ghost.*不存在/);
+  });
+
+  it("孤儿合法 + player 不进 coverage：空设计 + 全孤儿 → 不报", () => {
+    expect(auditEntityIdentity(d({}), base())).toEqual([]);
+  });
+
+  it("player.id 不是合法 sourceIntent：config 指它 → 悬空 error", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, sourceIntent: "p-postman" };
+    expect(auditEntityIdentity(d({}), c).map((i) => i.message).join()).toMatch(/p-postman.*不存在/);
   });
 });

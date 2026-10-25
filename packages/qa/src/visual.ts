@@ -215,7 +215,15 @@ function visualConfigCoherence(ctx: QaContext, config: GameConfig, manifest: Ass
   for (const e of design.data.interactables) bucketOf.set(e.id, "interactables");
   for (const e of design.data.resources) bucketOf.set(e.id, "resources");
 
-  const entityOf = new Map(config.entities.map((e) => [e.id, e]));
+  // ⚠️ join 键 = `sourceIntent`（entity-identity-v1 票 04）：按设计实体 id 分组（1:N 一个键多个实体）；
+  //   无 `sourceIntent` 的孤儿（地面 solid / 终点 goal）不进组。
+  const bySource = new Map<string, GameConfig["entities"][number][]>();
+  for (const e of config.entities) {
+    if (e.sourceIntent === undefined) continue;
+    const list = bySource.get(e.sourceIntent);
+    if (list) list.push(e);
+    else bySource.set(e.sourceIntent, [e]);
+  }
   const sizeOf = (assetId: string) => manifest.assets.find((a) => a.id === assetId)?.size ?? null;
   const anchorOf = (assetId: string) => manifest.assets.find((a) => a.id === assetId)?.anchor ?? FALLBACK_ANCHOR;
 
@@ -226,22 +234,26 @@ function visualConfigCoherence(ctx: QaContext, config: GameConfig, manifest: Ass
     if (bucket === undefined || bucket === "player") continue;
     const allowed = DESIGN_BUCKET_KINDS[bucket];
     if (allowed === undefined) continue;
-    const ent = entityOf.get(obj.sourceIntent);
-    if (ent === undefined) {
+    const ents = bySource.get(obj.sourceIntent);
+    if (ents === undefined || ents.length === 0) {
       findings.push({ target: obj.sourceIntent, severity: "error",
         detail: `VDS 里 "${obj.sourceIntent}"（${bucket} 桶）在 GameConfig 里**不存在** —— 视觉设计画了、配置没做` });
       continue;
     }
-    if (!allowed.includes(ent.kind)) {
+    // 串桶：同 sourceIntent 的**任一**实体 kind 越界 = error（1:N 也要逐个查）
+    const stray = ents.find((e) => !allowed.includes(e.kind));
+    if (stray !== undefined) {
       findings.push({ target: obj.sourceIntent, severity: "error",
-        detail: `设计桶 ${bucket} 的实体 "${obj.sourceIntent}" 在 GameConfig 里是 kind "${ent.kind}"，` +
+        detail: `设计桶 ${bucket} 的实体 "${obj.sourceIntent}" 在 GameConfig 里是 kind "${stray.kind}"，` +
           `不在允许集合 {${allowed.join(", ")}} —— ⚠️ 串桶` });
       continue; // error 优先，跳过该实体的几何观察（避免 (judgement,target) 重复）
     }
-    // 几何观察（只报、不阻断）：只比尺寸 w/h，无阈值，措辞描述性
-    const size = ent.body ?? sizeOf(ent.asset);
+    // 几何观察（只报、不阻断）：只比尺寸 w/h，无阈值，措辞描述性。
+    //   1:N 的实体共享同一设计实体/资源 ⇒ 尺寸一致，取第一个比即可。
+    const first = ents[0]!;
+    const size = first.body ?? sizeOf(first.asset);
     if (size === null) continue;
-    const box = entityBox(ent.at, size, anchorOf(ent.asset));
+    const box = entityBox(first.at, size, anchorOf(first.asset));
     if (box.w !== obj.bounds.w || box.h !== obj.bounds.h)
       findings.push({ target: obj.sourceIntent, severity: "warning",
         detail: `视觉设计里 "${obj.sourceIntent}" 的构图为 ${obj.bounds.w}×${obj.bounds.h}，` +

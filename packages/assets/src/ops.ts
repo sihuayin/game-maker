@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
+  auditGameConfig, auditEntityIdentity, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
   formatIssues, GameDesignSpecSchema,
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
   parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
@@ -849,10 +849,10 @@ export const gameConfigExample = {
   },
   terrain: [{ x: 0, y: 250, w: 1440, h: 20 }],
   entities: [
-    { id: "pickup-1", kind: "pickup", at: { x: 300, y: 250 }, asset: "<可拾取资源的 id>" },
+    { id: "pickup-1", kind: "pickup", at: { x: 300, y: 250 }, asset: "<可拾取资源的 id>", sourceIntent: "<设计实体 id>" },
     { id: "block-1", kind: "solid", at: { x: 500, y: 250 }, asset: "<静态障碍资源的 id>" },
     { id: "mover", kind: "hazard", at: { x: 800, y: 250 }, asset: "<危险物资源的 id>", anim: "<动画名>",
-      motion: { kind: "cycle", axis: "x", distance: 200, periodMs: 4000 } },
+      motion: { kind: "cycle", axis: "x", distance: 200, periodMs: 4000 }, sourceIntent: "<设计实体 id>" },
     { id: "gate", kind: "goal", at: { x: 1400, y: 250 }, asset: "<终点资源的 id>", anim: "<动画名>" },
   ],
   hud: {
@@ -1074,12 +1074,17 @@ export async function compileRuntime(opts: CompileRuntimeOptions): Promise<Comma
 6. \`objective\` **不带数量**：\`{"kind":"collect-then-reach","gate":"<某个 goal 实体的 id>"}\`。
    要捡几件由 \`kind:"pickup"\` 的实体条数**派生** —— 多写一个数就拒。
 7. \`gate\` 必须指向一个**真的存在**且 \`kind:"goal"\` 的实体；实体 id **不得重复**；**至少要有 1 个 pickup**。
-8. ⚠️ **\`hud\` 的坐标是屏幕空间（≤ ${vp.w}×${vp.h}），不是世界空间。**
+8. ⚠️ **\`sourceIntent\` = 这个实体是哪个设计实体的实例** —— 填**设计里真实存在的实体 id**
+   （见「这一关的设计」那节逐条列出的 \`id\`），**不许现编**、不许把设计 id 改写成新名字。
+   · **1:N**：一个设计实体（尤其 \`resources\` 可拾取物）可铺成**多条**实体 ⇒ 这多条**填同一个** \`sourceIntent\`；
+   · **孤儿**：地面 \`solid\` 块、终点 \`gate\` 这类**设计里没有对位**的结构/派生实体，**不填** \`sourceIntent\`；
+   · 玩家是顶层 \`player\`、不是实体，不在实体里。
+9. ⚠️ **\`hud\` 的坐标是屏幕空间（≤ ${vp.w}×${vp.h}），不是世界空间。**
    例如世界可以宽 1440，但屏幕只有 ${vp.w} 宽 —— 判的是**整个盒子**：清单里那件资源的**锚点落在 \`at\` 上**，
    按你声明的**尺寸**量出来的矩形，**四条边**都要落在屏幕内（左边、上边一样管，不是只看右边超没超）。直接拒。
-9. \`anim\` 只在资源有**多个**动画时才需要，且必须是清单里**真实存在**的动画名。
+10. \`anim\` 只在资源有**多个**动画时才需要，且必须是清单里**真实存在**的动画名。
    ⚠️ **只许用下面清单里的 id 与动画名** —— 清单里没有的一律拒收。
-10. ⚠️ \`player.anims\` 那三格（${PLAYER_ACTION_NAMES.map((n) => `\`${n}\``).join(" / ")}）**三格互不相同** ——
+11. ⚠️ \`player.anims\` 那三格（${PLAYER_ACTION_NAMES.map((n) => `\`${n}\``).join(" / ")}）**三格互不相同** ——
    必须是三个**不同**的动画名。外壳按这三个键**各取一路**播一种动作：三格填同一个名字，
    玩家三种动作在屏幕上长得一模一样，而这份配置会被拒收。⇒ 去清单里给这三格各挑一路不同的。
 
@@ -1158,6 +1163,7 @@ ${SKELETON_SHAPE_NOTE}
     //   （由背景资源尺寸 + world.size 决定）**不**移进来，仍是确定性失败（见循环后那一段）。
     const modelHard = [
       ...auditGameConfig(truth.value, manifest),
+      ...auditEntityIdentity(design, truth.value),
       ...auditScreenSpace(vp, gameHudScreenItems(truth.value, manifest,
         { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
     ].filter((i) => i.severity === "error");
@@ -1183,6 +1189,7 @@ ${SKELETON_SHAPE_NOTE}
   //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**。
   const issues: ConfigIssue[] = [
     ...auditGameConfig(config, manifest),
+    ...auditEntityIdentity(design, config),
     ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
       { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
     ...auditLayerCoverage(vp, config.world.size,

@@ -14,6 +14,14 @@ const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 /** ⚠️ 真产物：票 40 的包 + 票 33 的配置（那份配置**本身就是**一份合法正例）。 */
 const PACK = path.join(ROOT, "fixtures/packs/last-train/v2");
 const GOOD = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/game-configs/last-train.json"), "utf8"));
+// entity-identity-v1 票 03：给这份真配置补上 `sourceIntent`，映射到下面 DESIGN 的四桶 ——
+// 否则身份验真（coverage）会拒这份**老**配置。映射：suitcase-*（pickup）← r-lost（resources）·
+// carriage（hazard）← e-dog（enemies）· signal（goal）← i-signal（interactables）· luggage（solid）孤儿不带。
+for (const e of GOOD.entities) {
+  if (e.id.startsWith("suitcase")) e.sourceIntent = "r-lost";
+  else if (e.id === "carriage") e.sourceIntent = "e-dog";
+  else if (e.id === "signal") e.sourceIntent = "i-signal";
+}
 
 /** 一份最小但合法的设计（它的实体 id 不必与包里的资源 id 相同 —— **映射是模型的事**）。 */
 const DESIGN: GameDesignSpec = {
@@ -96,7 +104,9 @@ describe("编译：一次调用 → 一份落盘的配置", () => {
     expect(r.data.ok).toBe(true);
     expect(r.data.version).toBe(1);
     expect(r.data.levelId).toBe("l-1");
-    expect(fs.readFileSync(fileOf(d), "utf8")).toBe(JSON.stringify(GOOD, null, 2) + "\n");
+    // ⚠️ 比较**解析后**的 JSON（`toEqual` 不挑键序）—— 契约把 `sourceIntent` 排在 `id` 之后，
+    //   而 GOOD 这份老配置是 `JSON.parse` 进来的（键序 = 文件里写的），逐字节比对会因键序不同而误报。
+    expect(JSON.parse(fs.readFileSync(fileOf(d), "utf8"))).toEqual(GOOD);
     const ledger = r.data.ledger as { step: string; target: string; attempts: number; failures?: string[] }[];
     expect(ledger[0]).toMatchObject({ step: "compile-runtime", target: "game-config", attempts: 1, model: "deepseek-flash" });
     expect(ledger[0]!.failures).toBeUndefined();
@@ -164,6 +174,18 @@ describe("⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落
     expect(r.data.ok).toBe(true);
     const written = JSON.parse(fs.readFileSync(fileOf(d), "utf8"));
     expect(written.entities[0].at.y).toBeLessThan(290);
+  });
+
+  it("entity-identity-v1 票 03：config 缺 sourceIntent（设计实体没被覆盖）→ 模型错、重采样、不落盘", async () => {
+    const d = tmp();
+    const noRef = structuredClone(GOOD);
+    for (const e of noRef.entities) delete e.sourceIntent;
+    const e = await run(d, noRef).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect((e as CommandError).message).toMatch(/模型错/);
+    expect((e as CommandError).message).toMatch(/没有对应实体/);
+    expect(fs.existsSync(path.join(d, "out"))).toBe(false);
   });
 });
 

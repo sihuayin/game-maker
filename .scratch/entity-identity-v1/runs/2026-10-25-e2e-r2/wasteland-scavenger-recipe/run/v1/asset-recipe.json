@@ -1,0 +1,344 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-recipe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "ground-tile",
+        "role": "可平铺的地面砖",
+        "description": "瓦砾街道的可平铺地面砖，破碎混凝土与沙土堆积，边缘崩裂，表面有颗粒污渍",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "step-block",
+        "role": "台阶",
+        "description": "低矮混凝土平台/台阶，边缘崩裂，可踩踏的废墟残块",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 48,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "rubble-pile",
+        "role": "碎石堆",
+        "description": "断裂路面/瓦砾碎块堆，混凝土与钢筋残骸，可踩踏的斜坡状废墟",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 64,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "玩家角色",
+        "description": "背负重物、略驼背的拾荒者，破旧披风围巾与多层布料，露出皮肤，警惕伏低潜行的紧凑头身比小人",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 40
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "scavenger-hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "sheet": {
+              "columns": 2,
+              "rows": 1
+            },
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "sheet": {
+              "columns": 2,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "enemy-wasteland",
+        "role": "敌人",
+        "description": "游走的废土敌人，沿固定路线巡逻的破败身影，靠近时加速逼近的威胁轮廓",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 36
+        },
+        "required": true,
+        "characterId": "enemy-wasteland",
+        "masterAsset": "enemy-wasteland-master",
+        "animations": [
+          {
+            "name": "run",
+            "frames": 4,
+            "sheet": {
+              "columns": 4,
+              "rows": 1
+            },
+            "fps": 8,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "chest",
+        "role": "宝箱",
+        "description": "废墟中的旧宝箱，可被打开，表面锈蚀斑驳，内含温暖金色微光的宝物",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 28,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "resource-item",
+        "role": "可拾取物",
+        "description": "可拾取的废料与净水，作为计数收集品，物件像素细节清晰可辨",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 14,
+          "h": 14
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "hazard-spikes",
+        "role": "危险地形",
+        "description": "废墟中裸露的钢筋尖刺与碎玻璃，玩家触碰到会造成伤害",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "wasteland-bg",
+        "role": "背景",
+        "description": "废弃城市街道的多级视差背景，废墟街景",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0
+          },
+          {
+            "name": "far",
+            "parallax": 0.3,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          },
+          {
+            "name": "mid",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            }
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "HUD面板",
+        "description": "可拉伸的HUD面板底板，四边等宽对齐，中央平坦可任意重复，无中央图案",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-pip",
+        "role": "HUD图标",
+        "description": "点亮指示图标（pip），固定尺寸、与资源尺寸一致的小图标",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 14,
+          "h": 14
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-hero-master",
+      "role": "玩家角色母版",
+      "description": "背负重物、略驼背的拾荒者角色母版，破旧披风围巾与多层布料，紧凑头身比，伏低潜行姿态",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 32,
+        "h": 40
+      }
+    },
+    {
+      "id": "enemy-wasteland-master",
+      "role": "敌人母版",
+      "description": "游走的废土敌人母版，破败巡逻身影",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "enemy-wasteland",
+      "size": {
+        "w": 32,
+        "h": 36
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

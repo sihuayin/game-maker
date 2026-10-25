@@ -1,0 +1,226 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "低分辨率像素废土寻宝风",
+    "keywords": [
+      "低分辨率像素画",
+      "高细节层级",
+      "横版平台",
+      "废土后启示录",
+      "粗糙材质",
+      "老式发光屏",
+      "暗色调高对比"
+    ],
+    "description": "低分辨率像素画，但细节层级高：用较满的色板与3-4级明暗层次塑造工业/废土质感，材质偏粗糙脏旧，光照以暗环境中的点光源与发光体为主，保留暖色重音与霓虹/屏幕发光。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic"
+  },
+  "composition": {
+    "foreground": "前景为地面与遮挡物，营造深度与视差",
+    "midground": "中景为可交互的残垣、地面残骸与资源/宝箱分布层",
+    "background": "远景为破损天际线与暗色天空，前方有层次化废墟剪影",
+    "characterScale": "角色为中小尺寸，留出移动与跳跃空间",
+    "density": "中高密度，细节堆叠但不拥挤"
+  },
+  "palette": {
+    "primary": [
+      "palette:2",
+      "palette:5",
+      "palette:8"
+    ],
+    "secondary": [
+      "palette:5",
+      "palette:8",
+      "palette:8"
+    ],
+    "accent": [
+      "palette:9",
+      "palette:11",
+      "palette:12"
+    ],
+    "background": [
+      "palette:0",
+      "palette:4",
+      "palette:6"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:0"
+    ],
+    "highlight": [
+      "palette:14",
+      "palette:14",
+      "palette:10"
+    ]
+  },
+  "lighting": {
+    "direction": "侧光为主，辅以屏幕/霓虹自发光",
+    "softness": "硬边阴影",
+    "contrast": "高对比",
+    "mood": "昏暗废土，点光源与发光体突出"
+  },
+  "materials": {
+    "rust_metal": {
+      "appearance": "粗糙锈蚀金属，有明显明暗层次",
+      "texture": "颗粒状锈斑",
+      "color": [
+        "palette:2",
+        "palette:5",
+        "palette:0"
+      ]
+    },
+    "concrete_rubble": {
+      "appearance": "碎裂混凝土与砖石",
+      "texture": "粗糙颗粒",
+      "color": [
+        "palette:4",
+        "palette:6",
+        "palette:0"
+      ]
+    },
+    "screen_glow": {
+      "appearance": "发光的屏幕/仪表",
+      "texture": "自发光像素点",
+      "color": [
+        "palette:9",
+        "palette:11"
+      ]
+    },
+    "wood": {
+      "appearance": "旧木箱与板材",
+      "texture": "木纹脏旧",
+      "color": [
+        "palette:5",
+        "palette:8",
+        "palette:0"
+      ]
+    },
+    "skin": {
+      "appearance": "角色皮肤暖色",
+      "texture": "平滑像素",
+      "color": [
+        "palette:12",
+        "palette:14"
+      ]
+    },
+    "scrap_metal": {
+      "appearance": "明亮金属废料与罐子",
+      "texture": "光滑反光",
+      "color": [
+        "palette:8",
+        "palette:8",
+        "palette:14"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "中小型角色，头身比偏Q但保留肢体活动",
+    "silhouette": "轮廓清晰，背包/护具形成可辨识剪影",
+    "poseLanguage": "横版动态，蹲伏、跳跃、奔跑姿态分明",
+    "clothing": "拾荒者护甲、披风或耐磨衣物",
+    "faceAbstraction": "像素面部简化，靠发型/护目镜辨识"
+  },
+  "environment": {
+    "architecture": "崩坏的混凝土建筑与裸露钢筋",
+    "terrain": "碎石地面、破损道路、金属平台",
+    "props": "宝箱、资源罐、废料堆、发光屏、警示物",
+    "textureDensity": "中高，废墟细节密集"
+  },
+  "shapeLanguage": [
+    "方整块面为主",
+    "破碎的斜切边缘",
+    "锈蚀圆角结构"
+  ],
+  "constraints": [
+    "采用低分辨率像素绘制，但细节层级高，不简化形体的可读性",
+    "所有元素维持横版侧面视角与正交透视",
+    "保持3-4级明暗层次以塑造体积与材质",
+    "必须包含皮肤/暖色重音用于角色",
+    "发光屏与霓虹等自发光元素作为重音保留",
+    "材质偏粗糙脏旧，符合废土氛围",
+    "宝箱、资源、敌人、障碍物都需符合同一暗色调高对比光照体系"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素画但细节层级高",
+      "横版废土后启示录",
+      "粗糙脏旧材质",
+      "暗环境点光源与高对比",
+      "暖色重音与屏幕霓虹发光"
+    ],
+    "camera": {
+      "mode": "2D正交侧面视角",
+      "angle": "平视",
+      "depth": "多层视差"
+    },
+    "composition": {
+      "layer": "多层视差",
+      "characterScale": "中小尺寸角色",
+      "subjectPlacement": "主体居中偏下，留出跳跃空间"
+    },
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {
+      "mood": "昏暗废土",
+      "direction": "侧光加自发光",
+      "contrast": "高对比",
+      "softness": "硬边阴影"
+    },
+    "shapeLanguage": [
+      "方整块面",
+      "破碎斜切边缘",
+      "锈蚀圆角"
+    ],
+    "material": [
+      "粗糙锈蚀金属",
+      "碎裂混凝土",
+      "发光屏幕",
+      "脏旧木纹",
+      "暖色皮肤",
+      "光滑废金属"
+    ],
+    "environment": [
+      "崩坏混凝土建筑",
+      "碎石地面",
+      "废料堆",
+      "宝箱与资源罐",
+      "发光警示屏"
+    ],
+    "characterStyle": [
+      "拾荒者护甲",
+      "护目镜辨识",
+      "横版动态姿态"
+    ],
+    "constraints": [
+      "保持低分辨率像素但细节层级高",
+      "非简化块面，保留3-4级明暗",
+      "废土暗色调高对比光照统一",
+      "暖色与发光重音必须保留"
+    ],
+    "confidence": 0.9
+  }
+}

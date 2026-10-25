@@ -202,10 +202,11 @@ describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）
     format: "visual-design/v1", viewport: { w: 480, h: 270 },
     style: { visualWorldFormat: "visual-world/v1" }, objects,
   });
-  /** 真 config（last-train）+ 可选一个 id=ID 的实体（kind 由参数给；null = 不加 ⇒ 制造「缺失」）。 */
+  /** 真 config（last-train）+ 可选一个 `sourceIntent=ID` 的实体（kind 由参数给；null = 不加 ⇒ 制造「缺失」）。 */
   const configWith = (kind: string | null) => {
     const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
-    if (kind !== null) c.entities.push({ id: ID, kind, at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
+    // ⚠️ entity-identity-v1 票 04：join 键是 `sourceIntent`（不再是 `id`），实体要带它才查得到。
+    if (kind !== null) c.entities.push({ id: ID, sourceIntent: ID, kind, at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
     return c;
   };
   const vcFindings = (r: QAReport) => r.failures.filter((f) => f.judgement === "visual-config-coherence");
@@ -242,5 +243,27 @@ describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）
     const r = await run(ctx);
     expect(vcFindings(r).some((f) => f.severity === "warning")).toBe(true);
     expect(qaVerdict(r)).toBe("pass");
+  });
+
+  it("entity-identity-v1 票 04：1:N 合法 —— 同 sourceIntent 多个实体都 kind 在允许集合 ⇒ 无 error", async () => {
+    const ctx = stage();
+    const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
+    c.entities.push({ id: "e-drone-a", sourceIntent: ID, kind: "hazard", at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
+    c.entities.push({ id: "e-drone-b", sourceIntent: ID, kind: "hazard", at: { x: 760, y: 230 }, asset: "hazard-sweeping-carriage" });
+    write(ctx.runDir, "game-config.json", c);
+    write(ctx.runDir, "visual-design.json", vds([drone]));
+    expect(vcFindings(await run(ctx)).filter((f) => f.severity === "error")).toEqual([]);
+  });
+
+  it("entity-identity-v1 票 04：1:N 串桶 —— 其中一个实体 kind 越界 ⇒ error", async () => {
+    const ctx = stage();
+    const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
+    c.entities.push({ id: "e-drone-a", sourceIntent: ID, kind: "hazard", at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
+    c.entities.push({ id: "e-drone-b", sourceIntent: ID, kind: "decor", at: { x: 760, y: 230 }, asset: "hazard-sweeping-carriage" });
+    write(ctx.runDir, "game-config.json", c);
+    write(ctx.runDir, "visual-design.json", vds([drone]));
+    const f = vcFindings(await run(ctx)).find((x) => x.severity === "error");
+    expect(f?.target).toBe(ID);
+    expect(f?.detail).toMatch(/不在允许集合/);
   });
 });
