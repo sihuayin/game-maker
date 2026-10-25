@@ -1,8 +1,8 @@
 # 06. 管线接线 + 包注册 + compile 逻辑入口
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-25 · resolved)
 Blocked by: 01, 02, 03, 04, 05
 Map: ../map.md
 
@@ -31,3 +31,23 @@ Map: ../map.md
 
 **测试**：接线后 `create` 一条合成 run（构造输入）产出 `run/vN/visual-design.json` + `visual-design/{svg,preview}/`；
 失败路径不占版本号（`abandonRun`）；`pnpm check` 全绿。
+
+## Answer
+
+已落码（2026-10-25）：
+
+- **依赖边**：`pipeline → visual-design`（`check-deps.mjs` ALLOWED + `pipeline/package.json` + `pipeline/tsconfig.json`
+  references）。包注册（package.json/tsconfig/root references/check-deps）票 02/04 已完成，本票只补这一条边。
+- **`compile.ts`**：`compileVisualDesign(input): VisualDesignOutput` —— **纯计算**（`layoutVds → serializeVds →
+  renderVds → validateVds`），validator 判据不过抛 `CommandError("invalid")`（定位到阶段+对象）。**不写盘**
+  （序列化只此一处 = pipeline 的 `jstr`/`writeJson`），返回 `{vds, svg, png}` 交 pipeline 落盘。
+- **接线（`create-game.ts`）**：在 `say("character-dna")` 后、`say("recipe")` 前插一步 —— 读 `design.spec` +
+  `world.spec`，`viewport: DEFAULT_VIEWPORT`（480×270），写 `visual-design.json` + `visual-design/svg/scene.svg` +
+  `visual-design/preview/scene.png`（`encodePNG`）。**不调 `commitRun`**（骑现有单次 rename 原子落 + 失败不占号）；
+  `UNDERSTANDING_STEPS` 5→6（加 "visual-design"）；`UnderstandingPaths` 加 `visualDesign`。
+- **`RUN_ARTIFACT`** 加 `visualDesign` 键（"visual-design.json"）。「文件清单」§8.1 #8 **结构上成立**：每个文件都由
+  `writeJson`/`writeFileSync` 写、失败即抛，故「写成功」=「文件全在」，无需另加 fs 存在检查。
+- **连带修正 `create-game.test.ts` 3 处**：2× run 目录里 `visual-design/` 目录被当文件读（EISDIR）→ 顶层文件比时跳过；
+  1× 理解段进度 5→6 步。
+- **验证**：`compile.test.ts` 1/1（wasteland 真夹具编排产出三者一致）；`create-game.test.ts` 49/49；全仓 **1922/1922**；
+  `check:deps` + `build` + `typecheck` 绿。

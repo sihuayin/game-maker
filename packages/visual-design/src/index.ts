@@ -5,3 +5,4 @@ export * from "./instructions.js";
 export * from "./svg.js";
 export * from "./render.js";
 export * from "./validator.js";
+export * from "./compile.js";

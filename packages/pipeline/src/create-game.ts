@@ -24,11 +24,12 @@ import {
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { DEFAULT_VIEWPORT, compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, inspectPack, nextPackVersion, packAssets, planAssets, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
+import { DEFAULT_VIEWPORT, compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, encodePNG, inspectPack, nextPackVersion, packAssets, planAssets, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
 import { pixelIntegrity, qaRunner, withPixelFindings } from "@game-maker/qa";
+import { compileVisualDesign } from "@game-maker/visual-design";
 import { RUN_ARTIFACT, flattenPlannerOutput, injectCharacterRef, jstr, readRunJson, writeIntentMd, writeJson, writeVisualWorld } from "./artifacts.js";
 import { abandonRun, commitRun, openRun, parseRunVersion, type RunIdentity } from "./run.js";
 import { manifestChecksumOf } from "./publish-gate.js";
@@ -37,7 +38,7 @@ import { manifestChecksumOf } from "./publish-gate.js";
 export type Transport = { baseUrl: string; apiKey: string };
 
 /** 进度的**步**（票 15 的 Q6：步级，不是逐调用）。⚠️ 两段各报自己那几步。 */
-export const UNDERSTANDING_STEPS = ["visual-world", "intent", "design", "character-dna", "recipe"] as const;
+export const UNDERSTANDING_STEPS = ["visual-world", "intent", "design", "character-dna", "visual-design", "recipe"] as const;
 export const BUILD_STEPS = ["pack", "config", "qa"] as const;
 export type CreateStep = (typeof UNDERSTANDING_STEPS)[number] | (typeof BUILD_STEPS)[number];
 export type Progress = { step: CreateStep; index: number; total: number; detail?: string };
@@ -69,7 +70,7 @@ export type UnderstandingInput = {
 /** 第一段写下的那几项（相对 `outRoot`）。 */
 export type UnderstandingPaths = {
   runDir: string; intentMd: string; visualWorld: string; gameIntent: string;
-  gameDesign: string; characterDna: string; recipe: string; recipePlan: string;
+  gameDesign: string; characterDna: string; visualDesign: string; recipe: string; recipePlan: string;
 };
 
 /** 第二段写下的那几项。⚠️ `qaReport` 缺席 = **QA 没跑**（不是「跑了没问题」）。 */
@@ -362,6 +363,17 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     ledger.push(...(dna.ledger ?? []));
     writeJson(path.join(run.tmpDir, RUN_ARTIFACT.characterDna), dna.file);
 
+    say("visual-design");
+    // ⚠️ 旁轨（visual-design-impl-v1 票 06）：确定性布局 → VDS → SVG → PNG，**纯计算**、不闸主链。
+    //   失败抛 `CommandError("invalid")`（validator 判据），但产物只写 staging、骑 `commitRun` 的单次
+    //   rename 原子落、免费继承「失败不占号」。`visual-design/{svg,preview}/` 子树无需注册（骑 rename）。
+    const vdc = compileVisualDesign({ design: design.spec, vws: world.spec, viewport: DEFAULT_VIEWPORT });
+    writeJson(path.join(run.tmpDir, RUN_ARTIFACT.visualDesign), vdc.vds);
+    fs.mkdirSync(path.join(run.tmpDir, "visual-design/svg"), { recursive: true });
+    fs.mkdirSync(path.join(run.tmpDir, "visual-design/preview"), { recursive: true });
+    fs.writeFileSync(path.join(run.tmpDir, "visual-design/svg/scene.svg"), vdc.svg);
+    fs.writeFileSync(path.join(run.tmpDir, "visual-design/preview/scene.png"), encodePNG(vdc.png));
+
     say("recipe");
     // ⚠️ 规划那一步是**文件进出**的（它吃 `designPath` / `visualWorldPath`，写 `<id>/recipes/`）——
     //   所以这里把它指到 staging，而**不是**给它一个不存在的 run 目录（那时 id 还不知道）。
@@ -403,6 +415,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
         gameIntent: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.gameIntent)),
         gameDesign: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.gameDesign)),
         characterDna: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.characterDna)),
+        visualDesign: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.visualDesign)),
         recipe: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.recipe)),
         recipePlan: rel(input.outRoot, path.join(identity.dir, RUN_ARTIFACT.recipePlan)),
       },

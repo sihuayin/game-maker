@@ -25,6 +25,9 @@
     },
     {
       "path": "../qa"
+    },
+    {
+      "path": "../visual-design"
     }
   ]
 }

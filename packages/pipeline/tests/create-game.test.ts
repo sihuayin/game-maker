@@ -485,6 +485,9 @@ describe("§票 55 · 被拒的设计**也**留现场（`design-attempts.json`�
       // ⚠️ `ledger.json` 除外：它的 `ms` 是**时钟读数**，而重采样那一跑本来就该多记一发
       //   （账一个字没动 —— 票 55 的 Q7）
       if (f === "ledger.json") continue;
+      // ⚠️ `visual-design/` 是目录（svg/preview 子树）：逐文件比会 EISDIR。它的确定性由
+      //   render/compile 单测守着（同一指令流 ⇒ 逐字节同），这里只比 run 顶层**文件**。
+      if (f === "visual-design") continue;
       const read = (h: ReturnType<typeof harness>) =>
         fs.readFileSync(path.join(h.outRoot, "wasteland", "run", "v1", f));
       expect(read(clean).equals(read(retried)), f).toBe(true);
@@ -625,6 +628,9 @@ describe("§票 60 · 死在第一步也留现场（`visual-world-attempts.json`
       // ⚠️ `ledger.json` 除外：它的 `ms` 是**时钟读数**，而重采样那一跑本来就该多记一发
       //   （账一个字没动 —— 票 55 的 Q7 照旧）
       if (f === "ledger.json") continue;
+      // ⚠️ `visual-design/` 是目录（svg/preview 子树）：逐文件比会 EISDIR。它的确定性由
+      //   render/compile 单测守着（同一指令流 ⇒ 逐字节同），这里只比 run 顶层**文件**。
+      if (f === "visual-design") continue;
       const read = (h: ReturnType<typeof harness>) =>
         fs.readFileSync(path.join(h.outRoot, "wasteland", "run", "v1", f));
       expect(read(clean).equals(read(retried)), f).toBe(true);
@@ -763,11 +769,11 @@ describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的
 });
 
 describe("§两段各报自己那几步（Q6 的进度）", () => {
-  it("理解段报 5 步、构建段报 3 步（QA 默认在，所以是 pack → config → qa）", async () => {
+  it("理解段报 6 步、构建段报 3 步（QA 默认在，所以是 pack → config → qa）", async () => {
     const h = harness();
     const got: string[] = [];
     await understand(h, { onProgress: (p: { step: string }) => got.push(p.step) });
-    expect(got).toEqual(["visual-world", "intent", "design", "character-dna", "recipe"]);
+    expect(got).toEqual(["visual-world", "intent", "design", "character-dna", "visual-design", "recipe"]);
     const u = await understand(h);
     const got2: string[] = [];
     await build(h, u.run.dir, { onProgress: (p: { step: string }) => got2.push(p.step) });

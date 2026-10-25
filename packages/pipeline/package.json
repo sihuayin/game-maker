@@ -15,7 +15,8 @@
     "@game-maker/assets": "workspace:*",
     "@game-maker/vision": "workspace:*",
     "@game-maker/game-design": "workspace:*",
-    "@game-maker/qa": "workspace:*"
+    "@game-maker/qa": "workspace:*",
+    "@game-maker/visual-design": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

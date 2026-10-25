@@ -28,6 +28,7 @@ const ALLOWED = {
   "@game-maker/pipeline": [
     "@game-maker/contracts", "@game-maker/assets",
     "@game-maker/vision", "@game-maker/game-design", "@game-maker/qa",
+    "@game-maker/visual-design",
   ],
   "@game-maker/cli": ["@game-maker/contracts", "@game-maker/assets", "@game-maker/demo", "@game-maker/pipeline"],
   "@game-maker/mcp": ["@game-maker/contracts", "@game-maker/assets", "@game-maker/demo", "@game-maker/pipeline"],

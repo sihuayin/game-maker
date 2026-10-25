@@ -67,6 +67,7 @@ Effort: visual-design-impl-v1
 - [03 SVG 序列化 + 最小白名单解析器](issues/03-svg-serializer-parser.md)：`svg.ts` 落码——`serializeVds(vds,palette)`（确定性、layer 升序、id 转义、越界 fill 抛错）+ `parseWhitelistedSvg`（**字符级状态机，非 regex**）。白名单 3 元素 + 10 属性；处理转义/重复属性/非法结构；DOCTYPE/script/foreignObject/onclick 全拒。24/24 测试。
 - [04 PNG 渲染 + 与 SVG 的一致性证明](issues/04-png-render-consistency.md)：`instructions.ts` 共享指令流（`deriveRectInstructions`）—— `serializeVds` 与 `renderVds` 都从它派生（**结构性同一**）。`render.ts` 复用 `rasterize`/`encodePNG`（visual-design 因此加 `→ assets` 依赖边）。6/6 测试 + 全仓 1913/1913。
 - [05 VDC 自有确定性 validator](issues/05-vdc-validator.md)：`validator.ts` 落码——`validateVds(vds,palette,svg,png)` 七条判据（语法+白名单**前置门** → 画布 → id 唯一 → fill 界内 → 边界 round-trip → PNG 尺寸），返回 `VdcIssue[]` 定位到「阶段+对象」。「文件清单」归票 06。8/8 测试 + 全仓 1921/1921。
+- [06 管线接线 + compile 入口](issues/06-pipeline-wiring.md)：`compile.ts` 编排四步（纯计算，validator 失败抛 `CommandError("invalid")`）；create-game 在 character-dna 后插 visual-design 步（`UNDERSTANDING_STEPS` 5→6），写 `visual-design.json` + `visual-design/{svg,preview}/`；`pipeline → visual-design` 依赖边；`RUN_ARTIFACT` 加 `visualDesign` 键。全仓 1922/1922。
 
 ## Not yet specified
 

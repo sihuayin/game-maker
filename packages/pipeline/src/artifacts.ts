@@ -23,6 +23,8 @@ export const RUN_ARTIFACT = {
   config: "game-config.json",
   qaReport: "qa-report.json",
   ledger: "ledger.json",
+  /** 视觉设计规格（visual-design-impl-v1 票 06；`visual-design/{svg,preview}/` 子树无需注册，骑 rename）。 */
+  visualDesign: "visual-design.json",
 } as const;
 
 /** ⚠️ 与 `pack` 的 `jstr` **同一条规矩**（两处都在写产物 JSON，格式必须一样）：
