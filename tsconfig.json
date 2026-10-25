@@ -26,6 +26,9 @@
       "path": "packages/qa"
     },
     {
+      "path": "packages/visual-design"
+    },
+    {
       "path": "packages/pipeline"
     }
   ]

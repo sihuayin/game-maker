@@ -11,11 +11,9 @@ Map: ../map.md
 把 `VisualDesignCompiler` 接进现有 `create` 链，并完成新包的注册。**先核对实际配置，再动手**（用户 Q4 点名：
 「避免把注册点误认为只有三处」）。
 
-- **包注册**（核对为准，不只三处假设）：新包 `packages/visual-design/`（`package.json` + `tsconfig.json` +
-  `tsconfig.spec.json`，沿用 base 的 `composite/strict/NodeNext`）。注册点：① root `tsconfig.json` `references`
-  加 `packages/visual-design`；② `scripts/check-deps.mjs` 的 `ALLOWED` 加 `visual-design: ["@game-maker/contracts"]`
-  （**只依赖 contracts，不反依赖 pipeline/QA**，R11）；③ `pnpm-workspace.yaml` 已匹配 `packages/*`（核对无需改）。
-  改完跑 `pnpm check:deps` + `pnpm build` + `pnpm typecheck` 确认不破。
+- **包注册** ✅ **已由票 02 完成**（建包目录 + 自己的 `package.json`/`tsconfig.json`/`tsconfig.spec.json` + root
+  `references` 加 `packages/visual-design` + `check-deps.mjs` `ALLOWED` 加 `visual-design: ["@game-maker/contracts"]`，
+  只依赖 contracts）。本票**不需再注册**，开工时核对 `pnpm check:deps` + `pnpm build` 仍绿即可，然后做**管线接线**（下面）。
 - **逻辑入口（不挂 CLI）**：导出 `VisualDesignCompiler.compile(input): Promise<CommandResult>`（`packages/visual-design/src/index.ts`），
   编排 `layoutVds` → `serializeVds` → `renderVds` → `validateVds`（票 02–05），返回 `CommandResult`
   （`contracts/src/command.ts:13-20`）。CLI 独立命令**不加**（Q7）。

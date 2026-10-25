@@ -1,0 +1,23 @@
+{
+  "name": "@game-maker/visual-design",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Visual Design Compiler：确定性纯结构布局 → VDS → SVG 派生 → PNG 预览 → 自有 validator（旁轨，不闸主链）。",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@game-maker/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.spec.json"
+  }
+}
