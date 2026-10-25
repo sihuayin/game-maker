@@ -51,7 +51,7 @@ Effort: visual-design-impl-v1
      单测与真实 E2E 不互替。
 - **包落点（Q4）**：`packages/contracts/src/visual-design.ts`（VDS schema）；新包 `packages/visual-design/`
   （layout / SVG serialize / PNG render / validator）；`packages/qa/`（交叉验证判据 + finding 装配）。
-  新包只依赖 `@game-maker/contracts`，不反依赖 pipeline/QA（R11）。
+  新包依赖 `@game-maker/contracts` + `@game-maker/assets`（票 04 起复用单一光栅化实现），不反依赖 pipeline/QA。
 - **零新依赖（Q5）**：PNG 用 `raster.ts`+`png.ts` 手写（无 AA、逐字节可重放）；SVG 确定性序列化；二者同源一份
   矩形绘制指令，一致性由 validator 兜底（**不许因同源就省一致性验证**）。
 - **工作树纪律**：本图改仓库代码（执行），但**不动** `fixtures/`、`game-maker.local.json`、不 `reset`/`clean`；
@@ -65,6 +65,8 @@ Effort: visual-design-impl-v1
 - [01 Visual Design Spec 契约 schema 落码](issues/01-vds-contract-schema.md)：`contracts/src/visual-design.ts` 落码（zod/v4）—— `format:"visual-design/v1"` + `viewport`（只验形状，值注入）+ `style`（仅 `visualWorldFormat` 出处指针）+ `objects`（min(1)）；object `{id,role,bounds,layer,fill:PaletteRefShape,sourceIntent?}`；`role` 从 `EntityKind.options` 派生（单一来源，漂移测试盯着）。唯一 superRefine = id 不重复；跨文件悬空引用（palette 越界 / sourceIntent 悬空）归装配/QA 步（票 07）。14/14 测试 + 全仓 typecheck 绿。
 - [02 确定性纯结构布局算法](issues/02-layout-algorithm.md)：Q1 裁定 role = **视觉分组默认**（enemies→hazard · npcs→decor · interactables→pickup · resources→pickup），identity 判据改「设计桶↔kind 家族」（枚举表已写入票 07）。`layout.ts` 落码：分栏+固定地面线、容量检查、layer 0/10+/100/110、fill 语义桶 ref + 空桶回退。包脚手架（package.json/tsconfig）本票先建。11/11 测试 + wasteland 真夹具过 schema。
 - [03 SVG 序列化 + 最小白名单解析器](issues/03-svg-serializer-parser.md)：`svg.ts` 落码——`serializeVds(vds,palette)`（确定性、layer 升序、id 转义、越界 fill 抛错）+ `parseWhitelistedSvg`（**字符级状态机，非 regex**）。白名单 3 元素 + 10 属性；处理转义/重复属性/非法结构；DOCTYPE/script/foreignObject/onclick 全拒。24/24 测试。
+- [04 PNG 渲染 + 与 SVG 的一致性证明](issues/04-png-render-consistency.md)：`instructions.ts` 共享指令流（`deriveRectInstructions`）—— `serializeVds` 与 `renderVds` 都从它派生（**结构性同一**）。`render.ts` 复用 `rasterize`/`encodePNG`（visual-design 因此加 `→ assets` 依赖边）。6/6 测试 + 全仓 1913/1913。
+- [05 VDC 自有确定性 validator](issues/05-vdc-validator.md)：`validator.ts` 落码——`validateVds(vds,palette,svg,png)` 七条判据（语法+白名单**前置门** → 画布 → id 唯一 → fill 界内 → 边界 round-trip → PNG 尺寸），返回 `VdcIssue[]` 定位到「阶段+对象」。「文件清单」归票 06。8/8 测试 + 全仓 1921/1921。
 
 ## Not yet specified
 

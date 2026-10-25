@@ -22,8 +22,9 @@ const ALLOWED = {
   "@game-maker/vision": ["@game-maker/contracts"],
   "@game-maker/game-design": ["@game-maker/contracts"],
   "@game-maker/qa": ["@game-maker/contracts"],
-  // VDC 旁轨（visual-design-impl-v1 票 02）。只依赖 contracts（R11），不反依赖 pipeline/QA。
-  "@game-maker/visual-design": ["@game-maker/contracts"],
+  // VDC 旁轨（visual-design-impl-v1 票 02/04）。只依赖 contracts + assets（复用单一光栅化实现），
+  // 不反依赖 pipeline/QA。
+  "@game-maker/visual-design": ["@game-maker/contracts", "@game-maker/assets"],
   "@game-maker/pipeline": [
     "@game-maker/contracts", "@game-maker/assets",
     "@game-maker/vision", "@game-maker/game-design", "@game-maker/qa",

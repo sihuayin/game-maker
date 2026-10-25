@@ -1,8 +1,8 @@
 # 04. PNG 渲染 + 与 SVG 的一致性证明
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-25 · resolved)
 Blocked by: 01, 03
 Map: ../map.md
 
@@ -21,3 +21,20 @@ Map: ../map.md
 
 **测试**（TDD）：`renderVds` 的确定性（同 VDS 逐字节同 PNG）；尺寸 = 480×270；指令流与 `serializeVds` 用同一份
 中间表示（结构性同一）；rect 覆盖边界与 `bounds` 逐像素一致（无 AA 的二进制覆盖语义）。
+
+## Answer
+
+已落码（2026-10-25）：
+
+- **共享指令流 `instructions.ts`**：`deriveRectInstructions(vds, palette)` → 按 `layer` 升序的 `RectInstruction`
+  （`{id, x, y, width, height, fillRef, color}`）。越界 fill 在此抛一次，SVG/PNG 两条路继承同一错误。
+- **`serializeVds` 重构**（svg.ts）改为消费 `deriveRectInstructions`（行为不变，24 条旧测试仍全过）；
+  **`render.ts`** 新增 `toDrawList` + `renderVds`，也消费同一份指令流。
+- **一致性 = 结构性同一**：SVG（`serializeVds`）与 PNG（`toDrawList`→`rasterize`）**都**从
+  `deriveRectInstructions` 派生 —— 不是「事后比较两个独立实现」，而是同一指令流。测试里用
+  `parseWhitelistedSvg(serializeVds(...))` round-trip 与 `toDrawList(...).ops` 分别对账同一份指令。
+- **依赖边（连带改）**：visual-design 加 `→ @game-maker/assets`（复用 `rasterize`/`encodePNG` 单一实现，
+  不另写一份光栅化）。改了 `check-deps.mjs` ALLOWED + `package.json` + `tsconfig.json` references。⚠️
+  票 06 接线时还要加 `pipeline → visual-design` 那条边（现在没加）。
+- **验证**：`render.test.ts` **6/6**（确定性 · 尺寸 480×270 · 逐像素边界 = bounds · SVG/PNG 同指令流）；
+  visual-design 全套 **41/41**；全仓 **1913/1913**；`check:deps` + `build` 绿。

@@ -12,7 +12,8 @@
 // ⚠️ **约束 #1（用户逐字）**：零依赖**不代表**用脆弱的字符串检查。`parseWhitelistedSvg` 是**字符级
 //   状态机**，正确处理 XML 基本语法、属性解析（单/双引号、实体转义）、**重复属性**、**非法结构**；
 //   不靠正则找 `<rect>` 和 `id`。
-import { paletteColor, type VisualDesignSpec } from "@game-maker/contracts";
+import type { VisualDesignSpec } from "@game-maker/contracts";
+import { deriveRectInstructions } from "./instructions.js";
 
 export const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
@@ -32,14 +33,11 @@ function escapeAttr(s: string): string {
  * @throws fill 越界（`palette:N` 的 N ≥ 色板长度）时抛错 —— 序列化无法从无效 fill 产出合法 SVG。
  */
 export function serializeVds(vds: VisualDesignSpec, palette: readonly string[]): string {
-  const sorted = [...vds.objects].sort((a, b) => a.layer - b.layer);
   const { w, h } = vds.viewport;
   const lines = [`<svg xmlns="${SVG_NAMESPACE}" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`];
-  for (const o of sorted) {
-    const fill = paletteColor(o.fill, palette);
-    if (fill === undefined) throw new Error(`fill "${o.fill}" 越界（色板长度 ${palette.length}）`);
+  for (const r of deriveRectInstructions(vds, palette)) {
     lines.push(
-      `  <g id="${escapeAttr(o.id)}"><rect x="${o.bounds.x}" y="${o.bounds.y}" width="${o.bounds.w}" height="${o.bounds.h}" fill="${fill}"/></g>`,
+      `  <g id="${escapeAttr(r.id)}"><rect x="${r.x}" y="${r.y}" width="${r.width}" height="${r.height}" fill="${r.color}"/></g>`,
     );
   }
   lines.push("</svg>");

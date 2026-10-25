@@ -1,8 +1,8 @@
 # 05. VDC 自有确定性 validator 落码
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (2026-10-25 · resolved)
 Blocked by: 01, 03, 04
 Map: ../map.md
 
@@ -29,3 +29,20 @@ Map: ../map.md
 
 **测试**（TDD）：每一条判据的过/不过用例；安全失败后不继续处理后续检查；失败信息含「阶段 + 对象」；恶意 SVG
 （含外部实体）被前置门拦截。
+
+## Answer
+
+已落码（2026-10-25）：`packages/visual-design/src/validator.ts`，`index.ts` re-export。
+
+- **`validateVds(vds, palette, svg, png): VdcIssue[]`** —— 纯函数、确定性，返回定位到「阶段 + 对象」的 issue 清单
+  （空 = 通过）。判据失败由**调用方**（票 06 compile 入口）转 `CommandError("invalid")`。
+- **顺序 + 前置门**：① SVG 语法+安全白名单（`parseWhitelistedSvg`，失败**只报这一条、不继续处理**）→
+  ② 画布尺寸（SVG viewport = VDS viewport）→ ③ 对象 ID 唯一（SVG 侧；VDS 侧由 schema superRefine 保证）→
+  ④ 对象引用 fill 界内（`paletteColor` 越界 = 悬空引用，定位到对象）→ ⑤ 对象边界 round-trip（共享指令流
+  `deriveRectInstructions` vs parsed rects，fill 全界内才做）→ ⑥ 预览尺寸（PNG = viewport）。
+- **八条判据的落点**：§8.1 的「文件完整性」是**文件系统检查**，不在本纯函数里，归票 06（写盘后查文件全在）；
+  其余七条（语法/白名单/画布/ID/引用/边界/预览）都在本函数。「预览成功生成」的可机判半边 = PNG 尺寸，
+  「文件存在」半边归票 06。
+- **与 `audit*` 并行不复用**（票 06 已定）：这个是「确定性布局产物的自校验」，不是「AI 产 GameConfig 的模型审计」。
+- **验证**：`validator.test.ts` **8/8**（合法通过 · 确定性 · 前置门只报 svg · 画布/id/fill/bounds/png 各一条 ·
+  定位到对象）；visual-design 全套 **49/49**；全仓 **1921/1921**；`build` 绿。

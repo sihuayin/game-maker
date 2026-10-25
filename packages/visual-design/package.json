@@ -11,7 +11,8 @@
     }
   },
   "dependencies": {
-    "@game-maker/contracts": "workspace:*"
+    "@game-maker/contracts": "workspace:*",
+    "@game-maker/assets": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

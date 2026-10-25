@@ -197,6 +197,9 @@ importers:
 
   packages/visual-design:
     dependencies:
+      '@game-maker/assets':
+        specifier: workspace:*
+        version: link:../assets
       '@game-maker/contracts':
         specifier: workspace:*
         version: link:../contracts
