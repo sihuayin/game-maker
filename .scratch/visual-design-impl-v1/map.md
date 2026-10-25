@@ -69,6 +69,7 @@ Effort: visual-design-impl-v1
 - [05 VDC 自有确定性 validator](issues/05-vdc-validator.md)：`validator.ts` 落码——`validateVds(vds,palette,svg,png)` 七条判据（语法+白名单**前置门** → 画布 → id 唯一 → fill 界内 → 边界 round-trip → PNG 尺寸），返回 `VdcIssue[]` 定位到「阶段+对象」。「文件清单」归票 06。8/8 测试 + 全仓 1921/1921。
 - [06 管线接线 + compile 入口](issues/06-pipeline-wiring.md)：`compile.ts` 编排四步（纯计算，validator 失败抛 `CommandError("invalid")`）；create-game 在 character-dna 后插 visual-design 步（`UNDERSTANDING_STEPS` 5→6），写 `visual-design.json` + `visual-design/{svg,preview}/`；`pipeline → visual-design` 依赖边；`RUN_ARTIFACT` 加 `visualDesign` 键。全仓 1922/1922。
 - [07 VDS↔GameConfig 交叉验证](issues/07-qa-crosscheck.md)：第 7 判据 `visual-config-coherence`（`QA_JUDGEMENTS` 6→7 + 标签 + `QaContext.vdsPath`）。identity 用**设计桶↔kind 家族**（精确枚举），串桶/缺失=error、几何漂移=warning。合成器加 key、pipeline 传 vdsPath。夹具修 `CANNED.gameConfig` 补 e-drone。15/15 assemble + 全仓 1926/1926。
+- [08 真实 E2E 验收](issues/08-e2e-acceptance.md)：VDC **端到端真跑通**（修 vision prompt `camera.angle` 数字后全链跑过）—— `visual-design.json` + `svg/scene.svg` + `preview/scene.png` 落盘、第 7 判据抓到**设计→config id 缺口**。但 QA 判 5 条硬失败，**全在 VDC 外**（生图质量 + 设计→config id 不保真），各另立 effort。VDC 验证到位，整链「判据全绿」未达。
 
 ## Not yet specified
 

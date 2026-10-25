@@ -1,0 +1,84 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版废土寻宝游戏",
+  "subgenre": "生存探索",
+  "camera": "横版视角",
+  "targetExperience": "在荒凉的废土中探索、搜刮资源的紧张与惊奇感",
+  "coreLoopSteps": [
+    "在废弃城市中探索移动",
+    "寻找并收集资源和宝箱",
+    "躲避危险和敌人",
+    "达成最终目标"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "探索废弃城市",
+      "寻找资源和宝箱",
+      "躲避危险和敌人",
+      "达成最终目标"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒凉、危险的废土氛围"
+  },
+  "mechanics": [
+    {
+      "id": "move-sideways",
+      "name": "横版移动"
+    },
+    {
+      "id": "jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "collect-resource",
+      "name": "收集资源"
+    },
+    {
+      "id": "open-chest",
+      "name": "打开宝箱"
+    },
+    {
+      "id": "avoid-danger-enemy",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "chest",
+      "type": "interactable",
+      "role": "可打开的宝箱，内含奖励"
+    },
+    {
+      "id": "resource-pickup",
+      "type": "resource",
+      "role": "可拾取可消耗的资源"
+    },
+    {
+      "id": "enemy-wasteland",
+      "type": "enemy",
+      "role": "需要躲避的敌人"
+    },
+    {
+      "id": "danger-hazard",
+      "type": "interactable",
+      "role": "需要躲避的危险"
+    }
+  ],
+  "winConditions": [
+    "达成最终目标"
+  ],
+  "loseConditions": [],
+  "ambiguity": [
+    "winConditions：最终目标的具体内容需求没提",
+    "loseConditions：失败条件（如死亡、血量）需求没提",
+    "progression：是否有关卡或数值成长需求没提",
+    "challenge：难度来源的具体设计需求没提",
+    "player：拾荒者的具体能力（如血量、攻击手段）需求没提",
+    "entities：危险的具体形式（陷阱、环境或敌人）需求没提",
+    "title：游戏未起名"
+  ]
+}

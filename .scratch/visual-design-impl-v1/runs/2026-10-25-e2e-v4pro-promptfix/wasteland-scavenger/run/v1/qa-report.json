@@ -1,0 +1,111 @@
+{
+  "format": "qa-report/v1",
+  "subject": {
+    "packId": "wasteland-scavenger",
+    "packVersion": 1,
+    "manifestChecksum": "sha256:24a0013c103e12168eea874c678f130d6b56c7444c4528e97b0ee736429dae3d"
+  },
+  "checked": [
+    "palette-binding",
+    "constructive-constraint",
+    "layer-coverage",
+    "reference-resolution",
+    "reachability",
+    "intent-coverage",
+    "visual-config-coherence"
+  ],
+  "failures": [
+    {
+      "target": "enemy-wasteland.walk",
+      "detail": "源图 → 目标长宽比差 -34.6%（|ΔAR| ≥ 25%） —— 交付图被拉伸 / 压扁，不是设计能解释的差异；阈值来源：票 03 裁定（7 包 / 47 条样本，正常帧间 ≤ 9.1%）",
+      "severity": "error",
+      "judgement": "constructive-constraint"
+    },
+    {
+      "target": "enemy-wasteland",
+      "detail": "VDS 里 \"enemy-wasteland\"（enemies 桶）在 GameConfig 里**不存在** —— 视觉设计画了、配置没做",
+      "severity": "error",
+      "judgement": "visual-config-coherence"
+    },
+    {
+      "target": "chest",
+      "detail": "VDS 里 \"chest\"（interactables 桶）在 GameConfig 里**不存在** —— 视觉设计画了、配置没做",
+      "severity": "error",
+      "judgement": "visual-config-coherence"
+    },
+    {
+      "target": "danger-hazard",
+      "detail": "VDS 里 \"danger-hazard\"（interactables 桶）在 GameConfig 里**不存在** —— 视觉设计画了、配置没做",
+      "severity": "error",
+      "judgement": "visual-config-coherence"
+    },
+    {
+      "target": "resource-pickup",
+      "detail": "VDS 里 \"resource-pickup\"（resources 桶）在 GameConfig 里**不存在** —— 视觉设计画了、配置没做",
+      "severity": "error",
+      "judgement": "visual-config-coherence"
+    }
+  ],
+  "observations": [
+    {
+      "source": "inspect",
+      "outcome": "ok",
+      "lines": [
+        "wasteland-scavenger v1 · generated",
+        "9 个资源 · 4 张图集",
+        "  scavenger · animation · 48×64 · generated/quantized · 14 帧 · 动画 idle(4) run(6) jump(4) · 用色 15/16",
+        "  enemy-wasteland · animation · 56×64 · generated/quantized · 6 帧 · 动画 walk(6) · 用色 13/16",
+        "  chest · sprite · 32×24 · generated/quantized · 1 帧 · 用色 10/16",
+        "  danger-hazard · sprite · 32×32 · generated/quantized · 1 帧 · 用色 13/16",
+        "  resource-pickup · sprite · 16×16 · generated/quantized · 1 帧 · 用色 14/16",
+        "  ground-tile · sprite · 64×32 · generated/quantized · 1 帧 · 用色 15/16",
+        "  wasteland-bg · background · 640×360 · generated/quantized · 4 帧 · 用色 16/16",
+        "  hud-panel · ui · 64×32 · generated/exact · 1 帧 · 用色 2/16",
+        "  hud-pip · ui · 16×16 · generated/exact · 1 帧 · 用色 6/16",
+        "源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：",
+        "  scavenger.idle                 源图 1242×464 (2.677) → 目标 192×64 (3.000) · 长宽比差 +12.1%",
+        "  scavenger.run                  源图 1288×328 (3.927) → 目标 288×64 (4.500) · 长宽比差 +14.6%",
+        "  scavenger.jump                 源图 1267×468 (2.707) → 目标 192×64 (3.000) · 长宽比差 +10.8%",
+        "  enemy-wasteland.walk           源图 1341×167 (8.030) → 目标 336×64 (5.250) · 长宽比差 -34.6%",
+        "  chest                          源图 1200×896 (1.339) → 目标 32×24 (1.333) · 长宽比差 -0.4%",
+        "  danger-hazard                  源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+        "  resource-pickup                源图 1024×1024 (1.000) → 目标 16×16 (1.000) · 长宽比差 0.0%",
+        "  ground-tile                    源图 1376×768 (1.792) → 目标 64×32 (2.000) · 长宽比差 +11.6%",
+        "  wasteland-bg.sky               源图 1376×768 (1.792) → 目标 640×360 (1.778) · 长宽比差 -0.8%",
+        "  wasteland-bg.far               源图 1376×768 (1.792) → 目标 640×360 (1.778) · 长宽比差 -0.8%",
+        "  wasteland-bg.mid               源图 1376×768 (1.792) → 目标 640×360 (1.778) · 长宽比差 -0.8%",
+        "  wasteland-bg.near              源图 1376×768 (1.792) → 目标 640×360 (1.778) · 长宽比差 -0.8%",
+        "  scavenger-master               源图 896×1200 (0.747) → 目标 48×64 (0.750) · 长宽比差 +0.4%",
+        "  enemy-wasteland-master         源图 928×1152 (0.806) → 目标 56×64 (0.875) · 长宽比差 +8.6%",
+        "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+        "  wasteland-bg.sky         640×360  100.0%",
+        "  wasteland-bg.far         640×360  58.0%",
+        "  wasteland-bg.mid         640×360  45.4%",
+        "  wasteland-bg.near        640×360  45.1%",
+        "色板 16 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+        "  #1b2027 · 9/9 个资源用到 · 占全部不透明像素 26.3%",
+        "  #2a3442 · 8/9 个资源用到 · 占全部不透明像素 15.4%",
+        "  #4a3222 · 8/9 个资源用到 · 占全部不透明像素 7.3%",
+        "  #2e3b4e · 7/9 个资源用到 · 占全部不透明像素 5.9%",
+        "  #3b4a5c · 7/9 个资源用到 · 占全部不透明像素 12.1%",
+        "  #6b4a33 · 7/9 个资源用到 · 占全部不透明像素 3.6%",
+        "  #565b60 · 8/9 个资源用到 · 占全部不透明像素 17.5%",
+        "  #4a6076 · 3/9 个资源用到 · 占全部不透明像素 1.6%",
+        "  #8a6244 · 7/9 个资源用到 · 占全部不透明像素 2.9%",
+        "  #7a7f84 · 6/9 个资源用到 · 占全部不透明像素 3.8%",
+        "  #c98b5e · 8/9 个资源用到 · 占全部不透明像素 0.8%",
+        "  #9aa0a5 · 5/9 个资源用到 · 占全部不透明像素 2.2%",
+        "  #d9a441 · 6/9 个资源用到 · 占全部不透明像素 0.1%",
+        "  #e8c39e · 6/9 个资源用到 · 占全部不透明像素 0.5%",
+        "  #f2d98b · 5/9 个资源用到 · 占全部不透明像素 0.0%",
+        "  #e6e2d6 · 4/9 个资源用到 · 占全部不透明像素 0.0%",
+        "色板外像素 0 个 · 占全部不透明像素 0.00%（**观察，不是判据** —— 对不上可以是设计）"
+      ]
+    },
+    {
+      "source": "review",
+      "outcome": "unavailable",
+      "reason": "这次创建链没有跑 `reviewPack`（它是**人工主动调用的诊断命令** —— `game-maker review <run 目录>` 那一支，**不由创建链自动调用**；而执行它还会产生**一次视觉调用**的成本） —— 没有可原样搬来的观察，而**空不等于「比过了、没差异」**"
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "format": "asset-plan/v1",
+  "recipeId": "wasteland-scavenger",
+  "recipeVersion": 1,
+  "plannerVersion": "1",
+  "capabilities": {
+    "routes": {
+      "image": true,
+      "drawlist": true,
+      "import": false
+    },
+    "runtime": {
+      "profile": "platformer",
+      "version": "1",
+      "capabilities": [
+        "input:keyboard",
+        "camera:side-scroll",
+        "camera:parallax",
+        "collision:aabb",
+        "motion:cyclic",
+        "objective:collect-then-reach",
+        "hud:screen-space",
+        "coord:delivery-pixels"
+      ]
+    }
+  },
+  "inputs": {
+    "styleRef": "stylespec.json",
+    "referenceImage": "reference.png"
+  },
+  "assets": [
+    {
+      "id": "scavenger",
+      "route": "image",
+      "reason": {
+        "code": "image:character",
+        "text": "角色资源（characterId）"
+      },
+      "inputs": {
+        "masterAsset": "scavenger-master"
+      },
+      "candidate": "image",
+      "participated": false
+    },
+    {
+      "id": "enemy-wasteland",
+      "route": "image",
+      "reason": {
+        "code": "image:character",
+        "text": "角色资源（characterId）"
+      },
+      "inputs": {
+        "masterAsset": "enemy-wasteland-master"
+      },
+      "candidate": "image",
+      "participated": false
+    },
+    {
+      "id": "chest",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "danger-hazard",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "resource-pickup",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "ground-tile",
+      "route": "image",
+      "reason": {
+        "code": "image:candidate",
+        "text": "无硬信号时由模型候选平局选择 image"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": true
+    },
+    {
+      "id": "wasteland-bg",
+      "route": "image",
+      "reason": {
+        "code": "image:background",
+        "text": "背景资源（kind: background）"
+      },
+      "inputs": {},
+      "candidate": "image",
+      "participated": false
+    },
+    {
+      "id": "hud-panel",
+      "route": "drawlist",
+      "reason": {
+        "code": "drawlist:ui-ninepatch",
+        "text": "九宫格 UI（kind: ui + ninePatch）"
+      },
+      "inputs": {},
+      "candidate": "drawlist",
+      "participated": false
+    },
+    {
+      "id": "hud-pip",
+      "route": "drawlist",
+      "reason": {
+        "code": "drawlist:candidate",
+        "text": "无硬信号时由模型候选平局选择 drawlist"
+      },
+      "inputs": {},
+      "candidate": "drawlist",
+      "participated": true
+    }
+  ]
+}

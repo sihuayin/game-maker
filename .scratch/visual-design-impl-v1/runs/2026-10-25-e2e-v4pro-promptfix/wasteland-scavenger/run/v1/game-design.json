@@ -1,0 +1,122 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土拾荒者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的废墟中向左向右移动、跳跃跨越残骸",
+    "沿途搜索并收集散落的资源与宝箱",
+    "躲避游荡的敌人与危险机关，避免受伤",
+    "带着收集到的资源抵达关卡终点，达成目标"
+  ],
+  "player": {
+    "id": "scavenger",
+    "role": "背披风、背行囊的拾荒者，控制其移动与跳跃",
+    "abilities": [
+      "左右移动",
+      "跳跃跨越残骸与沟壑",
+      "受击后损耗生命"
+    ],
+    "goals": [
+      "探索废弃城市各区域",
+      "收集资源与打开宝箱",
+      "躲避敌人与危险机关",
+      "抵达关卡终点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "enemy-wasteland",
+      "behavior": "在中景活动层左右巡逻，靠近玩家时加速逼近",
+      "threat": "接触玩家造成生命损耗，迫使玩家绕行或跳跃躲避"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "chest",
+      "type": "宝箱",
+      "behavior": "玩家靠近并触发后打开，释放内含资源奖励"
+    },
+    {
+      "id": "danger-hazard",
+      "type": "危险机关",
+      "behavior": "固定在场景中的危险物，接触即对玩家造成伤害"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-pickup",
+      "purpose": "拾取后可在关卡内累积，作为达成收集目标的计数与奖励"
+    }
+  ],
+  "world": {
+    "theme": "荒凉、危险的后末日废土",
+    "setting": "倒塌的混凝土建筑、断裂墙体、歪斜钢筋、残破塔吊与废弃车辆残骸散布于碎石荒地之上",
+    "structure": "前景为近处瓦砾、残骸与埋藏宝箱，制造遮挡与纵深感；中景为玩家活动层，拾荒者、敌人、资源与宝箱排布于此，主体居中偏下；远景为多层视差城市废墟剪影，破败建筑、倒塌塔吊与远方烟尘构成背景"
+  },
+  "levels": [
+    {
+      "id": "level-1",
+      "purpose": "引导玩家掌握移动、跳跃、收集与躲避的基础循环",
+      "layout": "从左到右：起点位于废墟街道入口，穿过破碎路面与低矮残骸，途中拾取资源并绕过第一处危险机关，随后遇到巡逻敌人，绕行或跳跃越过，最后在一处倒塌墙体后找到宝箱，抵达终点",
+      "entities": [
+        "scavenger",
+        "chest",
+        "resource-pickup",
+        "enemy-wasteland",
+        "danger-hazard"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "关卡线性推进",
+    "description": "完成当前关卡、收集足够资源并抵达终点后，进入更复杂、敌人与危险更密集的后续区域"
+  },
+  "mechanics": [
+    {
+      "id": "move-sideways",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-resource",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "open-chest",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "avoid-danger-enemy",
+      "mechanic": "avoid-danger"
+    },
+    {
+      "id": "danger-hazard-contact",
+      "mechanic": "hazard-contact"
+    }
+  ],
+  "winConditions": [
+    "抵达关卡终点并达成资源收集目标"
+  ],
+  "loseConditions": [
+    "生命值耗尽"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

@@ -42,7 +42,7 @@ export const TOOL_NAME = "emit_visual_world";
 export const TOOL_DESCRIPTION = `输出一份 VisualWorldSpec —— 它描述这个世界**长什么样、按什么规则长**，
 不是对这张图的描述，更不是复述画面内容。
 
-⚠️ 有三件事 schema 表达不出来，必须由这里说清楚：
+⚠️ 有四件事 schema 表达不出来，必须由这里说清楚：
 
 1. \`style.camera\` / \`style.composition\` / \`style.lighting\` 是**开放对象**（键名与值都随意），
    **不是数组**。它们是"原话"的载体，例如 \`{"mode":"2D正交侧面视角","angle":"平视"}\`。
@@ -61,6 +61,11 @@ export const TOOL_DESCRIPTION = `输出一份 VisualWorldSpec —— 它描述�
       —— 顶层那一格**永远是上面那个六桶对象**，它一个色值都不装。
    六桶里的 \`palette:N\` 与 \`materials.*.color\` 里的 \`palette:N\`，**都指向 \`style.palette\`**：
    下标从 0 起、**严格小于**色板长度。色板里**不许有重复色**，色值一律**小写** \`#rrggbb\`。
+
+4. 顶层还有一个**结构化**的 \`camera\`（**不是** \`style.camera\`，别弄混）：\`mode\` 是封闭枚举
+   （side / top-down / isometric / first-person / other）；\`angle\` 与 \`elevation\` 是**数字**、可省；
+   \`projection\` 与 \`perspective\` 是**字符串**、可省。第 1 条里 \`"angle":"平视"\` 是 **\`style.camera\`**
+   的原话（字符串）——**不要**照它把字符串填进顶层的 \`camera.angle\`（那个是数字）。不确定就**省掉**、别填字符串。
 
 只调这个工具，不要解释。`;
 

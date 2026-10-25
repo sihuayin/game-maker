@@ -1,0 +1,225 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "keywords": [
+      "低分辨率像素画",
+      "横版平台跳跃",
+      "废土远景",
+      "扁平色块分层",
+      "有限色板明暗分级",
+      "硬边像素描边"
+    ],
+    "description": "低分辨率像素画风格，但细节层级控制在可读范围内：色块化明暗、硬边像素轮廓、无抗锯齿无渐变抖动。题材为废弃城市/车站断面式场景，建筑立面以大面积纯色块加少量窗洞与标志牌构成，远景色阶压暗，前景地面以重复像素纹理表现。光照为平直的均匀侧光，靠明度分级而非渐变塑形，整体偏黄昏/暮色的冷暗基调加暖黄高光。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "正交平行投影，无透视收敛",
+    "angle": 0,
+    "elevation": 0,
+    "perspective": "2D 横版侧视"
+  },
+  "composition": {
+    "foreground": "横贯底部的带状地面，含重复像素纹理的通道线与最下方暗色条带，作为遮挡与移动层",
+    "midground": "横贯画面的建筑立面与墙面装饰（窗、标牌、壁灯的矩形色块），作为角色活动的主平面",
+    "background": "低明度天空色带 + 建筑剪影/屋顶三角轮廓，压暗且几乎无内部细节，形成视差最远层",
+    "objectScale": "门窗与标牌等立面元素相对角色 1.5–3 倍大小，可附着于墙面",
+    "characterScale": "角色高约占画面高度的 1/5，位于中景平面，处于画面水平中偏右",
+    "density": "中低密度，大片留白式纯色墙面，靠少量矩形装饰元素建立节奏"
+  },
+  "palette": {
+    "primary": [
+      "palette:2",
+      "palette:5",
+      "palette:5"
+    ],
+    "secondary": [
+      "palette:9",
+      "palette:9",
+      "palette:5",
+      "palette:8"
+    ],
+    "accent": [
+      "palette:12",
+      "palette:14",
+      "palette:10",
+      "palette:15"
+    ],
+    "background": [
+      "palette:1",
+      "palette:4",
+      "palette:0"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:1",
+      "palette:3"
+    ],
+    "highlight": [
+      "palette:15",
+      "palette:15",
+      "palette:11",
+      "palette:14"
+    ]
+  },
+  "lighting": {
+    "direction": "正面平光，略带右上方向感，无投影方向变化",
+    "softness": "硬边，无渐变、无柔化边缘",
+    "contrast": "中等对比，靠 2–3 级明度差区分体块",
+    "mood": "黄昏暮色的冷暗环境中点缀暖黄人工光源，荒凉但有暖意"
+  },
+  "materials": {
+    "wall_stucco": {
+      "appearance": "大面积哑光墙面，纯色填充",
+      "texture": "无纹理，仅边缘一条明度差色带",
+      "color": [
+        "palette:2",
+        "palette:5"
+      ]
+    },
+    "dark_metal": {
+      "appearance": "暗蓝近黑的金属与遮蔽物，哑光带微弱高光",
+      "texture": "硬边像素，单像素亮边",
+      "color": [
+        "palette:0",
+        "palette:1"
+      ]
+    },
+    "concrete_ground": {
+      "appearance": "中性灰带状地面，中明度",
+      "texture": "重复方形像素节奏，分隔线用更暗色",
+      "color": [
+        "palette:9",
+        "palette:9"
+      ]
+    },
+    "emissive_lamp": {
+      "appearance": "暖黄色光源与标牌，自身明亮不透明",
+      "texture": "纯色块，外缘一圈更亮像素",
+      "color": [
+        "palette:12",
+        "palette:14",
+        "palette:10"
+      ]
+    },
+    "wood_furniture": {
+      "appearance": "暖棕色木质长条体块",
+      "texture": "平面色块，仅顶部一条亮边",
+      "color": [
+        "palette:5",
+        "palette:8"
+      ]
+    },
+    "skin": {
+      "appearance": "角色面部暖色皮肤",
+      "texture": "2×2 像素面部块",
+      "color": [
+        "palette:15"
+      ]
+    }
+  },
+  "character": {
+    "proportions": "Q 版短身，头身比约 1:2.5，方块头配小方身",
+    "silhouette": "方形剪影，头顶小方帽形成辨识轮廓，四肢为粗短矩形",
+    "poseLanguage": "直立站立，正面朝向镜头，四肢简短，动作靠整体位移而非关节",
+    "clothing": "深色制服上衣配亮色腰带扣，短腿深色裤，帽顶有亮色徽记",
+    "faceAbstraction": "极简抽象：两个方形眼白加小方形瞳孔，无鼻无嘴"
+  },
+  "environment": {
+    "architecture": "废弃车站/城市断面：平直墙面、三角屋顶剪影、矩形窗洞与悬挂式标牌",
+    "terrain": "平坦带状站台地面与下方深色轨道带，垂直分层清晰",
+    "props": "长凳、壁灯、广告窗、悬挂标牌、小瓦数路灯，均为矩形与小三角构成的体块",
+    "textureDensity": "低密度，几乎无噪点，靠重复等距像素块表现地面节奏"
+  },
+  "shapeLanguage": [
+    "矩形为基本单元，边长对齐像素网格",
+    "三角形仅用于屋顶与山形图案剪影",
+    "圆形仅限太阳/灯头等 4–6 像素半径的像素圆",
+    "轮廓硬边 1 像素，无羽化",
+    "体块之间留纯色间距，不叠花纹"
+  ],
+  "constraints": [
+    "所有边缘必须硬边像素，禁止抗锯齿、渐变、模糊与噪点",
+    "每个物体最多使用 3 级明度（本体 / 阴影 / 高光），不得增加更多分割",
+    "角色与可交互道具必须用比背景更高的明度对比与暖色重音，保证在暗色立面上可读",
+    "发光元素（灯、标牌、宝箱图标）必须使用色板中的暖黄高亮色，不得用灰阶代替",
+    "禁止使用非色板颜色，所有新资源需从 style.palette 内取色",
+    "前景地面层必须比中景立面更暗，以维持视差与纵深感",
+    "建筑立面保持大面积纯色，装饰元素只以矩形/三角形体块附着，不做花纹堆叠"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "低分辨率像素画",
+      "横版废土场景",
+      "扁平色块分层",
+      "暮色冷调加暖黄光源",
+      "硬边无抗锯齿"
+    ],
+    "camera": {
+      "mode": "2D正交侧面视角",
+      "angle": "平视",
+      "perspective": "无透视"
+    },
+    "composition": {
+      "layout": "远景天空带 / 中景建筑立面 / 前景地面带三层视差",
+      "characterScale": "角色高约画面 1/5"
+    },
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {
+      "direction": "正面平光略带右上",
+      "softness": "硬边",
+      "mood": "黄昏暮色",
+      "contrast": "中等"
+    },
+    "shapeLanguage": [
+      "矩形块面",
+      "三角剪影",
+      "像素圆"
+    ],
+    "material": [
+      "哑光墙面",
+      "暗色金属",
+      "中性混凝土地面",
+      "暖黄自发光",
+      "暖棕木材"
+    ],
+    "environment": [
+      "废弃车站与城市立面",
+      "平坦站台与轨道带",
+      "矩形窗洞与悬挂标牌"
+    ],
+    "characterStyle": [
+      "Q 版方块头",
+      "极简方眼",
+      "深色制服配亮色徽记"
+    ],
+    "constraints": [
+      "硬边像素，禁抗锯齿与渐变",
+      "每物体最多三级明度",
+      "发光件须用暖黄高亮色"
+    ],
+    "confidence": 0.86
+  }
+}

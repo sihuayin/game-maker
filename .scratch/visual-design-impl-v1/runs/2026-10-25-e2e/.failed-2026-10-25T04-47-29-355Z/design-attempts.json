@@ -1,0 +1,172 @@
+{
+  "format": "run-design-attempts/v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "empty-input",
+      "detail": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。",
+      "raw": {}
+    },
+    {
+      "attempt": 2,
+      "outcome": "schema",
+      "detail": "工具入参不过契约：player.goals: Invalid input: expected array, received undefined",
+      "raw": {
+        "format": "game-design/v1",
+        "game": {
+          "title": "荒城拾荒者",
+          "genre": "platformer",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "coreLoopSteps": [
+          "在废弃城市的站台平面上横向移动与跳跃，向城市深处推进",
+          "沿途拾取散落的废土资源，补充体力并累计寻宝进度",
+          "发现嵌入墙面的宝箱，靠近并打开它取走宝物",
+          "察觉巡逻敌人的行动节奏，跳过或从下方躲避其威胁",
+          "继续向更深处的废墟前进，寻找下一处宝箱"
+        ],
+        "player": {
+          "id": "hero-scavenger",
+          "role": "一名方块短身的废土拾荒者，头顶小方帽作为辨识轮廓，背着行囊在废弃城市中寻宝求生",
+          "abilities": [
+            "左右横向跑动，速度恒定、可在任意时刻反向",
+            "单次跳跃，起跳高度足以越过矮墙与敌人的巡逻路线",
+            "接触拾取物即自动收进背包",
+            "贴近宝箱时按键打开，取出其中的宝物",
+            "被危险物或敌人接触会损失体力"
+          ]
+        },
+        "enemies": [
+          {
+            "id": "wasteland-enemy",
+            "behavior": "在站台地面的一段固定区间内左右往复巡逻，走到端点停顿后转身，不做追击",
+            "threat": "接触即造成体力损失并把玩家弹开，玩家必须靠跳跃越过或等它转身后通过"
+          },
+          {
+            "id": "rail-stalker",
+            "behavior": "从下方暗色轨道带升起，沿固定高度水平漂浮一段后沉回轨道，周期性出现",
+            "threat": "出现在玩家必须经过的中段通道上，形成限时通过的威胁，撞上即掉体力"
+          }
+        ],
+        "npcs": [
+          {
+            "id": "scavenger-player",
+            "role": "玩家控制的废土拾荒者，本作主角的身份登记条目",
+            "interaction": "由玩家直接操控移动、跳跃、拾取与开箱"
+          }
+        ],
+        "interactables": [
+          {
+            "id": "treasure-chest",
+            "type": "宝箱",
+            "behavior": "静止嵌在站台上或墙边，玩家贴近按键打开后吐出宝物并变为空箱，只可开启一次"
+          },
+          {
+            "id": "broken-bench",
+            "type": "可站立障碍",
+            "behavior": "长凳色块横在通道上，可跳上去站立，也可从下方钻过"
+          }
+        ],
+        "resources": [
+          {
+            "id": "wasteland-resource",
+            "purpose": "散落在通道上的废土废料净水，拾取后累计寻宝进度并在体力受损时回复一格体力"
+          }
+        ],
+        "world": {
+          "theme": "低分辨率像素画风的荒凉废土，冷暗黄昏基调配暖黄高光，硬边像素轮廓、无渐变",
+          "setting": "废弃车站与城市断面的横版场景：平直墙面、三角屋顶剪影、矩形窗洞与悬挂标牌，下方是站台带与深色轨道带",
+          "structure": "纵向四层：最底层为横贯画面的暗色轨道条带，兼作遮挡与威胁来源；其上是横贯底部的带状站台地面，用重复等距像素块表现通道节奏，为移动层；再上是横贯画面的建筑立面与墙面装饰（窗、标牌、壁灯矩形色块），为角色活动的主平面；最上为低明度天空色带与三角屋顶剪影，压暗且无内部细节，作为视差最远层。立面元素为角色的 1.5–3 倍大小，中低密度、大片留白纯色墙面靠少量矩形装饰建立节奏"
+        },
+        "levels": [
+          {
+            "id": "level-01-station-platform",
+            "purpose": "教学段：让玩家熟悉横版移动、跳跃、拾取资源与打开第一只宝箱，并第一次遭遇巡逻敌人",
+            "layout": "从画面最左侧站台起点出生，向右平坦推进；中段有一张可跳上的破长凳，长凳上方悬挂标牌形成视觉遮挡；长凳之后是第一只巡逻敌人，需跳过或等它转身；敌人之后散落两枚资源，再接第一只宝箱；最右侧是一段下探到轨道带的矮台，通过后进入下一关",
+            "entities": [
+              "hero-scavenger",
+              "scavenger-player",
+              "wasteland-resource",
+              "wasteland-enemy",
+              "treasure-chest",
+              "broken-bench"
+            ]
+          },
+          {
+            "id": "level-02-collapsed-concourse",
+            "purpose": "加压段：在轨道带威胁下穿越更长的通道，并打开第二只宝箱取走更深处的宝物",
+            "layout": "从左端站台入口开始，向右穿过一段被轨道带切开的缺口，需在轨道怪物升起前跳过；缺口之后墙面出现广告窗与壁灯装饰，节奏变密；中段两名敌人交替巡逻形成通过窗口；再向右是第二只宝箱，位于站台尽头墙边；最后一段向下的斜坡式台阶通往更深处的城市",
+            "entities": [
+              "hero-scavenger",
+              "scavenger-player",
+              "wasteland-resource",
+              "wasteland-enemy",
+              "rail-stalker",
+              "treasure-chest"
+            ]
+          }
+        ],
+        "progression": {
+          "model": "linear-levels",
+          "description": "从左到右依次通过两段废弃城市区域，宝箱数量与资源累计构成寻宝进度；每开启一只宝箱即解锁更深一层的城市区域，难度靠敌人密度、巡逻交替与轨道威胁的加入提升，玩家能力不成长"
+        },
+        "mechanics": [
+          {
+            "id": "side-scroll-move",
+            "mechanic": "run"
+          },
+          {
+            "id": "jump",
+            "mechanic": "jump"
+          },
+          {
+            "id": "collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "open-chest",
+            "mechanic": "open-chest"
+          },
+          {
+            "id": "evade-danger",
+            "mechanic": "avoid-danger"
+          },
+          {
+            "id": "evade-enemy",
+            "mechanic": "hazard-contact"
+          }
+        ],
+        "winConditions": [
+          "打开废弃城市深处最后一关的全部宝箱并抵达区域尽头的出口"
+        ],
+        "loseConditions": [
+          "体力被危险物或敌人接触耗尽归零"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "camera:parallax",
+          "collision:aabb",
+          "motion:cyclic",
+          "objective:collect-then-reach",
+          "hud:screen-space",
+          "coord:delivery-pixels"
+        ],
+        "difficulty": {
+          "model": "enemy-density-and-timing",
+          "description": "难度来自敌人的巡逻密度与轨道怪物的出现节拍：第二关把单个敌人换成两名交替巡逻，并把必经缺口压在轨道怪物升起的时间窗内，迫使玩家用跳跃和等待时机通过，而非硬闯"
+        }
+      }
+    },
+    {
+      "attempt": 3,
+      "outcome": "empty-input",
+      "detail": "工具被调了，但入参是空的或用不了（拿到 object）—— ⚠️ 票 27 第 1 发实测过这一档：上游烧了 1135 个输出 token，入参没了。**这不是模型不听话、也不是坏 JSON**，是数据丢了。",
+      "raw": {}
+    }
+  ]
+}

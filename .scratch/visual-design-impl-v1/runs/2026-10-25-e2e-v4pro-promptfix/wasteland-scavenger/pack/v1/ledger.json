@@ -1,0 +1,177 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger",
+  "packVersion": 1,
+  "createdAt": "2026-10-25T05:25:14.000Z",
+  "run": {
+    "wallClockMs": 1115839,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "image": {
+        "calls": 12,
+        "attempts": 13
+      },
+      "drawlist": {
+        "calls": 2,
+        "attempts": 5
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "scavenger-master",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 70521,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "enemy-wasteland-master",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 77788,
+      "requestedSize": "aspect 4:5",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 183506,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "enemy-wasteland",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 38813,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "chest",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 66303,
+      "requestedSize": "aspect 4:3",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-pip",
+      "upstream": "messages",
+      "ms": 10447,
+      "attempts": 2,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 69,
+        "outputTokens": 613
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 27090,
+      "attempts": 3,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 49,
+        "outputTokens": 911
+      }
+    },
+    {
+      "step": "image",
+      "target": "danger-hazard",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 77338,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "resource-pickup",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 21965,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ground-tile",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 150181,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 29067,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 86954,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 99243,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 31852,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 72913,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger",
+      "attempts": 2,
+      "upstream": "gemini",
+      "ms": 753448,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    }
+  ]
+}

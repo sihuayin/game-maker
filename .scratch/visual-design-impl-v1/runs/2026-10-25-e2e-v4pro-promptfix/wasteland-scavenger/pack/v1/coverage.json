@@ -1,0 +1,39 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "wasteland-scavenger",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.sky",
+      "w": 640,
+      "h": 360,
+      "opaque": 230400,
+      "ratio": 1
+    },
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.far",
+      "w": 640,
+      "h": 360,
+      "opaque": 133602,
+      "ratio": 0.5798697916666666
+    },
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.mid",
+      "w": 640,
+      "h": 360,
+      "opaque": 104705,
+      "ratio": 0.4544487847222222
+    },
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.near",
+      "w": 640,
+      "h": 360,
+      "opaque": 103909,
+      "ratio": 0.4509939236111111
+    }
+  ]
+}

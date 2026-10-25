@@ -1,0 +1,104 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "wasteland-scavenger",
+  "runVersion": 1,
+  "createdAt": "2026-10-25T05:06:38.482Z",
+  "run": {
+    "wallClockMs": 134234,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 6
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 19665,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 2792,
+        "outputTokens": 1819
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 5722,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 126,
+        "outputTokens": 637
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 9730,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 2231,
+        "outputTokens": 1018
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 12646,
+      "attempts": 1,
+      "requestedModel": "deepseek-v4-pro",
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 2195,
+        "outputTokens": 860
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 86355,
+      "attempts": 6,
+      "failures": [
+        "schema",
+        "empty-input",
+        "schema",
+        "empty-input",
+        "empty-input"
+      ],
+      "model": "deepseek-v4-pro",
+      "usage": {
+        "inputTokens": 4,
+        "outputTokens": 1674
+      }
+    }
+  ]
+}

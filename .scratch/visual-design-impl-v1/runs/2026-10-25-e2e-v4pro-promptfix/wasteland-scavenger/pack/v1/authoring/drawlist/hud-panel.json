@@ -1,0 +1,273 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-panel",
+  "frame": "hud-panel",
+  "viewBox": [
+    0,
+    0,
+    64,
+    32
+  ],
+  "expectedSize": [
+    64,
+    32
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 28,
+      "w": 64,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 0,
+      "w": 4,
+      "h": 32
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 60,
+      "y": 0,
+      "w": 4,
+      "h": 32
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 26,
+      "w": 56,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 4,
+      "w": 2,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 58,
+      "y": 4,
+      "w": 2,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 0,
+      "w": 2,
+      "h": 32
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 62,
+      "y": 0,
+      "w": 2,
+      "h": 32
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 30,
+      "w": 64,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 2,
+      "y": 2,
+      "w": 60,
+      "h": 28
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:9",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:11",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:12",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:13",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:14",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:15",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 4,
+      "y": 4,
+      "w": 56,
+      "h": 24
+    }
+  ]
+}
