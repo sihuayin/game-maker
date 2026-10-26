@@ -19,13 +19,11 @@
 //   `run/v<N>/game-intent.json` 由 pipeline（票 15）落盘；`run/v<N>/intent.md` 存的是
 //   **调用方手里那段原文的字节**，而本函数连原文都不回传 —— 它就在调用方手上。
 import {
-  STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, GameIntentSpecSchema, forcedTool, parseToolUse,
-  type CallFailure, type GameIntentSpec, type LedgerCall, type LedgerStep, type LedgerUsage,
+  STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, GameIntentSpecSchema,
+  buildTextRequest, parseTextResponse, textModelOf, textUsageOf,
+  type CallFailure, type GameIntentSpec, type LedgerCall, type LedgerStep, type LedgerUsage, type TextTransport,
 } from "@game-maker/contracts";
 import { TOOL_DESCRIPTION, TOOL_NAME, intentPrompt } from "./prompts.js";
-
-/** 请求的模型名。⚠️ 与 `assets` / `vision` 同源（票 24 的实况：代理**请求一个、回另一个**）。 */
-const REQUESTED_MODEL = "deepseek-v4-pro";
 
 /** 输出上限。⚠️ 与票 08 同档（16_000）：本产物比 VWS 小得多（票 09 探针实测 991–1159 token），
  *  而这是**上限不是分配**，给足不花钱；**截断**则会把一次本来会成功的调用变成 `truncated` 重采样。 */
@@ -42,7 +40,7 @@ export type AnalyzeIntentInput = {
    *  这里只吃**已经拿到手的那串文本**。落盘由票 15 逐字节复制 `run/v<N>/intent.md`，
    *  ⚠️ **别在这里 trim 它的落盘形态** —— 提示词那边的 `trim()` 是另一件事（见 `prompts.ts`）。 */
   requirementText: string;
-  transport: { baseUrl: string; apiKey: string };
+  transport: TextTransport;
   /** 测试可注入（`review.ts` 同款用法）。 */
   fetchImpl?: typeof fetch;
   /** 一次上游调用的超时。默认 [[UPSTREAM_TIMEOUT_MS]] —— ⚠️ 测「超时」那条路时才传小的。 */
@@ -105,23 +103,13 @@ type Trip =
   | { kind: "upstream"; failure: Extract<CallFailure, "http" | "timeout">; detail: string };
 
 /** 上游自己报的那两样 —— **拿不到就缺席，不许编一个**。 */
-function spentOf(body: unknown): Spent {
-  const j = body as {
-    model?: string;
-    usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
-  } | null;
-  const u = j?.usage;
-  const usage: LedgerUsage = {
-    ...(u?.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
-    ...(u?.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
-    ...(u?.completion_tokens_details?.reasoning_tokens !== undefined
-      ? { reasoningTokens: u.completion_tokens_details.reasoning_tokens } : {}),
-  };
+function spentOf(transport: TextTransport, body: unknown): Spent {
+  const { model, usage } = textUsageOf(transport, body);
   return {
-    requestedModel: REQUESTED_MODEL,
-    ...(j?.model ? { model: j.model } : {}),
+    requestedModel: textModelOf(transport),
+    ...(model ? { model } : {}),
     // ⚠️ 上游没给就**整个键缺席** —— 不许填 0 冒充「测到了 0」。
-    ...(Object.keys(usage).length > 0 ? { usage } : {}),
+    ...(usage ? { usage } : {}),
   };
 }
 
@@ -146,17 +134,13 @@ function assertRequirement(text: string): string {
 
 /** 一次往返。**只做一次** —— 重采样在调用方那层（R16 的固定次数）。 */
 async function onceThrough(o: {
-  baseUrl: string; apiKey: string; body: string; timeoutMs: number; doFetch: typeof fetch;
+  url: string; headers: Record<string, string>; body: string; timeoutMs: number; doFetch: typeof fetch; transport: TextTransport;
 }): Promise<Trip> {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), o.timeoutMs);
   let res: Response;
   try {
-    res = await o.doFetch(`${o.baseUrl}/v1/messages`, {
-      method: "POST", signal: ctl.signal,
-      headers: { "content-type": "application/json", "x-api-key": o.apiKey, "anthropic-version": "2023-06-01" },
-      body: o.body,
-    });
+    res = await o.doFetch(o.url, { method: "POST", signal: ctl.signal, headers: o.headers, body: o.body });
   } catch (e) {
     // ⚠️ 中止与「连不上」是**两件事**，而 fetch 都抛 AbortError/TypeError —— 分开报，否则人查错方向。
     if (ctl.signal.aborted)
@@ -171,10 +155,10 @@ async function onceThrough(o: {
   try { body = await res.json(); }
   catch (e) { return { kind: "upstream", failure: "http", detail: `上游回的不是 JSON：${(e as Error).message}` }; }
 
-  const spent = spentOf(body);
+  const spent = spentOf(o.transport, body);
   // ⚠️ **唯一算数的判据**：入参过 Zod（**含顶层那条 gate**）。`stop_reason === "tool_use"` **不是**成功信号
   //   —— 票 27 第 1 发与票 09 的探针各实测过一次：工具被调、`input = {}`、上千 token 打水漂。
-  const parsed = parseToolUse(body, TOOL_NAME, GameIntentSpecSchema);
+  const parsed = parseTextResponse({ transport: o.transport, body, toolName: TOOL_NAME, schema: GameIntentSpecSchema });
   if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
   return { kind: "ok", value: parsed.value, spent };
 }
@@ -197,10 +181,9 @@ export async function analyzeIntent(input: AnalyzeIntentInput): Promise<AnalyzeI
 
   const doFetch = input.fetchImpl ?? fetch;
   const timeoutMs = input.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
-  const body = JSON.stringify({
-    model: REQUESTED_MODEL, max_tokens: MAX_TOKENS, thinking: { type: "disabled" },
-    ...forcedTool(TOOL_NAME, TOOL_DESCRIPTION, GameIntentSpecSchema),
-    messages: [{ role: "user", content: [{ type: "text", text: intentPrompt({ requirementText }) }] }],
+  const req = buildTextRequest({
+    transport: input.transport, prompt: intentPrompt({ requirementText }),
+    toolName: TOOL_NAME, toolDescription: TOOL_DESCRIPTION, schema: GameIntentSpecSchema, maxTokens: MAX_TOKENS,
   });
 
   const call = spentCall("analyze-intent", LEDGER_TARGET);
@@ -208,7 +191,7 @@ export async function analyzeIntent(input: AnalyzeIntentInput): Promise<AnalyzeI
   let lastDetail = "";
   for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++) {
     const once = await onceThrough({
-      baseUrl: input.transport.baseUrl, apiKey: input.transport.apiKey, body, timeoutMs, doFetch,
+      url: req.url, headers: req.headers, body: req.body, timeoutMs, doFetch, transport: input.transport,
     });
     if (once.kind === "upstream") {
       call.trip({ failure: once.failure });

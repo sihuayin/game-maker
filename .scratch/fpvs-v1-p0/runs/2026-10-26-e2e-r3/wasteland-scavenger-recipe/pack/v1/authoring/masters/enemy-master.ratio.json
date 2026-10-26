@@ -1,0 +1,22 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 1,
+  "masters": [
+    {
+      "master": "enemy-master",
+      "requested": {
+        "w": 32,
+        "h": 32
+      },
+      "returned": {
+        "w": 1024,
+        "h": 1024
+      },
+      "requestedRatio": 1,
+      "returnedRatio": 1,
+      "ratioDelta": 0,
+      "match": true
+    }
+  ]
+}

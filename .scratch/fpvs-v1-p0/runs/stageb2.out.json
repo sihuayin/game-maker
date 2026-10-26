@@ -1,0 +1,20 @@
+{
+  "command": "build",
+  "error": "编译出来的配置**过不了校验**（3 条硬失败）：\n  · scene.background[0]: 层 \"wasteland-station-bg.sky\" 盖不住世界：世界 1200×270px、视口 480×270px（镜头横向最多走 720px、纵向 0px），它画出来 320×180px，视差 0 会跟着镜头退掉 0×0px，最坏时屏幕上只剩 320×180px，而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）\n  · scene.background[1]: 层 \"wasteland-station-bg.far-buildings\" 盖不住世界：世界 1200×270px、视口 480×270px（镜头横向最多走 720px、纵向 0px），它画出来 1200×180px，视差 0.3 会跟着镜头退掉 216×0px，最坏时屏幕上只剩 984×180px，而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）\n  · scene.background[2]: 层 \"wasteland-station-bg.station-wall\" 盖不住世界：世界 1200×270px、视口 480×270px（镜头横向最多走 720px、纵向 0px），它画出来 1200×180px，视差 0.6 会跟着镜头退掉 432×0px，最坏时屏幕上只剩 768×180px，而视口要 480×270px。—— **不平铺的层只有 parallax = 0 才恒成立**（票 40 算过的那条）\n⚠️ **层盖不住世界是确定性的** —— 由背景资源尺寸 + world.size 决定，重抽 config 改不了，也不落盘。要去的地方：资源清单（换一个盖得住世界的背景），不是再抽一次 config。",
+  "exitCode": 4,
+  "ledger": [
+    {
+      "step": "compile-runtime",
+      "target": "game-config",
+      "upstream": "messages",
+      "ms": 24761,
+      "attempts": 1,
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 5722,
+        "outputTokens": 856,
+        "reasoningTokens": 4434
+      }
+    }
+  ]
+}

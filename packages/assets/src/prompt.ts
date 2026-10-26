@@ -6,6 +6,7 @@ import { PLAYER_ACTION_NAMES, type GameDesignSpec, type VisualWorldSpec } from "
 // 归 `assets` 而不是 `contracts`：它是 schema 的**镜像**，会随提示工程调优而改；
 // 而 contracts 只放不随便动的东西。schema 一改，这里必须跟着改 —— 所以 op 集只有这一处描述。
 import type { AssetSpec, CharacterDNA, StyleSpec } from "@game-maker/contracts";
+import { deriveSheetGrid } from "./sheet.js";
 
 /** 色板行。`palette:N` 的下标就是这里的序号 —— 模型必须能一一对上。 */
 export function paletteLine(palette: readonly string[]): string {
@@ -439,8 +440,10 @@ function animationSheetPrompt(spec: AssetSpec, style: StyleSpec, animName?: stri
   const n = anim.frames;
   // ── 票 01：**固定网格**与旧的「横排一排」是两套排版说法 ─────────────────────
   // ⚠️ 不能两份都留在同一段提示词里（「网格」与「横向排开」同时说，模型只执行一条 ——
-  //   这一支已经吃过一次「4 个角色 + 只有 1 个物体」的亏）。省略 `sheet` ⇒ 旧文字**逐字不变**。
-  const sheet = anim.sheet;
+  //   这一支已经吃过一次「4 个角色 + 只有 1 个物体」的亏）。
+  // ⚠️ 票 13：省略 `sheet` 不再**逐字**是旧横排 —— N≥3 帧时确定性推导一个「最接近正方形」的网格
+  //   （`deriveSheetGrid`），因为 N 帧横排的 AR 是 N:1、生图模型对 N≥4 的极端横条发不出（实测 ~2.9）。
+  const sheet = anim.sheet ?? deriveSheetGrid(n);
   // 票 16 的 A：`rows=1` 走**单行等距排开**，不叫「网格」——
   // ⚠️ 2.5 听到「网格」会画格线、编号，并把 4×2 画成 4×3（2026-10-19 真跑证据）。
   const oneRow = sheet !== undefined && sheet.rows === 1;
@@ -607,8 +610,9 @@ export const recipeShapeSpec = (): string => `每个 spec 只许有这些键：k
 按类可以另加，且**形状必须逐字如下**：
   animation  → "animations":[{"name":"walk","frames":4,"fps":8,"loop":true}, ...]
                ← 可选 \`sheet\`：\`{"columns":2,"rows":2}\` —— 这次生图按**固定网格**排版，
-                 \`columns × rows\` 必须等于这个动画的 \`frames\`（省略 = 旧的按墨迹间隙切）；
-                 只对 \`source.kind:"image"\` 有意义。
+                 \`columns × rows\` 必须等于这个动画的 \`frames\`；只对 \`source.kind:"image"\` 有意义。
+               ← ⚠️ **≥3 帧强烈建议写 \`sheet\`**（4 帧 = \`{"columns":2,"rows":2}\`、6 帧 = \`{"columns":3,"rows":2}\`）：
+                 一排 N 个的横条长宽比 N:1、生图模型发不出；省略时 pack 也会**自动**推成近正方形网格。
   background → "layers":[${renderSampleLayers()}]
                ← **数组**，每项是对象，**从远到近**排序；层名会拼成帧名 \`<资源 id>.<层名>\`
                ← ⚠️ **视差与平铺必须配对**：**不平铺的层，\`parallax\` 必须是 \`0\`**；
@@ -897,8 +901,10 @@ export function assetPlanPrompt(input: {
   vws: VisualWorldSpec;
   /** 照抄值（与票 08 让模型照抄 `style.id` 同款）：装配/落盘时会**强制改写**。 */
   echo: { styleRef: string; styleId: string; referenceImage?: string };
+  /** 外壳视口（`DEFAULT_VIEWPORT`，由 `planAssets` 传）。背景画布高/宽的下限照它算。 */
+  viewport: { w: number; h: number };
 }): string {
-  const { design, vws, echo } = input;
+  const { design, vws, echo, viewport } = input;
   // ⚠️ **插值出来的是字面词本身**（`idle` / `run` / `jump`），**不是 `<idle>` 那种占位符**：
   //   占位符读起来像「这里自己填一个名字」，而契约要的正是**照字面**（票 61 的 Q12(r4) 原话：
   //   「最终送入模型的提示词中直接呈现 idle、run、jump，不带尖括号，不允许模型改名」）。
@@ -964,9 +970,19 @@ ${worldBrief(vws)}
 3. 这三路**每路至少 2 帧** —— 1 帧是静帧，不是动画。
 4. 这一件**必须写 \`characterId\`**，值就是 \`${design.player.id}\`（上面设计层那个玩家的 id，一个字不许改）。
 
+⚠️ **角色类资源按身份定尺寸**（别一刀切成 32×32 方框）：\`size\` 要匹配这个角色的**自然比例** ——
+  高挑的人形 / 机器人（守卫、哨兵、骑士这类）用**高框**（如 \`{"w":24,"h":32}\` 或 \`{"w":32,"h":48}\`），
+  它们生图时会自然画成高挑、硬套方框会被压扁；Q 版 / 矮胖 / 方形角色照旧用方框（如 \`{"w":32,"h":32}\`）。
+
 ⚠️ 四个槽的 \`id\` **沿用上面设计层给的那些 id**（一个字都不许改）；设计层没点名、但**设计说得出**
 的东西可以新加，给它们起新 id。
 ⚠️ 背景层：**层数按画面需要定**（三层的写法：由远到近，一层一段描述），**没有「必须三层」这回事**。
+⚠️ **背景画布要盖住世界**（本代视口 ${viewport.w}×${viewport.h}，世界只横向滚、纵向不滚 ⇒ 世界高恒 = 视口高 ${viewport.h}）：
+  1. **高**：背景的 \`size.h\` **至少 = 视口高 ${viewport.h}**（所有层共用这一个 \`size\`；比它矮，config 那一步的
+     「层盖不住世界」确定性拒收，重抽 config 改不了）。
+  2. **宽**：正视差（\`parallax > 0\`）的层**必须写 \`tileable:{"x":true}\`**（它会被铺满整条世界宽）；
+     \`parallax: 0\` 的最远层（如天空）画一张 \`size.w ≥ ${viewport.w}\` 的图即可，左右不必接缝。
+  3. **不**竖向平铺（不写 \`tileable.y\`）。
 ⚠️ **地形/台阶**（recipe-config-gap-v1 票 05）：平台关的 \`solid\` 实体**只能引用 \`sprite\`** ——
 若这一关的 layout 需要**看得见的静态碰撞体**（地面砖 / 台阶 / 碎石堆 / 斜坡），产出一件对应的 \`sprite\`
 （role 写「可平铺的地面砖」/「台阶」/「碎石堆」这类），config 那一步才有 sprite 可引；不产它，关卡就只剩

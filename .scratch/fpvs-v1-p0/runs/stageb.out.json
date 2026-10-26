@@ -1,0 +1,5 @@
+{
+  "command": "build",
+  "error": "读不出 `asset-recipe.json`（/Volumes/shy/some-projects/game-maker/wasteland-scavenger-recipe/run/v1/asset-recipe.json）：ENOENT: no such file or directory, open '/Volumes/shy/some-projects/game-maker/wasteland-scavenger-recipe/run/v1/asset-recipe.json'",
+  "exitCode": 1
+}

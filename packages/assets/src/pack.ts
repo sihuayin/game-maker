@@ -21,7 +21,7 @@ import { buildAtlas } from "./atlas.js";
 import { backgroundCoverage } from "./coverage.js";
 import { emptyImage, inkBBox, type RasterImage } from "./image.js";
 import { DESPILL_THRESHOLDS, despillMagenta, dominantOpaqueColor, edgeConnectedBackground, foregroundBlocks, importFrames, keyBackground, l1Distance, sliceGrid, type Box } from "./import.js";
-import { auditSheetCells, bottomBand, cropAboveBand, segmentRowCells, sliceGridCells, type SheetCellIssue } from "./sheet.js";
+import { auditSheetCells, bottomBand, cropAboveBand, deriveSheetGrid, segmentRowCells, sliceGridCells, type SheetCellIssue } from "./sheet.js";
 import { animationFramePrompt, framePlan, imageNegativePrompt, imagePrompt, keyColorFor } from "./prompt.js";
 import { MASTER_SOURCES, masterNegativePrompt, masterPrompt, masterRatioLine, masterRatioReading } from "./master.js";
 import type { ImageGenCall, ImageGenerator } from "./image-gen.js";
@@ -676,11 +676,11 @@ async function buildInto(opts: BuildPackOptions): Promise<BuildPackResult> {
               raw: `authoring/generated/${p.name}.png`,
             }))
           : imageUnitsOf(spec).map((u) => ({ ...u, raw: rawName(u) }));
-        /** 这个 unit 的**固定网格**（票 01）。省略 = 旧路径（按墨迹间隙分块）。 */
+        /** 这个 unit 的**固定网格**（票 01）。省略 = 旧路径（按墨迹间隙分块）；N≥3 帧确定性推导（票 13）。 */
         const gridOf = (u: PackUnit) =>
           frameMode || u.anim === undefined || spec.kind !== "animation"
             ? undefined
-            : spec.animations.find((a) => a.name === u.anim)?.sheet;
+            : spec.animations.find((a) => a.name === u.anim)?.sheet ?? deriveSheetGrid(u.frames);
 
         // ⚠️ **逐动画分批导入**：同一个动画内的帧必须共用裁框（那才是不抖的关键），
         // 而不同动画的补宽不一样，混一个数组交给 `importFrames` 会直接报尺寸不一致。

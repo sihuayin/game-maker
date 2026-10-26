@@ -1,0 +1,108 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土拾荒者：荒城求生",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市中进行横版移动与跳跃探索",
+    "搜寻废墟中的资源与宝箱",
+    "躲避巡逻敌人与危险机关",
+    "到达指定地点达成最终目标"
+  ],
+  "player": {
+    "id": "player-scavenger",
+    "role": "废土拾荒者",
+    "abilities": [
+      "横版跑跳与地形跨越",
+      "躲避敌人巡逻与危险机关",
+      "搜寻废墟资源与开启宝箱"
+    ],
+    "goals": [
+      "在废弃城市中探索搜寻资源和宝箱",
+      "躲避危险和敌人",
+      "到达指定地点达成最终目标"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "entity-wasteland-enemy",
+      "behavior": "在车站站台与铁轨废墟区域横向循环巡逻",
+      "threat": "触碰玩家造成伤害并阻碍通行"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "entity-treasure-chest",
+      "type": "chest",
+      "behavior": "玩家靠近后可开启交互，获取其中存放的废土关键物资"
+    }
+  ],
+  "resources": [
+    {
+      "id": "entity-scrap-resource",
+      "purpose": "散落在场景中可供拾取，用于收集判定与物资积累"
+    }
+  ],
+  "world": {
+    "theme": "废土·废弃城市",
+    "setting": "荒凉、危险且充满未知的废弃城市与车站废墟",
+    "structure": "横向铁路轨道与底部基准线，站台与木质建筑墙面、窗户挂件，双色分层夜空与建筑大面背景，极低纯色与扁平构件分层"
+  },
+  "levels": [
+    {
+      "id": "level-wasteland-station",
+      "purpose": "在废弃车站与建筑废墟中进行探索搜寻，躲避巡逻敌人并安全抵达安全出口",
+      "layout": "玩家从左侧平坦混凝土站台出发，向右横向跨越铁轨与木质废墟建筑，躲避巡逻敌人并搜寻散落资源与宝箱，最终到达右侧出口终点",
+      "entities": [
+        "player-scavenger",
+        "entity-wasteland-enemy",
+        "entity-treasure-chest",
+        "entity-scrap-resource"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "关卡探索与物资累积",
+    "description": "通过搜寻废墟中的物资与宝箱累积资源，推进关卡探索进度并抵达更深处的危险区域"
+  },
+  "mechanics": [
+    {
+      "id": "mech-horizontal-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "mech-jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "mech-dodge",
+      "mechanic": "avoid-danger"
+    },
+    {
+      "id": "mech-search-collect",
+      "mechanic": "collect-pickup"
+    }
+  ],
+  "winConditions": [
+    "搜寻并收集关卡中的物资与宝箱",
+    "到达指定的关卡安全区域终点"
+  ],
+  "loseConditions": [
+    "生命值归零（受到巡逻敌人或危险机关伤害）"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "wasteland-scavenger-assets",
+  "runVersion": 1,
+  "createdAt": "2026-10-26T13:12:04.689Z",
+  "run": {
+    "wallClockMs": 93727,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 20293,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 3335,
+        "outputTokens": 921,
+        "reasoningTokens": 1511
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 17476,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 3008,
+        "outputTokens": 515,
+        "reasoningTokens": 2413
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 18831,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 4237,
+        "outputTokens": 767,
+        "reasoningTokens": 2938
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 13031,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 2863,
+        "outputTokens": 594,
+        "reasoningTokens": 1491
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 23881,
+      "attempts": 1,
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 7507,
+        "outputTokens": 1524,
+        "reasoningTokens": 2172
+      }
+    }
+  ]
+}

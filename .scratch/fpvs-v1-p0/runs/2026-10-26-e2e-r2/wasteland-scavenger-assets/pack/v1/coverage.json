@@ -1,0 +1,31 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "bg-wasteland-station",
+      "frame": "bg-wasteland-station.sky",
+      "w": 480,
+      "h": 270,
+      "opaque": 129600,
+      "ratio": 1
+    },
+    {
+      "asset": "bg-wasteland-station",
+      "frame": "bg-wasteland-station.far-buildings",
+      "w": 480,
+      "h": 270,
+      "opaque": 28510,
+      "ratio": 0.21998456790123458
+    },
+    {
+      "asset": "bg-wasteland-station",
+      "frame": "bg-wasteland-station.station-wall",
+      "w": 480,
+      "h": 270,
+      "opaque": 52971,
+      "ratio": 0.40872685185185187
+    }
+  ]
+}

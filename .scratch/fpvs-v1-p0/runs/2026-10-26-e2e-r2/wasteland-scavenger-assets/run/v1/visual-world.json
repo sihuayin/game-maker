@@ -1,0 +1,135 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "复古极简像素横版风",
+    "keywords": [
+      "像素风",
+      "2D横版",
+      "废土探索",
+      "极简风格"
+    ],
+    "description": "极简低分辨率2D横版像素美术风格，使用扁平色块与基本几何体塑造人物与环境。"
+  },
+  "camera": {
+    "mode": "side"
+  },
+  "composition": {
+    "foreground": "横向铁路轨道与底部基准线",
+    "midground": "站台与木质建筑墙面、窗户挂件",
+    "background": "双色分层夜空与建筑大面背景",
+    "objectScale": "建筑与背景占据大部分空间",
+    "characterScale": "占画面高度约1/4",
+    "density": "极低，大面积纯色与扁平构件"
+  },
+  "palette": {
+    "primary": [
+      "palette:2",
+      "palette:2",
+      "palette:9"
+    ],
+    "secondary": [
+      "palette:1",
+      "palette:4",
+      "palette:3"
+    ],
+    "accent": [
+      "palette:14",
+      "palette:14",
+      "palette:12"
+    ],
+    "background": [
+      "palette:1",
+      "palette:4",
+      "palette:2"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:0",
+      "palette:3"
+    ],
+    "highlight": [
+      "palette:14",
+      "palette:15",
+      "palette:11"
+    ]
+  },
+  "lighting": {
+    "direction": "正面无明显阴影，局部点状发光",
+    "softness": "硬边无过渡色块",
+    "contrast": "中高对比，大块暗色与明亮黄光呼应",
+    "mood": "宁静废土、夜晚沉寂"
+  },
+  "materials": {},
+  "character": {
+    "proportions": "2头身Q版极简比例",
+    "silhouette": "矩形轮廓，线条平直",
+    "poseLanguage": "正面向前站立，几何刚硬",
+    "clothing": "暗蓝色制服配棕色帽子与腰带",
+    "faceAbstraction": "极简方块脸，单像素眼鼻"
+  },
+  "environment": {
+    "architecture": "扁平木质车站墙面与尖顶斜屋顶",
+    "terrain": "平坦混凝土站台与横向铁轨",
+    "props": "海报框、木椅、圆形挂标、站牌灯",
+    "textureDensity": "极低，靠色块区分结构"
+  },
+  "shapeLanguage": [
+    "直角矩形",
+    "等腰三角形",
+    "规则正圆形"
+  ],
+  "constraints": [
+    "严格保持低分辨率像素点阵与无渐变平涂",
+    "使用扁平正交侧视角，无透视网格",
+    "人物与场景构件必须由规则矩形与三角形拼合",
+    "保持色板内的高对比重音黄与极简暗色基调"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "极简低分辨率像素风",
+      "横版2D废土遗迹题材"
+    ],
+    "camera": {},
+    "composition": {},
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {},
+    "shapeLanguage": [
+      "矩形",
+      "三角形"
+    ],
+    "material": [],
+    "environment": [
+      "横版像素关卡场景"
+    ],
+    "characterStyle": [
+      "极简方块像素角色"
+    ],
+    "constraints": [
+      "保持像素点对齐"
+    ],
+    "confidence": 0.95
+  }
+}

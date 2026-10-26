@@ -1,0 +1,23 @@
+{
+  "ok": false,
+  "expected": "pass",
+  "stage": "reset-sequence",
+  "reason": "第 1 次：重置发生了，但不是「从抬高面起跳、空中撞 hazard」的序列（jumpedElevated=false，重置前 onFloor=false）",
+  "durationMs": 4672,
+  "extra": {},
+  "console": [
+    {
+      "type": "log",
+      "text": "%c %c %c %c %c Phaser v3.90.0 (Canvas | Web Audio) %c https://phaser.io/v390 background: #ff0000 background: #ffff00 background: #00ff00 background: #00ffff color: #ffffff; background: #000000 background: transparent"
+    },
+    {
+      "type": "log",
+      "text": "[shell] v2 · 视口 480×270 · 世界 1440×270 · 4 张图集"
+    },
+    {
+      "type": "warning",
+      "text": "[warning] hud.panel: 这个渲染器不支持九宫格（Phaser 的 nineslice 仅 WebGL）—— 面板退回普通拉伸"
+    }
+  ],
+  "exceptions": []
+}

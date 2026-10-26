@@ -107,6 +107,7 @@ export * from "./character-dna.js";
 // ── V2 的结构化调用底座：失败闭集 + 工具入参的取与验（票 27 / 28）──────────
 // ⚠️ **纯的**：没有 fetch。I/O 那一半各包自理 —— 结构上新包够不着彼此（R11）。
 export * from "./structured-call.js";
+export * from "./gemini-call.js";
 
 // ── 一次资源生成「花了什么」的账（跟着包走的收据）──────────────────────────
 export * from "./ledger.js";

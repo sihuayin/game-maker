@@ -1,0 +1,143 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "2D Low-Res Wasteland Pixel Art",
+    "keywords": [
+      "pixel art",
+      "2D side-scroller",
+      "retro arcade",
+      "wasteland station",
+      "blocky graphics"
+    ],
+    "description": "Low-resolution 2D side-scrolling pixel art with flat warm tones and dark ambient sky."
+  },
+  "camera": {
+    "mode": "side",
+    "perspective": "orthographic"
+  },
+  "composition": {
+    "foreground": "Horizontal railway tracks and platform floor",
+    "midground": "Flat station wall, frame, clock, bench",
+    "background": "Flat horizon sky and dark rooflines",
+    "objectScale": "Human-scale pixel props",
+    "characterScale": "Medium-small centered sprite",
+    "density": "Sparse, clean layout"
+  },
+  "palette": {
+    "primary": [
+      "palette:2",
+      "palette:5",
+      "palette:8",
+      "palette:10"
+    ],
+    "secondary": [
+      "palette:3",
+      "palette:7",
+      "palette:6",
+      "palette:3"
+    ],
+    "accent": [
+      "palette:14",
+      "palette:12",
+      "palette:14",
+      "palette:12"
+    ],
+    "background": [
+      "palette:0",
+      "palette:4",
+      "palette:1",
+      "palette:0"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:0",
+      "palette:1"
+    ],
+    "highlight": [
+      "palette:14",
+      "palette:15",
+      "palette:9"
+    ]
+  },
+  "lighting": {
+    "direction": "Ambient flat lighting",
+    "softness": "Hard flat pixel edges",
+    "contrast": "Medium",
+    "mood": "Subdued, cozy night ambient"
+  },
+  "materials": {},
+  "character": {
+    "proportions": "Chibi 2-head-tall pixel sprite",
+    "silhouette": "Blocky, clean rectangular outline",
+    "poseLanguage": "Static front-facing idle pose",
+    "clothing": "Uniform coat, peaked cap, brass buckle",
+    "faceAbstraction": "Minimal pixel features, dot eyes, block nose"
+  },
+  "environment": {
+    "architecture": "Simple rectangular wooden/brick structures",
+    "terrain": "Flat horizontal railway platform",
+    "props": "Platform bench, wall frame, hanging clock, tracks",
+    "textureDensity": "Low, solid color blocks with minimal pixel dither"
+  },
+  "shapeLanguage": [
+    "Sharp rectangles and crisp straight lines",
+    "Simple pixelated circles for light fixtures",
+    "Triangular roof and mountain silhouettes"
+  ],
+  "constraints": [
+    "Maintain strict grid-aligned pixel art with flat color fills",
+    "Use 2D side-view camera angle for horizontal exploration",
+    "Limit shading to 2-3 flat tonal steps per object",
+    "Keep character silhouettes distinct and blocky"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "2D low-res pixel art",
+      "Flat color block shading",
+      "Post-apocalyptic retro arcade aesthetic"
+    ],
+    "camera": {},
+    "composition": {},
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {},
+    "shapeLanguage": [],
+    "material": [
+      "Matte pixel color blocks"
+    ],
+    "environment": [
+      "Side-scrolling wasteland railway station"
+    ],
+    "characterStyle": [
+      "Minimal blocky pixel character",
+      "High contrast white face with dark outline"
+    ],
+    "constraints": [
+      "Maintain pixel-grid consistency",
+      "Keep flat color fills without gradients"
+    ],
+    "confidence": 0.95
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版废土寻宝",
+  "subgenre": "横版平台跳跃探索",
+  "camera": "2D横版",
+  "targetExperience": "在废土废弃城市中探索寻宝、搜集物资并规避危险敌人的生存寻宝体验",
+  "coreLoopSteps": [
+    "在废弃城市中横版移动与跳跃探索",
+    "寻找并收集资源与宝箱",
+    "躲避路线上的敌人和危险",
+    "抵达并完成最终目标"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "在废弃城市中探索",
+      "寻找资源和宝箱",
+      "躲避危险和敌人",
+      "达成最终目标"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "废土荒凉与危险未知的探索氛围"
+  },
+  "mechanics": [
+    {
+      "id": "horizontal-move",
+      "name": "横版移动"
+    },
+    {
+      "id": "jump-action",
+      "name": "跳跃"
+    },
+    {
+      "id": "find-resources",
+      "name": "寻找资源"
+    },
+    {
+      "id": "find-chests",
+      "name": "寻找宝箱"
+    },
+    {
+      "id": "dodge-hazards",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "wasteland-chest",
+      "type": "interactable",
+      "role": "可打开并获取物资的宝箱"
+    },
+    {
+      "id": "wasteland-scraps",
+      "type": "resource",
+      "role": "废弃城市中散落的可拾取资源"
+    },
+    {
+      "id": "wasteland-patroller",
+      "type": "enemy",
+      "role": "巡逻或遗留在城市中的危险敌人"
+    }
+  ],
+  "winConditions": [
+    "达成最终目标"
+  ],
+  "loseConditions": [
+    "触碰危险或被敌人攻击导致失败"
+  ],
+  "ambiguity": [
+    "winConditions：需求提到了最终目标，但未具体说明终点形式或触发条件",
+    "loseConditions：需求未明确具体的失败判定（如血量归零、坠落或死亡）",
+    "progression：需求未提及玩家数值成长、装备升级或关卡解锁等进阶机制",
+    "challenge：需求未说明敌人的行为模式、攻击方式及危险的具体类型"
+  ]
+}

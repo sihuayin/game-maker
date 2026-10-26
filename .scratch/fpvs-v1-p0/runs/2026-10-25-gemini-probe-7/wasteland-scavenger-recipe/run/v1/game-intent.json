@@ -1,0 +1,76 @@
+{
+  "format": "game-intent/v1",
+  "genre": "废土寻宝",
+  "subgenre": "横版动作探索",
+  "camera": "2D横版视角",
+  "targetExperience": "在废弃城市废墟中搜寻物资的紧张感与探索乐趣",
+  "coreLoopSteps": [
+    "在废弃城市中探索",
+    "寻找资源和宝箱",
+    "躲避危险和敌人",
+    "达成最终目标"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "在废弃城市中搜寻资源和宝箱",
+      "躲避危险与敌人",
+      "达成最终目标"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒凉且充满未知的废土氛围"
+  },
+  "mechanics": [
+    {
+      "id": "mech-horizontal-move",
+      "name": "横版移动"
+    },
+    {
+      "id": "mech-jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "mech-search",
+      "name": "寻找资源和宝箱"
+    },
+    {
+      "id": "mech-dodge",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "abandoned-chest",
+      "type": "interactable",
+      "role": "放置于废墟中的宝箱，供拾荒者开启获取资源"
+    },
+    {
+      "id": "scavenge-resource",
+      "type": "resource",
+      "role": "分散在地图各处的可拾取废土资源"
+    },
+    {
+      "id": "wasteland-enemy",
+      "type": "enemy",
+      "role": "巡逻并阻碍拾荒者移动与探索的废土敌人"
+    }
+  ],
+  "challenge": {
+    "type": "生存回避",
+    "description": "在探索过程中躲避危险和敌人"
+  },
+  "winConditions": [
+    "达成最终目标"
+  ],
+  "loseConditions": [
+    "触碰危险或被敌人攻击导致死亡/失败"
+  ],
+  "ambiguity": [
+    "winConditions：需求仅提到有最终目标，未说明具体达成方式（如到达指定出口或收集定量资源）",
+    "loseConditions：需求提到躲避危险和敌人，但未明确具体的失败判定与生命机制",
+    "camera：需求提到了横版，但未指定具体视角拉远拉近与镜头跟随规则"
+  ]
+}

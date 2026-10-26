@@ -1,0 +1,113 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土寻宝者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃车站与建筑废墟间横向移动与跳跃探索",
+    "寻找并收集分散的废土资源与开启宝箱",
+    "躲避巡逻的废土敌人与潜在危险",
+    "到达区域最右侧的安全撤离点完成搜寻任务"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "穿梭于废弃城市车站与建筑废墟中的废土拾荒者",
+    "abilities": [
+      "横向跑动与跳跃攀爬平台",
+      "开启废墟宝箱与拾取分散资源",
+      "精准跳跃躲避巡逻敌人碰撞"
+    ],
+    "goals": [
+      "搜寻并收集废弃城市中的资源与宝箱",
+      "躲避巡逻敌人的威胁并保持生命值",
+      "安全到达关卡出口撤离点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "wasteland-enemy",
+      "behavior": "在车站地面与高台平台间低速左右巡逻，发现玩家不会主动追踪但会形成固定路径障碍",
+      "threat": "玩家碰撞后造成伤害并造成短暂击退效果"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "abandoned-chest",
+      "type": "chest",
+      "behavior": "放置于废墟角落或平台上方，玩家靠近后可交互开启，产出资源并提升探索进度"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scavenge-resource",
+      "purpose": "分散在地图各处的可拾取物资，增加探索积分与目标达成度"
+    }
+  ],
+  "world": {
+    "theme": "荒凉且充满未知的废土探索，暗调底色与高亮发光元素形成强烈对比",
+    "setting": "废弃的横向城市车站、平顶建筑墙面与铁轨地表",
+    "structure": "空间分层明晰：背景为深蓝至灰蓝渐变的废土夜空与远景建筑带；中景为站台边缘、铁轨、平顶建筑墙体与横向梁柱；前景为玩家移动平台、悬挂式发光告示牌、路灯及散落的宝箱与资源箱。低密度大块面留白，横向延伸感强。"
+  },
+  "levels": [
+    {
+      "id": "level-1",
+      "purpose": "基础探索与玩法引入：掌握横向移动跳跃、收集物资宝箱并避开敌人到达出口",
+      "layout": "从左侧废弃车站起点出发，向右横向越过铁轨与支撑柱平台，避开中段低速巡逻的废土敌人，收集途中的废土资源与宝箱，最终到达右侧发光告示牌下的撤离出口",
+      "entities": [
+        "scavenger-hero",
+        "wasteland-enemy",
+        "abandoned-chest",
+        "scavenge-resource"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "线性关卡解锁与探索度提升",
+    "description": "随着关卡推进，搜索区域更加宽广，高低错落的跳跃地形增多，宝箱与资源分布在更具挑战性的隐蔽高处。"
+  },
+  "difficulty": {
+    "model": "平缓渐进式难度",
+    "description": "初始阶段平台宽阔且敌人巡逻节奏固定，后续关卡增加高低错落的平台地形与更加频繁的敌人巡逻，考验玩家的跳跃时机与避障反应。"
+  },
+  "mechanics": [
+    {
+      "id": "mech-horizontal-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "mech-jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "mech-search",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "mech-dodge",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "成功到达关卡最右侧的安全撤离点"
+  ],
+  "loseConditions": [
+    "生命值因多次碰撞废土敌人而耗尽"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space",
+    "coord:delivery-pixels"
+  ]
+}

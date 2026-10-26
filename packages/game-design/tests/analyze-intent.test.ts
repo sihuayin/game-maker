@@ -192,3 +192,41 @@ describe("出发前的两处「免费」拦停 —— **不记进账**，别让�
       .rejects.toThrowError(/没有别的输入/);
   });
 });
+
+describe("gemini 协议（fpvs-v1-p0 票 07）", () => {
+  const geminiReply = (args: unknown, finishReason = "STOP") => ({
+    candidates: [{ content: { parts: [{ functionCall: { name: TOOL_NAME, args } }] }, finishReason }],
+    modelVersion: "gemini-3.1-flash",
+    usageMetadata: { promptTokenCount: 838, candidatesTokenCount: 991 },
+  });
+
+  it("走 `:generateContent` + `x-goog-api-key`，并正确解析 functionCall", async () => {
+    let url = ""; let headers: Record<string, string> = {}; let body: Record<string, any> = {};
+    const f = (async (u: string, init: RequestInit) => {
+      url = u; headers = init.headers as Record<string, string>; body = JSON.parse(String(init.body));
+      return res(geminiReply(modelOut()));
+    }) as unknown as typeof fetch;
+    const r = await analyzeIntent(input({
+      transport: { protocol: "gemini", baseUrl: "http://upstream.test", apiKey: "k", model: "gemini-3.1-flash" },
+      fetchImpl: f,
+    }));
+    expect(url).toBe("http://upstream.test/models/gemini-3.1-flash:generateContent");
+    expect(headers["x-goog-api-key"]).toBe("k");
+    expect(headers["anthropic-version"]).toBeUndefined();
+    expect(body.contents[0].parts[0].text).toContain("废土横版寻宝");
+    expect(body.tools[0].functionDeclarations[0].name).toBe(TOOL_NAME);
+    expect(body.generationConfig.maxOutputTokens).toBe(16_000);
+    expect(r.spec.genre).toBe("platformer");
+    expect(r.ledger?.[0]?.model).toBe("gemini-3.1-flash");
+    expect(r.ledger?.[0]?.requestedModel).toBe("gemini-3.1-flash");
+  });
+
+  it("gemini 的 `MAX_TOKENS` ⇒ `truncated`（与 anthropic 的 `max_tokens` 同档，且没留下可用入参）", async () => {
+    const f = (async () => res(geminiReply({}, "MAX_TOKENS"))) as unknown as typeof fetch;
+    const err = await thrown(analyzeIntent(input({
+      transport: { protocol: "gemini", baseUrl: "http://upstream.test", apiKey: "k" },
+      fetchImpl: f,
+    })));
+    expect(err.failure).toBe("truncated");
+  });
+});

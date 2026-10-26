@@ -4,8 +4,8 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { PLAN_TOOL_DESCRIPTION, SKELETON_SHAPE_NOTE, TD_REFERENCE_SCALE, animationFramePrompt, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
-import type { AssetSpec, CharacterDNA, StyleSpec } from "@game-maker/contracts";
+import { PLAN_TOOL_DESCRIPTION, SKELETON_SHAPE_NOTE, TD_REFERENCE_SCALE, animationFramePrompt, assetPlanPrompt, assetTask, imagePrompt, recipeShapeSpec, renderPrompt, tdConfigPrompt } from "../src/index.js";
+import type { AssetSpec, CharacterDNA, GameDesignSpec, StyleSpec, VisualWorldSpec } from "@game-maker/contracts";
 
 describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
   const spec = recipeShapeSpec();
@@ -29,6 +29,13 @@ describe("清单的形状说明：**同时钉住两边**（票 08）", () => {
     // 真正让它判断对的是这条 —— 写了它，**画**就被约束了。
     expect(spec).toMatch(/中央区必须平坦且可任意重复/);
     expect(spec).toMatch(/一圈空心框/);
+  });
+
+  it("animation：≥3 帧建议写 sheet（一排 N 个横条 N:1 生图发不出，票 13）", () => {
+    // ⚠️ 这一条是补的：票 13 之前 `sheet` 只是「可选」、模型全不写 ⇒ 4 帧横条 AR 4.0 生图发不出、
+    //   交付帧压扁（票 05 重跑 `constructive-constraint`）。这句把「建议写」钉住。
+    expect(spec).toMatch(/≥3 帧强烈建议写/);
+    expect(spec).toMatch(/自动/);
   });
 });
 
@@ -357,11 +364,52 @@ describe("固定网格：多帧提示词按 cols×rows 描述（票 01）", () =
     expect(p).not.toContain("格子");
   });
 
-  it("没写 sheet 的旧路径一字不改 —— 仍走横排", () => {
-    const old = { ...GRID, animations: [{ name: "run", frames: 9, fps: 8, loop: true }] };
-    const p = imagePrompt(old, STYLE);
+  it("没写 sheet 的 N≥3 帧：确定性推导网格（票 13）—— 9 帧 ⇒ 3×3，不再走横排", () => {
+    const nine = { ...GRID, animations: [{ name: "run", frames: 9, fps: 8, loop: true }] };
+    const p = imagePrompt(nine, STYLE);
+    expect(p).toContain("固定网格");
+    expect(p).toContain("3 列 × 3 行");
+    expect(p).not.toContain("横向排开");
+  });
+
+  it("没写 sheet 的 N≤2 帧：仍走横排（票 13 只压 ≥3 帧）", () => {
+    const two = { ...GRID, animations: [{ name: "run", frames: 2, fps: 8, loop: true }] };
+    const p = imagePrompt(two, STYLE);
     expect(p).toContain("横向排开");
-    expect(p).not.toContain("3 列 × 3 行");
-    expect(p).not.toContain("每一格恰好一个角色");
+    expect(p).not.toContain("固定网格");
+  });
+});
+
+describe("背景画布覆盖：提示词把视口高/宽的下限写给模型（票 09）", () => {
+  const DESIGN = JSON.parse(readFileSync(fileURLToPath(new URL(
+    "../../../fixtures/e2e/wasteland-platformer/game-design.json", import.meta.url)), "utf8")) as GameDesignSpec;
+  const VWS = JSON.parse(readFileSync(fileURLToPath(new URL(
+    "../../../fixtures/e2e/wasteland-platformer/visual-world.json", import.meta.url)), "utf8")) as VisualWorldSpec;
+  const prompt = assetPlanPrompt({
+    design: DESIGN, vws: VWS,
+    echo: { styleRef: "stylespec.json", styleId: "wasteland" },
+    viewport: { w: 480, h: 270 },
+  });
+
+  it("高：写明背景 `size.h` 至少 = 视口高 270（世界高恒 = 视口高）", () => {
+    expect(prompt).toMatch(/size\.h.*至少 = 视口高 270/);
+    expect(prompt).toMatch(/世界高恒 = 视口高 270/);
+  });
+
+  it("宽：正视差层必须 tileable.x，parallax 0 层宽 ≥ 视口宽", () => {
+    expect(prompt).toMatch(/parallax > 0/);
+    expect(prompt).toMatch(/tileable:\{"x":true\}/);
+    expect(prompt).toMatch(/size\.w ≥ 480/);
+  });
+
+  it("竖向不平铺（不写 tileable.y）", () => {
+    expect(prompt).toMatch(/竖向平铺/);
+    expect(prompt).toMatch(/tileable\.y/);
+  });
+
+  it("角色类资源按身份定尺寸：高挑用高框、Q 版用方框（票 15）", () => {
+    expect(prompt).toMatch(/按身份定尺寸/);
+    expect(prompt).toMatch(/高框/);
+    expect(prompt).toMatch(/方框/);
   });
 });

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">
+  <g id="background"><rect x="0" y="0" width="480" height="270" fill="#2a3442"/></g>
+  <g id="scavenger-hero"><rect x="8" y="190" width="24" height="40" fill="#6b4a33"/></g>
+  <g id="entity-enemy"><rect x="124" y="214" width="16" height="16" fill="#2a3442"/></g>
+  <g id="entity-chest"><rect x="240" y="214" width="16" height="16" fill="#d9a441"/></g>
+  <g id="entity-resource"><rect x="356" y="214" width="16" height="16" fill="#d9a441"/></g>
+  <g id="ui-panel"><rect x="8" y="8" width="160" height="24" fill="#f2d98b"/></g>
+  <g id="ui-pip"><rect x="16" y="16" width="12" height="8" fill="#f2d98b"/></g>
+</svg>

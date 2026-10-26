@@ -1,0 +1,87 @@
+{
+  "frames": {
+    "wasteland-station-bg.far-buildings": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 180
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 180
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 180
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "wasteland-station-bg.sky": {
+      "frame": {
+        "x": 0,
+        "y": 180,
+        "w": 320,
+        "h": 180
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 180
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 180
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "wasteland-station-bg.station-wall": {
+      "frame": {
+        "x": 0,
+        "y": 360,
+        "w": 320,
+        "h": 180
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 180
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 180
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.backgrounds.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 320,
+      "h": 540
+    },
+    "scale": 1
+  }
+}

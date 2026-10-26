@@ -1,0 +1,112 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土拾荒者：荒墟寻宝",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的横版平台与铁轨废墟中移动与跳跃探索",
+    "寻找并搜刮分布在废墟中的废土资源与宝箱以积累物资",
+    "躲避巡逻的废土敌人与环境危险，维持生存生命值",
+    "收集足够物资并成功到达关卡右侧安全撤离点完成通关"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "废土拾荒者",
+    "abilities": [
+      "横版左右移动跑动",
+      "跳跃跨越地形与平台障碍",
+      "开启废墟宝箱与拾取废土资源",
+      "利用避敌路线躲避危险敌人"
+    ],
+    "goals": [
+      "在废弃城市废墟中搜刮宝箱与废土资源",
+      "躲避巡逻敌人保持生存生命值",
+      "抵达废墟尽头的安全撤离点完成搜索"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "wasteland-enemy",
+      "behavior": "在混凝土平台与枕木铁轨间来回巡逻走动，发现玩家靠近时会持续沿路线移动阻截",
+      "threat": "接触玩家时扣除生命值，阻碍探索与宝箱搜刮"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "treasure-chest",
+      "type": "chest",
+      "behavior": "玩家靠近并按键互动后打开，产出高价值珍贵废土物资与关卡积分奖励"
+    }
+  ],
+  "resources": [
+    {
+      "id": "scavenge-resource",
+      "purpose": "散落在废墟各处的废土零件与可拾取物资，收集可增加积分与储备"
+    }
+  ],
+  "world": {
+    "theme": "荒凉、危险且充满未知的废土城市废墟",
+    "setting": "深蓝夜空下的废弃城市废墟、平顶木质与混凝土墙体建筑、底部横向延伸的枕木铁轨与平整 platform",
+    "structure": "双层平行的深蓝夜空与几何圆形月亮为背景；平整褐色建筑主墙面挂有相框贴纸与小型路灯为中景；枕木铁轨与平整混凝土平台为前景履带"
+  },
+  "levels": [
+    {
+      "id": "level-wasteland-ruins-1",
+      "purpose": "引导玩家熟悉横版平台移动跳跃、搜刮废土宝箱与资源，同时学会避开敌人敌人巡逻路线到达出口",
+      "layout": "玩家从左侧铁轨起点出发，横向向右跳跃穿过废弃建筑区与断裂平台，搜刮沿途的宝箱与资源，避开巡逻敌人，最终抵达右侧安全撤离区",
+      "entities": [
+        "scavenger-hero",
+        "wasteland-enemy",
+        "treasure-chest",
+        "scavenge-resource"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "stage-by-stage-exploration",
+    "description": "通过搜刮废土资源与宝箱累积物资积分，解锁更具挑战的废墟区域与更高价值的搜刮关卡"
+  },
+  "difficulty": {
+    "model": "static-patrol-and-platforming",
+    "description": "敌人固定路线巡逻与平台跳跃难度相辅相成，考验玩家的观察与移动时机"
+  },
+  "mechanics": [
+    {
+      "id": "horizontal-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump-movement",
+      "mechanic": "jump"
+    },
+    {
+      "id": "collect-and-search",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "dodge-danger",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "搜刮资源并成功抵达关卡右侧安全撤离点"
+  ],
+  "loseConditions": [
+    "玩家生命值因接触危险敌人扣尽"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

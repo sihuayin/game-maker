@@ -1,0 +1,714 @@
+{
+  "format": "assetpack/v4",
+  "id": "wasteland-scavenger-recipe",
+  "version": 1,
+  "createdAt": "2026-10-25T15:13:55.000Z",
+  "generator": {
+    "name": "game-maker",
+    "version": "0.0.0"
+  },
+  "provenance": {
+    "mode": "generated"
+  },
+  "palette": {
+    "ref": "authoring/stylespec.json#/palette",
+    "size": 16,
+    "values": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "coverage": {
+      "exact": 2,
+      "composited": 0,
+      "quantized": 7,
+      "unbound": 0
+    }
+  },
+  "atlases": [
+    {
+      "id": "animations",
+      "kind": "animation",
+      "meta": "delivery/atlas.animations.json",
+      "image": "delivery/atlas.animations.png",
+      "size": {
+        "w": 24,
+        "h": 288
+      },
+      "frames": 12,
+      "assets": [
+        "scavenger-hero",
+        "wasteland-enemy"
+      ],
+      "checksum": "sha256:7f8c2813aba4047994d29e48abdf30e793dfc33c2755650eb3e5648892f10682"
+    },
+    {
+      "id": "backgrounds",
+      "kind": "background",
+      "meta": "delivery/atlas.backgrounds.json",
+      "image": "delivery/atlas.backgrounds.png",
+      "size": {
+        "w": 320,
+        "h": 540
+      },
+      "frames": 3,
+      "assets": [
+        "wasteland-station-bg"
+      ],
+      "checksum": "sha256:ea43298da6f5a23f68e46d825fddc453eaab5a5cd5eda8891577eddc1da5308c"
+    },
+    {
+      "id": "sprites",
+      "kind": "sprite",
+      "meta": "delivery/atlas.sprites.json",
+      "image": "delivery/atlas.sprites.png",
+      "size": {
+        "w": 32,
+        "h": 76
+      },
+      "frames": 4,
+      "assets": [
+        "abandoned-chest",
+        "exit-sign",
+        "scavenge-resource",
+        "station-platform"
+      ],
+      "checksum": "sha256:42fd775cf156424fb749294a34da27e8c03be15758cc36a1df5d8b2ac14f7d3d"
+    },
+    {
+      "id": "ui",
+      "kind": "ui",
+      "meta": "delivery/atlas.ui.json",
+      "image": "delivery/atlas.ui.png",
+      "size": {
+        "w": 32,
+        "h": 48
+      },
+      "frames": 2,
+      "assets": [
+        "hud-panel",
+        "hud-resource-icon"
+      ],
+      "checksum": "sha256:92c2ab7e0237f4f63b7327f620bd887dc8dcc0c4d5866cd47829f3191638464a"
+    }
+  ],
+  "assets": [
+    {
+      "id": "scavenger-hero",
+      "kind": "animation",
+      "role": "玩家角色-废土拾荒者",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "scavenger-hero.idle1"
+        },
+        {
+          "name": "scavenger-hero.idle2"
+        },
+        {
+          "name": "scavenger-hero.run1"
+        },
+        {
+          "name": "scavenger-hero.run2"
+        },
+        {
+          "name": "scavenger-hero.run3"
+        },
+        {
+          "name": "scavenger-hero.run4"
+        },
+        {
+          "name": "scavenger-hero.jump1"
+        },
+        {
+          "name": "scavenger-hero.jump2"
+        }
+      ],
+      "animations": [
+        {
+          "name": "idle",
+          "frames": [
+            "scavenger-hero.idle1",
+            "scavenger-hero.idle2"
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": [
+            "scavenger-hero.run1",
+            "scavenger-hero.run2",
+            "scavenger-hero.run3",
+            "scavenger-hero.run4"
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": [
+            "scavenger-hero.jump1",
+            "scavenger-hero.jump2"
+          ],
+          "fps": 6,
+          "loop": false
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.idle.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.run.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenger-hero.jump.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "wasteland-enemy",
+      "kind": "animation",
+      "role": "废土巡逻敌人",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 24
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "animations",
+      "frames": [
+        {
+          "name": "wasteland-enemy.patrol1"
+        },
+        {
+          "name": "wasteland-enemy.patrol2"
+        },
+        {
+          "name": "wasteland-enemy.patrol3"
+        },
+        {
+          "name": "wasteland-enemy.patrol4"
+        }
+      ],
+      "animations": [
+        {
+          "name": "patrol",
+          "frames": [
+            "wasteland-enemy.patrol1",
+            "wasteland-enemy.patrol2",
+            "wasteland-enemy.patrol3",
+            "wasteland-enemy.patrol4"
+          ],
+          "fps": 6,
+          "loop": true
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-enemy.patrol.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "abandoned-chest",
+      "kind": "sprite",
+      "role": "废墟宝箱",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "abandoned-chest"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/abandoned-chest.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "scavenge-resource",
+      "kind": "sprite",
+      "role": "废土可拾取物资",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 12,
+        "h": 12
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "scavenge-resource"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/scavenge-resource.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "station-platform",
+      "kind": "sprite",
+      "role": "车站铁轨 platform 平台砖",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "station-platform"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/station-platform.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "exit-sign",
+      "kind": "sprite",
+      "role": "撤离出口发光告示牌",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 24,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlasId": "sprites",
+      "frames": [
+        {
+          "name": "exit-sign"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/exit-sign.png",
+          "original": "生图"
+        }
+      ]
+    },
+    {
+      "id": "wasteland-station-bg",
+      "kind": "background",
+      "role": "废弃车站场景背景",
+      "origin": "generated",
+      "paletteBinding": "quantized",
+      "required": true,
+      "size": {
+        "w": 320,
+        "h": 180
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "layers": [
+        {
+          "name": "sky",
+          "parallax": 0
+        },
+        {
+          "name": "far-buildings",
+          "parallax": 0.3,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        },
+        {
+          "name": "station-wall",
+          "parallax": 0.6,
+          "tileable": {
+            "x": true,
+            "y": false
+          }
+        }
+      ],
+      "atlasId": "backgrounds",
+      "frames": [
+        {
+          "name": "wasteland-station-bg.sky"
+        },
+        {
+          "name": "wasteland-station-bg.far-buildings"
+        },
+        {
+          "name": "wasteland-station-bg.station-wall"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-station-bg.sky.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-station-bg.far-buildings.png",
+          "original": "生图 · 3 次调用"
+        },
+        {
+          "kind": "bitmap",
+          "ref": "authoring/generated/wasteland-station-bg.station-wall.png",
+          "original": "生图 · 3 次调用"
+        }
+      ]
+    },
+    {
+      "id": "hud-panel",
+      "kind": "ui",
+      "role": "HUD 面板底板",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 32,
+        "h": 32
+      },
+      "anchor": {
+        "x": 0,
+        "y": 0
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-panel"
+        }
+      ],
+      "scale9Borders": {
+        "x": 6,
+        "y": 6,
+        "w": 20,
+        "h": 20
+      },
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-panel.json"
+        }
+      ]
+    },
+    {
+      "id": "hud-resource-icon",
+      "kind": "ui",
+      "role": "HUD 资源计数图标",
+      "origin": "generated",
+      "paletteBinding": "exact",
+      "required": true,
+      "size": {
+        "w": 16,
+        "h": 16
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "atlasId": "ui",
+      "frames": [
+        {
+          "name": "hud-resource-icon"
+        }
+      ],
+      "authoring": [
+        {
+          "kind": "drawlist",
+          "ref": "authoring/drawlist/hud-resource-icon.json"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "authoring/drawlist/hud-panel.json",
+      "bytes": 7013,
+      "checksum": "sha256:705db1b6762983267a965fa0b5493dbdd88b0df7af2c05e767d98bc641501b1d"
+    },
+    {
+      "path": "authoring/drawlist/hud-resource-icon.json",
+      "bytes": 4669,
+      "checksum": "sha256:f825dce87033cb8c049fb454ea0b0e6951f77da318bc6bcfb5bc480d5965cbd9"
+    },
+    {
+      "path": "authoring/generated/abandoned-chest.png",
+      "bytes": 935398,
+      "checksum": "sha256:ce3a4c8ce8961a5a5173e304ef2e4b587439df37e18406a3f5924571bc99b42b"
+    },
+    {
+      "path": "authoring/generated/abandoned-chest.prompt.txt",
+      "bytes": 1871,
+      "checksum": "sha256:961b847dced42fb48d5415f5968e6f227877acfec14990ff32dcf857d66f2483"
+    },
+    {
+      "path": "authoring/generated/exit-sign.png",
+      "bytes": 907173,
+      "checksum": "sha256:4adf25eb4045429b0c7f23f00a7835bb9da48117ad6239611b89064574ed4f1c"
+    },
+    {
+      "path": "authoring/generated/exit-sign.prompt.txt",
+      "bytes": 1898,
+      "checksum": "sha256:f2b6e6cc152e7528814af45539f5bbdc093e2ed9b868c49149adbffda1c6a443"
+    },
+    {
+      "path": "authoring/generated/scavenge-resource.png",
+      "bytes": 860007,
+      "checksum": "sha256:3aab7b6b8e8b09e6225b081fd5ac334a1ec00be64490c1ecb3feb3397ca45711"
+    },
+    {
+      "path": "authoring/generated/scavenge-resource.prompt.txt",
+      "bytes": 1880,
+      "checksum": "sha256:4795c2d80cb90fcefc5cbaf4da87308c1b73b5db423f8f2b93bf4bc36b4efa7f"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.idle.png",
+      "bytes": 993351,
+      "checksum": "sha256:2266905abbe53152e073be91effed856a9287dfa6c2622590733bfcac840a0b8"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.idle.prompt.txt",
+      "bytes": 4159,
+      "checksum": "sha256:e5ec6d01826c1271c433d97ab1ed02f9eadc891b9925c315eddbaea511959a68"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.jump.png",
+      "bytes": 973052,
+      "checksum": "sha256:b97ba205684ec63bca7ada3c6f5ad319bd63c9bdf19ea3bd14660b08ab5f7c0b"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.jump.prompt.txt",
+      "bytes": 4159,
+      "checksum": "sha256:146c5b4d6e4180cb740621f3d1ece951a5f0c7ca84c1223bdd1227bf8b345dff"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.run.png",
+      "bytes": 1080263,
+      "checksum": "sha256:31b97c07a8b686903d10193227de3538932aef8ed85722a0343e828ac8ef37fd"
+    },
+    {
+      "path": "authoring/generated/scavenger-hero.run.prompt.txt",
+      "bytes": 4157,
+      "checksum": "sha256:e16c4a47a5100710c474b5f0259a50fafe5ad4fa4702cf22dbbbbc6d532dfd3a"
+    },
+    {
+      "path": "authoring/generated/station-platform.png",
+      "bytes": 899781,
+      "checksum": "sha256:5ff0c42360a78b3b53bf4ecc2bf04e69fc3b06deea12d813a0c0d485cda78020"
+    },
+    {
+      "path": "authoring/generated/station-platform.prompt.txt",
+      "bytes": 1902,
+      "checksum": "sha256:ebe7dbd6ae2ea239d19325f68ba32cbb987a53754f3c89c8248c941915d19a7d"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol.png",
+      "bytes": 1100615,
+      "checksum": "sha256:f0f415246db997c9d15f22ebcf43fdbc58e18074afa2566e6d734648fa2ba806"
+    },
+    {
+      "path": "authoring/generated/wasteland-enemy.patrol.prompt.txt",
+      "bytes": 4076,
+      "checksum": "sha256:6c7d3baf14415afe54c78188d940bfafe6010fa2d696a867b1b4c436a1d98754"
+    },
+    {
+      "path": "authoring/generated/wasteland-station-bg.far-buildings.png",
+      "bytes": 1249653,
+      "checksum": "sha256:0710e41bb8fa7a94326513b93679bac0136b478cac1d11e37c053284b47d7627"
+    },
+    {
+      "path": "authoring/generated/wasteland-station-bg.far-buildings.prompt.txt",
+      "bytes": 1813,
+      "checksum": "sha256:b58d68e2942d60e39800ffa8d40e5345075b9de133366e19b2ec46a61b0285ab"
+    },
+    {
+      "path": "authoring/generated/wasteland-station-bg.sky.png",
+      "bytes": 510102,
+      "checksum": "sha256:5e6074b6f7fead3337d2310bfcbc0a7d853e5c909bf0abe82eebc7c5a7a56ca8"
+    },
+    {
+      "path": "authoring/generated/wasteland-station-bg.sky.prompt.txt",
+      "bytes": 1927,
+      "checksum": "sha256:3747d24f57eb312d9868431678edcb653d5972888d69f515acddbcdd6ed7a6f4"
+    },
+    {
+      "path": "authoring/generated/wasteland-station-bg.station-wall.png",
+      "bytes": 1123464,
+      "checksum": "sha256:9f7738134731f25681cf29f2fd0c4ec1a00424dbdfe0b2716181d437f8a1c177"
+    },
+    {
+      "path": "authoring/generated/wasteland-station-bg.station-wall.prompt.txt",
+      "bytes": 1818,
+      "checksum": "sha256:ce67ad8993a3dcfcbbb8dd7768414a723b680d81169a4d7b312ac720a5d11eaf"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.png",
+      "bytes": 770014,
+      "checksum": "sha256:6c66d5b9d67d3ff143507ec6a8d8a6ac2706ebeabcd496791822e0e9871f437a"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.prompt.txt",
+      "bytes": 4161,
+      "checksum": "sha256:c80d8600b994d0468f6800f7110f228a988cd3bf3b7af0c85715887a5f45f5ea"
+    },
+    {
+      "path": "authoring/masters/scavenger-hero-master.ratio.json",
+      "bytes": 405,
+      "checksum": "sha256:7369bc85d2e3d7e9fc25b1eb39fcedf1de54c3e19b0bf7dfd408ff696af7b840"
+    },
+    {
+      "path": "authoring/masters/wasteland-enemy-master.png",
+      "bytes": 973230,
+      "checksum": "sha256:7c53decd3af7de0e5ec44cf951dd685b8c7b95fff070ad962bd5c893aaa1df39"
+    },
+    {
+      "path": "authoring/masters/wasteland-enemy-master.prompt.txt",
+      "bytes": 4056,
+      "checksum": "sha256:0e50fb5896410c192bd20be0f228cfa17588068938e234ca4b0d8bacce8825ae"
+    },
+    {
+      "path": "authoring/masters/wasteland-enemy-master.ratio.json",
+      "bytes": 406,
+      "checksum": "sha256:cc19a6cc9405840ce8ddae498a05fa58370f556605dbc152b59cdc4638b58f59"
+    },
+    {
+      "path": "authoring/stylespec.json",
+      "bytes": 1090,
+      "checksum": "sha256:b37a09cce895f5234b6345e47467e8c7cd4bc4fe6f42699220ac89130356de77"
+    },
+    {
+      "path": "authoring/visual-world.json",
+      "bytes": 5370,
+      "checksum": "sha256:581840e81d65788c97c1f0de5972da9c250e580fbae8df91fead3930d5b4e956"
+    },
+    {
+      "path": "coverage.json",
+      "bytes": 674,
+      "checksum": "sha256:99498c39d2536c90859aa908e3f393cf8a4c4aea8535cd04825d08fda702a033"
+    },
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5050,
+      "checksum": "sha256:f51286058c951c42332086f5aa9602ebdefaab6a953ee5e9e690fd987e391968"
+    },
+    {
+      "path": "delivery/atlas.animations.png",
+      "bytes": 4502,
+      "checksum": "sha256:7f8c2813aba4047994d29e48abdf30e793dfc33c2755650eb3e5648892f10682"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.json",
+      "bytes": 1464,
+      "checksum": "sha256:0786855af17156fa9acbfe9d2b4d37ec85d9986fa4332af20a20160c1db1cca6"
+    },
+    {
+      "path": "delivery/atlas.backgrounds.png",
+      "bytes": 27781,
+      "checksum": "sha256:ea43298da6f5a23f68e46d825fddc453eaab5a5cd5eda8891577eddc1da5308c"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 1792,
+      "checksum": "sha256:acc2abef57e73befad2849dcf09ff9cce846efcbf9f7169dd654b3d0afe260ab"
+    },
+    {
+      "path": "delivery/atlas.sprites.png",
+      "bytes": 972,
+      "checksum": "sha256:42fd775cf156424fb749294a34da27e8c03be15758cc36a1df5d8b2ac14f7d3d"
+    },
+    {
+      "path": "delivery/atlas.ui.json",
+      "bytes": 1091,
+      "checksum": "sha256:a38d0e72eedb2830b40d6d2e677a2bea033f79a2f3a6369a34206d3d7e8e5fe5"
+    },
+    {
+      "path": "delivery/atlas.ui.png",
+      "bytes": 386,
+      "checksum": "sha256:92c2ab7e0237f4f63b7327f620bd887dc8dcc0c4d5866cd47829f3191638464a"
+    },
+    {
+      "path": "ledger.json",
+      "bytes": 4129,
+      "checksum": "sha256:ac34e6ac1787fc71b78d06e04bfd1eace7358cd90864b6087f8c2c87f12d90db"
+    },
+    {
+      "path": "master-ratios.json",
+      "bytes": 685,
+      "checksum": "sha256:811a2625b369e2d1f2e6e2ea62314fdd1ef1aad64087d1f9d710330ab5d61fb9"
+    }
+  ]
+}

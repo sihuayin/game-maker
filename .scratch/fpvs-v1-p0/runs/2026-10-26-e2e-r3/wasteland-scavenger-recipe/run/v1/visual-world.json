@@ -1,0 +1,135 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "复古极简低轨像素风",
+    "keywords": [
+      "像素风",
+      "2D横版",
+      "废土探索",
+      "平涂色块"
+    ],
+    "description": "极简低分辨率像素风格，注重明确的复古块面感与横版平视视角。"
+  },
+  "camera": {
+    "mode": "side",
+    "projection": "orthographic"
+  },
+  "composition": {
+    "foreground": "铁轨与平台边缘。",
+    "midground": "车站大楼外墙、座椅、挂画与主角。",
+    "background": "双色渐变夜空与远山轮廓。",
+    "objectScale": "大型建筑与微型角色对比。",
+    "characterScale": "主体角色约占画面高度1/4。",
+    "density": "低密度，块状布局。"
+  },
+  "palette": {
+    "primary": [
+      "palette:5",
+      "palette:8"
+    ],
+    "secondary": [
+      "palette:1",
+      "palette:9"
+    ],
+    "accent": [
+      "palette:12",
+      "palette:12"
+    ],
+    "background": [
+      "palette:1",
+      "palette:4"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:1"
+    ],
+    "highlight": [
+      "palette:14",
+      "palette:15"
+    ]
+  },
+  "lighting": {
+    "direction": "无明确光源，平涂发光。",
+    "softness": "硬边缘，无软阴影。",
+    "contrast": "中高对比度，色块清晰分界。",
+    "mood": "静谧、荒凉、夜间废土。"
+  },
+  "materials": {},
+  "character": {
+    "proportions": "2头身Q版低分辨率像素角色。",
+    "silhouette": "矩形与块状几何轮廓。",
+    "poseLanguage": "正面站立，像素方块构成的僵硬姿态。",
+    "clothing": "简单制服与深色帽子，黄色扣饰。",
+    "faceAbstraction": "极简方块脸，黑眼珠与黑鼻点。"
+  },
+  "environment": {
+    "architecture": "扁平平顶木质/砖石废墟建筑。",
+    "terrain": "平坦的灰色水泥站台与横向铁轨。",
+    "props": "长椅、挂画、告示牌、灯柱、铁轨。",
+    "textureDensity": "极低，纯色块堆叠。"
+  },
+  "shapeLanguage": [
+    "平直水平线",
+    "矩形块面",
+    "极简三角形"
+  ],
+  "constraints": [
+    "使用极简方块像素风格，无平滑渐变",
+    "色彩必须严格限制在限定色板内",
+    "物体与角色需保持黑边或高对比度轮廓区分",
+    "严格保持正侧视2D横版视角"
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "极简低分辨率像素画",
+      "废土横版探索"
+    ],
+    "camera": {},
+    "composition": {},
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {},
+    "shapeLanguage": [
+      "正方形",
+      "矩形",
+      "等腰三角形"
+    ],
+    "material": [
+      "平涂色块"
+    ],
+    "environment": [
+      "横版平视废土站台"
+    ],
+    "characterStyle": [
+      "低分辨率像素小人",
+      "大方块头部"
+    ],
+    "constraints": [
+      "像素无渐变",
+      "平涂色块"
+    ],
+    "confidence": 0.95
+  }
+}

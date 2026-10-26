@@ -1,0 +1,289 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-recipe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "玩家角色-废土拾荒者",
+        "description": "低分辨率像素风格废土拾荒者，矮胖二头身方块造型，深色外套与腰间明黄色扣环腰带，方形顶帽。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "scavenger-hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "wasteland-enemy",
+        "role": "废土巡逻敌人",
+        "description": "废土低速巡逻方块警卫，带有低调深沉金属躯干与高亮暖橙色发光眼灯。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true,
+        "characterId": "wasteland-enemy",
+        "masterAsset": "wasteland-enemy-master",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "abandoned-chest",
+        "role": "废墟宝箱",
+        "description": "废墟角落中的废弃金属宝箱，带金黄与暖橙色高亮发光锁扣。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "scavenge-resource",
+        "role": "废土可拾取物资",
+        "description": "散落的微型方块废土物资包，高亮金黄微光，可被玩家拾取。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 12,
+          "h": 12
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "station-platform",
+        "role": "车站铁轨 platform 平台砖",
+        "description": "废弃车站平坦混凝土地面与双线铁轨地表块，用于搭建横向移动平台。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "exit-sign",
+        "role": "撤离出口发光告示牌",
+        "description": "悬挂式黄色高亮发光告示牌，标记关卡右侧的废土搜寻安全撤离出口。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "wasteland-station-bg",
+        "role": "废弃车站场景背景",
+        "description": "废弃车站与废墟建筑分层侧视背景，深蓝夜空至废墟墙体。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 320,
+          "h": 180
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0,
+            "description": "深蓝至灰蓝色渐变废土夜空，极远处微弱光带"
+          },
+          {
+            "name": "far-buildings",
+            "parallax": 0.3,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "远景废弃建筑轮廓线与横向梁柱结构"
+          },
+          {
+            "name": "station-wall",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "中景废弃车站墙面、窗框与横向压顶梁柱"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "HUD 面板底板",
+        "description": "屏幕空间 HUD 状态信息底板，九宫格拉伸，深色边框与平坦中央区。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 6,
+          "right": 6,
+          "top": 6,
+          "bottom": 6
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-resource-icon",
+        "role": "HUD 资源计数图标",
+        "description": "屏幕空间 HUD 资源计数图标，金黄色高亮微型齿轮物资图标。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "scavenger-hero-master",
+      "role": "玩家角色母版",
+      "description": "废土拾荒者二头身正交视角创作态母版，方正外套、腰间亮黄腰带扣与方形帽子。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 24,
+        "h": 24
+      }
+    },
+    {
+      "id": "wasteland-enemy-master",
+      "role": "巡逻敌人母版",
+      "description": "废土巡逻机器人二头身创作态母版，粗犷方块金属躯干与发光眼灯。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "wasteland-enemy",
+      "size": {
+        "w": 24,
+        "h": 24
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

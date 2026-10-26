@@ -1,0 +1,284 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-recipe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "废土拾荒者主角动画",
+        "description": "2头身像素风废土拾荒者，身穿简易深色制服与深色帽子，带有醒目的黄色扣饰。僵硬方块姿态，具备待机、跑动与跳跃动作。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "hero-master",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 2,
+            "sheet": {
+              "columns": 2,
+              "rows": 1
+            },
+            "fps": 4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "sheet": {
+              "columns": 2,
+              "rows": 2
+            },
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "sheet": {
+              "columns": 2,
+              "rows": 1
+            },
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "entity-enemy",
+        "role": "巡逻敌人动画",
+        "description": "巡逻在废墟与铁轨上的废土机械怪物或游荡警卫，矩形像素轮廓，在固定路线进行往复巡逻。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "entity-enemy",
+        "masterAsset": "enemy-master",
+        "animations": [
+          {
+            "name": "patrol",
+            "frames": 4,
+            "sheet": {
+              "columns": 2,
+              "rows": 2
+            },
+            "fps": 6,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "entity-chest",
+        "role": "废弃废宝箱",
+        "description": "废弃城市车站内的金属与木质宝箱，带有斑驳锈迹与醒目的黄色扣饰合页，玩家靠近可开启获得物资。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 24
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "entity-resource",
+        "role": "可拾取废土生存资源包",
+        "description": "裹着防护布的生存物资包与罐头组合，像素块面清晰，明亮醒目，用于生存与关卡评分。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "station-platform",
+        "role": "水泥站台与铁轨地面砖",
+        "description": "平坦灰色水泥站台边缘与带深色铁轨纹理的平台拼接砖，像素风格平涂色块，支持横向平铺构成地形。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "屏幕空间 HUD 状态面板",
+        "description": "屏幕空间 HUD 九宫格背景面板，深色废土金属框边，四角带有像素扣饰，中央平坦留空用于拉伸装载状态与数据。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 6,
+          "right": 6,
+          "top": 6,
+          "bottom": 6
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-resource-icon",
+        "role": "屏幕空间 HUD 物资指示图标",
+        "description": "屏幕右上角 HUD 使用的资源计数固定尺寸像素图标，明亮突出，无九宫格拉伸。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "ruined-station-bg",
+        "role": "废弃车站与废墟远景背景",
+        "description": "废弃车站与废墟大楼分层背景，包含渐变夜空、远山轮廓、大楼外墙、挂画与灯柱剪影。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0,
+            "description": "双色渐变夜空与远山轮廓剪影"
+          },
+          {
+            "name": "station-wall",
+            "parallax": 0.5,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "车站大楼外墙、窗框与水泥结构废墟"
+          },
+          {
+            "name": "foreground-ruins",
+            "parallax": 0.8,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "前景废弃长椅、挂画、告示牌与站台灯柱"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "hero-master",
+      "role": "废土拾荒者创作母版",
+      "description": "废土拾荒者主角创作母版，2头身Q版像素角色的正面静态视觉参考，定义制服与帽子扣饰细节。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    {
+      "id": "enemy-master",
+      "role": "巡逻敌人创作母版",
+      "description": "巡逻敌人创作母版，废土机械怪物或巡逻警卫的正面静态视觉参考，定义暗色轮廓与危险警示标志。",
+      "source": {
+        "kind": "image"
+      },
+      "characterId": "entity-enemy",
+      "size": {
+        "w": 32,
+        "h": 32
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

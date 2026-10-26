@@ -90,13 +90,19 @@ const modelLike = () => {
     const k = deliveredColour(m[1]!);
     painted.push(`#${k.map((v) => v.toString(16).padStart(2, "0")).join("")}`);
     const n = Number(CELLS_IN_PROMPT.exec(req.prompt)?.[1] ?? 1);
-    const w = req.size.w, h = req.size.h, cellW = w / n;
+    // ⚠️ 票 13：提示词可能是「固定网格 N 列 × M 行」—— 桩照着画网格，不永远是横排。
+    const gridMatch = /(\d+) 列 × (\d+) 行/.exec(req.prompt);
+    const cols = gridMatch ? Number(gridMatch[1]!) : n;
+    const rows = gridMatch ? Number(gridMatch[2]!) : 1;
+    const w = req.size.w, h = req.size.h, cellW = w / cols, cellH = h / rows;
     const data = Buffer.alloc(w * h * 4);
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      const cell = Math.min(n - 1, Math.floor(x / cellW));
-      const inX = x - cell * cellW;
+      const col = Math.min(cols - 1, Math.floor(x / cellW));
+      const row = Math.min(rows - 1, Math.floor(y / cellH));
+      const inX = x - col * cellW;
+      const inY = y - row * cellH;
       // 每格的墨占中间 40% —— 留下的那圈底正好是「四周很窄的空白」与「角色之间的缝」
-      const inner = inX >= cellW * 0.3 && inX < cellW * 0.7 && y >= h * 0.3 && y < h * 0.7;
+      const inner = inX >= cellW * 0.3 && inX < cellW * 0.7 && inY >= cellH * 0.3 && inY < cellH * 0.7;
       const c = inner ? px("#3e3236") : k;
       const o = (y * w + x) * 4;
       data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255;

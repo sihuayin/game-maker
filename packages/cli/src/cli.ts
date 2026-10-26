@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  asCommandError, CommandError, EXIT, acceptAnimationPack, compileRuntime, compileTdGame, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
+  asCommandError, CommandError, EXIT, acceptAnimationPack, compileRuntime, compileTdGame, createProxyFetch, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, resolveTextTransport, verifyPack, writeAcceptanceReport,
   type AcceptanceResult, type CommandResult, type InspectData, type WrittenAcceptanceReport,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
@@ -492,8 +492,11 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
   const outRoot = path.resolve(typeof flags.out === "string" ? flags.out : "out");
   const env = deps.env ?? process.env;
   const cwd = deps.cwd ?? process.cwd();
-  const up = deps.fetchImpl === undefined ? {} : { fetchImpl: deps.fetchImpl };
-  const transport = { baseUrl: env.ANTHROPIC_BASE_URL ?? "", apiKey: env.ANTHROPIC_AUTH_TOKEN ?? "" };
+  const text = resolveTextTransport({ env, cwd }).transport;
+  const transport = text ?? { baseUrl: "", apiKey: "" };
+  // ⚠️ 文本上游的代理在**壳层**建一次（gemini 直连 Google 在境内要它）；`deps.fetchImpl`（测试注入）优先。
+  const fetchImpl = deps.fetchImpl ?? (text?.proxy ? createProxyFetch({ proxy: text.proxy }) : undefined);
+  const up = fetchImpl === undefined ? {} : { fetchImpl };
 
   try {
     // ⚠️ 这两件事必须分开：**要了 --help = 成功**（用户得到了他想要的），

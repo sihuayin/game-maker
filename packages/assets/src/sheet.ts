@@ -204,6 +204,22 @@ export function sliceGridCells(img: RasterImage, spec: { columns: number; rows: 
   });
 }
 
+/**
+ * 动画帧表的**确定性网格推导**（票 13）：`sheet` 缺席时，把 N 帧排成一个「最接近正方形」的网格，
+ * 而不是默认的一排 N 个横条 —— 一排 N 个的 AR 是 N:1，生图模型对 N≥4 的极端横条发不出
+ * （票 05 重跑实测：run 4 帧源图只发到 ~2.9、目标 4.0，交付帧被压扁，`constructive-constraint` 判拒）。
+ *
+ * ⚠️ **只在有二维分解时推导**（`rows ≥ 2`）：质数帧数（3/5/7）没有二维网格，退化回横条（记已知限制）。
+ * ⚠️ 返回 `undefined` = 保持现状（横条 + 旧的分块路径）；返回网格 = 走 `sliceGridCells` 按格切。
+ *   调用方用 `anim.sheet ?? deriveSheetGrid(n)` —— 一处规则、两个调用者（`animationSheetPrompt` 与 `pack` 的 `gridOf`）。
+ */
+export function deriveSheetGrid(frames: number): { columns: number; rows: number } | undefined {
+  for (let rows = Math.floor(Math.sqrt(frames)); rows >= 2; rows--) {
+    if (frames % rows === 0) return { columns: frames / rows, rows };
+  }
+  return undefined;
+}
+
 /** 一格的读数**为什么不合格**。⚠️ 报文由 `pack` 拼（这里只交事实，不带资源名）。 */
 export type SheetCellIssue =
   | { kind: "empty"; index: number; row: number; column: number }

@@ -1,0 +1,187 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 1440,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "ruined-station-bg"
+    }
+  },
+  "player": {
+    "asset": "scavenger-hero",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 50,
+      "y": 230
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 230,
+      "w": 450,
+      "h": 40
+    },
+    {
+      "x": 500,
+      "y": 230,
+      "w": 450,
+      "h": 40
+    },
+    {
+      "x": 1000,
+      "y": 230,
+      "w": 440,
+      "h": 40
+    }
+  ],
+  "entities": [
+    {
+      "id": "resource-1",
+      "sourceIntent": "entity-resource",
+      "kind": "pickup",
+      "at": {
+        "x": 200,
+        "y": 222
+      },
+      "asset": "entity-resource"
+    },
+    {
+      "id": "platform-1",
+      "kind": "solid",
+      "at": {
+        "x": 304,
+        "y": 198
+      },
+      "asset": "station-platform"
+    },
+    {
+      "id": "chest-1",
+      "sourceIntent": "entity-chest",
+      "kind": "pickup",
+      "at": {
+        "x": 320,
+        "y": 198
+      },
+      "asset": "entity-chest"
+    },
+    {
+      "id": "enemy-1",
+      "sourceIntent": "entity-enemy",
+      "kind": "hazard",
+      "at": {
+        "x": 600,
+        "y": 230
+      },
+      "asset": "entity-enemy",
+      "anim": "patrol",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 120,
+        "periodMs": 3000
+      }
+    },
+    {
+      "id": "platform-2",
+      "kind": "solid",
+      "at": {
+        "x": 684,
+        "y": 198
+      },
+      "asset": "station-platform"
+    },
+    {
+      "id": "chest-2",
+      "sourceIntent": "entity-chest",
+      "kind": "pickup",
+      "at": {
+        "x": 700,
+        "y": 198
+      },
+      "asset": "entity-chest"
+    },
+    {
+      "id": "resource-2",
+      "sourceIntent": "entity-resource",
+      "kind": "pickup",
+      "at": {
+        "x": 820,
+        "y": 222
+      },
+      "asset": "entity-resource"
+    },
+    {
+      "id": "enemy-2",
+      "sourceIntent": "entity-enemy",
+      "kind": "hazard",
+      "at": {
+        "x": 1050,
+        "y": 230
+      },
+      "asset": "entity-enemy",
+      "anim": "patrol",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 100,
+        "periodMs": 2500
+      }
+    },
+    {
+      "id": "resource-3",
+      "sourceIntent": "entity-resource",
+      "kind": "pickup",
+      "at": {
+        "x": 1180,
+        "y": 222
+      },
+      "asset": "entity-resource"
+    },
+    {
+      "id": "station-exit-gate",
+      "kind": "goal",
+      "at": {
+        "x": 1380,
+        "y": 198
+      },
+      "asset": "station-platform"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "hud-panel",
+      "at": {
+        "x": 10,
+        "y": 10
+      },
+      "size": {
+        "w": 100,
+        "h": 28
+      }
+    },
+    "pip": {
+      "asset": "hud-resource-icon",
+      "at": {
+        "x": 24,
+        "y": 24
+      },
+      "step": {
+        "x": 16,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "station-exit-gate"
+  }
+}

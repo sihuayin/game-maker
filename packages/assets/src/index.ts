@@ -14,6 +14,7 @@ export * from "./quantize.js";
 export * from "./atlas.js";
 export * from "./import.js";
 export * from "./image-config.js";
+export * from "./text-config.js";
 export * from "./image-gen-error.js";
 export * from "./image-gen.js";
 export * from "./http.js";

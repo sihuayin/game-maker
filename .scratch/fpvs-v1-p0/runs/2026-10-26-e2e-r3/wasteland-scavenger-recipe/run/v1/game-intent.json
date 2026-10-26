@@ -1,0 +1,71 @@
+{
+  "format": "game-intent/v1",
+  "genre": "横版动作冒险",
+  "subgenre": "废土寻宝",
+  "camera": "横版视角",
+  "targetExperience": "在荒凉废弃城市中搜寻资源宝箱、躲避危险敌人的废土生存寻宝体验",
+  "coreLoopSteps": [
+    "在废弃城市中进行横版移动与跳跃探索",
+    "寻找并收集资源与宝箱",
+    "躲避危险与敌人并达成最终目标"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "在废弃城市中寻找资源和宝箱",
+      "躲避危险和敌人，达成最终目标"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "充满危险与探索机遇的废土荒凉氛围"
+  },
+  "mechanics": [
+    {
+      "id": "mech-horizontal-move",
+      "name": "横版移动"
+    },
+    {
+      "id": "mech-jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "mech-search",
+      "name": "寻找资源和宝箱"
+    },
+    {
+      "id": "mech-dodge",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "entity-chest",
+      "type": "interactable",
+      "role": "废弃城市中的宝箱"
+    },
+    {
+      "id": "entity-resource",
+      "type": "resource",
+      "role": "废弃城市中可搜寻的资源"
+    },
+    {
+      "id": "entity-enemy",
+      "type": "enemy",
+      "role": "废弃城市中游荡的敌人"
+    }
+  ],
+  "challenge": {
+    "type": "避障与敌人规避",
+    "description": "在探索过程中躲避废弃城市里的危险与敌人"
+  },
+  "winConditions": [
+    "达成最终目标"
+  ],
+  "loseConditions": [],
+  "ambiguity": [
+    "winConditions：需求提到了最终目标，但未明确具体的达成条件",
+    "loseConditions：需求未明确具体的失败判定机制"
+  ]
+}

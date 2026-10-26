@@ -14,7 +14,7 @@
 //      仍然可用（0.7s、干净 JSON）。代理的上游配置一直在变，所以端点是**参数**不是常量。
 //   ③ **关 thinking** —— 开着会吃光输出预算（实测 max_tokens=8000 时 reasoning=8000），
 //      关掉快 18 倍、且真的产出内容；代价是会加 markdown 围栏，所以要剥。
-import { DrawListSchema, UPSTREAM_TIMEOUT_MS, type AssetSpec, type DrawList, type LedgerCall, type LedgerUsage, type StyleSpec } from "@game-maker/contracts";
+import { DrawListSchema, UPSTREAM_TIMEOUT_MS, buildPlainTextRequest, parsePlainText, type AssetSpec, type DrawList, type LedgerCall, type LedgerUsage, type StyleSpec, type TextProtocol } from "@game-maker/contracts";
 import { assetTask, drawListFewShot, drawListOpsSpec, framePlan, paletteLine, styleBrief } from "./prompt.js";
 import type { DrawListGenerator } from "./pack.js";
 
@@ -36,6 +36,8 @@ export type GenerateOptions = {
   apiKey: string;
   /** 走哪个协议。默认 `messages` —— 见文件头那条实测。 */
   endpoint?: "messages" | "chat-completions";
+  /** 文本上游协议：`anthropic`（默认，走上面的 endpoint）或 `gemini`（native `:generateContent`）。 */
+  protocol?: TextProtocol;
   model?: string;
   /**
    * 输出预算。默认 **32000**。
@@ -101,7 +103,8 @@ ${assetTask(spec, style)}
 }
 
 export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerator {
-  const model = opts.model ?? "deepseek-v4-pro";
+  const protocol = opts.protocol ?? "anthropic";
+  const model = opts.model ?? (protocol === "gemini" ? "gemini-3.5-flash" : "deepseek-v4-pro");
   const endpoint = opts.endpoint ?? "messages";
   const doFetch = opts.fetchImpl ?? fetch;
 
@@ -118,6 +121,17 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
     let usage: LedgerUsage | undefined;
     let servedModel: string | undefined;
     try {
+      if (protocol === "gemini") {
+        const req = buildPlainTextRequest({ transport: { protocol, baseUrl: opts.baseUrl, apiKey: opts.apiKey, model }, prompt, maxTokens: opts.maxTokens ?? 32_000 });
+        const res = await doFetch(req.url, { method: "POST", signal: ctl.signal, headers: req.headers, body: req.body });
+        if (!res.ok) throw new GenerationError(spec.id, `上游返回 HTTP ${res.status}：${(await res.text()).slice(0, 200)}`);
+        const b = await res.json();
+        const r = parsePlainText({ protocol, baseUrl: opts.baseUrl, apiKey: opts.apiKey, model }, b);
+        servedModel = r.model;
+        usage = r.usage;
+        if (r.stopReason === "MAX_TOKENS") throw new GenerationError(spec.id, `输出撞上了 maxOutputTokens（${opts.maxTokens ?? 32_000}）被截断 —— 帧数太多或每帧 op 太多，调大预算`);
+        raw = r.text;
+      } else {
       const res = await doFetch(`${opts.baseUrl}${endpoint === "messages" ? "/v1/messages" : "/v1/chat/completions"}`, {
         method: "POST", signal: ctl.signal,
         headers: endpoint === "messages"
@@ -160,6 +174,7 @@ export function createDrawListGenerator(opts: GenerateOptions): DrawListGenerato
       raw = endpoint === "messages"
         ? (body.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("")
         : body.choices?.[0]?.message?.content ?? "";
+      }
     } catch (e) {
       if (e instanceof GenerationError) throw e;
       throw new GenerationError(spec.id, `请求失败：${(e as Error).message}`);

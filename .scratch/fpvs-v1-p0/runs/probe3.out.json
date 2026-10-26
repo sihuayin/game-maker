@@ -1,0 +1,17 @@
+{
+  "command": "create",
+  "error": "上游返回 HTTP 400：{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Invalid JSON payload received. Unknown name \\\"additionalProperties\\\" at 'tools[0].function_declarations[0].parameters.properties[1].value': Cannot find ",
+  "exitCode": 3,
+  "ledger": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 1859,
+      "attempts": 1,
+      "failures": [
+        "http"
+      ]
+    }
+  ]
+}

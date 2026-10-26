@@ -1,0 +1,379 @@
+{
+  "format": "run-design-attempts/v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "rejected",
+      "detail": "意图里的机制「在废弃城市中探索」（`mech-explore`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
+      "rejections": [
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「在废弃城市中探索」（`mech-explore`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        }
+      ],
+      "raw": {
+        "progression": {
+          "model": "stage-clear",
+          "description": "关卡地形复杂度与敌人巡逻密度逐渐增加，要求玩家更高精度的移动跳跃与躲避操作"
+        },
+        "mechanics": [
+          {
+            "mechanic": "run",
+            "id": "mech-horizontal-move"
+          },
+          {
+            "mechanic": "jump",
+            "id": "mech-jump"
+          },
+          {
+            "id": "mech-collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "id": "mech-open-chest",
+            "mechanic": "open-chest"
+          },
+          {
+            "id": "mech-evade-danger",
+            "mechanic": "avoid-danger"
+          }
+        ],
+        "player": {
+          "role": "废土拾荒者，在废弃城市中搜寻宝藏并规避危险",
+          "abilities": [
+            "横版移动",
+            "平台跳跃",
+            "开启宝箱",
+            "拾取废土资源"
+          ],
+          "id": "scavenger-hero",
+          "goals": [
+            "探索废弃城市",
+            "搜集废土资源与宝箱",
+            "规避敌人与危险并抵达终点"
+          ]
+        },
+        "difficulty": {
+          "description": "敌人采用固定路线巡逻，考验玩家跳跃时机与避障节奏",
+          "model": "static-obstacle-patrol"
+        },
+        "coreLoopSteps": [
+          "在废弃城市的横版平台与轨道上探索与跳跃",
+          "搜寻并拾取废土资源以及开启宝箱",
+          "躲避巡逻的废墟敌人与危险陷阱",
+          "安全抵达出口完成搜寻目标"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "collision:aabb",
+          "objective:collect-then-reach",
+          "hud:screen-space"
+        ],
+        "world": {
+          "theme": "废土·废弃城市",
+          "setting": "荒凉且充满危险的废弃火车站与城市废墟",
+          "structure": "Horizontal railway tracks and platform floor; Flat station wall, frame, clock, bench; Flat horizon sky and dark rooflines"
+        },
+        "winConditions": [
+          "搜集关键废土资源与宝箱并安全抵达最右侧出口"
+        ],
+        "npcs": [],
+        "format": "game-design/v1",
+        "enemies": [
+          {
+            "behavior": "在废墟平台与轨道间按固定路线来回巡逻",
+            "id": "wasteland-enemy",
+            "threat": "与玩家接触时造成致命伤害或任务失败"
+          }
+        ],
+        "game": {
+          "genre": "platformer",
+          "title": "废土寻宝者",
+          "camera": "side",
+          "runtimeProfile": {
+            "id": "platformer",
+            "version": "1"
+          }
+        },
+        "loseConditions": [
+          "触碰巡逻敌人造成生命值归零",
+          "跌落至平台下方危险深渊"
+        ],
+        "interactables": [
+          {
+            "type": "chest",
+            "id": "treasure-chest",
+            "behavior": "玩家靠近并按下互动按键后开启，获得宝藏奖励"
+          }
+        ],
+        "resources": [
+          {
+            "id": "waste-resource",
+            "purpose": "可拾取的废土生存物资，用于增加资源计数与搜集完成度"
+          }
+        ],
+        "levels": [
+          {
+            "id": "level-1-station-ruins",
+            "layout": "玩家从左侧站台起点出发，向右跨越 platform 平台与轨道，途经废墟收集 waste-resource 与开启 treasure-chest，避开 wasteland-enemy 巡逻路线，最终抵达最右侧安全出口",
+            "entities": [
+              "scavenger-hero",
+              "wasteland-enemy",
+              "treasure-chest",
+              "waste-resource"
+            ],
+            "purpose": "引导玩家掌握横版移动与跳跃探索，搜集废土资源与宝箱，躲避敌人并到达终点"
+          }
+        ]
+      }
+    },
+    {
+      "attempt": 2,
+      "outcome": "rejected",
+      "detail": "意图里的机制「在废弃城市中探索」（`mech-explore`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
+      "rejections": [
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「在废弃城市中探索」（`mech-explore`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        }
+      ],
+      "raw": {
+        "world": {
+          "setting": "荒凉的废弃城市火车站废墟与废弃铁轨平台",
+          "theme": "荒凉且充满危险的废土探索氛围",
+          "structure": "Horizontal railway tracks and platform floor; Flat station wall, frame, clock, bench; Flat horizon sky and dark rooflines; Human-scale pixel props"
+        },
+        "enemies": [
+          {
+            "behavior": "沿着车站平台与铁轨区域进行定时往返巡逻移动",
+            "id": "wasteland-enemy",
+            "threat": "触碰会造成伤害并削减玩家体力，多次触碰导致失败"
+          }
+        ],
+        "game": {
+          "title": "废土寻宝：车站废墟",
+          "genre": "platformer",
+          "runtimeProfile": {
+            "version": "1",
+            "id": "platformer"
+          },
+          "camera": "side"
+        },
+        "npcs": [],
+        "interactables": [
+          {
+            "type": "chest",
+            "id": "treasure-chest",
+            "behavior": "玩家靠近并按键互动后即可开启，获得丰厚的珍贵宝藏奖励"
+          }
+        ],
+        "progression": {
+          "model": "level-completion",
+          "description": "玩家通过在探索过程中积累搜集到的废土资源与宝箱奖励，提升探索完成度并解锁后续更复杂的关卡结构"
+        },
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "collision:aabb",
+          "objective:collect-then-reach",
+          "hud:screen-space"
+        ],
+        "coreLoopSteps": [
+          "在废弃城市的车站与铁轨平台上控制拾荒者进行横版移动与跳跃探索",
+          "寻找并拾取散落在废墟中的废土资源与隐藏宝箱",
+          "躲避巡逻的废墟敌人与危险障碍，安全抵达终点完成任务"
+        ],
+        "format": "game-design/v1",
+        "levels": [
+          {
+            "id": "level-station-ruins",
+            "purpose": "引导玩家完成基础横版移动探索、资源搜集、宝箱开启与避敌解密的核心循环",
+            "layout": "玩家从左侧铁轨起点出发，横向跨越废墟砖石平台与挂钟壁画区域，避开巡逻敌人，在平台中段拾取资源并开启宝箱，最后到达右侧安全出口",
+            "entities": [
+              "scavenger-hero",
+              "wasteland-enemy",
+              "treasure-chest",
+              "waste-resource"
+            ]
+          }
+        ],
+        "player": {
+          "id": "scavenger-hero",
+          "abilities": [
+            "横版左右跑动移动",
+            "跳跃跨越废墟平台与障碍",
+            "拾取废土资源与打开宝箱",
+            "躲避与绕开敌人巡逻路径"
+          ],
+          "goals": [
+            "探索废弃城市车站废墟",
+            "搜集可用的废土物资与珍贵宝箱",
+            "躲避危险与敌人袭击，安全到达终点"
+          ],
+          "role": "废土拾荒者"
+        },
+        "winConditions": [
+          "收集关卡内必要的废土资源并开启宝箱",
+          "成功躲避所有危险敌人并安全到达关卡右侧终点出口"
+        ],
+        "loseConditions": [
+          "生命值被废墟敌人击扣至零",
+          "掉入危险区域或无法逃脱敌人追踪"
+        ],
+        "mechanics": [
+          {
+            "mechanic": "run",
+            "id": "mech-horizontal-move"
+          },
+          {
+            "mechanic": "jump",
+            "id": "mech-jump"
+          },
+          {
+            "id": "mech-collect-resource",
+            "mechanic": "collect-pickup"
+          },
+          {
+            "mechanic": "open-chest",
+            "id": "mech-open-chest"
+          },
+          {
+            "id": "mech-evade-danger",
+            "mechanic": "avoid-danger"
+          }
+        ],
+        "resources": [
+          {
+            "id": "waste-resource",
+            "purpose": "废墟中可寻找并拾取的物资，用于增加资源积分与完成探索目标"
+          }
+        ],
+        "difficulty": {
+          "description": "随着横向探索深入，巡逻敌人的移动频率与跳跃平台的错落间距逐步增加难度",
+          "model": "linear-scaling"
+        }
+      }
+    },
+    {
+      "attempt": 3,
+      "outcome": "rejected",
+      "detail": "意图里的机制「在废弃城市中探索」（`mech-explore`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）",
+      "rejections": [
+        {
+          "reason": "intent-mechanic-missing",
+          "detail": "意图里的机制「在废弃城市中探索」（`mech-explore`）在设计层没有对家。⚠️ 设计层的机制是**封闭枚举** （只有外壳真做得了的那几条），所以这条要么**外壳做不了它**、要么**它被丢掉了** —— 两种都算 R12 的拒绝：**别把用户要的东西悄悄做丢**。（若确实做不了，把那句话从需求里去掉，或者换一代外壳。）"
+        }
+      ],
+      "raw": {
+        "coreLoopSteps": [
+          "在废弃城市车站的横版平台间纵跳穿梭与探索",
+          "搜寻并拾取废土资源，找到隐藏的可操作宝箱",
+          "躲避巡逻的废墟敌人与危险陷阱",
+          "携带收集到的物资安全到达终点"
+        ],
+        "format": "game-design/v1",
+        "levels": [
+          {
+            "layout": "玩家从最左侧铁轨平台起点出发，向右跨越断裂高台并拾取废土资源，绕过中央巡逻的废墟敌人，在右侧候车室开箱后到达最右侧废墟出口",
+            "entities": [
+              "scavenger-hero",
+              "wasteland-enemy",
+              "treasure-chest",
+              "waste-resource"
+            ],
+            "purpose": "引导玩家熟悉横版跑跳、资源搜集、避敌与宝箱开启的核心玩法",
+            "id": "wasteland-station-level-1"
+          }
+        ],
+        "player": {
+          "role": "废土拾荒者",
+          "abilities": [
+            "左右横版跑动与高低跳跃",
+            "搜集废土资源与开启宝箱",
+            "躲避敌人巡逻与危险陷阱"
+          ],
+          "goals": [
+            "探索废弃车站，搜集废土资源并开启宝箱",
+            "躲避废墟敌人的攻击并安全到达关卡出口"
+          ],
+          "id": "scavenger-hero"
+        },
+        "winConditions": [
+          "搜集废土资源并打开宝箱，成功到达关卡出口"
+        ],
+        "runtimeRequirements": [
+          "input:keyboard",
+          "camera:side-scroll",
+          "collision:aabb",
+          "objective:collect-then-reach",
+          "hud:screen-space"
+        ],
+        "world": {
+          "theme": "荒凉且充满危险的废土探索",
+          "setting": "废弃的城市火车站与荒凉废墟铁轨",
+          "structure": "由远景暗色天际线与破损屋顶、中景车站墙壁与挂钟椅凳、前景横版铁轨与木质/砖石平台组成的横向分层结构"
+        },
+        "mechanics": [
+          {
+            "id": "mech-horizontal-move",
+            "mechanic": "run"
+          },
+          {
+            "id": "mech-jump",
+            "mechanic": "jump"
+          },
+          {
+            "mechanic": "collect-pickup",
+            "id": "mech-collect-resource"
+          },
+          {
+            "id": "mech-open-chest",
+            "mechanic": "open-chest"
+          },
+          {
+            "mechanic": "avoid-danger",
+            "id": "mech-evade-danger"
+          }
+        ],
+        "resources": [
+          {
+            "purpose": "废弃物资与水资源，拾取后增加资源计数并达成搜集任务",
+            "id": "waste-resource"
+          }
+        ],
+        "game": {
+          "genre": "platformer",
+          "camera": "side",
+          "title": "废土寻宝：废墟车站",
+          "runtimeProfile": {
+            "version": "1",
+            "id": "platformer"
+          }
+        },
+        "interactables": [
+          {
+            "behavior": "玩家靠近后按下互动键开启，获得珍贵废土宝藏与关卡目标进度",
+            "id": "treasure-chest",
+            "type": "chest"
+          }
+        ],
+        "progression": {
+          "model": "关卡探索与物资积累进阶",
+          "description": "随着关卡推进，平台跳跃地形变复杂，敌人巡逻路线更严密，宝箱位置更隐蔽，考验玩家的操作精准度与时机掌控"
+        },
+        "enemies": [
+          {
+            "behavior": "在废墟平台与铁轨间左右来回巡逻，触碰玩家时造成伤害",
+            "id": "wasteland-enemy",
+            "threat": "触碰玩家会扣减血量，直接威胁玩家生存"
+          }
+        ],
+        "loseConditions": [
+          "玩家触碰废墟敌人导致生命值耗尽"
+        ],
+        "npcs": []
+      }
+    }
+  ]
+}

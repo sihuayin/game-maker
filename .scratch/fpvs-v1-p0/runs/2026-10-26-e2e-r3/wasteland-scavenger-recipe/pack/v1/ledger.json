@@ -1,0 +1,161 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 1,
+  "createdAt": "2026-10-26T13:52:31.000Z",
+  "run": {
+    "wallClockMs": 239107,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "image": {
+        "calls": 10,
+        "attempts": 10
+      },
+      "drawlist": {
+        "calls": 2,
+        "attempts": 2
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "hero-master",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 51052,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "enemy-master",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 53259,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 65005,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "entity-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 59123,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "entity-chest",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 49086,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-resource-icon",
+      "upstream": "messages",
+      "ms": 19510,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 1358,
+        "outputTokens": 491,
+        "reasoningTokens": 2190
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 26669,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 1479,
+        "outputTokens": 1343,
+        "reasoningTokens": 5655
+      }
+    },
+    {
+      "step": "image",
+      "target": "entity-resource",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 18534,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "station-platform",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 40273,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-station-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 11817,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 64803,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-station-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 51117,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "ruined-station-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 55817,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 49078,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    }
+  ]
+}

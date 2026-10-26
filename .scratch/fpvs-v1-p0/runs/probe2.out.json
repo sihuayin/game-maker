@@ -1,0 +1,17 @@
+{
+  "command": "create",
+  "error": "上游返回 HTTP 400：{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Invalid JSON payload received. Unknown name \\\"const\\\" at 'tools[0].function_declarations[0].parameters.properties[0].value': Cannot find field.\\nInvalid",
+  "exitCode": 3,
+  "ledger": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 1151,
+      "attempts": 1,
+      "failures": [
+        "http"
+      ]
+    }
+  ]
+}

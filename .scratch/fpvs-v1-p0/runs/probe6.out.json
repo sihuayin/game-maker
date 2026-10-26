@@ -1,0 +1,17 @@
+{
+  "command": "create",
+  "error": "上游返回 HTTP 400：{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Invalid JSON payload received. Unknown name \\\"exclusiveMinimum\\\" at 'tools[0].function_declarations[0].parameters.properties[5].value.items.properties[0",
+  "exitCode": 3,
+  "ledger": [
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 869,
+      "attempts": 1,
+      "failures": [
+        "http"
+      ]
+    }
+  ]
+}

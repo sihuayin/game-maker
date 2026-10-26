@@ -1,0 +1,17 @@
+{
+  "command": "create",
+  "error": "上游返回 HTTP 404：",
+  "exitCode": 3,
+  "ledger": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 1007,
+      "attempts": 1,
+      "failures": [
+        "http"
+      ]
+    }
+  ]
+}

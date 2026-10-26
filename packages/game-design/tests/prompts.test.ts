@@ -105,6 +105,18 @@ describe("工具说明 = schema 说不清的东西唯一的家（R2-Q5）", () =
     expect(TOOL_DESCRIPTION).toContain("别删实体");
   });
 
+  it("⑥ **伞状动词不是一条机制**：探索/寻宝/冒险拆成移动+收集+抵达，不单独立 `explore`（票 11）", () => {
+    // ⚠️ 病根（票 05 重跑）：analyze-intent 把「在废弃城市中探索」抽成独立机制 `mech-explore`，
+    //   而设计层 MECHANICS 封闭枚举没有 `explore`（「探索」= 移动+寻找+抵达的合称）⇒ R12 拒绝「悄悄做丢」。
+    //   ⚠️ 关键在**跟第 1 条分界**：二段跳是「一条」照样记，探索是「好几条的合称」要拆 —— 不然模型会把
+    //   「拆」读成「做不了的也拆掉」，又把 R12 唯一能说出口的那句（二段跳）吞了。
+    expect(TOOL_DESCRIPTION).toContain("伞状动词不是一条机制");
+    expect(TOOL_DESCRIPTION).toContain("探索");
+    expect(TOOL_DESCRIPTION).toContain("拆成");
+    expect(TOOL_DESCRIPTION).toContain("explore");
+    expect(TOOL_DESCRIPTION).toContain("好几条的合称");
+  });
+
   it("⑥ 字段台账里也各点了一次名（`mechanics` 的边界 / `entities` 不许撞）", () => {
     const p = intentPrompt({ requirementText: "x" });
     expect(p).toContain("都不是机制");                 // `mechanics` 那一条

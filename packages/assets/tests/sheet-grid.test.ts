@@ -5,7 +5,7 @@
 //   · `auditSheetCells` 只回答「这一格该不该收」—— 空格 / 多主体 / 四边框。
 //   混在一条集成测试里，任何一条红都说不清是切错了还是判错了。
 import { describe, expect, it } from "vitest";
-import { auditSheetCells, emptyImage, sliceGridCells, type RasterImage } from "../src/index.js";
+import { auditSheetCells, deriveSheetGrid, emptyImage, sliceGridCells, type RasterImage } from "../src/index.js";
 
 type RGB = readonly [number, number, number];
 
@@ -103,5 +103,29 @@ describe("§ auditSheetCells —— 严格结构（票 01 人裁）", () => {
     fillRect(img, 6, 6, 4, 4, COLORS[0]!);
     const issues = auditSheetCells([img], { columns: 1, rows: 1 });
     expect(issues.map((i) => i.kind)).toEqual(["border"]);
+  });
+});
+
+describe("§ deriveSheetGrid —— 帧表网格推导（票 13）", () => {
+  it("N=4 ⇒ 2×2（近正方形，压 AR 从 4.0 到 1.0）", () => {
+    expect(deriveSheetGrid(4)).toEqual({ columns: 2, rows: 2 });
+  });
+  it("N=6 ⇒ 3×2", () => {
+    expect(deriveSheetGrid(6)).toEqual({ columns: 3, rows: 2 });
+  });
+  it("N=8 ⇒ 4×2（不是 8×1 横条）", () => {
+    expect(deriveSheetGrid(8)).toEqual({ columns: 4, rows: 2 });
+  });
+  it("N=9 ⇒ 3×3", () => {
+    expect(deriveSheetGrid(9)).toEqual({ columns: 3, rows: 3 });
+  });
+  it("N≤2 ⇒ undefined（保持横条 / 旧分块路径）", () => {
+    expect(deriveSheetGrid(1)).toBeUndefined();
+    expect(deriveSheetGrid(2)).toBeUndefined();
+  });
+  it("质数 N（3 / 5 / 7）无二维分解 ⇒ undefined（退化横条，已知限制）", () => {
+    expect(deriveSheetGrid(3)).toBeUndefined();
+    expect(deriveSheetGrid(5)).toBeUndefined();
+    expect(deriveSheetGrid(7)).toBeUndefined();
   });
 });

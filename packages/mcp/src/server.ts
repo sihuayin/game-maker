@@ -7,7 +7,7 @@
 // 客户端不支持通知也能跑，只是看不到进度。
 import { createInterface } from "node:readline";
 import {
-  acceptAnimationPack, asCommandError, CommandError, compileRuntime, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, verifyPack, writeAcceptanceReport,
+  acceptAnimationPack, asCommandError, CommandError, compileRuntime, createProxyFetch, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, resolveTextTransport, verifyPack, writeAcceptanceReport,
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
@@ -66,6 +66,14 @@ function qaReportOf(qa: QAReport, qaReportPath: string, outDir: string): {
 /** 生图上游：**环境变量优先**，其次本地那份（已 gitignore 的）配置 —— 与 CLI 同源。 */
 function imageTransportOf() {
   return resolveImageTransport({ env: process.env, cwd: process.cwd() }).transport;
+}
+
+/** 文本上游：文件 `text` 段优先、`ANTHROPIC_*` env 回落 —— 与 CLI 同源；代理在壳层建一次。 */
+function textTransportOf() {
+  const t = resolveTextTransport({ env: process.env, cwd: process.cwd() }).transport;
+  const transport = t ?? { baseUrl: "", apiKey: "" };
+  const fetchImpl = t?.proxy ? createProxyFetch({ proxy: t.proxy }) : undefined;
+  return { transport, ...(fetchImpl ? { fetchImpl } : {}) };
 }
 
 /** 工具面。**description 内嵌「什么时候用 / 什么样的输入会失败」**（票 30 问题 6）。 */
@@ -262,7 +270,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             result = await planAssets({
               designPath: String(args.designPath), visualWorldPath: String(args.visualWorldPath),
               outRoot: String(args.outDir ?? "out"),
-              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...textTransportOf(),
               ...(imageTransport === undefined ? {} : { imageTransport }),
             });
             break;
@@ -270,7 +278,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
           case "build_asset_pack":
             result = await packAssets({
               recipePath: String(args.recipePath), outRoot: String(args.outDir ?? "out"),
-              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...textTransportOf(),
               // ⚠️ **生图凭据**（票 66）：`packAssets` 拿不到它，遇到任何 `source.kind:"image"` 的清单
               //   就**在发出第一发之前**退 2（`ops.ts:1375` 的 `needsImage && !opts.imageTransport`）
               //   —— 也就是说这个工具对「真生图」那一类清单**彻底不可用**，而真生图正是你会去调它的原因。
@@ -335,7 +343,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               designPath: String(args.designPath), packDir: String(args.packDir),
               ...(args.levelId !== undefined ? { levelId: String(args.levelId) } : {}),
               outRoot: String(args.outDir ?? "out"),
-              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...textTransportOf(),
               viewport: VIEWPORT,
             });
             break;
@@ -348,7 +356,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               //   而 agent 给的大概率是绝对路径。这里**只做相对化、不做别的解释**；
               //   `cwd` 与 `runUnderstanding` 的默认值同一个（`process.cwd()`）。
               styleReferences: [{ path: styleRefOf(process.cwd(), String(args.stylePath)) }],
-              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...textTransportOf(),
               ...(args.styleId === undefined ? {} : { styleId: String(args.styleId) }),
               ...(imageTransportOf() === undefined ? {} : { imageTransport: imageTransportOf()! }),
               onProgress: (p) => tick(0.4, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),
@@ -356,7 +364,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             tick(0.5, "构建层：生图 → 配置 → QA → 站点…");
             const built = await runBuild({
               outRoot: String(args.outDir ?? "out"), runDir: understanding.run.dir,
-              transport: { baseUrl: process.env.ANTHROPIC_BASE_URL ?? "", apiKey: process.env.ANTHROPIC_AUTH_TOKEN ?? "" },
+              ...textTransportOf(),
               ...(imageTransportOf() === undefined ? {} : { imageTransport: imageTransportOf()! }),
               viewport: VIEWPORT,
               onProgress: (p) => tick(0.7, `${p.step}${p.detail === undefined ? "" : `：${p.detail}`}`),

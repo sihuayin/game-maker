@@ -1,0 +1,175 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 1440,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "bg-wasteland-station"
+    }
+  },
+  "player": {
+    "asset": "player-scavenger",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 230
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 230,
+      "w": 1440,
+      "h": 40
+    }
+  ],
+  "entities": [
+    {
+      "id": "scrap-1",
+      "sourceIntent": "entity-scrap-resource",
+      "kind": "pickup",
+      "at": {
+        "x": 200,
+        "y": 222
+      },
+      "asset": "entity-scrap-resource"
+    },
+    {
+      "id": "enemy-1",
+      "sourceIntent": "entity-wasteland-enemy",
+      "kind": "hazard",
+      "at": {
+        "x": 380,
+        "y": 230
+      },
+      "asset": "entity-wasteland-enemy",
+      "anim": "patrol",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 100,
+        "periodMs": 3000
+      }
+    },
+    {
+      "id": "platform-1",
+      "kind": "solid",
+      "at": {
+        "x": 520,
+        "y": 170
+      },
+      "asset": "tile-platform"
+    },
+    {
+      "id": "scrap-2",
+      "sourceIntent": "entity-scrap-resource",
+      "kind": "pickup",
+      "at": {
+        "x": 536,
+        "y": 162
+      },
+      "asset": "entity-scrap-resource"
+    },
+    {
+      "id": "chest-1",
+      "sourceIntent": "entity-treasure-chest",
+      "kind": "pickup",
+      "at": {
+        "x": 720,
+        "y": 230
+      },
+      "asset": "entity-treasure-chest"
+    },
+    {
+      "id": "enemy-2",
+      "sourceIntent": "entity-wasteland-enemy",
+      "kind": "hazard",
+      "at": {
+        "x": 880,
+        "y": 230
+      },
+      "asset": "entity-wasteland-enemy",
+      "anim": "patrol",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 120,
+        "periodMs": 3500
+      }
+    },
+    {
+      "id": "platform-2",
+      "kind": "solid",
+      "at": {
+        "x": 1020,
+        "y": 170
+      },
+      "asset": "tile-platform"
+    },
+    {
+      "id": "scrap-3",
+      "sourceIntent": "entity-scrap-resource",
+      "kind": "pickup",
+      "at": {
+        "x": 1036,
+        "y": 162
+      },
+      "asset": "entity-scrap-resource"
+    },
+    {
+      "id": "chest-2",
+      "sourceIntent": "entity-treasure-chest",
+      "kind": "pickup",
+      "at": {
+        "x": 1200,
+        "y": 230
+      },
+      "asset": "entity-treasure-chest"
+    },
+    {
+      "id": "gate",
+      "kind": "goal",
+      "at": {
+        "x": 1380,
+        "y": 198
+      },
+      "asset": "tile-platform"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "ui-hud-panel",
+      "at": {
+        "x": 10,
+        "y": 10
+      },
+      "size": {
+        "w": 80,
+        "h": 32
+      }
+    },
+    "pip": {
+      "asset": "ui-icon-scrap",
+      "at": {
+        "x": 26,
+        "y": 26
+      },
+      "step": {
+        "x": 18,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "gate"
+  }
+}

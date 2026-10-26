@@ -1,0 +1,113 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土寻宝者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的站台与建筑废墟中进行横版移动与跳跃探索",
+    "搜索并收集废墟中的物资资源与废弃宝箱",
+    "躲避游荡巡逻的危险敌人与地形陷阱",
+    "带着搜集到的资源安全到达关卡终点达成生存目标"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "废土拾荒者",
+    "abilities": [
+      "横版左右移动",
+      "平台跳跃",
+      "开启宝箱与搜寻资源",
+      "规避敌人巡逻路线"
+    ],
+    "goals": [
+      "在废弃城市中搜寻珍贵资源与宝箱",
+      "躲避危险与巡逻敌人",
+      "安全抵达终点完成废土生存探索"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "entity-enemy",
+      "behavior": "在废墟平台与铁轨区域之间进行固定路线往复巡逻",
+      "threat": "与玩家发生碰撞造成伤害，阻止玩家搜寻宝箱"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "entity-chest",
+      "type": "chest",
+      "behavior": "玩家靠近触碰后开启，掉落珍贵宝藏与关键物资"
+    }
+  ],
+  "resources": [
+    {
+      "id": "entity-resource",
+      "purpose": "搜集用于废土生存与解锁关卡评分的资源包"
+    }
+  ],
+  "world": {
+    "theme": "荒凉废土生存与废墟寻宝",
+    "setting": "充满危险与探索机遇的废弃城市车站、水泥站台与横向铁轨废墟",
+    "structure": "前景为平坦水泥站台与横向铁轨；中景为车站大楼外墙、长椅、挂画、灯柱与平顶废墟平台；背景为双色渐变夜空与远山轮廓，低密度块状布局。"
+  },
+  "levels": [
+    {
+      "id": "level-ruined-station",
+      "purpose": "新手探索关卡：引导玩家掌握横版移动与跳跃，完成资源与宝箱搜寻，学会避开巡逻敌人",
+      "layout": "从左侧水泥站台起点向右推进，跨越横向铁轨与平顶废墟建筑，搜寻中段放置的宝箱与资源，避开巡逻敌人后到达右侧出口安全区",
+      "entities": [
+        "scavenger-hero",
+        "entity-chest",
+        "entity-resource",
+        "entity-enemy"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "linear-exploration",
+    "description": "随着关卡深入，探索区域结构更加复杂，放置的宝箱与资源价值提升，敌人巡逻机制更具挑战性"
+  },
+  "difficulty": {
+    "model": "step-wise",
+    "description": "从宽敞平坦的废弃站台逐渐过渡到多层建筑废墟，敌人巡逻路线更紧凑，平台跳跃难度适度上升"
+  },
+  "mechanics": [
+    {
+      "id": "mech-horizontal-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "mech-jump",
+      "mechanic": "jump"
+    },
+    {
+      "id": "mech-search",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "mech-dodge",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "收集废墟中的宝箱与资源并成功到达出口 safe zone"
+  ],
+  "loseConditions": [
+    "生命值归零（与敌人发生碰撞）"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "camera:parallax",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

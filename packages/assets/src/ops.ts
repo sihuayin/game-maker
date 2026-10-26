@@ -9,10 +9,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, auditEntityIdentity, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR, forcedTool,
+  auditGameConfig, auditEntityIdentity, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR,
   formatIssues, GameDesignSpecSchema,
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
-  parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, parseToolUse, PLATFORMER_V1,
+  parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, PLATFORMER_V1,
   PLAYER_ACTION_NAMES,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, EMPTY_INPUT_ATTEMPTS, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
@@ -21,6 +21,8 @@ import {
   type GameDesignSpec,
   type AssetSource, type LayerCoverage,
 } from "@game-maker/contracts";
+import { z as z4 } from "zod/v4";
+import { buildPlainTextRequest, buildTextRequest, geminiUsageOf, parsePlainText, parseTextResponse, textModelOf, textProtocolOf, type TextTransport } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -32,6 +34,7 @@ import { describeImageTransport, type ImageTransport } from "./image-config.js";
 import { createProxyFetch } from "./http.js";
 import { decodePNG } from "./png.js";
 import { DESPILL_THRESHOLDS, dominantOpaqueColor } from "./import.js";
+import { deriveSheetGrid } from "./sheet.js";
 import { plannerCapabilitiesOf, resolveRoute, sourceForDecision, type ExistingAsset } from "./route.js";
 import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, designBrief, drawListFewShot, drawListOpsSpec, paletteLine, PLAN_TOOL_DESCRIPTION, PLAN_TOOL_NAME, recipeShapeSpec, SKELETON_SHAPE_HEADING, SKELETON_SHAPE_NOTE, styleBrief, tdConfigPrompt } from "./prompt.js";
 
@@ -39,7 +42,7 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
 import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, backgroundLayerEntries, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { asCommandError, CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
-export type Transport = { baseUrl: string; apiKey: string };
+export type Transport = TextTransport;
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
 
 /**
@@ -92,6 +95,11 @@ export type PlanAssetsOptions = {
    */
   imageTransport?: ImageTransport;
   /**
+   * 外壳视口。默认 [[DEFAULT_VIEWPORT]]。⚠️ **背景覆盖闸与提示词的高/宽下限照它算**，
+   *   必须与 `compileRuntime` 那一步用**同一个数**（create 链两处都传 `input.viewport ?? DEFAULT_VIEWPORT`）。
+   */
+  viewport?: { w: number; h: number };
+  /**
    * 既有素材（**fixture / 手写 Recipe 路径专用**；create 链传空，第一轮 Q4）。
    * `ref` 相对 recipe 输出目录解析；可访问性由 planAssets 预检查后传给 resolver。
    */
@@ -99,7 +107,11 @@ export type PlanAssetsOptions = {
 };
 
 /** 上游自报的模型名与用量（与 `callText` 那条路同款 —— 它们是「花了什么」的事实，票 45）。 */
-function spentOfTool(body: unknown): Spent {
+function spentOfTool(transport: Transport, body: unknown): Spent {
+  if (textProtocolOf(transport) === "gemini") {
+    const { model, usage } = geminiUsageOf(body);
+    return { ...(model ? { model } : {}), ...(usage ? { usage } : {}) };
+  }
   const j = body as {
     model?: string;
     usage?: { input_tokens?: number; output_tokens?: number; reasoning_tokens?: number };
@@ -127,20 +139,20 @@ function spentOfTool(body: unknown): Spent {
  *   工具被调、`input = {}`、1135 token 打水漂）。
  */
 async function onceThroughTool<T>(o: {
-  transport: Transport; body: string; tool: string; schema: StructuredSchema<T>;
+  transport: Transport; prompt: string; tool: string; toolDescription: string; schema: StructuredSchema<T> & z4.ZodType; maxTokens: number;
   fetchImpl?: typeof fetch; timeoutMs?: number;
 }): Promise<Once<T>> {
   const doFetch = o.fetchImpl ?? fetch;
   const timeoutMs = o.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
+  const req = buildTextRequest({
+    transport: o.transport, prompt: o.prompt, toolName: o.tool, toolDescription: o.toolDescription,
+    schema: o.schema as z4.ZodType, maxTokens: o.maxTokens,
+  });
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), timeoutMs);
   let res: Response;
   try {
-    res = await doFetch(`${o.transport.baseUrl}/v1/messages`, {
-      method: "POST", signal: ctl.signal,
-      headers: { "content-type": "application/json", "x-api-key": o.transport.apiKey, "anthropic-version": "2023-06-01" },
-      body: o.body,
-    });
+    res = await doFetch(req.url, { method: "POST", signal: ctl.signal, headers: req.headers, body: req.body });
   } catch (e) {
     const kind = ctl.signal.aborted ? ("timeout" as const) : ("http" as const);
     const msg = ctl.signal.aborted
@@ -167,8 +179,8 @@ async function onceThroughTool<T>(o: {
     return { kind: "upstream", failure: "http",
       error: new UpstreamCallError("http", `上游回的不是一个 messages 应答（拿到 ${describeShape(body)}）`) };
 
-  const spent = spentOfTool(body);
-  const parsed = parseToolUse(body, o.tool, o.schema);
+  const spent = spentOfTool(o.transport, body);
+  const parsed = parseTextResponse<T>({ transport: o.transport, body, toolName: o.tool, schema: o.schema });
   // 形式的失败（没调工具 / 入参丢了 / 不合线形状）由 `parseToolUse` 分好类 —— 那一档才是重采样的理由。
   if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
   return { kind: "ok", result: { ok: true, value: parsed.value } as const, spent };
@@ -309,6 +321,44 @@ export function emptyPaletteProblem(palette: readonly string[], what: string): s
 }
 
 /**
+ * **背景层覆盖闸**（票 09，FPVS-V1-P0 票 08 裁定）：背景画布盖不住世界的那一类是**清单层的确定性缺口**，
+ * 而 config 那一步的 `auditLayerCoverage` 在**花完生图钱之后**才抓它（Stage B 卡点：背景 320×180 < 视口 480×270）。
+ * ⇒ 在花钱之前、还在抽签圈里就判：背景尺寸不够、正视差层不平铺、parallax 0 层宽不足，都算「模型没生成好」。
+ *
+ * ⚠️ **判的是清单**（`AssetRecipe`），不是包，与玩家闸 / HUD 闸 / 覆盖闸**同一档**（`schema`、重采样）。
+ * ⚠️ **为什么只判这三条、不判全量覆盖**：世界**宽**是 config 那一步才定的（`world.size.w`），清单层拿不到；
+ *   而世界**高**恒 = 视口高（config 规则钉死）⇒ 只有「高 ≥ 视口高」与「宽怎么铺」在清单层可判。
+ *   宽分两路：正视差层 `tileable.x` 铺满世界宽（恒盖住，与 `layerDrawnSize` 那条规则同一件事）；
+ *   parallax 0 层不平铺、用标称宽，只需 ≥ 视口宽。正视差又不平铺的那层宽度依赖未知的世界宽，**不可判 ⇒ 直接拒**。
+ * ⚠️ **口径（票 08 逐字）**：高 ≥ 视口高、宽走 tileable.x（parallax 0 层宽 ≥ 视口宽）；**不** tileable.y（竖向平铺不作逃生舱）。
+ * ⚠️ `size` 是所有层**共用**的一个标称尺寸（契约 `asset-spec.ts:140` 逐字），所以高判一次、宽逐层判。
+ */
+export function backgroundCoverageGate(recipe: AssetRecipe, viewport: { w: number; h: number }): string | null {
+  const problems: string[] = [];
+  for (const e of recipe.assets) {
+    if (e.spec.kind !== "background") continue;
+    const s = e.spec;
+    const layers = s.layers ?? [];
+    // ⚠️ 无层（单层背景）config 那步也不审（`backgroundLayerEntries` 对 `layers ?? []` 返回 `[]`），
+    //   本闸只做「config 会拒什么」的必要条件，不引入 config 没有的判据 —— 无层背景跳过。
+    if (layers.length === 0) continue;
+    if (s.size.h < viewport.h)
+      problems.push(`背景 "${s.id}" 高 ${s.size.h} < 视口高 ${viewport.h}（所有层共用这个标称高，世界高恒 = 视口高）`);
+    for (const l of layers) {
+      if (l.tileable?.x) continue; // 平铺 x：画宽 = 世界宽，恒盖住
+      if (l.parallax > 0)
+        problems.push(`背景 "${s.id}" 的层 "${l.name}" 正视差 ${l.parallax} 却不 tileable.x —— 世界宽 config 那一步才定，宽度无法在清单层保证（要正视差就写 tileable.x，或改 parallax = 0）`);
+      else if (s.size.w < viewport.w)
+        problems.push(`背景 "${s.id}" 的层 "${l.name}"（parallax 0）宽 ${s.size.w} < 视口宽 ${viewport.w}`);
+    }
+  }
+  if (problems.length === 0) return null;
+  return "背景盖不住世界（清单层确定性缺口，重抽 config 改不了）：\n"
+    + problems.map((p) => `  · ${p}`).join("\n")
+    + "\n⚠️ 高 ≥ 视口高、正视差层 tileable.x、parallax 0 层宽 ≥ 视口宽 —— 请改背景尺寸 / 平铺后重出清单。";
+}
+
+/**
  * 规划一份资源清单。**两阶段的第一阶段**（票 28）—— 清单落盘，人过目，再 `pack`。
  *
  * ⚠️ 清单**绝不覆盖**：每次规划写一个新的 `v<N>`（与资源包同一条规矩）。
@@ -358,20 +408,10 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
   const STYLE_FILE = "stylespec.json";
   const REF_FILE = "reference.png";
 
-  const body = JSON.stringify({
-    // ⚠️ 与 `callText` 同源（票 24 的实况：代理**请求一个、回另一个**，`model` 与 `requestedModel` 是两个事实）。
-    model: "deepseek-v4-pro", max_tokens: 16_000, thinking: { type: "disabled" },
-    ...forcedTool(PLAN_TOOL_NAME, PLAN_TOOL_DESCRIPTION, RecipeToolSchema),
-    messages: [{
-      role: "user",
-      content: [{
-        type: "text",
-        text: assetPlanPrompt({
-          design, vws: world,
-          echo: { styleRef: STYLE_FILE, styleId: world.style.id, ...(refs.length > 0 ? { referenceImage: REF_FILE } : {}) }
-        })
-      }]
-    }]
+  const vp = opts.viewport ?? DEFAULT_VIEWPORT;
+  const prompt = assetPlanPrompt({
+    design, vws: world, viewport: vp,
+    echo: { styleRef: STYLE_FILE, styleId: world.style.id, ...(refs.length > 0 ? { referenceImage: REF_FILE } : {}) }
   });
 
   // ⚠️ 账**只进回报，不落盘**（票 19：账跟着「包」走，而「清单」不是包 —— 清单可以是人直接写的）。
@@ -383,7 +423,7 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
   let others = 0;
   while (emptyInputs < EMPTY_INPUT_ATTEMPTS && others < STRUCTURED_CALL_ATTEMPTS) {
     const once = await onceThroughTool({
-      transport: opts.transport, body, tool: PLAN_TOOL_NAME, schema: RecipeToolSchema,
+      transport: opts.transport, prompt, tool: PLAN_TOOL_NAME, toolDescription: PLAN_TOOL_DESCRIPTION, schema: RecipeToolSchema, maxTokens: 16_000,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
       ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
     });
@@ -454,6 +494,16 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
     if (playerErr !== null) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = playerErr;
+      others++;
+      continue;
+    }
+    // ⚠️ **票 09（FPVS-V1-P0 票 08）：背景层覆盖闸** —— 与上面三道闸同一档（`schema`、重采样）。
+    //   背景画布盖不住世界是**清单层的确定性缺口**（尺寸/平铺写错了），config 那一步花完生图钱才拒；
+    //   在花钱之前就判、三发内可补。判据 = 高 ≥ 视口高、正视差层 tileable.x、parallax 0 层宽 ≥ 视口宽。
+    const bgErr = backgroundCoverageGate(truth.value, vp);
+    if (bgErr !== null) {
+      call.trip({ failure: "schema", spent: once.spent });
+      lastError = bgErr;
       others++;
       continue;
     }
@@ -646,16 +696,12 @@ Promise<{ text: string; usage?: LedgerUsage; servedModel?: string; stopReason?: 
   const doFetch = opts.fetchImpl ?? fetch;
   // ⚠️ 超时**做成参数**：否则「上游不响应」这条路径在测试里就要真等 180 秒，而那等于测不了。
   const timeoutMs = opts.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
+  const req = buildPlainTextRequest({ transport: opts, prompt: opts.prompt, maxTokens: 32_000 });
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), timeoutMs);
   let res: Response;
   try {
-    res = await doFetch(`${opts.baseUrl}/v1/messages`, {
-      method: "POST",
-      signal: ctl.signal,
-      headers: { "content-type": "application/json", "x-api-key": opts.apiKey, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "deepseek-v4-pro", max_tokens: 32_000, thinking: { type: "disabled" }, messages: [{ role: "user", content: opts.prompt }] }),
-    });
+    res = await doFetch(req.url, { method: "POST", signal: ctl.signal, headers: req.headers, body: req.body });
   } catch (e) {
     // ⚠️ 中止与「连不上」是**两件事**，而 fetch 都抛 AbortError/TypeError —— 分开报，否则人查错方向
     if (ctl.signal.aborted) throw new UpstreamCallError("timeout", `上游 ${Math.round(timeoutMs / 1000)} 秒没回应，已中止（超时）`);
@@ -679,23 +725,12 @@ Promise<{ text: string; usage?: LedgerUsage; servedModel?: string; stopReason?: 
   //   的同一条归一化一致，两条路因此**同判**（票 51 的 M3 那一行 `{"content":5}` 从此不再分歧）。
   if (!isResponseObject(body))
     throw new UpstreamCallError("http", `上游回的不是一个 messages 应答（拿到 ${describeShape(body)}）`);
-  const j = body as {
-    model?: string; content?: { type: string; text?: string }[]; stop_reason?: string;
-    usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
-  };
-  const u = j.usage;
-  const blocks = Array.isArray(j.content) ? j.content : [];
+  const r = parsePlainText(opts, body);
   return {
-    text: blocks.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
-    ...(j.model ? { servedModel: j.model } : {}),
-    // ⚠️ `stop_reason` 要交出来（票 28）：以前这一层只顾着取文本，于是**截断**
-    //   在三个调用点上一律表现为「不是合法 JSON」—— 一个**假病因**，而它会把人引去查模型。
-    ...(j.stop_reason ? { stopReason: j.stop_reason } : {}),
-    ...(u ? { usage: {
-      ...(u.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
-      ...(u.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
-      ...(u.completion_tokens_details?.reasoning_tokens !== undefined ? { reasoningTokens: u.completion_tokens_details.reasoning_tokens } : {}),
-    } } : {}),
+    text: r.text,
+    ...(r.model ? { servedModel: r.model } : {}),
+    ...(r.stopReason ? { stopReason: r.stopReason } : {}),
+    ...(r.usage ? { usage: r.usage } : {}),
   };
 }
 
@@ -1126,13 +1161,7 @@ ${SKELETON_SHAPE_NOTE}
   let lastError = "";
   for (let attempt = 0; attempt < STRUCTURED_CALL_ATTEMPTS; attempt++) {
     const once = await onceThroughTool({
-      transport: opts.transport, body: JSON.stringify({
-        // ⚠️ 与 `callText` 同源（票 24 的实况：代理**请求一个、回另一个**）。
-        model: "deepseek-v4-pro", max_tokens: 16_000, thinking: { type: "disabled" },
-        ...forcedTool(CONFIG_TOOL_NAME, CONFIG_TOOL_DESCRIPTION, ConfigToolSchema),
-        messages: [{ role: "user", content: [{ type: "text", text: prompt }] }]
-      }),
-      tool: CONFIG_TOOL_NAME, schema: ConfigToolSchema,
+      transport: opts.transport, prompt, tool: CONFIG_TOOL_NAME, toolDescription: CONFIG_TOOL_DESCRIPTION, schema: ConfigToolSchema, maxTokens: 16_000,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
       ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {})
     });
@@ -1704,6 +1733,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
       ...(characterDna !== undefined ? { characterDna } : {}),
       generate: createDrawListGenerator({
         baseUrl: opts.transport.baseUrl, apiKey: opts.transport.apiKey,
+        protocol: textProtocolOf(opts.transport), model: textModelOf(opts.transport),
         onCall: (c) => ledger.push(c),
         ...(opts.fetchImpl ? { fetchImpl: opts.fetchImpl } : {}),
       }),
@@ -2030,7 +2060,14 @@ function sourceSizeObservations(packDir: string, m: AssetPackManifest): { lines:
     if (a.kind === "animation" && a.animations) {
       for (const anim of a.animations) {
         const raw = find(`${a.id}.${anim.name}.png`);
-        if (raw !== undefined) add(a.id, anim.name, raw, { w: a.size.w * anim.frames.length, h: a.size.h }, true);
+        // ⚠️ 票 13：动画片的「目标」是**请求的画布**（网格 = columns×rows），不是 N 帧横条 ——
+        //   与 pack 的 `gridOf` 用同一个 `deriveSheetGrid`（无显式 sheet 时两侧一致）。
+        //   ⚠️ 已知限制：manifest 不记显式 `sheet`，这里对「显式写 `sheet:{N,1}`」的配方会按推导网格算（今天无此例）。
+        const grid = deriveSheetGrid(anim.frames.length);
+        const target = grid
+          ? { w: a.size.w * grid.columns, h: a.size.h * grid.rows }
+          : { w: a.size.w * anim.frames.length, h: a.size.h };
+        if (raw !== undefined) add(a.id, anim.name, raw, target, true);
       }
     } else if (a.kind === "background" && a.layers) {
       for (const layer of a.layers) {

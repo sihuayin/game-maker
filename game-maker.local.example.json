@@ -1,6 +1,6 @@
 {
   "_说明": "复制成 game-maker.local.json 再填。那个文件名**已被 .gitignore 忽略**（本模板不忽略）。",
-  "_优先级": "环境变量 GAME_MAKER_IMAGE_* 优先于本文件。",
+  "_优先级": "环境变量 GAME_MAKER_IMAGE_* 优先于本文件（image 段）；text 段同样被 ANTHROPIC_* env 盖过 —— 要用文件里的 gemini 就 unset ANTHROPIC_BASE_URL/ANTHROPIC_AUTH_TOKEN。",
   "_shape": "protocol 必填，三选一；不同协议下 baseUrl 的含义不同，见下。",
   "image": {
     "protocol": "openai",
@@ -8,6 +8,14 @@
     "apiKey": "<在这里填，不要提交>",
     "model": "gpt-image-2.5",
     "proxy": "http://127.0.0.1:9098"
+  },
+  "text": {
+    "_protocol": "anthropic 或 gemini；gemini 走 native :generateContent + function calling",
+    "protocol": "gemini",
+    "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+    "apiKey": "<与 image 段的 gemini key 相同即可>",
+    "model": "gemini-3.5-flash",
+    "proxy": "http://127.0.0.1:7890"
   },
   "_minimax": {
     "protocol": "minimax",

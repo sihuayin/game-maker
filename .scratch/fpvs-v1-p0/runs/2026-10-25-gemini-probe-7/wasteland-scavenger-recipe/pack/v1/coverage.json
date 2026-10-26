@@ -1,0 +1,31 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 1,
+  "layers": [
+    {
+      "asset": "wasteland-station-bg",
+      "frame": "wasteland-station-bg.sky",
+      "w": 320,
+      "h": 180,
+      "opaque": 57600,
+      "ratio": 1
+    },
+    {
+      "asset": "wasteland-station-bg",
+      "frame": "wasteland-station-bg.far-buildings",
+      "w": 320,
+      "h": 180,
+      "opaque": 41990,
+      "ratio": 0.7289930555555556
+    },
+    {
+      "asset": "wasteland-station-bg",
+      "frame": "wasteland-station-bg.station-wall",
+      "w": 320,
+      "h": 180,
+      "opaque": 42061,
+      "ratio": 0.7302256944444444
+    }
+  ]
+}

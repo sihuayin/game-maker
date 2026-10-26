@@ -18,17 +18,14 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   STRUCTURED_CALL_ATTEMPTS, STYLE_MEDIA_TYPES, UPSTREAM_TIMEOUT_MS, VISUAL_WORLD_ATTEMPTS_FORMAT, VisualWorldSpecSchema,
-  carryOnError, forcedTool, formatIssues, parseToolUse,
+  buildTextRequest, carryOnError, formatIssues, parseTextResponse, textModelOf, textUsageOf,
   type CallFailure, type LedgerCall, type LedgerStep, type LedgerUsage, type StyleReference,
-  type ToolUseFailure,
+  type TextImagePart, type TextTransport, type ToolUseFailure,
   type VisualWorldAttempt, type VisualWorldAttempts, type VisualWorldResponseSummary, type VisualWorldSpec,
 } from "@game-maker/contracts";
 import { buildVisualWorld } from "./build-visual-world.js";
 import { TOOL_DESCRIPTION, TOOL_NAME, visionPrompt } from "./prompts.js";
 import { applyDeterministicPalette, extractPalette, PALETTE_SIZE, type PaletteSource } from "./palette.js";
-
-/** 请求的模型名。⚠️ 与 `assets` 同源（票 24 的实况：代理**请求一个、回另一个**，`model` 与 `requestedModel` 是两个事实）。 */
-const REQUESTED_MODEL = "deepseek-v4-pro";
 
 /** 输出上限。⚠️ 票 08 的八发实测 **1742–2156 token**（内嵌 `style` 子树把票 27 的 1135–1660 顶上去了）。
  *  这是**上限不是分配**，给足不花钱；而**截断**会把一次本来会成功的调用变成 `truncated` 重采样。 */
@@ -59,7 +56,7 @@ export type AnalyzeReferenceInput = {
    *   与 `resolveImageTransport({env, cwd})` 同款，**不**让这一层去读全局状态。
    */
   cwd?: string;
-  transport: { baseUrl: string; apiKey: string };
+  transport: TextTransport;
   /**
    * 参考图的**已解码像素**（第一阶段恰好一张）。
    *
@@ -130,23 +127,13 @@ type Trip =
   | { kind: "upstream"; failure: Extract<CallFailure, "http" | "timeout">; detail: string };
 
 /** 上游自己报的那两样 —— **拿不到就缺席，不许编一个**。 */
-function spentOf(body: unknown): Spent {
-  const j = body as {
-    model?: string;
-    usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
-  } | null;
-  const u = j?.usage;
-  const usage: LedgerUsage = {
-    ...(u?.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
-    ...(u?.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
-    ...(u?.completion_tokens_details?.reasoning_tokens !== undefined
-      ? { reasoningTokens: u.completion_tokens_details.reasoning_tokens } : {}),
-  };
+function spentOf(transport: TextTransport, body: unknown): Spent {
+  const { model, usage } = textUsageOf(transport, body);
   return {
-    requestedModel: REQUESTED_MODEL,
-    ...(j?.model ? { model: j.model } : {}),
+    requestedModel: textModelOf(transport),
+    ...(model ? { model } : {}),
     // ⚠️ 上游没给就**整个键缺席** —— 不许填 0 冒充「测到了 0」。
-    ...(Object.keys(usage).length > 0 ? { usage } : {}),
+    ...(usage ? { usage } : {}),
   };
 }
 
@@ -198,7 +185,7 @@ function assertRequirement(text: string): string {
   return t;
 }
 
-function imageBlocks(refs: StyleReference[], cwd: string): Record<string, unknown>[] {
+function imageBlocks(refs: StyleReference[], cwd: string): TextImagePart[] {
   return refs.map((r) => {
     const ext = path.extname(r.path).toLowerCase();
     const media = STYLE_MEDIA_TYPES[ext];
@@ -208,24 +195,20 @@ function imageBlocks(refs: StyleReference[], cwd: string): Record<string, unknow
     let bytes: Buffer;
     try { bytes = fs.readFileSync(path.resolve(cwd, r.path)); }
     catch (e) { throw new Error(`参考图读不出来：${r.path} —— ${(e as Error).message}`); }
-    return { type: "image", source: { type: "base64", media_type: media, data: bytes.toString("base64") } };
+    return { mediaType: media, base64: bytes.toString("base64") };
   });
 }
 
 /** 一次往返。**只做一次** —— 重采样在调用方那层（R16 的固定次数）。 */
 async function onceThrough(o: {
-  baseUrl: string; apiKey: string; body: string; timeoutMs: number; doFetch: typeof fetch;
-  styleReferences: StyleReference[]; styleId: string; referencePixels?: PaletteSource;
+  url: string; headers: Record<string, string>; body: string; timeoutMs: number; doFetch: typeof fetch;
+  transport: TextTransport; styleReferences: StyleReference[]; styleId: string; referencePixels?: PaletteSource;
 }): Promise<Trip> {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), o.timeoutMs);
   let res: Response;
   try {
-    res = await o.doFetch(`${o.baseUrl}/v1/messages`, {
-      method: "POST", signal: ctl.signal,
-      headers: { "content-type": "application/json", "x-api-key": o.apiKey, "anthropic-version": "2023-06-01" },
-      body: o.body,
-    });
+    res = await o.doFetch(o.url, { method: "POST", signal: ctl.signal, headers: o.headers, body: o.body });
   } catch (e) {
     // ⚠️ 中止与「连不上」是**两件事**，而 fetch 都抛 AbortError/TypeError —— 分开报，否则人查错方向。
     if (ctl.signal.aborted)
@@ -240,10 +223,10 @@ async function onceThrough(o: {
   try { body = await res.json(); }
   catch (e) { return { kind: "upstream", failure: "http", detail: `上游回的不是 JSON：${(e as Error).message}` }; }
 
-  const spent = spentOf(body);
+  const spent = spentOf(o.transport, body);
   const response = responseOf(body, spent);
   // ⚠️ **唯一算数的判据**：入参过 Zod。`stop_reason === "tool_use"` **不是**成功信号（票 27 第 1 发：`input = {}`）。
-  const parsed = parseToolUse(body, TOOL_NAME, ModelFacingSpec);
+  const parsed = parseTextResponse({ transport: o.transport, body, toolName: TOOL_NAME, schema: ModelFacingSpec });
   // ⚠️ **`raw` 原样往外带**（票 60）：`parseToolUse` 自票 55 起**两个分支都回它**，
   //   这里只是**不让它在半路掉下去** —— 「模型把顶层 `palette` 写成了哪一种数组」全靠它。
   if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent, raw: parsed.raw, response };
@@ -309,13 +292,11 @@ export async function analyzeReference(input: AnalyzeReferenceInput): Promise<An
 
   const doFetch = input.fetchImpl ?? fetch;
   const timeoutMs = input.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
-  const body = JSON.stringify({
-    model: REQUESTED_MODEL, max_tokens: MAX_TOKENS, thinking: { type: "disabled" },
-    ...forcedTool(TOOL_NAME, TOOL_DESCRIPTION, ModelFacingSpec),
-    messages: [{
-      role: "user",
-      content: [...imageBlocks(styleReferences, cwd), { type: "text", text: visionPrompt({ requirementText, styleId: input.styleId }) }],
-    }],
+  const req = buildTextRequest({
+    transport: input.transport,
+    prompt: visionPrompt({ requirementText, styleId: input.styleId }),
+    toolName: TOOL_NAME, toolDescription: TOOL_DESCRIPTION, schema: ModelFacingSpec, maxTokens: MAX_TOKENS,
+    images: imageBlocks(styleReferences, cwd),
   });
 
   const call = spentCall("analyze-reference", input.styleId);
@@ -334,8 +315,8 @@ export async function analyzeReference(input: AnalyzeReferenceInput): Promise<An
   let lastDetail = "";
   for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++) {
     const once = await onceThrough({
-      baseUrl: input.transport.baseUrl, apiKey: input.transport.apiKey, body, timeoutMs, doFetch,
-      styleReferences, styleId: input.styleId,
+      url: req.url, headers: req.headers, body: req.body, timeoutMs, doFetch,
+      transport: input.transport, styleReferences, styleId: input.styleId,
       ...(input.referencePixels === undefined ? {} : { referencePixels: input.referencePixels }),
     });
     if (once.kind === "upstream") {

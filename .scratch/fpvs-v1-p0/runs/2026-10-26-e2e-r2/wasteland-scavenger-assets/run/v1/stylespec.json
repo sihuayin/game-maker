@@ -1,0 +1,43 @@
+{
+  "id": "style",
+  "identity": [
+    "极简低分辨率像素风",
+    "横版2D废土遗迹题材"
+  ],
+  "camera": {},
+  "composition": {},
+  "palette": [
+    "#1b2027",
+    "#2a3442",
+    "#4a3222",
+    "#2e3b4e",
+    "#3b4a5c",
+    "#6b4a33",
+    "#565b60",
+    "#4a6076",
+    "#8a6244",
+    "#7a7f84",
+    "#c98b5e",
+    "#9aa0a5",
+    "#d9a441",
+    "#e8c39e",
+    "#f2d98b",
+    "#e6e2d6"
+  ],
+  "lighting": {},
+  "shapeLanguage": [
+    "矩形",
+    "三角形"
+  ],
+  "material": [],
+  "environment": [
+    "横版像素关卡场景"
+  ],
+  "characterStyle": [
+    "极简方块像素角色"
+  ],
+  "constraints": [
+    "保持像素点对齐"
+  ],
+  "confidence": 0.95
+}

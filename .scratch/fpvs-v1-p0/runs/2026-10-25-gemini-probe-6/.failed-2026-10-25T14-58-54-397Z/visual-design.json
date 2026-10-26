@@ -1,0 +1,100 @@
+{
+  "format": "visual-design/v1",
+  "viewport": {
+    "w": 480,
+    "h": 270
+  },
+  "style": {
+    "visualWorldFormat": "visual-world/v1"
+  },
+  "objects": [
+    {
+      "id": "background",
+      "role": "background",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 270
+      },
+      "layer": 0,
+      "fill": "palette:1"
+    },
+    {
+      "id": "scavenger-hero",
+      "role": "player",
+      "bounds": {
+        "x": 8,
+        "y": 190,
+        "w": 24,
+        "h": 40
+      },
+      "layer": 10,
+      "fill": "palette:2",
+      "sourceIntent": "scavenger-hero"
+    },
+    {
+      "id": "wasteland-enemy",
+      "role": "hazard",
+      "bounds": {
+        "x": 124,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 11,
+      "fill": "palette:9",
+      "sourceIntent": "wasteland-enemy"
+    },
+    {
+      "id": "treasure-chest",
+      "role": "pickup",
+      "bounds": {
+        "x": 240,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 12,
+      "fill": "palette:12",
+      "sourceIntent": "treasure-chest"
+    },
+    {
+      "id": "scavenge-resource",
+      "role": "pickup",
+      "bounds": {
+        "x": 356,
+        "y": 214,
+        "w": 16,
+        "h": 16
+      },
+      "layer": 13,
+      "fill": "palette:12",
+      "sourceIntent": "scavenge-resource"
+    },
+    {
+      "id": "ui-panel",
+      "role": "ui-panel",
+      "bounds": {
+        "x": 8,
+        "y": 8,
+        "w": 160,
+        "h": 24
+      },
+      "layer": 100,
+      "fill": "palette:15"
+    },
+    {
+      "id": "ui-pip",
+      "role": "ui-pip",
+      "bounds": {
+        "x": 16,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "layer": 110,
+      "fill": "palette:15"
+    }
+  ]
+}

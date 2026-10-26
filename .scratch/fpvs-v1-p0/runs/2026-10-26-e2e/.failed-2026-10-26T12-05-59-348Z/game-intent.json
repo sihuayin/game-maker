@@ -1,0 +1,81 @@
+{
+  "format": "game-intent/v1",
+  "genre": "废土寻宝",
+  "subgenre": "横版平台探索",
+  "camera": "横版视角",
+  "targetExperience": "在废弃城市中搜寻宝藏并规避敌人的紧张废土探索体验",
+  "coreLoopSteps": [
+    "在废弃城市中横版移动与跳跃探索",
+    "寻找与搜集废土资源和宝箱",
+    "躲避敌人与危险，达成最终目标"
+  ],
+  "player": {
+    "role": "拾荒者",
+    "goals": [
+      "在废弃城市中探索",
+      "寻找资源和宝箱",
+      "躲避危险和敌人",
+      "完成最终目标"
+    ]
+  },
+  "world": {
+    "theme": "废土",
+    "setting": "废弃城市",
+    "atmosphere": "荒凉且充满危险的废土探索氛围"
+  },
+  "mechanics": [
+    {
+      "id": "mech-horizontal-move",
+      "name": "横版移动"
+    },
+    {
+      "id": "mech-jump",
+      "name": "跳跃"
+    },
+    {
+      "id": "mech-explore",
+      "name": "在废弃城市中探索"
+    },
+    {
+      "id": "mech-collect-resource",
+      "name": "寻找资源"
+    },
+    {
+      "id": "mech-open-chest",
+      "name": "寻找宝箱"
+    },
+    {
+      "id": "mech-evade-danger",
+      "name": "躲避危险和敌人"
+    }
+  ],
+  "entities": [
+    {
+      "id": "wasteland-enemy",
+      "type": "enemy",
+      "role": "废墟中需要躲避的敌人与危险"
+    },
+    {
+      "id": "treasure-chest",
+      "type": "interactable",
+      "role": "包含奖励的可操作宝箱"
+    },
+    {
+      "id": "waste-resource",
+      "type": "resource",
+      "role": "废墟中可寻找与拾取的资源"
+    }
+  ],
+  "winConditions": [
+    "完成最终目标"
+  ],
+  "loseConditions": [
+    "触碰危险或敌人导致失败"
+  ],
+  "ambiguity": [
+    "winConditions：需求写明包含“最终目标”，但未具体定义目标的达成条件",
+    "loseConditions：需求提到躲避危险和敌人，但未明确具体的失败判定（如血量耗尽或一触即死）",
+    "progression：需求未提及局内或局外的成长与进阶机制",
+    "challenge：需求未明确敌人的行为模式与危险障碍的具体类型"
+  ]
+}

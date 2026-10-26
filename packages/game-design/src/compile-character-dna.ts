@@ -17,15 +17,12 @@
 //   ⚠️ 账的**一格仍然 = 一次调用**（`CONTEXT.md` 的词条），N 条记录不改这件事。
 import {
   CharacterDNAFileSchema, GameDesignSpecSchema, STRUCTURED_CALL_ATTEMPTS, UPSTREAM_TIMEOUT_MS, VisualWorldSpecSchema,
-  forcedTool, parseToolUse,
+  buildTextRequest, parseTextResponse, textModelOf, textUsageOf,
   type CallFailure, type CharacterDNAFile, type GameDesignSpec, type LedgerCall, type LedgerStep,
-  type LedgerUsage, type VisualWorldSpec
+  type LedgerUsage, type TextTransport, type VisualWorldSpec
 } from "@game-maker/contracts";
 import { buildCharacterDna } from "./build-character-dna.js";
 import { CHARACTER_DNA_TOOL_DESCRIPTION, CHARACTER_DNA_TOOL_NAME, characterDnaPrompt } from "./prompts.js";
-
-/** 请求的模型名。⚠️ 与前四发同源（票 24 的实况：代理**请求一个、回另一个**）。 */
-const REQUESTED_MODEL = "deepseek-v4-pro";
 
 /** 输出上限。⚠️ 一族一次，比 `compile-design` 小得多（每个角色 100~200 token 量级）——
  *  但**上限不是分配**，留够余量比省这一个数划算（票 27 实测过截断的代价：那一发烧掉 1135 token）。 */
@@ -39,7 +36,7 @@ export type CompileCharacterDnaInput = {
   design: GameDesignSpec;
   /** 已解析的这个世界（`analyze-reference` 的产物）。 */
   vws: VisualWorldSpec;
-  transport: { baseUrl: string; apiKey: string };
+  transport: TextTransport;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
 };
@@ -89,22 +86,12 @@ type Trip =
   | { kind: "bad"; failure: CallFailure; detail: string; spent: Spent }
   | { kind: "upstream"; failure: Extract<CallFailure, "http" | "timeout">; detail: string };
 
-function spentOf(body: unknown): Spent {
-  const j = body as {
-    model?: string;
-    usage?: { input_tokens?: number; output_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
-  } | null;
-  const u = j?.usage;
-  const usage: LedgerUsage = {
-    ...(u?.input_tokens !== undefined ? { inputTokens: u.input_tokens } : {}),
-    ...(u?.output_tokens !== undefined ? { outputTokens: u.output_tokens } : {}),
-    ...(u?.completion_tokens_details?.reasoning_tokens !== undefined
-      ? { reasoningTokens: u.completion_tokens_details.reasoning_tokens } : {}),
-  };
+function spentOf(transport: TextTransport, body: unknown): Spent {
+  const { model, usage } = textUsageOf(transport, body);
   return {
-    requestedModel: REQUESTED_MODEL,
-    ...(j?.model ? { model: j.model } : {}),
-    ...(Object.keys(usage).length > 0 ? { usage } : {}),
+    requestedModel: textModelOf(transport),
+    ...(model ? { model } : {}),
+    ...(usage ? { usage } : {}),
   };
 }
 
@@ -135,18 +122,14 @@ function assertUpstream(design: GameDesignSpec, vws: VisualWorldSpec): { design:
 
 /** 一次往返。**只做一次** —— 重采样在调用方那层（R16 的固定次数）。 */
 async function onceThrough(o: {
-  baseUrl: string; apiKey: string; body: string; timeoutMs: number; doFetch: typeof fetch;
-  design: GameDesignSpec; vws: VisualWorldSpec;
+  url: string; headers: Record<string, string>; body: string; timeoutMs: number; doFetch: typeof fetch;
+  transport: TextTransport; design: GameDesignSpec; vws: VisualWorldSpec;
 }): Promise<Trip> {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), o.timeoutMs);
   let res: Response;
   try {
-    res = await o.doFetch(`${o.baseUrl}/v1/messages`, {
-      method: "POST", signal: ctl.signal,
-      headers: { "content-type": "application/json", "x-api-key": o.apiKey, "anthropic-version": "2023-06-01" },
-      body: o.body,
-    });
+    res = await o.doFetch(o.url, { method: "POST", signal: ctl.signal, headers: o.headers, body: o.body });
   } catch (e) {
     if (ctl.signal.aborted)
       return { kind: "upstream", failure: "timeout", detail: `上游 ${Math.round(o.timeoutMs / 1000)} 秒没回应，已中止（超时）` };
@@ -160,9 +143,9 @@ async function onceThrough(o: {
   try { body = await res.json(); }
   catch (e) { return { kind: "upstream", failure: "http", detail: `上游回的不是 JSON：${(e as Error).message}` }; }
 
-  const spent = spentOf(body);
+  const spent = spentOf(o.transport, body);
   // ⚠️ **唯一算数的判据**：入参过 Zod。`stop_reason === "tool_use"` **不是**成功信号。
-  const parsed = parseToolUse(body, CHARACTER_DNA_TOOL_NAME, CharacterDNAFileSchema);
+  const parsed = parseTextResponse({ transport: o.transport, body, toolName: CHARACTER_DNA_TOOL_NAME, schema: CharacterDNAFileSchema });
   if (!parsed.ok) return { kind: "bad", failure: parsed.failure, detail: parsed.detail, spent };
 
   // 重过契约（gate 在这里响）→ 跑三条检查（集合 gate + 守门人 + 跨文书引用 · 票 69）。
@@ -183,10 +166,9 @@ export async function compileCharacterDna(input: CompileCharacterDnaInput): Prom
 
   const doFetch = input.fetchImpl ?? fetch;
   const timeoutMs = input.timeoutMs ?? UPSTREAM_TIMEOUT_MS;
-  const body = JSON.stringify({
-    model: REQUESTED_MODEL, max_tokens: MAX_TOKENS, thinking: { type: "disabled" },
-    ...forcedTool(CHARACTER_DNA_TOOL_NAME, CHARACTER_DNA_TOOL_DESCRIPTION, CharacterDNAFileSchema),
-    messages: [{ role: "user", content: [{ type: "text", text: characterDnaPrompt({ design, vws }) }] }],
+  const req = buildTextRequest({
+    transport: input.transport, prompt: characterDnaPrompt({ design, vws }),
+    toolName: CHARACTER_DNA_TOOL_NAME, toolDescription: CHARACTER_DNA_TOOL_DESCRIPTION, schema: CharacterDNAFileSchema, maxTokens: MAX_TOKENS,
   });
 
   const call = spentCall("character-dna", LEDGER_TARGET);
@@ -194,7 +176,7 @@ export async function compileCharacterDna(input: CompileCharacterDnaInput): Prom
   let lastDetail = "";
   for (let attempt = 1; attempt <= STRUCTURED_CALL_ATTEMPTS; attempt++) {
     const once = await onceThrough({
-      baseUrl: input.transport.baseUrl, apiKey: input.transport.apiKey, body, timeoutMs, doFetch, design, vws,
+      url: req.url, headers: req.headers, body: req.body, timeoutMs, doFetch, transport: input.transport, design, vws,
     });
     if (once.kind === "upstream") {
       call.trip({ failure: once.failure });

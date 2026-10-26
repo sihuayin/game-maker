@@ -1,0 +1,101 @@
+{
+  "format": "qa-report/v1",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "manifestChecksum": "sha256:66caebde149254623fa587dc1d58e1942a2aebdfb01b727bcbf5409f3b895d4d"
+  },
+  "checked": [
+    "palette-binding",
+    "constructive-constraint",
+    "layer-coverage",
+    "reference-resolution",
+    "reachability",
+    "intent-coverage",
+    "visual-config-coherence"
+  ],
+  "failures": [
+    {
+      "target": "scavenger-hero.run",
+      "detail": "源图 → 目标长宽比差 +333.1%（|ΔAR| ≥ 25%） —— 交付图被拉伸 / 压扁，不是设计能解释的差异；阈值来源：票 03 裁定（7 包 / 47 条样本，正常帧间 ≤ 9.1%）",
+      "severity": "error",
+      "judgement": "constructive-constraint"
+    },
+    {
+      "target": "entity-enemy.patrol",
+      "detail": "源图 → 目标长宽比差 +401.4%（|ΔAR| ≥ 25%） —— 交付图被拉伸 / 压扁，不是设计能解释的差异；阈值来源：票 03 裁定（7 包 / 47 条样本，正常帧间 ≤ 9.1%）",
+      "severity": "error",
+      "judgement": "constructive-constraint"
+    },
+    {
+      "target": "entity-enemy",
+      "detail": "视觉设计里 \"entity-enemy\" 的构图为 16×16，配置几何为 32×32 —— 尺寸有差（只报、不阻断）",
+      "severity": "warning",
+      "judgement": "visual-config-coherence"
+    },
+    {
+      "target": "entity-chest",
+      "detail": "视觉设计里 \"entity-chest\" 的构图为 16×16，配置几何为 24×24 —— 尺寸有差（只报、不阻断）",
+      "severity": "warning",
+      "judgement": "visual-config-coherence"
+    }
+  ],
+  "observations": [
+    {
+      "source": "inspect",
+      "outcome": "ok",
+      "lines": [
+        "wasteland-scavenger-recipe v1 · generated",
+        "8 个资源 · 4 张图集",
+        "  scavenger-hero · animation · 32×32 · generated/quantized · 8 帧 · 动画 idle(2) run(4) jump(2) · 用色 12/16",
+        "  entity-enemy · animation · 32×32 · generated/quantized · 4 帧 · 动画 patrol(4) · 用色 12/16",
+        "  entity-chest · sprite · 24×24 · generated/quantized · 1 帧 · 用色 12/16",
+        "  entity-resource · sprite · 16×16 · generated/quantized · 1 帧 · 用色 15/16",
+        "  station-platform · sprite · 32×32 · generated/quantized · 1 帧 · 用色 8/16",
+        "  hud-panel · ui · 32×32 · generated/exact · 1 帧 · 用色 10/16",
+        "  hud-resource-icon · ui · 16×16 · generated/exact · 1 帧 · 用色 10/16",
+        "  ruined-station-bg · background · 480×270 · generated/quantized · 3 帧 · 用色 14/16",
+        "源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：",
+        "  scavenger-hero.idle            源图 1022×548 (1.865) → 目标 64×32 (2.000) · 长宽比差 +7.2%",
+        "  scavenger-hero.run             源图 738×799 (0.924) → 目标 128×32 (4.000) · 长宽比差 +333.1%",
+        "  scavenger-hero.jump            源图 926×540 (1.715) → 目标 64×32 (2.000) · 长宽比差 +16.6%",
+        "  entity-enemy.patrol            源图 718×900 (0.798) → 目标 128×32 (4.000) · 长宽比差 +401.4%",
+        "  entity-chest                   源图 1024×1024 (1.000) → 目标 24×24 (1.000) · 长宽比差 0.0%",
+        "  entity-resource                源图 1024×1024 (1.000) → 目标 16×16 (1.000) · 长宽比差 0.0%",
+        "  station-platform               源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+        "  ruined-station-bg.sky          源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  ruined-station-bg.station-wall 源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  ruined-station-bg.foreground-ruins 源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  hero-master                    源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+        "  enemy-master                   源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+        "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+        "  ruined-station-bg.sky    480×270  100.0%",
+        "  ruined-station-bg.station-wall 480×270  55.8%",
+        "  ruined-station-bg.foreground-ruins 480×270  12.7%",
+        "色板 16 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+        "  #1b2027 · 8/8 个资源用到 · 占全部不透明像素 37.1%",
+        "  #2a3442 · 8/8 个资源用到 · 占全部不透明像素 22.0%",
+        "  #4a3222 · 7/8 个资源用到 · 占全部不透明像素 13.1%",
+        "  #2e3b4e · 7/8 个资源用到 · 占全部不透明像素 4.1%",
+        "  #3b4a5c · 8/8 个资源用到 · 占全部不透明像素 2.0%",
+        "  #6b4a33 · 6/8 个资源用到 · 占全部不透明像素 1.5%",
+        "  #565b60 · 8/8 个资源用到 · 占全部不透明像素 4.1%",
+        "  #4a6076 · 4/8 个资源用到 · 占全部不透明像素 0.9%",
+        "  #8a6244 · 5/8 个资源用到 · 占全部不透明像素 0.9%",
+        "  #7a7f84 · 7/8 个资源用到 · 占全部不透明像素 9.6%",
+        "  #c98b5e · 6/8 个资源用到 · 占全部不透明像素 1.2%",
+        "  #9aa0a5 · 6/8 个资源用到 · 占全部不透明像素 2.6%",
+        "  #d9a441 · 4/8 个资源用到 · 占全部不透明像素 0.0%",
+        "  #e8c39e · 4/8 个资源用到 · 占全部不透明像素 0.4%",
+        "  #f2d98b · 3/8 个资源用到 · 占全部不透明像素 0.5%",
+        "  #e6e2d6 · 2/8 个资源用到 · 占全部不透明像素 0.0%",
+        "色板外像素 0 个 · 占全部不透明像素 0.00%（**观察，不是判据** —— 对不上可以是设计）"
+      ]
+    },
+    {
+      "source": "review",
+      "outcome": "unavailable",
+      "reason": "这次创建链没有跑 `reviewPack`（它是**人工主动调用的诊断命令** —— `game-maker review <run 目录>` 那一支，**不由创建链自动调用**；而执行它还会产生**一次视觉调用**的成本） —— 没有可原样搬来的观察，而**空不等于「比过了、没差异」**"
+    }
+  ]
+}

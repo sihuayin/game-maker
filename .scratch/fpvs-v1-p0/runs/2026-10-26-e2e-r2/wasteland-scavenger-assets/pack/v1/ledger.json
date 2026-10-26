@@ -1,0 +1,179 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-assets",
+  "packVersion": 1,
+  "createdAt": "2026-10-26T13:16:31.000Z",
+  "run": {
+    "wallClockMs": 266711,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "image": {
+        "calls": 12,
+        "attempts": 12
+      },
+      "drawlist": {
+        "calls": 2,
+        "attempts": 2
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 35451,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "master-wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 40476,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 52783,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "entity-wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 76192,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "entity-treasure-chest",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 42011,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-icon-scrap",
+      "upstream": "messages",
+      "ms": 16207,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 1340,
+        "outputTokens": 476,
+        "reasoningTokens": 2929
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "ui-hud-panel",
+      "upstream": "messages",
+      "ms": 30173,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 1453,
+        "outputTokens": 521,
+        "reasoningTokens": 4104
+      }
+    },
+    {
+      "step": "image",
+      "target": "entity-scrap-resource",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 39182,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "tile-ground",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 54902,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "tile-platform",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 37039,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "bg-wasteland-station",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 42469,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 66461,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "entity-wasteland-enemy",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 51462,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "bg-wasteland-station",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 52908,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "player-scavenger",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 50526,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "bg-wasteland-station",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 41765,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    }
+  ]
+}

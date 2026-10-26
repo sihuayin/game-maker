@@ -75,7 +75,7 @@ const generateImage = (img: RasterImage): ImageGenerator => async (req) => ({
   call: { protocol: "openai", requestedSize: `${req.size.w}x${req.size.h}`, ms: 1, attempts: 1 },
 });
 
-const build = (img: RasterImage, frames = 4) => buildAssetPack({
+const build = (img: RasterImage, frames = 3) => buildAssetPack({
   recipe: recipe(frames), style: STYLE, outDir: tmp(), recipeDir: ROOT,
   generate: () => { throw new Error("本测试只有 image 资源，drawlist 不该被调用"); },
   generateImage: generateImage(img), sourceDateEpoch: EPOCH,
@@ -83,9 +83,9 @@ const build = (img: RasterImage, frames = 4) => buildAssetPack({
 
 describe("多帧底部横带：失败才触发的救援（票 99 / 票 100）", () => {
   it("⭐ 有横带 ⇒ 切出 N 帧，**且交付帧里横带颜色 0 像素**", async () => {
-    const { manifest, packDir, groundBands } = await build(sheet(4, { band: true }));
+    const { manifest, packDir, groundBands } = await build(sheet(3, { band: true }));
     const anim = manifest.assets[0]!.animations![0]!;
-    expect(anim.frames).toEqual(["guard.idle1", "guard.idle2", "guard.idle3", "guard.idle4"]);
+    expect(anim.frames).toEqual(["guard.idle1", "guard.idle2", "guard.idle3"]);
     expect(groundBands, "救援必须留痕 —— 不许静默").toEqual([
       { assetId: "guard", anim: "idle", rows: 4, cover: 1 },
     ]);
@@ -101,17 +101,17 @@ describe("多帧底部横带：失败才触发的救援（票 99 / 票 100）", 
   });
 
   it("正常图（无横带）⇒ 行为一字不改，且**没有**救援记录", async () => {
-    const { manifest, groundBands } = await build(sheet(4));
-    expect(manifest.assets[0]!.animations![0]!.frames).toEqual(["guard.idle1", "guard.idle2", "guard.idle3", "guard.idle4"]);
+    const { manifest, groundBands } = await build(sheet(3));
+    expect(manifest.assets[0]!.animations![0]!.frames).toEqual(["guard.idle1", "guard.idle2", "guard.idle3"]);
     expect(groundBands).toBeUndefined();
   });
 
   it("阴性①：角色真的连成一块（无横带）⇒ 仍然抛「检测到 1 块」", async () => {
-    await expect(build(merged(4))).rejects.toThrow(/检测到 1 块/);
+    await expect(build(merged(3))).rejects.toThrow(/检测到 1 块/);
   });
 
   it("阴性②：有横带但只画了 N-1 个角色 ⇒ 裁完仍不是 N 块，照样抛", async () => {
-    await expect(build(sheet(4, { band: true, characters: 3 })))
+    await expect(build(sheet(3, { band: true, characters: 2 })))
       .rejects.toThrow(/检测到 1 块[\s\S]*底部一条贯穿画面的横带/);
   });
 });

@@ -288,7 +288,7 @@ const READ_STATE = `(()=>{
     collected: s.collected,
     won: !!s.won,
     pickups: (s.pickups || []).map((q) => ({ x: q.x, y: q.y, active: !!q.active, visible: !!q.visible })),
-    hazards: (s.hazards || []).map((h) => ({ x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs })),
+    hazards: (s.hazards || []).map((h) => ({ x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs, t0: h.t0 })),
     gate: s.gate ? { x: s.gate.x, y: s.gate.y } : null,
     solids,
     scrollX: s.cameras && s.cameras.main ? s.cameras.main.scrollX : 0,
@@ -544,9 +544,17 @@ function shouldJump(st, ctx) {
   const groundAhead = st.solids.some((s) =>
     s.y <= st.bottom + 8 && s.y >= st.bottom - 90 && s.x <= probe && s.x + s.w >= probe,
   );
-  const hazardAhead = st.hazards.some((h) =>
-    h.x > st.x && h.x - st.x < 100 && Math.abs(h.y - st.y) < 90,
-  );
+  const hazardAhead = st.hazards.some((h) => {
+    if (!(h.x > st.x && h.x - st.x < 100 && Math.abs(h.y - st.y) < 90)) return false;
+    // ⚠️ 票 17：巡逻 hazard（distance>0）是三角波，跳的过程中它在动 —— 只看当前 x 会撞上
+    //   （票 05 第四次重跑实测 12 连撞）。只在它**远离玩家**时跳（phase<0.5 = 向 + 方向移动），
+    //   否则等它远离再跳；`t0` 由 READ_STATE 逐帧累加、periodMs 是三角波周期。
+    if (h.distance > 0 && h.periodMs > 0) {
+      const phase = ((h.t0 ?? 0) % h.periodMs) / h.periodMs;
+      if (phase >= 0.5) return false;
+    }
+    return true;
+  });
   const pickupAbove = st.pickups.some((p) =>
     p.active && p.x > st.x && p.x - st.x < 130 && p.y < st.bottom - 20,
   );
