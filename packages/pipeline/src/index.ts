@@ -13,3 +13,4 @@ export * from "./create-game.js";
 export * from "./publish-gate.js";
 export * from "./review.js";
 export * from "./delivery.js";
+export * from "./playtest.js";

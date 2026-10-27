@@ -170,7 +170,7 @@ export function createObserver({ scenario, spawn }) {
       const m = a.expect;
       const observed = m.kind === "event" ? (counts[m.type] ?? 0) : valueOf(m.path);
       const pass = compare(m.op, observed, m.value);
-      const base = { id: a.id, kind: a.kind, requires: a.requires, observed };
+      const base = { id: a.id, kind: a.kind, requires: a.requires, observed, expect: a.expect, withinMs: a.withinMs };
       if (pass) {
         // 事件计数的 pass 在轮询有洞时不一定充分（洞可能漏事件）；gte 是单调下界，仍可判。
         if (m.kind === "event" && gaps.length > 0 && m.op !== "gte")
@@ -227,6 +227,7 @@ export function createObserver({ scenario, spawn }) {
       hits: (st?.dangers || []).reduce((n, d) => n + (d.hits || 0), 0),
       chestsOpened: (st?.chests || []).filter((c) => c.opened).length,
       activePickups: (st?.pickups || []).filter((p) => p.active).length,
+      playerX: st ? st.x : null,
     };
   }
 

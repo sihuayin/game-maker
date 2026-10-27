@@ -21,7 +21,7 @@
 //   小写 + 连字符 = 仓库「not X」的既有约定（`not-tested` / `not-run`），
 //   与 spec 文档里的大写 `FAIL`/`INCOMPLETE` 只是写法不同、语义同一。
 import { z } from "zod/v4";
-import { DeliveryPlaytestSchema, mapPlaytest, type DeliveryPlaytest } from "./playtest.js";
+import { DeliveryPlaytestSchema, mapPlaytest, playtestSummaryOf, type DeliveryPlaytest, type PlaytestReport } from "./playtest.js";
 
 export const DeliveryCheckStatus = z.enum(["pass", "fail", "incomplete", "blocked", "not-required"]);
 export type DeliveryCheckStatus = z.infer<typeof DeliveryCheckStatus>;
@@ -67,7 +67,7 @@ export function deriveDeliveryVerdict(
 //     `config`         游戏配置编译（compileRuntime）
 //     `qa`             三个 QA 族（qaVerdict，六判据）
 //     `site`           站点构建（assembleSite）
-//     `playable-smoke` 自动试玩（headless smoke，票 09 落地）
+//     `playable-smoke` 试玩（Playtest V1；键名保留，消费者换成 playtest 报告）
 //     `visual-review`  视觉人工对照（HumanVerdict，票 10 落地）
 //
 //   ⚠️ **必需性不住在 `checks[]` 的每条里**（票 04 Q2 约束二）：`checks` 只有 `key/status/detail`，
@@ -92,7 +92,7 @@ export const DELIVERY_CHECK_LABELS: Record<DeliveryCheckKey, string> = {
   "config": "配置编译",
   "qa": "QA 六判据",
   "site": "站点构建",
-  "playable-smoke": "自动试玩",
+  "playable-smoke": "试玩",
   "visual-review": "视觉人工对照",
 };
 
@@ -302,6 +302,52 @@ export function applyVisualReview(delivery: DeliveryReport, review: DeliveryVisu
     visualReview: review,
     ...(delivery.playtest === undefined ? {} : { playtest: delivery.playtest }),
     evidence: delivery.evidence,
+    ...(delivery.knownLimitations === undefined ? {} : { knownLimitations: delivery.knownLimitations }),
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 七、试玩结果 → delivery 写回（票 06 Q8 / 票 08）
+//
+//   ⚠️ **纯函数，零 I/O**：身份校验用完整、已验证的 `PlaytestReport`；文件读写与原子提交在
+//     `packages/pipeline/src/playtest.ts` 的 `writePlaytestToReport`。
+//   ⚠️ 只动三处：`playable-smoke` 检查项、`delivery.playtest` 摘要、`verdict`（由 buildDeliveryReport 重算）。
+//     `visualReview` / `knownLimitations` / QA 层字段原样保留。
+//   ⚠️ 证据替换：移除旧的 `playtest-*` ref，再追加本次 attempt 的证据；非 playtest 证据不删。
+export function applyPlaytest(
+  delivery: DeliveryReport,
+  report: PlaytestReport,
+  evidence: readonly DeliveryEvidence[],
+): DeliveryReport {
+  const resultEvidence = evidence.find((e) => e.ref === "playtest-result");
+  if (resultEvidence === undefined)
+    throw new Error("applyPlaytest 需要一条 ref=playtest-result 的证据条目（报告路径）");
+  if (delivery.site === undefined)
+    throw new Error("delivery 没有 site 身份 —— 不能把试玩结果写进一个未装配/身份不明的交付报告");
+  const id = report.identity;
+  if (id.packId !== delivery.pack.packId || id.packVersion !== delivery.pack.packVersion)
+    throw new Error(`试玩报告 pack 身份与 delivery 不一致：报告 ${id.packId} v${id.packVersion} / delivery ${delivery.pack.packId} v${delivery.pack.packVersion}`);
+  if (id.siteVersion !== delivery.site.version || id.shellVersion !== delivery.site.shell)
+    throw new Error(`试玩报告 site/shell 身份与 delivery 不一致：报告 site v${id.siteVersion} shell=${id.shellVersion} / delivery site v${delivery.site.version} shell=${delivery.site.shell}`);
+
+  const summary = playtestSummaryOf(report, resultEvidence.path);
+  const mapped = mapPlaytest(summary);
+  const checks = delivery.checks.map((c) => c.key === "playable-smoke"
+    ? { key: c.key, status: mapped.status, ...(mapped.detail === undefined ? {} : { detail: mapped.detail }) }
+    : c);
+  const kept = delivery.evidence.filter((e) => !e.ref.startsWith("playtest-"));
+  const byRef = new Map<string, DeliveryEvidence>();
+  for (const e of kept) byRef.set(e.ref, { ...e });
+  for (const e of evidence) byRef.set(e.ref, { ...e });
+  return buildDeliveryReport({
+    runId: delivery.runId,
+    pack: delivery.pack,
+    config: delivery.config,
+    site: delivery.site,
+    checks,
+    visualReview: delivery.visualReview,
+    playtest: summary,
+    evidence: [...byRef.values()],
     ...(delivery.knownLimitations === undefined ? {} : { knownLimitations: delivery.knownLimitations }),
   });
 }

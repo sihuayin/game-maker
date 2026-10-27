@@ -40,7 +40,9 @@ node packages/demo/probe/playtest/playtest.mjs \
 
 `scenarios/five-state/` 是票 02 的首版五场景（一态一个）。契约是 `playtest-scenario/v1` 的 JSON：
 版本绑定（目标 site 版本）、语义动作、断言三值、终止条件、时限、可比较事件。
-`env-no-chrome` / `timeout-hang` 是 **harness 条件场景**（`required:false`，不进真实游戏交付聚合）。
+`success-basic` 是交付必需场景；`failure-missing-pickup` / `limitation-wide-patrol` 是覆盖/诊断场景
+（`required:false`，故意注入失败/限制，不进交付命令的必需场景集）；`env-no-chrome` / `timeout-hang`
+是 harness 条件场景（同样 `required:false`）。
 
 ## 不在本目录
 

@@ -5,7 +5,7 @@ import {
   canonicalProjection, mapPlaytest, playtestProjectionOf, playtestSummaryOf, samePlaytestProjection,
   type DeliveryCheckStatus, type DeliveryPlaytest, type PlaytestReport, type PlaytestScenarioReport,
 } from "../src/index.js";
-import { applyVisualReview, buildDeliveryReport, deliveryVerdictOf } from "../src/delivery.js";
+import { applyPlaytest, applyVisualReview, buildDeliveryReport, deliveryVerdictOf } from "../src/delivery.js";
 
 const identity = {
   scenarioFormatVersion: PLAYTEST_SCENARIO_VERSION as typeof PLAYTEST_SCENARIO_VERSION,
@@ -34,7 +34,7 @@ function scenario(over: Partial<PlaytestScenarioReport> = {}): PlaytestScenarioR
     assertions,
     assertionAggregate: aggregateAssertions(assertions),
     endState: { collected: 6, won: true, hits: 0, chestsOpened: 2, activePickups: 0, playerX: 1380 },
-    initialState: { collected: 0, won: false, hits: 0, chestsOpened: 0, activePickups: 4 },
+    initialState: { collected: 0, won: false, hits: 0, chestsOpened: 0, activePickups: 4, playerX: 40 },
     comparableEvents: ["pickup", "win"],
     eventCounts: { pickup: 6, win: 1 },
     actions: [],
@@ -258,6 +258,52 @@ describe("DeliveryPlaytestSchema / delivery 不变量", () => {
     const withBaseline = { ...passSummary, baseline: { result: "changed" as const } };
     expect(mapPlaytest(withBaseline)).toEqual({ status: "pass", detail: "SUCCESS" });
     expect(DeliveryReportSchema.parse(delivery({ playtest: withBaseline })).verdict).toBe("pass");
+  });
+});
+
+describe("applyPlaytest（票 08 写回纯函数）", () => {
+  const ev = [
+    { ref: "playtest-result", path: "g/run/v1/playtest/v1/result.json" },
+    { ref: "playtest-events", path: "g/run/v1/playtest/v1/success-basic/events.jsonl" },
+  ];
+  const baseDelivery = () => DeliveryReportSchema.parse(delivery({
+    checks: checks("incomplete"),
+    evidence: [...evidence, { ref: "playtest-old", path: "old/result.json" }, { ref: "qa-report", path: "g/run/v1/qa-report.json" }],
+    knownLimitations: ["已知限制"],
+  }));
+
+  it("pass 报告：只动三处，保留 visualReview/knownLimitations，替换 playtest-* 证据", () => {
+    const r = report({ aggregate: "SUCCESS", scenarios: [scenario({ outcome: "SUCCESS" })] });
+    const next = applyPlaytest(baseDelivery(), r, ev);
+    expect(next.checks.find((c) => c.key === "playable-smoke")).toMatchObject({ status: "pass", detail: "SUCCESS" });
+    expect(next.playtest?.aggregate).toBe("SUCCESS");
+    expect(next.verdict).toBe("pass");
+    expect(next.visualReview).toEqual({ status: "pass" });
+    expect(next.knownLimitations).toEqual(["已知限制"]);
+    expect(next.evidence.map((e) => e.ref).sort()).toEqual(["playtest-events", "playtest-result", "qa-report"]);
+    expect(next.evidence.some((e) => e.ref === "playtest-old")).toBe(false);
+  });
+
+  it("GAMEPLAY_FAILURE 报告 ⇒ 检查项 fail + verdict fail", () => {
+    const a = { id: "hits", kind: "invariant" as const, requires: ["hits"], result: "fail" as const, observed: 1, expect: { kind: "invariant", path: "hits", op: "eq", value: 0 }, withinMs: 1000, evidence: ["playtest-events"] };
+    const r = report({
+      aggregate: "GAMEPLAY_FAILURE",
+      scenarios: [scenario({ outcome: "GAMEPLAY_FAILURE", assertions: [a], assertionAggregate: "fail", terminationReached: false })],
+    });
+    const next = applyPlaytest(baseDelivery(), r, ev);
+    expect(next.checks.find((c) => c.key === "playable-smoke")).toMatchObject({ status: "fail", detail: "GAMEPLAY_FAILURE" });
+    expect(next.verdict).toBe("fail");
+  });
+
+  it("身份不匹配 ⇒ 拒写，不污染 delivery", () => {
+    const r = report({ aggregate: "SUCCESS", scenarios: [scenario({ outcome: "SUCCESS" })] });
+    const bad = { ...r, identity: { ...r.identity, siteVersion: 2 } };
+    expect(() => applyPlaytest(baseDelivery(), bad as typeof r, ev)).toThrow(/site/);
+  });
+
+  it("没有 playtest-result 证据 ⇒ 拒写", () => {
+    const r = report({ aggregate: "SUCCESS", scenarios: [scenario({ outcome: "SUCCESS" })] });
+    expect(() => applyPlaytest(baseDelivery(), r, [ev[1]!])).toThrow(/playtest-result/);
   });
 });
 

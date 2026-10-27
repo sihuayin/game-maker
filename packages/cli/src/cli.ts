@@ -17,6 +17,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
 import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
+import { runPlaytestCommand } from "./playtest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -33,6 +34,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker accept <资源包目录> [--baseline <baseline 目录>] [--out <目录>] [--json]
   game-maker review <run 目录> [--json]
   game-maker review-verdict <run 目录> --verdict pass|fail [--reviewer <名字>] [--note "..."] [--json]
+  game-maker playtest <run 目录> [--out <目录>] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
   把包的联系表与**原图**一起喂给视觉模型，要一份「哪里不像」的观察清单。
@@ -43,6 +45,12 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 \`review-verdict\` 是**视觉人工对照的写回**（FPVS-V1-P1 · 票 10）：人看过后，把结论写进那个
   run 的 \`qa-report.json\` 的 \`delivery.visualReview\`（仅 CLI、不加 MCP）。**不碰 QA 层、不伪造站点版本**；
   reviewer 缺省取 \`git config user.name\`。
+
+\`playtest\` 是 Playtest V1 的**试玩**（仅 CLI、不加 MCP；票 06）：对一个已经装配好的 run 执行固定场景，
+  观测运行事件/状态、产出可复现证据，并把五态归因写回 \`qa-report.json\` 的 \`delivery.playtest\`。
+  ⚠️ **它会启动本地 Chrome**（headless），但**不调用任何付费上游**；\`create\` / \`build\` 本身不启动浏览器。
+  ⚠️ 只吃 run 目录，不接受 \`--pack\` / \`--site\` / \`--config\` / \`--scenario\` 覆盖 —— 身份从报告与产物关系解析。
+  退出码：0 = 试玩 SUCCESS 且交付写回成功；1 = 非 SUCCESS 或写回失败；4 = 准备拒绝/输入不合法；2 = 用法错。
 
 \`accept\` 是**结构验收**（免费、不生成、不调用上游）：读一个交付态资源包，逐项核对
   manifest / 图集 JSON / PNG / 动画帧，写 \`<out>/<packId>/acceptance/v<N>/report.json\` 与
@@ -702,6 +710,15 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         const written = writeAcceptanceReport({ report: accepted.report, outDir: outRoot });
         result = acceptComplete(accepted, written);
         exitCode = accepted.hasErrors ? EXIT.failure : EXIT.ok;
+        break;
+      }
+      case "playtest": {
+        // ⚠️ 仅 CLI（票 06 Q2）：创建链不启动浏览器；身份与准备校验在 core，壳只解析参数/渲染。
+        const dir = positionals[0];
+        if (dir === undefined) throw new CommandError("usage", "playtest 需要一个 run 目录（<out>/<gameId>/run/v<N>）");
+        const playtest = runPlaytestCommand({ outRoot, runDirInput: dir });
+        result = playtest.result;
+        exitCode = playtest.exitCode;
         break;
       }
       case "review": {

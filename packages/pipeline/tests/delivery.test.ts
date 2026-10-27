@@ -268,7 +268,7 @@ describe("deliverySummaryOf（票 13 · FR-06，P1）", () => {
     });
     const s = deliverySummaryOf(delivery);
     expect(s.summary[0]).toContain("incomplete");
-    expect(s.summary.join("\n")).toContain("自动试玩");
+    expect(s.summary.join("\n")).toContain("试玩");
     expect(s.summary.join("\n")).toContain("视觉人工对照");
     expect(s.data.deliveryVerdict).toBe("incomplete");
   });

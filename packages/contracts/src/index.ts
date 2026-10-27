@@ -187,5 +187,6 @@ export * from "./delivery.js";
 //   `playable-smoke.mjs`。输入是探针产出的 result.json（松散形状，非契约）。
 export * from "./playable-smoke.js";
 export * from "./playtest.js";
+export * from "./playtest-attribution.js";
 
 export * from "./asset-plan.js";

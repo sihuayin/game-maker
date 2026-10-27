@@ -103,13 +103,20 @@ Effort: playtest-v1
   harness（版本绑定、状态差观测、步进决策、`events/trace/input/result`、`site-integrity`）+ 五态场景文件 +
   零付费真实产物两次运行 `determinism.same=true`、站点字节未改；真实 run 未通关只记 `unknown`（五态归因归 08）。
   → 解除 08；09 待 08。
+- [08 五态归因器（阶段化决策 + 证据最小集）](issues/08-attribution-engine.md)：**已收口** —— 纯函数
+  `attribute` 阶段化决策（prepare/boot/execute/evaluate）· 五态 + `UNKNOWN` + 独立 `not-executed` · 环境健康前置门 ·
+  runtime-error 来源判定 · 初始态/invariant/win-contract 游戏失败 · `AGENT_LIMITATION` 正面证据 · `SUCCESS` 门槛 ·
+  结构化 `InsufficientEvidence` · 聚合优先级 · CLI `game-maker playtest <run>` + `run/v<N>/playtest/v<K>/` attempt +
+  `applyPlaytest`/`writePlaytestToReport` 原子写回/证据替换/幂等/身份拒写 · 真实产物 E2E = `AGENT_LIMITATION → incomplete`
+  （exit 1，站点字节未改、QA 层保留）· 全仓 2123 测试绿。→ 解除 09；smoke 退役/自测/CONTEXT 拆到
+  [10](issues/10-smoke-retirement.md)（09 验收后硬切）。
 
 ## Not yet specified
 
 <!-- in-scope fog that graduates as the frontier advances -->
 
-（无）—— 06 收口后，交付接入、smoke 退役、契约字段、真实验收、词汇/CLI 摘要均已毕业为 07/08/09。
-剩余风险（真实运行能否稳定产出某态、Chrome 可用性）属于实施验收的观察项，不是未指定决策。
+（无）—— 06 收口后交付接入/契约字段毕业为 07/08/09；08 收口后 smoke 退役、自测迁移、CONTEXT.md 词条毕业为
+[10](issues/10-smoke-retirement.md)。剩余风险（真实运行能否稳定产出某态、Chrome 可用性）属于实施验收的观察项，不是未指定决策。
 
 ## Out of scope
 

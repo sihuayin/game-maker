@@ -127,6 +127,9 @@ export const PlaytestAssertionResultSchema = z.strictObject({
   requires: z.array(z.string().min(1)),
   result: z.enum(["pass", "fail", "unknown"]),
   observed: z.unknown().optional(),
+  /** 断言声明的匹配器与窗口（归因用它判断「否定条件是否可判」，不靠断言 id/场景名）。 */
+  expect: z.unknown().optional(),
+  withinMs: z.number().int().positive().optional(),
   insufficientEvidence: InsufficientEvidenceSchema.optional(),
   evidence: z.array(z.string().min(1)).default([]),
 }).superRefine((a, ctx) => {
@@ -205,6 +208,7 @@ export const PlaytestScenarioReportSchema = z.strictObject({
     hits: z.number().int().nonnegative(),
     chestsOpened: z.number().int().nonnegative(),
     activePickups: z.number().int().nonnegative(),
+    playerX: z.number().nullable(),
   }),
   /** 语义动作的执行摘要（实际按键轨迹在 `input.jsonl`；票 02 要求动作轨迹可追溯）。 */
   actions: z.array(z.strictObject({
