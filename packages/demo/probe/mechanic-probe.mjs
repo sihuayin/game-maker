@@ -3,7 +3,7 @@
  * 机制化 QA probe（票 15）—— 每个机制一条可运行的运行时断言。
  *
  * 它回答「这条机制**真的在运行时发生**了吗」：不是看 config 里有没有字段，而是 headless Chrome
- * 里读运行时状态逐条断（文档 FR-06 / 风险三）。与 `playable-smoke.mjs`（票 10）共用
+ * 里读运行时状态逐条断（文档 FR-06 / 风险三）。与 playtest 自测/runner 共用
  * `probe-harness.mjs` 的 Chrome/CDP/状态探针。
  *
  *   node packages/demo/probe/mechanic-probe.mjs [--out <dir>] [--only <mechanicId>]
@@ -261,7 +261,7 @@ async function main() {
       }
       result.durationMs = Date.now() - t0;
       result.passed = result.failures.length === 0;
-      // ⚠️ 运行时不得有 console.error / 未捕获异常（与 playable-smoke 同一条判据）
+      // ⚠️ 运行时不得有 console.error / 未捕获异常（与新 playtest harness 同一条判据）
       const errs = page.consoleErrors();
       if (errs.length || page.exceptions.length) {
         result.failures.push(`页面有错误：console.error ${errs.length} 条 / 未捕获异常 ${page.exceptions.length} 条` + (errs.length ? `；首条：${errs[0].text}` : ''));

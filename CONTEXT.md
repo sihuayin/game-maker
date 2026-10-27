@@ -670,18 +670,77 @@ _避免_：把它当 [[意图覆盖]] 用 —— 那个是「意图的实体/机
 
 ---
 
+## Playtest V1（2026-10-27 捡回并重定义）
+
+Playtest V1 从「已出局」里捡回下面这些词，但**按新 harness 重定义**；旧闭环模型的定义不继承。
+核心边界：**观测是证据，不是判据**；断言三值不越权替代五态归因；`expectedOutcome` 是设计意图，不是实际结果。
+
+**Playtest（试玩）**
+对一个已经装配好的 site 执行固定场景契约、从外部观测运行状态/事件、产出可复现报告。
+v1 的入口是 `game-maker playtest <run 目录>`；它取代旧 headless smoke，但交付键名 `playable-smoke` 保留。
+
+**Playtest Attempt（试玩尝试）**
+`run/v<N>/playtest/v<K>/` 的一次执行；一旦创建不可覆盖。包含报告、`events`、`trace`、`input`、
+console/exceptions 与站点字节完整性证据。`delivery.playtest.report` 指向当前采用的那一次。
+
+**Runtime Observation（运行时观察）**
+harness 从只读外部探针轮询得到的状态快照与结构化观测。它**不是**完整 Runtime Event Log，
+外壳零改动；同一轮询窗口内发生又消失的瞬时事件可能结构性不可判（见 [[结构性不可判]]）。
+
+**Runtime Event Log（运行时事件日志）**
+`events.jsonl` 的 11 类闭事件：`scene-ready` / `spawn` / `pickup` / `win` / `chest-open` /
+`danger-hit` / `danger-erupt` / `land` / `jump` / `reset` / `runtime-error`。
+事件 = 离散状态跃迁（边），由状态差推导（`source:"poll"`）或 harness 实际捕获的错误（`source:"cdp"`）；
+不冒充未观察到的顺序、帧号或时序。
+
+**Runtime Black Box（运行时黑盒）**
+一次 attempt 的证据包：events / trace / input / console / exceptions / result。
+用于诊断与重跑；`input.jsonl` 记录实际发出的输入，**只是诊断，不是判定依据**（见 [[重放]]）。
+
+**RuntimeEntity（运行时实体）**
+观测里 `actor` 引用的实体。v1 的实体下标只在本次运行内解释，**不是跨版本稳定 ID**；
+无法可靠定位实体时为 `null`，不猜。
+
+**Semantic Test Action（语义测试动作）**
+以游戏语义而非屏幕坐标表达的动作：`move_to` / `jump_over` / `wait_until` / `reach_goal` / `assert_state`。
+由薄解释器执行；实际按键轨迹记在 `input.jsonl`。具体玩法目标与动作序列来自场景契约数据，不写死在解释器里。
+
+**GameplayTestPlan（玩法测试计划）**
+场景契约的集合（五态 + harness 条件 + 自测）。它声明设计意图（`expectedOutcome`）、动作、断言、
+终止条件与时限；实际结果由证据独立归因，**不由 `expectedOutcome` 预填**。
+
+**Critical Path（关键路径）**
+场景声明的动作与终止链。v1 的 `SUCCESS` 要求执行到底、终止条件达成、至少一条实质断言求值 `pass`；
+它不是引擎内置门禁，也不自动判「没走到终点 = 游戏失败」。
+
+**Evidence（证据）**
+可追溯到**本次执行**的 E3 运行证据：命令、退出码、路径、产物身份。E0–E2（推测/源码/测试）
+可以帮助设计，但不能单独证明某次运行实际发生了什么。
+
+**Playtest Outcome（试玩结果）**
+五态 `SUCCESS` / `GAMEPLAY_FAILURE` / `ENVIRONMENT_FAILURE` / `AGENT_LIMITATION` / `TIMEOUT`，
+外加 `UNKNOWN`（归因不成立，不是第六种原因）。与断言三值、`expectedOutcome` 是**三个独立维度**。
+
+**InsufficientEvidence（证据不足记录）**
+`UNKNOWN` 的结构化缺口：`ruleId` + `missingObservation` + `affectedAssertionIds` + `explanation`。
+缺失即 schema 拒绝；不能只写「没有数据」。
+
+**not-executed（未执行）**
+执行状态，不是 outcome：版本/schema/准备拒绝，或证据尚未开始。参与交付的**执行资格**判断，
+不参与五态 outcome 排序；交付映射为 `blocked`，与 `ENVIRONMENT_FAILURE` 保留语义差别。
+
 ## 已出局（本 effort 不采用，词汇保留供将来的闭环地图使用）
 
 以下术语曾是本项目的核心词汇，2026-09-24 随终点重画整体出局。
 **它们不代表本项目当前采用的含义**，列在此处只为在别处读到时不致误解。
+⚠️ 其中 `Runtime Observation / RuntimeEntity / Runtime Event Log / Runtime Black Box /
+Semantic Test Action / GameplayTestPlan / Critical Path / Evidence` 已于 2026-10-27 由
+Playtest V1 **捡回并重定义**（见上一节）；旧义不再代表当前含义。
 
-- **Creation Run / Iteration / Attempt / Lifecycle State** —— 闭环模型的生命周期载体。
-- **Runtime Observation / RuntimeEntity / Runtime Event Log / Runtime Black Box** —— 游戏运行时的语义快照与事件流。
-- **Runtime Bridge（运行时桥）** —— 游戏内部暴露语义状态的通道。
-- **Semantic Test Action（语义测试动作）** —— 以游戏语义而非屏幕坐标表达的测试操作。
-- **GameplayTestPlan / Critical Path** —— 玩法测试计划与关键路径。
-- **Visual QA / Gameplay QA / Requirement QA / Runtime QA** —— 各维度质检。
-- **Evidence（证据）** —— QA Issue 携带的可追溯凭据。
+- **Creation Run / Iteration / Attempt / Lifecycle State** —— 闭环模型的生命周期载体
+  （⚠️ 与 Playtest Attempt 不是一回事：后者是一次试玩执行，不是整条创建链的 attempt）。
+- **Runtime Bridge（运行时桥）** —— 游戏内部暴露语义状态的通道（v1 不引入；观测走外部只读探针）。
+- **Visual QA / Gameplay QA / Requirement QA / Runtime QA** —— 各维度质检（不是本图的五态归因）。
 - **Creation Gate / Hard Gate / Quality Score / Blocker** —— 门禁与评分。
 - **Repair / RepairAction / RepairProgress / Stalled / Best State / Budget** —— 修复循环。
 - **Checkpoint** —— 阶段状态 dump（原只做写入，不做 Resume）。

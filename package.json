@@ -11,7 +11,7 @@
     "check:links": "node scripts/check-links.mjs",
     "check": "pnpm check:deps && pnpm check:links && pnpm build",
     "test": "vitest run --passWithNoTests",
-    "test:playable": "pnpm build && node packages/demo/probe/playable-smoke.mjs",
+    "test:playtest": "pnpm build && node packages/demo/probe/playtest/self-test.mjs && vitest run packages/contracts/tests/playtest-attribution.test.ts packages/contracts/tests/playtest-baseline.test.ts packages/contracts/tests/playtest.test.ts packages/pipeline/tests/playtest.test.ts packages/pipeline/tests/playtest-baseline.test.ts packages/demo/probe/playtest/tests",
     "test:mechanic": "pnpm build && node packages/demo/probe/mechanic-probe.mjs",
     "test:acceptance": "pnpm build && node packages/demo/probe/free-acceptance.mjs",
     "typecheck": "tsc -b && pnpm -r --if-present typecheck"

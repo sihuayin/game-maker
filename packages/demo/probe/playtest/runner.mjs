@@ -11,7 +11,7 @@ import {
   PlaytestEventSchema, PlaytestInputEventSchema, PlaytestReportSchema, PlaytestScenarioSchema, aggregateAssertions, playtestProjectionOf, samePlaytestProjection,
 } from "@game-maker/contracts";
 import {
-  CHROME_FLAGS, connectCdp, delay, findChrome, launchChrome, makePage, startServer, writeJson,
+  CHROME_FLAGS, INPUT_BLOCKER, connectCdp, delay, findChrome, launchChrome, makePage, startServer, writeJson,
 } from "../probe-harness.mjs";
 import { PHASER_HOOK } from "../probe-harness.mjs";
 import { createObserver } from "./observe.mjs";
@@ -189,7 +189,9 @@ async function runScenario({ page, scenario, dir, target, command }) {
   page.clearLog();
   let start;
   try {
-    start = await page.reload();
+    start = scenario.harnessCondition === "input-blocked"
+      ? await page.reload({ preScripts: [INPUT_BLOCKER] })
+      : await page.reload();
   } catch (e) {
     const report = notExecutedScenario(scenario, `boot 失败：${msgOf(e)}`);
     writeJson(path.join(dir, "console.json"), page.consoleEntries);

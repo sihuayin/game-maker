@@ -1,15 +1,13 @@
 // 机制化 QA probe 的**可复用 harness**（票 15）。
 //
-// 从 `playable-smoke.mjs`（票 10）抽出来的那一半「与具体玩法场景无关」的机器：
+// 「与具体玩法场景无关」的浏览器机器（历史来源：旧 `playable-smoke`；2026-10-27 退役）：
 //   找/启 Chrome → CDP → 注入只读状态探针 → 驱动 → 读状态 → 断言。
-// `mechanic-probe.mjs` import 这里。⚠️ `playable-smoke.mjs` **暂未迁移**到这份 harness
-//   （迁移是独立的清理，不在本票「不阻塞 harness 本身」的范围里）—— 它仍带着自己那份
-//   抽出来之前的旧拷贝，是「两套真相」纪律下的一条已知欠账，记在 [票 15 的 Answer]。
+// `mechanic-probe.mjs` 与 playtest 自测/runner import 这里 —— 仓库里只有这一套 CDP/Chrome 机器。
 //
 // ⚠️ **不改站点运行时**：状态读取靠 CDP 在页面里注入一个只读探针（捕获 Phaser 实例），
 //   负例里的「旧实现」也只是在**本次页面会话**里猴子补丁，站点产物本身不动。
 //
-// ⚠️ 与 `playable-smoke.mjs` 同款：依赖 Node 22（内置 fetch / WebSocket）、系统 Chrome、
+// ⚠️ 与新 playtest harness 同款：依赖 Node 22（内置 fetch / WebSocket）、系统 Chrome、
 //   已构建的 `packages/demo/dist`。不新增 Playwright / Puppeteer / 任何依赖。
 
 import fs from 'node:fs';
@@ -204,7 +202,7 @@ export function connectCdp(url) {
 }
 
 // 只读状态探针：读的是场景上**已经存在**的字段（TS 的 private 只在编译期）。
-// ⚠️ 票 15 在 playable-smoke 那版基础上加了 `chests` / `dangers`（含 `state` 与 `hits`）——
+// ⚠️ 票 15 在旧 playable-smoke 那版基础上加了 `chests` / `dangers`（含 `state` 与 `hits`）——
 //   机制 probe（open-chest / avoid-danger）靠这两样读「开没开」「喷发没喷发、打中没打中」。
 export const READ_STATE = `(()=>{
   const g = window.__gmGame

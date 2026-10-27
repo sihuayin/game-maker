@@ -51,5 +51,12 @@ node packages/demo/probe/playtest/playtest.mjs \
   `hazard-legacy` / `gate` / `pickup` / `input` 负例迁移 → 票 08。
 - 基线比较与真实产物验收 → 票 09。
 
-⚠️ 旧 `playable-smoke.mjs` 的自测负例**暂时仍在旧 smoke 上**（不在五态场景集里）；
-票 08 在硬切前把它们迁到 `pnpm test:playtest`，不复制第三套浏览器基础设施。
+## 自测（票 10）
+
+`self-test.mjs` 是 harness 自测，**不进五态交付场景集**：`gate`（装配期拒绝）· `pickup`（初始态 pickup 缺失）·
+`input`（按键阻断走不动）· `hazard-legacy`（旧 `hitHazard` 猴子补丁仍被 reset-floor 抓住）。
+它复用 `probe-harness.mjs` 的 CDP/Chrome，不复制第三套浏览器基础设施。
+
+```bash
+pnpm test:playtest   # 自测 + 离线五态/写回/基线测试
+```

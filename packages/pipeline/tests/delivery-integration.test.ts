@@ -1,14 +1,14 @@
 // 票 11 给「跨阶段报告关联」立的集成判据（§8.2）—— 报告不是单点，是**链上串起来**的。
 //
 //   ⚠️ 这一组**不付费、不跑真生图**：上游/生图都用 `upstream.ts` 的假响应，产物只落临时 out 树。
-//     单点判据（`buildSiteFailureDelivery` / `mapPlayableSmoke` / `writeVisualReviewToReport` 各自）由
-//     `delivery.test.ts` / `playable-smoke.test.ts` / `review-verdict.test.ts` 盯；这里盯的是**跨阶段**那几条：
-//     QA 硬失败 → delivery 落盘 · build → site → 视觉一路串下来的 verdict · smoke 检查项怎么并进 delivery。
+//     单点判据（`buildSiteFailureDelivery` / `mapPlaytest` / `writeVisualReviewToReport` 各自）由
+//     `delivery.test.ts` / `playtest.test.ts` / `review-verdict.test.ts` 盯；这里盯的是**跨阶段**那几条：
+//     QA 硬失败 → delivery 落盘 · build → site → 视觉一路串下来的 verdict · 试玩检查项怎么并进 delivery。
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { buildDeliveryReport, mapPlayableSmoke } from "@game-maker/contracts";
+import { buildDeliveryReport, mapPlaytest } from "@game-maker/contracts";
 import {
   buildSiteFailureDelivery, buildSiteSuccessDelivery, runBuild, runUnderstanding,
   writeDeliveryToReport, writeVisualReviewToReport,
@@ -118,13 +118,15 @@ describe("站点确定性失败 → delivery（票 04 Q4 · §8.2 跨阶段）",
   });
 });
 
-describe("smoke 检查项并进 delivery（票 09 · §8.2 跨阶段）", () => {
-  it("mapPlayableSmoke(navigate 超时) → incomplete+UNKNOWN，并进 delivery 后 verdict 归 incomplete", () => {
-    const mapped = mapPlayableSmoke({ ok: false, stage: "navigate", reason: "超时 collected=1/4 won=false" });
+describe("试玩检查项并进 delivery（票 09/06 · §8.2 跨阶段）", () => {
+  it("mapPlaytest(UNKNOWN) → incomplete+UNKNOWN，并进 delivery 后 verdict 归 incomplete", () => {
+    const mapped = mapPlaytest({
+      execution: "executed", aggregate: "UNKNOWN",
+      scenarios: [{ scenarioId: "playable", required: true, execution: "executed", outcome: "UNKNOWN" }],
+    });
     expect(mapped).toEqual({ status: "incomplete", detail: "UNKNOWN" });
 
-    // 把 mapped 的 status/detail **原样**并进一份「其余全过、只有试玩未完成」的 delivery ——
-    // 这正是阶段C 读真实 smoke result.json 之后要做的同一件事（票 09：只映射、不另建状态）。
+    // 把 mapped 的 status/detail **原样**并进一份「其余全过、只有试玩未完成」的 delivery。
     const delivery = buildDeliveryReport({
       runId: "wasteland/run/v1", pack: { packId: "wasteland", packVersion: 1 }, config: { file: "wasteland/run/v1/game-config.json" },
       site: { version: 1, shell: "2" },

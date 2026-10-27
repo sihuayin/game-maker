@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-27T13:24:50.307Z",
+  "ok": true,
+  "results": [
+    {
+      "name": "gate",
+      "ok": true,
+      "reason": "按预期在装配期拒绝：装配期校验不过 —— 硬失败，不产出站点（1 条）：\n  · objective.gate: 找不到 id 为 \"no-such-gate-for-self-test\" 的 goal 实体（现有 goal：extraction）"
+    },
+    {
+      "name": "pickup",
+      "ok": true,
+      "reason": "initialActivePickups=2 · missing-pickup=fail"
+    },
+    {
+      "name": "input",
+      "ok": true,
+      "reason": "progress=0.0px · termination=false"
+    },
+    {
+      "name": "hazard-legacy",
+      "ok": true,
+      "reason": "旧实现按预期在 reset-floor 失败：重置后 30 帧内 body.bottom 最大 371.75 > floorY+1 (251.00)；重置后 30 帧内 onFloor 没有变真"
+    }
+  ]
+}

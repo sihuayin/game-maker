@@ -1,0 +1,47 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "input-blocked",
+  "version": 1,
+  "required": false,
+  "expectedOutcome": "UNKNOWN",
+  "baselineEligible": false,
+  "target": {
+    "siteVersion": 1
+  },
+  "harnessCondition": "input-blocked",
+  "setup": {
+    "kind": "none"
+  },
+  "actions": [
+    {
+      "kind": "move_to",
+      "target": {
+        "kind": "gate"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "id": "initial-pickups",
+      "kind": "state",
+      "requires": [
+        "initialActivePickups"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "initialActivePickups",
+        "op": "gte",
+        "value": 1
+      },
+      "withinMs": 8000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": {
+    "kind": "won"
+  },
+  "timeoutMs": 8000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": []
+}

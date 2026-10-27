@@ -183,9 +183,6 @@ export * from "./qa.js";
 // ⚠️ **报告层词汇，不是 QA 层**：`qaVerdict` 是「QA 族跑没跑满」，`DeliveryVerdict`
 //   是「综合六类之后能不能交付」—— 前者是后者的输入之一，同名不同义（票 03 Q3）。
 export * from "./delivery.js";
-// ⚠️ **试玩结果 → `playable-smoke` 检查项的映射**（票 09）—— 只解释、不跑 smoke、不改
-//   `playable-smoke.mjs`。输入是探针产出的 result.json（松散形状，非契约）。
-export * from "./playable-smoke.js";
 export * from "./playtest.js";
 export * from "./playtest-attribution.js";
 export * from "./playtest-baseline.js";

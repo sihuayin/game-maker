@@ -110,6 +110,11 @@ Effort: playtest-v1
   `applyPlaytest`/`writePlaytestToReport` 原子写回/证据替换/幂等/身份拒写 · 真实产物 E2E = `AGENT_LIMITATION → incomplete`
   （exit 1，站点字节未改、QA 层保留）· 全仓 2123 测试绿。→ 解除 09；smoke 退役/自测/CONTEXT 拆到
   [10](issues/10-smoke-retirement.md)（09 验收后硬切）。
+- [10 smoke 退役与自测迁移（effort 末尾硬切）](issues/10-smoke-retirement.md)：**已收口** —— 删除旧
+  `playable-smoke` 实现/测试/导出/常量 + `test:playable` → `test:playtest` · `self-test.mjs` 迁移
+  `gate`/`pickup`/`input`/`hazard-legacy`（全绿，复用 `probe-harness`）· `CONTEXT.md` 捡回并重定义词汇 ·
+  旧 `qa-report/v1` 的 `playable-smoke` 数据仍可读、不升级 · 站点字节未改、无付费 · 全仓 2129 测试 +
+  `test:playtest` 78 测试绿。→ 无 open ticket；目的地已到。
 - [09 基线机制（身份 / 覆盖 / 三值比较 / 人工晋升）](issues/09-baseline-mechanism.md)：**已收口** ——
   `playtest-baseline/v1` 自足 JSON（身份/coverage/expected/source）· 三值比较器（身份不匹配 ⇒ `not-comparable`、
   只比较 coverage、`changed` 带 diff）· 显式晋升命令（两次干净运行/同身份/投影一致/覆盖理由/审计/默认拒绝覆盖）·
@@ -122,7 +127,8 @@ Effort: playtest-v1
 <!-- in-scope fog that graduates as the frontier advances -->
 
 （无）—— 06 收口后交付接入/契约字段毕业为 07/08/09；08 收口后 smoke 退役、自测迁移、CONTEXT.md 词条毕业为
-[10](issues/10-smoke-retirement.md)。剩余风险（真实运行能否稳定产出某态、Chrome 可用性）属于实施验收的观察项，不是未指定决策。
+[10](issues/10-smoke-retirement.md)。**10 已收口：01–10 全部关闭，无 open ticket；Playtest V1 目的地已到。**
+剩余风险（真实运行能否稳定产出某态、Chrome 可用性）属于实施验收的观察项，不是未指定决策。
 
 ## Out of scope
 

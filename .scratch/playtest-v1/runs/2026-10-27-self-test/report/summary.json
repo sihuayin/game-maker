@@ -1,0 +1,101 @@
+{
+  "startedAt": "2026-10-27T13:24:21.662Z",
+  "command": "self-test",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/pack/v7",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-self-test/scenarios",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-self-test/report",
+  "repeat": 1,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "ruin-scavenger-extraction-assets",
+    "packVersion": 7,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-self-test/report/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "failure-missing-pickup",
+          "execution": "executed",
+          "assertionAggregate": "fail",
+          "terminationReached": false,
+          "steps": 211
+        },
+        {
+          "scenarioId": "input-blocked",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": false,
+          "steps": 204
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 1,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "failure-missing-pickup",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "failure-missing-pickup",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "missing-pickup",
+                "result": "fail"
+              },
+              {
+                "id": "won",
+                "result": "fail"
+              }
+            ],
+            "endState": {
+              "collected": 2,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 2
+            }
+          }
+        ]
+      },
+      {
+        "scenarioId": "input-blocked",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "input-blocked",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 0,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 3
+            },
+            "eventCounts": {}
+          }
+        ]
+      }
+    ]
+  }
+}

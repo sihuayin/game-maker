@@ -192,7 +192,7 @@ export const PlaytestScenarioReportSchema = z.strictObject({
   scenarioVersion: z.number().int().positive(),
   required: z.boolean(),
   /** 票 02 的层标记：harness 条件场景（no-chrome / hang）不进真实游戏交付聚合（票 04 Q2）。 */
-  harnessCondition: z.enum(["none", "no-chrome", "hang"]).default("none"),
+  harnessCondition: z.enum(["none", "no-chrome", "hang", "input-blocked"]).default("none"),
   /** 场景**设计意图**；与实际归因独立（票 02）。保留供 harness 自检，不参与归因。 */
   expectedOutcome: PlaytestOutcome,
   baselineEligible: z.boolean(),
@@ -365,7 +365,7 @@ export const PlaytestScenarioSchema = z.strictObject({
   /** 版本绑定：主绑目标 site；pack/config 从实际 site 依赖解析（票 02 Q3）。 */
   target: z.strictObject({ siteVersion: z.number().int().positive() }),
   /** harness 条件场景（环境故障 / 超时注入）；正常游戏场景为 none。 */
-  harnessCondition: z.enum(["none", "no-chrome", "hang"]).default("none"),
+  harnessCondition: z.enum(["none", "no-chrome", "hang", "input-blocked"]).default("none"),
   setup: PlaytestSetupSchema.default({ kind: "none" }),
   actions: z.array(PlaytestActionSchema).min(1),
   assertions: z.array(PlaytestAssertionSchema).min(1),
