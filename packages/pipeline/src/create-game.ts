@@ -33,6 +33,7 @@ import { compileVisualDesign } from "@game-maker/visual-design";
 import { RUN_ARTIFACT, flattenPlannerOutput, injectCharacterRef, jstr, readRunJson, writeIntentMd, writeJson, writeVisualWorld } from "./artifacts.js";
 import { abandonRun, commitRun, openRun, parseRunVersion, type RunIdentity } from "./run.js";
 import { manifestChecksumOf } from "./publish-gate.js";
+import { buildQaFailureDelivery, writeDeliveryToReport } from "./delivery.js";
 
 /** 两个上下游的口子（与各步自己的形状一致：`{baseUrl, apiKey}`）。 */
 export type Transport = { baseUrl: string; apiKey: string };
@@ -632,15 +633,32 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     //   ⚠️ 与「配置过不了校验就**不落盘**」那条不冲突：坏配置是**输入**，报告是**诊断**。
     const qaReportPath = path.join(runDir, RUN_ARTIFACT.qaReport);
     writeJson(qaReportPath, qa);
-    assertQaPassed(qa, rel(input.outRoot, qaReportPath));
+    // ⚠️ **交付验收：QA 段失败要提前落 `delivery`**（fpvs-v1-p1 票 08 / 票 04 Q4）—— 站点还没装配、
+    //   试玩还没跑，但「这一版交付结论 = fail」**现在就确定**，不必等站点（它根本跑不到）。
+    //   ⚠️ `qaStatus` 由 `qaVerdict` 定：`incomplete`（判据没跑全）≠ `fail`（确定性硬失败 / 机制覆盖缺）。
+    //   收尾异常**不覆盖原始失败**：delivery 写不下也把 QA/机制的失败原样抛出去（票 04 Q4 末行）。
+    const qaDeliveryStatus = qaVerdict(qa) === "incomplete" ? "incomplete" : "fail";
+    try {
+      assertQaPassed(qa, rel(input.outRoot, qaReportPath));
 
-    // ── 机制覆盖门禁（票 08）：六判据是**产物级**，这一条是**机制级**端到端能力 ——
-    //   每条设计声明要做的机制，设计/运行时/QA 三层缺一即拒（FR-07 末：单条失败不被总体掩盖）。
-    //   ⚠️ 接在 `assertQaPassed` 之后：六判据先放行，再查「机制齐不齐」。
-    const coverage = buildMechanicCoverage(designParsed.data);
-    const coverageProblem = mechanicCoverageProblem(coverage);
-    if (coverageProblem !== undefined)
-      throw new CommandError("invalid", coverageProblem);
+      // ── 机制覆盖门禁（票 08）：六判据是**产物级**，这一条是**机制级**端到端能力 ——
+      //   每条设计声明要做的机制，设计/运行时/QA 三层缺一即拒（FR-07 末：单条失败不被总体掩盖）。
+      //   ⚠️ 接在 `assertQaPassed` 之后：六判据先放行，再查「机制齐不齐」。
+      const coverage = buildMechanicCoverage(designParsed.data);
+      const coverageProblem = mechanicCoverageProblem(coverage);
+      if (coverageProblem !== undefined)
+        throw new CommandError("invalid", coverageProblem);
+    } catch (e) {
+      try {
+        writeDeliveryToReport(runDir, buildQaFailureDelivery({
+          outRoot: input.outRoot, runDir, packDir, manifest: manifest.value, configPath,
+          qaStatus: qaDeliveryStatus,
+        }));
+      } catch {
+        // 收尾异常不覆盖原始失败（票 04 Q4 末行）。
+      }
+      throw e;
+    }
   }
 
   // ⚠️ **链级并集**（Q14）：理解段那几发 ∪ 这一次构建的（包 + 配置）。

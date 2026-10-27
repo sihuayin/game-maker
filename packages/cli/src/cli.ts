@@ -14,7 +14,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { assertPublishableQa, reviewRun, runBuild, runUnderstanding, styleRefOf, type CreateStep } from "@game-maker/pipeline";
+import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -228,14 +228,29 @@ async function buildAndSite(o: {
     packDir: built.paths.packDir, configPath: built.paths.config, outRoot: o.outRoot,
     ...(built.paths.qaReport === undefined ? {} : { qaReportPath: built.paths.qaReport }),
   });
-  const site = assembleFromConfig({
-    packDir: built.paths.packDir, configPath: built.paths.config,
-    shellJsPath: o.shellJsPath ?? defaultShellPath(detectFormat(raw) ?? "", o.cwd),
-    outRoot: o.outRoot, gameId: built.gameId,
-    // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）—— 这次运行的三样产物同一个版本号。
-    siteVersion: built.packVersion,
-  });
-  return { built, site };
+  // ⚠️ **交付收尾**（fpvs-v1-p1 票 08）：站点装配成功/失败都补写 `delivery`（票 04 Q3/Q4）。
+  //   收尾异常不覆盖原始失败 —— `tryWriteDelivery` 写不下也把站点失败原样抛出去。
+  try {
+    const site = assembleFromConfig({
+      packDir: built.paths.packDir, configPath: built.paths.config,
+      shellJsPath: o.shellJsPath ?? defaultShellPath(detectFormat(raw) ?? "", o.cwd),
+      outRoot: o.outRoot, gameId: built.gameId,
+      // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）—— 这次运行的三样产物同一个版本号。
+      siteVersion: built.packVersion,
+    });
+    tryWriteDelivery(built.runDir, buildSiteSuccessDelivery({
+      outRoot: o.outRoot, runDir: built.runDir, packDir: built.paths.packDir,
+      manifest: built.manifest, configPath: built.paths.config,
+      siteVersion: site.data.siteVersion as number, shellVersion: site.data.shellVersion as string,
+    }));
+    return { built, site };
+  } catch (e) {
+    tryWriteDelivery(built.runDir, buildSiteFailureDelivery({
+      outRoot: o.outRoot, runDir: built.runDir, packDir: built.paths.packDir,
+      manifest: built.manifest, configPath: built.paths.config,
+    }));
+    throw e;
+  }
 }
 
 /** 清单摘要里那几行**共用的**（`create` 停与不停都要打）。 */

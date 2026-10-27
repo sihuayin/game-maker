@@ -92,6 +92,7 @@
 // [票 21]: ../../../.scratch/game-maker-v2/issues/21-repair-loop.md
 
 import { z } from "zod/v4";
+import { DeliveryReportSchema } from "./delivery.js";
 
 export const QA_REPORT_FORMAT = "qa-report/v1" as const;
 
@@ -296,7 +297,11 @@ export const QAReportSchema = z.strictObject({
   /** 判据的全部结论。**空 = 通过**（在 `checked` 齐的前提下 —— 见 `qaVerdict`）。 */
   failures: z.array(QAFailureSchema),
   /** 观察。**不许影响成败**，它只是报给人看。 */
-  observations: z.array(ObservationSchema)
+  observations: z.array(ObservationSchema),
+  /** **交付验收子对象**（FPVS-V1-P1 · 票 08）：QA 层之上的那一层 —— 综合资源/配置/QA/站点/试玩/视觉六类
+   *  之后**能不能交付**。⚠️ **可选**：旧报告没有它仍能解析（向后兼容）；而 **`delivery` 缺席 ≠ 交付通过**，
+   *  它只是「还没做交付收尾」（票 04 Q1）。⚠️ **加它是加性的、不升版** —— 现有 QA 字段语义一个字不改。 */
+  delivery: DeliveryReportSchema.optional()
 }).superRefine((r, ctx) => {
   // ① `checked` 不许重复
   const seen = new Set<QAJudgement>();

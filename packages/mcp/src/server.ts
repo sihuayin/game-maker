@@ -12,7 +12,7 @@ import {
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
 import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
-import { assertPublishableQa, runBuild, runUnderstanding, styleRefOf } from "@game-maker/pipeline";
+import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery } from "@game-maker/pipeline";
 import path from "node:path";
 import fs from "node:fs";
 
@@ -376,14 +376,29 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
               outRoot: String(args.outDir ?? "out"),
               ...(built.paths.qaReport === undefined ? {} : { qaReportPath: built.paths.qaReport }),
             });
-            const site = assembleSite({
-              packDir: built.paths.packDir, configPath: built.paths.config,
-              shellJsPath: defaultShellPath("", process.cwd()),
-              outRoot: String(args.outDir ?? "out"), gameId: built.gameId,
-              // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）
-              siteVersion: built.packVersion,
-            });
+            // ⚠️ **交付收尾**（fpvs-v1-p1 票 08）：与 CLI 同一套 —— 装配成功/失败都补写 `delivery`。
             const outDir = String(args.outDir ?? "out");
+            let site: ReturnType<typeof assembleSite>;
+            try {
+              site = assembleSite({
+                packDir: built.paths.packDir, configPath: built.paths.config,
+                shellJsPath: defaultShellPath("", process.cwd()),
+                outRoot: outDir, gameId: built.gameId,
+                // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）
+                siteVersion: built.packVersion,
+              });
+              tryWriteDelivery(built.runDir, buildSiteSuccessDelivery({
+                outRoot: outDir, runDir: built.runDir, packDir: built.paths.packDir,
+                manifest: built.manifest, configPath: built.paths.config,
+                siteVersion: site.data.siteVersion as number, shellVersion: site.data.shellVersion as string,
+              }));
+            } catch (e) {
+              tryWriteDelivery(built.runDir, buildSiteFailureDelivery({
+                outRoot: outDir, runDir: built.runDir, packDir: built.paths.packDir,
+                manifest: built.manifest, configPath: built.paths.config,
+              }));
+              throw e;
+            }
             const qa = built.qa === undefined || built.paths.qaReport === undefined
               ? undefined : qaReportOf(built.qa, built.paths.qaReport, outDir);
             result = {

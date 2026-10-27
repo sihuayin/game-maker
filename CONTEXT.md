@@ -522,6 +522,27 @@ _Avoid_: 色板摘要、画面占比。
 所以前者是**没有那一条**，不是一条写着「不适用」的条目 ——
 把两者混起来，「没查」会读成「查过了」。
 
+**交付检查状态 / 交付结论（DeliveryCheckStatus / DeliveryVerdict）** —— ⚠️ **2026-10-27 新词**（fpvs-v1-p1 票 03/07）
+交付验收报告的两个层：单个检查项的**状态**（五值：`pass` / `fail` / `incomplete` / `blocked` / `not-required`）与最终
+**交付结论**（四值：`pass` / `fail` / `incomplete` / `blocked`）。
+⚠️ **总序优先** `fail > blocked > incomplete > pass`：确定性失败永远赢；「没查」不许读成 `pass`（`incomplete` 是它的名字）。
+⚠️ 它**不是 [[QA 族]] 那一层**：`qaVerdict`（pass/fail/incomplete）是「QA 族跑没跑满」，
+交付结论是「综合资源/配置/QA/站点/试玩/视觉六类之后**能不能交付**」—— 前者是后者的**输入之一**，同名不同义。
+⚠️ `not-required` 不参与最终计算，且**不能出现在必需检查项上**（「必需」与「不要求」自相矛盾，写前即拒）。
+_避免_：把 `DeliveryVerdict` 当成 `qaVerdict` 的另一个名字用。
+
+**交付验收报告（delivery）** —— ⚠️ **2026-10-27 新词**（fpvs-v1-p1 票 08）
+`qa-report.json` 顶层那个**可选子对象**（`delivery`）：QA 层之上**再补的一层**，把资源校验 / 配置编译 / QA /
+站点构建 / 自动试玩 / 视觉人工对照六类结果汇成一份可追溯的交付结论。六个检查项（`asset-pack` · `config` · `qa` ·
+`site` · `playable-smoke` · `visual-review`）**全部必需**，且每个 `key` 是否必需由**代码里的固定注册表**声明，
+**不住在 `checks[]` 每条里** —— 于是「必需检查项缺失」与「必需检查项标 `not-required`」都在写之前被拒，不靠
+`not-required` 隐式绕过。
+⚠️ **两阶段落盘**：QA 步写 QA 层（`qaVerdict` 那一层）；站点装配成功后**才**补 `delivery`（含 `assembleSite` 显式分配的
+站点版本）。站点**未装配就省略 `site`**，不伪造版本。
+⚠️ **`delivery` 缺席 ≠ 交付通过**：旧报告没它仍解析，但那只是「还没做交付收尾」，不是「这一版能交付」。
+⚠️ 报告**必须绑产物**：`pack` 复用 `subject`，`config.file` 指向实际配置，`site` 只在已获版本时填。
+_避免_：把「站点装配成功」直接当成「交付通过」—— 试玩与视觉评审没做完，交付结论仍是 `incomplete`。
+
 **参考玩家（Reference Player）** —— ⚠️ **2026-09-29 新词**（塔防那张图，
 [票 02](.scratch/td-compile-v1/issues/02-reference-player-strategy.md)）
 **一个把「这一关是通的」变成可断言的事的玩家**：它产出的动作与鼠标点出来的**一模一样**，

@@ -179,4 +179,12 @@ export * from "./config-tool.js";
 //   `QAFailure.judgement` 取用 —— 于是「码的条数 = 判据的条数」在类型上只有一份。
 export * from "./qa.js";
 
+// ── 交付验收（FPVS-V1-P1 · 票 03/07）───────────────────────────────────────
+// ⚠️ **报告层词汇，不是 QA 层**：`qaVerdict` 是「QA 族跑没跑满」，`DeliveryVerdict`
+//   是「综合六类之后能不能交付」—— 前者是后者的输入之一，同名不同义（票 03 Q3）。
+export * from "./delivery.js";
+// ⚠️ **试玩结果 → `playable-smoke` 检查项的映射**（票 09）—— 只解释、不跑 smoke、不改
+//   `playable-smoke.mjs`。输入是探针产出的 result.json（松散形状，非契约）。
+export * from "./playable-smoke.js";
+
 export * from "./asset-plan.js";
