@@ -8,9 +8,9 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { parseAssetPack, QA_JUDGEMENTS, QA_REPORT_FORMAT, type AssetPackManifest } from "@game-maker/contracts";
+import { parseAssetPack, QA_JUDGEMENTS, QA_REPORT_FORMAT, buildDeliveryReport, type AssetPackManifest } from "@game-maker/contracts";
 import {
-  buildQaFailureDelivery, buildSiteFailureDelivery, buildSiteSuccessDelivery,
+  buildQaFailureDelivery, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf,
   tryWriteDelivery, writeDeliveryToReport, writeVisualReviewToReport,
 } from "../src/delivery.js";
 
@@ -232,5 +232,58 @@ describe("writeVisualReviewToReport（票 10：视觉评审写回）", () => {
     writeVisualReviewToReport({ outRoot: out, runDir, review: { status: "pass" } });
 
     expect(fs.readdirSync(runDir).filter((f) => f.includes(".tmp"))).toEqual([]);
+  });
+});
+
+describe("deliverySummaryOf（票 13 · FR-06，P1）", () => {
+  it("delivery 缺席 → 明示「尚无交付结论」，不默认 pass", () => {
+    const s = deliverySummaryOf(undefined);
+    expect(s.summary[0]).toContain("尚无");
+    expect(s.summary[0]).not.toContain("pass");
+    expect(s.data.deliveryVerdict).toBeNull();
+  });
+
+  it("全 pass → verdict 行说 pass，无失败/未完成项", () => {
+    const delivery = buildDeliveryReport({
+      runId: "x/run/v1", pack: { packId: "x", packVersion: 1 }, config: { file: "x/c.json" },
+      site: { version: 1, shell: "2" },
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" },
+        { key: "qa", status: "pass" }, { key: "site", status: "pass" },
+        { key: "playable-smoke", status: "pass" }, { key: "visual-review", status: "pass" },
+      ],
+      visualReview: { status: "pass", reviewer: "人" },
+    });
+    const s = deliverySummaryOf(delivery);
+    expect(s.summary[0]).toContain("pass");
+    expect(s.summary.join("\n")).not.toContain("未完成");
+    expect(s.data.deliveryVerdict).toBe("pass");
+  });
+
+  it("试玩 UNKNOWN → verdict incomplete、试玩项标未完成、已知限制列出来", () => {
+    const out = tmp();
+    const delivery = buildSiteSuccessDelivery({
+      outRoot: out, runDir: runDirOf(out), packDir: PACK, manifest: manifest(),
+      configPath: configPathOf(out), siteVersion: 1, shellVersion: "2",
+    });
+    const s = deliverySummaryOf(delivery);
+    expect(s.summary[0]).toContain("incomplete");
+    expect(s.summary.join("\n")).toContain("自动试玩");
+    expect(s.summary.join("\n")).toContain("视觉人工对照");
+    expect(s.data.deliveryVerdict).toBe("incomplete");
+  });
+
+  it("QA 硬失败 → verdict fail、失败项与阻塞项分开列", () => {
+    const out = tmp();
+    const delivery = buildQaFailureDelivery({
+      outRoot: out, runDir: runDirOf(out), packDir: PACK, manifest: manifest(),
+      configPath: configPathOf(out), qaStatus: "fail",
+    });
+    const s = deliverySummaryOf(delivery);
+    expect(s.summary[0]).toContain("fail");
+    const joined = s.summary.join("\n");
+    expect(joined).toContain("QA 六判据"); // 失败项
+    expect(joined).toContain("被前置阻塞"); // 阻塞项
+    expect(s.data.deliveryVerdict).toBe("fail");
   });
 });

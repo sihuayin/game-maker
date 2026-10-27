@@ -75,6 +75,15 @@ Effort: fpvs-v1-p1
   `writeVisualReviewToReport`（只动视觉评审三处、原子替换、缺 delivery 初始化不伪造站点）+ `applyVisualReview` / `visualReviewToCheck`
   （纯函数、verdict 重算）。全仓 2054/2054 · typecheck 绿。→ 实施段 07/08/09/10 全部落地，毕业 [11 跨阶段集成测试](issues/11-cross-stage-integration-tests.md) /
   [12 阶段C 真实产物验收](issues/12-stage-c-real-artifact-acceptance.md) / [13 CLI 摘要](issues/13-cli-summary-fr06.md)。
+- [11 跨阶段集成测试](issues/11-cross-stage-integration-tests.md)：**已收口** —— `delivery-integration.test.ts` 4 条（假上游、零付费）：
+  QA 硬失败 → delivery 提前落盘（端到端 through `runBuild`，锁死票 08 接线）· build→site→视觉一路串（视觉 pass 后 verdict 仍 incomplete）·
+  站点失败 → delivery · smoke 映射并进 delivery。跨版本不误用/收尾异常由 publish-gate.test.ts + tryWriteDelivery 覆盖。全仓 2058/2058 · typecheck 绿。
+- [12 阶段C 真实产物验收](issues/12-stage-c-real-artifact-acceptance.md)：**已收口** —— `acceptance.mjs`（零付费、只读 fpvs-v1-p0 历史产物）产出统一报告
+  `.scratch/fpvs-v1-p1/runs/2026-10-27-stage-c/qa-report.json`（QA 层 + delivery，过 schema）：试玩 navigate→incomplete+UNKNOWN + 已知限制 + 4 条证据、
+  视觉转录票 02 PASS（不冒充重评）、verdict=incomplete（确定性算）、八问全落点。→ **目的地已达**，只剩 [13 CLI 摘要](issues/13-cli-summary-fr06.md)（P1）。
+- [13 CLI 摘要](issues/13-cli-summary-fr06.md)：**已收口** —— `deliverySummaryOf(delivery | undefined)` 共享给 CLI + MCP（只渲染、不重算 verdict）：
+  失败/未完成/阻塞分开列 + 视觉状态 + 已知限制，缺席明示「尚无交付结论」不默认 pass；`buildAndSite` 返回 delivery、`createComplete`/`buildComplete`
+  与 MCP `create_game` 追加同一份 summary + data。全仓 2062/2062 · typecheck 绿。→ **13 张票全收口，地图完成。**
 
 ## Not yet specified
 

@@ -13,8 +13,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  applyVisualReview, buildDeliveryReport, CommandError, QAReportSchema, qaVerdict, visualReviewToCheck,
-  type AssetPackManifest, type DeliveryReport, type DeliveryVisualReview, type QAReport,
+  applyVisualReview, buildDeliveryReport, CommandError, DELIVERY_CHECK_LABELS, QAReportSchema, qaVerdict, visualReviewToCheck,
+  type AssetPackManifest, type DeliveryCheckKey, type DeliveryReport, type DeliveryVisualReview, type QAReport,
 } from "@game-maker/contracts";
 import { RUN_ARTIFACT, writeJson } from "./artifacts.js";
 import { manifestChecksumOf } from "./publish-gate.js";
@@ -202,4 +202,51 @@ function writeJsonAtomic(p: string, o: unknown): void {
   const tmp = `${p}.tmp-${process.pid}`;
   writeJson(tmp, o);
   fs.renameSync(tmp, p);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 六、终端交付聚合摘要（票 13 · FR-06，P1）
+//
+//   从 `delivery` 派生给终端读的那几行 —— ⚠️ **只渲染、不重算**：`verdict` 直接读 `delivery.verdict`
+//   （`deriveDeliveryVerdict`/`deliveryVerdictOf` 已经算好了），不另建一套状态计算逻辑（票 04 Q5）。
+//   失败 / 未完成 / 阻塞**分开列**（FR-06：不把同一问题在多个阶段的重复记录当多个缺陷）。
+//   全文仍在 `qa-report.json`，这里只是聚合。
+
+/** 从 `delivery` 派生终端交付摘要。`delivery` 缺席 ⇒ 明示「尚无交付结论」，**不默认 pass**。 */
+export function deliverySummaryOf(delivery: DeliveryReport | undefined): {
+  summary: string[]; data: Record<string, unknown>;
+} {
+  if (delivery === undefined) {
+    return {
+      summary: ["⚠️ 交付结论：尚无（这份报告没有 delivery 段 —— 不算通过）"],
+      data: { deliveryVerdict: null },
+    };
+  }
+  const failed = delivery.checks.filter((c) => c.status === "fail");
+  const incomplete = delivery.checks.filter((c) => c.status === "incomplete");
+  const blocked = delivery.checks.filter((c) => c.status === "blocked");
+  const label = (k: string) => DELIVERY_CHECK_LABELS[k as DeliveryCheckKey] ?? k;
+  const verdictLine = {
+    pass: "✅ 交付结论：pass —— 六类检查全过、视觉已确认",
+    fail: "✗ 交付结论：fail —— 有确定性失败",
+    blocked: "⚠️ 交付结论：blocked —— 前置阶段失败",
+    incomplete: "⚠️ 交付结论：incomplete —— 尚不满足正式交付条件",
+  }[delivery.verdict];
+  return {
+    summary: [
+      verdictLine,
+      ...failed.map((c) => `  ✗ ${label(c.key)}${c.detail ? `：${c.detail}` : ""}`),
+      ...blocked.map((c) => `  · ${label(c.key)}：被前置阻塞`),
+      ...incomplete.map((c) => `  ⚠️ ${label(c.key)}：未完成${c.detail ? `（${c.detail}）` : ""}`),
+      `  视觉评审：${delivery.visualReview.status}` +
+        (delivery.visualReview.reviewer ? `（${delivery.visualReview.reviewer}）` : ""),
+      ...(delivery.knownLimitations ?? []).map((k) => `  已知限制：${k}`),
+    ],
+    data: {
+      deliveryVerdict: delivery.verdict,
+      deliveryChecks: delivery.checks.map((c) => ({ key: c.key, status: c.status, ...(c.detail === undefined ? {} : { detail: c.detail }) })),
+      visualReview: delivery.visualReview,
+      knownLimitations: delivery.knownLimitations ?? [],
+    },
+  };
 }

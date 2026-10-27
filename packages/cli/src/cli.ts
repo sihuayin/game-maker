@@ -9,13 +9,13 @@ import {
   type AcceptanceResult, type CommandResult, type InspectData, type WrittenAcceptanceReport,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
-import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
+import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type DeliveryReport, type QAReport } from "@game-maker/contracts";
 // ⚠️ **观察的渲染与 `pack` 那条命令共用同一个函数**（票 39）—— 两条路各写一份文案就是两份漂移。
 import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
+import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -226,7 +226,7 @@ async function buildAndSite(o: {
   env: NodeJS.ProcessEnv; cwd: string; io: CliIo; concurrency?: Concurrency; fetchImpl?: typeof fetch;
   /** 显式指定外壳 bundle（与 `site` 命令同款）—— 独立安装时按仓库布局找不到它。 */
   shellJsPath?: string;
-}): Promise<{ built: Awaited<ReturnType<typeof runBuild>>; site: CommandResult }> {
+}): Promise<{ built: Awaited<ReturnType<typeof runBuild>>; site: CommandResult; delivery: DeliveryReport }> {
   const img = resolveImageTransport({ env: o.env, cwd: o.cwd });
   for (const w of img.warnings) o.io.err(`⚠️ ${w}\n`);
   const built = await runBuild({
@@ -256,12 +256,14 @@ async function buildAndSite(o: {
       // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）—— 这次运行的三样产物同一个版本号。
       siteVersion: built.packVersion,
     });
-    tryWriteDelivery(built.runDir, buildSiteSuccessDelivery({
+    // ⚠️ 交付摘要要它（票 13）：buildSiteSuccessDelivery 的产物既落盘、又给摘要用。
+    const delivery = buildSiteSuccessDelivery({
       outRoot: o.outRoot, runDir: built.runDir, packDir: built.paths.packDir,
       manifest: built.manifest, configPath: built.paths.config,
       siteVersion: site.data.siteVersion as number, shellVersion: site.data.shellVersion as string,
-    }));
-    return { built, site };
+    });
+    tryWriteDelivery(built.runDir, delivery);
+    return { built, site, delivery };
   } catch (e) {
     tryWriteDelivery(built.runDir, buildSiteFailureDelivery({
       outRoot: o.outRoot, runDir: built.runDir, packDir: built.paths.packDir,
@@ -333,10 +335,11 @@ function awaitingCheckpoint(
 /** `create --yes` 跑完时的那份回报。⚠️ **`ambiguity` 照样打**（票 03 押在这一票上的那两条之一）。 */
 function createComplete(
   u: Awaited<ReturnType<typeof runUnderstanding>>,
-  b: Awaited<ReturnType<typeof runBuild>>, site: CommandResult, outRoot: string,
+  b: Awaited<ReturnType<typeof runBuild>>, site: CommandResult, delivery: DeliveryReport, outRoot: string,
 ): CommandResult {
   const r = recipeLines(u);
   const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot, b.inspectData, b.paths.packDir);
+  const d = deliverySummaryOf(delivery);
   return {
     command: "create",
     summary: [
@@ -348,6 +351,7 @@ function createComplete(
       ...masterRatioNotes(b.masterRatios ?? []),
       ...(qa?.summary ?? []),
       ...site.summary,
+      ...d.summary,
     ],
     data: {
       status: "complete", gameId: u.run.gameId, runVersion: u.run.version, packVersion: b.packVersion,
@@ -357,6 +361,7 @@ function createComplete(
       imageCalls: r.imageCalls.total, imageCallBreakdown: r.imageCalls.breakdown,
       ambiguity: u.intent.ambiguity,
       ...(qa?.data ?? {}),
+      ...d.data,
     },
     artifacts: [
       { path: relPath(outRoot, u.run.dir), kind: "run" },
@@ -369,12 +374,13 @@ function createComplete(
 
 /** `build` 跑完时的那份回报。⚠️ `ambiguity` 从磁盘上那份意图里读回来（人可能已经看过，但记一笔无害）。 */
 function buildComplete(
-  b: Awaited<ReturnType<typeof runBuild>>, site: CommandResult, outRoot: string,
+  b: Awaited<ReturnType<typeof runBuild>>, site: CommandResult, delivery: DeliveryReport, outRoot: string,
 ): CommandResult {
   const intentPath = path.join(b.runDir, "game-intent.json");
   let ambiguity: string[] = [];
   try { ambiguity = (JSON.parse(fs.readFileSync(intentPath, "utf8")) as { ambiguity?: string[] }).ambiguity ?? []; } catch { /* 读不到就算了 */ }
   const qa = b.qa === undefined || b.paths.qaReport === undefined ? undefined : qaReportOf(b.qa, b.paths.qaReport, outRoot, b.inspectData, b.paths.packDir);
+  const d = deliverySummaryOf(delivery);
   return {
     command: "build",
     summary: [
@@ -385,6 +391,7 @@ function buildComplete(
       ...masterRatioNotes(b.masterRatios ?? []),
       ...(qa?.summary ?? []),
       ...site.summary,
+      ...d.summary,
     ],
     data: {
       status: "complete", gameId: b.gameId, runVersion: b.runVersion, packVersion: b.packVersion,
@@ -393,6 +400,7 @@ function buildComplete(
       entry: String(site.data["entry"] ?? ""), serveRoot: String(site.data["serveRoot"] ?? ""),
       ambiguity,
       ...(qa?.data ?? {}),
+      ...d.data,
     },
     artifacts: [
       { path: relPath(outRoot, b.runDir), kind: "run" },
@@ -561,10 +569,10 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
           result = awaitingCheckpoint(understanding, outRoot);
           break;
         }
-        const { built, site } = await buildAndSite({ outRoot, runDir: understanding.run.dir, transport, env, cwd, io, ...up,
+        const { built, site, delivery } = await buildAndSite({ outRoot, runDir: understanding.run.dir, transport, env, cwd, io, ...up,
           ...concurrencyArg(flags),
           ...(typeof flags.shell === "string" ? { shellJsPath: path.resolve(cwd, flags.shell) } : {}) });
-        result = createComplete(understanding, built, site, outRoot);
+        result = createComplete(understanding, built, site, delivery, outRoot);
         break;
       }
       case "build": {
@@ -573,10 +581,10 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         const dir = positionals[0];
         if (dir === undefined) throw new CommandError("usage", "build 需要一个 run 目录（create 打出来的那个：<out>/<gameId>/run/v<N>）");
         const runDir = path.resolve(dir);
-        const { built, site } = await buildAndSite({ outRoot, runDir, transport, env, cwd, io, ...up,
+        const { built, site, delivery } = await buildAndSite({ outRoot, runDir, transport, env, cwd, io, ...up,
           ...concurrencyArg(flags),
           ...(typeof flags.shell === "string" ? { shellJsPath: path.resolve(cwd, flags.shell) } : {}) });
-        result = buildComplete(built, site, outRoot);
+        result = buildComplete(built, site, delivery, outRoot);
         break;
       }
       case "plan": {

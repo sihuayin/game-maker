@@ -11,8 +11,8 @@ import {
   type CommandResult,
 } from "@game-maker/assets";
 import { assembleSite, defaultShellPath, VIEWPORT } from "@game-maker/demo";
-import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type QAReport } from "@game-maker/contracts";
-import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery } from "@game-maker/pipeline";
+import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type DeliveryReport, type QAReport } from "@game-maker/contracts";
+import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery } from "@game-maker/pipeline";
 import path from "node:path";
 import fs from "node:fs";
 
@@ -379,6 +379,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             // ⚠️ **交付收尾**（fpvs-v1-p1 票 08）：与 CLI 同一套 —— 装配成功/失败都补写 `delivery`。
             const outDir = String(args.outDir ?? "out");
             let site: ReturnType<typeof assembleSite>;
+            let delivery: DeliveryReport;
             try {
               site = assembleSite({
                 packDir: built.paths.packDir, configPath: built.paths.config,
@@ -387,11 +388,13 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
                 // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）
                 siteVersion: built.packVersion,
               });
-              tryWriteDelivery(built.runDir, buildSiteSuccessDelivery({
+              // ⚠️ 交付摘要要它（票 13）：既落盘、又给 structuredContent 用。
+              delivery = buildSiteSuccessDelivery({
                 outRoot: outDir, runDir: built.runDir, packDir: built.paths.packDir,
                 manifest: built.manifest, configPath: built.paths.config,
                 siteVersion: site.data.siteVersion as number, shellVersion: site.data.shellVersion as string,
-              }));
+              });
+              tryWriteDelivery(built.runDir, delivery);
             } catch (e) {
               tryWriteDelivery(built.runDir, buildSiteFailureDelivery({
                 outRoot: outDir, runDir: built.runDir, packDir: built.paths.packDir,
@@ -401,6 +404,7 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
             }
             const qa = built.qa === undefined || built.paths.qaReport === undefined
               ? undefined : qaReportOf(built.qa, built.paths.qaReport, outDir);
+            const d = deliverySummaryOf(delivery);
             result = {
               command: "create",
               summary: [
@@ -409,10 +413,11 @@ export async function handle(msg: Rpc, emit: Emit = send): Promise<void> {
                 ...understanding.intent.ambiguity.map((a) => `⚠️ **用户没说清的地方**：${a}`),
                 ...(qa?.summary ?? []),
                 ...site.summary,
+                ...d.summary,
               ],
               data: {
                 status: "complete", gameId: built.gameId, runVersion: understanding.run.version,
-                packVersion: built.packVersion, ...site.data, ...(qa?.data ?? {}),
+                packVersion: built.packVersion, ...site.data, ...(qa?.data ?? {}), ...d.data,
               },
               artifacts: [
                 ...site.artifacts,
