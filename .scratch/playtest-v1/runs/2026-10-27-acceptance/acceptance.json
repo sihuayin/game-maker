@@ -1,0 +1,96 @@
+{
+  "acceptanceVersion": "playtest-acceptance/v1",
+  "verdict": "pass",
+  "startedAt": "2026-10-27T13:13:43.383Z",
+  "finishedAt": "2026-10-27T13:14:40.120Z",
+  "source": {
+    "historicalRun": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe",
+    "sandbox": ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe",
+    "historicalMutated": false,
+    "legacyReport": ".scratch/fpvs-v1-p1/runs/2026-10-27-stage-c/qa-report.json"
+  },
+  "environment": {
+    "chrome": "found",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "node": "v22.23.2",
+    "platform": "darwin"
+  },
+  "checks": {
+    "realPlaytest": {
+      "command": "/Users/sihuayin/.nvm/versions/node/v22.23.2/bin/node /Volumes/shy/some-projects/game-maker/packages/cli/dist/cli.mjs playtest /Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1 --out /Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts --json",
+      "exitCode": 1,
+      "attempt": ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/playtest/v1",
+      "reportVersion": "playtest-report/v1",
+      "execution": "executed",
+      "aggregate": "AGENT_LIMITATION",
+      "checkStatus": "incomplete",
+      "detail": "AGENT_LIMITATION",
+      "requiredScenariosComplete": true,
+      "evidenceRefsResolve": true,
+      "deliveryVerdict": "incomplete",
+      "gameExecutionReached": true,
+      "sceneReadyObserved": true,
+      "executionEvidence": [
+        ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/playtest/v1/success-basic/events.jsonl",
+        ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/playtest/v1/success-basic/trace.jsonl"
+      ]
+    },
+    "attributionDelivery": {
+      "checkStatusMatches": true,
+      "summaryConsistent": true,
+      "verdictMatches": true,
+      "identityMatches": true
+    },
+    "offlineFiveStates": {
+      "command": "pnpm exec vitest run packages/contracts/tests/playtest-attribution.test.ts packages/contracts/tests/playtest-baseline.test.ts packages/contracts/tests/playtest.test.ts packages/pipeline/tests/playtest.test.ts packages/pipeline/tests/playtest-baseline.test.ts packages/demo/probe/playtest/tests",
+      "exitCode": 0,
+      "covered": [
+        "SUCCESS",
+        "GAMEPLAY_FAILURE",
+        "ENVIRONMENT_FAILURE",
+        "AGENT_LIMITATION",
+        "TIMEOUT",
+        "UNKNOWN",
+        "not-executed"
+      ],
+      "passed": true
+    },
+    "legacyReport": {
+      "path": ".scratch/fpvs-v1-p1/runs/2026-10-27-stage-c/qa-report.json",
+      "parsed": true,
+      "hasPlaytestSummary": false,
+      "upgradedToNewEvidence": false,
+      "oldPlayableSmoke": "incomplete",
+      "qaVerdict": "pass"
+    },
+    "baselineObservational": {
+      "promoted": true,
+      "result": "match",
+      "statusUnchanged": true,
+      "verdictUnchanged": true
+    }
+  },
+  "incompleteReasons": [],
+  "artifacts": [
+    {
+      "ref": "acceptance",
+      "path": ".scratch/playtest-v1/runs/2026-10-27-acceptance/acceptance.json"
+    },
+    {
+      "ref": "playtest-result",
+      "path": ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/playtest/v1/result.json"
+    },
+    {
+      "ref": "execution-evidence",
+      "path": ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/playtest/v1/success-basic/events.jsonl"
+    },
+    {
+      "ref": "execution-evidence",
+      "path": ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/playtest/v1/success-basic/trace.jsonl"
+    },
+    {
+      "ref": "qa-report",
+      "path": ".scratch/playtest-v1/runs/2026-10-27-acceptance/artifacts/wasteland-scavenger-recipe/run/v1/qa-report.json"
+    }
+  ]
+}

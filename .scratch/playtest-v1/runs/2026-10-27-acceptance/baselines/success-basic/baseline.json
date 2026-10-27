@@ -1,0 +1,51 @@
+{
+  "baselineFormatVersion": "playtest-baseline/v1",
+  "baselineId": "success-basic",
+  "identity": {
+    "scenarioFormatVersion": "playtest-scenario/v1",
+    "scenarioId": "success-basic",
+    "scenarioVersion": 1,
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "shellVersion": "2",
+    "harnessVersion": "playtest-harness/v1",
+    "rulesVersion": "playtest-rules/v1"
+  },
+  "coverage": {
+    "assertions": [
+      "initial-pickups"
+    ],
+    "endState": [
+      "collected"
+    ],
+    "events": [
+      "pickup"
+    ]
+  },
+  "expected": {
+    "outcome": "AGENT_LIMITATION",
+    "assertions": {
+      "initial-pickups": "pass"
+    },
+    "endState": {
+      "collected": 3
+    },
+    "eventCounts": {
+      "pickup": 2
+    }
+  },
+  "source": {
+    "runId": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1",
+    "reportPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1/playtest/v2/result.json",
+    "reportChecksum": "sha256:b8942403eb4651d09ec04a4425828846d95b423b0395081ffef089a524a3bde1",
+    "secondRunId": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1",
+    "secondReportPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1/playtest/v3/result.json",
+    "secondReportChecksum": "sha256:9f34bffc113ba3691278482b4067db409e1bb359b4400aa2ab21dd0c04321d38",
+    "promotedBy": "acceptance",
+    "promotedAt": "2026-10-27T13:13:43.515Z",
+    "reason": "acceptance：观察基线比较，不改交付状态"
+  }
+}

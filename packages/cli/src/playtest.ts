@@ -10,11 +10,11 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
   CommandError, PLAYTEST_HARNESS_VERSION, PLAYTEST_REPORT_VERSION, PLAYTEST_RULES_VERSION,
-  PLAYTEST_SCENARIO_VERSION, PlaytestReportSchema, PlaytestScenarioSchema, QAReportSchema,
-  aggregateAssertions, attribute, attributeReport,
+  PLAYTEST_SCENARIO_VERSION, PlaytestBaselineSchema, PlaytestReportSchema, PlaytestScenarioSchema, QAReportSchema,
+  aggregateAssertions, attribute, attributeReport, comparePlaytestToBaseline,
   type DeliveryCheckStatus, type DeliveryEvidence, type DeliveryReport, type PlaytestAttributionEvidence,
-  type PlaytestAttributionResult, type PlaytestOutcome, type PlaytestReport, type PlaytestScenarioReport,
-  type PlaytestScenario,
+  type PlaytestAttributionResult, type PlaytestBaselineCompareResult, type PlaytestOutcome,
+  type PlaytestReport, type PlaytestScenarioReport, type PlaytestScenario,
 } from "@game-maker/contracts";
 import { manifestChecksumOf, writePlaytestToReport, writePlaytestWritebackError } from "@game-maker/pipeline";
 import { RUN_ARTIFACT } from "@game-maker/pipeline";
@@ -226,6 +226,21 @@ function scenarioRefs(id: string): string[] {
   return ["events", "trace", "input", "console", "exceptions"].map((k) => `playtest-${id}-${k}`);
 }
 
+function baselineFor(report: PlaytestReport): PlaytestBaselineCompareResult | undefined {
+  const root = path.resolve(process.env.PLAYTEST_BASELINE_DIR ?? path.join(process.cwd(), "fixtures/playtest-baselines"));
+  for (const s of report.scenarios) {
+    const file = path.join(root, s.scenarioId, "baseline.json");
+    if (!fs.existsSync(file)) continue;
+    try {
+      const baseline = PlaytestBaselineSchema.parse(readJson(file));
+      return comparePlaytestToBaseline(report, baseline);
+    } catch (e) {
+      return { result: "not-comparable", baselineId: s.scenarioId, reason: `基线文件损坏：${e instanceof Error ? e.message : String(e)}` };
+    }
+  }
+  return undefined;
+}
+
 function finalizeReport(t: Target, raw: PlaytestReport, attemptDir: string): { report: PlaytestReport; results: Map<string, PlaytestAttributionResult> } {
   const evidences = raw.scenarios.map((s) => attributionEvidence(t, path.join(attemptDir, s.scenarioId), s));
   const attribution = attributeReport(evidences);
@@ -245,13 +260,18 @@ function finalizeReport(t: Target, raw: PlaytestReport, attemptDir: string): { r
     };
   });
   const allRefs = scenarios.flatMap((s) => s.evidence);
-  const report = PlaytestReportSchema.parse({
+  const baseReport = PlaytestReportSchema.parse({
     ...raw,
     execution: attribution.execution,
     ...(attribution.aggregate === undefined ? {} : { aggregate: attribution.aggregate }),
     scenarios,
     evidence: ["playtest-result", "playtest-site-integrity", "playtest-chrome", ...allRefs],
   });
+  // 基线比较是**纯观察**：只挂 baseline 段，不改 outcome / check / verdict。
+  const baseline = baselineFor(baseReport);
+  const report = baseline === undefined
+    ? baseReport
+    : PlaytestReportSchema.parse({ ...baseReport, baseline });
   return { report, results };
 }
 
@@ -273,6 +293,13 @@ function deliveryEvidence(t: Target, attemptDir: string, report: PlaytestReport)
     }
   }
   return out;
+}
+
+function baselineNote(b: { result: "match" | "changed" | "not-comparable"; reason?: string } | undefined): string {
+  if (b === undefined) return "";
+  if (b.result === "changed") return " · 与基线不同（观察）";
+  if (b.result === "match") return " · 与基线一致";
+  return ` · 与基线不可比较：${b.reason ?? "原因缺失"}`;
 }
 
 export function runPlaytestCommand(opts: { outRoot: string; runDirInput: string }): { result: CommandResult; exitCode: number } {
@@ -351,7 +378,7 @@ export function runPlaytestCommand(opts: { outRoot: string; runDirInput: string 
     }),
     delivery === undefined
       ? `  ⚠️ 交付写回失败：${writebackError instanceof Error ? writebackError.message : String(writebackError)}`
-      : `  交付：${delivery.verdict}（playable-smoke=${delivery.checks.find((c) => c.key === "playable-smoke")?.status}）${delivery.playtest?.baseline ? ` · 基线比较：${delivery.playtest.baseline.result}` : ""}`,
+      : `  交付：${delivery.verdict}（playable-smoke=${delivery.checks.find((c) => c.key === "playable-smoke")?.status}）${baselineNote(delivery.playtest?.baseline)}`,
     `  证据：${rel(outRoot, finalDir)}`,
   ];
   return {

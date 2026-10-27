@@ -9,13 +9,13 @@ import {
   type AcceptanceResult, type CommandResult, type InspectData, type WrittenAcceptanceReport,
 } from "@game-maker/assets";
 import { CONFIG_FILE_NAME, HUD_LINE_HEIGHT, KNOWN_FORMATS, VIEWPORT, assembleFromConfig, detectFormat, defaultShellPath } from "@game-maker/demo";
-import { QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type DeliveryReport, type QAReport } from "@game-maker/contracts";
+import { PlaytestBaselineCoverageSchema, QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaVerdict, type DeliveryReport, type QAReport } from "@game-maker/contracts";
 // ⚠️ **观察的渲染与 `pack` 那条命令共用同一个函数**（票 39）—— 两条路各写一份文案就是两份漂移。
 import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
+import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, promotePlaytestBaseline, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 import { runPlaytestCommand } from "./playtest.js";
 
@@ -35,6 +35,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker review <run 目录> [--json]
   game-maker review-verdict <run 目录> --verdict pass|fail [--reviewer <名字>] [--note "..."] [--json]
   game-maker playtest <run 目录> [--out <目录>] [--json]
+  game-maker playtest-baseline promote <baselineId> --report <result.json> --second-report <result.json> --coverage <coverage.json> --reason "..." [--dir <目录>] [--replace] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
   把包的联系表与**原图**一起喂给视觉模型，要一份「哪里不像」的观察清单。
@@ -51,6 +52,11 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   ⚠️ **它会启动本地 Chrome**（headless），但**不调用任何付费上游**；\`create\` / \`build\` 本身不启动浏览器。
   ⚠️ 只吃 run 目录，不接受 \`--pack\` / \`--site\` / \`--config\` / \`--scenario\` 覆盖 —— 身份从报告与产物关系解析。
   退出码：0 = 试玩 SUCCESS 且交付写回成功；1 = 非 SUCCESS 或写回失败；4 = 准备拒绝/输入不合法；2 = 用法错。
+
+\`playtest-baseline promote\` 是**显式人工晋升基线**（票 05/09）：读两份干净运行报告，要求同身份/同场景/
+  同判定规则、覆盖字段投影一致，写 \`fixtures/playtest-baselines/<id>/baseline.json\`。
+  ⚠️ **普通运行/CI 不会自动新建或覆盖基线**；已存在时默认拒绝，重定必须显式 \`--replace\` 并由人在入库 diff 里审计。
+  覆盖范围只由 \`--coverage\` 声明；覆盖外字段不参与比较；比较是纯观察，不改归因/交付状态。
 
 \`accept\` 是**结构验收**（免费、不生成、不调用上游）：读一个交付态资源包，逐项核对
   manifest / 图集 JSON / PNG / 动画帧，写 \`<out>/<packId>/acceptance/v<N>/report.json\` 与
@@ -115,6 +121,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "qa-report",
     // 票 10（FPVS-V1-P1）：`review-verdict` 的视觉评审结论
     "verdict", "reviewer", "note",
+    // Playtest V1 票 09：基线晋升
+    "report", "second-report", "coverage", "reason", "dir",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -710,6 +718,41 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         const written = writeAcceptanceReport({ report: accepted.report, outDir: outRoot });
         result = acceptComplete(accepted, written);
         exitCode = accepted.hasErrors ? EXIT.failure : EXIT.ok;
+        break;
+      }
+      case "playtest-baseline": {
+        // 显式人工晋升（票 05 Q3/票 09）：普通运行不走这里；已存在默认拒绝。
+        const sub = positionals[0];
+        const baselineId = positionals[1];
+        if (sub !== "promote" || baselineId === undefined)
+          throw new CommandError("usage", "用法：playtest-baseline promote <baselineId> --report <result.json> --second-report <result.json> --coverage <coverage.json> --reason \"...\" [--dir <目录>] [--replace]");
+        const reportPath = flags.report;
+        const secondReport = flags["second-report"];
+        const coveragePath = flags.coverage;
+        const reason = flags.reason;
+        if (typeof reportPath !== "string" || typeof secondReport !== "string" || typeof coveragePath !== "string" || typeof reason !== "string")
+          throw new CommandError("usage", "playtest-baseline promote 需要 --report / --second-report / --coverage / --reason");
+        let coverageRaw: unknown;
+        try { coverageRaw = JSON.parse(fs.readFileSync(path.resolve(coveragePath), "utf8")); }
+        catch (e) { throw new CommandError("invalid", `读不出 coverage：${coveragePath}（${e instanceof Error ? e.message : String(e)}）`); }
+        const coverage = PlaytestBaselineCoverageSchema.parse(coverageRaw);
+        const baselineDir = path.resolve(typeof flags.dir === "string" ? flags.dir : "fixtures/playtest-baselines");
+        const promotedBy = gitUserName() ?? "unknown";
+        const baseline = promotePlaytestBaseline({
+          baselineDir, baselineId, scenarioId: baselineId, reportPaths: [reportPath, secondReport],
+          coverage, reason, promotedBy, ...(flags.replace === true ? { replace: true } : {}),
+        });
+        const file = path.join(baselineDir, baselineId, "baseline.json");
+        result = {
+          command: "playtest-baseline",
+          summary: [
+            `基线：${baselineId}（${baseline.expected.outcome}）`,
+            `  覆盖：断言 ${coverage.assertions.join(", ") || "—"} · 终态 ${coverage.endState.join(", ") || "—"} · 事件 ${coverage.events.join(", ") || "—"}`,
+            `  来源：${path.relative(process.cwd(), file)}（promotedBy=${promotedBy}）`,
+          ],
+          data: { baselineId, file: path.relative(process.cwd(), file), expected: baseline.expected, coverage, source: baseline.source },
+          artifacts: [{ path: path.relative(process.cwd(), file), kind: "playtest-baseline" }],
+        };
         break;
       }
       case "playtest": {

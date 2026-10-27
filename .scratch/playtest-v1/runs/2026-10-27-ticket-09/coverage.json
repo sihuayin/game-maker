@@ -1,0 +1,5 @@
+{
+  "assertions": ["initial-pickups"],
+  "endState": ["collected"],
+  "events": ["pickup"]
+}

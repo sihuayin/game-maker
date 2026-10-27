@@ -188,5 +188,6 @@ export * from "./delivery.js";
 export * from "./playable-smoke.js";
 export * from "./playtest.js";
 export * from "./playtest-attribution.js";
+export * from "./playtest-baseline.js";
 
 export * from "./asset-plan.js";

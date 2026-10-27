@@ -110,6 +110,12 @@ Effort: playtest-v1
   `applyPlaytest`/`writePlaytestToReport` 原子写回/证据替换/幂等/身份拒写 · 真实产物 E2E = `AGENT_LIMITATION → incomplete`
   （exit 1，站点字节未改、QA 层保留）· 全仓 2123 测试绿。→ 解除 09；smoke 退役/自测/CONTEXT 拆到
   [10](issues/10-smoke-retirement.md)（09 验收后硬切）。
+- [09 基线机制（身份 / 覆盖 / 三值比较 / 人工晋升）](issues/09-baseline-mechanism.md)：**已收口** ——
+  `playtest-baseline/v1` 自足 JSON（身份/coverage/expected/source）· 三值比较器（身份不匹配 ⇒ `not-comparable`、
+  只比较 coverage、`changed` 带 diff）· 显式晋升命令（两次干净运行/同身份/投影一致/覆盖理由/审计/默认拒绝覆盖）·
+  `playtest` 纯观察接入（「与基线不同」措辞，不改 outcome/check/verdict）· 零付费阶段C acceptance.mjs
+  （真实执行证明、归因/交付一致性、离线五态、旧报告兼容、基线观察；`verdict=pass`，真实 `AGENT_LIMITATION→incomplete`
+  且 CLI exit 1；历史产物未改）· 全仓 2140 测试绿。→ 解除 10（smoke 退役/自测/CONTEXT 是最后一张）。
 
 ## Not yet specified
 

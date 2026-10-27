@@ -1,0 +1,36 @@
+{
+  "command": "playtest",
+  "summary": [
+    "试玩：wasteland-scavenger-recipe/run/v1 · attempt v4",
+    "  · success-basic: AGENT_LIMITATION · 断言=unknown",
+    "  交付：incomplete（playable-smoke=incomplete） · 与基线一致",
+    "  证据：wasteland-scavenger-recipe/run/v1/playtest/v4"
+  ],
+  "data": {
+    "runDir": "wasteland-scavenger-recipe/run/v1",
+    "attempt": "wasteland-scavenger-recipe/run/v1/playtest/v4",
+    "execution": "executed",
+    "aggregate": "AGENT_LIMITATION",
+    "scenarios": [
+      {
+        "scenarioId": "success-basic",
+        "execution": "executed",
+        "outcome": "AGENT_LIMITATION",
+        "assertionAggregate": "unknown",
+        "terminationReached": false
+      }
+    ],
+    "deliveryVerdict": "incomplete",
+    "writebackError": null
+  },
+  "artifacts": [
+    {
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v4/result.json",
+      "kind": "playtest-report"
+    },
+    {
+      "path": "wasteland-scavenger-recipe/run/v1/qa-report.json",
+      "kind": "qa-report"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "command": "playtest-baseline",
+  "summary": [
+    "基线：success-basic（AGENT_LIMITATION）",
+    "  覆盖：断言 initial-pickups · 终态 collected · 事件 pickup",
+    "  来源：.scratch/playtest-v1/runs/2026-10-27-ticket-09/baselines/success-basic/baseline.json（promotedBy=amber）"
+  ],
+  "data": {
+    "baselineId": "success-basic",
+    "file": ".scratch/playtest-v1/runs/2026-10-27-ticket-09/baselines/success-basic/baseline.json",
+    "expected": {
+      "outcome": "AGENT_LIMITATION",
+      "assertions": {
+        "initial-pickups": "pass"
+      },
+      "endState": {
+        "collected": 3
+      },
+      "eventCounts": {
+        "pickup": 2
+      }
+    },
+    "coverage": {
+      "assertions": [
+        "initial-pickups"
+      ],
+      "endState": [
+        "collected"
+      ],
+      "events": [
+        "pickup"
+      ]
+    },
+    "source": {
+      "runId": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1",
+      "reportPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1/playtest/v2/result.json",
+      "reportChecksum": "sha256:b8942403eb4651d09ec04a4425828846d95b423b0395081ffef089a524a3bde1",
+      "secondRunId": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1",
+      "secondReportPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1/playtest/v3/result.json",
+      "secondReportChecksum": "sha256:9f34bffc113ba3691278482b4067db409e1bb359b4400aa2ab21dd0c04321d38",
+      "promotedBy": "amber",
+      "promotedAt": "2026-10-27T13:10:34.088Z",
+      "reason": "验收：接受当前 AGENT_LIMITATION 覆盖字段"
+    }
+  },
+  "artifacts": [
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-27-ticket-09/baselines/success-basic/baseline.json",
+      "kind": "playtest-baseline"
+    }
+  ]
+}
