@@ -21,6 +21,7 @@
 //   小写 + 连字符 = 仓库「not X」的既有约定（`not-tested` / `not-run`），
 //   与 spec 文档里的大写 `FAIL`/`INCOMPLETE` 只是写法不同、语义同一。
 import { z } from "zod/v4";
+import { DeliveryPlaytestSchema, mapPlaytest, type DeliveryPlaytest } from "./playtest.js";
 
 export const DeliveryCheckStatus = z.enum(["pass", "fail", "incomplete", "blocked", "not-required"]);
 export type DeliveryCheckStatus = z.infer<typeof DeliveryCheckStatus>;
@@ -154,6 +155,8 @@ export const DeliveryReportSchema = z.strictObject({
   verdict: DeliveryVerdict,
   /** 视觉评审状态（独立于 QA/结构验收，票 04 Q2）。 */
   visualReview: DeliveryVisualReviewSchema,
+  /** 试玩摘要（票 06 Q7）：**可选** —— 旧报告没有它仍可解析；新写回路径必须同时写它与检查项。 */
+  playtest: DeliveryPlaytestSchema.optional(),
   /** 证据引用（日志/试玩/截图），可追溯。 */
   evidence: z.array(DeliveryEvidenceSchema),
   /** 确认的限制（不代替状态）。 */
@@ -189,6 +192,40 @@ export const DeliveryReportSchema = z.strictObject({
     ctx.addIssue({ code: "custom", path: ["site"], message: "有 site 版本却记 site 未通过 —— 只能记已装配那一次的通过" });
   if (!hasSite && siteCheck?.status === "pass")
     ctx.addIssue({ code: "custom", path: ["checks"], message: "site 检查项 pass 却没有 site 版本 —— 版本号丢失" });
+
+  // ⑥ 试玩摘要与检查项一致（票 06 Q7）。`playtest` 缺席是旧报告，合法；在场就要守住全部不变量。
+  if (r.playtest !== undefined) {
+    const mapped = mapPlaytest(r.playtest);
+    const smoke = r.checks.find((c) => c.key === "playable-smoke");
+    if (smoke === undefined) return; // 必需项缺失已由②报过
+    if (smoke.status !== mapped.status)
+      ctx.addIssue({ code: "custom", path: ["checks"], message: `playable-smoke 应为 ${mapped.status}，实际 ${smoke.status}` });
+    if (mapped.detail !== undefined && smoke.detail !== mapped.detail)
+      ctx.addIssue({ code: "custom", path: ["checks"], message: `playable-smoke detail 应为 ${mapped.detail}，实际 ${smoke.detail ?? "(缺)"}` });
+
+    const refs = new Set(r.evidence.map((e) => e.ref));
+    const used = [...r.playtest.evidence, ...r.playtest.scenarios.flatMap((s) => s.evidence)];
+    for (const ref of used)
+      if (!refs.has(ref)) ctx.addIssue({ code: "custom", path: ["playtest", "evidence"], message: `证据引用无法解析：${ref}` });
+
+    const resultEvidence = r.evidence.find((e) => e.ref === "playtest-result");
+    if (resultEvidence === undefined)
+      ctx.addIssue({ code: "custom", path: ["evidence"], message: "有 playtest 摘要却没有 playtest-result 证据条目" });
+    else if (resultEvidence.path !== r.playtest.report)
+      ctx.addIssue({ code: "custom", path: ["playtest", "report"], message: `playtest.report 与 playtest-result 路径不一致：${r.playtest.report} vs ${resultEvidence.path}` });
+
+    if (mapped.status === "pass") {
+      const required = r.playtest.scenarios.filter((s) => s.required);
+      if (required.some((s) => s.execution !== "executed" || s.outcome !== "SUCCESS"))
+        ctx.addIssue({ code: "custom", path: ["playtest", "scenarios"], message: "pass 要求所有必需场景 executed + SUCCESS" });
+      if (r.playtest.evidence.length === 0)
+        ctx.addIssue({ code: "custom", path: ["playtest", "evidence"], message: "pass 必须引用报告级证据" });
+    } else if (used.length === 0) {
+      ctx.addIssue({ code: "custom", path: ["playtest", "evidence"], message: "非 pass 的 playtest 必须有证据引用" });
+    }
+    if (mapped.status === "fail" && r.playtest.aggregate !== "GAMEPLAY_FAILURE")
+      ctx.addIssue({ code: "custom", path: ["playtest", "aggregate"], message: "fail 只能来自 GAMEPLAY_FAILURE" });
+  }
 });
 export type DeliveryReport = z.infer<typeof DeliveryReportSchema>;
 
@@ -208,6 +245,7 @@ export type DeliveryReportInput = {
   site?: { version: number; shell: string };
   checks: readonly DeliveryCheck[];
   visualReview?: DeliveryVisualReview;
+  playtest?: DeliveryPlaytest;
   evidence?: readonly DeliveryEvidence[];
   knownLimitations?: readonly string[];
 };
@@ -227,6 +265,7 @@ export function buildDeliveryReport(input: DeliveryReportInput): DeliveryReport 
     checks: input.checks.map((c) => ({ ...c })),
     verdict: deliveryVerdictOf(input.checks),
     visualReview: input.visualReview ?? { status: "pending" },
+    ...(input.playtest === undefined ? {} : { playtest: input.playtest }),
     evidence: input.evidence === undefined ? [] : input.evidence.map((e) => ({ ...e })),
     ...(input.knownLimitations === undefined ? {} : { knownLimitations: [...input.knownLimitations] }),
   });
@@ -261,6 +300,7 @@ export function applyVisualReview(delivery: DeliveryReport, review: DeliveryVisu
     ...(delivery.site === undefined ? {} : { site: delivery.site }),
     checks,
     visualReview: review,
+    ...(delivery.playtest === undefined ? {} : { playtest: delivery.playtest }),
     evidence: delivery.evidence,
     ...(delivery.knownLimitations === undefined ? {} : { knownLimitations: delivery.knownLimitations }),
   });

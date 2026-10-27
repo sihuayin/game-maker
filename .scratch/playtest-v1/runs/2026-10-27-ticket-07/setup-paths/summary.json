@@ -1,0 +1,104 @@
+{
+  "startedAt": "2026-10-27T12:22:53.919Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-setup --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-setup",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths",
+  "repeat": 1,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "failure-missing-pickup",
+          "execution": "executed",
+          "assertionAggregate": "fail",
+          "terminationReached": false,
+          "steps": 207
+        },
+        {
+          "scenarioId": "limitation-wide-patrol",
+          "execution": "executed",
+          "assertionAggregate": "unknown",
+          "terminationReached": false,
+          "steps": 209
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 1,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "failure-missing-pickup",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "failure-missing-pickup",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "missing-pickup",
+                "result": "fail"
+              },
+              {
+                "id": "won",
+                "result": "unknown"
+              }
+            ],
+            "endState": {
+              "collected": 0,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 3
+            },
+            "eventCounts": {
+              "pickup": 0
+            }
+          }
+        ]
+      },
+      {
+        "scenarioId": "limitation-wide-patrol",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "limitation-wide-patrol",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "won",
+                "result": "unknown"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 3
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+{"v":1,"seq":0,"t":0,"frame":null,"type":"scene-ready","actor":null,"params":{"x":40,"y":240,"onFloor":true},"source":"poll"}
+{"v":1,"seq":1,"t":0,"frame":null,"type":"spawn","actor":null,"params":{"inferred":true,"x":40,"y":240,"onFloor":true},"source":"poll"}

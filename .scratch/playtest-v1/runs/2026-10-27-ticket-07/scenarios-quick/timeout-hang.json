@@ -1,0 +1,50 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "timeout-hang",
+  "version": 1,
+  "required": true,
+  "expectedOutcome": "TIMEOUT",
+  "baselineEligible": false,
+  "target": {
+    "siteVersion": 1
+  },
+  "harnessCondition": "hang",
+  "setup": {
+    "kind": "none"
+  },
+  "actions": [
+    {
+      "kind": "move_to",
+      "target": {
+        "kind": "gate"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "id": "won",
+      "kind": "state",
+      "requires": [
+        "won"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "won",
+        "op": "eq",
+        "value": true
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": {
+    "kind": "won"
+  },
+  "timeoutMs": 5000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": [
+    "pickup",
+    "win"
+  ]
+}

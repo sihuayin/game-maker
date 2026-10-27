@@ -1,0 +1,53 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "limitation-wide-patrol",
+  "version": 1,
+  "required": true,
+  "expectedOutcome": "AGENT_LIMITATION",
+  "baselineEligible": false,
+  "target": {
+    "siteVersion": 1
+  },
+  "harnessCondition": "none",
+  "setup": {
+    "kind": "mutate-hazard",
+    "index": 0,
+    "distance": 100,
+    "periodMs": 1600
+  },
+  "actions": [
+    {
+      "kind": "move_to",
+      "target": {
+        "kind": "gate"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "id": "won",
+      "kind": "state",
+      "requires": [
+        "won"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "won",
+        "op": "eq",
+        "value": true
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": {
+    "kind": "won"
+  },
+  "timeoutMs": 8000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": [
+    "pickup",
+    "win"
+  ]
+}

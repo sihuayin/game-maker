@@ -1,0 +1,99 @@
+{
+  "startedAt": "2026-10-27T12:20:47.428Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-quick --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/quick",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-quick",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/quick",
+  "repeat": 1,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/quick/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "env-no-chrome",
+          "execution": {
+            "status": "not-executed",
+            "reason": "harness 条件：no-chrome（不启动浏览器）"
+          },
+          "assertionAggregate": "unknown",
+          "terminationReached": false,
+          "steps": 0
+        },
+        {
+          "scenarioId": "timeout-hang",
+          "execution": "executed",
+          "assertionAggregate": "unknown",
+          "terminationReached": false,
+          "steps": 137
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 1,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "env-no-chrome",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "env-no-chrome",
+            "outcome": null,
+            "assertions": [],
+            "endState": {
+              "collected": 0,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 0,
+              "win": 0
+            }
+          }
+        ]
+      },
+      {
+        "scenarioId": "timeout-hang",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "timeout-hang",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "won",
+                "result": "unknown"
+              }
+            ],
+            "endState": {
+              "collected": 0,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 4
+            },
+            "eventCounts": {
+              "pickup": 0,
+              "win": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

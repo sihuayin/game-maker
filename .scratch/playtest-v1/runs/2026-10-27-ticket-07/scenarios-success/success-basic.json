@@ -1,0 +1,88 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "success-basic",
+  "version": 1,
+  "required": true,
+  "expectedOutcome": "SUCCESS",
+  "baselineEligible": true,
+  "target": {
+    "siteVersion": 1
+  },
+  "harnessCondition": "none",
+  "setup": {
+    "kind": "none"
+  },
+  "actions": [
+    {
+      "kind": "move_to",
+      "target": {
+        "kind": "gate"
+      }
+    },
+    {
+      "kind": "wait_until",
+      "condition": {
+        "kind": "won"
+      },
+      "timeoutMs": 45000
+    }
+  ],
+  "assertions": [
+    {
+      "id": "initial-pickups",
+      "kind": "state",
+      "requires": [
+        "initialActivePickups"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "initialActivePickups",
+        "op": "eq",
+        "value": 4
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    },
+    {
+      "id": "all-collected",
+      "kind": "state",
+      "requires": [
+        "collected"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "collected",
+        "op": "eq",
+        "value": 6
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    },
+    {
+      "id": "won",
+      "kind": "state",
+      "requires": [
+        "won"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "won",
+        "op": "eq",
+        "value": true
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": {
+    "kind": "won"
+  },
+  "timeoutMs": 45000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": [
+    "pickup",
+    "win",
+    "chest-open"
+  ]
+}

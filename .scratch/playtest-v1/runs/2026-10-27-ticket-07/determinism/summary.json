@@ -1,0 +1,119 @@
+{
+  "startedAt": "2026-10-27T12:23:22.678Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-success --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism --repeat 2",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-success",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism",
+  "repeat": 2,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "success-basic",
+          "execution": "executed",
+          "assertionAggregate": "unknown",
+          "terminationReached": false,
+          "steps": 1134
+        }
+      ],
+      "siteUnchanged": true
+    },
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v2",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "success-basic",
+          "execution": "executed",
+          "assertionAggregate": "unknown",
+          "terminationReached": false,
+          "steps": 1136
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 2,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "success-basic",
+        "runs": 2,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "success-basic",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              },
+              {
+                "id": "all-collected",
+                "result": "unknown"
+              },
+              {
+                "id": "won",
+                "result": "unknown"
+              }
+            ],
+            "endState": {
+              "collected": 3,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 1,
+              "activePickups": 2
+            },
+            "eventCounts": {
+              "pickup": 2,
+              "win": 0,
+              "chest-open": 1
+            }
+          },
+          {
+            "scenarioId": "success-basic",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              },
+              {
+                "id": "all-collected",
+                "result": "unknown"
+              },
+              {
+                "id": "won",
+                "result": "unknown"
+              }
+            ],
+            "endState": {
+              "collected": 3,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 1,
+              "activePickups": 2
+            },
+            "eventCounts": {
+              "pickup": 2,
+              "win": 0,
+              "chest-open": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

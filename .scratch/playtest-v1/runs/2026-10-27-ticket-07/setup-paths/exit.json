@@ -1,0 +1,6 @@
+{
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-setup --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths",
+  "exitCode": 0,
+  "at": "2026-10-27T12:23:11.783Z",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths"
+}

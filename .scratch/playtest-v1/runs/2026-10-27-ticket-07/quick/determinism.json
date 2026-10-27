@@ -1,0 +1,57 @@
+{
+  "repeat": 1,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "env-no-chrome",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "env-no-chrome",
+          "outcome": null,
+          "assertions": [],
+          "endState": {
+            "collected": 0,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 0,
+            "win": 0
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "timeout-hang",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "timeout-hang",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "won",
+              "result": "unknown"
+            }
+          ],
+          "endState": {
+            "collected": 0,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 4
+          },
+          "eventCounts": {
+            "pickup": 0,
+            "win": 0
+          }
+        }
+      ]
+    }
+  ]
+}

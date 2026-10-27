@@ -1,0 +1,10 @@
+{
+  "kind": "remove-pickup",
+  "applied": true,
+  "ok": true,
+  "removed": {
+    "x": 220,
+    "y": 232
+  },
+  "left": 3
+}

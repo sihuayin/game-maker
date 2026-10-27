@@ -1,0 +1,69 @@
+{
+  "ticket": "07",
+  "date": "2026-10-27",
+  "zeroPaid": true,
+  "historicalArtifacts": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe",
+  "environment": {
+    "chrome": "system Chrome（headless=new）",
+    "node": "v22.23.2（pnpm 构建环境）"
+  },
+  "runs": [
+    {
+      "name": "determinism-success-basic",
+      "command": "node packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-success --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism --repeat 2",
+      "exitCode": 0,
+      "out": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism",
+      "attempts": [
+        ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v1",
+        ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v2"
+      ],
+      "determinismSame": true,
+      "siteBytesUnchanged": true,
+      "scenario": "success-basic",
+      "observed": "executed；终止条件未达成（assertions unknown）；归因归票 08，不在本层声称 SUCCESS"
+    },
+    {
+      "name": "harness-conditions",
+      "command": "node packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-quick --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/quick",
+      "exitCode": 0,
+      "out": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/quick",
+      "scenarios": {
+        "env-no-chrome": "not-executed（harness 条件：不启动浏览器）",
+        "timeout-hang": "executed（5s 截止未终止；断言 unknown）"
+      },
+      "siteBytesUnchanged": true
+    },
+    {
+      "name": "setup-paths",
+      "command": "node packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/playtest-v1/runs/2026-10-27-ticket-07/scenarios-setup --out .scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths",
+      "exitCode": 0,
+      "out": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/setup-paths",
+      "observed": {
+        "failure-missing-pickup": "初始 activePickups=3 < 期望 4 ⇒ 断言 fail（票 04 Q4 要求的初始态证据）",
+        "limitation-wide-patrol": "hazard 0 distance 改为 100 ⇒ 执行 8s 未通关；断言 unknown"
+      },
+      "siteBytesUnchanged": true
+    }
+  ],
+  "tests": {
+    "pnpm test": { "exitCode": 0, "files": 140, "tests": 2100 },
+    "pnpm typecheck": { "exitCode": 0 }
+  },
+  "observation": {
+    "shellVersion": "2",
+    "siteBytesUnchanged": true,
+    "inSessionTap": false,
+    "eventSources": ["poll", "cdp"],
+    "eventsPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v1/success-basic/events.jsonl",
+    "inputPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v1/success-basic/input.jsonl",
+    "tracePath": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v1/success-basic/trace.jsonl",
+    "siteIntegrityPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/attempt-v1/site-integrity.json",
+    "determinismPath": ".scratch/playtest-v1/runs/2026-10-27-ticket-07/determinism/determinism.json"
+  },
+  "notInThisTicket": [
+    "五态归因器（票 08）",
+    "delivery.playtest 写回与 game-maker playtest CLI（票 08）",
+    "smoke 退役与 hazard-legacy / gate / pickup / input 自测迁移（票 08）",
+    "基线比较与真实产物验收（票 09）"
+  ]
+}

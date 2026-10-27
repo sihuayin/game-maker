@@ -98,6 +98,11 @@ Effort: playtest-v1
   不得 pass（fail 优先），`aggregate=SUCCESS` 不等于 pass · 真实产物零付费验收（历史产物沙箱副本；必须证明
   真实游戏执行，Chrome 缺失只记 incomplete 且非 0 退出）· smoke 本 effort 末尾硬切（实现退役、历史契约保留）。
   → 解除 07；08/09 范围扩展（交付接入执行层 / 真实验收与旧报告兼容）。
+- [07 Harness 核心与观测](issues/07-playtest-harness-core.md)：**已收口** —— 契约（`playtest-report/v1` /
+  `playtest-scenario/v1` / `delivery.playtest` 摘要 / 11 类事件按类型 `params` / `input`）+ 纯映射聚合 +
+  harness（版本绑定、状态差观测、步进决策、`events/trace/input/result`、`site-integrity`）+ 五态场景文件 +
+  零付费真实产物两次运行 `determinism.same=true`、站点字节未改；真实 run 未通关只记 `unknown`（五态归因归 08）。
+  → 解除 08；09 待 08。
 
 ## Not yet specified
 

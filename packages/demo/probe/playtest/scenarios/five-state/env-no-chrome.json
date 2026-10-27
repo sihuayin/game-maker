@@ -1,0 +1,51 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "env-no-chrome",
+  "version": 1,
+  "required": false,
+  "expectedOutcome": "ENVIRONMENT_FAILURE",
+  "baselineEligible": false,
+  "target": {
+    "siteVersion": 1
+  },
+  "harnessCondition": "no-chrome",
+  "setup": {
+    "kind": "none"
+  },
+  "actions": [
+    {
+      "kind": "wait_until",
+      "condition": {
+        "kind": "won"
+      },
+      "timeoutMs": 1000
+    }
+  ],
+  "assertions": [
+    {
+      "id": "won",
+      "kind": "state",
+      "requires": [
+        "won"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "won",
+        "op": "eq",
+        "value": true
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": {
+    "kind": "won"
+  },
+  "timeoutMs": 5000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": [
+    "pickup",
+    "win"
+  ]
+}

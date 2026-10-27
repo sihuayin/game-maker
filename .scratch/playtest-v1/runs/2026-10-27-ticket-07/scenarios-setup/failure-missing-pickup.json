@@ -1,0 +1,72 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "failure-missing-pickup",
+  "version": 1,
+  "required": true,
+  "expectedOutcome": "GAMEPLAY_FAILURE",
+  "baselineEligible": true,
+  "target": {
+    "siteVersion": 1
+  },
+  "harnessCondition": "none",
+  "setup": {
+    "kind": "remove-pickup",
+    "index": 0
+  },
+  "actions": [
+    {
+      "kind": "move_to",
+      "target": {
+        "kind": "gate"
+      }
+    },
+    {
+      "kind": "wait_until",
+      "condition": {
+        "kind": "won"
+      },
+      "timeoutMs": 8000
+    }
+  ],
+  "assertions": [
+    {
+      "id": "missing-pickup",
+      "kind": "state",
+      "requires": [
+        "initialActivePickups"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "initialActivePickups",
+        "op": "eq",
+        "value": 4
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    },
+    {
+      "id": "won",
+      "kind": "state",
+      "requires": [
+        "won"
+      ],
+      "expect": {
+        "kind": "state",
+        "path": "won",
+        "op": "eq",
+        "value": true
+      },
+      "withinMs": 45000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": {
+    "kind": "won"
+  },
+  "timeoutMs": 8000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": [
+    "pickup"
+  ]
+}

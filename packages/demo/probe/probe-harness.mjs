@@ -90,22 +90,26 @@ export function findChrome() {
   return found;
 }
 
+export const CHROME_FLAGS = [
+  '--headless=new',
+  '--disable-gpu',
+  '--no-sandbox',
+  '--disable-dev-shm-usage',
+  '--no-first-run',
+  '--no-default-browser-check',
+  '--disable-background-networking',
+  '--disable-background-timer-throttling',
+  '--disable-renderer-backgrounding',
+  '--disable-backgrounding-occluded-windows',
+  '--hide-scrollbars',
+  '--window-size=1000,600',
+];
+
 export async function launchChrome(chrome, logFile) {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'gm-probe-'));
   const log = fs.openSync(logFile, 'a');
   const proc = spawn(chrome, [
-    '--headless=new',
-    '--disable-gpu',
-    '--no-sandbox',
-    '--disable-dev-shm-usage',
-    '--no-first-run',
-    '--no-default-browser-check',
-    '--disable-background-networking',
-    '--disable-background-timer-throttling',
-    '--disable-renderer-backgrounding',
-    '--disable-backgrounding-occluded-windows',
-    '--hide-scrollbars',
-    '--window-size=1000,600',
+    ...CHROME_FLAGS,
     '--remote-debugging-port=0',
     `--user-data-dir=${profile}`,
     'about:blank',
@@ -223,7 +227,7 @@ export const READ_STATE = `(()=>{
     collected: s.collected,
     won: !!s.won,
     pickups: (s.pickups || []).map((q) => ({ x: q.x, y: q.y, active: !!q.active, visible: !!q.visible })),
-    hazards: (s.hazards || []).map((h) => ({ x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs })),
+    hazards: (s.hazards || []).map((h) => ({ x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs, t0: h.t0 })),
     chests: (s.chests || []).map((c) => ({ x: c.sprite.x, y: c.sprite.y, opened: !!c.opened })),
     dangers: (s.dangers || []).map((d) => ({ x: d.sprite.x, y: d.sprite.y, state: d.state, hits: d.hits })),
     gate: s.gate ? { x: s.gate.x, y: s.gate.y } : null,

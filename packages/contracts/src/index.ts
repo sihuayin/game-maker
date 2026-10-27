@@ -186,5 +186,6 @@ export * from "./delivery.js";
 // ⚠️ **试玩结果 → `playable-smoke` 检查项的映射**（票 09）—— 只解释、不跑 smoke、不改
 //   `playable-smoke.mjs`。输入是探针产出的 result.json（松散形状，非契约）。
 export * from "./playable-smoke.js";
+export * from "./playtest.js";
 
 export * from "./asset-plan.js";
