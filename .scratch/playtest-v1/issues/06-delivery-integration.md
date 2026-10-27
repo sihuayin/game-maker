@@ -28,4 +28,8 @@ Blocked by: 04
 > 本票只裁定**键名（`playable-smoke` 保留 vs 新增 `playtest`）、schema 条件校验、命令改名、兼容迁移与真实产物验收**，
 > 不重开归因语义。
 
+> **与票 05 的接口（2026-10-27 补）**：票 05 已定——基线比较是**纯观察**（三值 `match/changed/not-comparable`），
+> **不得**改变 `PlaytestOutcome`、断言三值、`DeliveryCheckStatus` 或 `DeliveryVerdict`；试玩报告带 `baseline` 比较段，
+> delivery / CLI 只展示（「与基线不同」措辞），不把 `changed` 写成「回归失败」。基线机制本身归票 09。
+
 HITL：用户逐字裁定。

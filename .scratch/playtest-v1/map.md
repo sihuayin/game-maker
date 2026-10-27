@@ -40,7 +40,8 @@ Effort: playtest-v1
 - **零付费 / 离线优先**：验收复用现有真实产物，不因试玩重复付费生图、不新增付费调用。
 - **交付契约稳定**：`qa-report/v1` 的 `delivery` 只加性扩展（沿用 fpvs-v1-p1「可选子对象 + 固定注册表 + 不升版」），
   `playable-smoke` 键与既有 schema 不破坏。
-- **工作树纪律**：不改 `fixtures/`、`game-maker.local.json`；不 `reset`/`clean`；不提交/推送除非单独授权；
+- **工作树纪律**：不改既有 `fixtures/`（唯一加性例外：可新增 `fixtures/playtest-baselines/` 及其基线文件，
+  **不得修改、删除或重写既有 fixture**）、不改 `game-maker.local.json`；不 `reset`/`clean`；不提交/推送除非单独授权；
   测试产物只写 `out/` 或本 effort 目录。
 - **证据分级**：E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + 退出码 + 路径）。
 
@@ -79,12 +80,22 @@ Effort: playtest-v1
   `UNKNOWN` 须结构化 `InsufficientEvidence`（ruleId + missingObservation + affectedAssertionIds + explanation）。
   Harness 只产证据与归因，`mapPlaytest` 纯映射、`buildDeliveryReport` 重算 verdict，harness 不写交付结论。
   → 解除 [06](issues/06-delivery-integration.md) 阻塞；键名/schema/迁移归 06。
+- [05 可重放测试 + 回归基线](issues/05-replay-baseline.md)：**已收口** —— 三层分工（语义重跑 = 回归基础 /
+  操作轨迹重放 = 诊断，`input.jsonl` 不得当判定依据 / 证据级比较 = 比较器）· 判定确定性契约（outcome + 断言三值 +
+  离散终态 + 显式覆盖且证据充分的规范化事件计数必须一致；位置/时间戳/事件顺序/截图可抖动；动作按观测步、
+  固定轮询与时限、固定 Chrome 配置、去掉影响决策的墙钟判断；v1 无随机种子）· 基线 = 自足 JSON
+  （`baselineFormatVersion` + `identity` + `coverage` + `expected` + `source`）放 `fixtures/playtest-baselines/`
+  （工作树纪律加性例外）· 晋升须连续两次干净运行 + 人工显式 + 审计；允许记录非 SUCCESS 的已接受行为；
+  禁自动新建/覆盖 · 比较三值 `match / changed / not-comparable`，**纯观察**：不改 outcome、断言三值、
+  `DeliveryCheckStatus`、`DeliveryVerdict`；「回归失败」唯一来源仍是契约断言 + 票 04 归因；
+  不稳定覆盖字段降级为观察并留审计。→ 解除 Harness 实现（07/08 可开工；交付接入层待 06）。
 
 ## Not yet specified
 
 <!-- in-scope fog that graduates as the frontier advances -->
 
-- **Harness 实现**（新 `playtest` harness 骨架，吸收 smoke 的正例 / 负例能力）—— 02/03 已裁定；但完整骨架还需 04 五态归因 + 05 重放基线 + 06 交付接入定型，待这三张裁定后毕业。
+- **交付接入实现（第三层）**（playtest 报告 + 基线比较段接入 delivery / CLI）—— 归因与基线语义已由 04/05 裁定；
+  键名、schema、迁移待 06，机制待 09 基线落地后毕业。
 - **smoke 退役 / 迁移时序**（`playable-smoke.mjs` 与 `mapPlayableSmoke` 的退役、`pnpm test:playable` 命令迁移）—— 待 06 交付接入裁定后毕业。
 - **交付契约加性字段落地**（`delivery` schema 扩展 + 新检查项消费者重算）—— 待 04 归因 + 06 接入裁定后毕业。
 - **真实产物验收**（像 fpvs-v1-p1 的 `acceptance.mjs`，零付费跑真产物出统一报告）—— 实施段之后毕业。
