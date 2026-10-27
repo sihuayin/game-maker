@@ -89,17 +89,22 @@ Effort: playtest-v1
   禁自动新建/覆盖 · 比较三值 `match / changed / not-comparable`，**纯观察**：不改 outcome、断言三值、
   `DeliveryCheckStatus`、`DeliveryVerdict`；「回归失败」唯一来源仍是契约断言 + 票 04 归因；
   不稳定覆盖字段降级为观察并留审计。→ 解除 Harness 实现（07/08 可开工；交付接入层待 06）。
+- [06 交付接入（取代 playable-smoke）](issues/06-delivery-integration.md)：**已收口** —— 保留 `playable-smoke` 键
+  （label 改「试玩」、`delivery.playtest` 可选摘要、必需项不得绕过、旧报告可读且旧结果不升级）· 独立 CLI
+  `game-maker playtest <run>`（create/build 零 Chrome、无 MCP）· `run/v<N>/playtest/v<K>/` 版本化 attempt、
+  只吃 run 目录、严格身份校验 · 退出码 0/1/2/4（0 须试玩成功且写回成功）· 写回只动 check/summary/verdict、
+  `playtest-*` 证据替换、身份不匹配不污染 delivery、原子提交 + `writeback-error.json` · 聚合
+  `GAMEPLAY_FAILURE > ENVIRONMENT_FAILURE > TIMEOUT > AGENT_LIMITATION > UNKNOWN > SUCCESS`，必需场景未执行
+  不得 pass（fail 优先），`aggregate=SUCCESS` 不等于 pass · 真实产物零付费验收（历史产物沙箱副本；必须证明
+  真实游戏执行，Chrome 缺失只记 incomplete 且非 0 退出）· smoke 本 effort 末尾硬切（实现退役、历史契约保留）。
+  → 解除 07；08/09 范围扩展（交付接入执行层 / 真实验收与旧报告兼容）。
 
 ## Not yet specified
 
 <!-- in-scope fog that graduates as the frontier advances -->
 
-- **交付接入实现（第三层）**（playtest 报告 + 基线比较段接入 delivery / CLI）—— 归因与基线语义已由 04/05 裁定；
-  键名、schema、迁移待 06，机制待 09 基线落地后毕业。
-- **smoke 退役 / 迁移时序**（`playable-smoke.mjs` 与 `mapPlayableSmoke` 的退役、`pnpm test:playable` 命令迁移）—— 待 06 交付接入裁定后毕业。
-- **交付契约加性字段落地**（`delivery` schema 扩展 + 新检查项消费者重算）—— 待 04 归因 + 06 接入裁定后毕业。
-- **真实产物验收**（像 fpvs-v1-p1 的 `acceptance.mjs`，零付费跑真产物出统一报告）—— 实施段之后毕业。
-- **CONTEXT.md 词条落地 + CLI 摘要渲染五态**—— 待 04 归因 + 06 接入裁定后毕业。
+（无）—— 06 收口后，交付接入、smoke 退役、契约字段、真实验收、词汇/CLI 摘要均已毕业为 07/08/09。
+剩余风险（真实运行能否稳定产出某态、Chrome 可用性）属于实施验收的观察项，不是未指定决策。
 
 ## Out of scope
 

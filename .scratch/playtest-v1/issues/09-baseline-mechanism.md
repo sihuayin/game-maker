@@ -3,7 +3,7 @@
 Type: task
 Status: open
 Map: ../map.md
-Blocked by: 05, 07, 08
+Blocked by: 05, 06, 07, 08
 
 ## Question
 
@@ -30,3 +30,14 @@ Blocked by: 05, 07, 08
 - 允许基线记录非 `SUCCESS` 的已接受行为（如 `failure-missing-pickup` 的 `GAMEPLAY_FAILURE`）；
 - 自动运行无法写基线；晋升留痕可审计；
 - 比较结果不改变票 04 的归因与交付状态；全仓测试绿 + typecheck 绿。
+
+## 追加范围（票 06 收口 · 2026-10-27）
+
+在基线机制之外，本票落真实产物验收与旧报告兼容：
+
+1. **零付费真实产物验收**：`.scratch/playtest-v1/acceptance.mjs`，前置 `pnpm build`；复用 `.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4`，在 `.scratch/playtest-v1/runs/<日期>-acceptance/` 建立可写沙箱；历史产物只读（前后哈希比对 `historicalMutated: false`）。
+2. **验收三块**：① 真实产物链路（本地 Chrome、正式 attempt、写回沙箱 `qa-report.json`）；② 归因/交付一致性（check status、`delivery.playtest`、verdict、证据引用、身份）；③ 离线五态 + 准备拒绝测试（记录命令/退出码）+ 旧报告兼容（`.scratch/fpvs-v1-p1/runs/2026-10-27-stage-c/qa-report.json` 可解析、无 `delivery.playtest`、未升级）。
+3. **`acceptance.json`（`playtest-acceptance/v1`）**：`verdict`（pass/incomplete/fail）、`source`（historicalRun/sandbox/historicalMutated）、`environment`（chrome found|missing）、`checks.realPlaytest`（command/exitCode/attempt/reportVersion/execution/aggregate/checkStatus/detail/requiredScenariosComplete/evidenceRefsResolve/deliveryVerdict/**gameExecutionReached**/**sceneReadyObserved**/**executionEvidence**）、`checks.attributionDelivery`、`checks.offlineFiveStates`、`checks.legacyReport`、`incompleteReasons`、`artifacts`。
+4. **判定**：`pass` 须 Chrome 可用 + **真实游戏执行已被证实**（不只是 `execution=executed`）+ 一致性全过 + 离线五态/准备拒绝测试通过 + 旧报告兼容 + 历史产物未改；`incomplete` = Chrome 缺失或未能证明真实游戏执行，且其余检查无链路缺陷；`fail` = schema/映射/证据/身份/verdict 不一致、报告损坏、历史产物被改，或**离线验收断言失败**（离线失败不得降格为 incomplete）。退出码 `0` pass / `1` fail|incomplete / `4` 输入或历史产物不可用。
+5. **基线观察**：只验证 `changed` 不改变 status/verdict；晋升与两次干净运行仍按票 05 及本票既有范围。
+6. 真实运行五态任一都可接受，不要求 `SUCCESS`；Chrome 缺失时终端必须明说「真实游戏执行未验收」，且 `incomplete` 不得返回 `0`。
