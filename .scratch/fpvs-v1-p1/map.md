@@ -71,15 +71,16 @@ Effort: fpvs-v1-p1
   非超时失败 stage `floor`·`win`·`runtime`→fail+GAMEPLAY_FAILURE / 超时→incomplete+UNKNOWN / 未跑→blocked）+
   `playableSmokeEvidence`（result.json/console/exceptions + fail-<stage>.png）+ `playableSmokeKnownLimitations`
   （navigate→票 05 Q3 事实化措辞，**永不产 AGENT_LIMITATION**）。纯函数、暂未接入口（阶段C 消费）。全仓 2040/2040 · typecheck 绿。→ 解锁 10。
+- [10 视觉评审写入实施](issues/10-visual-review-impl.md)：**已收口** —— CLI `review-verdict`（仅 CLI、不加 MCP，归属校验三连）+
+  `writeVisualReviewToReport`（只动视觉评审三处、原子替换、缺 delivery 初始化不伪造站点）+ `applyVisualReview` / `visualReviewToCheck`
+  （纯函数、verdict 重算）。全仓 2054/2054 · typecheck 绿。→ 实施段 07/08/09/10 全部落地，毕业 [11 跨阶段集成测试](issues/11-cross-stage-integration-tests.md) /
+  [12 阶段C 真实产物验收](issues/12-stage-c-real-artifact-acceptance.md) / [13 CLI 摘要](issues/13-cli-summary-fr06.md)。
 
 ## Not yet specified
 
 <!-- in-scope fog that graduates as the frontier advances -->
 
-- **跨阶段集成测试**（§8.2）：等 07/08/09/10 实施落地后。
-- **CLI 摘要（FR-06，P1）**：核心报告落地后再实施，复用观察摘要机制（票 04 Q5 裁定）。
-- **阶段C 真实产物验收**（§8.4）：报告落地后，用最新 E2E 真实产物（`fpvs-v1-p0` 的 `2026-10-26-e2e-r4`）做一次
-  零付费端到端报告验收，输出统一报告 + 版本关联 + 试玩证据 + 视觉状态 + 最终结论。
+（实施段已全部落地，此处清空 —— 余下的三件已在上述 11 / 12 / 13 三张票里，不再是雾。）
 
 ## Out of scope
 

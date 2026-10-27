@@ -11,8 +11,8 @@
 //   §6 矩阵十二场景（A–L）一条一条映射在下面。
 import { describe, expect, it } from "vitest";
 import {
-  buildDeliveryReport, DELIVERY_CHECK_KEYS, DELIVERY_CHECK_LABELS, DELIVERY_REQUIRED_CHECKS,
-  DeliveryReportSchema, deriveDeliveryVerdict,
+  applyVisualReview, buildDeliveryReport, DELIVERY_CHECK_KEYS, DELIVERY_CHECK_LABELS, DELIVERY_REQUIRED_CHECKS,
+  DeliveryReportSchema, deriveDeliveryVerdict, visualReviewToCheck,
 } from "../src/delivery.js";
 import type { DeliveryCheck, DeliveryCheckKey, DeliveryCheckStatus } from "../src/delivery.js";
 import { QA_JUDGEMENTS, QA_REPORT_FORMAT, QAReportSchema } from "../src/qa.js";
@@ -234,5 +234,54 @@ describe("qa-report/v1 兼容旧报告（票 08）", () => {
     expect(parsed.success).toBe(true);
     if (parsed.success) expect(parsed.data.delivery?.verdict).toBe("pass");
     expect(oldReport()).not.toHaveProperty("delivery");
+  });
+});
+
+// ── 票 10：视觉评审 → 检查项 ─────────────────────────────────────────────
+describe("visualReviewToCheck / applyVisualReview（票 10）", () => {
+  it("pending→incomplete、pass→pass、fail→fail", () => {
+    expect(visualReviewToCheck("pending")).toBe("incomplete");
+    expect(visualReviewToCheck("pass")).toBe("pass");
+    expect(visualReviewToCheck("fail")).toBe("fail");
+  });
+
+  const delivery = (visual: DeliveryCheckStatus = "incomplete", over: Record<string, unknown> = {}) =>
+    buildDeliveryReport({
+      runId: "x/run/v1", pack: { packId: "x", packVersion: 1 }, config: { file: "x/run/v1/c.json" },
+      site: { version: 1, shell: "2" },
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" },
+        { key: "qa", status: "pass" }, { key: "site", status: "pass" },
+        { key: "playable-smoke", status: "pass" }, { key: "visual-review", status: visual },
+      ],
+      ...over,
+    });
+
+  it("把 pass 并进已有 delivery：visual-review 检查项 → pass、verdict 重算 → pass", () => {
+    const before = delivery("incomplete");
+    expect(before.verdict).toBe("incomplete");
+    const after = applyVisualReview(before, { status: "pass", reviewer: "人", reviewedAt: "2026-10-27" });
+    expect(after.visualReview.status).toBe("pass");
+    expect(after.checks.find((c) => c.key === "visual-review")!.status).toBe("pass");
+    expect(after.verdict).toBe("pass");
+  });
+
+  it("把 fail 并进已有 delivery：visual-review 检查项 → fail、verdict → fail", () => {
+    const after = applyVisualReview(delivery(), { status: "fail" });
+    expect(after.checks.find((c) => c.key === "visual-review")!.status).toBe("fail");
+    expect(after.verdict).toBe("fail");
+  });
+
+  it("只动视觉评审三处，其余字段（身份/站点/证据/已知限制）原样保留", () => {
+    const before = delivery("incomplete", {
+      knownLimitations: ["已知限制"], evidence: [{ ref: "r", path: "p" }],
+    });
+    const after = applyVisualReview(before, { status: "pass" });
+    expect(after.runId).toBe(before.runId);
+    expect(after.pack).toEqual(before.pack);
+    expect(after.config).toEqual(before.config);
+    expect(after.site).toEqual(before.site);
+    expect(after.knownLimitations).toEqual(before.knownLimitations);
+    expect(after.evidence).toEqual(before.evidence);
   });
 });

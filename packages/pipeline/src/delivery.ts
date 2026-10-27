@@ -13,7 +13,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  buildDeliveryReport, QAReportSchema, type AssetPackManifest, type DeliveryReport,
+  applyVisualReview, buildDeliveryReport, CommandError, QAReportSchema, qaVerdict, visualReviewToCheck,
+  type AssetPackManifest, type DeliveryReport, type DeliveryVisualReview, type QAReport,
 } from "@game-maker/contracts";
 import { RUN_ARTIFACT, writeJson } from "./artifacts.js";
 import { manifestChecksumOf } from "./publish-gate.js";
@@ -134,4 +135,71 @@ export function tryWriteDelivery(runDir: string, delivery: DeliveryReport): bool
   } catch {
     return false;
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 五、视觉评审写回（票 10）
+//
+//   `review-verdict` 那一支（**仅 CLI**）要写 `delivery.visualReview`。⚠️ 与上面 `writeDeliveryToReport`
+//   不同：它**不整体重写** `delivery`，而是**只动视觉评审那三处**（`visualReview` 对象、`visual-review`
+//   检查项、`verdict`）—— 其余字段（身份/站点/证据/已知限制）原样保留，QA 层更是一个字都不碰。
+
+/**
+ * 把一次视觉评审并进 `run/v<N>/qa-report.json`：
+ *   · 已有 `delivery` → `applyVisualReview`（只改视觉评审三处）；
+ *   · 没有 `delivery` → 初始化一份（身份从 `subject` + runDir 推，**不伪造站点版本**）。
+ * ⚠️ **原子替换**：先写 `.tmp` 再 rename（票 06 Q2「不就地覆写」），中断不会留下半截报告。
+ */
+export function writeVisualReviewToReport(opts: {
+  outRoot: string;
+  runDir: string;
+  review: DeliveryVisualReview;
+}): void {
+  const p = path.join(opts.runDir, RUN_ARTIFACT.qaReport);
+  let raw: unknown;
+  try {
+    raw = JSON.parse(fs.readFileSync(p, "utf8"));
+  } catch (e) {
+    throw new Error(`读不出 \`${RUN_ARTIFACT.qaReport}\`（${p}）：${(e as Error).message}`);
+  }
+  const report = QAReportSchema.parse(raw);
+  const delivery = report.delivery === undefined
+    ? initialDeliveryWithReview(opts.outRoot, opts.runDir, report, opts.review)
+    : applyVisualReview(report.delivery, opts.review);
+  writeJsonAtomic(p, { ...report, delivery });
+}
+
+/** 没有 `delivery` 时初始化一份（票 10 项 1）：构建段三查（资源/配置/QA）按「报告已到 QA」记，
+ *  站点/试玩记 `incomplete`（未做）、视觉用本次评审。⚠️ **不伪造站点版本**：`site` 省略、`site` 检查项 `incomplete`。 */
+function initialDeliveryWithReview(
+  outRoot: string, runDir: string, report: QAReport, review: DeliveryVisualReview,
+): DeliveryReport {
+  const subject = report.subject;
+  if (subject === undefined)
+    throw new CommandError("invalid", "这份报告没有 `subject`（包身份），无法初始化交付结论 —— 重跑 `build` 会生成带身份的");
+  return buildDeliveryReport({
+    runId: rel(outRoot, runDir),
+    pack: {
+      packId: subject.packId,
+      packVersion: subject.packVersion,
+      ...(subject.manifestChecksum === undefined ? {} : { manifestChecksum: subject.manifestChecksum }),
+    },
+    config: { file: rel(outRoot, path.join(runDir, RUN_ARTIFACT.config)) },
+    checks: [
+      { key: "asset-pack", status: "pass" },
+      { key: "config", status: "pass" },
+      { key: "qa", status: qaVerdict(report) },
+      { key: "site", status: "incomplete" },
+      { key: "playable-smoke", status: "incomplete" },
+      { key: "visual-review", status: visualReviewToCheck(review.status) },
+    ],
+    visualReview: review,
+  });
+}
+
+/** **原子替换**（票 06 Q2「不就地覆写」）：先写 `.tmp` 再 `rename`。 */
+function writeJsonAtomic(p: string, o: unknown): void {
+  const tmp = `${p}.tmp-${process.pid}`;
+  writeJson(tmp, o);
+  fs.renameSync(tmp, p);
 }

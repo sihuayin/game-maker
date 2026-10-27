@@ -3,6 +3,7 @@
 // 所有逻辑在 core（`@game-maker/assets` 的 ops）—— 这里不许有业务判断。
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import {
   asCommandError, CommandError, EXIT, acceptAnimationPack, compileRuntime, compileTdGame, createProxyFetch, exitCodeOfError, failureDirOfError, failureSiteNote, formatSpentCalls, inspectPack, ledgerOfError, packAssets, planAssets, resolveImageTransport, resolveTextTransport, verifyPack, writeAcceptanceReport,
   type AcceptanceResult, type CommandResult, type InspectData, type WrittenAcceptanceReport,
@@ -14,7 +15,7 @@ import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
 import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, type CreateStep } from "@game-maker/pipeline";
+import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
@@ -31,12 +32,17 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker inspect <资源包目录> [--json]
   game-maker accept <资源包目录> [--baseline <baseline 目录>] [--out <目录>] [--json]
   game-maker review <run 目录> [--json]
+  game-maker review-verdict <run 目录> --verdict pass|fail [--reviewer <名字>] [--note "..."] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
   把包的联系表与**原图**一起喂给视觉模型，要一份「哪里不像」的观察清单。
   ⚠️ **它要花钱**（一次视觉调用），所以它**不在创建链上**：要不要跑、跑几次，由人决定；
   ⚠️ 它**不打分、不判定通过与否、也不阻断任何产物** —— 拿不到结果就当没有。
   ⚠️ 花了的那一发**记进 <run 目录>/ledger.json**（run 级那份）。
+
+\`review-verdict\` 是**视觉人工对照的写回**（FPVS-V1-P1 · 票 10）：人看过后，把结论写进那个
+  run 的 \`qa-report.json\` 的 \`delivery.visualReview\`（仅 CLI、不加 MCP）。**不碰 QA 层、不伪造站点版本**；
+  reviewer 缺省取 \`git config user.name\`。
 
 \`accept\` 是**结构验收**（免费、不生成、不调用上游）：读一个交付态资源包，逐项核对
   manifest / 图集 JSON / PNG / 动画帧，写 \`<out>/<packId>/acceptance/v<N>/report.json\` 与
@@ -99,6 +105,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "baseline",
     // 票 09（P0-02b）：`site` 的显式 QA 报告（外部包 / 非规范 out 树）
     "qa-report",
+    // 票 10（FPVS-V1-P1）：`review-verdict` 的视觉评审结论
+    "verdict", "reviewer", "note",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -128,6 +136,16 @@ function parseVersion(v: string): number {
   const n = Number(v);
   if (!Number.isInteger(n) || n < 1) throw new CommandError("usage", `--version 必须是 ≥1 的整数（给的是 "${v}"）`);
   return n;
+}
+
+/** 评审人默认值：`git config user.name`（票 10「reviewer（默认 git user）」）。读不到就 `undefined`（评审字段最小化，不硬造）。 */
+function gitUserName(): string | undefined {
+  try {
+    const name = execSync("git config user.name", { encoding: "utf8" }).trim();
+    return name.length > 0 ? name : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** `--concurrency` / `--concurrency-image` 的值：必须是 ≥1 的整数。⚠️ 报错要点**给的那个 flag 的名字**。 */
@@ -685,6 +703,42 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         const dir = positionals[0];
         if (!dir) throw new CommandError("usage", "review 需要一个 run 目录（build 打出来的那个：<out>/<gameId>/run/v<N>）");
         result = await reviewRun({ runDir: path.resolve(dir), outRoot, transport, ...up });
+        break;
+      }
+      case "review-verdict": {
+        // ⚠️ **视觉人工评审写回**（FPVS-V1-P1 票 10）：仅 CLI、不加 MCP。人看过的结论写进
+        //   `delivery.visualReview` —— 不碰 QA 层、不碰 delivery 其余字段（票 06 Q3 评审字段最小化）。
+        const dir = positionals[0];
+        if (dir === undefined)
+          throw new CommandError("usage", "review-verdict 需要一个 run 目录（<out>/<gameId>/run/v<N>）");
+        const runDir = path.resolve(dir);
+        // ⚠️ **校验归属**（票 06 Q2）：目标必须是有效 run（v<N>）+ 报告存在 + verdict 合法。
+        if (!/\/v\d+$/.test(runDir))
+          throw new CommandError("usage", `"${dir}" 不是一次运行的目录（要 <gameId>/run/v<N> 的形状）`);
+        const qaReportPath = path.join(runDir, "qa-report.json");
+        if (!fs.existsSync(qaReportPath))
+          throw new CommandError("usage", `找不到 QA 报告：${qaReportPath} —— 先跑 build（QA 在 build 里跑）`);
+        const verdict = flags.verdict;
+        if (verdict !== "pass" && verdict !== "fail")
+          throw new CommandError("usage", "review-verdict 需要 --verdict pass|fail");
+        // ⚠️ `flags.verdict` 的类型是 `string | boolean | undefined`（noUncheckedIndexedAccess），
+        //   `!==` 窄化后 TypeScript 仍把它读成 `string` —— 这里显式收窄（上面的判断已保证 pass|fail）。
+        const status: "pass" | "fail" = verdict;
+        const reviewer = typeof flags.reviewer === "string" ? flags.reviewer : gitUserName();
+        const reviewedAt = new Date().toISOString();
+        const review = {
+          status,
+          ...(reviewer === undefined ? {} : { reviewer }),
+          reviewedAt,
+          ...(typeof flags.note === "string" ? { note: flags.note } : {}),
+        };
+        writeVisualReviewToReport({ outRoot, runDir, review });
+        result = {
+          command: "review-verdict",
+          summary: [`视觉评审 ${status}：已写入 ${relPath(outRoot, qaReportPath)}`],
+          data: { runDir: relPath(outRoot, runDir), status, ...(reviewer === undefined ? {} : { reviewer }), reviewedAt },
+          artifacts: [{ path: relPath(outRoot, qaReportPath), kind: "qa-report" }],
+        };
         break;
       }
       default: throw new CommandError("usage", `不认识的操作 "${command}"`);

@@ -231,3 +231,37 @@ export function buildDeliveryReport(input: DeliveryReportInput): DeliveryReport 
     ...(input.knownLimitations === undefined ? {} : { knownLimitations: [...input.knownLimitations] }),
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 四、视觉评审 → 检查项（票 10）
+//
+//   `visualReview.status`（人的裁定）与 `visual-review` 检查项**必须一致**，而 verdict 又由
+//   检查项算 ⇒ 写一次视觉评审，要同时动三处：`visualReview` 对象、`visual-review` 检查项、
+//   `verdict`。这三个函数把「怎么动」收在一处，别让 CLI / 阶段C 各写一份会漂移的逻辑。
+
+/** `visualReview.status` → `visual-review` 检查项 status（`pending`→`incomplete`，`pass`/`fail` 直通）。 */
+export function visualReviewToCheck(status: DeliveryVisualReviewStatus): DeliveryCheckStatus {
+  return status === "pending" ? "incomplete" : status;
+}
+
+/**
+ * 把一次视觉评审**并进**已有 `delivery`（票 10）：更新 `visualReview` + `visual-review` 检查项 +
+ * 重算 `verdict`，其余字段（身份 / 站点 / 证据 / 已知限制）原样保留。
+ *
+ * ⚠️ **纯函数** —— 经 `buildDeliveryReport` 走一遍 schema，verdict 重算 + 一致性校验一起做，
+ *   不会漏掉「视觉评审从 pending 改 pass 后 verdict 却没跟上」那种假绿。
+ */
+export function applyVisualReview(delivery: DeliveryReport, review: DeliveryVisualReview): DeliveryReport {
+  const status = visualReviewToCheck(review.status);
+  const checks = delivery.checks.map((c) => (c.key === "visual-review" ? { ...c, status } : c));
+  return buildDeliveryReport({
+    runId: delivery.runId,
+    pack: delivery.pack,
+    config: delivery.config,
+    ...(delivery.site === undefined ? {} : { site: delivery.site }),
+    checks,
+    visualReview: review,
+    evidence: delivery.evidence,
+    ...(delivery.knownLimitations === undefined ? {} : { knownLimitations: delivery.knownLimitations }),
+  });
+}
