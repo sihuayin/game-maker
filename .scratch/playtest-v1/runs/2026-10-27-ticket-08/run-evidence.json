@@ -3,13 +3,27 @@
   "date": "2026-10-27",
   "zeroPaid": true,
   "tests": {
-    "pnpm test": { "exitCode": 0, "files": 142, "tests": 2123 },
-    "pnpm typecheck": { "exitCode": 0 }
+    "pnpm test": {
+      "exitCode": 0,
+      "files": 142,
+      "tests": 2123
+    },
+    "pnpm typecheck": {
+      "exitCode": 0
+    }
   },
   "attribution": {
     "file": "packages/contracts/tests/playtest-attribution.test.ts",
     "tests": 13,
-    "covered": ["SUCCESS", "GAMEPLAY_FAILURE", "ENVIRONMENT_FAILURE", "AGENT_LIMITATION", "TIMEOUT", "UNKNOWN", "not-executed"],
+    "covered": [
+      "SUCCESS",
+      "GAMEPLAY_FAILURE",
+      "ENVIRONMENT_FAILURE",
+      "AGENT_LIMITATION",
+      "TIMEOUT",
+      "UNKNOWN",
+      "not-executed"
+    ],
     "rules": [
       "环境故障前置门：环境故障优先于游戏失败",
       "runtime-error 来源未定 ⇒ UNKNOWN；来源为游戏 ⇒ GAMEPLAY_FAILURE",
@@ -22,18 +36,25 @@
   "writeback": {
     "file": "packages/pipeline/tests/playtest.test.ts",
     "tests": 6,
-    "covered": ["成功写回只动 check/summary/verdict", "幂等/证据不重复", "身份不匹配拒写且 qa-report 不变", "config checksum 不匹配", "没有 delivery 不伪造", "写回失败留 writeback-error.json 且不改 result.json"]
+    "covered": [
+      "成功写回只动 check/summary/verdict",
+      "幂等/证据不重复",
+      "身份不匹配拒写且 qa-report 不变",
+      "config checksum 不匹配",
+      "没有 delivery 不伪造",
+      "写回失败留 writeback-error.json 且不改 result.json"
+    ]
   },
   "e2e": {
     "sandbox": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e",
     "command": "node packages/cli/dist/cli.mjs playtest .scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/run/v1 --out .scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out --json",
     "exitCode": 1,
     "attempts": [
-      "wasteland-scavenger-recipe/run/v1/playtest/v1",
-      "wasteland-scavenger-recipe/run/v1/playtest/v2",
-      "wasteland-scavenger-recipe/run/v1/playtest/v3"
+      "e2e-evidence/run/v1/playtest/v1",
+      "e2e-evidence/run/v1/playtest/v2",
+      "e2e-evidence/run/v1/playtest/v3"
     ],
-    "deliveryPointsTo": "wasteland-scavenger-recipe/run/v1/playtest/v3/result.json",
+    "deliveryPointsTo": "e2e-evidence/run/v1/playtest/v3/result.json",
     "execution": "executed",
     "aggregate": "AGENT_LIMITATION",
     "scenario": "success-basic → AGENT_LIMITATION（assertions unknown、termination=false）",
@@ -43,10 +64,16 @@
     "siteBytesUnchanged": true,
     "qaLayerPreserved": true,
     "evidenceRefs": [
-      "playtest-result", "playtest-site-integrity", "playtest-chrome",
-      "playtest-success-basic-events", "playtest-success-basic-trace", "playtest-success-basic-input",
-      "playtest-success-basic-console", "playtest-success-basic-exceptions"
-    ]
+      "playtest-result",
+      "playtest-site-integrity",
+      "playtest-chrome",
+      "playtest-success-basic-events",
+      "playtest-success-basic-trace",
+      "playtest-success-basic-input",
+      "playtest-success-basic-console",
+      "playtest-success-basic-exceptions"
+    ],
+    "committedEvidence": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence"
   },
   "cliExitCodes": {
     "usage": 2,

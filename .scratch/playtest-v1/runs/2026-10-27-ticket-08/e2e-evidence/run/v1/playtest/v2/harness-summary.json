@@ -1,0 +1,75 @@
+{
+  "startedAt": "2026-10-27T12:51:54.631Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site /Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/site/v1 --scenario-dir /Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/run/v1/playtest/.tmp-69291-1793105513486/scenarios --out /Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/run/v1/playtest/.tmp-69291-1793105513486/harness",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/run/v1/playtest/.tmp-69291-1793105513486/scenarios",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/run/v1/playtest/.tmp-69291-1793105513486/harness",
+  "repeat": 1,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e/out/wasteland-scavenger-recipe/run/v1/playtest/.tmp-69291-1793105513486/harness/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "success-basic",
+          "execution": "executed",
+          "assertionAggregate": "unknown",
+          "terminationReached": false,
+          "steps": 1135
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 1,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "success-basic",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "success-basic",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              },
+              {
+                "id": "all-collected",
+                "result": "unknown"
+              },
+              {
+                "id": "won",
+                "result": "unknown"
+              }
+            ],
+            "endState": {
+              "collected": 3,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 1,
+              "activePickups": 2
+            },
+            "eventCounts": {
+              "pickup": 2,
+              "win": 0,
+              "chest-open": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

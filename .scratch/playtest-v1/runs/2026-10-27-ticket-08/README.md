@@ -1,6 +1,8 @@
 # 票 08 真实产物端到端（沙箱）
 
-历史产物只读；沙箱在 `e2e/out/`，`pack/v1` 与 `site/v1` 是指向
+历史产物只读；可复跑沙箱在 `e2e/out/`（被 `.gitignore` 的 `out/` 规则忽略），
+**入库的证据副本在 `e2e-evidence/`**（qa-report + playtest v1/v2/v3）。
+`pack/v1` 与 `site/v1` 是指向
 `.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/{pack,site}/v1` 的相对 symlink。
 
 构造命令：
