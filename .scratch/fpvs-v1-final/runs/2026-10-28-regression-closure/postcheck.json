@@ -1,0 +1,26 @@
+{
+  "format": "fpvs-regression-closure-postcheck/v1",
+  "generatedAt": "2026-10-28T10:26:31.679Z",
+  "head": "b4f03c281d6fcedf32eed217e6388892d01d5896",
+  "snapshot": {
+    "snapshotChanged": 0,
+    "referenceChanged": 0
+  },
+  "work": {
+    "changedVsSnapshot": [
+      "run/v1/qa-report.json"
+    ]
+  },
+  "gitStatus": [
+    "M .scratch/fpvs-v1-final/issues/10-regression-closure.md",
+    " M .scratch/fpvs-v1-final/map.md",
+    "?? .scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/"
+  ],
+  "reportChecklist": {
+    "rows": 27,
+    "rowsWithConclusion": 27,
+    "allHaveConclusion": true
+  },
+  "consistency": "pass",
+  "verdict": "pass"
+}

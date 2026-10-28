@@ -158,24 +158,22 @@ Effort: fpvs-v1-final
   CLI/MCP 共用摘要 / playtest·visual 映射 / 缺席不默认 pass / 报告文本）。`pnpm test` 2160/145
   exit 0 + `pnpm typecheck` exit 0（日志在 `regression/`）；零付费、快照零写入、历史零覆盖。
   → 解除 FA-06 阻塞（最终回归与收口）。
+- [FA-06 最终回归与收口](issues/10-regression-closure.md)：**已收口** —— `pnpm test` **2160/145**
+  exit 0 · `pnpm typecheck` exit 0 · `pnpm test:playtest` self-test 4/4 + **96/8** exit 0 ·
+  `pnpm test:acceptance` 免费闭环全绿（allOk=true，追加理由：probe-harness 为 mechanic-probe
+  共用观测面）。self-test 覆盖 10 个 tracked 文件 → 新证据复制到 `self-test-run/` 后
+  `git restore`，恢复哈希与运行前一致。contracts/MCP/依赖零变更、零删除、零付费、历史零覆盖、
+  阈值未降；快照 66 + 参考 14 条哈希 0 变化；§8 清单 27/27 有结论；consistency 12/12；
+  最终 verdict 保持 **`pass`**。→ **无 open ticket；地图完成，FPVS-V1 Final Acceptance 目的地已达。**
+  报告：[runs/2026-10-28-regression-closure/README.md](runs/2026-10-28-regression-closure/README.md)。
 
 ## Not yet specified
 
 <!-- in-scope fog that graduates as the frontier advances -->
 
-- **有限策略修复能否在真实危险物下产出自动 SUCCESS**：**已由 FA-02 回答 = 能**（2 次迭代内；
-  4 次真实运行全 SUCCESS）。Q4(i) 的兜底（人工证据 / `incomplete`）不触发；人工证据不再需要。
-- **FA-03 在"已通关"后的实际范围**：归因复核改为「确认 SUCCESS 证据充分 + 危险物接触的间接证据
-  措辞 + FR-03 离线边界测试」；不再有"未通关原因判定"的主体，若发现新缺陷按配置/管线级有限修复处理。
-  **已由 FA-03 回答 = 无新缺陷、零修复**：SUCCESS 证据充分；危险物措辞已用可复现读数修正；
-  FR-03 补 7 个离线用例；唯一遗留是规则 ④ 的**潜在**误归因路径（未触发，改语义待审批）。
-- **最终 verdict 非 pass 时的「未解决项 / 限制」结构**：逐项证据引用、缺口、阻塞原因
-  （取决于最终结果是 fail / blocked / incomplete 中的哪一种）。
-  **已由 FA-04 回答 = 本轮 `delivery.verdict = pass`**：六项检查全 pass、视觉人工审核 pass；
-  「非 pass 结构」不触发，FA-05 仍按 §8 清单逐项列限制/证据（含危险物接触间接证据等措辞）。
-- **若 FA-03 产出新版本产物，需要重做哪些取证**：试玩、视觉、报告的身份重绑范围
-  （取决于缺陷是否出现及修复层级）。
-  **已由 FA-03 回答 = 不适用**：没有新版本产物，验收对象仍是 FA-01 冻结的 `pack/v1 · site/v1 · shell 2`。
+（无）—— FA-01–06 全部收口；FA-05 最终 verdict = `pass`；FA-06 回归/约束/快照/报告自检全绿；
+**无 open ticket，FPVS-V1 Final Acceptance 目的地已达。** 剩余风险（危险物接触的间接证据、
+规则 ④ 的潜在误归因路径、人工视觉判断）是保留在最终报告里的观察项/限制，不是未指定决策。
 
 ## Out of scope
 

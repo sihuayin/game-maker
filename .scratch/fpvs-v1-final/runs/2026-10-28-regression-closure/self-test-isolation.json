@@ -1,0 +1,46 @@
+{
+  "format": "fpvs-self-test-isolation/v1",
+  "generatedAt": "2026-10-28T10:24:01.028Z",
+  "dir": ".scratch/playtest-v1/runs/2026-10-28-self-test",
+  "trackedFiles": 22,
+  "overwrittenTrackedFiles": [
+    "hazard-legacy/reset-1.png",
+    "report/attempt-v1/failure-missing-pickup/events.jsonl",
+    "report/attempt-v1/failure-missing-pickup/input.jsonl",
+    "report/attempt-v1/failure-missing-pickup/trace.jsonl",
+    "report/attempt-v1/input-blocked/events.jsonl",
+    "report/attempt-v1/input-blocked/input.jsonl",
+    "report/attempt-v1/input-blocked/trace.jsonl",
+    "report/attempt-v1/result.json",
+    "report/summary.json",
+    "summary.json"
+  ],
+  "postRunHashes": {
+    "hazard-legacy/reset-1.png": "sha256:5b73d707375a048ffaca9fc882bd7a4ee1cbab4100e24602d50cae4a98f30991",
+    "report/attempt-v1/failure-missing-pickup/events.jsonl": "sha256:150831edfcff9acd8454cb84ddb435dd1401557cfd021c02fe41dd28b6a2b718",
+    "report/attempt-v1/failure-missing-pickup/input.jsonl": "sha256:6ea9fc44d2cbf1575610db284be2b0645c2faa3e82c77082492a24f82ae2610e",
+    "report/attempt-v1/failure-missing-pickup/trace.jsonl": "sha256:5a5b5a179b5b0dd9845c6cd9ffc62fd3501689e8a22222063ad5545da8a0976f",
+    "report/attempt-v1/input-blocked/events.jsonl": "sha256:b52fc5d3b1925d6fdd7c8a6ce087d749c0b9fc9f0ee6b33aa0bef67a2a1d9056",
+    "report/attempt-v1/input-blocked/input.jsonl": "sha256:6764965316d331b9b089bc7ac16a6e8335a1e135c3ae90f09c69a9a2142b170a",
+    "report/attempt-v1/input-blocked/trace.jsonl": "sha256:cec8c1027009314fe7db8a021f5bc4b7818987bc858acc62a746859d7d324712",
+    "report/attempt-v1/result.json": "sha256:9aca25c901078d6c65464cd778f8b8a4006ee553b29581f6f36bdb58e21ee153",
+    "report/summary.json": "sha256:fb7d9e137002354e1beeb0bcc7256aeae9f955f37d2d413147491f9bece23514",
+    "summary.json": "sha256:62b2dd8e34755e291d2daab61bafc80aed849a01d5b519dba8a3f586d9be157d"
+  },
+  "copiedTo": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run",
+  "restoredWith": "git restore --source=HEAD -- .scratch/playtest-v1/runs/2026-10-28-self-test",
+  "restoredHashes": {
+    "hazard-legacy/reset-1.png": "sha256:01d1fdaeb656052d8ee97910c4418a3f42a19fb8fd744dbc32368d9191fe70e7",
+    "report/attempt-v1/failure-missing-pickup/events.jsonl": "sha256:8fd438b671aad2ee1f888e3ed6d1fb46cde58d83ae18a693d91e4e59fffbdcfb",
+    "report/attempt-v1/failure-missing-pickup/input.jsonl": "sha256:dac617636e017768cb5cba6775bb240c0bf583fb995345a62732dc56a182dda0",
+    "report/attempt-v1/failure-missing-pickup/trace.jsonl": "sha256:7548e583b462b2cc83a404ef5db9a84697157d3809ff16996e9cd93a4abef70a",
+    "report/attempt-v1/input-blocked/events.jsonl": "sha256:1ba5eab64a70e7a4c6b4ba8e918bf4087f215a998a1e36abe589d946a3dd489f",
+    "report/attempt-v1/input-blocked/input.jsonl": "sha256:3cd59b58a2a0ce9e5a3dc4ac043fc37697b7d8a6c433690a400c03f84bd1bbaf",
+    "report/attempt-v1/input-blocked/trace.jsonl": "sha256:ee75f6c711d883321228d3d195ef37a86dae05cc0779d77b2d9337a8c9cfbffc",
+    "report/attempt-v1/result.json": "sha256:fae85c8c98e7716d24e27d52984b5c987374c98677ab7e532fee33b0ef0a49f9",
+    "report/summary.json": "sha256:ef4528b21feb9cfa977c0bcfa561ffb205fa81ae9b152ac1245e0fca91f4d4bd",
+    "summary.json": "sha256:caa848184fa7b42b10c2aad847990b1edd9f898ae04779a3effaea8679170f16"
+  },
+  "restoredMatchesPrecheck": true,
+  "note": "test:playtest 的 self-test 覆盖了 10 个已跟踪文件；新证据复制到 self-test-run/ 后，已用 git restore 恢复历史字节。"
+}

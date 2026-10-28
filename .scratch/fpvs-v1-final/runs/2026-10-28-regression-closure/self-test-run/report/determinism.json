@@ -1,0 +1,62 @@
+{
+  "repeat": 1,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "failure-missing-pickup",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "failure-missing-pickup",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "missing-pickup",
+              "result": "fail"
+            },
+            {
+              "id": "won",
+              "result": "unknown"
+            }
+          ],
+          "endState": {
+            "collected": 1,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 1
+          },
+          "eventCounts": {
+            "pickup": 1
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "input-blocked",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "input-blocked",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "initial-pickups",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 0,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 3
+          },
+          "eventCounts": {}
+        }
+      ]
+    }
+  ]
+}

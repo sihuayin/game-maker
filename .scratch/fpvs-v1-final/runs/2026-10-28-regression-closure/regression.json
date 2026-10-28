@@ -1,0 +1,34 @@
+{
+  "format": "fpvs-regression-closure-results/v1",
+  "generatedAt": "2026-10-28T10:25:33.563Z",
+  "commands": [
+    {
+      "name": "test",
+      "command": "pnpm test",
+      "exitCode": 0,
+      "log": "regression/test.txt",
+      "summary": " Test Files  145 passed (145) ·       Tests  2160 passed (2160)"
+    },
+    {
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "log": "regression/typecheck.txt",
+      "summary": "packages/pipeline typecheck: Done · packages/mcp typecheck: Done · packages/cli typecheck: Done"
+    },
+    {
+      "name": "playtest",
+      "command": "pnpm test:playtest",
+      "exitCode": 0,
+      "log": "regression/playtest.txt",
+      "summary": "✅ 自测全绿 ·  Test Files  8 passed (8) ·       Tests  96 passed (96)"
+    },
+    {
+      "name": "acceptance",
+      "command": "FREE_ACCEPTANCE_OUT=... pnpm test:acceptance",
+      "exitCode": 0,
+      "log": "regression/acceptance.txt",
+      "summary": "免费验收闭环全绿（vitest / mechanic-probe / mechanic-coverage=satisfied）；free-acceptance/free-acceptance.json allOk=true"
+    }
+  ]
+}

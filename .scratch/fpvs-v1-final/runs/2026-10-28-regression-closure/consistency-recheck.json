@@ -1,0 +1,199 @@
+{
+  "format": "fpvs-final-acceptance-consistency/v1",
+  "generatedAt": "2026-10-28T10:25:17.715Z",
+  "subject": {
+    "run": "wasteland-scavenger-recipe/run/v1",
+    "report": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+    "reportSha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6",
+    "verdict": "pass"
+  },
+  "verdict": "pass",
+  "checksFailed": 0,
+  "checks": [
+    {
+      "id": "report.schema",
+      "pass": true,
+      "issues": []
+    },
+    {
+      "id": "delivery.present",
+      "pass": true,
+      "hasDelivery": true,
+      "hasSite": true,
+      "hasPlaytest": true,
+      "hasVisualReview": true
+    },
+    {
+      "id": "verdict.deterministic",
+      "pass": true,
+      "declared": "pass",
+      "recomputedFromChecks": "pass"
+    },
+    {
+      "id": "summary.shared-by-cli-and-mcp",
+      "pass": true,
+      "verdict": "pass",
+      "summaryVerdict": "pass",
+      "verdictLine": "✅ 交付结论：pass —— 六类检查全过、视觉已确认",
+      "note": "CLI create/build（cli.ts:361/402）与 MCP create_game（server.ts:407）都只调用这个纯函数；没有第二套 verdict 计算。"
+    },
+    {
+      "id": "playtest.mapping",
+      "pass": true,
+      "mapped": {
+        "status": "pass",
+        "detail": "SUCCESS"
+      },
+      "check": {
+        "key": "playable-smoke",
+        "status": "pass",
+        "detail": "SUCCESS"
+      },
+      "report": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "aggregate": "SUCCESS"
+    },
+    {
+      "id": "visual.mapping",
+      "pass": true,
+      "visualReview": {
+        "status": "pass",
+        "reviewer": "人（本次会话用户）",
+        "reviewedAt": "2026-10-28T08:12:51.004Z",
+        "note": "P0-06 六项人工对照通过：整体风格 / 色彩与明暗 / 角色 / 场景 / 关键物件 / 实际运行效果。材料绑定 pack/v1 · site/v1 · shell 2，真实按键通关截图 9 张（0 reset、站点字节未改），见 runs/2026-10-28-visual-review/。"
+      },
+      "visualCheck": {
+        "key": "visual-review",
+        "status": "pass"
+      },
+      "derived": "pass"
+    },
+    {
+      "id": "checks.all-pass",
+      "pass": true,
+      "checks": [
+        {
+          "key": "asset-pack",
+          "status": "pass"
+        },
+        {
+          "key": "config",
+          "status": "pass"
+        },
+        {
+          "key": "qa",
+          "status": "pass"
+        },
+        {
+          "key": "site",
+          "status": "pass"
+        },
+        {
+          "key": "playable-smoke",
+          "status": "pass",
+          "detail": "SUCCESS"
+        },
+        {
+          "key": "visual-review",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "id": "playtest.result",
+      "pass": true,
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "aggregate": "SUCCESS",
+      "outcome": "SUCCESS",
+      "won": true,
+      "collected": 6,
+      "resets": 0,
+      "identity": {
+        "scenarioFormatVersion": "playtest-scenario/v1",
+        "siteVersion": 1,
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "shellVersion": "2",
+        "harnessVersion": "playtest-harness/v1",
+        "rulesVersion": "playtest-rules/v1"
+      }
+    },
+    {
+      "id": "identity.three-way",
+      "pass": true,
+      "delivery": {
+        "pack": {
+          "packId": "wasteland-scavenger-recipe",
+          "packVersion": 1,
+          "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+        },
+        "site": {
+          "version": 1,
+          "shell": "2"
+        }
+      },
+      "playtest": {
+        "scenarioFormatVersion": "playtest-scenario/v1",
+        "siteVersion": 1,
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "shellVersion": "2",
+        "harnessVersion": "playtest-harness/v1",
+        "rulesVersion": "playtest-rules/v1"
+      },
+      "frozen": {
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "shellVersion": "2",
+        "siteVersion": 1,
+        "siteJson": {
+          "shell": "2",
+          "pack": "v1",
+          "config": "game-config.json"
+        },
+        "configFile": "run/v1/game-config.json",
+        "siteConfigFile": "site/v1/game-config.json",
+        "manifestChecksumFromReport": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "manifestFileSha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "manifestChecksumMatchesFile": true,
+        "runConfigSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "siteConfigSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "runConfigEqualsSiteConfig": true,
+        "historicalPlaytestIdentity": {
+          "scenarioFormatVersion": "playtest-scenario/v1",
+          "siteVersion": 1,
+          "packId": "wasteland-scavenger-recipe",
+          "packVersion": 1,
+          "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+          "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+          "shellVersion": "2",
+          "harnessVersion": "playtest-harness/v1",
+          "rulesVersion": "playtest-rules/v1"
+        }
+      }
+    },
+    {
+      "id": "evidence.refs-exist",
+      "pass": true,
+      "total": 8,
+      "missing": []
+    },
+    {
+      "id": "no-missing-evidence-defaults-pass",
+      "pass": true,
+      "missingPlaytestMapsTo": {
+        "status": "blocked"
+      },
+      "pendingVisualMapsTo": "incomplete",
+      "absentDeliverySummary": "⚠️ 交付结论：尚无（这份报告没有 delivery 段 —— 不算通过）"
+    },
+    {
+      "id": "report.text-consistent",
+      "pass": true,
+      "note": "报告文本的最终结论必须与 delivery.verdict 一致。"
+    }
+  ]
+}

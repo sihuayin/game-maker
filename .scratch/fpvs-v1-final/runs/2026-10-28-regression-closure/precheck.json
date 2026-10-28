@@ -1,0 +1,72 @@
+{
+  "format": "fpvs-regression-closure-precheck/v1",
+  "generatedAt": "2026-10-28T10:21:52.353Z",
+  "head": "b4f03c281d6fcedf32eed217e6388892d01d5896",
+  "snapshot": {
+    "snapshotFiles": 66,
+    "referenceFiles": 14,
+    "snapshotChanged": [],
+    "referenceChanged": []
+  },
+  "work": {
+    "changedVsSnapshot": [
+      "run/v1/qa-report.json"
+    ]
+  },
+  "selfTest": {
+    "dir": ".scratch/playtest-v1/runs/2026-10-28-self-test",
+    "trackedFiles": 22,
+    "hashes": {
+      "gate/config-gate-missing.json": "sha256:29b4ac87a141487a1fca717229a4c98cd60925c6ce40be2ec83128686b01d323",
+      "hazard-legacy/reset-1.png": "sha256:01d1fdaeb656052d8ee97910c4418a3f42a19fb8fd744dbc32368d9191fe70e7",
+      "report/attempt-v1/failure-missing-pickup/console.json": "sha256:f4509357e768dd0422437b3b5eb93d3afb657d47699015974c6eab10efce9ab5",
+      "report/attempt-v1/failure-missing-pickup/events.jsonl": "sha256:8fd438b671aad2ee1f888e3ed6d1fb46cde58d83ae18a693d91e4e59fffbdcfb",
+      "report/attempt-v1/failure-missing-pickup/exceptions.json": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "report/attempt-v1/failure-missing-pickup/input.jsonl": "sha256:dac617636e017768cb5cba6775bb240c0bf583fb995345a62732dc56a182dda0",
+      "report/attempt-v1/failure-missing-pickup/setup.json": "sha256:e0a26204b3378a655e5f419c5cfa6d4a0374f04e19234aeadd88663b0fd759f6",
+      "report/attempt-v1/failure-missing-pickup/trace.jsonl": "sha256:7548e583b462b2cc83a404ef5db9a84697157d3809ff16996e9cd93a4abef70a",
+      "report/attempt-v1/input-blocked/console.json": "sha256:f4509357e768dd0422437b3b5eb93d3afb657d47699015974c6eab10efce9ab5",
+      "report/attempt-v1/input-blocked/events.jsonl": "sha256:1ba5eab64a70e7a4c6b4ba8e918bf4087f215a998a1e36abe589d946a3dd489f",
+      "report/attempt-v1/input-blocked/exceptions.json": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "report/attempt-v1/input-blocked/input.jsonl": "sha256:3cd59b58a2a0ce9e5a3dc4ac043fc37697b7d8a6c433690a400c03f84bd1bbaf",
+      "report/attempt-v1/input-blocked/setup.json": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2",
+      "report/attempt-v1/input-blocked/trace.jsonl": "sha256:ee75f6c711d883321228d3d195ef37a86dae05cc0779d77b2d9337a8c9cfbffc",
+      "report/attempt-v1/result.json": "sha256:fae85c8c98e7716d24e27d52984b5c987374c98677ab7e532fee33b0ef0a49f9",
+      "report/attempt-v1/site-integrity.json": "sha256:4b16e83b320025373eff957dae8008bd2908f97ff36341c661a1dcca7d073f50",
+      "report/determinism.json": "sha256:c9083c6f8f92302bc3745c2d20869f58dafb815df19dd7da1da9271da9acab29",
+      "report/rejections.json": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "report/summary.json": "sha256:ef4528b21feb9cfa977c0bcfa561ffb205fa81ae9b152ac1245e0fca91f4d4bd",
+      "scenarios/failure-missing-pickup.json": "sha256:1e5d8f298e62c52238a451685f2077168e476e9b0a331e8359c4ce1b16146320",
+      "scenarios/input-blocked.json": "sha256:d5c2ef3e01236f3eceb94ba44af7ed96d598b06d4267df598dc980affa99586b",
+      "summary.json": "sha256:caa848184fa7b42b10c2aad847990b1edd9f898ae04779a3effaea8679170f16"
+    },
+    "ignoredOut": true
+  },
+  "constraints": {
+    "codeChanges": [
+      "CONTEXT.md",
+      "docs/v7.5/demo.md",
+      "packages/cli/src/cli.ts",
+      "packages/cli/src/playtest.ts",
+      "packages/cli/tests/cli.test.ts",
+      "packages/cli/tests/playtest-scenario-dir.test.ts",
+      "packages/contracts/tests/delivery.test.ts",
+      "packages/contracts/tests/playtest-attribution.test.ts",
+      "packages/contracts/tests/playtest.test.ts",
+      "packages/demo/probe/playtest/README.md",
+      "packages/demo/probe/playtest/observe.mjs",
+      "packages/demo/probe/playtest/policy.mjs",
+      "packages/demo/probe/playtest/runner.mjs",
+      "packages/demo/probe/playtest/tests/observe.test.mjs",
+      "packages/demo/probe/playtest/tests/policy.test.mjs",
+      "packages/demo/probe/probe-harness.mjs",
+      "packages/pipeline/tests/delivery.test.ts"
+    ],
+    "contractsSrcChanges": [],
+    "mcpSrcChanges": [],
+    "depsChanges": [],
+    "deletedFiles": [],
+    "testDeletions": [],
+    "gitStatus": ""
+  }
+}

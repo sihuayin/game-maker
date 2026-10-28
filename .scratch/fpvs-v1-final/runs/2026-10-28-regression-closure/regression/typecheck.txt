@@ -1,0 +1,25 @@
+
+> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker
+> tsc -b && pnpm -r --if-present typecheck
+
+Scope: 10 of 11 workspace projects
+packages/contracts typecheck$ tsc -p tsconfig.spec.json
+packages/contracts typecheck: Done
+packages/assets typecheck$ tsc -p tsconfig.spec.json
+packages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json
+packages/game-design typecheck$ tsc -p tsconfig.spec.json
+packages/qa typecheck$ tsc -p tsconfig.spec.json
+packages/qa typecheck: Done
+packages/vision typecheck$ tsc -p tsconfig.spec.json
+packages/game-design typecheck: Done
+packages/vision typecheck: Done
+packages/assets typecheck: Done
+packages/demo typecheck: Done
+packages/visual-design typecheck$ tsc -p tsconfig.spec.json
+packages/visual-design typecheck: Done
+packages/pipeline typecheck$ tsc -p tsconfig.spec.json
+packages/pipeline typecheck: Done
+packages/cli typecheck$ tsc -p tsconfig.spec.json
+packages/mcp typecheck$ tsc -p tsconfig.spec.json
+packages/mcp typecheck: Done
+packages/cli typecheck: Done

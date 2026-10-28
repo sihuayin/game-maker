@@ -1,0 +1,26 @@
+
+> game-maker@0.0.0 test:acceptance /Volumes/shy/some-projects/game-maker
+> pnpm build && node packages/demo/probe/free-acceptance.mjs
+
+
+> game-maker@0.0.0 build /Volumes/shy/some-projects/game-maker
+> tsc -b && pnpm -r --if-present bundle
+
+Scope: 10 of 11 workspace projects
+packages/demo bundle$ esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js
+packages/demo bundle:   dist/shell.js  1.6mb ⚠️
+packages/demo bundle: ⚡ Done in 1042ms
+packages/demo bundle: Done
+packages/cli bundle$ esbuild src/cli.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/cli.mjs --external:vite --external:phaser
+packages/mcp bundle$ esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser
+packages/cli bundle:   dist/cli.mjs  1.5mb ⚠️
+packages/cli bundle: ⚡ Done in 678ms
+packages/mcp bundle:   dist/server.mjs  1.4mb ⚠️
+packages/mcp bundle: ⚡ Done in 678ms
+packages/cli bundle: Done
+packages/mcp bundle: Done
+✅ vitest
+✅ mechanic-probe
+✅ mechanic-coverage · satisfied
+
+✅ 免费验收闭环全绿 —— 证据在 /Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance

@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-10-28T10:24:49.003Z",
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance",
+  "allOk": true,
+  "checks": [
+    {
+      "name": "vitest",
+      "ok": true
+    },
+    {
+      "name": "mechanic-probe",
+      "ok": true
+    },
+    {
+      "name": "mechanic-coverage",
+      "ok": true,
+      "verdict": "satisfied"
+    }
+  ]
+}

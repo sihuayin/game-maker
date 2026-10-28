@@ -1,0 +1,46 @@
+
+> game-maker@0.0.0 test:playtest /Volumes/shy/some-projects/game-maker
+> pnpm build && node packages/demo/probe/playtest/self-test.mjs && vitest run packages/contracts/tests/playtest-attribution.test.ts packages/contracts/tests/playtest-baseline.test.ts packages/contracts/tests/playtest.test.ts packages/pipeline/tests/playtest.test.ts packages/pipeline/tests/playtest-baseline.test.ts packages/demo/probe/playtest/tests
+
+
+> game-maker@0.0.0 build /Volumes/shy/some-projects/game-maker
+> tsc -b && pnpm -r --if-present bundle
+
+Scope: 10 of 11 workspace projects
+packages/demo bundle$ esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js
+packages/demo bundle:   dist/shell.js  1.6mb ⚠️
+packages/demo bundle: ⚡ Done in 709ms
+packages/demo bundle: Done
+packages/mcp bundle$ esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser
+packages/cli bundle$ esbuild src/cli.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/cli.mjs --external:vite --external:phaser
+packages/cli bundle:   dist/cli.mjs  1.5mb ⚠️
+packages/cli bundle: ⚡ Done in 61ms
+packages/mcp bundle:   dist/server.mjs  1.4mb ⚠️
+packages/mcp bundle: ⚡ Done in 61ms
+packages/mcp bundle: Done
+packages/cli bundle: Done
+Playtest self-test · 证据 /Volumes/shy/some-projects/game-maker/.scratch/playtest-v1/runs/2026-10-28-self-test
+✅ gate · 按预期在装配期拒绝：装配期校验不过 —— 硬失败，不产出站点（1 条）：
+  · objective.gate: 找不到 id 为 "no-such-gate-for-self-test" 的 goal 实体（现有 goal：extraction）
+✅ pickup · initialActivePickups=2 · missing-pickup=fail
+✅ input · progress=0.0px · termination=false
+✅ hazard-legacy · 旧实现按预期在 reset-floor 失败：重置后 30 帧内 body.bottom 最大 379.50 > floorY+1 (251.00)；重置后 30 帧内 onFloor 没有变真
+
+✅ 自测全绿
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 3ms
+ ✓ packages/demo/probe/playtest/tests/policy.test.mjs (11 tests) 7ms
+ ✓ packages/contracts/tests/playtest-attribution.test.ts (14 tests) 3ms
+ ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 6ms
+ ✓ packages/contracts/tests/playtest.test.ts (33 tests) 21ms
+ ✓ packages/demo/probe/playtest/tests/scenarios.test.mjs (4 tests) 5ms
+ ✓ packages/pipeline/tests/playtest-baseline.test.ts (6 tests) 19ms
+ ✓ packages/pipeline/tests/playtest.test.ts (6 tests) 21ms
+
+ Test Files  8 passed (8)
+      Tests  96 passed (96)
+   Start at  18:23:23
+   Duration  873ms (transform 833ms, setup 0ms, collect 2.49s, tests 86ms, environment 1ms, prepare 1.76s)
+
