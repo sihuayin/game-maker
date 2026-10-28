@@ -1,0 +1,103 @@
+{
+  "format": "fpvs-visual-review-record/v1",
+  "reviewedAt": "2026-10-28T08:12:51.004Z",
+  "reviewer": "人（本次会话用户）",
+  "reviewType": "human",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "work": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe"
+  },
+  "materials": {
+    "index": "materials.json",
+    "reference": [
+      ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/reference.png",
+      ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/style.png"
+    ],
+    "deliveredAssets": [
+      "assets/character-frames.png",
+      "assets/patroller-frames.png",
+      "assets/objects-frames.png",
+      "assets/background-frames.png"
+    ],
+    "runningScreenshots": [
+      "shots/01-startup.png",
+      "shots/02-movement.png",
+      "shots/03-jump.png",
+      "shots/04-pickup.png",
+      "shots/05-chest-open.png",
+      "shots/06-hazard-wait.png",
+      "shots/07-hazard-cross.png",
+      "shots/08-goal.png",
+      "shots/09-final.png"
+    ],
+    "runEvidence": ["capture.json", "events.jsonl", "trace.jsonl", "input.jsonl", "console.json", "exceptions.json"],
+    "existingVisualQa": "materials.json → existingVisualQa（QA 视觉通道 unavailable；2 条尺寸 warning，不阻断）"
+  },
+  "items": [
+    {
+      "id": "overall-style",
+      "question": "游戏画面的整体美术表达是否与参考图一致",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": ["reference.png", "assets/reference-vs-gameplay.png", "shots/01-startup.png", "shots/08-goal.png"]
+    },
+    {
+      "id": "color-light",
+      "question": "主色调、对比关系及明暗分布是否存在明显偏差",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": ["reference.png", "assets/background-frames.png", "assets/reference-vs-gameplay.png"]
+    },
+    {
+      "id": "character",
+      "question": "玩家角色的外观、轮廓和视觉表达是否符合预期",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": ["assets/character-frames.png", "assets/player-in-game.png"]
+    },
+    {
+      "id": "scene",
+      "question": "背景、地形及环境元素是否符合参考图风格",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": ["assets/background-frames.png", "shots/01-startup.png", "shots/05-chest-open.png"]
+    },
+    {
+      "id": "key-objects",
+      "question": "宝箱、收集物、危险物等关键资源是否符合游戏意图",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": ["assets/patroller-frames.png", "assets/objects-frames.png", "shots/05-chest-open.png", "shots/06-hazard-wait.png"]
+    },
+    {
+      "id": "runtime-rendering",
+      "question": "资源在游戏中是否出现明显裁切、比例异常、错位或其他影响体验的问题",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。注：截图上下边缘是 Chrome 视口裁切（游戏 480×270 以 zoom 2 渲染为 960×540），不是游戏内裁切。",
+      "evidence": ["shots/01-startup.png", "shots/03-jump.png", "shots/07-hazard-cross.png", "shots/08-goal.png", "assets/player-in-game.png"]
+    }
+  ],
+  "overall": "pass",
+  "problems": [],
+  "constraints": {
+    "historicalPassSubstituted": false,
+    "missingMaterials": [],
+    "versionMismatch": false,
+    "note": "本轮材料全部绑定 FA-01 冻结版本；历史阶段C 的 visual PASS 仅作参考，未继承。"
+  },
+  "deliveryBinding": {
+    "writtenBy": "packages/cli review-verdict → writeVisualReviewToReport",
+    "report": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+    "visualReviewStatus": "pass",
+    "visualReviewCheck": "pass",
+    "playableSmokeCheck": "pass (SUCCESS)",
+    "verdict": "pass",
+    "snapshotZeroWrites": true
+  }
+}

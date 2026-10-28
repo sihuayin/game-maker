@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>FA-04 · P0-06 视觉人工审核材料</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #16181d; color: #e8e8ea; font: 15px/1.65 -apple-system, "PingFang SC", "Hiragino Sans GB", sans-serif; }
+  main { max-width: 1220px; margin: 0 auto; padding: 32px 28px 80px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 44px 0 12px; padding-top: 18px; border-top: 1px solid #2c3038; }
+  h3 { font-size: 16px; margin: 24px 0 8px; color: #cfd3da; }
+  p, li { color: #c6cad2; }
+  .muted { color: #8b929e; font-size: 13px; }
+  .warn { color: #f0b35b; }
+  .ok { color: #77c98a; }
+  .bad { color: #f17d7d; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0 6px; }
+  th, td { border: 1px solid #343943; padding: 7px 9px; text-align: left; vertical-align: top; font-size: 13.5px; }
+  th { background: #22262d; color: #dfe3ea; font-weight: 600; }
+  code { background: #23272f; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  figure { margin: 14px 0 22px; }
+  figure img { display: block; max-width: 100%; border: 1px solid #2c3038; background: #0d0f12; }
+  figcaption { font-size: 13px; color: #9aa1ac; margin-top: 6px; }
+  .pixel { image-rendering: pixelated; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .judge { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .judge td:last-child { height: 44px; }
+  .badge { display: inline-block; padding: 1px 7px; border: 1px solid #3a404b; border-radius: 999px; font-size: 12px; color: #b9c0cb; }
+  a { color: #8cc4ff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>FA-04 · P0-06 视觉一致性人工审核</h1>
+  <p class="muted">材料绑定 FA-01 冻结的最终验收版本。审核者：<strong>人类（本会话用户）</strong>；本页只准备材料，不替人判断。</p>
+
+  <h2>0. 审核对象身份</h2>
+  <table>
+    <tr><th>项</th><th>值</th></tr>
+    <tr><td>游戏 / 包</td><td><code>wasteland-scavenger-recipe</code> · <code>pack/v1</code></td></tr>
+    <tr><td>站点 / shell</td><td><code>site/v1</code> · shell <code>2</code> · <code>site.json</code> = pack <code>v1</code> / config <code>game-config.json</code></td></tr>
+    <tr><td>配置</td><td><code>site/v1/game-config.json</code>（= run 的 <code>game-config.json</code>）</td></tr>
+    <tr><td>manifest checksum</td><td><code>sha256:a162942d…feb3</code></td></tr>
+    <tr><td>config checksum</td><td><code>sha256:455d9c7f…7dcd</code></td></tr>
+    <tr><td>只读快照</td><td><code>.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/</code>（66 文件，<code>chmod -R a-w</code>）</td></tr>
+    <tr><td>可写工作区（本次截图来源）</td><td><code>.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/</code>（site/pack/config 与快照逐字节一致）</td></tr>
+    <tr><td>运行证据</td><td><code>shots/</code>（真实按键 · 通关 · 0 reset · 站点字节未改）· <code>capture.json</code> · <code>events/trace/input</code></td></tr>
+    <tr><td>材料索引 / 哈希</td><td><code>materials.json</code>（逐文件 sha256；源材料对快照 <span class="ok">frozen match</span>）</td></tr>
+  </table>
+  <p class="muted">说明：<code>qa-report.json</code> 的 work 版比快照只多 FA-02 的 <code>delivery</code> 写回；QA 层（含视觉相关 failures/observations）与快照字节一致（见 <code>materials.json → existingVisualQa.qaReportBinding</code>）。</p>
+
+  <h2>1. 原始风格参考图</h2>
+  <figure>
+    <img class="pixel" src="../../work/wasteland-scavenger-recipe/run/v1/reference.png" style="width:960px;max-width:100%" alt="style reference">
+    <figcaption><code>run/v1/reference.png</code> · 480×270 · 与 <code>style.png</code> 同字节（sha256:76ed648e…89d0）</figcaption>
+  </figure>
+  <p><strong>输入意图</strong>：制作一个横版废土寻宝游戏；拾荒者在废弃城市探索、寻找资源和宝箱、躲避危险和敌人。风格：2D 横版像素、废土 / 废弃车站、低分辨率块状精灵、干净平坦色块。</p>
+
+  <h2>2. 实际交付的资源包（关键资源）</h2>
+  <p class="muted">以下均为 <code>pack/v1/delivery/</code> 的真实交付图集帧（不是源图 / master）；图集帧在游戏里按 2× 显示。</p>
+  <h3>角色 · scavenger-hero（idle / run / jump）</h3>
+  <figure><img class="pixel" src="assets/character-frames.png" alt="character frames"><figcaption>10 帧 · 24×32 · 8×</figcaption></figure>
+  <h3>巡逻危险物 · wasteland-patroller</h3>
+  <figure><img class="pixel" src="assets/patroller-frames.png" alt="patroller frames"><figcaption>6 帧 · 24×32 · 8×</figcaption></figure>
+  <h3>宝箱 / 收集物 / 平台 / HUD</h3>
+  <figure><img class="pixel" src="assets/objects-frames.png" alt="objects frames"><figcaption>chest 32×32 · platform 32×32 · scraps 16×16 · hud-panel 64×64 · hud-icon 16×16 · 6×</figcaption></figure>
+  <h3>背景层（sky / ruins / wall / railway）</h3>
+  <figure><img class="pixel" src="assets/background-frames.png" alt="background frames"><figcaption>4 层 · 480×270 · 1×</figcaption></figure>
+
+  <h2>3. 实际运行画面（冻结站点 · 真实按键）</h2>
+  <p class="muted">截图 1000×457（Chrome 视口）；游戏 480×270 以 zoom 2 渲染为 960×540，上下被视口裁切。运行结果：<span class="ok">won=true · collected=6 · chests=2 · reset=0 · runtime-error=0</span>；站点字节前后未改（见 <code>capture.json → siteIntegrity</code>）。</p>
+  <div class="grid">
+    <figure><img src="shots/01-startup.png" alt="startup"><figcaption>01 启动 · 出生点 / HUD / 背景（t=5.8s）</figcaption></figure>
+    <figure><img src="shots/02-movement.png" alt="movement"><figcaption>02 移动 · 已收集 1 件（t=7.7s）</figcaption></figure>
+    <figure><img src="shots/03-jump.png" alt="jump"><figcaption>03 跳跃 · 空中（t=7.9s）</figcaption></figure>
+    <figure><img src="shots/04-pickup.png" alt="pickup"><figcaption>04 收集 · 拾取后（t=7.7s）</figcaption></figure>
+    <figure><img src="shots/06-hazard-wait.png" alt="hazard wait"><figcaption>06 危险物 · 巡逻带外沿等待（t=9.0s）</figcaption></figure>
+    <figure><img src="shots/07-hazard-cross.png" alt="hazard cross"><figcaption>07 危险物 · 空中越过巡逻怪（t=10.3s）</figcaption></figure>
+    <figure><img src="shots/05-chest-open.png" alt="chest"><figcaption>05 宝箱 · 开启后（收集 3 件，t=12.2s）</figcaption></figure>
+    <figure><img src="shots/08-goal.png" alt="goal"><figcaption>08 到达目标 · won=true（t=22.5s）</figcaption></figure>
+  </div>
+  <figure><img class="pixel" src="assets/player-in-game.png" alt="player in game"><figcaption>实际运行中的玩家（截图裁剪 · 5×）：启动 / 跳跃 / 越障 / 宝箱 / 到达目标</figcaption></figure>
+  <figure><img class="pixel" src="assets/hud-in-game.png" alt="hud in game"><figcaption>实际运行中的 HUD（到达目标时 · 3×）</figcaption></figure>
+  <figure><img class="pixel" src="assets/reference-vs-gameplay.png" alt="reference vs gameplay"><figcaption>参考图（左） vs 实际运行画面（右）</figcaption></figure>
+
+  <h2>4. 已有 Visual QA 结果与问题记录（辅助，不替代人工判断）</h2>
+  <p class="muted">QA 的视觉观察通道为 <code>unavailable</code>（未配置视觉上游）。以下是 QA 层已有记录：</p>
+  <table>
+    <tr><th>target</th><th>记录</th><th>严重度</th></tr>
+    <tr><td>wasteland-patroller</td><td>视觉设计构图 16×16，配置几何 24×32 —— 尺寸有差（只报、不阻断）</td><td>warning</td></tr>
+    <tr><td>wasteland-chest</td><td>视觉设计构图 16×16，配置几何 32×32 —— 尺寸有差（只报、不阻断）</td><td>warning</td></tr>
+  </table>
+  <p class="muted">设计意图（<code>visual-world.json</code>）：整体为“低到中等密度、干净水平分层”的 flat pixel art；背景层覆盖率 sky 100% / ruins 58.5% / wall 45.1% / railway（见 <code>run/v1/qa-report.json</code> inspect 观察）。</p>
+  <p class="muted">源图 → 目标尺寸的长宽比观察（不阻断）：hero jump −10.2%、patroller walk +18.5%、patroller idle +8.4%，其余 ≤4.3%。</p>
+
+  <h2>5. 请人类逐项判断（FR-04 表）</h2>
+  <p>每项填写：<strong>通过 / 不通过 / 无法确认</strong> + 理由 + 证据。所有材料均绑定上面的最终版本；缺失项必须标“无法确认”，不得用历史 PASS 替代。</p>
+  <table class="judge">
+    <tr><th style="width:16%">检查项</th><th style="width:26%">判断问题</th><th style="width:14%">结论</th><th>主要理由 / 已发现问题 / 证据</th></tr>
+    <tr><td>整体风格</td><td>游戏画面的整体美术表达是否与参考图一致</td><td></td><td></td></tr>
+    <tr><td>色彩与明暗</td><td>主色调、对比关系及明暗分布是否存在明显偏差</td><td></td><td></td></tr>
+    <tr><td>角色</td><td>玩家角色的外观、轮廓和视觉表达是否符合预期</td><td></td><td></td></tr>
+    <tr><td>场景</td><td>背景、地形及环境元素是否符合参考图风格</td><td></td><td></td></tr>
+    <tr><td>关键物件</td><td>宝箱、收集物、危险物等关键资源是否符合游戏意图</td><td></td><td></td></tr>
+    <tr><td>实际运行效果</td><td>资源在游戏中是否出现明显裁切、比例异常、错位或其他影响体验的问题</td><td></td><td></td></tr>
+  </table>
+  <p class="muted">总体结论：全部通过 → <code>pass</code>；任一明确不通过 → <code>fail</code>；材料不完整 / 版本不匹配 / 无法可靠判断 → <code>incomplete</code>。</p>
+
+  <h2>6. 审核记录</h2>
+  <table>
+    <tr><th>被审核版本</th><td><code>wasteland-scavenger-recipe</code> pack/v1 · site/v1 · shell 2 · config sha256:455d9c7f…7dcd</td></tr>
+    <tr><th>参考图</th><td><code>run/v1/reference.png</code>（= style.png）</td></tr>
+    <tr><th>运行画面</th><td><code>shots/01..09</code>（真实按键通关，0 reset，站点字节未改）</td></tr>
+    <tr><th>审核结果</th><td>（待人类填写）</td></tr>
+    <tr><th>主要判断理由</th><td>（待人类填写）</td></tr>
+    <tr><th>已发现问题与证据</th><td>（待人类填写）</td></tr>
+    <tr><th>审核时间 / 审核者</th><td>（待人类填写）</td></tr>
+  </table>
+</main>
+</body>
+</html>

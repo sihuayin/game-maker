@@ -1,0 +1,256 @@
+{
+  "format": "fpvs-visual-review-capture/v1",
+  "generatedAt": "2026-10-28T05:59:22.690Z",
+  "subject": {
+    "siteDir": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1",
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+  },
+  "run": {
+    "scenario": "acceptance-win-wasteland-v1",
+    "won": true,
+    "collected": 6,
+    "chestsOpened": 2,
+    "resets": 0,
+    "runtimeErrors": 0,
+    "steps": 434,
+    "durationMs": 22594
+  },
+  "shots": [
+    {
+      "file": "shots/01-startup.png",
+      "t": 5817,
+      "tag": "startup",
+      "state": {
+        "x": 40,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 0,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 402,
+            "y": 240
+          },
+          {
+            "x": 783.7,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/02-movement.png",
+      "t": 7683,
+      "tag": "moving right",
+      "state": {
+        "x": 200.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 354.5,
+            "y": 240
+          },
+          {
+            "x": 769.2,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/04-pickup.png",
+      "t": 7732,
+      "tag": "pickup collected",
+      "state": {
+        "x": 200.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 354.5,
+            "y": 240
+          },
+          {
+            "x": 769.2,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/03-jump.png",
+      "t": 7866,
+      "tag": "airborne (platform/jump)",
+      "state": {
+        "x": 217,
+        "y": 220.5,
+        "bottom": 220.5,
+        "onFloor": false,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 342.3,
+            "y": 240
+          },
+          {
+            "x": 756.7,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/06-hazard-wait.png",
+      "t": 8952,
+      "tag": "waiting outside patrol band",
+      "state": {
+        "x": 314.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 409.9,
+            "y": 240
+          },
+          {
+            "x": 757.6,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/07-hazard-cross.png",
+      "t": 10286,
+      "tag": "airborne over patroller",
+      "state": {
+        "x": 326.5,
+        "y": 220.5,
+        "bottom": 220.5,
+        "onFloor": false,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 381.2,
+            "y": 240
+          },
+          {
+            "x": 831,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/05-chest-open.png",
+      "t": 12150,
+      "tag": "chest opened",
+      "state": {
+        "x": 472.5,
+        "y": 190,
+        "bottom": 190,
+        "onFloor": true,
+        "collected": 3,
+        "won": false,
+        "chestsOpened": 1,
+        "hazards": [
+          {
+            "x": 423.2,
+            "y": 240
+          },
+          {
+            "x": 737,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/08-goal.png",
+      "t": 22499,
+      "tag": "goal reached",
+      "state": {
+        "x": 1369.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 6,
+        "won": true,
+        "chestsOpened": 2,
+        "hazards": [
+          {
+            "x": 366.8,
+            "y": 240
+          },
+          {
+            "x": 726.7,
+            "y": 240
+          }
+        ]
+      }
+    },
+    {
+      "file": "shots/09-final.png",
+      "t": 22548,
+      "tag": "final state",
+      "state": {
+        "x": 1369.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 6,
+        "won": true,
+        "chestsOpened": 2,
+        "hazards": [
+          {
+            "x": 363.5,
+            "y": 240
+          },
+          {
+            "x": 730.1,
+            "y": 240
+          }
+        ]
+      }
+    }
+  ],
+  "siteIntegrity": {
+    "before": {
+      "game-config.json": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "index.html": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+      "shell.js": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+      "site.json": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    },
+    "after": {
+      "game-config.json": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "index.html": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+      "shell.js": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+      "site.json": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    },
+    "unchanged": true
+  }
+}

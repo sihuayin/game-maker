@@ -140,6 +140,16 @@ Effort: fpvs-v1-final
   `pnpm test` 2160/145 + typecheck + `test:playtest` self-test 4/4 + 96 测试绿。
   报告：[runs/2026-10-28-attribution/README.md](runs/2026-10-28-attribution/README.md)。
   → 前沿移至 FA-04（视觉人工审核）与最终汇总。
+- [FA-04 视觉人工审核](issues/08-visual-review.md)：**已收口** —— 材料全部绑定 FA-01 冻结版本
+  （pack/v1 · site/v1 · shell 2；reference/deliveredAssets 对快照 frozen match；qa-report 只多
+  FA-02 的 delivery，QA 层字节一致）；`materials.json` 逐文件 sha256（17 源 + 27 生成）；
+  `capture.mjs` 从冻结站点真实按键实拍 9 张运行画面（通关、0 reset、站点字节未改），
+  资源图集帧 8×/6×/1× 放大 + 已有 Visual QA 记录；人类六项（整体风格 / 色彩与明暗 / 角色 /
+  场景 / 关键物件 / 实际运行效果）**全部 pass**，未提出具体问题，历史阶段C PASS 未继承。
+  `review-verdict --verdict pass` 写回：`visual-review=pass`、六项检查全 pass、
+  `delivery.verdict=pass`；快照零写入。逐项记录 `review-record.json`；
+  报告：[runs/2026-10-28-visual-review/README.md](runs/2026-10-28-visual-review/README.md)。
+  → 解除 FA-05 阻塞（06/07/08/05 全部满足）。
 
 ## Not yet specified
 
@@ -153,6 +163,8 @@ Effort: fpvs-v1-final
   FR-03 补 7 个离线用例；唯一遗留是规则 ④ 的**潜在**误归因路径（未触发，改语义待审批）。
 - **最终 verdict 非 pass 时的「未解决项 / 限制」结构**：逐项证据引用、缺口、阻塞原因
   （取决于最终结果是 fail / blocked / incomplete 中的哪一种）。
+  **已由 FA-04 回答 = 本轮 `delivery.verdict = pass`**：六项检查全 pass、视觉人工审核 pass；
+  「非 pass 结构」不触发，FA-05 仍按 §8 清单逐项列限制/证据（含危险物接触间接证据等措辞）。
 - **若 FA-03 产出新版本产物，需要重做哪些取证**：试玩、视觉、报告的身份重绑范围
   （取决于缺陷是否出现及修复层级）。
   **已由 FA-03 回答 = 不适用**：没有新版本产物，验收对象仍是 FA-01 冻结的 `pack/v1 · site/v1 · shell 2`。

@@ -1,0 +1,604 @@
+{
+  "format": "fpvs-visual-review-materials/v1",
+  "generatedAt": "2026-10-28T08:13:55.648Z",
+  "subject": {
+    "work": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe",
+    "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "siteJson": {
+      "shell": "2",
+      "pack": "v1",
+      "config": "game-config.json"
+    }
+  },
+  "capture": {
+    "run": {
+      "scenario": "acceptance-win-wasteland-v1",
+      "won": true,
+      "collected": 6,
+      "chestsOpened": 2,
+      "resets": 0,
+      "runtimeErrors": 0,
+      "steps": 434,
+      "durationMs": 22594
+    },
+    "siteIntegrity": {
+      "before": {
+        "game-config.json": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "index.html": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+        "shell.js": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+        "site.json": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+      },
+      "after": {
+        "game-config.json": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "index.html": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+        "shell.js": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+        "site.json": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+      },
+      "unchanged": true
+    },
+    "shots": [
+      {
+        "file": "shots/01-startup.png",
+        "t": 5817,
+        "tag": "startup",
+        "state": {
+          "x": 40,
+          "y": 240,
+          "bottom": 240,
+          "onFloor": true,
+          "collected": 0,
+          "won": false,
+          "chestsOpened": 0,
+          "hazards": [
+            {
+              "x": 402,
+              "y": 240
+            },
+            {
+              "x": 783.7,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/02-movement.png",
+        "t": 7683,
+        "tag": "moving right",
+        "state": {
+          "x": 200.5,
+          "y": 240,
+          "bottom": 240,
+          "onFloor": true,
+          "collected": 1,
+          "won": false,
+          "chestsOpened": 0,
+          "hazards": [
+            {
+              "x": 354.5,
+              "y": 240
+            },
+            {
+              "x": 769.2,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/04-pickup.png",
+        "t": 7732,
+        "tag": "pickup collected",
+        "state": {
+          "x": 200.5,
+          "y": 240,
+          "bottom": 240,
+          "onFloor": true,
+          "collected": 1,
+          "won": false,
+          "chestsOpened": 0,
+          "hazards": [
+            {
+              "x": 354.5,
+              "y": 240
+            },
+            {
+              "x": 769.2,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/03-jump.png",
+        "t": 7866,
+        "tag": "airborne (platform/jump)",
+        "state": {
+          "x": 217,
+          "y": 220.5,
+          "bottom": 220.5,
+          "onFloor": false,
+          "collected": 1,
+          "won": false,
+          "chestsOpened": 0,
+          "hazards": [
+            {
+              "x": 342.3,
+              "y": 240
+            },
+            {
+              "x": 756.7,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/06-hazard-wait.png",
+        "t": 8952,
+        "tag": "waiting outside patrol band",
+        "state": {
+          "x": 314.5,
+          "y": 240,
+          "bottom": 240,
+          "onFloor": true,
+          "collected": 1,
+          "won": false,
+          "chestsOpened": 0,
+          "hazards": [
+            {
+              "x": 409.9,
+              "y": 240
+            },
+            {
+              "x": 757.6,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/07-hazard-cross.png",
+        "t": 10286,
+        "tag": "airborne over patroller",
+        "state": {
+          "x": 326.5,
+          "y": 220.5,
+          "bottom": 220.5,
+          "onFloor": false,
+          "collected": 1,
+          "won": false,
+          "chestsOpened": 0,
+          "hazards": [
+            {
+              "x": 381.2,
+              "y": 240
+            },
+            {
+              "x": 831,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/05-chest-open.png",
+        "t": 12150,
+        "tag": "chest opened",
+        "state": {
+          "x": 472.5,
+          "y": 190,
+          "bottom": 190,
+          "onFloor": true,
+          "collected": 3,
+          "won": false,
+          "chestsOpened": 1,
+          "hazards": [
+            {
+              "x": 423.2,
+              "y": 240
+            },
+            {
+              "x": 737,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/08-goal.png",
+        "t": 22499,
+        "tag": "goal reached",
+        "state": {
+          "x": 1369.5,
+          "y": 240,
+          "bottom": 240,
+          "onFloor": true,
+          "collected": 6,
+          "won": true,
+          "chestsOpened": 2,
+          "hazards": [
+            {
+              "x": 366.8,
+              "y": 240
+            },
+            {
+              "x": 726.7,
+              "y": 240
+            }
+          ]
+        }
+      },
+      {
+        "file": "shots/09-final.png",
+        "t": 22548,
+        "tag": "final state",
+        "state": {
+          "x": 1369.5,
+          "y": 240,
+          "bottom": 240,
+          "onFloor": true,
+          "collected": 6,
+          "won": true,
+          "chestsOpened": 2,
+          "hazards": [
+            {
+              "x": 363.5,
+              "y": 240
+            },
+            {
+              "x": 730.1,
+              "y": 240
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "existingVisualQa": {
+    "status": "review observation unavailable（无视觉上游）；以下为 QA 层已有记录，不替代本轮人工审核",
+    "qaReportBinding": {
+      "snapshotHasDelivery": false,
+      "workHasDelivery": true,
+      "qaLayerIdentical": true,
+      "note": "work 的 qa-report 只多了 FA-02 的 delivery 写回；QA 层（含视觉相关 failures/observations）与冻结快照一致。"
+    },
+    "failures": [
+      {
+        "target": "wasteland-patroller",
+        "detail": "视觉设计里 \"wasteland-patroller\" 的构图为 16×16，配置几何为 24×32 —— 尺寸有差（只报、不阻断）",
+        "severity": "warning",
+        "judgement": "visual-config-coherence"
+      },
+      {
+        "target": "wasteland-chest",
+        "detail": "视觉设计里 \"wasteland-chest\" 的构图为 16×16，配置几何为 32×32 —— 尺寸有差（只报、不阻断）",
+        "severity": "warning",
+        "judgement": "visual-config-coherence"
+      }
+    ],
+    "observations": [
+      {
+        "source": "inspect",
+        "outcome": "ok",
+        "lines": [
+          "wasteland-scavenger-recipe v1 · generated",
+          "8 个资源 · 4 张图集",
+          "  scavenger-hero · animation · 24×32 · generated/quantized · 10 帧 · 动画 idle(4) run(4) jump(2) · 用色 11/16",
+          "  wasteland-patroller · animation · 24×32 · generated/quantized · 6 帧 · 动画 walk(4) idle(2) · 用色 10/16",
+          "  wasteland-chest · sprite · 32×32 · generated/quantized · 1 帧 · 用色 13/16",
+          "  wasteland-scraps · sprite · 16×16 · generated/quantized · 1 帧 · 用色 15/16",
+          "  wasteland-platform-tile · sprite · 32×32 · generated/quantized · 1 帧 · 用色 10/16",
+          "  wasteland-bg · background · 480×270 · generated/quantized · 4 帧 · 用色 15/16",
+          "  hud-panel · ui · 64×64 · generated/exact · 1 帧 · 用色 11/16",
+          "  hud-icon-scrap · ui · 16×16 · generated/exact · 1 帧 · 用色 10/16",
+          "源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：",
+          "  scavenger-hero.idle            源图 896×1200 (0.747) → 目标 48×64 (0.750) · 长宽比差 +0.4%",
+          "  scavenger-hero.run             源图 742×1032 (0.719) → 目标 48×64 (0.750) · 长宽比差 +4.3%",
+          "  scavenger-hero.jump            源图 867×519 (1.671) → 目标 48×32 (1.500) · 长宽比差 -10.2%",
+          "  wasteland-patroller.walk       源图 670×1059 (0.633) → 目标 48×64 (0.750) · 长宽比差 +18.5%",
+          "  wasteland-patroller.idle       源图 927×670 (1.384) → 目标 48×32 (1.500) · 长宽比差 +8.4%",
+          "  wasteland-chest                源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+          "  wasteland-scraps               源图 1024×1024 (1.000) → 目标 16×16 (1.000) · 长宽比差 0.0%",
+          "  wasteland-platform-tile        源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+          "  wasteland-bg.sky               源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+          "  wasteland-bg.ruins             源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+          "  wasteland-bg.wall              源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+          "  wasteland-bg.railway           源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+          "  master-scavenger-hero          源图 896×1200 (0.747) → 目标 24×32 (0.750) · 长宽比差 +0.4%",
+          "  master-wasteland-patroller     源图 896×1200 (0.747) → 目标 24×32 (0.750) · 长宽比差 +0.4%",
+          "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+          "  wasteland-bg.sky         480×270  100.0%",
+          "  wasteland-bg.ruins       480×270  58.5%",
+          "  wasteland-bg.wall        480×270  45.1%",
+          "  wasteland-bg.railway     480×270  41.0%",
+          "色板 16 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+          "  #1b2027 · 8/8 个资源用到 · 占全部不透明像素 24.9%",
+          "  #2a3442 · 8/8 个资源用到 · 占全部不透明像素 7.7%",
+          "  #4a3222 · 7/8 个资源用到 · 占全部不透明像素 7.3%",
+          "  #2e3b4e · 7/8 个资源用到 · 占全部不透明像素 6.2%",
+          "  #3b4a5c · 8/8 个资源用到 · 占全部不透明像素 5.7%",
+          "  #6b4a33 · 8/8 个资源用到 · 占全部不透明像素 10.8%",
+          "  #565b60 · 6/8 个资源用到 · 占全部不透明像素 10.9%",
+          "  #4a6076 · 2/8 个资源用到 · 占全部不透明像素 6.5%",
+          "  #8a6244 · 8/8 个资源用到 · 占全部不透明像素 3.6%",
+          "  #7a7f84 · 6/8 个资源用到 · 占全部不透明像素 7.9%",
+          "  #c98b5e · 8/8 个资源用到 · 占全部不透明像素 1.4%",
+          "  #9aa0a5 · 4/8 个资源用到 · 占全部不透明像素 6.6%",
+          "  #d9a441 · 5/8 个资源用到 · 占全部不透明像素 0.3%",
+          "  #e8c39e · 4/8 个资源用到 · 占全部不透明像素 0.1%",
+          "  #f2d98b · 4/8 个资源用到 · 占全部不透明像素 0.1%",
+          "  #e6e2d6 · 2/8 个资源用到 · 占全部不透明像素 0.0%",
+          "色板外像素 0 个 · 占全部不透明像素 0.00%（**观察，不是判据** —— 对不上可以是设计）"
+        ]
+      },
+      {
+        "source": "review",
+        "outcome": "unavailable",
+        "reason": "这次创建链没有跑 `reviewPack`（它是**人工主动调用的诊断命令** —— `game-maker review <run 目录>` 那一支，**不由创建链自动调用**；而执行它还会产生**一次视觉调用**的成本） —— 没有可原样搬来的观察，而**空不等于「比过了、没差异」**"
+      }
+    ],
+    "checked": [
+      "palette-binding",
+      "constructive-constraint",
+      "layer-coverage",
+      "reference-resolution",
+      "reachability",
+      "intent-coverage",
+      "visual-config-coherence"
+    ]
+  },
+  "materials": {
+    "reference": [
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/reference.png",
+        "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0",
+        "frozen": "match",
+        "snapshotSha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/style.png",
+        "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0",
+        "frozen": "match",
+        "snapshotSha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+      }
+    ],
+    "deliveredAssets": [
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.png",
+        "sha256": "sha256:5e7a24e2e60715b7e4c5112d1cc767f1d20a06a2c0ebc92660f4433468712c8e",
+        "frozen": "match",
+        "snapshotSha256": "sha256:5e7a24e2e60715b7e4c5112d1cc767f1d20a06a2c0ebc92660f4433468712c8e"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+        "sha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd",
+        "frozen": "match",
+        "snapshotSha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.sprites.png",
+        "sha256": "sha256:3d27b1221ef23a6ac38303f533afcf8bdb4587aa4a055392e08c779d4c28a671",
+        "frozen": "match",
+        "snapshotSha256": "sha256:3d27b1221ef23a6ac38303f533afcf8bdb4587aa4a055392e08c779d4c28a671"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.sprites.json",
+        "sha256": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746",
+        "frozen": "match",
+        "snapshotSha256": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.backgrounds.png",
+        "sha256": "sha256:f3aa1d6089c21e68497a2c56cb7ae73700b40f36edcc4805c97093f788c6422c",
+        "frozen": "match",
+        "snapshotSha256": "sha256:f3aa1d6089c21e68497a2c56cb7ae73700b40f36edcc4805c97093f788c6422c"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.backgrounds.json",
+        "sha256": "sha256:5a3407c8da3736df07c1187fed84232e1af229e53787aa5abe95fe57ae111b17",
+        "frozen": "match",
+        "snapshotSha256": "sha256:5a3407c8da3736df07c1187fed84232e1af229e53787aa5abe95fe57ae111b17"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.ui.png",
+        "sha256": "sha256:4f94ab9adaa627cf823da3074e53677659dba50be05d3e1a85fed5903d685a71",
+        "frozen": "match",
+        "snapshotSha256": "sha256:4f94ab9adaa627cf823da3074e53677659dba50be05d3e1a85fed5903d685a71"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/delivery/atlas.ui.json",
+        "sha256": "sha256:6a053faeb99119a140a44cad751498cc3b67f25015fbf5fd0dd4e30aea2a9559",
+        "frozen": "match",
+        "snapshotSha256": "sha256:6a053faeb99119a140a44cad751498cc3b67f25015fbf5fd0dd4e30aea2a9559"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "sha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "frozen": "match",
+        "snapshotSha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/authoring/stylespec.json",
+        "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2",
+        "frozen": "match",
+        "snapshotSha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/authoring/visual-world.json",
+        "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524",
+        "frozen": "match",
+        "snapshotSha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+      }
+    ],
+    "visualContext": [
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/game-design.json",
+        "sha256": "sha256:208788094f4fabfd5a88ea78e5eb20ac6db40d12e26a09c3b7567b447bcd1ebe",
+        "frozen": "match",
+        "snapshotSha256": "sha256:208788094f4fabfd5a88ea78e5eb20ac6db40d12e26a09c3b7567b447bcd1ebe"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/visual-world.json",
+        "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524",
+        "frozen": "match",
+        "snapshotSha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/stylespec.json",
+        "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2",
+        "frozen": "match",
+        "snapshotSha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+      },
+      {
+        "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+        "sha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6",
+        "frozen": "differs",
+        "snapshotSha256": "sha256:ac342549c65af368ad5c1947bda051885eab09035fec72c218b8557d8e9c2345"
+      }
+    ]
+  },
+  "generated": [
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/background-frames.png",
+      "sha256": "sha256:f641ac9b0839eea26094589e3c8adfd6b3f00d02f01f563c7d15bd05965b3377",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/character-frames.png",
+      "sha256": "sha256:90db8918aa19735e1e08792e031b54cf431629a29886479bac6e1f7238cdf047",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/hud-in-game.png",
+      "sha256": "sha256:b3d6a917963e295b47445231d2487849852654709c0fcb94800f5d0f3a6ee157",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/objects-frames.png",
+      "sha256": "sha256:93726f55e1ee590c95df3e3911701e89375279fc279739a64390fef4dbe71406",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/patroller-frames.png",
+      "sha256": "sha256:65bbe8651a3a0670b18568e3c4ae1bc9be1bc0d8087ba215e7742d1ed81ac58e",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/player-in-game.png",
+      "sha256": "sha256:b38edc588ea418f2cfc37e4c0697ffbffd8996362e638196c2880aab1a0d4675",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/assets/reference-vs-gameplay.png",
+      "sha256": "sha256:bd6127bf27763b065e935040b247e60d69a51215da669c2e7846afc8d9637400",
+      "kind": "contact-sheet"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+      "sha256": "sha256:71e544d9b357df6e72e4b50b6f45fa05310a8ddcbb8bf74cfe188f6fdbe65c2c",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+      "sha256": "sha256:0170124c187fa13a28a74b8c9314d21421da36385ec18b00dffaeb6b684082c1",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+      "sha256": "sha256:462fc8584459ecfb52008c367c741e09fd27edc3be14848434cfe89ebe987973",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+      "sha256": "sha256:328fc7a9cca5d423327962831e870321255930c83d5a76c989ba1e23660f7276",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+      "sha256": "sha256:29e1f93199f580d3838eccf73c07ec198c53c14c1d824727cb25a41d2e44139b",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+      "sha256": "sha256:9b5744c8b903610f78ac47499b07e8e3c02a48109cc6f067c332f9e0fe5039ee",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+      "sha256": "sha256:92e1a04f620184dd7613c43eb42fabced1844a5816f9a0dc4cc13f443fcca48b",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png",
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/09-final.png",
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7",
+      "kind": "screenshot"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/capture.json",
+      "sha256": "sha256:8a27db7e81e0e6dede1a8b2ebaa80d0b4e0f9f1947af001f67db02be38276f58",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/events.jsonl",
+      "sha256": "sha256:115710a3df66e392ece22763c82d923a0d98e155359a325d9d322915bb96d518",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/trace.jsonl",
+      "sha256": "sha256:d21e424c078eeaa9eee3c061dd0af60b0a5f39b5396a4e73836d15c23b50ac74",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/input.jsonl",
+      "sha256": "sha256:19a849a3cb651d69420cc2b2a93e375d430cdf867dc6c96a7bd669ab1043e85f",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/console.json",
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/exceptions.json",
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/review.html",
+      "sha256": "sha256:9facbc3f7e03559071c31c7887979ada9d0e00226e5709f76ed2efae842b1706",
+      "kind": "review-artifact"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/review-record.json",
+      "sha256": "sha256:a1602021720ed1a984913094eebff3a9b29ad5ef09f2ef7347c620ea0d93a0c1",
+      "kind": "review-artifact"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/README.md",
+      "sha256": "sha256:31872f663d60e69549fb2681b65e5e54d9f8a1f7d79ff1a6cb446fea1c7dd4cb",
+      "kind": "review-artifact"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/capture.mjs",
+      "sha256": "sha256:fc928631a2e12b9353e4427409a37966cabc60edae5769a8ab4fc270e4636a93",
+      "kind": "run-evidence"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/build-materials.mjs",
+      "sha256": "sha256:a5bb9c85476740677cd0dc3085109bbd117d5af786829c8268b8441b34d1c78c",
+      "kind": "run-evidence"
+    }
+  ]
+}

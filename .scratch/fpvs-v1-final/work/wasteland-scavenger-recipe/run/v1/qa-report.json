@@ -127,12 +127,15 @@
       },
       {
         "key": "visual-review",
-        "status": "incomplete"
+        "status": "pass"
       }
     ],
-    "verdict": "incomplete",
+    "verdict": "pass",
     "visualReview": {
-      "status": "pending"
+      "status": "pass",
+      "reviewer": "人（本次会话用户）",
+      "reviewedAt": "2026-10-28T08:12:51.004Z",
+      "note": "P0-06 六项人工对照通过：整体风格 / 色彩与明暗 / 角色 / 场景 / 关键物件 / 实际运行效果。材料绑定 pack/v1 · site/v1 · shell 2，真实按键通关截图 9 张（0 reset、站点字节未改），见 runs/2026-10-28-visual-review/。"
     },
     "playtest": {
       "report": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
