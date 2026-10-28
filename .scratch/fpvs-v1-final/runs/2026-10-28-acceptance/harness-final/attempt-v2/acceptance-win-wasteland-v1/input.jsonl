@@ -1,0 +1,29 @@
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":0,"seq":0,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":1843,"seq":1,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":1843,"seq":2,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":3097,"seq":3,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":3149,"seq":4,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":4479,"seq":5,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":4531,"seq":6,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":4836,"seq":7,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":4837,"seq":8,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":5315,"seq":9,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":5368,"seq":10,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":7578,"seq":11,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":8531,"seq":12,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":8531,"seq":13,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":8582,"seq":14,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":9315,"seq":15,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":9367,"seq":16,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":10026,"seq":17,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":10026,"seq":18,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":11049,"seq":19,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":11101,"seq":20,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":12013,"seq":21,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":12064,"seq":22,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":12830,"seq":23,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":12882,"seq":24,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":12919,"seq":25,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":12920,"seq":26,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":16259,"seq":27,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":16260,"seq":28,"source":"cleanup"}

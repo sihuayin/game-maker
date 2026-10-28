@@ -1,0 +1,312 @@
+{
+  "reportVersion": "playtest-report/v1",
+  "identity": {
+    "scenarioFormatVersion": "playtest-scenario/v1",
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "shellVersion": "2",
+    "harnessVersion": "playtest-harness/v1",
+    "rulesVersion": "playtest-rules/v1"
+  },
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/fpvs-v1-final/scenarios/acceptance --out .scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-1",
+  "exitCode": 0,
+  "startedAt": "2026-10-28T03:53:57.492Z",
+  "finishedAt": "2026-10-28T03:55:59.951Z",
+  "execution": "executed",
+  "scenarios": [
+    {
+      "scenarioId": "acceptance-win-wasteland-v1",
+      "scenarioVersion": 1,
+      "required": true,
+      "harnessCondition": "none",
+      "expectedOutcome": "SUCCESS",
+      "baselineEligible": false,
+      "execution": "executed",
+      "terminationReached": false,
+      "assertions": [
+        {
+          "id": "initial-pickups",
+          "kind": "state",
+          "requires": [
+            "initialActivePickups"
+          ],
+          "result": "pass",
+          "observed": 4,
+          "expect": {
+            "kind": "state",
+            "path": "initialActivePickups",
+            "op": "eq",
+            "value": 4
+          },
+          "withinMs": 120000,
+          "evidence": []
+        },
+        {
+          "id": "all-collected",
+          "kind": "state",
+          "requires": [
+            "collected"
+          ],
+          "result": "unknown",
+          "observed": 1,
+          "expect": {
+            "kind": "state",
+            "path": "collected",
+            "op": "eq",
+            "value": 6
+          },
+          "withinMs": 120000,
+          "insufficientEvidence": {
+            "ruleId": "negative-not-judgeable",
+            "missingObservation": "否定条件在窗口内不可判",
+            "affectedAssertionIds": [
+              "all-collected"
+            ],
+            "explanation": "没有到达可作出否定结论的位置/状态（例如未到 gate 或仍有未拾取物），不能把没观察到当作失败"
+          },
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        },
+        {
+          "id": "chests-opened",
+          "kind": "state",
+          "requires": [
+            "chestsOpened"
+          ],
+          "result": "fail",
+          "observed": 0,
+          "expect": {
+            "kind": "state",
+            "path": "chestsOpened",
+            "op": "eq",
+            "value": 2
+          },
+          "withinMs": 120000,
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        },
+        {
+          "id": "pickups-cleared",
+          "kind": "state",
+          "requires": [
+            "activePickups"
+          ],
+          "result": "fail",
+          "observed": 3,
+          "expect": {
+            "kind": "state",
+            "path": "activePickups",
+            "op": "eq",
+            "value": 0
+          },
+          "withinMs": 120000,
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        },
+        {
+          "id": "pickup-events",
+          "kind": "event",
+          "requires": [
+            "pickup"
+          ],
+          "result": "unknown",
+          "observed": 1,
+          "expect": {
+            "kind": "event",
+            "type": "pickup",
+            "op": "gte",
+            "value": 4
+          },
+          "withinMs": 120000,
+          "insufficientEvidence": {
+            "ruleId": "negative-not-judgeable",
+            "missingObservation": "否定条件在窗口内不可判",
+            "affectedAssertionIds": [
+              "pickup-events"
+            ],
+            "explanation": "没有到达可作出否定结论的位置/状态（例如未到 gate 或仍有未拾取物），不能把没观察到当作失败"
+          },
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        },
+        {
+          "id": "chest-events",
+          "kind": "event",
+          "requires": [
+            "chest-open"
+          ],
+          "result": "fail",
+          "observed": 0,
+          "expect": {
+            "kind": "event",
+            "type": "chest-open",
+            "op": "gte",
+            "value": 2
+          },
+          "withinMs": 120000,
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        },
+        {
+          "id": "won",
+          "kind": "state",
+          "requires": [
+            "won"
+          ],
+          "result": "unknown",
+          "observed": false,
+          "expect": {
+            "kind": "state",
+            "path": "won",
+            "op": "eq",
+            "value": true
+          },
+          "withinMs": 120000,
+          "insufficientEvidence": {
+            "ruleId": "negative-not-judgeable",
+            "missingObservation": "否定条件在窗口内不可判",
+            "affectedAssertionIds": [
+              "won"
+            ],
+            "explanation": "没有到达可作出否定结论的位置/状态（例如未到 gate 或仍有未拾取物），不能把没观察到当作失败"
+          },
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        },
+        {
+          "id": "win-event",
+          "kind": "event",
+          "requires": [
+            "win"
+          ],
+          "result": "unknown",
+          "observed": 0,
+          "expect": {
+            "kind": "event",
+            "type": "win",
+            "op": "gte",
+            "value": 1
+          },
+          "withinMs": 120000,
+          "insufficientEvidence": {
+            "ruleId": "negative-not-judgeable",
+            "missingObservation": "否定条件在窗口内不可判",
+            "affectedAssertionIds": [
+              "win-event"
+            ],
+            "explanation": "没有到达可作出否定结论的位置/状态（例如未到 gate 或仍有未拾取物），不能把没观察到当作失败"
+          },
+          "evidence": [
+            "playtest-events",
+            "playtest-trace"
+          ]
+        }
+      ],
+      "assertionAggregate": "fail",
+      "endState": {
+        "collected": 1,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 3,
+        "playerX": 438
+      },
+      "initialState": {
+        "collected": 0,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 4,
+        "playerX": 40
+      },
+      "actions": [
+        {
+          "kind": "move_to",
+          "outcome": "completed",
+          "durationMs": 1859,
+          "steps": 51
+        },
+        {
+          "kind": "move_to",
+          "outcome": "timeout",
+          "durationMs": 118162,
+          "steps": 3137
+        }
+      ],
+      "comparableEvents": [
+        "pickup",
+        "win",
+        "chest-open"
+      ],
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 1,
+        "win": 0,
+        "chest-open": 0,
+        "danger-hit": 0,
+        "danger-erupt": 0,
+        "land": 32,
+        "jump": 32,
+        "reset": 19,
+        "runtime-error": 0
+      },
+      "evidence": [
+        "playtest-events",
+        "playtest-trace",
+        "playtest-input",
+        "playtest-console",
+        "playtest-exceptions"
+      ],
+      "durationMs": 120410,
+      "steps": 3138
+    }
+  ],
+  "runtime": {
+    "pollIntervalMs": 50,
+    "stepDelayMs": 35,
+    "scenarioTimeoutMs": 120000,
+    "viewport": {
+      "w": 1000,
+      "h": 600
+    },
+    "deviceScaleFactor": 1,
+    "chromeFlags": [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-background-timer-throttling",
+      "--disable-renderer-backgrounding",
+      "--disable-backgrounding-occluded-windows",
+      "--hide-scrollbars",
+      "--window-size=1000,600"
+    ]
+  },
+  "evidence": [
+    "playtest-events",
+    "playtest-trace",
+    "playtest-input",
+    "playtest-console",
+    "playtest-exceptions",
+    "playtest-chrome"
+  ]
+}

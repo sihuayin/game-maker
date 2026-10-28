@@ -1,0 +1,769 @@
+{
+  "format": "fpvs-final-hashes/v1",
+  "generatedAt": "2026-10-27T14:20:36.823Z",
+  "algorithm": "sha256",
+  "roots": {
+    "snapshot": "artifacts/wasteland-scavenger-recipe",
+    "reference": "artifacts/reference",
+    "work": "work/wasteland-scavenger-recipe"
+  },
+  "entries": [
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/drawlist/hud-icon-scrap.json",
+      "relativePath": "pack/v1/authoring/drawlist/hud-icon-scrap.json",
+      "bytes": 2678,
+      "sha256": "sha256:c618a9137be7e8801af600a283854351866d0e036b2e671ac4cfac12a377a0c3"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/drawlist/hud-panel.json",
+      "relativePath": "pack/v1/authoring/drawlist/hud-panel.json",
+      "bytes": 6222,
+      "sha256": "sha256:d3768321bb48c496b7585546ca00470cc9f3c831f46b6db19dd4a70b861377dd"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/scavenger-hero.idle.png",
+      "relativePath": "pack/v1/authoring/generated/scavenger-hero.idle.png",
+      "bytes": 1220095,
+      "sha256": "sha256:e78fcac820e5d7074f1ab8c6b2c09e1dee97b6acfff24d0f20a8033a852ebcf1"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/scavenger-hero.idle.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/scavenger-hero.idle.prompt.txt",
+      "bytes": 4681,
+      "sha256": "sha256:d111b6521eb506df9fd2a944ccbb7c2b069bf3779e8b0c0c0c2b5ca0a98b6503"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/scavenger-hero.jump.png",
+      "relativePath": "pack/v1/authoring/generated/scavenger-hero.jump.png",
+      "bytes": 899552,
+      "sha256": "sha256:f8dd635738210b4700d8cabad57394f582c72b2d2bb51e8ba38192a7467a7d61"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/scavenger-hero.jump.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/scavenger-hero.jump.prompt.txt",
+      "bytes": 4117,
+      "sha256": "sha256:8a49d3bf56c2d48d2452a820d0032d3cdf69b5c96b4fa8b722662d374483a1c4"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/scavenger-hero.run.png",
+      "relativePath": "pack/v1/authoring/generated/scavenger-hero.run.png",
+      "bytes": 1163990,
+      "sha256": "sha256:7693eea270d58b44fb1890ae07beec91977458f44aa3175e0ef85fd8fbc7dd16"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/scavenger-hero.run.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/scavenger-hero.run.prompt.txt",
+      "bytes": 4679,
+      "sha256": "sha256:bf26ddd77d6db4beb03a31cd556f9f4b90b0f161f733e8053a33ec47990dd3db"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.railway.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.railway.png",
+      "bytes": 960341,
+      "sha256": "sha256:8ec54773b515e1105463c024b245e8c3fa6e027b6881a3e2ed6b779d4c6cd5aa"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.railway.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.railway.prompt.txt",
+      "bytes": 1784,
+      "sha256": "sha256:83f2b2f61d2a46c174a44511861ecd10bd687b04a1eb3d8fc596f8d58a659940"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.ruins.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.ruins.png",
+      "bytes": 949307,
+      "sha256": "sha256:f5dcd906fcd112bd2cbf229c93754c7b64e0c00d1f20a1878b592587b05f8be7"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.ruins.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.ruins.prompt.txt",
+      "bytes": 1791,
+      "sha256": "sha256:47ced24bf1008cbdc7fde7774e0e2650f5d8938a7be67d5443de5d5ef5e0bb2f"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.sky.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.sky.png",
+      "bytes": 469926,
+      "sha256": "sha256:42321f8202db5d1ee0ffcb4b38bb71a0f990b28ffd6107b5323a2c4ee32ed5f5"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.sky.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.sky.prompt.txt",
+      "bytes": 1892,
+      "sha256": "sha256:56a04135e59593a8f2715f7f8cc2a155d219634df187237387c579a219f03a7e"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.wall.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.wall.png",
+      "bytes": 1063866,
+      "sha256": "sha256:e1062eb8446bd1397d43f429be76b2e82fbcea926579e91467ff6c0256bda146"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-bg.wall.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-bg.wall.prompt.txt",
+      "bytes": 1787,
+      "sha256": "sha256:e68776390d4b5ab1b9df0c25d74d8ec4c4cfc949de26821a4d795e0c9ebd276a"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-chest.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-chest.png",
+      "bytes": 1195183,
+      "sha256": "sha256:292273183bea394e8101ed76bd2047a9c94473e24219b1f1ef6232be19a54cf9"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-chest.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-chest.prompt.txt",
+      "bytes": 1860,
+      "sha256": "sha256:ac3fad3ef2cb616c040df726f9950919fc6837bedacf329f2f1c2e3d21f32566"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-patroller.idle.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-patroller.idle.png",
+      "bytes": 991046,
+      "sha256": "sha256:4f5f8448a13483ea5992e46f5eda8f87785cc0e10e2d7a33c4861d906295f5e3"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-patroller.idle.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-patroller.idle.prompt.txt",
+      "bytes": 4119,
+      "sha256": "sha256:0fdebaed308eab3e9348c0e3d40787af725e103bf38d6bd4b7db5bd90da27600"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-patroller.walk.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-patroller.walk.png",
+      "bytes": 1058989,
+      "sha256": "sha256:0bc433effc3bf32869463b7ddb81daf52bfb96034625bce2858213c9787075d5"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-patroller.walk.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-patroller.walk.prompt.txt",
+      "bytes": 4683,
+      "sha256": "sha256:f09251c75b66f746056453b362df108e8f1c1a166e3a938ee38f26ec477c679e"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-platform-tile.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-platform-tile.png",
+      "bytes": 982887,
+      "sha256": "sha256:556ef1450ac37cceed25c9e10f5471003351b4c3ebebb47baa8f63c26d2619ef"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-platform-tile.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-platform-tile.prompt.txt",
+      "bytes": 1902,
+      "sha256": "sha256:601e76f20dacd5a8fb58630b4a45b98a5fbad4fe3bdc688d0b8c4042b2f8be10"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-scraps.png",
+      "relativePath": "pack/v1/authoring/generated/wasteland-scraps.png",
+      "bytes": 1152515,
+      "sha256": "sha256:4eb01c42030f7549847f27d28e2b8ecce0bf1bf2d917bd6180c3dddc067ac33f"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/generated/wasteland-scraps.prompt.txt",
+      "relativePath": "pack/v1/authoring/generated/wasteland-scraps.prompt.txt",
+      "bytes": 1878,
+      "sha256": "sha256:95b92348c5b18efe7c9c16e74f23e54c8126ed36d0c62310876e0a31e7354df2"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/masters/master-scavenger-hero.png",
+      "relativePath": "pack/v1/authoring/masters/master-scavenger-hero.png",
+      "bytes": 928461,
+      "sha256": "sha256:8de0ed0ee9def603d16111cfe1a20216a22a132dc074fd23c500ec84e0607947"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/masters/master-scavenger-hero.prompt.txt",
+      "relativePath": "pack/v1/authoring/masters/master-scavenger-hero.prompt.txt",
+      "bytes": 4118,
+      "sha256": "sha256:6b292229456e9dbd091ac16f8353fca8af98b01e705dd4897776df31cff2d31e"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/masters/master-scavenger-hero.ratio.json",
+      "relativePath": "pack/v1/authoring/masters/master-scavenger-hero.ratio.json",
+      "bytes": 445,
+      "sha256": "sha256:285d942faabf31696ad735a85f8b0a88697dcd173fd8b439736c16b4f56165f1"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/masters/master-wasteland-patroller.png",
+      "relativePath": "pack/v1/authoring/masters/master-wasteland-patroller.png",
+      "bytes": 822182,
+      "sha256": "sha256:55d8ae3d4cf8c519bf91954ef0c909b3a7596341e28957e270dfd6467e88f927"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/masters/master-wasteland-patroller.prompt.txt",
+      "relativePath": "pack/v1/authoring/masters/master-wasteland-patroller.prompt.txt",
+      "bytes": 4090,
+      "sha256": "sha256:dff4e12893d861e37d235c594541662b7ee15fd064ccc983a1b24d6fdef61396"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/masters/master-wasteland-patroller.ratio.json",
+      "relativePath": "pack/v1/authoring/masters/master-wasteland-patroller.ratio.json",
+      "bytes": 450,
+      "sha256": "sha256:4113f126a44f2be623bd4484657284ce591c1e2aef0818953e42765dff1bc514"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/stylespec.json",
+      "relativePath": "pack/v1/authoring/stylespec.json",
+      "bytes": 758,
+      "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/authoring/visual-world.json",
+      "relativePath": "pack/v1/authoring/visual-world.json",
+      "bytes": 3970,
+      "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/coverage.json",
+      "relativePath": "pack/v1/coverage.json",
+      "bytes": 785,
+      "sha256": "sha256:d9d626534fde2ebd08b7965a091fc561b702bee618f5995ccb84028184ca3dbc"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+      "relativePath": "pack/v1/delivery/atlas.animations.json",
+      "bytes": 6681,
+      "sha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.png",
+      "relativePath": "pack/v1/delivery/atlas.animations.png",
+      "bytes": 6750,
+      "sha256": "sha256:5e7a24e2e60715b7e4c5112d1cc767f1d20a06a2c0ebc92660f4433468712c8e"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.backgrounds.json",
+      "relativePath": "pack/v1/delivery/atlas.backgrounds.json",
+      "bytes": 1832,
+      "sha256": "sha256:5a3407c8da3736df07c1187fed84232e1af229e53787aa5abe95fe57ae111b17"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.backgrounds.png",
+      "relativePath": "pack/v1/delivery/atlas.backgrounds.png",
+      "bytes": 39525,
+      "sha256": "sha256:f3aa1d6089c21e68497a2c56cb7ae73700b40f36edcc4805c97093f788c6422c"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.sprites.json",
+      "relativePath": "pack/v1/delivery/atlas.sprites.json",
+      "bytes": 1407,
+      "sha256": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.sprites.png",
+      "relativePath": "pack/v1/delivery/atlas.sprites.png",
+      "bytes": 1690,
+      "sha256": "sha256:3d27b1221ef23a6ac38303f533afcf8bdb4587aa4a055392e08c779d4c28a671"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.ui.json",
+      "relativePath": "pack/v1/delivery/atlas.ui.json",
+      "bytes": 1088,
+      "sha256": "sha256:6a053faeb99119a140a44cad751498cc3b67f25015fbf5fd0dd4e30aea2a9559"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.ui.png",
+      "relativePath": "pack/v1/delivery/atlas.ui.png",
+      "bytes": 516,
+      "sha256": "sha256:4f94ab9adaa627cf823da3074e53677659dba50be05d3e1a85fed5903d685a71"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/ledger.json",
+      "relativePath": "pack/v1/ledger.json",
+      "bytes": 4349,
+      "sha256": "sha256:435f63a3f80595b7eea719654438a83bddd35e8394831c63201d71471e3283fa"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "relativePath": "pack/v1/manifest.json",
+      "bytes": 19477,
+      "sha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/pack/v1/master-ratios.json",
+      "relativePath": "pack/v1/master-ratios.json",
+      "bytes": 769,
+      "sha256": "sha256:eb885be323088342ef818f7e33d2c432950d3976b3ae863bc2ead01340b431b3"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/asset-recipe.json",
+      "relativePath": "run/v1/asset-recipe.json",
+      "bytes": 7243,
+      "sha256": "sha256:81906164bfa36a7ae0bd082835950f7e2ccbc31eb2f4381f322532c1af0cc93b"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/asset-recipe.plan.json",
+      "relativePath": "run/v1/asset-recipe.plan.json",
+      "bytes": 2947,
+      "sha256": "sha256:c296f7ed39c45e94e90cc4e772865ae2f6ec6afb744c65a3048514775dc3cc65"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/character-dna.json",
+      "relativePath": "run/v1/character-dna.json",
+      "bytes": 2463,
+      "sha256": "sha256:25742be75eacb4c804e72f32782d27fa009c466e7224f89b79a2dc9986576059"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "relativePath": "run/v1/game-config.json",
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/game-design.json",
+      "relativePath": "run/v1/game-design.json",
+      "bytes": 3202,
+      "sha256": "sha256:208788094f4fabfd5a88ea78e5eb20ac6db40d12e26a09c3b7567b447bcd1ebe"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/game-intent.json",
+      "relativePath": "run/v1/game-intent.json",
+      "bytes": 2087,
+      "sha256": "sha256:9388055e6492e134ba8e453efec4974d508e2eaef2281942879e2debd4d05d5b"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/intent.md",
+      "relativePath": "run/v1/intent.md",
+      "bytes": 257,
+      "sha256": "sha256:314efbd6b46b3b899b38de35c8bba89dc0ea01e5bb66c2791dabf309f40b7eb1"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/ledger.json",
+      "relativePath": "run/v1/ledger.json",
+      "bytes": 6749,
+      "sha256": "sha256:42ed224e4a6356b1db94dac749d0b5502d7e24976d9e5154932823ffa2921a4d"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/qa-report.json",
+      "relativePath": "run/v1/qa-report.json",
+      "bytes": 5987,
+      "sha256": "sha256:ac342549c65af368ad5c1947bda051885eab09035fec72c218b8557d8e9c2345"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/reference.png",
+      "relativePath": "run/v1/reference.png",
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/style.png",
+      "relativePath": "run/v1/style.png",
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/stylespec.json",
+      "relativePath": "run/v1/stylespec.json",
+      "bytes": 758,
+      "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/visual-design.json",
+      "relativePath": "run/v1/visual-design.json",
+      "bytes": 1778,
+      "sha256": "sha256:60824c960ee1d5b17f210f86a53047b61cdd8c669d71bae107b7c60670a1a8da"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/visual-design/preview/scene.png",
+      "relativePath": "run/v1/visual-design/preview/scene.png",
+      "bytes": 1077,
+      "sha256": "sha256:83806b6d7185f05de36513a44cfeb308e74b71346b278a4d93f9fa527aa57ede"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/visual-design/svg/scene.svg",
+      "relativePath": "run/v1/visual-design/svg/scene.svg",
+      "bytes": 712,
+      "sha256": "sha256:5d77e3ef4a8953294a51711379601fd7eb7b0e08ae06239652bf19f821446461"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/run/v1/visual-world.json",
+      "relativePath": "run/v1/visual-world.json",
+      "bytes": 3970,
+      "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "relativePath": "site/v1/game-config.json",
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/site/v1/index.html",
+      "relativePath": "site/v1/index.html",
+      "bytes": 285,
+      "sha256": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/site/v1/shell.js",
+      "relativePath": "site/v1/shell.js",
+      "bytes": 1612305,
+      "sha256": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1"
+    },
+    {
+      "role": "snapshot",
+      "path": "artifacts/wasteland-scavenger-recipe/site/v1/site.json",
+      "relativePath": "site/v1/site.json",
+      "bytes": 67,
+      "sha256": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/chrome.log",
+      "relativePath": "playtest-v1/attempt-v1/chrome.log",
+      "bytes": 10647,
+      "sha256": "sha256:aad011ec4a822cbbc6899d8c671105fc97244e1a367d8b20096ad6d10f765649"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/harness-determinism.json",
+      "relativePath": "playtest-v1/attempt-v1/harness-determinism.json",
+      "bytes": 880,
+      "sha256": "sha256:390fb124a747b1b95f5edfe81eae21ad000f7a957c63f2de87779e321b17f479"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/harness-exit.json",
+      "relativePath": "playtest-v1/attempt-v1/harness-exit.json",
+      "bytes": 849,
+      "sha256": "sha256:b9de9d6edfffe0d5ffc51fe6dc8776d138a72608e0e6f6d9e10ad8cb4e28be0a"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/harness-rejections.json",
+      "relativePath": "playtest-v1/attempt-v1/harness-rejections.json",
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/harness-summary.json",
+      "relativePath": "playtest-v1/attempt-v1/harness-summary.json",
+      "bytes": 3000,
+      "sha256": "sha256:daf48246c8c816b95f1c147af74eaae6116806bd75a6342fa4921e78dcb8c490"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/result.json",
+      "relativePath": "playtest-v1/attempt-v1/result.json",
+      "bytes": 5967,
+      "sha256": "sha256:afe634d0ac2a949cf23b61e4539b45a12afb4139e6ba9ae8ac981eeede80b616"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/site-integrity.json",
+      "relativePath": "playtest-v1/attempt-v1/site-integrity.json",
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/success-basic/console.json",
+      "relativePath": "playtest-v1/attempt-v1/success-basic/console.json",
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/success-basic/events.jsonl",
+      "relativePath": "playtest-v1/attempt-v1/success-basic/events.jsonl",
+      "bytes": 13863,
+      "sha256": "sha256:4e114bfc4bb24dbd4ea35993e2dee9abcb47f062699e07c63878c3cca9d31ab3"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/success-basic/exceptions.json",
+      "relativePath": "playtest-v1/attempt-v1/success-basic/exceptions.json",
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/success-basic/input.jsonl",
+      "relativePath": "playtest-v1/attempt-v1/success-basic/input.jsonl",
+      "bytes": 9175,
+      "sha256": "sha256:25581fd6c5656febdb4bb29e009760fa5bcc01b6e955c40c0053983799e652b5"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/success-basic/setup.json",
+      "relativePath": "playtest-v1/attempt-v1/success-basic/setup.json",
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/playtest-v1/attempt-v1/success-basic/trace.jsonl",
+      "relativePath": "playtest-v1/attempt-v1/success-basic/trace.jsonl",
+      "bytes": 591361,
+      "sha256": "sha256:15ea530583b143dcd3e811ed6aede89c2ac368858da4b588866454b2515c2547"
+    },
+    {
+      "role": "reference",
+      "path": "artifacts/reference/prior-delivery-stage-c/qa-report.json",
+      "relativePath": "prior-delivery-stage-c/qa-report.json",
+      "bytes": 7698,
+      "sha256": "sha256:2d0f26e865c61aeaabbc6276241fbef4827e90b793d8d316be241470b84ef5f5"
+    }
+  ],
+  "counts": {
+    "snapshotFiles": 66,
+    "referenceFiles": 14,
+    "workFiles": 66
+  },
+  "critical": [
+    {
+      "expected": "site/v1/site.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "site/v1/index.html",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "site/v1/shell.js",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "site/v1/game-config.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/game-config.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/qa-report.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/intent.md",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/reference.png",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/style.png",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/game-design.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/game-intent.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/stylespec.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "run/v1/visual-world.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "pack/v1/manifest.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "pack/v1/ledger.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "pack/v1/coverage.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "pack/v1/authoring/stylespec.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "pack/v1/authoring/visual-world.json",
+      "matched": true,
+      "missing": false
+    },
+    {
+      "expected": "pack/v1/delivery/atlas.*.json",
+      "matched": true,
+      "missing": false,
+      "matches": [
+        "pack/v1/delivery/atlas.animations.json",
+        "pack/v1/delivery/atlas.backgrounds.json",
+        "pack/v1/delivery/atlas.sprites.json",
+        "pack/v1/delivery/atlas.ui.json"
+      ]
+    },
+    {
+      "expected": "pack/v1/delivery/atlas.*.png",
+      "matched": true,
+      "missing": false,
+      "matches": [
+        "pack/v1/delivery/atlas.animations.png",
+        "pack/v1/delivery/atlas.backgrounds.png",
+        "pack/v1/delivery/atlas.sprites.png",
+        "pack/v1/delivery/atlas.ui.png"
+      ]
+    },
+    {
+      "expected": "pack/v1/authoring/drawlist/*.json",
+      "matched": true,
+      "missing": false,
+      "matches": [
+        "pack/v1/authoring/drawlist/hud-icon-scrap.json",
+        "pack/v1/authoring/drawlist/hud-panel.json"
+      ]
+    },
+    {
+      "expected": "pack/v1/authoring/generated/*",
+      "matched": true,
+      "missing": false,
+      "matches": [
+        "pack/v1/authoring/generated/scavenger-hero.idle.png",
+        "pack/v1/authoring/generated/scavenger-hero.idle.prompt.txt",
+        "pack/v1/authoring/generated/scavenger-hero.jump.png",
+        "pack/v1/authoring/generated/scavenger-hero.jump.prompt.txt",
+        "pack/v1/authoring/generated/scavenger-hero.run.png"
+      ]
+    },
+    {
+      "expected": "pack/v1/authoring/masters/*",
+      "matched": true,
+      "missing": false,
+      "matches": [
+        "pack/v1/authoring/masters/master-scavenger-hero.png",
+        "pack/v1/authoring/masters/master-scavenger-hero.prompt.txt",
+        "pack/v1/authoring/masters/master-scavenger-hero.ratio.json",
+        "pack/v1/authoring/masters/master-wasteland-patroller.png",
+        "pack/v1/authoring/masters/master-wasteland-patroller.prompt.txt"
+      ]
+    },
+    {
+      "expected": "run/v1/visual-design/**",
+      "matched": true,
+      "missing": false,
+      "matches": [
+        "run/v1/visual-design/preview/scene.png",
+        "run/v1/visual-design/svg/scene.svg"
+      ]
+    }
+  ],
+  "missing": [],
+  "comparisons": {
+    "snapshotVsSource": {
+      "label": "snapshot-vs-source",
+      "same": true,
+      "checkedLeft": 66,
+      "checkedRight": 66,
+      "mismatches": []
+    },
+    "workVsSnapshot": {
+      "label": "work-vs-snapshot",
+      "same": true,
+      "checkedLeft": 66,
+      "checkedRight": 66,
+      "mismatches": []
+    },
+    "sourceStable": {
+      "label": "source-before-vs-after",
+      "same": true,
+      "checkedLeft": 66,
+      "checkedRight": 66,
+      "mismatches": []
+    }
+  },
+  "readOnly": {
+    "snapshot": {
+      "readOnly": true,
+      "writableEntries": [],
+      "writableCount": 0
+    },
+    "reference": {
+      "readOnly": true,
+      "writableEntries": [],
+      "writableCount": 0
+    }
+  }
+}

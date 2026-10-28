@@ -305,6 +305,41 @@ describe("applyPlaytest（票 08 写回纯函数）", () => {
     const r = report({ aggregate: "SUCCESS", scenarios: [scenario({ outcome: "SUCCESS" })] });
     expect(() => applyPlaytest(baseDelivery(), r, [ev[1]!])).toThrow(/playtest-result/);
   });
+
+  it("pack id / packVersion / shell 不匹配 ⇒ 拒写（版本不匹配不写成 pass）", () => {
+    const r = report({ aggregate: "SUCCESS", scenarios: [scenario({ outcome: "SUCCESS" })] });
+    for (const identity of [
+      { ...r.identity, packId: "other-pack" },
+      { ...r.identity, packVersion: 2 },
+      { ...r.identity, shellVersion: "v8" },
+    ]) {
+      expect(() => applyPlaytest(baseDelivery(), { ...r, identity } as typeof r, ev)).toThrow(/pack|site|shell/);
+    }
+  });
+
+  it("delivery 没有 site 身份 ⇒ 拒写（不写进身份不明的交付）", () => {
+    const r = report({ aggregate: "SUCCESS", scenarios: [scenario({ outcome: "SUCCESS" })] });
+    const noSite = { ...baseDelivery() } as Record<string, unknown>;
+    delete noSite.site;
+    expect(() => applyPlaytest(noSite as never, r, ev)).toThrow(/site/);
+  });
+
+  it("UNKNOWN ⇒ playable-smoke incomplete + 交付仍 incomplete（未知不升级为通过）", () => {
+    const insufficientEvidence = { ruleId: "negative-not-judgeable", missingObservation: "到达 gate", affectedAssertionIds: ["won"], explanation: "未到 gate，否定条件不可判" };
+    const assertions = [{
+      id: "won", kind: "state" as const, requires: ["won"], result: "unknown" as const,
+      expect: { kind: "state", path: "won", op: "eq", value: true }, withinMs: 1000,
+      insufficientEvidence, evidence: ["playtest-events"],
+    }];
+    const r = report({
+      aggregate: "UNKNOWN",
+      scenarios: [scenario({ outcome: "UNKNOWN", terminationReached: false, assertions, assertionAggregate: "unknown", insufficientEvidence })],
+    });
+    const next = applyPlaytest(baseDelivery(), r, ev);
+    expect(next.checks.find((c) => c.key === "playable-smoke")).toMatchObject({ status: "incomplete", detail: "UNKNOWN" });
+    expect(next.verdict).toBe("incomplete");
+    expect(next.playtest?.scenarios[0]?.insufficientEvidence?.ruleId).toBe("negative-not-judgeable");
+  });
 });
 
 describe("场景契约", () => {

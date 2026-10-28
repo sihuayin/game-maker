@@ -92,6 +92,20 @@ describe("attribute · 五态", () => {
     expect(outcomeOf(r)).toBe("UNKNOWN");
     if (r.execution === "executed") expect(r.insufficientEvidence?.ruleId).toBe("timeout-and-undecidable");
   });
+
+  it("无失败证据、无终止、无超时 ⇒ UNKNOWN（沉默不是通过，也不是失败）", () => {
+    const unknownAssertion = {
+      id: "won", kind: "state" as const, requires: ["won"], result: "unknown" as const,
+      expect: { kind: "state", path: "won", op: "eq", value: true }, withinMs: 1000,
+      insufficientEvidence: { ruleId: "negative-not-judgeable", missingObservation: "到达 gate", affectedAssertionIds: ["won"], explanation: "未到 gate，否定条件不可判" },
+      evidence: ["ev"],
+    };
+    const r = attribute(evidence({
+      scenario: scenario({ terminationReached: false, assertions: [unknownAssertion], assertionAggregate: "unknown" }),
+    }));
+    expect(outcomeOf(r)).toBe("UNKNOWN");
+    if (r.execution === "executed") expect(r.insufficientEvidence?.ruleId).toBe("insufficient-evidence");
+  });
 });
 
 describe("attribute · not-executed / boot", () => {

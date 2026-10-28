@@ -1,0 +1,66 @@
+{
+  "startedAt": "2026-10-27T14:30:08.070Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/fpvs-v1-final/runs/2026-10-27-gate-stop/scenario-only --out .scratch/fpvs-v1-final/runs/2026-10-27-gate-stop/harness-clear-patroller-2-after-fix --repeat 1",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-27-gate-stop/scenario-only",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-27-gate-stop/harness-clear-patroller-2-after-fix",
+  "repeat": 1,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-27-gate-stop/harness-clear-patroller-2-after-fix/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "gate-stop-diagnostic-clear-patroller-2",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": false,
+          "steps": 1394
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 1,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "gate-stop-diagnostic-clear-patroller-2",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "gate-stop-diagnostic-clear-patroller-2",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 6,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 2,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 4,
+              "win": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

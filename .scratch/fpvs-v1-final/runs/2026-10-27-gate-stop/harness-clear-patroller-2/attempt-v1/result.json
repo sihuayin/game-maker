@@ -1,0 +1,213 @@
+{
+  "reportVersion": "playtest-report/v1",
+  "identity": {
+    "scenarioFormatVersion": "playtest-scenario/v1",
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "shellVersion": "2",
+    "harnessVersion": "playtest-harness/v1",
+    "rulesVersion": "playtest-rules/v1"
+  },
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/fpvs-v1-final/scenarios --out .scratch/fpvs-v1-final/runs/2026-10-27-gate-stop/harness-clear-patroller-2 --repeat 1",
+  "exitCode": 0,
+  "startedAt": "2026-10-27T14:26:04.403Z",
+  "finishedAt": "2026-10-27T14:29:01.541Z",
+  "execution": "executed",
+  "scenarios": [
+    {
+      "scenarioId": "gate-stop-diagnostic-clear-patroller-2",
+      "scenarioVersion": 1,
+      "required": false,
+      "harnessCondition": "none",
+      "expectedOutcome": "SUCCESS",
+      "baselineEligible": false,
+      "execution": "executed",
+      "terminationReached": false,
+      "assertions": [
+        {
+          "id": "initial-pickups",
+          "kind": "state",
+          "requires": [
+            "initialActivePickups"
+          ],
+          "result": "pass",
+          "observed": 4,
+          "expect": {
+            "kind": "state",
+            "path": "initialActivePickups",
+            "op": "eq",
+            "value": 4
+          },
+          "withinMs": 120000,
+          "evidence": []
+        }
+      ],
+      "assertionAggregate": "pass",
+      "endState": {
+        "collected": 6,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 2,
+        "activePickups": 0,
+        "playerX": 1360.5
+      },
+      "initialState": {
+        "collected": 0,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 4,
+        "playerX": 40
+      },
+      "actions": [
+        {
+          "kind": "move_to",
+          "outcome": "completed",
+          "durationMs": 54964,
+          "steps": 1387
+        }
+      ],
+      "comparableEvents": [
+        "pickup",
+        "win"
+      ],
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 4,
+        "win": 0,
+        "chest-open": 2,
+        "danger-hit": 0,
+        "danger-erupt": 0,
+        "land": 62,
+        "jump": 63,
+        "reset": 8,
+        "runtime-error": 0
+      },
+      "evidence": [
+        "playtest-events",
+        "playtest-trace",
+        "playtest-input",
+        "playtest-console",
+        "playtest-exceptions"
+      ],
+      "durationMs": 55340,
+      "steps": 1388
+    },
+    {
+      "scenarioId": "gate-stop-diagnostic",
+      "scenarioVersion": 1,
+      "required": false,
+      "harnessCondition": "none",
+      "expectedOutcome": "SUCCESS",
+      "baselineEligible": false,
+      "execution": "executed",
+      "terminationReached": false,
+      "assertions": [
+        {
+          "id": "initial-pickups",
+          "kind": "state",
+          "requires": [
+            "initialActivePickups"
+          ],
+          "result": "pass",
+          "observed": 4,
+          "expect": {
+            "kind": "state",
+            "path": "initialActivePickups",
+            "op": "eq",
+            "value": 4
+          },
+          "withinMs": 120000,
+          "evidence": []
+        }
+      ],
+      "assertionAggregate": "pass",
+      "endState": {
+        "collected": 3,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 1,
+        "activePickups": 2,
+        "playerX": 778.5
+      },
+      "initialState": {
+        "collected": 0,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 4,
+        "playerX": 40
+      },
+      "actions": [
+        {
+          "kind": "move_to",
+          "outcome": "timeout",
+          "durationMs": 120012,
+          "steps": 3014
+        }
+      ],
+      "comparableEvents": [
+        "pickup",
+        "win"
+      ],
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 2,
+        "win": 0,
+        "chest-open": 1,
+        "danger-hit": 0,
+        "danger-erupt": 0,
+        "land": 154,
+        "jump": 155,
+        "reset": 24,
+        "runtime-error": 0
+      },
+      "evidence": [
+        "playtest-events",
+        "playtest-trace",
+        "playtest-input",
+        "playtest-console",
+        "playtest-exceptions"
+      ],
+      "durationMs": 120437,
+      "steps": 3015
+    }
+  ],
+  "runtime": {
+    "pollIntervalMs": 50,
+    "stepDelayMs": 35,
+    "scenarioTimeoutMs": 120000,
+    "viewport": {
+      "w": 1000,
+      "h": 600
+    },
+    "deviceScaleFactor": 1,
+    "chromeFlags": [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-background-timer-throttling",
+      "--disable-renderer-backgrounding",
+      "--disable-backgrounding-occluded-windows",
+      "--hide-scrollbars",
+      "--window-size=1000,600"
+    ]
+  },
+  "evidence": [
+    "playtest-events",
+    "playtest-trace",
+    "playtest-input",
+    "playtest-console",
+    "playtest-exceptions",
+    "playtest-chrome"
+  ]
+}

@@ -225,7 +225,19 @@ export const READ_STATE = `(()=>{
     collected: s.collected,
     won: !!s.won,
     pickups: (s.pickups || []).map((q) => ({ x: q.x, y: q.y, active: !!q.active, visible: !!q.visible })),
-    hazards: (s.hazards || []).map((h) => ({ x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs, t0: h.t0 })),
+    hazards: (s.hazards || []).map((h) => {
+      const hb = h.sprite.body;
+      return {
+        x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs, t0: h.t0,
+        // FA-02：策略需要危险物的几何足迹（盒），不能从精灵尺寸反推。只读，不改站点。
+        left: hb ? hb.x : h.sprite.x - h.sprite.displayWidth / 2,
+        right: hb ? hb.x + hb.width : h.sprite.x + h.sprite.displayWidth / 2,
+        top: hb ? hb.y : h.sprite.y - h.sprite.displayHeight,
+        bottom: hb ? hb.y + hb.height : h.sprite.y,
+        width: hb ? hb.width : h.sprite.displayWidth,
+        height: hb ? hb.height : h.sprite.displayHeight,
+      };
+    }),
     chests: (s.chests || []).map((c) => ({ x: c.sprite.x, y: c.sprite.y, opened: !!c.opened })),
     dangers: (s.dangers || []).map((d) => ({ x: d.sprite.x, y: d.sprite.y, state: d.state, hits: d.hits })),
     gate: s.gate ? { x: s.gate.x, y: s.gate.y } : null,

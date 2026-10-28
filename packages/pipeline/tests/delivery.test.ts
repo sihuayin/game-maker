@@ -8,7 +8,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { parseAssetPack, QA_JUDGEMENTS, QA_REPORT_FORMAT, buildDeliveryReport, type AssetPackManifest } from "@game-maker/contracts";
+import { parseAssetPack, QA_JUDGEMENTS, QA_REPORT_FORMAT, QAReportSchema, buildDeliveryReport, type AssetPackManifest } from "@game-maker/contracts";
 import {
   buildQaFailureDelivery, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf,
   tryWriteDelivery, writeDeliveryToReport, writeVisualReviewToReport,
@@ -285,5 +285,88 @@ describe("deliverySummaryOf（票 13 · FR-06，P1）", () => {
     expect(joined).toContain("QA 六判据"); // 失败项
     expect(joined).toContain("被前置阻塞"); // 阻塞项
     expect(s.data.deliveryVerdict).toBe("fail");
+  });
+});
+
+// ── FA-03 · FR-03 边界：CLI / MCP / 交付报告同一结论 ────────────────────────
+//   CLI（cli.ts 的 create/build）与 MCP（server.ts 的 create）**都只经过 `deliverySummaryOf`**。
+//   这里钉住「同一份 delivery，写盘读回后摘要结论 = 报告 verdict」，防止某一壳自己重算或漂移；
+//   同时覆盖 §6.1 的「未知/未完成/不通过不能被读成通过」。
+describe("FR-03 · CLI / MCP / 交付报告同一结论（FA-03）", () => {
+  type Check = { key: string; status: string; detail?: string };
+  const cases: Array<{
+    verdict: string; checks: Check[];
+    visualReview?: { status: string; reviewer?: string };
+    site?: { version: number; shell: string };
+  }> = [
+    {
+      verdict: "pass", site: { version: 1, shell: "2" }, visualReview: { status: "pass", reviewer: "人" },
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" }, { key: "qa", status: "pass" },
+        { key: "site", status: "pass" }, { key: "playable-smoke", status: "pass", detail: "SUCCESS" },
+        { key: "visual-review", status: "pass" },
+      ],
+    },
+    {
+      verdict: "incomplete", site: { version: 1, shell: "2" },
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" }, { key: "qa", status: "pass" },
+        { key: "site", status: "pass" }, { key: "playable-smoke", status: "incomplete" },
+        { key: "visual-review", status: "incomplete" },
+      ],
+    },
+    {
+      verdict: "fail", site: { version: 1, shell: "2" }, visualReview: { status: "fail" },
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" }, { key: "qa", status: "pass" },
+        { key: "site", status: "pass" }, { key: "playable-smoke", status: "pass", detail: "SUCCESS" },
+        { key: "visual-review", status: "fail" },
+      ],
+    },
+    {
+      verdict: "blocked",
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" }, { key: "qa", status: "pass" },
+        { key: "site", status: "blocked" }, { key: "playable-smoke", status: "blocked" },
+        { key: "visual-review", status: "incomplete" },
+      ],
+    },
+  ];
+
+  it("四种 verdict：写盘读回后，交付报告与终端摘要（CLI/MCP 共用）一致", () => {
+    for (const c of cases) {
+      const out = tmp();
+      const runDir = runDirOf(out);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, "qa-report.json"), JSON.stringify(qaReport(), null, 2) + "\n");
+      const delivery = buildDeliveryReport({
+        runId: `${ID}/run/v1`, pack: { packId: ID, packVersion: 2 },
+        config: { file: `${ID}/run/v1/game-config.json` },
+        ...(c.site === undefined ? {} : { site: c.site as never }),
+        checks: c.checks as never,
+        ...(c.visualReview === undefined ? {} : { visualReview: c.visualReview as never }),
+      });
+      writeDeliveryToReport(runDir, delivery);
+
+      const parsed = QAReportSchema.parse(JSON.parse(fs.readFileSync(path.join(runDir, "qa-report.json"), "utf8")));
+      expect(parsed.delivery?.verdict).toBe(c.verdict);
+      const s = deliverySummaryOf(parsed.delivery);
+      expect(s.data.deliveryVerdict).toBe(parsed.delivery?.verdict);
+      expect(s.summary[0]).toContain(c.verdict);
+      // 非 pass 的结论行不得含「：pass」——「没查/没通过」不能被摘要读成通过。
+      if (c.verdict !== "pass") expect(s.summary[0]).not.toContain("：pass");
+    }
+  });
+
+  it("报告没有 delivery ⇒ 摘要明示「尚无」，不是 pass（旧报告不会被读成通过）", () => {
+    const out = tmp();
+    const runDir = runDirOf(out);
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.writeFileSync(path.join(runDir, "qa-report.json"), JSON.stringify(qaReport(), null, 2) + "\n");
+    const parsed = QAReportSchema.parse(JSON.parse(fs.readFileSync(path.join(runDir, "qa-report.json"), "utf8")));
+    expect(parsed.delivery).toBeUndefined();
+    const s = deliverySummaryOf(undefined);
+    expect(s.data.deliveryVerdict).toBeNull();
+    expect(s.summary[0]).not.toContain("pass");
   });
 });

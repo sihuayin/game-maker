@@ -51,8 +51,59 @@ function requireUnder(outRoot: string, p: string): string {
   return relPath;
 }
 
+/**
+ * 读取并筛选交付试玩场景（FA-01D，用户 2026-10-28 批准）：
+ *   · 只读：不启动浏览器、不写报告；
+ *   · 保留既有语义：`harnessCondition === "none"` 且 `required === true`；
+ *   · `required:false` 的诊断/覆盖场景不进入交付命令（它们走 harness 直跑）；
+ *   · 任何 schema 错误 / siteVersion 不匹配 / 没有有效必需场景 ⇒ `CommandError("invalid")`（CLI exit 4）。
+ * ⚠️ 目录由调用方解析（CLI 把相对路径按 cwd 解析），本函数只做校验与筛选。
+ */
+export function selectScenarios(
+  scenarioDirInput: string,
+  siteVersion: number,
+): { file: string; scenario: PlaytestScenario }[] {
+  const scenarioDir = path.resolve(scenarioDirInput);
+  let entries: string[];
+  try {
+    if (!fs.existsSync(scenarioDir)) throw new Error("不存在");
+    if (!fs.statSync(scenarioDir).isDirectory()) throw new Error("不是目录");
+    entries = fs.readdirSync(scenarioDir);
+  } catch (e) {
+    throw new CommandError("invalid", `场景目录不可用：${scenarioDir}（${e instanceof Error ? e.message : String(e)}）`);
+  }
+
+  const scenarios: { file: string; scenario: PlaytestScenario }[] = [];
+  for (const file of entries.filter((f) => f.endsWith(".json")).sort()) {
+    const full = path.join(scenarioDir, file);
+    let raw: unknown;
+    try {
+      raw = readJson(full);
+    } catch (e) {
+      throw new CommandError("invalid", `场景文件读不出 JSON：${full}（${e instanceof Error ? e.message : String(e)}）`);
+    }
+    const parsed = PlaytestScenarioSchema.safeParse(raw);
+    if (!parsed.success)
+      throw new CommandError("invalid",
+        `场景契约不过 schema：${full}\n${parsed.error.issues.map((i) => `  · ${i.path.join(".")}: ${i.message}`).join("\n")}`);
+    const scenario = parsed.data;
+    if (scenario.harnessCondition !== "none") continue;
+    // `required:false` = 覆盖/诊断场景（故意失败/限制注入），不进交付命令的必需场景集。
+    if (!scenario.required) continue;
+    if (scenario.target.siteVersion !== siteVersion)
+      throw new CommandError("invalid",
+        `场景 ${scenario.id} 目标 site v${scenario.target.siteVersion} 与实际 v${siteVersion} 不匹配：${full}`);
+    scenarios.push({ file: full, scenario });
+  }
+
+  if (scenarios.length === 0)
+    throw new CommandError("invalid",
+      `场景目录没有可执行的必需场景（需要 harnessCondition="none" 且 required=true）：${scenarioDir}`);
+  return scenarios;
+}
+
 /** 票 06 Q4 的六项准备校验；任何一项不满足都不执行试玩。 */
-function resolveTarget(outRoot: string, runDirInput: string): Target {
+function resolveTarget(outRoot: string, runDirInput: string, scenarioDir: string = SCENARIO_DIR): Target {
   const runDir = path.resolve(runDirInput);
   if (!/\/v\d+$/.test(runDir))
     throw new CommandError("usage", `"${runDirInput}" 不是一次运行的目录（要 <gameId>/run/v<N> 的形状）`);
@@ -106,20 +157,9 @@ function resolveTarget(outRoot: string, runDirInput: string): Target {
   if (!fs.existsSync(deliveryConfig) || sha256File(deliveryConfig) !== configChecksum)
     throw new CommandError("invalid", "delivery.config 指向的配置与站点实际消费的配置不一致");
 
-  // 场景契约：只取游戏场景（harness 条件场景不进交付聚合）
-  const scenarios: { file: string; scenario: PlaytestScenario }[] = [];
-  for (const file of fs.readdirSync(SCENARIO_DIR).filter((f) => f.endsWith(".json")).sort()) {
-    const parsed = PlaytestScenarioSchema.safeParse(readJson(path.join(SCENARIO_DIR, file)));
-    if (!parsed.success) throw new CommandError("invalid", `场景契约不过 schema：${file}\n${parsed.error.issues.map((i) => `  · ${i.path.join(".")}: ${i.message}`).join("\n")}`);
-    const scenario = parsed.data;
-    if (scenario.harnessCondition !== "none") continue;
-    // `required:false` = 覆盖/诊断场景（故意失败/限制注入），不进交付命令的必需场景集。
-    if (!scenario.required) continue;
-    if (scenario.target.siteVersion !== siteVersion)
-      throw new CommandError("invalid", `场景 ${scenario.id} 目标 site v${scenario.target.siteVersion} 与实际 v${siteVersion} 不匹配`);
-    scenarios.push({ file: path.join(SCENARIO_DIR, file), scenario });
-  }
-  if (scenarios.length === 0) throw new CommandError("invalid", "没有可执行的游戏场景（五个场景里只有 harness 条件场景？）");
+  // 场景契约：只取游戏场景（harness 条件场景不进交付聚合）。
+  // FA-01D：目录可由 `--scenario-dir` 覆盖；默认仍是五态目录。
+  const scenarios = selectScenarios(scenarioDir, siteVersion);
 
   return {
     outRoot, runDir, gameId, siteDir, siteVersion, shellVersion: delivery.site.shell,
@@ -302,11 +342,13 @@ function baselineNote(b: { result: "match" | "changed" | "not-comparable"; reaso
   return ` · 与基线不可比较：${b.reason ?? "原因缺失"}`;
 }
 
-export function runPlaytestCommand(opts: { outRoot: string; runDirInput: string }): { result: CommandResult; exitCode: number } {
+export function runPlaytestCommand(opts: { outRoot: string; runDirInput: string; scenarioDir?: string }): { result: CommandResult; exitCode: number } {
   const outRoot = path.resolve(opts.outRoot);
+  // FA-01D：场景目录是输入；相对路径按 cwd 解析，绝对路径原样使用（path.resolve 同时满足）。
+  const resolvedScenarioDir = opts.scenarioDir === undefined ? SCENARIO_DIR : path.resolve(process.cwd(), opts.scenarioDir);
   let target: Target;
   try {
-    target = resolveTarget(outRoot, opts.runDirInput);
+    target = resolveTarget(outRoot, opts.runDirInput, resolvedScenarioDir);
   } catch (e) {
     // 准备拒绝：如果 run 目录 + qa-report 已经可读，留一条拒绝记录（不伪造 attempt、不写 delivery）。
     try {

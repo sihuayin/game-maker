@@ -1,0 +1,43 @@
+{
+  "repeat": 1,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "success-basic",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "success-basic",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "initial-pickups",
+              "result": "pass"
+            },
+            {
+              "id": "all-collected",
+              "result": "unknown"
+            },
+            {
+              "id": "won",
+              "result": "unknown"
+            }
+          ],
+          "endState": {
+            "collected": 3,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 1,
+            "activePickups": 2
+          },
+          "eventCounts": {
+            "pickup": 2,
+            "win": 0,
+            "chest-open": 1
+          }
+        }
+      ]
+    }
+  ]
+}

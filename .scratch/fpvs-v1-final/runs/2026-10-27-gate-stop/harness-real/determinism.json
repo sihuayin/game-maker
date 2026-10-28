@@ -1,0 +1,34 @@
+{
+  "repeat": 1,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "gate-stop-diagnostic",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "gate-stop-diagnostic",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "initial-pickups",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 3,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 1,
+            "activePickups": 2
+          },
+          "eventCounts": {
+            "pickup": 2,
+            "win": 0
+          }
+        }
+      ]
+    }
+  ]
+}

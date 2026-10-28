@@ -34,7 +34,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker accept <资源包目录> [--baseline <baseline 目录>] [--out <目录>] [--json]
   game-maker review <run 目录> [--json]
   game-maker review-verdict <run 目录> --verdict pass|fail [--reviewer <名字>] [--note "..."] [--json]
-  game-maker playtest <run 目录> [--out <目录>] [--json]
+  game-maker playtest <run 目录> [--out <目录>] [--scenario-dir <目录>] [--json]
   game-maker playtest-baseline promote <baselineId> --report <result.json> --second-report <result.json> --coverage <coverage.json> --reason "..." [--dir <目录>] [--replace] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
@@ -50,7 +50,8 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 \`playtest\` 是 Playtest V1 的**试玩**（仅 CLI、不加 MCP；票 06）：对一个已经装配好的 run 执行固定场景，
   观测运行事件/状态、产出可复现证据，并把五态归因写回 \`qa-report.json\` 的 \`delivery.playtest\`。
   ⚠️ **它会启动本地 Chrome**（headless），但**不调用任何付费上游**；\`create\` / \`build\` 本身不启动浏览器。
-  ⚠️ 只吃 run 目录，不接受 \`--pack\` / \`--site\` / \`--config\` / \`--scenario\` 覆盖 —— 身份从报告与产物关系解析。
+  ⚠️ 只吃 run 目录，不接受 \`--pack\` / \`--site\` / \`--config\` 覆盖 —— 身份从报告与产物关系解析；
+     \`--scenario-dir <目录>\` 可指定场景目录（默认五态），相对路径按 cwd 解析。
   退出码：0 = 试玩 SUCCESS 且交付写回成功；1 = 非 SUCCESS 或写回失败；4 = 准备拒绝/输入不合法；2 = 用法错。
 
 \`playtest-baseline promote\` 是**显式人工晋升基线**（票 05/09）：读两份干净运行报告，要求同身份/同场景/
@@ -123,6 +124,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "verdict", "reviewer", "note",
     // Playtest V1 票 09：基线晋升
     "report", "second-report", "coverage", "reason", "dir",
+    // FA-01D：试玩场景目录（默认五态）
+    "scenario-dir",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -759,7 +762,8 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         // ⚠️ 仅 CLI（票 06 Q2）：创建链不启动浏览器；身份与准备校验在 core，壳只解析参数/渲染。
         const dir = positionals[0];
         if (dir === undefined) throw new CommandError("usage", "playtest 需要一个 run 目录（<out>/<gameId>/run/v<N>）");
-        const playtest = runPlaytestCommand({ outRoot, runDirInput: dir });
+        const scenarioDir = typeof flags["scenario-dir"] === "string" ? flags["scenario-dir"] : undefined;
+        const playtest = runPlaytestCommand({ outRoot, runDirInput: dir, ...(scenarioDir === undefined ? {} : { scenarioDir }) });
         result = playtest.result;
         exitCode = playtest.exitCode;
         break;

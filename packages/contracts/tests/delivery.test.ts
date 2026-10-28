@@ -235,6 +235,27 @@ describe("qa-report/v1 兼容旧报告（票 08）", () => {
     if (parsed.success) expect(parsed.data.delivery?.verdict).toBe("pass");
     expect(oldReport()).not.toHaveProperty("delivery");
   });
+
+  it("历史阶段C：visual-review=pass 但 playable-smoke=incomplete ⇒ 读回仍是 incomplete（旧 PASS 不升级）", () => {
+    const historical = {
+      runId: "w/run/v1", pack: { packId: "w", packVersion: 1 },
+      config: { file: "w/run/v1/game-config.json" }, site: { version: 1, shell: "2" },
+      checks: [
+        { key: "asset-pack", status: "pass" }, { key: "config", status: "pass" },
+        { key: "qa", status: "pass" }, { key: "site", status: "pass" },
+        { key: "playable-smoke", status: "incomplete", detail: "UNKNOWN" },
+        { key: "visual-review", status: "pass" },
+      ],
+      verdict: "incomplete",
+      visualReview: { status: "pass", reviewer: "历史阶段C" },
+      evidence: [],
+    };
+    const parsed = QAReportSchema.parse({ ...oldReport(), delivery: historical });
+    expect(parsed.delivery?.verdict).toBe("incomplete");
+    expect(parsed.delivery?.playtest).toBeUndefined(); // 旧 smoke 数据不是 Playtest V1 报告，也不被合成一份
+    expect(parsed.delivery?.checks.find((c) => c.key === "playable-smoke")?.status).toBe("incomplete");
+    expect(parsed.delivery?.checks.find((c) => c.key === "visual-review")?.status).toBe("pass");
+  });
 });
 
 // ── 票 10：视觉评审 → 检查项 ─────────────────────────────────────────────

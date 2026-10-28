@@ -1,0 +1,34 @@
+{
+  "repeat": 1,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "gate-stop-diagnostic-clear-patroller-2",
+      "runs": 1,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "gate-stop-diagnostic-clear-patroller-2",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "initial-pickups",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 6,
+            "won": true,
+            "hits": 0,
+            "chestsOpened": 2,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 4,
+            "win": 1
+          }
+        }
+      ]
+    }
+  ]
+}

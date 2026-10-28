@@ -61,6 +61,11 @@ describe("参数解析（手写，无依赖）", () => {
   it("⚠️ 带值选项后面缺值 → 报参数错，而不是把 undefined 当值", () => {
     expect(() => parseArgs(["pack", "--recipe"])).toThrow(/后面要跟一个值/);
   });
+  it("playtest 接受 --scenario-dir，缺值报参数错（FA-01D）", () => {
+    expect(parseArgs(["playtest", "g/run/v1", "--scenario-dir", "custom/scenarios"]).flags["scenario-dir"])
+      .toBe("custom/scenarios");
+    expect(() => parseArgs(["playtest", "g/run/v1", "--scenario-dir"])).toThrow(/后面要跟一个值/);
+  });
 });
 
 describe("并发 flag 的语义（票 41 —— 「能独立控制 image concurrency」）", () => {

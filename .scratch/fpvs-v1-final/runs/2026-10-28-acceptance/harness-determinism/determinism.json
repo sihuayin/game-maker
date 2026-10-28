@@ -1,0 +1,113 @@
+{
+  "repeat": 2,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "acceptance-win-wasteland-v1",
+      "runs": 2,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "acceptance-win-wasteland-v1",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "initial-pickups",
+              "result": "pass"
+            },
+            {
+              "id": "all-collected",
+              "result": "pass"
+            },
+            {
+              "id": "chests-opened",
+              "result": "pass"
+            },
+            {
+              "id": "pickups-cleared",
+              "result": "pass"
+            },
+            {
+              "id": "pickup-events",
+              "result": "pass"
+            },
+            {
+              "id": "chest-events",
+              "result": "pass"
+            },
+            {
+              "id": "won",
+              "result": "pass"
+            },
+            {
+              "id": "win-event",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 6,
+            "won": true,
+            "hits": 0,
+            "chestsOpened": 2,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 4,
+            "win": 1,
+            "chest-open": 2
+          }
+        },
+        {
+          "scenarioId": "acceptance-win-wasteland-v1",
+          "outcome": null,
+          "assertions": [
+            {
+              "id": "initial-pickups",
+              "result": "pass"
+            },
+            {
+              "id": "all-collected",
+              "result": "pass"
+            },
+            {
+              "id": "chests-opened",
+              "result": "pass"
+            },
+            {
+              "id": "pickups-cleared",
+              "result": "pass"
+            },
+            {
+              "id": "pickup-events",
+              "result": "pass"
+            },
+            {
+              "id": "chest-events",
+              "result": "pass"
+            },
+            {
+              "id": "won",
+              "result": "pass"
+            },
+            {
+              "id": "win-event",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 6,
+            "won": true,
+            "hits": 0,
+            "chestsOpened": 2,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 4,
+            "win": 1,
+            "chest-open": 2
+          }
+        }
+      ]
+    }
+  ]
+}

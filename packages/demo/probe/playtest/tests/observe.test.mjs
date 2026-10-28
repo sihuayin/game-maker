@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createObserver } from "../observe.mjs";
-import { createPolicy, noteObservation, shouldJump } from "../policy.mjs";
+import { createPolicy, noteObservation, shouldJump, targetReached } from "../policy.mjs";
 
 const state = (over = {}) => ({
   x: 40, y: 240, bottom: 240, left: 28, right: 52, vx: 0, vy: 0,
@@ -80,16 +80,34 @@ describe("断言三值（证据门控 + 否定可判）", () => {
     expect(r.insufficientEvidence.ruleId).toBe("negative-not-judgeable");
   });
 
-  it("到了 gate 仍 won=false ⇒ fail（否定条件可判）", () => {
+  it("玩家右边界进入 gate 盒、仍 won=false ⇒ fail（否定条件可判）", () => {
     const obs = createObserver({ scenario: scenario([wonAssertion]), spawn: { x: 40, y: 240 } });
-    obs.record(state({ x: 1380 }), 0);
-    obs.record(state({ x: 1380 }), 50);
+    obs.record(state({ x: 1368, right: 1380 }), 0);
+    obs.record(state({ x: 1368, right: 1380 }), 50);
     expect(obs.assertionResults()[0].result).toBe("fail");
+  });
+
+  it("停在 gate 盒外 8px（FA-01B 实测）⇒ won=false 是 unknown，不是 fail", () => {
+    const obs = createObserver({ scenario: scenario([wonAssertion]), spawn: { x: 40, y: 240 } });
+    obs.record(state({ x: 1360.5, right: 1372.5 }), 0);
+    obs.record(state({ x: 1360.5, right: 1372.5 }), 50);
+    const r = obs.assertionResults()[0];
+    expect(r.result).toBe("unknown");
+    expect(r.insufficientEvidence.ruleId).toBe("negative-not-judgeable");
+  });
+
+  it("横向进入 gate 但在盒上方空中（FA-01B 实测）⇒ 仍未到达，won=false 是 unknown", () => {
+    const obs = createObserver({ scenario: scenario([wonAssertion]), spawn: { x: 40, y: 240 } });
+    obs.record(state({ x: 1369.5, right: 1381.5, bottom: 201.75 }), 0);
+    obs.record(state({ x: 1369.5, right: 1381.5, bottom: 201.75 }), 50);
+    const r = obs.assertionResults()[0];
+    expect(r.result).toBe("unknown");
+    expect(r.insufficientEvidence.ruleId).toBe("negative-not-judgeable");
   });
 
   it("轮询有洞 ⇒ unknown（不能把没看到当失败/通过）", () => {
     const obs = createObserver({ scenario: scenario([wonAssertion]), spawn: { x: 40, y: 240 } });
-    obs.record(state({ x: 1380 }), 0);
+    obs.record(state({ x: 1380, right: 1392 }), 0);
     obs.markGap(50, "state-unreadable");
     const r = obs.assertionResults()[0];
     expect(r.result).toBe("unknown");
@@ -114,5 +132,13 @@ describe("策略按观测步决策（不依赖墙钟）", () => {
     const st = state({ x: 300, onFloor: true, blockedRight: true, touchingRight: true });
     for (let i = 0; i < 8; i++) { noteObservation(st, a); noteObservation(st, b); }
     expect(shouldJump(st, a)).toBe(shouldJump(st, b));
+  });
+
+  it("gate 停点用玩家右边界对 gate 盒左边界 + 垂直重叠（FA-01B）", () => {
+    const gate = { kind: "gate" };
+    expect(targetReached(state({ x: 1360.5, right: 1372.5 }), gate)).toBe(false);
+    expect(targetReached(state({ x: 1369.5, right: 1381.5, bottom: 201.75 }), gate)).toBe(false);
+    expect(targetReached(state({ x: 1369.5, right: 1381.5, bottom: 240 }), gate)).toBe(true);
+    expect(targetReached(state({ x: 1368, right: 1380, bottom: 240 }), gate)).toBe(true);
   });
 });

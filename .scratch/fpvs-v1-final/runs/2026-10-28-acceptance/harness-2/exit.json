@@ -1,0 +1,6 @@
+{
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/fpvs-v1-final/scenarios/acceptance --out .scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-2",
+  "exitCode": 0,
+  "at": "2026-10-28T03:59:30.267Z",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-2"
+}

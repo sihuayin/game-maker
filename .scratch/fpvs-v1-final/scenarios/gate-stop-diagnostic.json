@@ -1,0 +1,29 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "gate-stop-diagnostic",
+  "version": 1,
+  "required": false,
+  "expectedOutcome": "SUCCESS",
+  "baselineEligible": false,
+  "target": { "siteVersion": 1 },
+  "harnessCondition": "none",
+  "setup": { "kind": "none" },
+  "actions": [
+    { "kind": "move_to", "target": { "kind": "gate" } }
+  ],
+  "assertions": [
+    {
+      "id": "initial-pickups",
+      "kind": "state",
+      "requires": ["initialActivePickups"],
+      "expect": { "kind": "state", "path": "initialActivePickups", "op": "eq", "value": 4 },
+      "withinMs": 120000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": { "kind": "won" },
+  "timeoutMs": 120000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": ["pickup", "win"]
+}

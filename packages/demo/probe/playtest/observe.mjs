@@ -127,7 +127,8 @@ export function createObserver({ scenario, spawn }) {
     maxHits = Math.max(maxHits, (st.dangers || []).reduce((n, d) => n + (d.hits || 0), 0));
     maxChests = Math.max(maxChests, (st.chests || []).filter((ch) => ch.opened).length);
     sawWon = sawWon || !!st.won;
-    if (st.gate && st.x >= st.gate.x - 20) gateReached = true;
+    // gate 的锚点是 {0,0}，`gate.x` 即盒左边界；玩家右边界进入盒子才算到达（FA-01B）。
+    if (st.gate && st.right >= st.gate.x && st.bottom >= st.gate.y) gateReached = true;
 
     prev = st;
     last = st;

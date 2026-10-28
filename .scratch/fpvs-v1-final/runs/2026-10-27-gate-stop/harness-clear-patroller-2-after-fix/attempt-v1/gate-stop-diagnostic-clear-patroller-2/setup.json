@@ -1,0 +1,13 @@
+{
+  "kind": "mutate-hazard",
+  "applied": true,
+  "ok": true,
+  "before": {
+    "distance": 120,
+    "periodMs": 3500
+  },
+  "after": {
+    "distance": 10000,
+    "periodMs": 20000
+  }
+}

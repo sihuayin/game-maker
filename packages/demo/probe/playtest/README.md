@@ -44,6 +44,11 @@ node packages/demo/probe/playtest/playtest.mjs \
 （`required:false`，故意注入失败/限制，不进交付命令的必需场景集）；`env-no-chrome` / `timeout-hang`
 是 harness 条件场景（同样 `required:false`）。
 
+⚠️ **执行策略会"等"**（FA-02，2026-10-28）：`move_to` / `reach_goal` 不只是"按住右键直到到达"——
+前方有横向巡逻危险物时，策略会在巡逻带外沿**松开右键等待**安全相位，再按实时几何/相位起跳越过；
+等待/恢复都走同一按键通道，记在 `input.jsonl`。场景协议不变；物理量取自被验收游戏自己的
+`player.move`，危险物盒足迹由只读 `READ_STATE` 提供。
+
 ## 不在本目录
 
 - 五态归因器（`attribute` / `InsufficientEvidence` 决策表）→ 票 08。

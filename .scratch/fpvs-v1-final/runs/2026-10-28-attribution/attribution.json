@@ -1,0 +1,316 @@
+{
+  "format": "fpvs-fa03-attribution-verification/v1",
+  "generatedAt": "2026-10-28T04:42:24.693Z",
+  "subject": {
+    "run": "wasteland-scavenger-recipe/run/v1",
+    "attempt": "playtest/v2",
+    "scenario": "acceptance-win-wasteland-v1",
+    "snapshot": "artifacts/wasteland-scavenger-recipe (66 files, read-only)",
+    "report": "run/v1/playtest/v2/result.json"
+  },
+  "verdict": "pass",
+  "checksFailed": 0,
+  "checks": [
+    {
+      "id": "identity.three-way",
+      "pass": true,
+      "observed": {
+        "siteVersion": 1,
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "shellVersion": "2",
+        "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+      }
+    },
+    {
+      "id": "bytes.snapshot-untouched",
+      "pass": true,
+      "snapshotFiles": 66,
+      "referenceFiles": 14,
+      "diffs": [],
+      "refDiffs": []
+    },
+    {
+      "id": "bytes.work-vs-snapshot",
+      "pass": true,
+      "diffs": [
+        "run/v1/qa-report.json"
+      ]
+    },
+    {
+      "id": "bytes.site-integrity",
+      "pass": true,
+      "unchanged": true,
+      "now": {
+        "index.html": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+        "shell.js": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+        "site.json": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896",
+        "game-config.json": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+      }
+    },
+    {
+      "id": "run.setup-none",
+      "pass": true,
+      "setup": {
+        "kind": "none",
+        "applied": true
+      }
+    },
+    {
+      "id": "run.executed",
+      "pass": true,
+      "execution": "executed",
+      "exitCode": 0,
+      "terminationReached": true,
+      "assertionAggregate": "pass"
+    },
+    {
+      "id": "events.recount",
+      "pass": true,
+      "recounted": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 4,
+        "jump": 9,
+        "land": 9,
+        "chest-open": 2,
+        "win": 1
+      },
+      "mismatched": [],
+      "zeroNotZero": []
+    },
+    {
+      "id": "assertions.recompute",
+      "pass": true,
+      "assertions": [
+        {
+          "id": "initial-pickups",
+          "declared": 4,
+          "recomputed": 4,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "all-collected",
+          "declared": 6,
+          "recomputed": 6,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "chests-opened",
+          "declared": 2,
+          "recomputed": 2,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "pickups-cleared",
+          "declared": 0,
+          "recomputed": 0,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "pickup-events",
+          "declared": 4,
+          "recomputed": 4,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "chest-events",
+          "declared": 2,
+          "recomputed": 2,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "won",
+          "declared": true,
+          "recomputed": true,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        },
+        {
+          "id": "win-event",
+          "declared": 1,
+          "recomputed": 1,
+          "declaredPass": "pass",
+          "recomputedPass": true
+        }
+      ],
+      "bad": []
+    },
+    {
+      "id": "startup",
+      "pass": true,
+      "sceneReady": 1,
+      "spawn": 1,
+      "consoleErrors": [],
+      "exceptions": 0
+    },
+    {
+      "id": "movement",
+      "pass": true,
+      "firstX": 40,
+      "lastX": 1371,
+      "samples": 453,
+      "gaps": 0
+    },
+    {
+      "id": "jump-land",
+      "pass": true,
+      "spaceDowns": 9,
+      "jump": 9,
+      "land": 9
+    },
+    {
+      "id": "pickups",
+      "pass": true,
+      "pickupEvents": 4,
+      "initialActive": 4,
+      "finalActive": 0
+    },
+    {
+      "id": "chests",
+      "pass": true,
+      "chestOpenEvents": 2,
+      "openedInTrace": 2
+    },
+    {
+      "id": "gate.win",
+      "pass": true,
+      "won": true,
+      "winEventT": 17006,
+      "lastPickupT": 13653,
+      "playerRight": 1383,
+      "gateX": 1380,
+      "playerBottom": 240,
+      "gateY": 208
+    },
+    {
+      "id": "collected-guard-order",
+      "pass": true,
+      "collectStep": 4,
+      "goalStep": 5,
+      "lastPickupT": 13653,
+      "reachGoalStartsAt": 13653
+    },
+    {
+      "id": "hazard.indirect",
+      "pass": true,
+      "reset": 0,
+      "dangerHit": 0,
+      "samplingOverlaps": 0,
+      "playerSize": {
+        "w": 24,
+        "h": 32
+      },
+      "hazardSize": {
+        "w": 24,
+        "h": 32
+      },
+      "minVerticalClearance_centerWithin14": 18.75,
+      "minVerticalClearance_boxOverlap": 6.25,
+      "minGapAt": {
+        "t": 5213,
+        "x": 362.5,
+        "bottom": 189.25,
+        "hazardX": 352.08
+      },
+      "caveat": "采样级重建（trace 约 38ms 一行）；接触的权威判据是游戏自己的 physics overlap → reset，本轮 reset=0。"
+    },
+    {
+      "id": "attribution.success",
+      "pass": true,
+      "attributed": {
+        "execution": "executed",
+        "stage": "evaluate",
+        "outcome": "SUCCESS",
+        "evidence": [
+          "playtest-events",
+          "playtest-trace"
+        ]
+      },
+      "declaredOutcome": "SUCCESS",
+      "env": {
+        "healthy": true,
+        "chromeAvailable": true,
+        "sceneReadyObserved": true,
+        "pollGaps": 0,
+        "failures": []
+      },
+      "action": {
+        "attempted": 7,
+        "completed": 7,
+        "timedOut": 0,
+        "explorationExhausted": true,
+        "stuck": false,
+        "progressPx": 1331
+      }
+    },
+    {
+      "id": "attribution.failed-iteration",
+      "pass": true,
+      "attributed": {
+        "execution": "executed",
+        "stage": "execute",
+        "outcome": "AGENT_LIMITATION",
+        "evidence": [
+          "playtest-events",
+          "playtest-trace"
+        ]
+      },
+      "resets": 19,
+      "steps": 3138,
+      "progressPx": 398,
+      "wonAssertionResult": "unknown",
+      "note": "断言聚合 fail 的不是 GAMEPLAY_FAILURE：won/collected/pickup 在未到 gate 时是 unknown，正面的能力边界证据（19 reset、3138 步、无终止）把它们归为 AGENT_LIMITATION。"
+    },
+    {
+      "id": "misattribution.gate-without-collected",
+      "pass": true,
+      "affected": false,
+      "atGateNotWonSamples": 0,
+      "guardOrdered": true,
+      "rule": "observe.mjs judgeableNegative('won') = gateReached；attribution rule ④ 把 failed won 判 GAMEPLAY_FAILURE",
+      "status": "known-limitation（只在未集齐就到达 gate 时触发；本验收场景的 collected 守卫使其不发生；改规则需审批）"
+    },
+    {
+      "id": "delivery.consistency",
+      "pass": true,
+      "playableSmoke": {
+        "key": "playable-smoke",
+        "status": "pass",
+        "detail": "SUCCESS"
+      },
+      "visualReview": {
+        "key": "visual-review",
+        "status": "incomplete"
+      },
+      "visualReviewObject": {
+        "status": "pending"
+      },
+      "verdict": "incomplete",
+      "mapped": {
+        "status": "pass",
+        "detail": "SUCCESS"
+      },
+      "scenariosMatch": true,
+      "missingEvidence": [],
+      "reportPath": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json"
+    },
+    {
+      "id": "history.not-upgraded",
+      "pass": true,
+      "historicalOutcome": "AGENT_LIMITATION",
+      "historicalCollected": 3,
+      "historicalVerdict": "incomplete",
+      "historicalVisual": "pass",
+      "currentVisual": "pending",
+      "note": "历史 stage-c 的 visual PASS 只作参考；本轮信封由 FA-01D 重新初始化（visual=pending），不继承。"
+    }
+  ]
+}

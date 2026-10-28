@@ -1,0 +1,159 @@
+{
+  "startedAt": "2026-10-28T03:59:44.504Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1 --scenario-dir .scratch/fpvs-v1-final/scenarios/acceptance --out .scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-determinism --repeat 2",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/scenarios/acceptance",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-determinism",
+  "repeat": 2,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-determinism/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "acceptance-win-wasteland-v1",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": true,
+          "steps": 449
+        }
+      ],
+      "siteUnchanged": true
+    },
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-acceptance/harness-determinism/attempt-v2",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "acceptance-win-wasteland-v1",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": true,
+          "steps": 456
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 2,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "acceptance-win-wasteland-v1",
+        "runs": 2,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "acceptance-win-wasteland-v1",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              },
+              {
+                "id": "all-collected",
+                "result": "pass"
+              },
+              {
+                "id": "chests-opened",
+                "result": "pass"
+              },
+              {
+                "id": "pickups-cleared",
+                "result": "pass"
+              },
+              {
+                "id": "pickup-events",
+                "result": "pass"
+              },
+              {
+                "id": "chest-events",
+                "result": "pass"
+              },
+              {
+                "id": "won",
+                "result": "pass"
+              },
+              {
+                "id": "win-event",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 6,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 2,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 4,
+              "win": 1,
+              "chest-open": 2
+            }
+          },
+          {
+            "scenarioId": "acceptance-win-wasteland-v1",
+            "outcome": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              },
+              {
+                "id": "all-collected",
+                "result": "pass"
+              },
+              {
+                "id": "chests-opened",
+                "result": "pass"
+              },
+              {
+                "id": "pickups-cleared",
+                "result": "pass"
+              },
+              {
+                "id": "pickup-events",
+                "result": "pass"
+              },
+              {
+                "id": "chest-events",
+                "result": "pass"
+              },
+              {
+                "id": "won",
+                "result": "pass"
+              },
+              {
+                "id": "win-event",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 6,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 2,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 4,
+              "win": 1,
+              "chest-open": 2
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

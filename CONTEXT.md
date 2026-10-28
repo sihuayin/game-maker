@@ -704,6 +704,8 @@ harness 从只读外部探针轮询得到的状态快照与结构化观测。它
 **Semantic Test Action（语义测试动作）**
 以游戏语义而非屏幕坐标表达的动作：`move_to` / `jump_over` / `wait_until` / `reach_goal` / `assert_state`。
 由薄解释器执行；实际按键轨迹记在 `input.jsonl`。具体玩法目标与动作序列来自场景契约数据，不写死在解释器里。
+⚠️ 执行策略可以在横向巡逻危险物前**松开方向键等待**安全相位再越过（FA-02，2026-10-28）——
+等待与恢复仍走同一按键通道，目标与协议不变。
 
 **GameplayTestPlan（玩法测试计划）**
 场景契约的集合（五态 + harness 条件 + 自测）。它声明设计意图（`expectedOutcome`）、动作、断言、

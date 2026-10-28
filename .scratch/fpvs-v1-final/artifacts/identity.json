@@ -1,0 +1,255 @@
+{
+  "format": "fpvs-final-identity/v1",
+  "generatedAt": "2026-10-27T14:20:36.823Z",
+  "source": {
+    "root": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe",
+    "pack": "pack/v1",
+    "run": "run/v1",
+    "site": "site/v1"
+  },
+  "snapshot": {
+    "root": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "readOnly": true,
+    "readOnlyProof": {
+      "writableCount": 0,
+      "mode": "chmod -R a-w"
+    }
+  },
+  "work": {
+    "root": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe",
+    "writable": true
+  },
+  "identity": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2",
+    "siteVersion": 1,
+    "siteJson": {
+      "shell": "2",
+      "pack": "v1",
+      "config": "game-config.json"
+    },
+    "configFile": "run/v1/game-config.json",
+    "siteConfigFile": "site/v1/game-config.json",
+    "manifestChecksumFromReport": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "manifestFileSha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "manifestChecksumMatchesFile": true,
+    "runConfigSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "siteConfigSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "runConfigEqualsSiteConfig": true,
+    "historicalPlaytestIdentity": {
+      "scenarioFormatVersion": "playtest-scenario/v1",
+      "siteVersion": 1,
+      "packId": "wasteland-scavenger-recipe",
+      "packVersion": 1,
+      "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+      "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "shellVersion": "2",
+      "harnessVersion": "playtest-harness/v1",
+      "rulesVersion": "playtest-rules/v1"
+    }
+  },
+  "inputs": {
+    "referenceImage": "run/v1/reference.png",
+    "styleImage": "run/v1/style.png",
+    "intentFile": "run/v1/intent.md",
+    "gameIntent": "run/v1/game-intent.json",
+    "gameDesign": "run/v1/game-design.json",
+    "stylespec": "run/v1/stylespec.json",
+    "visualWorld": "run/v1/visual-world.json"
+  },
+  "reports": {
+    "qaReport": "run/v1/qa-report.json",
+    "historicalPlaytest": "artifacts/reference/playtest-v1/attempt-v1/result.json",
+    "priorDeliveryReport": "artifacts/reference/prior-delivery-stage-c/qa-report.json"
+  },
+  "verification": {
+    "snapshotVsSource": {
+      "label": "snapshot-vs-source",
+      "same": true,
+      "checkedLeft": 66,
+      "checkedRight": 66,
+      "mismatches": []
+    },
+    "workVsSnapshot": {
+      "label": "work-vs-snapshot",
+      "same": true,
+      "checkedLeft": 66,
+      "checkedRight": 66,
+      "mismatches": []
+    },
+    "sourceStable": {
+      "label": "source-before-vs-after",
+      "same": true,
+      "checkedLeft": 66,
+      "checkedRight": 66,
+      "mismatches": []
+    },
+    "snapshotReadOnly": {
+      "readOnly": true,
+      "writableEntries": [],
+      "writableCount": 0
+    },
+    "referenceReadOnly": {
+      "readOnly": true,
+      "writableEntries": [],
+      "writableCount": 0
+    },
+    "critical": [
+      {
+        "expected": "site/v1/site.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "site/v1/index.html",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "site/v1/shell.js",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "site/v1/game-config.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/game-config.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/qa-report.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/intent.md",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/reference.png",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/style.png",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/game-design.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/game-intent.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/stylespec.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "run/v1/visual-world.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "pack/v1/manifest.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "pack/v1/ledger.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "pack/v1/coverage.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "pack/v1/authoring/stylespec.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "pack/v1/authoring/visual-world.json",
+        "matched": true,
+        "missing": false
+      },
+      {
+        "expected": "pack/v1/delivery/atlas.*.json",
+        "matched": true,
+        "missing": false,
+        "matches": [
+          "pack/v1/delivery/atlas.animations.json",
+          "pack/v1/delivery/atlas.backgrounds.json",
+          "pack/v1/delivery/atlas.sprites.json",
+          "pack/v1/delivery/atlas.ui.json"
+        ]
+      },
+      {
+        "expected": "pack/v1/delivery/atlas.*.png",
+        "matched": true,
+        "missing": false,
+        "matches": [
+          "pack/v1/delivery/atlas.animations.png",
+          "pack/v1/delivery/atlas.backgrounds.png",
+          "pack/v1/delivery/atlas.sprites.png",
+          "pack/v1/delivery/atlas.ui.png"
+        ]
+      },
+      {
+        "expected": "pack/v1/authoring/drawlist/*.json",
+        "matched": true,
+        "missing": false,
+        "matches": [
+          "pack/v1/authoring/drawlist/hud-icon-scrap.json",
+          "pack/v1/authoring/drawlist/hud-panel.json"
+        ]
+      },
+      {
+        "expected": "pack/v1/authoring/generated/*",
+        "matched": true,
+        "missing": false,
+        "matches": [
+          "pack/v1/authoring/generated/scavenger-hero.idle.png",
+          "pack/v1/authoring/generated/scavenger-hero.idle.prompt.txt",
+          "pack/v1/authoring/generated/scavenger-hero.jump.png",
+          "pack/v1/authoring/generated/scavenger-hero.jump.prompt.txt",
+          "pack/v1/authoring/generated/scavenger-hero.run.png"
+        ]
+      },
+      {
+        "expected": "pack/v1/authoring/masters/*",
+        "matched": true,
+        "missing": false,
+        "matches": [
+          "pack/v1/authoring/masters/master-scavenger-hero.png",
+          "pack/v1/authoring/masters/master-scavenger-hero.prompt.txt",
+          "pack/v1/authoring/masters/master-scavenger-hero.ratio.json",
+          "pack/v1/authoring/masters/master-wasteland-patroller.png",
+          "pack/v1/authoring/masters/master-wasteland-patroller.prompt.txt"
+        ]
+      },
+      {
+        "expected": "run/v1/visual-design/**",
+        "matched": true,
+        "missing": false,
+        "matches": [
+          "run/v1/visual-design/preview/scene.png",
+          "run/v1/visual-design/svg/scene.svg"
+        ]
+      }
+    ]
+  }
+}

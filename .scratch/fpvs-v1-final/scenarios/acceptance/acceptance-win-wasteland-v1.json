@@ -1,0 +1,67 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "acceptance-win-wasteland-v1",
+  "version": 1,
+  "required": true,
+  "expectedOutcome": "SUCCESS",
+  "baselineEligible": false,
+  "target": { "siteVersion": 1 },
+  "harnessCondition": "none",
+  "setup": { "kind": "none" },
+  "actions": [
+    { "kind": "move_to", "target": { "kind": "pickup", "index": 0 } },
+    { "kind": "move_to", "target": { "kind": "pickup", "index": 1 } },
+    { "kind": "move_to", "target": { "kind": "pickup", "index": 2 } },
+    { "kind": "move_to", "target": { "kind": "pickup", "index": 3 } },
+    { "kind": "wait_until", "condition": { "kind": "collected", "value": 6 }, "timeoutMs": 2000 },
+    { "kind": "reach_goal" },
+    { "kind": "wait_until", "condition": { "kind": "won" }, "timeoutMs": 120000 }
+  ],
+  "assertions": [
+    {
+      "id": "initial-pickups", "kind": "state", "requires": ["initialActivePickups"],
+      "expect": { "kind": "state", "path": "initialActivePickups", "op": "eq", "value": 4 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "all-collected", "kind": "state", "requires": ["collected"],
+      "expect": { "kind": "state", "path": "collected", "op": "eq", "value": 6 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "chests-opened", "kind": "state", "requires": ["chestsOpened"],
+      "expect": { "kind": "state", "path": "chestsOpened", "op": "eq", "value": 2 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "pickups-cleared", "kind": "state", "requires": ["activePickups"],
+      "expect": { "kind": "state", "path": "activePickups", "op": "eq", "value": 0 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "pickup-events", "kind": "event", "requires": ["pickup"],
+      "expect": { "kind": "event", "type": "pickup", "op": "gte", "value": 4 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "chest-events", "kind": "event", "requires": ["chest-open"],
+      "expect": { "kind": "event", "type": "chest-open", "op": "gte", "value": 2 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "won", "kind": "state", "requires": ["won"],
+      "expect": { "kind": "state", "path": "won", "op": "eq", "value": true },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    },
+    {
+      "id": "win-event", "kind": "event", "requires": ["win"],
+      "expect": { "kind": "event", "type": "win", "op": "gte", "value": 1 },
+      "withinMs": 120000, "onInsufficient": "unknown"
+    }
+  ],
+  "termination": { "kind": "won" },
+  "timeoutMs": 120000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": ["pickup", "win", "chest-open"]
+}

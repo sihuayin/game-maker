@@ -15,7 +15,7 @@ import {
 } from "../probe-harness.mjs";
 import { PHASER_HOOK } from "../probe-harness.mjs";
 import { createObserver } from "./observe.mjs";
-import { createPolicy, markJump, noteObservation, shouldJump, targetReached } from "./policy.mjs";
+import { createPolicy, decide, markJump, noteObservation, targetReached } from "./policy.mjs";
 
 const ZERO_END = { collected: 0, won: false, hits: 0, chestsOpened: 0, activePickups: 0, playerX: null };
 const ZERO_INITIAL = { collected: 0, won: false, hits: 0, chestsOpened: 0, activePickups: 0 };
@@ -151,7 +151,15 @@ async function applySetup(page, setup) {
 }
 
 async function runMoveTo({ page, scenario, action, target, deadline, obs, policy, kb, errorsOf, elapsed }) {
-  await kb.downRight(action.kind);
+  // FA-02：右键不再"按下就不放"——策略可以在巡逻危险物前停下等待（松开右键），安全窗口再恢复。
+  let rightDown = false;
+  const setRight = async (down) => {
+    if (down === rightDown) return;
+    rightDown = down;
+    if (down) await kb.downRight(action.kind);
+    else await kb.upRight(action.kind);
+  };
+  await setRight(true);
   try {
     while (Date.now() < deadline) {
       const st = await page.readState();
@@ -159,12 +167,14 @@ async function runMoveTo({ page, scenario, action, target, deadline, obs, policy
       if (!st) { await delay(scenario.stepDelayMs); continue; }
       noteObservation(st, policy);
       if (targetReached(st, target) || obs.terminationReached(scenario.termination)) return "completed";
-      if (shouldJump(st, policy)) { markJump(policy); await kb.jump(action.kind); }
+      const d = decide(st, policy);
+      await setRight(d.advance);
+      if (d.jump) { markJump(policy); await kb.jump(action.kind); }
       await delay(scenario.stepDelayMs);
     }
     return "timeout";
   } finally {
-    await kb.upRight(action.kind);
+    await setRight(false);
   }
 }
 
@@ -218,7 +228,9 @@ async function runScenario({ page, scenario, dir, target, command }) {
   const t0 = Date.now();
   const elapsed = () => Date.now() - t0;
   const obs = createObserver({ scenario, spawn: { x: initial.x, y: initial.y } });
-  const policy = createPolicy({ floorY, spawn: { x: initial.x, y: initial.y } });
+  // 物理量用**被验收游戏自己的** player.move（缺省回落到契约默认值），策略不写死本关数值。
+  const config = readJson(target.configPath);
+  const policy = createPolicy({ floorY, spawn: { x: initial.x, y: initial.y }, move: config?.player?.move });
   const input = [];
   const kb = createKeyboard(page, input);
   const errorsOf = () => ({ console: page.consoleErrors(), exceptions: page.exceptions });
