@@ -197,8 +197,8 @@ verdict.deterministic`）。
 
 | 命令 | 结果 | 备注 |
 |---|---|---|
-| `pnpm test` | **2160 tests / 145 files 全绿**（2026-10-28 复跑，exit 0） | 原始输出：`regression/test.log`；与 FA-03 基线一致；本轮无代码变更 |
-| `pnpm typecheck` | 全绿（2026-10-28 复跑，exit 0） | 原始输出：`regression/typecheck.log` |
+| `pnpm test` | **2160 tests / 145 files 全绿**（2026-10-28 复跑，exit 0） | 退出码：`regression/test.exit`（已入库）；详细日志本地生成（`.gitignore` 的 `*.log` 不入库），`pnpm test` 可复跑；与 FA-03 基线一致 |
+| `pnpm typecheck` | 全绿（2026-10-28 复跑，exit 0） | 退出码：`regression/typecheck.exit`（已入库）；日志可复跑生成 |
 | `pnpm test:playtest` | self-test 4/4 + **96 tests / 8 files 全绿**（FA-03 记录） | 本轮未重跑：self-test 会写已跟踪的 `.scratch/playtest-v1/runs/<date>-self-test`，避免覆盖历史证据（FA-06 处理） |
 | `pnpm test:acceptance` | 未跑 | 本阶段未触达意图→机制验收链路；`pnpm test` 已含单测/witness |
 
@@ -235,7 +235,7 @@ pnpm test && pnpm typecheck
 | `acceptance-run` | `runs/2026-10-28-acceptance/{README.md,harness-1,harness-final,...}` | 通关与失败迭代证据 |
 | `visual-review` | `runs/2026-10-28-visual-review/{README.md,review-record.json,materials.json,review.html,shots/,assets/}` | 人类 visual pass + 材料 |
 | `consistency` | 本目录 `consistency.json` | 最终态 CLI/MCP/报告一致性 |
-| `regression` | FA-03 报告 + 本次 `pnpm test` / `pnpm typecheck` 输出 | 2160/145 + typecheck 绿 |
+| `regression` | FA-03 报告 + 本次 `regression/test.exit` / `typecheck.exit` + `pnpm test` / `pnpm typecheck` 复跑 | 2160/145 + typecheck 绿（日志按 `.gitignore` 不入库） |
 
 ## 10. 最终结论
 

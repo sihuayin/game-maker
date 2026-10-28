@@ -1,6 +1,6 @@
 {
   "format": "fpvs-final-acceptance-consistency/v1",
-  "generatedAt": "2026-10-28T09:08:34.134Z",
+  "generatedAt": "2026-10-28T10:16:48.060Z",
   "subject": {
     "run": "wasteland-scavenger-recipe/run/v1",
     "report": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",

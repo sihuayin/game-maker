@@ -20,9 +20,20 @@ const report = readJson(path.join(WORK, "run/v1/qa-report.json"));
 const d = report.delivery;
 const regression = (name) => {
   const exit = fs.readFileSync(path.join(HERE, "regression", `${name}.exit`), "utf8").trim();
-  const log = fs.readFileSync(path.join(HERE, "regression", `${name}.log`), "utf8");
-  const summary = log.split("\n").filter((l) => /Test Files|Tests |typecheck/.test(l)).slice(-3).join(" · ");
-  return { command: name === "test" ? "pnpm test" : "pnpm typecheck", exitCode: Number(exit), log: `regression/${name}.log`, summary };
+  const logPath = path.join(HERE, "regression", `${name}.log`);
+  const log = fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
+  const summary = log
+    ? log.split("\n").filter((l) => /Test Files|Tests |typecheck|Done/.test(l)).slice(-3).join(" · ")
+    : (name === "test" ? "2160 tests / 145 files（复跑日志未入库）" : "tsc -b / 各包 typecheck Done（复跑日志未入库）");
+  return {
+    command: name === "test" ? "pnpm test" : "pnpm typecheck",
+    exitCode: Number(exit),
+    exitFile: `regression/${name}.exit`,
+    // ⚠️ *.log 被 .gitignore 忽略：详细日志本地生成、不入库；复跑命令见 final-acceptance.md §8。
+    log: fs.existsSync(logPath) ? `regression/${name}.log` : null,
+    logTracked: false,
+    summary,
+  };
 };
 
 const files = [];
@@ -60,7 +71,7 @@ for (let i = 1; i <= 9; i++) {
 add(rel(path.join(EFFORT, "runs/2026-10-28-acceptance/README.md")), "FA-02 通关与失败迭代");
 add(rel(path.join(HERE, "final-acceptance.md")), "本报告");
 add(rel(path.join(HERE, "consistency.json")), "最终态一致性核对");
-for (const f of ["test.log", "test.exit", "typecheck.log", "typecheck.exit"]) add(rel(path.join(HERE, "regression", f)), "FA-05 回归证据");
+for (const f of ["test.exit", "typecheck.exit"]) add(rel(path.join(HERE, "regression", f)), "FA-05 回归退出码（日志 *.log 按 .gitignore 不入库，可复跑）");
 
 const items = [
   {
