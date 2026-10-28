@@ -1,0 +1,230 @@
+{
+  "format": "fpvs-generic-playtest-final-verdict/v1",
+  "generatedAt": "2026-10-28T15:53:00Z",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "qaReport": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+    "qaReportSha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6"
+  },
+  "inheritedVerification": {
+    "checks": 27,
+    "failed": 0,
+    "pass": true,
+    "result": "evidence/07-inherited-verification.json"
+  },
+  "delivery": {
+    "declared": "pass",
+    "recomputed": "pass",
+    "requiredChecks": [
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass"
+    ]
+  },
+  "section55": [
+    {
+      "id": "5.5-1",
+      "baseline": "PARTIAL",
+      "verdict": "MET",
+      "evidence": [
+        "danger-forms.test.mjs",
+        "policy.test.mjs",
+        "06 input.jsonl 松开/恢复右键",
+        "0 reset"
+      ]
+    },
+    {
+      "id": "5.5-2",
+      "baseline": "PARTIAL",
+      "verdict": "MET",
+      "evidence": [
+        "termination.test.mjs（120 步 wait-limit）",
+        "06 真实等待/恢复"
+      ]
+    },
+    {
+      "id": "5.5-3",
+      "baseline": "PARTIAL",
+      "verdict": "MET",
+      "evidence": [
+        "termination.test.mjs（3 步验证/降级/耗尽）",
+        "06 jump-verified 9/10"
+      ]
+    },
+    {
+      "id": "5.5-4",
+      "baseline": "NOT MET",
+      "verdict": "MET",
+      "evidence": [
+        "pickupReachable 单跳包络 + 平台几何",
+        "06 collected 6（scrap-2/4）"
+      ]
+    },
+    {
+      "id": "5.5-5",
+      "baseline": "NOT MET",
+      "verdict": "MET",
+      "evidence": [
+        "termination.test.mjs（300 步/5 重置/120 等待/跳跃耗尽）",
+        "06 成功路径 stop=null"
+      ]
+    },
+    {
+      "id": "5.5-6",
+      "baseline": "MET",
+      "verdict": "MET",
+      "evidence": [
+        "stop{reason,atStep} 契约 + 归因测试",
+        "result.json/trace/strategy.json"
+      ]
+    },
+    {
+      "id": "5.5-7",
+      "baseline": "MET",
+      "verdict": "MET",
+      "evidence": [
+        "pnpm test 147/2207 exit 0",
+        "test:playtest 143/10 exit 0"
+      ]
+    },
+    {
+      "id": "5.5-8",
+      "baseline": "MET",
+      "verdict": "MET",
+      "evidence": [
+        "未改 Runtime/GameConfig/站点/生成协议",
+        "50 文件哈希不变"
+      ]
+    }
+  ],
+  "section55Counts": {
+    "MET": 8,
+    "PARTIAL": 0,
+    "NOT MET": 0
+  },
+  "gapList": [
+    {
+      "id": 1,
+      "status": "closed",
+      "by": "04"
+    },
+    {
+      "id": 2,
+      "status": "closed",
+      "by": "04"
+    },
+    {
+      "id": 3,
+      "status": "closed",
+      "by": "05"
+    },
+    {
+      "id": 4,
+      "status": "closed",
+      "by": "05"
+    },
+    {
+      "id": 5,
+      "status": "closed",
+      "by": "05"
+    },
+    {
+      "id": 6,
+      "status": "closed",
+      "by": "08 + 05"
+    },
+    {
+      "id": 7,
+      "status": "effort-closed",
+      "by": "07 script; product path unchanged"
+    },
+    {
+      "id": 8,
+      "status": "effort-closed",
+      "by": "07 script; product path unchanged"
+    },
+    {
+      "id": 9,
+      "status": "partial",
+      "by": "04 fixtures closed; five-state E2E not done (03 Q10); §1 stale narrative retired"
+    }
+  ],
+  "regression": {
+    "pnpm test": {
+      "exit": 0,
+      "result": "147 files / 2207 tests passed"
+    },
+    "pnpm typecheck": {
+      "exit": 0
+    },
+    "pnpm test:playtest": {
+      "exit": 0,
+      "result": "self-test 4/4 + 10 files / 143 tests"
+    },
+    "pnpm test:acceptance": {
+      "exit": 0,
+      "result": "allOk=true（vitest / mechanic-probe / mechanic-coverage=satisfied）"
+    }
+  },
+  "round06": {
+    "attempts": 2,
+    "success": 2,
+    "won": true,
+    "collected": 6,
+    "chestsOpened": 2,
+    "hits": 0,
+    "resets": 0,
+    "runtimeErrors": 0,
+    "steps": [
+      452,
+      451
+    ],
+    "projectionSame": true,
+    "siteFilesUnchanged": 50
+  },
+  "visual": {
+    "fa04Items": 6,
+    "supplementItems": 4,
+    "allPass": true,
+    "distinctFrames": 8,
+    "notFullSevenItemReReview": true
+  },
+  "finalVerdict": "pass",
+  "derivation": "delivery.verdict(recomputed=pass) AND section55 8/8 MET ⇒ pass（03 Q11 A；fail > blocked > incomplete > pass）",
+  "notASecondStateModel": "本文件只聚合既有 delivery verdict 与 §5.5 逐项判定，不新建第二套状态模型、不手改中间 JSON。",
+  "limitations": [
+    "产品读取路径仍不重算证据哈希；07 effort 脚本核对，产品路径未改（Q8(b) 未加固）。",
+    "只跑一个真实 Demo（冻结 wasteland），没有跨游戏证据。",
+    "纵向/喷发仅 E2 fixture；冻结 Demo 只有 axis:x 巡逻物。",
+    "五态浏览器 E2E 未做（03 Q10 A）。",
+    "旧 x=813/24 reset 不可复现；当前失败样本 x=438/19（FA-02 harness-1）。",
+    "FA-04 六项 ≠ §7.3 七项；09 补审来源分开标注，不是七项全量重审。",
+    "08-goal.png 与 09-final.png 字节相同，只有 8 个不同画面。",
+    "危险物接触无正向事件；hits=0/reset=0/trace 是间接判据。",
+    "交付内 FA-06 playtest 是 harness/rules v1；本轮 06 是 v2，身份只看 pack/site/config/shell。",
+    "06 未写回 delivery；交付内 playtest 仍指向 FA-06 v2 报告。",
+    "只有一个人工审核者、一次补审；09 不复核 FA-04 六项判断本身。",
+    "Playtest V1 证据集不含截图；视觉材料来自 FA-04 + 09。"
+  ],
+  "evidence": {
+    "inheritedVerification": "evidence/07-inherited-verification.json",
+    "finalReport": "evidence/07-final-acceptance.md",
+    "round06": [
+      "evidence/06-attempt-1/",
+      "evidence/06-attempt-2/",
+      "evidence/06-reproducibility.json"
+    ],
+    "visualSupplement": "evidence/09-review-record.supplement.json",
+    "regression": "evidence/07-regression/",
+    "acceptance": "evidence/07-acceptance/free-acceptance.json",
+    "deliveryReport": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json"
+  }
+}

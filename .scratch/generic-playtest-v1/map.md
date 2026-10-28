@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: generic-playtest-v1
 
-> **本图 2026-10-28 开。** 输入：`docs/v7.6/验证.md`（FPVS-V1 Final Acceptance — P0：通用试玩策略收敛与真实证据闭环）。
+> **本图 2026-10-28 开、2026-10-28 关闭。** 输入：`docs/v7.6/验证.md`（FPVS-V1 Final Acceptance — P0：通用试玩策略收敛与真实证据闭环）。
 > **收口形态（用户 2026-10-28 逐字裁定）**：**(a) 承载执行 + 证据复用** —— 逐条重验 v7.6；
 > 继承 P0-2～P0-4 已收口机制，只修真实审计发现的缺口；每张票收口到代码 + 测试 + 真实证据。
 > **方向裁定 Q1–Q9（用户 2026-10-28 逐字）**：
@@ -72,7 +72,9 @@ Effort: generic-playtest-v1
   [09](issues/09-visual-review-supplement.md)；最终结论 = 交付 verdict + §5.5 逐项判定。
 - **08 裁定（2026-10-28）**：批准 `stop?{reason,atStep}`（4 个执行器原因）；归因在游戏失败/环境失败/SUCCESS 之后
   把执行器 stop 判 `AGENT_LIMITATION`；交付摘要不镜像；确定性投影加 `stopReason`；05 按批准边界实施。
-- **剩余执行顺序**：04/05/06/09 已收口；**07 是唯一 frontier**（最后聚合）。
+- **地图关闭（2026-10-28）**：全部 9 张票已收口；07 最终结论 `pass`；目的地已达。
+  最终报告 `evidence/07-final-acceptance.md`、机器可读结论 `evidence/07-final-verdict.json`、
+  继承核对 `evidence/07-inherited-verification.json`（27/27）。
 - **09 事实（2026-10-28）**：人类补审 §7.3 四项全部 `pass`（可读性 / 动画 / 玩法-视觉对应 / 完成度）；
   8 个不同画面（08-goal 与 09-final 同字节，不称 9 个）；FA-04 三份记录零改动；
   记录 `evidence/09-review-record.supplement.json`、材料 `evidence/09-review-materials.json`；
@@ -148,6 +150,16 @@ Effort: generic-playtest-v1
   身份与 `artifacts/identity.json` 全等。追加记录 `evidence/09-review-record.supplement.json`，
   FA-04 `review-record/capture/materials` 零改动（哈希留档）；不冒充七项全量重审、不改产品审核路径、不写 delivery。
   → 解除 07 对 09 的阻塞；07 成为唯一 frontier。
+- [07 继承证据重验与最终聚合](issues/07-inherited-evidence-reverification-and-final-aggregation.md)：**已收口** ——
+  最终结论 **`pass`**：`deriveDeliveryVerdict` 重算六项必需检查 = `pass`，§5.5 **8/8 MET**；
+  01 差距清单 6 closed / 2 effort-closed（产品路径未改、已披露）/ 1 partial（五态 E2E 本轮不做）。
+  继承核对 effort 脚本 **27/27**：身份、FA-04 44 条材料、9 图/8 distinct、site-integrity、FA-05 36 条证据 +
+  12 条 consistency + qa-report `dc20e301…5ee6`、FA-06 回归、本轮 06 两份 attempt、50 文件快照、
+  09 补审与 FA-04 零改动全部通过。回归 `pnpm test` 2207/147 · `typecheck` · `test:playtest` 143/10 ·
+  `test:acceptance` allOk=true，全 exit 0。12 条限制已披露（产品读取路径不重算哈希、单 Demo、
+  纵向/喷发仅 fixture、五态 E2E 未做、旧 x=813/24 不可复现等）。
+  证据：`evidence/07-final-acceptance.md`、`07-final-verdict.json`、`07-inherited-verification.json`、
+  `scripts/07-verify-inherited.mjs`、`07-regression/`、`07-acceptance/`。→ **目的地已达，地图关闭。**
 
 ## Not yet specified
 

@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-10-28T15:51:31.273Z",
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/generic-playtest-v1/evidence/07-acceptance",
+  "allOk": true,
+  "checks": [
+    {
+      "name": "vitest",
+      "ok": true
+    },
+    {
+      "name": "mechanic-probe",
+      "ok": true
+    },
+    {
+      "name": "mechanic-coverage",
+      "ok": true,
+      "verdict": "satisfied"
+    }
+  ]
+}

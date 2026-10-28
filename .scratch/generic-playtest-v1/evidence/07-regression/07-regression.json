@@ -1,0 +1,39 @@
+{
+  "format": "fpvs-generic-playtest-regression/v1",
+  "generatedAt": "2026-10-28T15:52:00Z",
+  "commands": [
+    {
+      "name": "test",
+      "command": "pnpm test",
+      "exitCode": 0,
+      "summary": "147 files / 2207 tests passed",
+      "exitFile": "test.exit",
+      "log": "test.log (local; *.log 不入库)"
+    },
+    {
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "summary": "全部 workspace typecheck: Done",
+      "exitFile": "typecheck.exit",
+      "log": "typecheck.log (local; *.log 不入库)"
+    },
+    {
+      "name": "playtest",
+      "command": "pnpm test:playtest",
+      "exitCode": 0,
+      "summary": "self-test 4/4（gate / pickup / input / hazard-legacy）+ 10 files / 143 tests passed",
+      "exitFile": "playtest.exit",
+      "log": "playtest.log (local; *.log 不入库)"
+    },
+    {
+      "name": "acceptance",
+      "command": "FREE_ACCEPTANCE_OUT=.scratch/generic-playtest-v1/evidence/07-acceptance pnpm test:acceptance",
+      "exitCode": 0,
+      "summary": "免费验收闭环 allOk=true：vitest / mechanic-probe / mechanic-coverage=satisfied",
+      "exitFile": "acceptance.exit",
+      "evidence": "../07-acceptance/free-acceptance.json"
+    }
+  ],
+  "worktreeNote": "pnpm test:playtest 后已 git restore .scratch/playtest-v1/runs/2026-10-28-self-test/ 的 tracked 产物，并删除本次生成的两个 strategy.json；历史自测产物零改动。"
+}
