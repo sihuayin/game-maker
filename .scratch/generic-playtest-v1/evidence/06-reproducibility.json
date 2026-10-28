@@ -1,0 +1,166 @@
+{
+  "attempts": [
+    "06-attempt-1/attempt-v1",
+    "06-attempt-2/attempt-v1"
+  ],
+  "sameIdentity": true,
+  "identity": {
+    "scenarioFormatVersion": "playtest-scenario/v1",
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "shellVersion": "2",
+    "harnessVersion": "playtest-harness/v2",
+    "rulesVersion": "playtest-rules/v2"
+  },
+  "steps": [
+    452,
+    451
+  ],
+  "durationMs": [
+    17721,
+    17736
+  ],
+  "stop": [
+    null,
+    null
+  ],
+  "sameProjection": true,
+  "projection": {
+    "scenarioId": "acceptance-win-wasteland-v1",
+    "outcome": null,
+    "stopReason": null,
+    "assertions": [
+      {
+        "id": "initial-pickups",
+        "result": "pass"
+      },
+      {
+        "id": "all-collected",
+        "result": "pass"
+      },
+      {
+        "id": "chests-opened",
+        "result": "pass"
+      },
+      {
+        "id": "pickups-cleared",
+        "result": "pass"
+      },
+      {
+        "id": "pickup-events",
+        "result": "pass"
+      },
+      {
+        "id": "chest-events",
+        "result": "pass"
+      },
+      {
+        "id": "won",
+        "result": "pass"
+      },
+      {
+        "id": "win-event",
+        "result": "pass"
+      }
+    ],
+    "endState": {
+      "collected": 6,
+      "won": true,
+      "hits": 0,
+      "chestsOpened": 2,
+      "activePickups": 0
+    },
+    "eventCounts": {
+      "pickup": 4,
+      "win": 1,
+      "chest-open": 2
+    }
+  },
+  "canonical": [
+    "{\"scenarioId\":\"acceptance-win-wasteland-v1\",\"outcome\":null,\"stopReason\":null,\"assertions\":[{\"id\":\"all-collected\",\"result\":\"pass\"},{\"id\":\"chest-events\",\"result\":\"pass\"},{\"id\":\"chests-opened\",\"result\":\"pass\"},{\"id\":\"initial-pickups\",\"result\":\"pass\"},{\"id\":\"pickup-events\",\"result\":\"pass\"},{\"id\":\"pickups-cleared\",\"result\":\"pass\"},{\"id\":\"win-event\",\"result\":\"pass\"},{\"id\":\"won\",\"result\":\"pass\"}],\"endState\":{\"collected\":6,\"won\":true,\"hits\":0,\"chestsOpened\":2,\"activePickups\":0},\"eventCounts\":{\"chest-open\":2,\"pickup\":4,\"win\":1}}",
+    "{\"scenarioId\":\"acceptance-win-wasteland-v1\",\"outcome\":null,\"stopReason\":null,\"assertions\":[{\"id\":\"all-collected\",\"result\":\"pass\"},{\"id\":\"chest-events\",\"result\":\"pass\"},{\"id\":\"chests-opened\",\"result\":\"pass\"},{\"id\":\"initial-pickups\",\"result\":\"pass\"},{\"id\":\"pickup-events\",\"result\":\"pass\"},{\"id\":\"pickups-cleared\",\"result\":\"pass\"},{\"id\":\"win-event\",\"result\":\"pass\"},{\"id\":\"won\",\"result\":\"pass\"}],\"endState\":{\"collected\":6,\"won\":true,\"hits\":0,\"chestsOpened\":2,\"activePickups\":0},\"eventCounts\":{\"chest-open\":2,\"pickup\":4,\"win\":1}}"
+  ],
+  "siteIntegrity": [
+    true,
+    true
+  ],
+  "actions": [
+    [
+      [
+        "move_to",
+        "completed",
+        51
+      ],
+      [
+        "move_to",
+        "completed",
+        180
+      ],
+      [
+        "move_to",
+        "completed",
+        290
+      ],
+      [
+        "move_to",
+        "completed",
+        360
+      ],
+      [
+        "wait_until",
+        "completed",
+        361
+      ],
+      [
+        "reach_goal",
+        "completed",
+        450
+      ],
+      [
+        "wait_until",
+        "completed",
+        451
+      ]
+    ],
+    [
+      [
+        "move_to",
+        "completed",
+        50
+      ],
+      [
+        "move_to",
+        "completed",
+        177
+      ],
+      [
+        "move_to",
+        "completed",
+        287
+      ],
+      [
+        "move_to",
+        "completed",
+        359
+      ],
+      [
+        "wait_until",
+        "completed",
+        360
+      ],
+      [
+        "reach_goal",
+        "completed",
+        448
+      ],
+      [
+        "wait_until",
+        "completed",
+        450
+      ]
+    ]
+  ]
+}

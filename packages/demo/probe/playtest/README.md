@@ -33,6 +33,8 @@ node packages/demo/probe/playtest/playtest.mjs \
 - `trace.jsonl` —— 状态快照；不是输入轨迹。
 - `input.jsonl` —— 实际发出的按键（`type/key/code/t/seq/source`）；只作诊断。
 - `console.json` / `exceptions.json` / `setup.json` / `chrome.log`。
+- `strategy.json` —— **非契约 sidecar**：停止原因 / 阈值 / 最后观测，以及 `pickup-unreachable` 等策略注解；
+  不扩 `events.jsonl` 的 11 类闭事件、不改报告 schema。
 - `site-integrity.json` —— 运行前后站点字节哈希；用于证明外壳零改动。
 - `determinism.json` / `summary.json` / `exit.json`（在 out 根）。
 
@@ -48,6 +50,28 @@ node packages/demo/probe/playtest/playtest.mjs \
 前方有横向巡逻危险物时，策略会在巡逻带外沿**松开右键等待**安全相位，再按实时几何/相位起跳越过；
 等待/恢复都走同一按键通道，记在 `input.jsonl`。场景协议不变；物理量取自被验收游戏自己的
 `player.move`，危险物盒足迹由只读 `READ_STATE` 提供。
+
+⚠️ **三类危险形态（04，2026-10-28）**：横向巡逻沿用 FA-02；**纵向巡逻**（`axis:"y"`）按危险物的
+**完整扫掠范围**判相关性（不是当前帧），在「盒底高于玩家头顶」的窗口 ≥ 穿越时间 + 150ms 时才前进，
+**不要求起跳**；**定时喷发**按 `t % (periodMs + activeMs)` 推演，`periodMs` 是安全窗口、`activeMs`
+是喷发窗口，安全余量 150ms，观测到 `state:"active"` 时绝不进入；多个喷发物逐一路径推演。
+字段缺失时：纵向保守带外等待、喷发退化为 state-only（观测到 idle 才进）、连 state 都没有则不穿越；
+注解 `vertical-window-unknown` / `danger-window-unknown` 只落 `strategy.json` 的 `notes`
+（非契约 sidecar，不进 11 类闭事件，不扩 schema）。等待同样受 120 步 `wait-limit` 约束。
+`READ_STATE` 对 `dangers` 只读暴露打击盒足迹 + `periodMs` / `activeMs` / `t`。
+
+⚠️ **有限终止（票 05）**：策略不会无限等/无限跳。连续 **300** 观测步无复合进展
+（`maxX` / `collected` / `chestsOpened` / `gateReached` / `won` 任一严格增加即进展）、累计 **5** 次重置、
+连续 **120** 步 `advance:false`、或跳跃被证明无效（3 步内未离地连续 3 次 ⇒ 降级；累计 5 次且跳跃是唯一
+推进手段）时，执行器**主动停止**：`terminationReached=false`，`result.json` 的场景记
+`stop: { reason, atStep }`（`no-progress` / `reset-exhaustion` / `wait-limit` / `jump-exhaustion`），
+归因判 `AGENT_LIMITATION` —— **不是游戏失败，也不是场景超时**。被中断动作仍记 `outcome:"timeout"`，
+由 `stop.reason` 消歧。`atStep` 是 `trace.jsonl` 的累计观测步；最后观测见 `strategy.json`。
+harness 条件场景（`hang` / `input-blocked`）不套用这套规则。
+
+⚠️ **拾取物可达性（票 05）**：`pickupAbove` 只在「单跳包络 + 平台几何」证明可达时起跳；不可达时跳过但
+在 `strategy.json` 记 `pickup-unreachable`（拾取物下标 + 缺失几何），不静默。所有起跳前都做
+`jumpPredictionSafe`。必需目标不可达时如实归因（`AGENT_LIMITATION` / `TIMEOUT`），不判游戏失败。
 
 ## 不在本目录
 

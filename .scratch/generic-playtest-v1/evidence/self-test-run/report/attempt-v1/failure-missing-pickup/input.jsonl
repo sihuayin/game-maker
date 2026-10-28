@@ -1,0 +1,5 @@
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":1,"seq":0,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":979,"seq":1,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":1032,"seq":2,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":8016,"seq":3,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":8016,"seq":4,"source":"cleanup"}

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   DeliveryPlaytestSchema, DeliveryReportSchema, PLAYTEST_HARNESS_VERSION, PLAYTEST_REPORT_VERSION, PLAYTEST_RULES_VERSION,
-  PLAYTEST_SCENARIO_VERSION, PlaytestEventSchema, PlaytestReportSchema, PlaytestScenarioSchema, aggregateAssertions, aggregatePlaytestOutcome,
+  PLAYTEST_SCENARIO_VERSION, PLAYTEST_STOP_REASONS, PlaytestEventSchema, PlaytestReportSchema, PlaytestScenarioReportSchema,
+  PlaytestScenarioSchema, PlaytestStopSchema, aggregateAssertions, aggregatePlaytestOutcome,
   canonicalProjection, mapPlaytest, playtestProjectionOf, playtestSummaryOf, samePlaytestProjection,
   type DeliveryCheckStatus, type DeliveryPlaytest, type PlaytestReport, type PlaytestScenarioReport,
 } from "../src/index.js";
@@ -383,5 +384,68 @@ describe("playtestSummaryOf", () => {
     expect(s.aggregate).toBe("SUCCESS");
     expect(s.scenarios[0]!.outcome).toBe("SUCCESS");
     expect(s.evidence).toEqual(["playtest-result", "playtest-events"]);
+  });
+});
+
+describe("主动停止契约（票 08 / 05 实施）", () => {
+  const stopped = (over: Partial<PlaytestScenarioReport> = {}) =>
+    scenario({ terminationReached: false, steps: 120, stop: { reason: "wait-limit", atStep: 120 }, ...over });
+
+  it("四个执行器原因合法；非法原因 / 负 atStep / 非整数被拒", () => {
+    expect(PLAYTEST_STOP_REASONS).toEqual(["no-progress", "reset-exhaustion", "wait-limit", "jump-exhaustion"]);
+    for (const reason of PLAYTEST_STOP_REASONS)
+      expect(PlaytestStopSchema.parse({ reason, atStep: 0 })).toEqual({ reason, atStep: 0 });
+    expect(() => PlaytestStopSchema.parse({ reason: "scenario-timeout", atStep: 1 })).toThrow();
+    expect(() => PlaytestStopSchema.parse({ reason: "actions-exhausted", atStep: 1 })).toThrow();
+    expect(() => PlaytestStopSchema.parse({ reason: "no-progress", atStep: -1 })).toThrow();
+    expect(() => PlaytestStopSchema.parse({ reason: "no-progress", atStep: 1.5 })).toThrow();
+    expect(() => PlaytestStopSchema.parse({ reason: "no-progress", atStep: 1, extra: true })).toThrow();
+  });
+
+  it("旧报告（无 stop）仍可读；已执行场景可带 stop", () => {
+    expect(PlaytestScenarioReportSchema.parse(scenario()).stop).toBeUndefined();
+    expect(PlaytestScenarioReportSchema.parse(stopped()).stop).toEqual({ reason: "wait-limit", atStep: 120 });
+  });
+
+  it("拒绝 not-executed + stop", () => {
+    expect(() => PlaytestScenarioReportSchema.parse(stopped({
+      execution: { status: "not-executed", reason: "no site" },
+    }))).toThrow(/stop/);
+  });
+
+  it("拒绝 stop 与 terminationReached / SUCCESS 同时成立", () => {
+    expect(() => PlaytestScenarioReportSchema.parse(stopped({ terminationReached: true }))).toThrow(/stop/);
+    expect(() => PlaytestScenarioReportSchema.parse(stopped({ outcome: "SUCCESS" }))).toThrow(/stop/);
+  });
+
+  it("拒绝 stop.atStep > steps", () => {
+    expect(() => PlaytestScenarioReportSchema.parse(stopped({ steps: 119 }))).toThrow(/atStep/);
+    expect(PlaytestScenarioReportSchema.parse(stopped({ steps: 120 })).stop?.atStep).toBe(120);
+  });
+
+  it("停止事实不镜像进交付摘要；playable-smoke 仍按五态映射", () => {
+    const r = report({
+      aggregate: "AGENT_LIMITATION",
+      scenarios: [stopped({ outcome: "AGENT_LIMITATION", evidence: ["playtest-events"] })],
+    });
+    const summary = playtestSummaryOf(r, "g/run/v1/playtest/v1/result.json");
+    expect("stop" in summary).toBe(false);
+    expect("stop" in summary.scenarios[0]!).toBe(false);
+    expect(mapPlaytest(summary)).toEqual({ status: "incomplete", detail: "AGENT_LIMITATION" });
+  });
+
+  it("投影带 stopReason，参与确定性比较；旧报告为 null", () => {
+    const a = stopped({ stop: { reason: "no-progress", atStep: 120 } });
+    const b = stopped({ stop: { reason: "wait-limit", atStep: 120 } });
+    expect(playtestProjectionOf(a).stopReason).toBe("no-progress");
+    expect(playtestProjectionOf(scenario()).stopReason).toBeNull();
+    expect(samePlaytestProjection(playtestProjectionOf(a), playtestProjectionOf(b))).toBe(false);
+    expect(samePlaytestProjection(playtestProjectionOf(a), playtestProjectionOf({ ...a, stop: { reason: "no-progress", atStep: 119 } }))).toBe(true);
+  });
+
+  it("版本：report 保持 v1（加性可选），harness / rules 升 v2", () => {
+    expect(PLAYTEST_REPORT_VERSION).toBe("playtest-report/v1");
+    expect(PLAYTEST_HARNESS_VERSION).toBe("playtest-harness/v2");
+    expect(PLAYTEST_RULES_VERSION).toBe("playtest-rules/v2");
   });
 });

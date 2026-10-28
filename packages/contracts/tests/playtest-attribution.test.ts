@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  attribute, attributeReport,
+  PLAYTEST_STOP_REASONS, attribute, attributeReport,
   type PlaytestAttributionEvidence, type PlaytestAttributionResult,
 } from "../src/index.js";
 import { aggregateAssertions, type PlaytestScenarioReport } from "../src/playtest.js";
@@ -155,5 +155,66 @@ describe("attributeReport · 聚合", () => {
     const r = attributeReport([missing]);
     expect(r.execution).toMatchObject({ status: "not-executed" });
     expect(r.aggregate).toBeUndefined();
+  });
+});
+
+describe("attribute · 执行器主动停止（票 08 Q3 B）", () => {
+  const stoppedScenario = (reason: (typeof PLAYTEST_STOP_REASONS)[number]) =>
+    scenario({ terminationReached: false, stop: { reason, atStep: 120 } });
+
+  it("四个原因都判 AGENT_LIMITATION（不是游戏失败，也不是 TIMEOUT）", () => {
+    for (const reason of PLAYTEST_STOP_REASONS) {
+      const r = attribute(evidence({ scenario: stoppedScenario(reason), deadlineHit: true }));
+      expect(outcomeOf(r), reason).toBe("AGENT_LIMITATION");
+    }
+  });
+
+  it("主动停止优先于推导出的 deadlineHit（动作被中断仍记 timeout）", () => {
+    const r = attribute(evidence({
+      scenario: stoppedScenario("wait-limit"),
+      action: { attempted: 1, completed: 0, timedOut: 1, explorationExhausted: true, stuck: true, progressPx: 0 },
+      deadlineHit: true,
+    }));
+    expect(outcomeOf(r)).toBe("AGENT_LIMITATION");
+  });
+
+  it("主动停止优先于轮询断档（结构性不可判不覆盖停止原因）", () => {
+    const r = attribute(evidence({
+      scenario: stoppedScenario("no-progress"), structuralUndecidable: true,
+      environment: { healthy: true, chromeAvailable: true, sceneReadyObserved: true, pollGaps: 2, failures: [] },
+    }));
+    expect(outcomeOf(r)).toBe("AGENT_LIMITATION");
+  });
+
+  it("无 stop 的 deadline 仍按 TIMEOUT 归因", () => {
+    expect(outcomeOf(attribute(evidence({
+      scenario: scenario({ terminationReached: false }), deadlineHit: true,
+    })))).toBe("TIMEOUT");
+  });
+
+  it("已证实的游戏失败 / 环境故障 / SUCCESS 仍优先于 stop", () => {
+    const invariantFail = {
+      id: "hits", kind: "invariant" as const, requires: ["hits"], result: "fail" as const, observed: 1,
+      expect: { kind: "invariant", path: "hits", op: "eq", value: 0 }, withinMs: 1000, evidence: ["ev"],
+    };
+    const gameFailure = attribute(evidence({
+      scenario: scenario({
+        terminationReached: false, assertions: [invariantFail], assertionAggregate: "fail",
+        stop: { reason: "no-progress", atStep: 120 },
+      }),
+    }));
+    expect(outcomeOf(gameFailure)).toBe("GAMEPLAY_FAILURE");
+
+    const envFailure = attribute(evidence({
+      scenario: stoppedScenario("no-progress"),
+      environment: { healthy: false, chromeAvailable: true, sceneReadyObserved: true, pollGaps: 0, failures: ["asset 404"] },
+    }));
+    expect(outcomeOf(envFailure)).toBe("ENVIRONMENT_FAILURE");
+
+    // stop 与 terminationReached 不会同时成立（schema 不变量），这里验证归因优先级本身。
+    const success = attribute(evidence({
+      scenario: scenario({ stop: { reason: "jump-exhaustion", atStep: 10 } }),
+    }));
+    expect(outcomeOf(success)).toBe("SUCCESS");
   });
 });

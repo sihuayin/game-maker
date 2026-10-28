@@ -15,7 +15,7 @@ import {
 } from "../probe-harness.mjs";
 import { PHASER_HOOK } from "../probe-harness.mjs";
 import { createObserver } from "./observe.mjs";
-import { createPolicy, decide, markJump, noteObservation, targetReached } from "./policy.mjs";
+import { LIMITS, createPolicy, decide, markJump, noteObservation, stopReasonOf, targetReached } from "./policy.mjs";
 
 const ZERO_END = { collected: 0, won: false, hits: 0, chestsOpened: 0, activePickups: 0, playerX: null };
 const ZERO_INITIAL = { collected: 0, won: false, hits: 0, chestsOpened: 0, activePickups: 0 };
@@ -165,11 +165,13 @@ async function runMoveTo({ page, scenario, action, target, deadline, obs, policy
       const st = await page.readState();
       obs.record(st, elapsed(), errorsOf());
       if (!st) { await delay(scenario.stepDelayMs); continue; }
-      noteObservation(st, policy);
+      noteObservation(st, policy, obs.steps);
       if (targetReached(st, target) || obs.terminationReached(scenario.termination)) return "completed";
       const d = decide(st, policy);
+      // 主动停止（03/08）：到阈值就结束本次动作；动作 outcome 仍记 timeout，由 stop.reason 消歧。
+      if (stopReasonOf(st, policy) !== null) return "timeout";
       await setRight(d.advance);
-      if (d.jump) { markJump(policy); await kb.jump(action.kind); }
+      if (d.jump) { markJump(policy, st); await kb.jump(action.kind); }
       await delay(scenario.stepDelayMs);
     }
     return "timeout";
@@ -184,9 +186,11 @@ async function runWaitUntil({ page, scenario, action, deadline, obs, policy, err
     const st = await page.readState();
     obs.record(st, elapsed(), errorsOf());
     if (st) {
-      noteObservation(st, policy);
+      noteObservation(st, policy, obs.steps);
       if (action.condition.kind === "won" && st.won) return "completed";
       if (action.condition.kind === "collected" && st.collected >= action.condition.value) return "completed";
+      // 08 Q7：等待动作也逐观测步检查停止条件（no-progress / reset-exhaustion）。
+      if (stopReasonOf(st, policy) !== null) return "timeout";
     }
     await delay(scenario.stepDelayMs);
   }
@@ -231,6 +235,8 @@ async function runScenario({ page, scenario, dir, target, command }) {
   // 物理量用**被验收游戏自己的** player.move（缺省回落到契约默认值），策略不写死本关数值。
   const config = readJson(target.configPath);
   const policy = createPolicy({ floorY, spawn: { x: initial.x, y: initial.y }, move: config?.player?.move });
+  // harness 条件场景（hang / input-blocked）有自己的期望结局；只有真实游戏场景套用主动停止。
+  policy.enforceStop = scenario.harnessCondition === "none";
   const input = [];
   const kb = createKeyboard(page, input);
   const errorsOf = () => ({ console: page.consoleErrors(), exceptions: page.exceptions });
@@ -244,7 +250,7 @@ async function runScenario({ page, scenario, dir, target, command }) {
     while (Date.now() < deadline) {
       const st = await page.readState();
       obs.record(st, elapsed(), errorsOf());
-      if (st) noteObservation(st, policy);
+      if (st) noteObservation(st, policy, obs.steps);
       await delay(scenario.stepDelayMs);
     }
     actions.push({ kind: "hang", outcome: "timeout", durationMs: Date.now() - a0, steps: obs.steps });
@@ -290,6 +296,8 @@ async function runScenario({ page, scenario, dir, target, command }) {
     evidence: [...SCENARIO_EVIDENCE],
     durationMs: Date.now() - startedAt,
     steps: obs.steps,
+    // 执行器主动停止（票 08）：只记「为什么提前结束」；终止/终态/断言仍各自表达。
+    ...(policy.stop === null ? {} : { stop: policy.stop }),
   };
 
   // 落盘前按契约校验：params 按事件类型、source 真实性、input 字段集（票 03 Q5 / 票 05 Q1）。
@@ -301,6 +309,27 @@ async function runScenario({ page, scenario, dir, target, command }) {
   fs.writeFileSync(path.join(dir, "input.jsonl"), lines(input));
   writeJson(path.join(dir, "console.json"), page.consoleEntries);
   writeJson(path.join(dir, "exceptions.json"), page.exceptions);
+  // 策略注解（非契约 sidecar）：停止事实、阈值、最后计数与 `pickup-unreachable` 等证据，
+  // 不进 `events.jsonl` 的 11 类闭集、不扩报告 schema（03 Q3 / Q7）。
+  writeJson(path.join(dir, "strategy.json"), {
+    stop: policy.stop,
+    limits: LIMITS,
+    progress: policy.progress,
+    noProgressSteps: policy.noProgressSteps,
+    resets: policy.resets,
+    waits: policy.waits,
+    jump: {
+      failures: policy.jump.failures,
+      unverified: policy.jump.unverified,
+      degraded: policy.jump.degraded,
+      pending: policy.jump.pending,
+    },
+    lastObservation: final ? {
+      x: final.x, bottom: final.bottom, onFloor: final.onFloor, vy: final.vy,
+      collected: final.collected, won: final.won,
+    } : null,
+    notes: policy.notes,
+  });
   return scenarioReport;
 }
 

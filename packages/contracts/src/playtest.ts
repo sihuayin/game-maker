@@ -18,8 +18,10 @@ import type { DeliveryCheckStatus } from "./delivery.js";
 
 export const PLAYTEST_REPORT_VERSION = "playtest-report/v1";
 export const PLAYTEST_SCENARIO_VERSION = "playtest-scenario/v1";
-export const PLAYTEST_HARNESS_VERSION = "playtest-harness/v1";
-export const PLAYTEST_RULES_VERSION = "playtest-rules/v1";
+// 票 08（2026-10-28）：harness 产出 `stop`、归因按 `stop` 判 AGENT_LIMITATION —— 生产者与规则都变了，
+// 但报告 schema 只是**加性**可选字段，`playtest-report/v1` 不升版（旧报告仍可读）。
+export const PLAYTEST_HARNESS_VERSION = "playtest-harness/v2";
+export const PLAYTEST_RULES_VERSION = "playtest-rules/v2";
 
 /** 票 04 的五态 + `UNKNOWN`（归因不成立，不是第六种原因）。 */
 export const PlaytestOutcome = z.enum([
@@ -38,6 +40,26 @@ export const PlaytestExecutionSchema = z.union([
   z.strictObject({ status: z.literal("not-executed"), reason: z.string().min(1) }),
 ]);
 export type PlaytestExecution = z.infer<typeof PlaytestExecutionSchema>;
+
+/**
+ * 执行器**主动停止**的原因（票 08 Q1 批准）。
+ *
+ * ⚠️ 主动停止 ≠ 游戏失败 ≠ 场景超时：执行器在目标达成前主动结束，事实由 `terminationReached=false`
+ *   + `stop.reason` 共同表达；被中断动作仍记 `actions[].outcome="timeout"`，由 `stop.reason` 消歧。
+ * ⚠️ 非执行器结束（`scenario-timeout` / `action-timeout` / `actions-exhausted`）**不进入**这个枚举。
+ */
+export const PLAYTEST_STOP_REASONS = [
+  "no-progress", "reset-exhaustion", "wait-limit", "jump-exhaustion",
+] as const;
+export const PlaytestStopReason = z.enum(PLAYTEST_STOP_REASONS);
+export type PlaytestStopReason = z.infer<typeof PlaytestStopReason>;
+
+/** 场景级主动停止记录；`atStep` = `trace.jsonl` 的累计观测步（不是墙钟、不是动作序号）。 */
+export const PlaytestStopSchema = z.strictObject({
+  reason: PlaytestStopReason,
+  atStep: z.number().int().nonnegative(),
+});
+export type PlaytestStop = z.infer<typeof PlaytestStopSchema>;
 
 /** 票 03 的 11 类闭事件集。事件是状态差推导的边，不是外壳埋点。 */
 export const PLAYTEST_EVENT_TYPES = [
@@ -217,6 +239,8 @@ export const PlaytestScenarioReportSchema = z.strictObject({
     durationMs: z.number().nonnegative(),
     steps: z.number().int().nonnegative(),
   })).default([]),
+  /** 执行器主动停止（票 08）：只解释「为什么提前结束」，不取代 `terminationReached` / `outcome`。 */
+  stop: PlaytestStopSchema.optional(),
   /** 票 08 填入；票 07 的观测报告可以为缺席。 */
   outcome: PlaytestOutcome.optional(),
   insufficientEvidence: InsufficientEvidenceSchema.optional(),
@@ -241,6 +265,17 @@ export const PlaytestScenarioReportSchema = z.strictObject({
     if (s.assertions.length === 0) ctx.addIssue({ code: "custom", path: ["assertions"], message: "SUCCESS 必须有至少一条实质断言" });
     if (s.assertions.some((a) => a.result !== "pass"))
       ctx.addIssue({ code: "custom", path: ["assertions"], message: "SUCCESS 要求全部断言 pass，且不得有 unknown/fail" });
+  }
+  // ── `stop` 四条不变量（票 08 Q1）：主动停止只属于「已执行、未达成终止、非 SUCCESS」的场景 ──
+  if (s.stop !== undefined) {
+    if (s.execution !== "executed")
+      ctx.addIssue({ code: "custom", path: ["stop"], message: "not-executed 场景不得带 stop（没有执行就没有主动停止）" });
+    if (s.terminationReached)
+      ctx.addIssue({ code: "custom", path: ["stop"], message: "stop 与 terminationReached=true 不能同时成立" });
+    if (s.outcome === "SUCCESS")
+      ctx.addIssue({ code: "custom", path: ["stop"], message: "stop 与 outcome=SUCCESS 不能同时成立" });
+    if (s.steps !== undefined && s.stop.atStep > s.steps)
+      ctx.addIssue({ code: "custom", path: ["stop", "atStep"], message: `stop.atStep(${s.stop.atStep}) 不得超过场景 steps(${s.steps})` });
   }
 });
 export type PlaytestScenarioReport = z.infer<typeof PlaytestScenarioReportSchema>;
@@ -536,6 +571,8 @@ export function playtestSummaryOf(report: PlaytestReport, reportPath: string): D
 export const PlaytestProjectionSchema = z.strictObject({
   scenarioId: z.string().min(1),
   outcome: PlaytestOutcome.nullable(),
+  /** 主动停止原因参与确定性比较（票 08 Q5 B）；旧报告无 stop ⇒ null。 */
+  stopReason: z.string().nullable(),
   assertions: z.array(z.strictObject({ id: z.string().min(1), result: z.enum(["pass", "fail", "unknown"]) })),
   endState: z.strictObject({
     collected: z.number().int().nonnegative(),
@@ -554,6 +591,7 @@ export function playtestProjectionOf(scenario: PlaytestScenarioReport): Playtest
   return {
     scenarioId: scenario.scenarioId,
     outcome: scenario.outcome ?? null,
+    stopReason: scenario.stop?.reason ?? null,
     assertions: scenario.assertions.map((a) => ({ id: a.id, result: a.result })),
     endState: {
       collected: scenario.endState.collected,

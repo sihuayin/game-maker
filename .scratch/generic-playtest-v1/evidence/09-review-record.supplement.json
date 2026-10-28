@@ -1,0 +1,138 @@
+{
+  "format": "fpvs-visual-review-supplement/v1",
+  "reviewedAt": "2026-10-28T15:42:14Z",
+  "reviewer": "人（本次会话用户）",
+  "reviewType": "human",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "siteHashes": {
+      "manifest": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+      "config": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "index": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+      "shell": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+      "siteJson": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    }
+  },
+  "materials": {
+    "manifest": ".scratch/generic-playtest-v1/evidence/09-review-materials.json",
+    "fa04Directory": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review",
+    "distinctFrameCount": 8,
+    "frames": [
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+      ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png"
+    ],
+    "duplicateBytes": [
+      "shots/08-goal.png",
+      "shots/09-final.png"
+    ],
+    "note": "复用 FA-04 的 8 个不同画面；08-goal.png 与 09-final.png 字节相同，不声称 9 个不同画面。",
+    "manualRun": "http://127.0.0.1:8766/site/v1/index.html（审核会话内的本地只读服务；未改站点字节）"
+  },
+  "items": [
+    {
+      "id": "readability",
+      "question": "画面可读性：危险、收集物、出口和目标是否容易辨认？",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": [
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png"
+      ]
+    },
+    {
+      "id": "animation",
+      "question": "动画表现：关键动作是否存在明显冻结、错帧或不自然表现？",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。材料含跳跃/越障/开启帧，并提供本地只读运行入口供观察。",
+      "evidence": [
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png",
+        "http://127.0.0.1:8766/site/v1/index.html（审核会话内的本地只读运行入口）"
+      ]
+    },
+    {
+      "id": "function-match",
+      "question": "玩法与视觉对应关系：可见对象是否与其实际功能一致？",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": [
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png"
+      ]
+    },
+    {
+      "id": "completeness",
+      "question": "整体完成度：是否达到可展示、可试玩 Demo 的基本质量？",
+      "verdict": "pass",
+      "rationale": "审核者逐项确认通过；未提出具体问题。",
+      "evidence": [
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png"
+      ]
+    }
+  ],
+  "overall": "pass",
+  "problems": [],
+  "constraints": {
+    "historicalRecordModified": false,
+    "historicalRecordHashes": {
+      "review-record.json": "sha256:a1602021720ed1a984913094eebff3a9b29ad5ef09f2ef7347c620ea0d93a0c1",
+      "capture.json": "sha256:8a27db7e81e0e6dede1a8b2ebaa80d0b4e0f9f1947af001f67db02be38276f58",
+      "materials.json": "sha256:060debc46fcd52b99f6863d254fe8e964f471eacd93d2c2fb8c6659284f469af"
+    },
+    "distinctFramesNotNine": true,
+    "fullSevenItemReReview": false,
+    "scope": "只补审 §7.3 的四项未逐项记录维度；FA-04 六项按原样继承，不冒充全量重审。",
+    "noRegeneration": true,
+    "noPaidCall": true,
+    "noSiteByteChange": true
+  },
+  "bindingChecks": {
+    "manifestMatchesIdentity": true,
+    "configMatchesIdentity": true,
+    "captureSubjectMatchesIdentity": true,
+    "reviewRecordSubjectMatchesIdentity": true,
+    "siteIntegrityUnchanged": true,
+    "captureIndexMatchesCurrent": true
+  },
+  "deliveryBinding": {
+    "written": false,
+    "reason": "Q8(b)/03 Q9 A：本轮不改产品审核路径与 delivery 写回；记录交 07 聚合。"
+  }
+}

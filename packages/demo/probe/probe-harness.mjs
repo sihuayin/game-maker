@@ -239,7 +239,22 @@ export const READ_STATE = `(()=>{
       };
     }),
     chests: (s.chests || []).map((c) => ({ x: c.sprite.x, y: c.sprite.y, opened: !!c.opened })),
-    dangers: (s.dangers || []).map((d) => ({ x: d.sprite.x, y: d.sprite.y, state: d.state, hits: d.hits })),
+    // 04 Q7(b)：只读暴露定时喷发 danger 的**盒足迹 + 周期相位**，供策略推演安全窗口。
+    //   · box 是游戏自己的打击盒（config 的 entity box），不是精灵 body；
+    //   · t 是场景启动后的毫秒累计（命中复位不重置、页面重载归零）；
+    //   · 领域陷阱：periodMs 是安全窗口、activeMs 是喷发窗口，完整周期 = 两者之和。
+    dangers: (s.dangers || []).map((d) => {
+      const box = d.box || {};
+      const w = Number.isFinite(box.w) ? box.w : d.sprite.displayWidth;
+      const h = Number.isFinite(box.h) ? box.h : d.sprite.displayHeight;
+      const left = Number.isFinite(box.x) ? box.x : d.sprite.x - w / 2;
+      const top = Number.isFinite(box.y) ? box.y : d.sprite.y - h;
+      return {
+        x: d.sprite.x, y: d.sprite.y, state: d.state, hits: d.hits,
+        left, right: left + w, top, bottom: top + h, width: w, height: h,
+        periodMs: d.periodMs, activeMs: d.activeMs, t: d.t,
+      };
+    }),
     gate: s.gate ? { x: s.gate.x, y: s.gate.y } : null,
     solids,
     scrollX: s.cameras && s.cameras.main ? s.cameras.main.scrollX : 0,

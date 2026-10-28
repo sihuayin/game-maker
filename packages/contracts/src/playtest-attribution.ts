@@ -156,6 +156,13 @@ export function attribute(ev: PlaytestAttributionEvidence): PlaytestAttributionR
   )
     return executed(ev, "evaluate", "SUCCESS");
 
+  // ── 执行器主动停止（票 08 Q3 B）：能力边界，不是游戏失败，也不是场景超时 ──
+  // 放在正面失败 / 环境故障 / SUCCESS 之后，`positiveLimitation`、`structuralUndecidable`、
+  // `deadlineHit` 之前：120 步 wait-limit 不再仅因动作 timeout 被判 TIMEOUT，
+  // 300 步 no-progress 也不会丢掉停止原因。轮询断档同样不覆盖主动停止。
+  if (s.stop !== undefined && !s.terminationReached)
+    return executed(ev, ev.stage, "AGENT_LIMITATION");
+
   // ── 代理限制：正面能力边界证据（不是单纯超时）───────────────────────────
   const positiveLimitation =
     ev.action.attempted > 0 &&

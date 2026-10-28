@@ -1,0 +1,267 @@
+{
+  "format": "fpvs-visual-review-supplement-materials/v1",
+  "ticket": "09 视觉审核补审",
+  "generatedAt": "2026-10-28",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "siteDir": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/site/v1",
+    "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "siteHashes": {
+      "manifest": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+      "config": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "index": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+      "shell": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+      "siteJson": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    }
+  },
+  "bindingChecks": {
+    "manifestMatchesIdentity": true,
+    "configMatchesIdentity": true,
+    "captureSubjectMatchesIdentity": true,
+    "reviewRecordSubjectMatchesIdentity": true,
+    "siteIntegrityUnchanged": true,
+    "captureIndexMatchesCurrent": true
+  },
+  "distinctFrameCount": 8,
+  "notClaimed": "不是 9 个不同画面：08-goal.png 与 09-final.png 字节相同，只算 1 个画面。",
+  "frames": [
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+      "sha256": "sha256:71e544d9b357df6e72e4b50b6f45fa05310a8ddcbb8bf74cfe188f6fdbe65c2c",
+      "t": 5817,
+      "tag": "startup",
+      "state": {
+        "x": 40,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 0,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 402,
+            "y": 240
+          },
+          {
+            "x": 783.7,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+      "sha256": "sha256:0170124c187fa13a28a74b8c9314d21421da36385ec18b00dffaeb6b684082c1",
+      "t": 7683,
+      "tag": "moving right",
+      "state": {
+        "x": 200.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 354.5,
+            "y": 240
+          },
+          {
+            "x": 769.2,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+      "sha256": "sha256:328fc7a9cca5d423327962831e870321255930c83d5a76c989ba1e23660f7276",
+      "t": 7732,
+      "tag": "pickup collected",
+      "state": {
+        "x": 200.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 354.5,
+            "y": 240
+          },
+          {
+            "x": 769.2,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+      "sha256": "sha256:462fc8584459ecfb52008c367c741e09fd27edc3be14848434cfe89ebe987973",
+      "t": 7866,
+      "tag": "airborne (platform/jump)",
+      "state": {
+        "x": 217,
+        "y": 220.5,
+        "bottom": 220.5,
+        "onFloor": false,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 342.3,
+            "y": 240
+          },
+          {
+            "x": 756.7,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+      "sha256": "sha256:9b5744c8b903610f78ac47499b07e8e3c02a48109cc6f067c332f9e0fe5039ee",
+      "t": 8952,
+      "tag": "waiting outside patrol band",
+      "state": {
+        "x": 314.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 409.9,
+            "y": 240
+          },
+          {
+            "x": 757.6,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+      "sha256": "sha256:92e1a04f620184dd7613c43eb42fabced1844a5816f9a0dc4cc13f443fcca48b",
+      "t": 10286,
+      "tag": "airborne over patroller",
+      "state": {
+        "x": 326.5,
+        "y": 220.5,
+        "bottom": 220.5,
+        "onFloor": false,
+        "collected": 1,
+        "won": false,
+        "chestsOpened": 0,
+        "hazards": [
+          {
+            "x": 381.2,
+            "y": 240
+          },
+          {
+            "x": 831,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+      "sha256": "sha256:29e1f93199f580d3838eccf73c07ec198c53c14c1d824727cb25a41d2e44139b",
+      "t": 12150,
+      "tag": "chest opened",
+      "state": {
+        "x": 472.5,
+        "y": 190,
+        "bottom": 190,
+        "onFloor": true,
+        "collected": 3,
+        "won": false,
+        "chestsOpened": 1,
+        "hazards": [
+          {
+            "x": 423.2,
+            "y": 240
+          },
+          {
+            "x": 737,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": []
+    },
+    {
+      "file": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png",
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7",
+      "t": 22499,
+      "tag": "goal reached",
+      "state": {
+        "x": 1369.5,
+        "y": 240,
+        "bottom": 240,
+        "onFloor": true,
+        "collected": 6,
+        "won": true,
+        "chestsOpened": 2,
+        "hazards": [
+          {
+            "x": 366.8,
+            "y": 240
+          },
+          {
+            "x": 726.7,
+            "y": 240
+          }
+        ]
+      },
+      "sameBytesAs": [
+        "shots/09-final.png"
+      ]
+    }
+  ],
+  "manualRun": {
+    "url": "http://127.0.0.1:8766/site/v1/index.html",
+    "note": "本地只读静态服务（游戏根目录），用于观察动画；不改站点字节。操作：→ 移动，空格起跳。"
+  },
+  "dimensions": [
+    {
+      "id": "readability",
+      "question": "画面可读性：危险、收集物、出口和目标是否容易辨认？"
+    },
+    {
+      "id": "animation",
+      "question": "动画表现：关键动作是否存在明显冻结、错帧或不自然表现？"
+    },
+    {
+      "id": "function-match",
+      "question": "玩法与视觉对应关系：可见对象是否与其实际功能一致？"
+    },
+    {
+      "id": "completeness",
+      "question": "整体完成度：是否达到可展示、可试玩 Demo 的基本质量？"
+    }
+  ],
+  "scope": "只补审上述四项；不冒充 FA-04 六项的七项全量重审。FA-04 review-record / capture / materials 零改动。"
+}

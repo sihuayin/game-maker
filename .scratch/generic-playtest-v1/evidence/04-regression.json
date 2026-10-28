@@ -1,0 +1,77 @@
+{
+  "ticket": "04 危险形态通用化（横向 / 纵向 / 定时喷发）",
+  "at": "2026-10-28",
+  "identity": {
+    "baseCommit": "main@ae339b9",
+    "harnessVersion": "playtest-harness/v2",
+    "rulesVersion": "playtest-rules/v2"
+  },
+  "commands": [
+    {
+      "command": "pnpm test",
+      "exit": 0,
+      "result": "147 files / 2207 tests passed"
+    },
+    {
+      "command": "pnpm typecheck",
+      "exit": 0
+    },
+    {
+      "command": "pnpm test:playtest",
+      "exit": 0,
+      "result": "self-test 4/4（gate / pickup / input / hazard-legacy）+ 10 files / 143 tests passed"
+    }
+  ],
+  "acceptance": {
+    "verticalModel": "hazardModel 接受 axis:y，由观测反推锚点/相位；缺 distance/periodMs/几何 ⇒ null",
+    "verticalCorrelation": "verticalSweepOverlap 按完整扫掠范围（当前在高处但会扫到玩家 ⇒ 相关）",
+    "verticalWindow": "盒底高于玩家头顶的窗口 ≥ 穿越时间 + SAFETY_MARGIN_MS(150ms) ⇒ 前进；不要求起跳",
+    "verticalNoWindow": "整周期无安全窗 ⇒ 等待；连续 120 步 ⇒ wait-limit",
+    "verticalFallback": "缺运动字段 ⇒ 保守带外等待 + strategy.json notes 的 vertical-window-unknown（一次性）",
+    "dangerWindow": "t % (periodMs + activeMs) 推演；periodMs 为安全窗口、activeMs 为喷发窗口；余量 150ms",
+    "dangerActive": "state=active 或推演落入 active ⇒ 绝不进入",
+    "dangerFallback": "缺 box/t/periodMs/activeMs ⇒ state-only（idle 才进）+ danger-window-unknown；缺 state ⇒ 不穿越",
+    "dangerMultiple": "多个 danger 逐一路径推演（任一不满足即等待）",
+    "readState": "READ_STATE 对 dangers 只读暴露打击盒足迹 + periodMs/activeMs/t；hazards 仍复用 FA-02 body 几何（端到端测试直接求值 READ_STATE）",
+    "nonContractNotes": "vertical-window-unknown / danger-window-unknown 只落 strategy.json notes，不进 events.jsonl 11 类闭集",
+    "regression": "现有 policy/observe/scenarios/termination 测试与 pnpm test:playtest 保持绿"
+  },
+  "files": [
+    {
+      "path": "packages/demo/probe/playtest/policy.mjs",
+      "sha256": "bb66d0544bec698b5b0ce9d32afc73ae29592f102f0cf7226e7cb7f2febaf81b"
+    },
+    {
+      "path": "packages/demo/probe/probe-harness.mjs",
+      "sha256": "a9b577db337aa6e0e09214db5e30fcb55159572a65279fcf510e2ec6c85011a3"
+    },
+    {
+      "path": "packages/demo/probe/playtest/README.md",
+      "sha256": "511c36985bd1342ce714785ff2b1ae3424d469a199a13bf61bdab334c56f1827"
+    },
+    {
+      "path": "packages/demo/probe/playtest/tests/policy.test.mjs",
+      "sha256": "df628d3bfaee6c736f39a8af5adf5886130895e922535849538e5cadeb4f3377"
+    },
+    {
+      "path": "packages/demo/probe/playtest/tests/danger-forms.test.mjs",
+      "sha256": "bb6a5f8d3f5b32246198b11da0cd305dc892f1bb4e40ccf20ebf340c669e4040"
+    }
+  ],
+  "evidenceNote": "自测运行后已 git restore .scratch/playtest-v1/runs/2026-10-28-self-test/ 的 tracked 产物，并删除本次生成的两个 strategy.json；历史产物零改动。",
+  "notChanged": [
+    "Runtime",
+    "站点字节",
+    "GameConfig",
+    "SHELL_VERSION",
+    "contracts schema",
+    "actions[].outcome",
+    "events.jsonl 11 类闭集",
+    "delivery.playtest 镜像",
+    "avoid-danger probe"
+  ],
+  "limitations": [
+    "纵向巡逻与定时喷发只有确定性 fixture 证据（E2）；真实浏览器运行由 06 覆盖。",
+    "冻结 wasteland Demo 只含 axis:x 巡逻物（patroller-1/2），本轮未生成新的 y/danger 真实样本。"
+  ]
+}

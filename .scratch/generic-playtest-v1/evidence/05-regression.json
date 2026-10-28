@@ -1,0 +1,11 @@
+{
+  "ticket": "05 有限终止与动作验证",
+  "at": "2026-10-28",
+  "commands": [
+    { "command": "pnpm test", "exit": 0, "result": "146 files / 2189 tests passed" },
+    { "command": "pnpm typecheck", "exit": 0 },
+    { "command": "pnpm test:playtest", "exit": 0, "result": "self-test 4/4（gate / pickup / input / hazard-legacy）+ 9 files / 125 tests passed" }
+  ],
+  "selfTestEvidence": "evidence/self-test-run（含 strategy.json 策略注解；运行后已 git restore tracked 产物）",
+  "notChanged": ["Runtime", "站点字节", "GameConfig", "SHELL_VERSION", "actions[].outcome", "PLAYTEST_REPORT_VERSION", "delivery.playtest 镜像"]
+}

@@ -43,9 +43,11 @@ describe("FA-02 巡逻危险物：模型与跨带窗口", () => {
     expect(hazardModel(h2).vel).toBeLessThan(0);
   });
 
-  it("非横向巡逻 ⇒ null（不把静止危险物当巡逻物处理）", () => {
-    expect(hazardModel(patroller({ axis: "y" }))).toBeNull();
+  it("纵向巡逻由独立模型接受（04），缺运动字段仍为 null", () => {
+    // 04：`hazardModel` 同时服务横向/纵向；横向分支只挑 axis:"x"，纵向走完整扫掠范围。
+    expect(hazardModel(patroller({ axis: "y" })).axis).toBe("y");
     expect(hazardModel(patroller({ distance: 0 }))).toBeNull();
+    expect(hazardModel(patroller({ periodMs: 0 }))).toBeNull();
   });
 
   it("跨带窗口随物理量/几何变化，而不是写死的像素值", () => {
