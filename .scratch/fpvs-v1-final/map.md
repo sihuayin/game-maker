@@ -150,6 +150,14 @@ Effort: fpvs-v1-final
   `delivery.verdict=pass`；快照零写入。逐项记录 `review-record.json`；
   报告：[runs/2026-10-28-visual-review/README.md](runs/2026-10-28-visual-review/README.md)。
   → 解除 FA-05 阻塞（06/07/08/05 全部满足）。
+- [FA-05 最终报告与 verdict](issues/09-final-acceptance-report.md)：**已收口** —— 汇总身份、QA、试玩、
+  归因、视觉：六项必需检查全 pass ⇒ `deriveDeliveryVerdict` = **`pass`**（确定性、非默认）。
+  报告 `runs/2026-10-28-final-acceptance/final-acceptance.md` 逐项列强制条件 → 结论 → 证据
+  （路径/命令/退出码/身份）、5 条限制、§8 清单；`qa-report.json` 逐字节副本（sha256
+  `dc20e301…5ee6`）+ `evidence.json`（38 文件）+ `consistency.json` **12/12**（交付报告 /
+  CLI/MCP 共用摘要 / playtest·visual 映射 / 缺席不默认 pass / 报告文本）。`pnpm test` 2160/145
+  exit 0 + `pnpm typecheck` exit 0（日志在 `regression/`）；零付费、快照零写入、历史零覆盖。
+  → 解除 FA-06 阻塞（最终回归与收口）。
 
 ## Not yet specified
 

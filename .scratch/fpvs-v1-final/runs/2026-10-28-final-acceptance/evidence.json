@@ -1,0 +1,393 @@
+{
+  "format": "fpvs-final-acceptance-evidence/v1",
+  "generatedAt": "2026-10-28T09:08:51.066Z",
+  "subject": {
+    "work": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe",
+    "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+  },
+  "verdict": "pass",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "status": "pass"
+    },
+    {
+      "key": "config",
+      "status": "pass"
+    },
+    {
+      "key": "qa",
+      "status": "pass"
+    },
+    {
+      "key": "site",
+      "status": "pass"
+    },
+    {
+      "key": "playable-smoke",
+      "status": "pass",
+      "detail": "SUCCESS"
+    },
+    {
+      "key": "visual-review",
+      "status": "pass"
+    }
+  ],
+  "report": {
+    "origin": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+    "copy": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/qa-report.json",
+    "sha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6",
+    "copyMatchesOrigin": true
+  },
+  "items": [
+    {
+      "id": "identity-version-consistency",
+      "requirement": "产物身份与版本一致性",
+      "status": "satisfied",
+      "evidence": [
+        "artifacts/identity.json",
+        "artifacts/hashes.json",
+        "work/.../run/v1/playtest/v2/result.json",
+        "consistency.json#identity.three-way"
+      ]
+    },
+    {
+      "id": "build-config-qa",
+      "requirement": "构建、配置与 QA",
+      "status": "satisfied",
+      "evidence": [
+        "work/.../run/v1/qa-report.json",
+        "consistency.json#checks.all-pass"
+      ]
+    },
+    {
+      "id": "startup-and-controls",
+      "requirement": "真实启动与必要操作",
+      "status": "satisfied",
+      "evidence": [
+        "work/.../run/v1/playtest/v2/.../events.jsonl",
+        "trace.jsonl",
+        "input.jsonl",
+        "visual-review/shots/01..09"
+      ]
+    },
+    {
+      "id": "goal-completion",
+      "requirement": "真实目标完成",
+      "status": "satisfied",
+      "evidence": [
+        "work/.../run/v1/playtest/v2/result.json",
+        "consistency.json#playtest.result"
+      ]
+    },
+    {
+      "id": "playtest-attribution",
+      "requirement": "试玩失败归因 / 有限修复",
+      "status": "satisfied",
+      "evidence": [
+        "runs/2026-10-28-attribution/README.md",
+        "runs/2026-10-28-attribution/attribution.json",
+        "runs/2026-10-28-acceptance/harness-1/"
+      ]
+    },
+    {
+      "id": "visual-review-p06",
+      "requirement": "P0-06 人工视觉审核",
+      "status": "satisfied",
+      "evidence": [
+        "runs/2026-10-28-visual-review/README.md",
+        "review-record.json",
+        "materials.json",
+        "shots/01..09"
+      ]
+    },
+    {
+      "id": "blockers-and-gaps",
+      "requirement": "未解决阻塞与证据缺口",
+      "status": "none-blocking",
+      "evidence": [
+        "final-acceptance.md#3.7"
+      ],
+      "note": "无阻塞；5 条限制（危险物间接证据、规则④潜在路径、25.8px 不可复现、人工视觉、E3 无截图）已记录。"
+    },
+    {
+      "id": "final-verdict-deterministic",
+      "requirement": "最终 verdict 由现有 delivery 模型确定性计算",
+      "status": "satisfied",
+      "evidence": [
+        "work/.../run/v1/qa-report.json#delivery.checks",
+        "consistency.json#verdict.deterministic"
+      ]
+    },
+    {
+      "id": "cli-mcp-report-consistency",
+      "requirement": "CLI / MCP / 交付报告一致",
+      "status": "satisfied",
+      "evidence": [
+        "consistency.json#summary.shared-by-cli-and-mcp",
+        "consistency.json#no-missing-evidence-defaults-pass",
+        "packages/pipeline/tests/delivery.test.ts"
+      ]
+    },
+    {
+      "id": "engineering-constraints",
+      "requirement": "工程约束（测试/类型/契约/付费/历史/阈值）",
+      "status": "satisfied",
+      "evidence": [
+        "regression/test.log",
+        "regression/typecheck.log",
+        "runs/2026-10-28-attribution/README.md#5"
+      ]
+    }
+  ],
+  "regression": {
+    "test": {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "log": "regression/test.log",
+      "summary": " Test Files  145 passed (145) ·       Tests  2160 passed (2160)"
+    },
+    "typecheck": {
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "log": "regression/typecheck.log",
+      "summary": "packages/mcp typecheck$ tsc -p tsconfig.spec.json · packages/mcp typecheck: Done · packages/cli typecheck: Done"
+    }
+  },
+  "files": [
+    {
+      "path": ".scratch/fpvs-v1-final/artifacts/identity.json",
+      "bytes": 7425,
+      "sha256": "sha256:abf0047a355bf82cc8b688940faa64512d3b06105c147a95a903c676810c12ad",
+      "note": "三方身份"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/artifacts/hashes.json",
+      "bytes": 29850,
+      "sha256": "sha256:c7330dc00ea844d7ee555d58b1a8b5ba9409ff67f8f0886612ec7fe017514988",
+      "note": "80 条冻结哈希"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/reference.png",
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0",
+      "note": "冻结输入 / 配置"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/style.png",
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0",
+      "note": "冻结输入 / 配置"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "note": "冻结输入 / 配置"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+      "bytes": 9802,
+      "sha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6",
+      "note": "最终交付报告（origin）"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/qa-report.json",
+      "bytes": 9802,
+      "sha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6",
+      "note": "最终交付报告（逐字节副本）"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "bytes": 7764,
+      "sha256": "sha256:1826a5e1b429e52016d5738ffc299b69f30d79aa2de7c55786a785384a3ed28c",
+      "note": "试玩报告 SUCCESS"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/site-integrity.json",
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f",
+      "note": "站点字节未改"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/events.jsonl",
+      "bytes": 3206,
+      "sha256": "sha256:6ca7262ca072bc95c08b45de6f4e4a54b33fa71fa6cee263c1b047d9e10ad82a",
+      "note": "试玩运行时证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/trace.jsonl",
+      "bytes": 233948,
+      "sha256": "sha256:787f5454f4e7e6daca5d231c3a82c7d1161ccfc2602efe3ae02761957d85af09",
+      "note": "试玩运行时证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/input.jsonl",
+      "bytes": 2857,
+      "sha256": "sha256:365bd8471dfcd78e40a9ac5e0d3cd24a1676dade578bf25a58c49c22186fc0e5",
+      "note": "试玩运行时证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/console.json",
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558",
+      "note": "试玩运行时证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/exceptions.json",
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "note": "试玩运行时证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/setup.json",
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2",
+      "note": "试玩运行时证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-attribution/README.md",
+      "bytes": 11295,
+      "sha256": "sha256:b086d61460f4590647e96297aa28ee76f4f12303a2f9636a23c6867070f3a7b8",
+      "note": "FA-03 归因复核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-attribution/attribution.json",
+      "bytes": 8151,
+      "sha256": "sha256:be5212a8a0c0a0cab4738afda146a43281f8c5b35a1aaba53d3cc118d48e5776",
+      "note": "FA-03 归因复核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-attribution/verify.mjs",
+      "bytes": 20802,
+      "sha256": "sha256:0903782563461b2a16807047275e7abe89c00c3de970079f60895184532ab2eb",
+      "note": "FA-03 归因复核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/README.md",
+      "bytes": 7623,
+      "sha256": "sha256:31872f663d60e69549fb2681b65e5e54d9f8a1f7d79ff1a6cb446fea1c7dd4cb",
+      "note": "FA-04 视觉审核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/review-record.json",
+      "bytes": 4469,
+      "sha256": "sha256:a1602021720ed1a984913094eebff3a9b29ad5ef09f2ef7347c620ea0d93a0c1",
+      "note": "FA-04 视觉审核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/materials.json",
+      "bytes": 24678,
+      "sha256": "sha256:060debc46fcd52b99f6863d254fe8e964f471eacd93d2c2fb8c6659284f469af",
+      "note": "FA-04 视觉审核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/review.html",
+      "bytes": 10568,
+      "sha256": "sha256:9facbc3f7e03559071c31c7887979ada9d0e00226e5709f76ed2efae842b1706",
+      "note": "FA-04 视觉审核"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/01-startup.png",
+      "bytes": 20139,
+      "sha256": "sha256:71e544d9b357df6e72e4b50b6f45fa05310a8ddcbb8bf74cfe188f6fdbe65c2c",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/02-movement.png",
+      "bytes": 20466,
+      "sha256": "sha256:0170124c187fa13a28a74b8c9314d21421da36385ec18b00dffaeb6b684082c1",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/03-jump.png",
+      "bytes": 20628,
+      "sha256": "sha256:462fc8584459ecfb52008c367c741e09fd27edc3be14848434cfe89ebe987973",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/04-pickup.png",
+      "bytes": 20465,
+      "sha256": "sha256:328fc7a9cca5d423327962831e870321255930c83d5a76c989ba1e23660f7276",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/05-chest-open.png",
+      "bytes": 21028,
+      "sha256": "sha256:29e1f93199f580d3838eccf73c07ec198c53c14c1d824727cb25a41d2e44139b",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/06-hazard-wait.png",
+      "bytes": 21510,
+      "sha256": "sha256:9b5744c8b903610f78ac47499b07e8e3c02a48109cc6f067c332f9e0fe5039ee",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/07-hazard-cross.png",
+      "bytes": 21640,
+      "sha256": "sha256:92e1a04f620184dd7613c43eb42fabced1844a5816f9a0dc4cc13f443fcca48b",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/08-goal.png",
+      "bytes": 23105,
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-visual-review/shots/09-final.png",
+      "bytes": 23105,
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7",
+      "note": "运行截图"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-acceptance/README.md",
+      "bytes": 7977,
+      "sha256": "sha256:d55988fa1c5302e12fb7bd7f27c1a760242f25b2ead0d283a87a1ff500a4f6d5",
+      "note": "FA-02 通关与失败迭代"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/final-acceptance.md",
+      "bytes": 16226,
+      "sha256": "sha256:9c95dd13ce5089671bc08f4971144f606f968d63f072ffe96aeaab9f698e1555",
+      "note": "本报告"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/consistency.json",
+      "bytes": 6467,
+      "sha256": "sha256:c8741e8ae9a6fcf5cec5b264db513838bbf8a20aa4cc26cfc414ce1dd5d741ed",
+      "note": "最终态一致性核对"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/regression/test.log",
+      "bytes": 15771,
+      "sha256": "sha256:1397f2f0e9f88310c31b8c292d54dc20730b2362eab860fa3dc5dfab8f777b52",
+      "note": "FA-05 回归证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/regression/test.exit",
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "note": "FA-05 回归证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/regression/typecheck.log",
+      "bytes": 1037,
+      "sha256": "sha256:34079e0854a892735b87bd72afc41ff8a54312214e9f7f28e52e8b09ba52f1ec",
+      "note": "FA-05 回归证据"
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/regression/typecheck.exit",
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "note": "FA-05 回归证据"
+    }
+  ]
+}
