@@ -4,6 +4,8 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: p0-02-second-demo
 
+> **当前状态（2026-10-29）：零付费准备可继续；真实付费执行 BLOCKED（无严格硬限额）。**
+>
 > **本图 2026-10-29 开。** 输入：`docs/v7.6/p0-01-readonly-capability-audit.md`、`.scratch/p0-01-audit/rulings-2026-10-29.md`、`.scratch/p0-01-audit/research/09-decision-report.md`。P0-02 目前没有独立 PRD，本图同时定义它的执行契约。
 >
 > **终点形态（用户 2026-10-29 逐字裁定 Q1 = (a)）**：**承载执行** —— 从新输入、预算闸、`create/build`、delivery、真实浏览器 Playtest，到证据冻结与最终结论，形成完整闭环。
@@ -33,7 +35,7 @@ Effort: p0-02-second-demo
 ## Notes
 
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
-- **预算闸（Q2 c）**：票 01/14 已裁定未授权（票 14 仅选定 $6.00 目标）；真正的执行闸 = 票 18（零付费核验端点/计价/护栏）→ 票 19（预算授权 v3）。票 19 未通过前，任何可能调用文本/生图上游的命令都不得运行。
+- **预算闸（Q2 c）**：票 01/14/19 均未授权；严格 $6 硬停止不可得。P0-02 可继续零付费准备；**付费执行 BLOCKED**。继续路径 = 票 20（寻找可硬限额计量网关）→ 票 21（预算授权 v4）；票 21 未通过前，任何付费命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
 - **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17 已收口（用户接受 `rooftop-dusk.png`）；票 05 现在只阻塞在预算授权 v3（票 19）。
 - **成功判据（Q5/Q8）**：`create`/`build` exit 0；QA pass；发布闸；site；production shell 写 delivery；`playtest` SUCCESS；人工视觉 pass；新交付身份冻结。任一失败按证据记 `fail`/`blocked`，不修到通过。
@@ -65,6 +67,10 @@ Effort: p0-02-second-demo
 - [生成并检查参考图](issues/16-generate-and-check-reference.md)：**已收口（待验收）** —— 新建 effort-local `tools/generate-reference.mjs`，复用 `draw.mjs`，零付费/确定性生成 `inputs/reference/rooftop-dusk.png`（480×270、16 唯一色、每像素在色板内、sha `1b926a5b…f6f2`，两次运行一致）；不改现有 `generate.mjs`/fixtures/历史实验；视觉验收待票 17 由用户确认。详见 [research/16-reference-image.md](research/16-reference-image.md)。
 
 - [验收参考图](issues/17-accept-reference-image.md)：**已收口（HITL）** —— 用户**接受** `inputs/reference/rooftop-dusk.png` 作为 P0-02 参考图输入；480×270、16 唯一色、sha `1b926a5b…f6f2`；接受不等于预算授权。`create` checkpoint 仍只阻塞在预算授权 v3（票 19）。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §6。
+
+- [零付费核验 provider 端点、计价与护栏](issues/18-verify-provider-and-guardrail.md)：**已收口（task）** —— 端点已闭合：image 与文件 text 均为官方 Gemini（`generativelanguage.googleapis.com`），但当前 `ANTHROPIC_*` env 把 text 覆盖到本地代理 `127.0.0.1:15721`；执行前必须 unset 并在干净 env 复核。**严格 $6.00 硬护栏未建立**：官方 Prepay/spend cap 有延迟，本地 proxy 不是计量网关；可行的是有界超射（静态上限 + checkpoint 闸 + staging watcher + `--concurrency-image 1`，约 1–2 张图 ≈$0.034–$0.067）或保持阻塞/换 provider。详见 [research/18-provider-verification.md](research/18-provider-verification.md)。
+
+- [预算授权 v3（核验后生效）](issues/19-budget-authorization-v3.md)：**已收口（HITL）· 保持阻塞** —— Q1 **b**：严格 $6.00 硬停止不可得，不接受有界超射改变约束，因此不授权；Q2 不适用，不批准付费调用/生图。P0-02 可继续零付费准备，但真实付费执行 **BLOCKED**。继续路径 = 票 20「寻找可硬限额的计量网关」→ 票 21「预算授权 v4」；票 05/06/09 已改为阻塞在 21。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §7。
 
 ## Not yet specified
 

@@ -1,7 +1,7 @@
 # 零付费核验 provider 端点、计价与护栏
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: （无）
 
 ## Question
@@ -18,3 +18,12 @@ Blocked by: （无）
 5. 输出结论：**$6.00 硬护栏是否可建立**；若不可，列出最小替代方案或“保持阻塞”。
 
 产物：`.scratch/p0-02-second-demo/research/18-provider-verification.md`（含命令、退出码、脱敏输出）。
+
+## Answer
+
+**已收口（2026-10-29，零付费、零密钥输出、零生产修改）。** 详见 [../research/18-provider-verification.md](../research/18-provider-verification.md)。
+
+- **端点已闭合**：`image` 走官方 Gemini（`generativelanguage.googleapis.com`，`gemini-3.1-flash-lite-image`）；文件 `text` 也是官方 Gemini（`gemini-3.5-flash`），但当前被 `ANTHROPIC_*` env 覆盖到本地 anthropic 代理 `127.0.0.1:15721`。
+- **执行前必须** `unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN`；在干净 env 下复核 source=file / host=官方。否则文本路径与成本模型不成立。
+- **严格 $6.00 硬护栏未建立**：官方 Prepay/spend cap 有计费延迟；本地 proxy 不是计量网关。可行的是有界超射（静态上限 + checkpoint 闸 + staging watcher + `--concurrency-image 1`，超射约 1–2 张图 ≈$0.034–$0.067），或保持阻塞/换 provider。
+- 票 19 需在“接受有界超射 / 保持阻塞 / 换 provider”之间裁定。
