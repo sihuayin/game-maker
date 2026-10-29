@@ -71,6 +71,8 @@ Effort: p0-01-audit
 
 - [裁定第二个 Demo 唯一候选](issues/08-candidate-decision.md)：**已收口（HITL）** —— 唯一候选 **A 平台探索/收集**；允许进入 P0-02 付费试跑，但**付费执行需另行明确预算授权**，未获授权则暂停、不得降级复用旧包。P0-02 只新增输入（新 intent、参考图、自定义 scenario），不改生产代码、不手改中间 JSON、不新增运行时/契约；核心验收 `collect-pickup` + `reach-goal`，`open-chest` 可选；新参考图 → 新视觉世界/资源包；证据 = 真实运行 + delivery 报告 + 真实浏览器 Playtest，新交付的正式清单与 `verify-delivery` 留作后续缺口。成功不得用历史 E3 替代，也不得把壳级 delivery E3 / v2 playtest 写回 / 正式清单缺失默认为已通过；B 的假绿链是独立缺口。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md)。
 
+- [开发决策报告与缺口分类](issues/09-decision-report.md)：**已收口** —— 六类缺口：已具备 6 · 已实现需补证据 7 · 生产实现缺口 10 · 机制不可观测/判定 6 · 证据/身份/版本管理缺口 7 · 证据不足 7。**下一步唯一优先 = P0-02 A 付费试跑**；第二个 Demo 可进入实施（A），条件：预算授权 + 只新增输入（intent/参考图/自定义 scenario）+ 不改生产代码/不手改中间 JSON；核心验收 `collect-pickup` + `reach-goal`，`open-chest` 可选；新参考图→新视觉世界/资源包；证据=真实运行+delivery+真实浏览器 Playtest，正式清单/`verify-delivery` 后续补齐。最高风险：delivery 壳级 E3、v2 playtest 写回、默认场景常量、几何可通关、新交付清单。B 假绿链独立。详见 [research/09-decision-report.md](research/09-decision-report.md)。
+
 ## Not yet specified
 
 - P0-02 的预算、执行计划与需求拆分属于新 effort；本图只记录进入条件（A、输入、证据边界），不在此展开。
