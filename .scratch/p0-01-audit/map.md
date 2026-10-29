@@ -59,10 +59,13 @@ Effort: p0-01-audit
 
 - [冻结审计基准](issues/01-freeze-audit-baseline.md)：**已收口** —— 生产代码基线 **`2c1a9d5`**（`main`）；当前 HEAD `e5dc05e` 仅新增本期 effort 文件（12 files / 684 insertions），生产代码 diff 为空；工作区仅未跟踪 PRD（`sha256:9ac9e120…92f4a7`）；10 包 / 6,877 受跟踪文件 / 149 测试文件；未读本地凭据与忽略构建产物；零生产修改。详见 [research/01-baseline.md](research/01-baseline.md)。
 
+- [核实安全审计命令](issues/02-verify-safe-audit-commands.md)：**已收口** —— allowlist：只读 shell、`pnpm test`、`typecheck/build`（仅 `.gitignore` 的 dist）、`verify`/`inspect`、`accept`/`verify-delivery`/`test:evidence`/`site` 加 `--out <tmp>`；Chrome 机制探针仅按条件（需新观测 + 临时输出，非 Playtest）；禁止 `create/build/plan/pack/compile-*`、`playtest`、整条 `test:playtest`、`review`、`review-verdict`、`playtest-baseline`、`install`。未执行候选命令，零生产修改。详见 [research/02-safe-commands.md](research/02-safe-commands.md)。
+
 ## Not yet specified
 
 - 第二个 Demo 若不可进入实施，后续 P0-02 应以什么粒度、拆几张需求另立（取决于候选比较与缺口分类的结论）。
 - 审计文档的入库拆分方式（单独提交文档，或与 PRD 一并提交）——Q9 已定「完成后单独请求授权」，具体提交边界待收口时定。
+- 浏览器机制探针是否用于补证据：默认不用；若后续票需要新行为观测，按 Q7 单独批准并记录输出目录。
 - 是否存在只能靠付费/浏览器重跑才能消除的 `UNKNOWN`——取决于安全命令核实与证据审计；若存在，按 Q7 记为 `BLOCKED` 并写明解除代价，不绕过。
 
 ## Out of scope
