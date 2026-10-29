@@ -1,7 +1,7 @@
 # 预算授权 v4（网关核验后）
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 20
 
 ## Question
@@ -15,3 +15,15 @@ Blocked by: 20
 5. 第二次完整运行仍须另行 HITL 批准；只换输入、不改代码、不拼接。
 
 若没有可验证硬限额，本票保持阻塞，不授权付费。产物：票内 Answer + `rulings-2026-10-29.md`（追加逐字裁定）。
+
+## Answer
+
+**已收口（2026-10-29，HITL）：选择 LiteLLM 自托管路径，但仅进入零付费验证阶段；$6.00 与付费生图仍未授权。**
+
+- Q1 **a**：LiteLLM + Postgres 在仓库外部署；endpoint 主机名可提供，密钥不传输/输出。
+- Q2 分阶段：先用 `max_budget=0` / `max_parallel_requests=1` 验证两条 Gemini 路径在转发前返回 429，且上游零调用；验证通过后再另行提交预算授权。
+- 当前 **P0-02 仍 BLOCKED**；零预算验证成功不自动授权。
+- 后续获批运行才用 `max_budget=6`、清除 `ANTHROPIC_*`、确认文本与生图都走网关；任何路径绕过/无法计量即保持阻塞。
+- 第二次完整运行仍须另行 HITL 批准；不改代码、不手改中间 JSON、不拼接两次运行。
+
+下一道闸门 = 票 22「LiteLLM 零预算硬拒绝验证」→ 票 23「预算授权 v5」；票 05/06/09 已改为阻塞在 23。逐字裁定见 [../rulings-2026-10-29.md](../rulings-2026-10-29.md) §8。

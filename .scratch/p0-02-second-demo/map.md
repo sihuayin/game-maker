@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: p0-02-second-demo
 
-> **当前状态（2026-10-29）：零付费准备可继续；真实付费执行 BLOCKED（无严格硬限额）。**
+> **当前状态（2026-10-29）：零付费准备可继续；真实付费执行 BLOCKED（LiteLLM 零预算验证阶段）。**
 >
 > **本图 2026-10-29 开。** 输入：`docs/v7.6/p0-01-readonly-capability-audit.md`、`.scratch/p0-01-audit/rulings-2026-10-29.md`、`.scratch/p0-01-audit/research/09-decision-report.md`。P0-02 目前没有独立 PRD，本图同时定义它的执行契约。
 >
@@ -35,7 +35,7 @@ Effort: p0-02-second-demo
 ## Notes
 
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
-- **预算闸（Q2 c）**：票 01/14/19 均未授权；严格 $6 硬停止不可得。P0-02 可继续零付费准备；**付费执行 BLOCKED**。继续路径 = 票 20（寻找可硬限额计量网关）→ 票 21（预算授权 v4）；票 21 未通过前，任何付费命令都不得运行。
+- **预算闸（Q2 c）**：票 01/14/19 均未授权；严格 $6 硬停止不可得。P0-02 可继续零付费准备；**付费执行 BLOCKED**。继续路径 = 票 22（LiteLLM 零预算 429 验证）→ 票 23（预算授权 v5）。票 23 未通过前，任何付费命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
 - **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17 已收口（用户接受 `rooftop-dusk.png`）；票 05 现在只阻塞在预算授权 v3（票 19）。
 - **成功判据（Q5/Q8）**：`create`/`build` exit 0；QA pass；发布闸；site；production shell 写 delivery；`playtest` SUCCESS；人工视觉 pass；新交付身份冻结。任一失败按证据记 `fail`/`blocked`，不修到通过。
@@ -71,6 +71,10 @@ Effort: p0-02-second-demo
 - [零付费核验 provider 端点、计价与护栏](issues/18-verify-provider-and-guardrail.md)：**已收口（task）** —— 端点已闭合：image 与文件 text 均为官方 Gemini（`generativelanguage.googleapis.com`），但当前 `ANTHROPIC_*` env 把 text 覆盖到本地代理 `127.0.0.1:15721`；执行前必须 unset 并在干净 env 复核。**严格 $6.00 硬护栏未建立**：官方 Prepay/spend cap 有延迟，本地 proxy 不是计量网关；可行的是有界超射（静态上限 + checkpoint 闸 + staging watcher + `--concurrency-image 1`，约 1–2 张图 ≈$0.034–$0.067）或保持阻塞/换 provider。详见 [research/18-provider-verification.md](research/18-provider-verification.md)。
 
 - [预算授权 v3（核验后生效）](issues/19-budget-authorization-v3.md)：**已收口（HITL）· 保持阻塞** —— Q1 **b**：严格 $6.00 硬停止不可得，不接受有界超射改变约束，因此不授权；Q2 不适用，不批准付费调用/生图。P0-02 可继续零付费准备，但真实付费执行 **BLOCKED**。继续路径 = 票 20「寻找可硬限额的计量网关」→ 票 21「预算授权 v4」；票 05/06/09 已改为阻塞在 21。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §7。
+
+- [寻找可硬限额的计量网关](issues/20-metering-gateway.md)：**已收口（research）** —— **没有 provider 强制的严格 $6 路径**：官方 Prepay 有 ~10 分钟 overage、spend cap 月度非即时、AI Studio cap 实验性；Gemini RPD/Quota override 未获文档支持。最接近 = **LiteLLM Proxy 自托管**：key `max_budget=6`（lifetime）、预请求 429、per-request 预留（含 image）、原生 Gemini 路径、无需改生产代码；先用 `max_budget=0` 零付费验证 429。OpenRouter 非严格（image 不在在飞预留；$5.80 cap 才可能压住，需验证生图路由/PNG）。Cloudflare/Vercel/Portkey/Helicone/Requesty/Kong 不适用；本地 `127.0.0.1:15721` 是 CC Switch，只记日志/用量，无预算执行。兜底 = effort-local 计量代理（自建信任，需实现/HITL）。若只接受 provider 强制，保持 BLOCKED。详见 [research/20-metering-gateway.md](research/20-metering-gateway.md)。
+
+- [预算授权 v4（网关核验后）](issues/21-budget-authorization-v4.md)：**已收口（HITL）· 仅进入零付费验证** —— 选择 **LiteLLM 自托管**路径；$6.00 与付费生图**仍未授权**。先用 `max_budget=0` / `max_parallel_requests=1` 验证原生 Gemini `:generateContent` 与 `/v1beta/interactions` 在转发前返回 429、上游零调用；验证通过后再另行提交预算授权。P0-02 仍 **BLOCKED**；下一道闸门 = 票 22「LiteLLM 零预算硬拒绝验证」→ 票 23「预算授权 v5」；票 05/06/09 已改为阻塞在 23。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §8。
 
 ## Not yet specified
 
