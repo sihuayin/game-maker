@@ -81,3 +81,27 @@ LITELLM_KEY=<max_budget=0 的 key> \
 5. LiteLLM 的预留是**估算**，不是 provider 账单的精确值。
 
 任何一项不满足，都不进入 $6 授权；按票 23 保持阻塞或换兜底方案。
+
+## 7. 验证通过后的 repo 侧配置（模板）
+
+> 仅用于票 23 重新授权之后；不要在验证前使用，也不要把真实 key 写进仓库。
+
+`repo-config.template.json` 是临时 cwd 的 `game-maker.local.json` 模板：
+
+- `text.protocol = gemini`，`text.baseUrl = http://127.0.0.1:4000/v1beta`
+- `image.protocol = gemini`，`image.baseUrl = http://127.0.0.1:4000/v1beta`
+- `apiKey` 用 LiteLLM 的 **virtual key**（不是 Google key）；只放在临时 cwd 的副本里
+- **不要包含 `text.proxy`**：CLI 会把 `text.proxy` 同时用于生图 fetch，指向 localhost 时会走 HTTPS/CONNECT 而坏掉（`research/20` §1.1）
+- 执行前 `unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN`，否则 text 会被 env 覆盖到 CC Switch
+- 原 `game-maker.local.json` 不动；用临时 cwd + 这个副本
+
+```bash
+TMP=$(mktemp -d)
+cp .scratch/p0-02-second-demo/tools/litellm/repo-config.template.json "$TMP/game-maker.local.json"
+# 本地把 <LITELLM_VIRTUAL_KEY> 替换为 virtual key（不要提交、不要贴到对话）
+# 然后在该临时 cwd 执行（票 23 批准后才做）：
+#   unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN
+#   node <repo>/packages/cli/dist/cli.mjs create ... --out <repo>/out ...
+```
+
+若任何一条路径无法确认经过 LiteLLM，停止并报告，不运行付费命令。
