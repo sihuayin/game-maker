@@ -1,7 +1,7 @@
 # 冻结期望哈希清单（唯一信任锚）
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 02
 
 ## Question
@@ -23,3 +23,47 @@ Blocked by: 02
 
 完成判据：清单文件入库（随提交固定）、内容经用户审查、记录生成来源与每一条的纳入理由；
 校验器日后只读它、绝不自动更新。产物：`.scratch/evidence-integrity-v1/manifest/expected-hashes.json` + 审查记录。
+
+## Draft (awaiting review)
+
+已生成草案（2026-10-29）：
+
+- 清单：`.scratch/evidence-integrity-v1/manifest/expected-hashes.json`
+  sha256 `6efd248c2b53576ac993c21e0a2731b367b778f4f4c00a2b7578ce59f493fdf2`
+- 生成器（一次性、`--force` 才覆盖）：`.scratch/evidence-integrity-v1/tools/build-manifest.mjs`
+- 规模：191 个文件（147 required / 44 optional），约 18.4 MB；13 条 records（11 条要求身份）。
+- 覆盖校验：materials 44/44、FA-05 evidence 36/36、06 attempt 18/18 全部在清单内；`*.log` 0 条。
+
+按 D1–D12 的落法：
+
+| 项 | 落法 |
+|---|---|
+| D1 playtest 双来源 | 交付内 `playtest/v2/result.json`（harness v1）required，用于 `playable-smoke` 重导；06 两份 attempt（harness v2）18 文件 required，作额外证据 |
+| D4 outRoot | `roots.out = ../../fpvs-v1-final/work`；`delivery.*` 相对路径直接解析 |
+| D5 work 枚举 | work 树 41 条（含 playtest v1/v2、rejections）显式列出 |
+| D6 reference | 14 文件（去 chrome.log 后 13）`required:false` |
+| D7 重复截图 | 9 张全 required；「8 个不同字节」交给一致性检查 |
+| D9 reviewedAt | 不作身份/必需项 |
+| D10 consistency | `identity:false`，按文件哈希 + reportSha256 校验 |
+| D12 日志 | `*.log` 全部排除；regression 用 `.txt` + `.exit` |
+
+required 分组：protected 50 · delivery 2 · playtest 8 · visual-record 3 · visual-shot 9 · visual-material 32 ·
+acceptance-record 8 · acceptance-evidence 4 · regression 9 · playtest-attempt 18 · visual-supplement 2 ·
+identity 1 · freeze-manifest 1（hashes.json 经 evidence 36 进入 required）。
+optional：snapshot-run 16 · reference 13 · playtest-historical 12 · rejections 3。
+
+待用户审查确认后置 `resolved` 并随 git 固定；不覆盖、不自动更新。
+
+## Answer
+
+**已收口（2026-10-29，用户审查批准）。**
+
+- 清单：`.scratch/evidence-integrity-v1/manifest/expected-hashes.json`
+  sha256 `6efd248c2b53576ac993c21e0a2731b367b778f4f4c00a2b7578ce59f493fdf2`
+- 规模：191 个文件（147 required / 44 optional），18,374,540 bytes；13 条 records（11 条要求身份）。
+- `roots`（9）：`out` / `snapshot` / `reference` / `artifacts` / `fa04` / `fa05` / `fa06` / `runs` / `gp`，全部相对清单文件解析。
+- 覆盖自检：materials 44/44、FA-05 evidence 36/36、06 attempt 18/18；`*.log` 0 条。
+- 用户确认：保留 `hashes.json` 为 required（经 evidence 36）；snapshot run / playtest v1 / rejections 维持 optional。
+- D1–D12 落法见上节 Draft；D1 = 交付内 playtest v2（harness v1）重导 `playable-smoke` + 06 两份（harness v2）作额外必需证据。
+- 生成器：`.scratch/evidence-integrity-v1/tools/build-manifest.mjs`（一次性；默认拒绝覆盖，`--force` 才重建）。
+- 信任锚：随本次 git 提交固定；正式校验器只读清单、**绝不自动更新**。

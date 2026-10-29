@@ -83,13 +83,14 @@ Effort: evidence-integrity-v1
 
 <!-- 索引：每张关闭票一行，gist + 链接；详情只在票里 -->
 
-（尚无关闭票。）
+- [裁定归档：把 Q1–Q16 追加到 `docs/v7.6/验收.md`](issues/01-archive-rulings-in-prd.md)：**已收口** —— PRD 末尾新增 A1–A10（16 条裁定 / 三条约束 / 清单形状 / 状态映射 / 六项重导出 / 入口与退出码 / 路径与三方哈希 / 只读与负向测试 / Phase 0 前置 / 执行顺序）；原文前 20,518 字节 sha256 `780dd22a…7f0e` 逐字节不变（追加后前缀哈希一致）。
+- [Phase 0 只读审计：记录 schema、证据依赖图与差距清单](issues/02-phase0-readonly-audit.md)：**已收口** —— 正式路径不重算哈希、07 为唯一核验器（27 项）；`hashes.json` 只覆盖 66 snapshot + 14 reference、work 未列且已增至 95；身份矩阵可用（`packChecksum` ↔ `manifestChecksum` 等映射）；差距 EI/AC 清单 + 最小改动方案 + 清单冻结前 D1–D12 裁定项。全案：[research/phase0-audit.md](research/phase0-audit.md)。
+- [冻结期望哈希清单（唯一信任锚）](issues/03-freeze-expected-hash-manifest.md)：**已收口** —— 191 文件（147 required / 44 optional，约 18.4 MB）、13 条 records（11 条身份）、9 个 roots（out/snapshot/reference/artifacts/fa04/fa05/fa06/runs/gp）；D1–D12 落定（双 playtest 来源、work 显式枚举、reference optional、`*.log` 排除）；覆盖自检 materials 44/44 + evidence 36/36 + attempt 18/18；清单 sha256 `6efd248c…3fdf2`，随提交固定、校验器只读不回写。
 
 ## Not yet specified
 
 - **清单再生成策略**：交付更新 / 出现第二版后，如何生成新清单、旧清单如何并存与指向（V1 只冻结一份，未定）。
 - **验收报告的证据化**：`delivery-verification` 报告本身是否作为下一轮的证据登记、以及如何避免自指（未定）。
-- **审计发现的 schema 差异如何纳入清单**：FA-04/FA-09 记录身份字段若与 Q12 契约不完全一致，纳入方式由票 03 基于票 01 的实际审计结果裁定。
 - **性能与规模**：`test:evidence` 读取约 200MB 证据的真实耗时与 CI 可用性（票 05 量，之后可能引出缓存/裁剪策略）。
 - **第二个真实 Demo 的泛化验证**：PRD §R3 明确留待后续阶段，本图不做。
 
