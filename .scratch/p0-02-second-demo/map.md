@@ -52,6 +52,8 @@ Effort: p0-02-second-demo
 
 - [冻结 P0-02 起始基线](issues/02-freeze-p0-02-baseline.md)：**已收口** —— 起始 HEAD **`4f3bc69`**；生产代码与 P0-01 基线 `2c1a9d5` 零差异（`2c1a9d5..4f3bc69` 仅 21 个 P0-01 文档/effort 文件、3,078 insertions）；工作区仅未跟踪 P0-02 effort + PRD；10 包 / 6,886 tracked / 149 测试；关键输入 sha256 已绑定；未读本地凭据；零生产修改。详见 [research/02-baseline.md](research/02-baseline.md)。
 
+- [起草 A 的 intent 与关卡概念](issues/03-draft-a-inputs.md)：**已收口（起草）** —— **屋顶信使**：黄昏城市天际线，4 封信 `collect-pickup` + `reach-goal`；5 段屋顶，台阶 ≤50px、缺口 ≤55px（在 60.5/66 上限内）；无 hazard/danger/moving；16 色视觉；资源表 12 项 + 可选信箱；新参考图要求已列。零付费、零生成、零生产修改。待票 04 HITL 批准输入与参考图。详见 [inputs/a-intent.md](inputs/a-intent.md) · [a-level-concept.md](inputs/a-level-concept.md) · [a-assets.md](inputs/a-assets.md)。
+
 ## Not yet specified
 
 - 首次运行失败后是否授权第二次完整运行：须单独 HITL 批准；只允许换输入，不改生产代码，不得拼接两次运行。
