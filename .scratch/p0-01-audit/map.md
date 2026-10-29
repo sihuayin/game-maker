@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: p0-01-audit
 
-> **本图 2026-10-29 开。** 输入：`docs/v7.6/管线.md`（P0-01 · 生成管线只读能力审计 PRD；当前为未提交的工作区文件）。
+> **本图 2026-10-29 开、2026-10-29 关闭。** 输入：`docs/v7.6/管线.md`（P0-01 · 生成管线只读能力审计 PRD；当前为未提交的工作区文件）。
 > **终点形态（用户 2026-10-29 逐字裁定 Q1 = (a)）**：唯一交付物是可合并的只读审计文档，并给出能否进入第二个 Demo 实施的结论及最小阻塞解除方案；不直接实施修复或启动生成。
 >
 > **方向裁定 Q1–Q11（用户 2026-10-29 逐字）**：
@@ -73,13 +73,17 @@ Effort: p0-01-audit
 
 - [开发决策报告与缺口分类](issues/09-decision-report.md)：**已收口** —— 六类缺口：已具备 6 · 已实现需补证据 7 · 生产实现缺口 10 · 机制不可观测/判定 6 · 证据/身份/版本管理缺口 7 · 证据不足 7。**下一步唯一优先 = P0-02 A 付费试跑**；第二个 Demo 可进入实施（A），条件：预算授权 + 只新增输入（intent/参考图/自定义 scenario）+ 不改生产代码/不手改中间 JSON；核心验收 `collect-pickup` + `reach-goal`，`open-chest` 可选；新参考图→新视觉世界/资源包；证据=真实运行+delivery+真实浏览器 Playtest，正式清单/`verify-delivery` 后续补齐。最高风险：delivery 壳级 E3、v2 playtest 写回、默认场景常量、几何可通关、新交付清单。B 假绿链独立。详见 [research/09-decision-report.md](research/09-decision-report.md)。
 
+- [写主文档并自检](issues/10-write-main-doc.md)：**已收口 · 地图关闭** —— `docs/v7.6/p0-01-readonly-capability-audit.md`（287 行，PRD §6 十节 + §8 清单 18/18）；能力矩阵 52 行（31 E2E / 17 TESTED / 4 UNKNOWN / 0 BLOCKED），机制 10 条（交付级 E3 3/10、严格全链 2/10）；Playtest/视觉/证据八项；候选 A/B/C 与 HITL 裁定 A；下一步唯一优先 P0-02 A 试跑；引用路径全部存在、生产代码零 diff、零付费、零历史覆盖。详见 [主文档](../../docs/v7.6/p0-01-readonly-capability-audit.md)。
+
 ## Not yet specified
 
-- P0-02 的预算、执行计划与需求拆分属于新 effort；本图只记录进入条件（A、输入、证据边界），不在此展开。
-- 新交付的正式证据清单与 `verify-delivery` 如何生成/绑定（Q5 明确留到 P0-02 之后）。
-- 审计文档的入库拆分方式（单独提交文档，或与 PRD 一并提交）——Q9 已定「完成后单独请求授权」，具体提交边界待收口时定。
-- 浏览器机制探针是否用于补证据：默认不用；若后续票需要新行为观测，按 Q7 单独批准并记录输出目录。
-- 是否存在只能靠付费/浏览器重跑才能消除的 `UNKNOWN`——取决于安全命令核实与证据审计；若存在，按 Q7 记为 `BLOCKED` 并写明解除代价，不绕过。
+<!-- in-scope fog that graduates as the frontier advances -->
+
+（无）—— 10 收口完成；**无 open ticket，P0-01 目的地已达。**
+
+开图时留下的三项（P0-02 的预算/执行计划、新交付的正式证据清单与 `verify-delivery`、浏览器机制探针是否用于补证据）
+都是**本图目的地之后**的工作：P0-02 是新 effort，新交付证据清单是后续需求，浏览器探针只在需要新行为观测时按 Q7 单独批准。
+审计文档的入库拆分方式按 Q9 在收口后单独请求授权。
 
 ## Out of scope
 
