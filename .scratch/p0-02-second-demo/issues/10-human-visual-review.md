@@ -1,7 +1,7 @@
 # 人工视觉审核
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 09
 
 ## Question
@@ -13,3 +13,7 @@ HITL：用户本人审阅 Playtest 后的截图/运行画面，并给出视觉 v
 - 若 fail，记录具体问题，不修到通过。
 
 产物：票内 Answer + `.scratch/p0-02-second-demo/research/10-visual-review.md`。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定暂停 P0-02 / 重画范围。** 本票未执行、未授权；零付费产物保留。恢复需按重画后的新范围另开图/新票。

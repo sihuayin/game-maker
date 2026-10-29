@@ -1,7 +1,7 @@
 # LiteLLM 零预算硬拒绝验证
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: （无）
 
 ## Question
@@ -24,3 +24,7 @@ HITL/零付费：在仓库外部署 LiteLLM + Postgres，并验证它能在转�
 - **2026-10-29 模板已准备**：`.scratch/p0-02-second-demo/tools/litellm/` 内含 `litellm-config.yaml`、`docker-compose.yml`、`.env.example`、`verify-zero-budget.sh`、`README.md`。**未部署、未验证**；等待用户在仓库外部署并提供 endpoint 主机名（不传密钥）。
 
 - **2026-10-29 探测**：`http://127.0.0.1:4000/health/readiness` → HTTP 000；`docker ps` 无 litellm 容器。**等待用户在仓库外部署**；未做任何付费调用。已补 `repo-config.template.json` 与 README §7（验证通过后的 repo 侧配置模板，不含密钥）。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定不用 LiteLLM。** 未部署、未验证、未产生任何付费调用。模板保留在 `tools/litellm/` 仅作研究记录，不进入执行。硬护栏路径由票 24 重新裁定。

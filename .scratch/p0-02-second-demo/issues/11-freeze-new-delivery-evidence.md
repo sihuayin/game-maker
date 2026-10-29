@@ -1,7 +1,7 @@
 # 冻结新交付身份与证据
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 06, 09, 10
 
 ## Question
@@ -15,3 +15,7 @@ Blocked by: 06, 09, 10
 - 不覆盖历史；不生成正式证据清单、不跑 `verify-delivery`（后续缺口）。
 
 产物：`.scratch/p0-02-second-demo/freeze/`（snapshot/hashes/identity）+ `.scratch/p0-02-second-demo/research/11-freeze.md`。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定暂停 P0-02 / 重画范围。** 本票未执行、未授权；零付费产物保留。恢复需按重画后的新范围另开图/新票。

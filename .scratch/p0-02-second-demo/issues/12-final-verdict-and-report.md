@@ -1,7 +1,7 @@
 # 最终结论与报告
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 11
 
 ## Question
@@ -14,3 +14,7 @@ Blocked by: 11
 - 写出最终报告：命令、退出码、耗时、预算/调用、产物路径、交付身份、视觉 verdict、已知限制、后续缺口。
 
 产物：`.scratch/p0-02-second-demo/final-report.md` + `final-verdict.json`。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定暂停 P0-02 / 重画范围。** 本票未执行、未授权；零付费产物保留。恢复需按重画后的新范围另开图/新票。

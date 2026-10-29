@@ -1,8 +1,8 @@
 # 付费 build 与 delivery
 
 Type: task
-Status: open
-Blocked by: 05, 23
+Status: resolved
+Blocked by: 05, 25
 
 ## Question
 
@@ -15,3 +15,7 @@ Blocked by: 05, 23
 - 若预算上限将超：停止并报告。
 
 产物：新的 `run/pack/site` + delivery 报告 + `.scratch/p0-02-second-demo/research/06-build-evidence.md`。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定暂停 P0-02 / 重画范围。** 本票未执行、未授权；零付费产物保留。恢复需按重画后的新范围另开图/新票。

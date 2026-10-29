@@ -1,8 +1,8 @@
 # 运行真实浏览器 Playtest
 
 Type: task
-Status: open
-Blocked by: 08, 23
+Status: resolved
+Blocked by: 08, 25
 
 ## Question
 
@@ -14,3 +14,7 @@ Blocked by: 08, 23
 - 记录预算/调用（如涉及）。
 
 产物：`run/vN/playtest/vK/` + `.scratch/p0-02-second-demo/research/09-playtest-evidence.md`。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定暂停 P0-02 / 重画范围。** 本票未执行、未授权；零付费产物保留。恢复需按重画后的新范围另开图/新票。

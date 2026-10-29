@@ -1,7 +1,7 @@
 # 预算授权 v5（LiteLLM 验证后）
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 22
 
 ## Question
@@ -15,3 +15,7 @@ Blocked by: 22
 5. 第二次完整运行仍须另行 HITL 批准；只换输入、不改代码、不拼接。
 
 若验证失败/部分通过，本票保持阻塞，不授权付费。产物：票内 Answer + `rulings-2026-10-29.md`（追加逐字裁定）。
+
+## Answer
+
+**已关闭（2026-10-29）：用户裁定不用 LiteLLM，票 23 作废。** 未授权 $6，未授权付费生图；P0-02 付费执行保持 BLOCKED。新路径由票 24 重新裁定。

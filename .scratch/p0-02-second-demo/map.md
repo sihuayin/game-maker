@@ -4,9 +4,9 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: p0-02-second-demo
 
-> **当前状态（2026-10-29）：零付费准备可继续；真实付费执行 BLOCKED（LiteLLM 零预算验证阶段）。**
+> **当前状态（2026-10-29）：P0-02 暂停；真实付费执行 BLOCKED；零付费产物保留；恢复需重画范围。**
 >
-> **本图 2026-10-29 开。** 输入：`docs/v7.6/p0-01-readonly-capability-audit.md`、`.scratch/p0-01-audit/rulings-2026-10-29.md`、`.scratch/p0-01-audit/research/09-decision-report.md`。P0-02 目前没有独立 PRD，本图同时定义它的执行契约。
+> **本图 2026-10-29 开、2026-10-29 暂停（用户裁定 Q1 = e：重画范围）。** 输入：`docs/v7.6/p0-01-readonly-capability-audit.md`、`.scratch/p0-01-audit/rulings-2026-10-29.md`、`.scratch/p0-01-audit/research/09-decision-report.md`。P0-02 目前没有独立 PRD，本图同时定义它的执行契约。
 >
 > **终点形态（用户 2026-10-29 逐字裁定 Q1 = (a)）**：**承载执行** —— 从新输入、预算闸、`create/build`、delivery、真实浏览器 Playtest，到证据冻结与最终结论，形成完整闭环。
 >
@@ -36,7 +36,7 @@ Effort: p0-02-second-demo
 
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
 - **LiteLLM 模板**：`tools/litellm/`（config / compose / .env.example / verify-zero-budget.sh / README；不含密钥；**未实测**，待票 22 部署验证）。
-- **预算闸（Q2 c）**：票 01/14/19 均未授权；严格 $6 硬停止不可得。P0-02 可继续零付费准备；**付费执行 BLOCKED**。继续路径 = 票 22（LiteLLM 零预算 429 验证）→ 票 23（预算授权 v5）。票 23 未通过前，任何付费命令都不得运行。
+- **预算闸（Q2 c）**：票 01/14/19 均未授权；严格 $6 硬停止不可得。P0-02 可继续零付费准备；**付费执行 BLOCKED**。LiteLLM 已被用户否决；路径重选 = 票 24（重新选择硬护栏路径）→ 票 25（预算授权 v6）。票 25 未通过前，任何付费命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
 - **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17 已收口（用户接受 `rooftop-dusk.png`）；票 05 现在只阻塞在预算授权 v3（票 19）。
 - **成功判据（Q5/Q8）**：`create`/`build` exit 0；QA pass；发布闸；site；production shell 写 delivery；`playtest` SUCCESS；人工视觉 pass；新交付身份冻结。任一失败按证据记 `fail`/`blocked`，不修到通过。
@@ -75,16 +75,22 @@ Effort: p0-02-second-demo
 
 - [寻找可硬限额的计量网关](issues/20-metering-gateway.md)：**已收口（research）** —— **没有 provider 强制的严格 $6 路径**：官方 Prepay 有 ~10 分钟 overage、spend cap 月度非即时、AI Studio cap 实验性；Gemini RPD/Quota override 未获文档支持。最接近 = **LiteLLM Proxy 自托管**：key `max_budget=6`（lifetime）、预请求 429、per-request 预留（含 image）、原生 Gemini 路径、无需改生产代码；先用 `max_budget=0` 零付费验证 429。OpenRouter 非严格（image 不在在飞预留；$5.80 cap 才可能压住，需验证生图路由/PNG）。Cloudflare/Vercel/Portkey/Helicone/Requesty/Kong 不适用；本地 `127.0.0.1:15721` 是 CC Switch，只记日志/用量，无预算执行。兜底 = effort-local 计量代理（自建信任，需实现/HITL）。若只接受 provider 强制，保持 BLOCKED。详见 [research/20-metering-gateway.md](research/20-metering-gateway.md)。
 
-- [预算授权 v4（网关核验后）](issues/21-budget-authorization-v4.md)：**已收口（HITL）· 仅进入零付费验证** —— 选择 **LiteLLM 自托管**路径；$6.00 与付费生图**仍未授权**。先用 `max_budget=0` / `max_parallel_requests=1` 验证原生 Gemini `:generateContent` 与 `/v1beta/interactions` 在转发前返回 429、上游零调用；验证通过后再另行提交预算授权。P0-02 仍 **BLOCKED**；下一道闸门 = 票 22「LiteLLM 零预算硬拒绝验证」→ 票 23「预算授权 v5」；票 05/06/09 已改为阻塞在 23。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §8。
+- [预算授权 v4（网关核验后）](issues/21-budget-authorization-v4.md)：**已收口（HITL）· 仅进入零付费验证** —— 选择 **LiteLLM 自托管**路径；$6.00 与付费生图**仍未授权**。先用 `max_budget=0` / `max_parallel_requests=1` 验证原生 Gemini `:generateContent` 与 `/v1beta/interactions` 在转发前返回 429、上游零调用；验证通过后再另行提交预算授权。P0-02 仍 **BLOCKED**；下一道闸门 = 票 22「LiteLLM 零预算硬拒绝验证」→ 票 23「预算授权 v5」；票 05/06/09 已改为阻塞在 23。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §8。**后续（2026-10-29）：用户裁定不用 LiteLLM；票 22/23 已关闭，改由票 24 重新选择路径。**
+
+- [重新选择硬护栏路径](issues/24-choose-guardrail-path.md)：**已收口（HITL）· 暂停 P0-02** —— 用户裁定 **(e) 暂停 P0-02 / 重画范围**；付费执行保持 BLOCKED；剩余执行/场景/视觉/冻结/最终结论票全部关闭；不推进 LiteLLM / OpenRouter / 自建代理；零付费产物（参考图、provider 核验、成本/网关研究、LiteLLM 模板）保留作研究记录；恢复需重画范围、另行开图。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §10。
 
 ## Not yet specified
 
-- 首次运行失败后是否授权第二次完整运行：须单独 HITL 批准；只允许换输入，不改生产代码，不得拼接两次运行。
-- 新交付的正式证据清单与 `verify-delivery`：P0-01 Q5 已留作后续缺口；本期只冻结快照/哈希/身份。
-- 最终 P0-02 报告是否进入 `docs/`、以及是否与审计文档一并提交：收口时单独裁定。
-- 若 checkpoint 材料不全或 build 在付费前失败，是否换输入后重试：按 Q6 需单独批准。
+<!-- in-scope fog that graduates as the frontier advances -->
 
+（无）—— P0-02 已暂停，所有票已关闭；本图不恢复执行。
+
+重画后的 P0-02 范围、预算、硬护栏路径与证据边界尚未定义；若重启，应作为新 effort 重新开图，而不是在本图继续推进。
 ## Out of scope
+
+- **在重画范围前的一切 P0-02 付费执行**：`create`/`build`/生图/场景/视觉/冻结/最终结论均暂停，不推进；恢复需新图。
+
+- **LiteLLM 路径**：用户 2026-10-29 裁定不用；票 22/23 已关闭，`tools/litellm/` 模板仅作研究记录，不部署、不验证、不授权。
 
 - 修改生产代码、公共契约、CLI/MCP、运行时或依赖；修改测试以改变结果。
 - 手工编辑中间 JSON；补写缺失的成功证据；把两次运行拼成一次全绿。
