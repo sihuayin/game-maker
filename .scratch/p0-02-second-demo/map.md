@@ -35,6 +35,7 @@ Effort: p0-02-second-demo
 ## Notes
 
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
+- **LiteLLM 模板**：`tools/litellm/`（config / compose / .env.example / verify-zero-budget.sh / README；不含密钥；**未实测**，待票 22 部署验证）。
 - **预算闸（Q2 c）**：票 01/14/19 均未授权；严格 $6 硬停止不可得。P0-02 可继续零付费准备；**付费执行 BLOCKED**。继续路径 = 票 22（LiteLLM 零预算 429 验证）→ 票 23（预算授权 v5）。票 23 未通过前，任何付费命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
 - **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17 已收口（用户接受 `rooftop-dusk.png`）；票 05 现在只阻塞在预算授权 v3（票 19）。

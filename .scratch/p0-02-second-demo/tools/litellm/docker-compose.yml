@@ -1,0 +1,29 @@
+# P0-02 · LiteLLM + Postgres（仓库外部署用；模板不含密钥）
+# 用法：把本目录复制到仓库外，创建 .env（不要提交），docker compose up -d。
+# ⚠️ 镜像 tag 请 pin 到实际验证过的版本；不要在生产环境用浮动 tag。
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: litellm
+    volumes:
+      - litellm-db:/var/lib/postgresql/data
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    ports:
+      - "127.0.0.1:4000:4000"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?set in .env}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?set in .env}
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD}@postgres:5432/litellm
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    depends_on:
+      - postgres
+
+volumes:
+  litellm-db:

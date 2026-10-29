@@ -18,3 +18,7 @@ HITL/零付费：在仓库外部署 LiteLLM + Postgres，并验证它能在转�
 5. 若任一协议/路径无法硬拒、`x-goog-api-key` 不兼容、或存在绕过网关的路径：**立即保持阻塞**，不进入下一阶段。
 
 产物：`.scratch/p0-02-second-demo/research/22-litellm-zero-budget.md`（含证据与结论）。验证成功**不自动授权** $6 或付费生图；需票 23 重新裁定。
+
+## Comments
+
+- **2026-10-29 模板已准备**：`.scratch/p0-02-second-demo/tools/litellm/` 内含 `litellm-config.yaml`、`docker-compose.yml`、`.env.example`、`verify-zero-budget.sh`、`README.md`。**未部署、未验证**；等待用户在仓库外部署并提供 endpoint 主机名（不传密钥）。
