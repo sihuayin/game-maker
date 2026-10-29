@@ -58,14 +58,14 @@ Effort: p0-02-second-demo
 
 - [裁定参考图生成路径](issues/15-reference-image-path.md)：**已收口（HITL）** —— 路径 **(a) 新建 effort-local 脚本** `.scratch/p0-02-second-demo/tools/generate-reference.mjs`，复用 `draw.mjs`，零付费/确定性/可复现生成 480×270 黄昏屋顶城市；不改生产代码、现有 `generate.mjs`、fixtures 或历史实验；保留屋顶信使 + 4 封信 + 可选信箱；生成后检查尺寸/色彩/provenance/视觉效果，票 17 由用户验收；票 17 接受前不运行 `create` checkpoint。详见 [rulings-2026-10-29.md](rulings-2026-10-29.md)。
 
+- [调用成本估算与超限停止机制](issues/13-cost-model-and-stop-mechanism.md)：**已收口（research）** —— 官方价可核实但**端点未核实**：checkpoint ≈$0.073、build ≈$0.535、全量 ≈$0.608、A（16 图）≈$0.68；生图占 77%。结构性最坏 87 趟 ≈$4.32（A 16 图 ≈$4.59；24 图 ≈$5.67）。**不能提供“下一次调用前”可靠动态护栏**（run ledger 阶段末才落盘）；可行的是 Prepay/静态上限 ≥ 最坏/checkpoint 两段闸/staging watcher + `--concurrency-image 1`（有界超射 1–2 张）。`22 次调用`不是货币上限。票 14 需端点主机名、计价档、provider 硬上限与验证方式、金额/覆盖阶段、生图批准、`ANTHROPIC_*` env 处理、重试政策。详见 [research/13-cost-model.md](research/13-cost-model.md)。
+
 ## Not yet specified
 
 - 首次运行失败后是否授权第二次完整运行：须单独 HITL 批准；只允许换输入，不改生产代码，不得拼接两次运行。
 - 新交付的正式证据清单与 `verify-delivery`：P0-01 Q5 已留作后续缺口；本期只冻结快照/哈希/身份。
 - 最终 P0-02 报告是否进入 `docs/`、以及是否与审计文档一并提交：收口时单独裁定。
 - 若 checkpoint 材料不全或 build 在付费前失败，是否换输入后重试：按 Q6 需单独批准。
-- 预算的具体金额/调用上限：票 01 未授权；由票 13 成本模型 + 票 14 货币上限裁定；未给出前不执行。
-- 超限停止机制能否在不改生产代码的前提下保证每次付费调用前检查（票 13 评估；provider 硬限额 vs effort watcher）。
 
 ## Out of scope
 
