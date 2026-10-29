@@ -67,9 +67,14 @@ Effort: p0-01-audit
 
 - [机制与可观测性矩阵](issues/05-mechanism-observability.md)：**已收口（research）** —— 横版机制词表 10 条、9 条有运行时实现；**交付级 E3 3/10**（`collect-pickup` / `open-chest` / `reach-goal`；严格从闭集声明起点的全链只有 2/10，`reach-goal` 只在 `winConditions`）。`run`/`jump`/`gravity`/`collide-terrain` 仅间接观测；`hazard-contact` 有真实 `reset=10` 但无正向断言；`avoid-danger` 只有 fixture probe，冻结 config 无 danger 而覆盖仍判 `satisfied`；`moving-platform` 无运行时，手写 `solid+motion` 可静默绕过。三处系统性断点：config 编译器不读 `design.mechanics` 且 kind 铁律漏 chest/danger；覆盖门禁只读 design、probe 默认全过、不落盘；Playtest 默认场景写死 wasteland 常量且不判 hazard/danger/moving。塔防 9 类构念仅纯层仿真，无设计/QA/delivery/Playtest。详见 [research/05-mechanism-observability.md](research/05-mechanism-observability.md)。
 
+- [第二个 Demo 候选比较](issues/07-second-demo-candidates.md)：**已收口（research）** —— 当前运行时只有 `platformer/v1`，玩法差异只能来自关卡/视觉/机制重心。3 个候选：**A 平台探索/收集**（现有机制域、无新机制；证据最强、风险最低）、**B 危险时序**（`hazard-contact` + `avoid-danger` 为核心；有假绿/无正向断言风险）、**C 塔防**（类型差异最大；无设计/QA/delivery/Playtest，属平台级接入）。证据强弱 A > B > C，风险/成本 A < B < C；玩法差异 C > B > A。俯视角探索解谜列为 `BLOCKED` 非候选（需新运行时/契约，不是一份新 config）；免费验证只能证明运行时行为与测试事实，完整交付仍需付费 `create/build` + 浏览器 `playtest`。不做最终裁定，唯一候选交票 08 HITL。详见 [research/07-second-demo-candidates.md](research/07-second-demo-candidates.md)。
+
+- [裁定第二个 Demo 唯一候选](issues/08-candidate-decision.md)：**已收口（HITL）** —— 唯一候选 **A 平台探索/收集**；允许进入 P0-02 付费试跑，但**付费执行需另行明确预算授权**，未获授权则暂停、不得降级复用旧包。P0-02 只新增输入（新 intent、参考图、自定义 scenario），不改生产代码、不手改中间 JSON、不新增运行时/契约；核心验收 `collect-pickup` + `reach-goal`，`open-chest` 可选；新参考图 → 新视觉世界/资源包；证据 = 真实运行 + delivery 报告 + 真实浏览器 Playtest，新交付的正式清单与 `verify-delivery` 留作后续缺口。成功不得用历史 E3 替代，也不得把壳级 delivery E3 / v2 playtest 写回 / 正式清单缺失默认为已通过；B 的假绿链是独立缺口。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md)。
+
 ## Not yet specified
 
-- 第二个 Demo 若不可进入实施，后续 P0-02 应以什么粒度、拆几张需求另立（取决于候选比较与缺口分类的结论）。
+- P0-02 的预算、执行计划与需求拆分属于新 effort；本图只记录进入条件（A、输入、证据边界），不在此展开。
+- 新交付的正式证据清单与 `verify-delivery` 如何生成/绑定（Q5 明确留到 P0-02 之后）。
 - 审计文档的入库拆分方式（单独提交文档，或与 PRD 一并提交）——Q9 已定「完成后单独请求授权」，具体提交边界待收口时定。
 - 浏览器机制探针是否用于补证据：默认不用；若后续票需要新行为观测，按 Q7 单独批准并记录输出目录。
 - 是否存在只能靠付费/浏览器重跑才能消除的 `UNKNOWN`——取决于安全命令核实与证据审计；若存在，按 Q7 记为 `BLOCKED` 并写明解除代价，不绕过。
