@@ -61,6 +61,12 @@ Effort: p0-01-audit
 
 - [核实安全审计命令](issues/02-verify-safe-audit-commands.md)：**已收口** —— allowlist：只读 shell、`pnpm test`、`typecheck/build`（仅 `.gitignore` 的 dist）、`verify`/`inspect`、`accept`/`verify-delivery`/`test:evidence`/`site` 加 `--out <tmp>`；Chrome 机制探针仅按条件（需新观测 + 临时输出，非 Playtest）；禁止 `create/build/plan/pack/compile-*`、`playtest`、整条 `test:playtest`、`review`、`review-verdict`、`playtest-baseline`、`install`。未执行候选命令，零生产修改。详见 [research/02-safe-commands.md](research/02-safe-commands.md)。
 
+- [Playtest、人工视觉与证据完整性审计](issues/06-playtest-visual-evidence.md)：**已收口（research）** —— Playtest 真跑系统 Chrome/CDP/真实按键；交付内 v1/v2 为 E3（harness/rules v1），06 两份 v2 attempt 未归因，HEAD 的 v2 CLI 写回无 E3。状态靠轮询快照差分，瞬时事件结构性可漏；五态 + UNKNOWN + not-executed 分类完整（19 个归因用例），但交付默认只要求 happy-path，非 SUCCESS 无真实 E3。身份绑 site/pack/config/shell/harness/rules，缺 runId/attempt nonce 且版本不强制；人工视觉记录独立且匹配冻结身份（11/11 identity verified），机器只验完整性/一致性。`verify-delivery` 缺失/不符会 blocked/fail、exit 0 只在 pass，但失败重跑不撤销旧 pass、`review-verdict` 不校验身份。负向测试 18 + 6；CLI playtest 准备层、视觉非全 pass、playtest 摘要不一致无负向用例。详见 [research/06-playtest-visual-evidence.md](research/06-playtest-visual-evidence.md)。
+
+- [能力矩阵](issues/04-capability-matrix.md)：**已收口（research）** —— 10 个能力域共 52 行：**`E2E_VERIFIED` 31 · `TESTED` 17 · `UNKNOWN` 4 · `BLOCKED` 0**；E2E 行只来自 7 组真实运行，横版主链只有一组完整 E3（`040b907` create / `5b8283f` 冻结）。`delivery` 写回是新增代码，冻结 Demo 的信封由 effort 脚本初始化，壳级写回无 E3；Playtest v1 有 CLI 写回 E3、HEAD v2 组合无 E3、非 SUCCESS 仅 `AGENT_LIMITATION` 沙箱；人工视觉仅 1 次 E3，独立性与可重复性 `UNKNOWN`；`verify-delivery` HEAD 重跑 pass（223/151/72、13 records、六项 match、diagnostics 0），运行前后 1,035 个受保护文件零变化；TD compile 无真实模型 E3、TD 玩法 `UNKNOWN`；MCP 仅 `create_game` 全链且无 E3。整仓 `pnpm test` 在并发审计负载下两次超时、超时用例隔离重跑全过（环境约束，非能力失败）。详见 [research/04-capability-matrix.md](research/04-capability-matrix.md)。
+
+- [机制与可观测性矩阵](issues/05-mechanism-observability.md)：**已收口（research）** —— 横版机制词表 10 条、9 条有运行时实现；**交付级 E3 3/10**（`collect-pickup` / `open-chest` / `reach-goal`；严格从闭集声明起点的全链只有 2/10，`reach-goal` 只在 `winConditions`）。`run`/`jump`/`gravity`/`collide-terrain` 仅间接观测；`hazard-contact` 有真实 `reset=10` 但无正向断言；`avoid-danger` 只有 fixture probe，冻结 config 无 danger 而覆盖仍判 `satisfied`；`moving-platform` 无运行时，手写 `solid+motion` 可静默绕过。三处系统性断点：config 编译器不读 `design.mechanics` 且 kind 铁律漏 chest/danger；覆盖门禁只读 design、probe 默认全过、不落盘；Playtest 默认场景写死 wasteland 常量且不判 hazard/danger/moving。塔防 9 类构念仅纯层仿真，无设计/QA/delivery/Playtest。详见 [research/05-mechanism-observability.md](research/05-mechanism-observability.md)。
+
 ## Not yet specified
 
 - 第二个 Demo 若不可进入实施，后续 P0-02 应以什么粒度、拆几张需求另立（取决于候选比较与缺口分类的结论）。
