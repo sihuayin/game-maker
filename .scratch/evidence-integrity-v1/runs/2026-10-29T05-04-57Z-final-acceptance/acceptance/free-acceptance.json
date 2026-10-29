@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-10-29T05:07:14.721Z",
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance",
+  "allOk": true,
+  "checks": [
+    {
+      "name": "vitest",
+      "ok": true
+    },
+    {
+      "name": "mechanic-probe",
+      "ok": true
+    },
+    {
+      "name": "mechanic-coverage",
+      "ok": true,
+      "verdict": "satisfied"
+    }
+  ]
+}

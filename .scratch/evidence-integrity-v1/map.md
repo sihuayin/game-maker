@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: evidence-integrity-v1
 
-> **本图 2026-10-29 开。** 输入：`docs/v7.6/验收.md`（P0 · Evidence Integrity V1：交付证据完整性与可复核验收）。
+> **本图 2026-10-29 开、2026-10-29 关闭。** 输入：`docs/v7.6/验收.md`（P0 · Evidence Integrity V1：交付证据完整性与可复核验收）。
 > **终点形态（用户 2026-10-29 逐字裁定 Q1 = (a)）**：**承载执行** —— 在 main 上真正落地的正式验收能力，
 > 而不是停留在审计报告或规格文档：实现 + 负向测试 + 冻结 FPVS-V1 基线重验 + 新验收记录，按 §12 DoD 收口。
 >
@@ -90,13 +90,16 @@ Effort: evidence-integrity-v1
 - [正式入口：`verify-delivery` CLI + `pnpm test:evidence`](issues/05-cli-and-evidence-script.md)：**已收口** —— CLI `verify-delivery --manifest <清单> [--out]`：`--out` 落在声明 root 内 ⇒ usage(2) 且零写入；报告目录原子分配、JSON+MD 同一次运行、绝不覆盖；退出码 pass→0 / 其余→1 / 参数→2 / 清单 invalid→4。`pnpm test:evidence` 实测 **1,348ms / 20,207,992 bytes / 223 文件 / diagnostics=0 / pass**；6 个 CLI 测试；`pnpm test` 149/2231 · typecheck 全绿。
 - [负向测试：篡改 / 缺失 / 不可读 / 错配 / 路径逃逸 / 符号链接 / 结论过期](issues/06-negative-tests.md)：**已收口** —— 18 个 pipeline 用例（不可读=目录冒充、root 外/悬空/root 内符号链接、绝对路径、报告引用错 attempt、材料集合不一致、结论过期、只读性、确定性 + 既有篡改/缺失/身份/三方/verdict/`..`）；补 `references.report` 与 `visual.materials.collection`、config/site 的 blocked-vs-fail、可选日志入清单；`pnpm test` 149/2231 · typecheck 全绿；基线 223 文件 pass（1,348ms，diagnostics=0）。
 - [冻结 FPVS-V1 基线重验与只读性证据](issues/07-baseline-reverification.md)：**已收口** —— 清单 223/151/72（sha `ba7a485b…`）；`test:evidence` **pass / exit 0 / 5,766ms / 20,207,992 bytes / 13 records / diagnostics=0**，六项全 match；运行前后 **312 文件**逐文件 sha256 零变化（snapshot 66 · pack/site 50 · FA-04/05/06 · 06 attempts · 09 · work qa-report）；07 脚本副本 **27/27**（check id 集合一致）；证据目录 git status 零改动。
+- [DoD 收口：回归、证据聚合与最终结论](issues/08-dod-closure.md)：**已收口 · 最终结论 `pass` · 地图关闭** —— 证据完整性 223/223 文件 · 11/11 身份 · 144/144 一致性 verified，13 records，diagnostics=0，declared=recomputed=pass、六项全 match（exit 0 / 1,546ms / 19.3 MB）；五项回归 + 07 交叉（27/27）全部 exit 0（`pnpm test` 149/2231 · typecheck · test:playtest self-test 4/4 + 143 · test:acceptance allOk=true）；312 个受保护文件前后 sha256 零变化；DoD 10/10 MET；产物 `runs/2026-10-29T05-04-57Z-final-acceptance/`；未提交未推送。
 
 ## Not yet specified
 
-- **清单再生成策略**：交付更新 / 出现第二版后，如何生成新清单、旧清单如何并存与指向（V1 只冻结一份，未定）。
-- **验收报告的证据化**：`delivery-verification` 报告本身是否作为下一轮的证据登记、以及如何避免自指（未定）。
-- **性能与规模**：`test:evidence` 读取约 200MB 证据的真实耗时与 CI 可用性（票 05 量，之后可能引出缓存/裁剪策略）。
-- **第二个真实 Demo 的泛化验证**：PRD §R3 明确留待后续阶段，本图不做。
+<!-- in-scope fog that graduates as the frontier advances -->
+
+（无）—— 08 收口完成；**无 open ticket，Evidence Integrity V1 目的地已达。**
+开图时列入的四项（清单再生成策略 / 验收报告的证据化 / 性能与 CI 可用性 / 第二个 Demo 的泛化验证）
+均未在 V1 启动，也不构成到达目的地的未决决策：前两项属交付更新后的运维问题，第三项本图已量得 1.5 s / 19.3 MB
+且不作性能门槛，第四项 PRD §R3 明确留待后续。如需推进，作为新 effort 重新开图。
 
 ## Out of scope
 

@@ -1,0 +1,54 @@
+{
+  "format": "mechanic-coverage/v1",
+  "mechanics": [
+    {
+      "mechanic": "run",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "not-tested"
+    },
+    {
+      "mechanic": "jump",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "not-tested"
+    },
+    {
+      "mechanic": "gravity",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "not-tested"
+    },
+    {
+      "mechanic": "collide-terrain",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "not-tested"
+    },
+    {
+      "mechanic": "collect-pickup",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "satisfied"
+    },
+    {
+      "mechanic": "open-chest",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "satisfied"
+    },
+    {
+      "mechanic": "avoid-danger",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "satisfied"
+    },
+    {
+      "mechanic": "reach-goal",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "qa": "not-tested"
+    }
+  ],
+  "verdict": "satisfied"
+}

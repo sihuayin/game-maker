@@ -1,0 +1,406 @@
+{
+  "format": "fpvs-inherited-verification/v1",
+  "generatedAt": "2026-10-29T05:07:35.832Z",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "qaReport": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/qa-report.json",
+    "qaReportSha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6"
+  },
+  "summary": {
+    "checks": 27,
+    "failed": 0,
+    "pass": true
+  },
+  "deliveryVerdict": {
+    "declared": "pass",
+    "recomputed": "pass",
+    "required": [
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass",
+      "pass"
+    ]
+  },
+  "checks": [
+    {
+      "id": "identity.delivery.pack",
+      "pass": true,
+      "detail": {
+        "delivery": {
+          "packId": "wasteland-scavenger-recipe",
+          "packVersion": 1,
+          "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+        },
+        "identity": {
+          "packId": "wasteland-scavenger-recipe",
+          "packVersion": 1
+        }
+      }
+    },
+    {
+      "id": "identity.delivery.manifest",
+      "pass": true,
+      "detail": {
+        "declared": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "actual": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+      }
+    },
+    {
+      "id": "identity.delivery.site-shell",
+      "pass": true,
+      "detail": {
+        "version": 1,
+        "shell": "2"
+      }
+    },
+    {
+      "id": "identity.delivery.config",
+      "pass": true,
+      "detail": {
+        "declared": "wasteland-scavenger-recipe/run/v1/game-config.json",
+        "actual": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "expected": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+      }
+    },
+    {
+      "id": "identity.manifest-file",
+      "pass": true,
+      "detail": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+    },
+    {
+      "id": "identity.site-config-file",
+      "pass": true,
+      "detail": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "id": "inherit.review-record.subject",
+      "pass": true,
+      "detail": {
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "siteVersion": 1,
+        "shellVersion": "2",
+        "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+        "work": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe"
+      }
+    },
+    {
+      "id": "inherit.capture.subject",
+      "pass": true,
+      "detail": {
+        "siteDir": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1",
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "siteVersion": 1,
+        "shellVersion": "2",
+        "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+      }
+    },
+    {
+      "id": "inherit.materials.subject",
+      "pass": true,
+      "detail": {
+        "work": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe",
+        "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "siteVersion": 1,
+        "shellVersion": "2",
+        "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "siteJson": {
+          "shell": "2",
+          "pack": "v1",
+          "config": "game-config.json"
+        }
+      }
+    },
+    {
+      "id": "inherit.review-record.overall",
+      "pass": true,
+      "detail": {
+        "overall": "pass",
+        "items": [
+          [
+            "overall-style",
+            "pass"
+          ],
+          [
+            "color-light",
+            "pass"
+          ],
+          [
+            "character",
+            "pass"
+          ],
+          [
+            "scene",
+            "pass"
+          ],
+          [
+            "key-objects",
+            "pass"
+          ],
+          [
+            "runtime-rendering",
+            "pass"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "inherit.materials.hashes",
+      "pass": true,
+      "detail": {
+        "checked": 44,
+        "failures": []
+      }
+    },
+    {
+      "id": "inherit.capture.shots",
+      "pass": true,
+      "detail": {
+        "files": 9,
+        "distinct": 8,
+        "duplicate": [
+          "shots/08-goal.png",
+          "shots/09-final.png"
+        ]
+      }
+    },
+    {
+      "id": "inherit.capture.site-integrity",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "id": "inherit.capture.site-files",
+      "pass": true,
+      "detail": {
+        "index.html": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+        "shell.js": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+        "site.json": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896",
+        "game-config.json": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+      }
+    },
+    {
+      "id": "inherit.fa05.evidence",
+      "pass": true,
+      "detail": {
+        "count": 36,
+        "failures": []
+      }
+    },
+    {
+      "id": "inherit.fa05.consistency",
+      "pass": true,
+      "detail": {
+        "count": 12,
+        "failed": 0
+      }
+    },
+    {
+      "id": "inherit.fa05.report-hash",
+      "pass": true,
+      "detail": {
+        "actual": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6",
+        "expected": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6"
+      }
+    },
+    {
+      "id": "delivery.verdict",
+      "pass": true,
+      "detail": {
+        "declared": "pass",
+        "recomputed": "pass",
+        "missingKeys": [],
+        "checks": [
+          {
+            "key": "asset-pack",
+            "status": "pass"
+          },
+          {
+            "key": "config",
+            "status": "pass"
+          },
+          {
+            "key": "qa",
+            "status": "pass"
+          },
+          {
+            "key": "site",
+            "status": "pass"
+          },
+          {
+            "key": "playable-smoke",
+            "status": "pass",
+            "detail": "SUCCESS"
+          },
+          {
+            "key": "visual-review",
+            "status": "pass"
+          }
+        ]
+      }
+    },
+    {
+      "id": "delivery.visual+playtest",
+      "pass": true,
+      "detail": {
+        "visual": "pass",
+        "aggregate": "SUCCESS"
+      }
+    },
+    {
+      "id": "inherit.fa06.regression",
+      "pass": true,
+      "detail": [
+        [
+          "test",
+          0
+        ],
+        [
+          "typecheck",
+          0
+        ],
+        [
+          "playtest",
+          0
+        ],
+        [
+          "acceptance",
+          0
+        ]
+      ]
+    },
+    {
+      "id": "round06.attempts",
+      "pass": true,
+      "detail": [
+        {
+          "attempt": 1,
+          "identity": true,
+          "success": true,
+          "noStop": true,
+          "siteUnchanged": true,
+          "contractVersion": [
+            "playtest-harness/v2",
+            "playtest-rules/v2"
+          ]
+        },
+        {
+          "attempt": 2,
+          "identity": true,
+          "success": true,
+          "noStop": true,
+          "siteUnchanged": true,
+          "contractVersion": [
+            "playtest-harness/v2",
+            "playtest-rules/v2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "round06.projection",
+      "pass": true,
+      "detail": {
+        "same": true,
+        "steps": [
+          452,
+          451
+        ]
+      }
+    },
+    {
+      "id": "snapshot.50-files",
+      "pass": true,
+      "detail": {
+        "count": 50,
+        "sameAsBeforeAfter1After2": true
+      }
+    },
+    {
+      "id": "supplement.subject",
+      "pass": true,
+      "detail": {
+        "packId": "wasteland-scavenger-recipe",
+        "packVersion": 1,
+        "siteVersion": 1,
+        "shellVersion": "2",
+        "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "snapshot": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+        "siteHashes": {
+          "manifest": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+          "config": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+          "index": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3",
+          "shell": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1",
+          "siteJson": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+        }
+      }
+    },
+    {
+      "id": "supplement.items",
+      "pass": true,
+      "detail": {
+        "overall": "pass",
+        "items": [
+          [
+            "readability",
+            "pass"
+          ],
+          [
+            "animation",
+            "pass"
+          ],
+          [
+            "function-match",
+            "pass"
+          ],
+          [
+            "completeness",
+            "pass"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "supplement.fa04-unmodified",
+      "pass": true,
+      "detail": {
+        "review-record.json": "sha256:a1602021720ed1a984913094eebff3a9b29ad5ef09f2ef7347c620ea0d93a0c1",
+        "capture.json": "sha256:8a27db7e81e0e6dede1a8b2ebaa80d0b4e0f9f1947af001f67db02be38276f58",
+        "materials.json": "sha256:060debc46fcd52b99f6863d254fe8e964f471eacd93d2c2fb8c6659284f469af"
+      }
+    },
+    {
+      "id": "supplement.scope",
+      "pass": true,
+      "detail": {
+        "historicalRecordModified": false,
+        "historicalRecordHashes": {
+          "review-record.json": "sha256:a1602021720ed1a984913094eebff3a9b29ad5ef09f2ef7347c620ea0d93a0c1",
+          "capture.json": "sha256:8a27db7e81e0e6dede1a8b2ebaa80d0b4e0f9f1947af001f67db02be38276f58",
+          "materials.json": "sha256:060debc46fcd52b99f6863d254fe8e964f471eacd93d2c2fb8c6659284f469af"
+        },
+        "distinctFramesNotNine": true,
+        "fullSevenItemReReview": false,
+        "scope": "只补审 §7.3 的四项未逐项记录维度；FA-04 六项按原样继承，不冒充全量重审。",
+        "noRegeneration": true,
+        "noPaidCall": true,
+        "noSiteByteChange": true
+      }
+    }
+  ]
+}
