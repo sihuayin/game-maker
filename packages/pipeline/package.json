@@ -11,12 +11,13 @@
     }
   },
   "dependencies": {
-    "@game-maker/contracts": "workspace:*",
     "@game-maker/assets": "workspace:*",
-    "@game-maker/vision": "workspace:*",
+    "@game-maker/contracts": "workspace:*",
     "@game-maker/game-design": "workspace:*",
     "@game-maker/qa": "workspace:*",
-    "@game-maker/visual-design": "workspace:*"
+    "@game-maker/vision": "workspace:*",
+    "@game-maker/visual-design": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

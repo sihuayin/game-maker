@@ -18,6 +18,7 @@ import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/con
 import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, promotePlaytestBaseline, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 import { runPlaytestCommand } from "./playtest.js";
+import { runVerifyDeliveryCommand } from "./evidence.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -36,6 +37,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker review-verdict <run 目录> --verdict pass|fail [--reviewer <名字>] [--note "..."] [--json]
   game-maker playtest <run 目录> [--out <目录>] [--scenario-dir <目录>] [--json]
   game-maker playtest-baseline promote <baselineId> --report <result.json> --second-report <result.json> --coverage <coverage.json> --reason "..." [--dir <目录>] [--replace] [--json]
+  game-maker verify-delivery --manifest <清单文件> [--out <目录>] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
   把包的联系表与**原图**一起喂给视觉模型，要一份「哪里不像」的观察清单。
@@ -126,6 +128,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "report", "second-report", "coverage", "reason", "dir",
     // FA-01D：试玩场景目录（默认五态）
     "scenario-dir",
+    // Evidence Integrity V1：`verify-delivery` 的输入清单
+    "manifest",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -811,6 +815,16 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
           data: { runDir: relPath(outRoot, runDir), status, ...(reviewer === undefined ? {} : { reviewer }), reviewedAt },
           artifacts: [{ path: relPath(outRoot, qaReportPath), kind: "qa-report" }],
         };
+        break;
+      }
+      case "verify-delivery": {
+        // ⚠️ 证据完整性验收（Evidence Integrity V1 · 票 05）：只读校验 + 新目录落报告。
+        //   判断全在 pipeline；壳只解析参数、映射退出码。
+        if (typeof flags.manifest !== "string")
+          throw new CommandError("usage", "verify-delivery 需要 --manifest <清单文件>");
+        const cmd = runVerifyDeliveryCommand({ manifestPath: path.resolve(cwd, flags.manifest), outRoot, cwd });
+        result = cmd.result;
+        exitCode = cmd.exitCode;
         break;
       }
       default: throw new CommandError("usage", `不认识的操作 "${command}"`);

@@ -15,3 +15,4 @@ export * from "./review.js";
 export * from "./delivery.js";
 export * from "./playtest.js";
 export * from "./playtest-baseline.js";
+export * from "./evidence-integrity.js";

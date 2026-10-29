@@ -72,6 +72,7 @@ function addAll(rels, opts) { for (const r of rels) add(r, opts); }
 const OUT_WORK = ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe";
 add(`${OUT_WORK}/run/v1/qa-report.json`, { required: true, role: "delivery" });
 add(`${OUT_WORK}/run/v1/game-config.json`, { required: true, role: "delivery" });
+addAll(walk(`${OUT_WORK}/site`), { required: true, role: "protected" });
 add(`${OUT_WORK}/run/v1/playtest/v2/result.json`, { required: true, role: "playtest" });
 add(`${OUT_WORK}/run/v1/playtest/v2/site-integrity.json`, { required: true, role: "playtest" });
 addAll(walk(`${OUT_WORK}/run/v1/playtest/v2/acceptance-win-wasteland-v1`, { excludeExt: [".log"] }), { required: true, role: "playtest" });

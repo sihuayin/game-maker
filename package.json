@@ -14,6 +14,7 @@
     "test:playtest": "pnpm build && node packages/demo/probe/playtest/self-test.mjs && vitest run packages/contracts/tests/playtest-attribution.test.ts packages/contracts/tests/playtest-baseline.test.ts packages/contracts/tests/playtest.test.ts packages/pipeline/tests/playtest.test.ts packages/pipeline/tests/playtest-baseline.test.ts packages/demo/probe/playtest/tests",
     "test:mechanic": "pnpm build && node packages/demo/probe/mechanic-probe.mjs",
     "test:acceptance": "pnpm build && node packages/demo/probe/free-acceptance.mjs",
+    "test:evidence": "pnpm build && node scripts/evidence-acceptance.mjs",
     "typecheck": "tsc -b && pnpm -r --if-present typecheck"
   },
   "devDependencies": {

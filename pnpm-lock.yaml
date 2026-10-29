@@ -164,6 +164,9 @@ importers:
       '@game-maker/visual-design':
         specifier: workspace:*
         version: link:../visual-design
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

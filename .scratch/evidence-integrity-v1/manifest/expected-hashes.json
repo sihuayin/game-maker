@@ -1,6 +1,6 @@
 {
   "format": "delivery-evidence-manifest/v1",
-  "generatedAt": "2026-10-29T03:37:32.965Z",
+  "generatedAt": "2026-10-29T03:51:39.849Z",
   "generatedBy": ".scratch/evidence-integrity-v1/tools/build-manifest.mjs",
   "note": "一次性生成、人工审查后随 git 固定；校验器只读、绝不回写。信任边界：能发现相对本清单的改动，发现不了清单与被验证据一起被改并提交。",
   "subject": {
@@ -886,6 +886,38 @@
       "required": true,
       "bytes": 3970,
       "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/game-config.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/index.html",
+      "role": "protected",
+      "required": true,
+      "bytes": 285,
+      "sha256": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/shell.js",
+      "role": "protected",
+      "required": true,
+      "bytes": 1612305,
+      "sha256": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/site.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 67,
+      "sha256": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
     },
     {
       "root": "reference",

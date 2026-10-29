@@ -67,3 +67,13 @@ optional：snapshot-run 16 · reference 13 · playtest-historical 12 · rejectio
 - D1–D12 落法见上节 Draft；D1 = 交付内 playtest v2（harness v1）重导 `playable-smoke` + 06 两份（harness v2）作额外必需证据。
 - 生成器：`.scratch/evidence-integrity-v1/tools/build-manifest.mjs`（一次性；默认拒绝覆盖，`--force` 才重建）。
 - 信任锚：随本次 git 提交固定；正式校验器只读清单、**绝不自动更新**。
+
+## Revision（2026-10-29，票 04 实施时）
+
+- 实施 `site` 六项重导出时发现清单漏了**交付侧** `out/<packId>/site/v1/` 的四个站点文件
+  （原清单只登记了 snapshot 受保护站点；work 站点从未逐条列出）。
+- 生成器补 `addAll(walk(OUT_WORK/site))`，用 `--force` 重新冻结：
+  **195 文件（151 required / 44 optional）**，sha256
+  `c168ba6c874b917db0faa2320e0b74d03522fca67f008c0de89ba581c01ed797`。
+- 清单的 roots / subject / records / D1–D12 规则不变；这是**完成度修正**（把交付侧站点纳入证据），
+  不是规则变更。旧 sha `6efd248c…` 作废。

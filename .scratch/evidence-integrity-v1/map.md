@@ -85,7 +85,9 @@ Effort: evidence-integrity-v1
 
 - [裁定归档：把 Q1–Q16 追加到 `docs/v7.6/验收.md`](issues/01-archive-rulings-in-prd.md)：**已收口** —— PRD 末尾新增 A1–A10（16 条裁定 / 三条约束 / 清单形状 / 状态映射 / 六项重导出 / 入口与退出码 / 路径与三方哈希 / 只读与负向测试 / Phase 0 前置 / 执行顺序）；原文前 20,518 字节 sha256 `780dd22a…7f0e` 逐字节不变（追加后前缀哈希一致）。
 - [Phase 0 只读审计：记录 schema、证据依赖图与差距清单](issues/02-phase0-readonly-audit.md)：**已收口** —— 正式路径不重算哈希、07 为唯一核验器（27 项）；`hashes.json` 只覆盖 66 snapshot + 14 reference、work 未列且已增至 95；身份矩阵可用（`packChecksum` ↔ `manifestChecksum` 等映射）；差距 EI/AC 清单 + 最小改动方案 + 清单冻结前 D1–D12 裁定项。全案：[research/phase0-audit.md](research/phase0-audit.md)。
-- [冻结期望哈希清单（唯一信任锚）](issues/03-freeze-expected-hash-manifest.md)：**已收口** —— 191 文件（147 required / 44 optional，约 18.4 MB）、13 条 records（11 条身份）、9 个 roots（out/snapshot/reference/artifacts/fa04/fa05/fa06/runs/gp）；D1–D12 落定（双 playtest 来源、work 显式枚举、reference optional、`*.log` 排除）；覆盖自检 materials 44/44 + evidence 36/36 + attempt 18/18；清单 sha256 `6efd248c…3fdf2`，随提交固定、校验器只读不回写。
+- [冻结期望哈希清单（唯一信任锚）](issues/03-freeze-expected-hash-manifest.md)：**已收口** —— **195 文件（151 required / 44 optional）**、13 条 records（11 条身份）、9 个 roots（out/snapshot/reference/artifacts/fa04/fa05/fa06/runs/gp）；D1–D12 落定（双 playtest 来源、work 显式枚举、reference optional、`*.log` 排除）；覆盖自检 materials 44/44 + evidence 36/36 + attempt 18/18；清单 sha256 `c168ba6c…b797`（04 实施时补入交付侧 site 四文件后重新冻结），校验器只读不回写。
+- [正式校验器核心：清单、哈希、路径、身份、一致性、六项重导出](issues/04-verifier-core.md)：**已收口** —— `packages/pipeline/src/evidence-integrity.ts` 只读实现：清单 schema、双端 realpath 路径安全、文件/身份/三方哈希/站点/截图去重/playtest 投影一致性、六项由证据重导出、`deriveDeliveryVerdict` 统一结论；9 个单测（篡改/缺失/身份缺/错/三方矛盾/verdict 不一致/路径逃逸/确定性）；`pnpm test` 148/2216 · typecheck · check:deps 全绿；真实基线 status=pass（195 文件 / 11 身份 / 9 张 8 distinct / diagnostics=0，manifest sha `c168ba6c…`）。
+- [正式入口：`verify-delivery` CLI + `pnpm test:evidence`](issues/05-cli-and-evidence-script.md)：**已收口** —— CLI `verify-delivery --manifest <清单> [--out]`：`--out` 落在声明 root 内 ⇒ usage(2) 且零写入；报告目录原子分配、JSON+MD 同一次运行、绝不覆盖；退出码 pass→0 / 其余→1 / 参数→2 / 清单 invalid→4。`pnpm test:evidence` 实测 **1,243ms / 19,990,756 bytes / 195 文件 / diagnostics=0 / pass**；6 个 CLI 测试；`pnpm test` 149/2222 · typecheck 全绿。
 
 ## Not yet specified
 
