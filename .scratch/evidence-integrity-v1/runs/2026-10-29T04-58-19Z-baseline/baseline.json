@@ -1,0 +1,117 @@
+{
+  "format": "evidence-baseline-reverification/v1",
+  "generatedAt": "2026-10-29T04:59:19.991Z",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+  },
+  "commands": {
+    "build": "pnpm build",
+    "verify": "node scripts/evidence-acceptance.mjs --out .scratch/evidence-integrity-v1/runs/2026-10-29T04-58-19Z-baseline",
+    "crossCheck": "EI_OUT=.scratch/evidence-integrity-v1/runs/2026-10-29T04-58-19Z-baseline/07-inherited-copy.json node .scratch/evidence-integrity-v1/scripts/07-verify-inherited-copy.mjs"
+  },
+  "manifest": {
+    "path": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+    "sha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "files": 223,
+    "required": 151,
+    "bytes": 20207992
+  },
+  "cli": {
+    "exitCode": 0,
+    "durationMs": 5766,
+    "reportDir": ".scratch/evidence-integrity-v1/runs/2026-10-29T04-58-19Z-baseline/2026-10-29T04-58-45-516Z-delivery-verification",
+    "reportSha256": "sha256:80575d82bf72ea7977f00b5868bcca0a2f3d76a22a0c93e0d5df4c13323ee711",
+    "status": "pass",
+    "declared": "pass",
+    "recomputed": "pass",
+    "diagnostics": 0,
+    "checks": [
+      {
+        "key": "asset-pack",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "config",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "qa",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "site",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "playable-smoke",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "visual-review",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      }
+    ],
+    "files": {
+      "total": 223,
+      "required": 151,
+      "optional": 72
+    },
+    "records": 13
+  },
+  "readOnly": {
+    "same": true,
+    "before": ".scratch/evidence-integrity-v1/runs/2026-10-29T04-58-19Z-baseline/snapshot-before.json",
+    "after": ".scratch/evidence-integrity-v1/runs/2026-10-29T04-58-19Z-baseline/snapshot-after.json",
+    "checked": 312,
+    "changed": [],
+    "sets": {
+      "snapshot": 66,
+      "packSite": 50,
+      "reference": 14,
+      "fa04": 29,
+      "fa05": 10,
+      "fa06": 162,
+      "gp06": 28,
+      "gp09": 2,
+      "workQa": 1
+    }
+  },
+  "crossCheck07": {
+    "exitCode": 0,
+    "checks": 27,
+    "failed": 0,
+    "pass": true,
+    "result": ".scratch/evidence-integrity-v1/runs/2026-10-29T04-58-19Z-baseline/07-inherited-copy.json",
+    "existing": ".scratch/generic-playtest-v1/evidence/07-inherited-verification.json",
+    "sameCheckIds": true,
+    "existingSummary": {
+      "checks": 27,
+      "failed": 0,
+      "pass": true
+    },
+    "differences": [
+      "07 的 27 项覆盖身份/材料/截图/站点/FA-05/FA-06/06 attempt/50 文件快照/09 补审；新校验器独立重算同一批证据，并额外校验路径安全、引用解析、可选日志、六项 declared↔recomputed。",
+      "07 的 `snapshot.50-files` 用冻结时的 before/after 快照比较；本票的只读快照覆盖 312 文件（含 FA-04/05/06、06 attempts、09、work qa-report），前后一致。",
+      "07 的 `supplement.fa04-unmodified` 由补审记录的自述哈希核对；新校验器用三方哈希（清单/自述/实际）+ 材料集合再做一遍。",
+      "两者结论一致（27/27 与 diagnostics=0、六项全 match），没有需要解释的矛盾。"
+    ]
+  },
+  "conclusion": "pass"
+}

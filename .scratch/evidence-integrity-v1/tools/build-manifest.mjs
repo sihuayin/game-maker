@@ -123,6 +123,12 @@ addAll(walk(".scratch/generic-playtest-v1/evidence/06-attempt-2/attempt-v1", { e
 add(".scratch/generic-playtest-v1/evidence/09-review-record.supplement.json", { required: true, role: "visual-supplement" });
 add(".scratch/generic-playtest-v1/evidence/09-review-materials.json", { required: true, role: "visual-supplement" });
 
+// ── 8.5 可选日志（`*.log` 不入库；只做本地核对，不在信任边界内）──────────
+for (const relDir of Object.values(ROOTS)) {
+  if (!fs.existsSync(P(relDir))) continue;
+  addAll(walk(relDir).filter((p) => p.endsWith(".log")), { required: false, role: "log" });
+}
+
 // ── 9. 映射 root（最长前缀）──────────────────────────────────────────────
 const rootList = Object.keys(ROOTS).sort((a, b) => ROOT_ABS[b].length - ROOT_ABS[a].length);
 function rootOf(abs) {

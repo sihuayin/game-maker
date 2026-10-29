@@ -65,3 +65,11 @@ Blocked by: 04
 - 本版无 MCP 镜像；`--json` 只走 CLI 的既有渲染。
 - `pnpm test:playtest` / `pnpm test:acceptance` 的最终回归归票 08（本票不改这两条链）。
 - 工作树未提交（CLI + 脚本 + 测试 + 本次运行记录）。
+
+### Final run（2026-10-29，票 06 之后）
+
+- 清单补入可选日志后重新冻结（223 文件 / 151 required / 72 optional，sha `ba7a485b…36fd`）。
+- `pnpm test:evidence`：**exit 0 · 1,348 ms · 20,207,992 bytes（约 19.3 MB）· 223 文件 · 13 条记录 · diagnostics=0 · pass**。
+- 报告：`runs/2026-10-29T04-31-30-968Z-delivery-verification/report.json`
+  （sha256 `e1a829ac…efb0`，139,125 bytes）；summary：`runs/2026-10-29T04-31-29-627Z-test-evidence/summary.json`。
+- 早先 04-14 的运行保留为历史，不覆盖。

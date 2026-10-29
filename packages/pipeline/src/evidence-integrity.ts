@@ -750,6 +750,58 @@ function siteIntegrity(index: Index, records: JsonRecord[], subject: ManifestSub
   return { results, diagnostics };
 }
 
+function reportReferences(index: Index, qa: QAReport | undefined): { results: ConsistencyResult[]; diagnostics: Array<{ rule: string; message: string; status: "fail" | "blocked" }> } {
+  const results: ConsistencyResult[] = [];
+  const diagnostics: Array<{ rule: string; message: string; status: "fail" | "blocked" }> = [];
+  if (qa?.delivery === undefined) {
+    results.push({ id: "references.report", rule: "交付报告引用", status: "blocked", detail: "qa-report 没有 delivery" });
+    diagnostics.push({ rule: "references.report", message: "无法核对 qa-report 的引用：没有 delivery", status: "blocked" });
+    return { results, diagnostics };
+  }
+  const out = index.roots.get("out")?.abs;
+  const check = (label: string, p: string): void => {
+    if (out === undefined) {
+      results.push({ id: "references.report", rule: "交付报告引用", status: "blocked", detail: `${label}：没有 out root` });
+      diagnostics.push({ rule: "references.report", message: `${label}：没有 out root`, status: "blocked" });
+      return;
+    }
+    const abs = path.resolve(out, p);
+    const hit = index.byAbs.get(abs);
+    const rel = path.relative(out, abs).split(path.sep).join("/");
+    const listed = index.files.get(`out:${rel}`);
+    if (hit !== undefined) {
+      const st = hit.result.status;
+      if (st === "verified") { results.push({ id: "references.report", rule: "交付报告引用", status: "verified", detail: `${label} → ${p}` }); return; }
+      if (st === "missing" || st === "unreadable") {
+        results.push({ id: "references.report", rule: "交付报告引用", status: "blocked", detail: `${label} → ${p}（${st}）` });
+        diagnostics.push({ rule: "references.report", message: `${label} 指向的文件不可用：${p}（${st}）`, status: "blocked" });
+        return;
+      }
+      results.push({ id: "references.report", rule: "交付报告引用", status: "fail", detail: `${label} → ${p}（${st}）` });
+      diagnostics.push({ rule: "references.report", message: `${label} 指向的文件不可验证：${p}（${st}）`, status: "fail" });
+      return;
+    }
+    if (listed === undefined) {
+      results.push({ id: "references.report", rule: "交付报告引用", status: "fail", detail: `${label} → ${p} 不在清单里` });
+      diagnostics.push({ rule: "references.report.reference-invalid", message: `${label} 引用的文件不在清单里：${p}`, status: "fail" });
+      return;
+    }
+    // 已入清单但磁盘上不在：可选日志不算错；必需的按 blocked。
+    if (listed.status === "optional-missing") {
+      results.push({ id: "references.report", rule: "交付报告引用", status: "verified", detail: `${label} → ${p}（optional，不在磁盘）` });
+      return;
+    }
+    const st = listed.status;
+    const blocked = st === "missing" || st === "unreadable";
+    results.push({ id: "references.report", rule: "交付报告引用", status: blocked ? "blocked" : "fail", detail: `${label} → ${p}（${st}）` });
+    diagnostics.push({ rule: "references.report", message: `${label} 指向的文件不可用：${p}（${st}）`, status: blocked ? "blocked" : "fail" });
+  };
+  check("config.file", qa.delivery.config.file);
+  if (qa.delivery.playtest !== undefined) check("playtest.report", qa.delivery.playtest.report);
+  for (const e of qa.delivery.evidence) check(`evidence.${e.ref}`, e.path);
+  return { results, diagnostics };
+}
+
 function canonicalJson(value: unknown): string {
   const norm = (v: unknown): unknown => {
     if (Array.isArray(v)) return v.map(norm);
@@ -858,6 +910,25 @@ function visualConsistency(index: Index, records: JsonRecord[]): { results: Cons
   }
 
   const review = records.find((r) => r.record.role === "visual-review" && r.json !== undefined);
+  const materialsRec = records.find((r) => r.record.role === "visual-materials");
+  const materialAbs = new Set<string>();
+  if (materialsRec?.json !== undefined) {
+    const m = materialsRec.json as Record<string, unknown>;
+    const mm = m["materials"];
+    const entries = [
+      ...(typeof mm === "object" && mm !== null ? [(mm as Record<string, unknown>)["reference"], (mm as Record<string, unknown>)["deliveredAssets"], (mm as Record<string, unknown>)["visualContext"]] : []),
+      m["generated"],
+    ].flat().filter((x): x is Record<string, unknown> => typeof x === "object" && x !== null);
+    for (const e of entries) {
+      if (typeof e["path"] !== "string") continue;
+      const hit = resolveDeclaredPath(index, e["path"]);
+      if (hit !== undefined) materialAbs.add(hit.abs);
+      else {
+        const abs = fa04 === undefined ? undefined : path.resolve(fa04, e["path"]);
+        if (abs !== undefined && index.byAbs.has(abs)) materialAbs.add(abs);
+      }
+    }
+  }
   if (review !== undefined) {
     const mats = (review.json as Record<string, unknown>)["materials"];
     if (typeof mats === "object" && mats !== null) {
@@ -871,9 +942,17 @@ function visualConsistency(index: Index, records: JsonRecord[]): { results: Cons
           diagnostics.push({ rule: "visual.materials.reference-invalid", message: `审核材料不在清单里：${p}`, status: "fail" });
         }
       };
-      for (const p of Array.isArray(m["reference"]) ? m["reference"] as unknown[] : []) if (typeof p === "string") checkRef(p, false);
-      for (const p of Array.isArray(m["deliveredAssets"]) ? m["deliveredAssets"] as unknown[] : []) if (typeof p === "string") checkRef(p, true);
-      for (const p of Array.isArray(m["runningScreenshots"]) ? m["runningScreenshots"] as unknown[] : []) if (typeof p === "string") checkRef(p, true);
+      const inCollection = (p: string, underFa04: boolean): void => {
+        const abs = underFa04 ? (fa04 === undefined ? undefined : path.resolve(fa04, p)) : resolveDeclaredPath(index, p)?.abs;
+        if (abs === undefined) return;
+        if (!materialAbs.has(abs)) {
+          results.push({ id: "visual.materials.collection", rule: "审核材料集合", status: "fail", detail: `${p} 不在 materials.json 里` });
+          diagnostics.push({ rule: "visual.materials.collection", message: `审核材料不在 materials.json 里：${p}`, status: "fail" });
+        }
+      };
+      for (const p of Array.isArray(m["reference"]) ? m["reference"] as unknown[] : []) if (typeof p === "string") { checkRef(p, false); inCollection(p, false); }
+      for (const p of Array.isArray(m["deliveredAssets"]) ? m["deliveredAssets"] as unknown[] : []) if (typeof p === "string") { checkRef(p, true); inCollection(p, true); }
+      for (const p of Array.isArray(m["runningScreenshots"]) ? m["runningScreenshots"] as unknown[] : []) if (typeof p === "string") { checkRef(p, true); inCollection(p, true); }
     }
   }
   if (results.length === 0) results.push({ id: "visual.records", rule: "视觉材料记录", status: "verified", detail: "没有可核对的视觉记录" });
@@ -914,7 +993,8 @@ function recomputeChecks(opts: {
     else {
       const hit = index.byAbs.get(path.resolve(out.abs, file));
       if (hit === undefined) checks.push({ key: "config", status: "blocked", detail: `配置不在清单里：${file}` });
-      else if (hit.result.status !== "verified") checks.push({ key: "config", status: "blocked", detail: `配置不可验证：${hit.result.status}` });
+      else if (hit.result.status === "missing" || hit.result.status === "unreadable") checks.push({ key: "config", status: "blocked", detail: `配置不可用：${hit.result.status}` });
+      else if (hit.result.status !== "verified") checks.push({ key: "config", status: "fail", detail: `配置不可验证：${hit.result.status}` });
       else if (hit.result.actual !== subject.configChecksum) checks.push({ key: "config", status: "fail", detail: `configChecksum 不符：${hit.result.actual}` });
       else checks.push({ key: "config", status: "pass" });
     }
@@ -941,9 +1021,15 @@ function recomputeChecks(opts: {
           const siteJson = JSON.parse(fs.readFileSync(path.join(siteDir, "site.json"), "utf8")) as Record<string, unknown>;
           refs = siteJson["pack"] === `v${subject.packVersion}` && siteJson["config"] === "game-config.json" && siteJson["shell"] === subject.shellVersion;
         } catch { refs = false; }
-        const unverified = names.map((n) => index.byAbs.get(path.join(siteDir, n))).filter((h) => h === undefined || h.result.status !== "verified");
-        checks.push(unverified.length > 0 ? { key: "site", status: "fail", detail: "站点文件哈希未验证" }
-          : !refs ? { key: "site", status: "fail", detail: "site.json 引用与 subject 不一致" }
+        const outAbs = index.roots.get("out")?.abs;
+        const statuses = names.map((n) => {
+          const rel = outAbs === undefined ? undefined : path.relative(outAbs, path.join(siteDir, n)).split(path.sep).join("/");
+          return rel === undefined ? undefined : index.files.get(`out:${rel}`);
+        });
+        const blocked = statuses.some((r) => r === undefined || r.status === "missing" || r.status === "unreadable");
+        const failed = statuses.some((r) => r !== undefined && r.status !== "verified" && r.status !== "missing" && r.status !== "unreadable");
+        checks.push(blocked ? { key: "site", status: "blocked", detail: "站点文件缺失/不可读" }
+          : failed || !refs ? { key: "site", status: "fail", detail: "站点文件哈希或引用不一致" }
           : { key: "site", status: "pass" });
       }
     }
@@ -1106,13 +1192,14 @@ export function verifyDeliveryEvidence(manifestPath: string): DeliveryVerificati
 
   const three = threeWay(index, records, manifest.subject);
   const site = siteIntegrity(index, records, manifest.subject);
+  const references = reportReferences(index, qa);
   const visual = visualConsistency(index, records);
   const play = playtestConsistency(records, qa);
   const recompute = recomputeChecks({ manifest, index, qa, records });
 
   // 一致性状态
-  const consistencyAll = [...three.results, ...site.results, ...visual.results, ...play.results];
-  const consistencyDiagnostics = [...three.diagnostics, ...site.diagnostics, ...visual.diagnostics, ...play.diagnostics];
+  const consistencyAll = [...three.results, ...site.results, ...references.results, ...visual.results, ...play.results];
+  const consistencyDiagnostics = [...three.diagnostics, ...site.diagnostics, ...references.diagnostics, ...visual.diagnostics, ...play.diagnostics];
   const consistencyStatus: DeliveryCheckStatus = consistencyDiagnostics.some((d) => d.status === "fail") || consistencyAll.some((r) => r.status === "fail")
     ? "fail" : consistencyDiagnostics.some((d) => d.status === "blocked") || consistencyAll.some((r) => r.status === "blocked") ? "blocked" : "pass";
 

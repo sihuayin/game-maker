@@ -134,6 +134,7 @@ function buildFixture(): Fixture {
   PlaytestReportSchema.parse(playtest);
   writeJson(path.join(runDir, "playtest", "v2", "result.json"), playtest);
   writeJson(path.join(runDir, "playtest", "v2", "site-integrity.json"), { before: siteHashes, after: siteHashes, unchanged: true });
+  write(path.join(runDir, "playtest", "v2", "acceptance-win", "events.jsonl"), '{"type":"win"}\n');
   const summary = playtestSummaryOf(
     PlaytestReportSchema.parse(playtest),
     `${PACK_ID}/run/v1/playtest/v2/result.json`,
@@ -263,6 +264,20 @@ function rehash(fx: Fixture, absPath: string): void {
   writeJson(fx.manifestPath, m);
 }
 
+function addManifestEntry(fx: Fixture, entry: { root: string; path: string; required?: boolean; sha256?: string; bytes?: number; role?: string }): void {
+  const m = readJson(fx.manifestPath);
+  m.files.push({
+    root: entry.root, path: entry.path, role: entry.role ?? "fixture",
+    required: entry.required ?? true, bytes: entry.bytes ?? 0,
+    sha256: entry.sha256 ?? "sha256:" + "0".repeat(64),
+  });
+  writeJson(fx.manifestPath, m);
+}
+
+function treeHashes(root: string): Record<string, string> {
+  return Object.fromEntries(walk(root).map((p) => [path.relative(root, p).split(path.sep).join("/"), SHA(p)]).sort());
+}
+
 describe("verifyDeliveryEvidence", () => {
   it("完整未变化的证据 → pass，六项声明与重算一致", () => {
     const fx = buildFixture();
@@ -356,6 +371,95 @@ describe("verifyDeliveryEvidence", () => {
     const report = verifyDeliveryEvidence(fx.manifestPath);
     expect(report.status).toBe("fail");
     expect(report.results.files.find((f) => f.path === "../escape.txt")?.status).toBe("path-invalid");
+  });
+
+  it("不可读（目录冒充文件）→ unreadable / blocked", () => {
+    const fx = buildFixture();
+    fs.rmSync(fx.siteIndexPath);
+    fs.mkdirSync(fx.siteIndexPath);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("blocked");
+    expect(report.results.files.find((f) => f.path.endsWith("/site/v1/index.html"))?.status).toBe("unreadable");
+  });
+
+  it("指向 root 外的符号链接 → path-invalid / fail", () => {
+    const fx = buildFixture();
+    const outside = path.join(fx.dir, "outside.json");
+    write(outside, "{}\n");
+    const link = path.join(fx.roots["out"]!, "escape.json");
+    fs.symlinkSync(outside, link);
+    addManifestEntry(fx, { root: "out", path: "escape.json" });
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.results.files.find((f) => f.path === "escape.json")?.status).toBe("path-invalid");
+  });
+
+  it("悬空符号链接 → path-invalid / fail", () => {
+    const fx = buildFixture();
+    const link = path.join(fx.roots["out"]!, "dangling.json");
+    fs.symlinkSync(path.join(fx.roots["out"]!, "nope.json"), link);
+    addManifestEntry(fx, { root: "out", path: "dangling.json" });
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.results.files.find((f) => f.path === "dangling.json")?.status).toBe("path-invalid");
+  });
+
+  it("root 内合法符号链接 → verified（不误伤）", () => {
+    const fx = buildFixture();
+    const target = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "game-config.json");
+    const link = path.join(fx.roots["out"]!, "inside-link.json");
+    fs.symlinkSync(target, link);
+    addManifestEntry(fx, { root: "out", path: "inside-link.json", sha256: SHA(target), bytes: fs.statSync(target).size });
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.results.files.find((f) => f.path === "inside-link.json")?.status).toBe("verified");
+  });
+
+  it("绝对路径引用 → path-invalid / fail", () => {
+    const fx = buildFixture();
+    const abs = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "game-config.json");
+    addManifestEntry(fx, { root: "out", path: abs, sha256: SHA(abs), bytes: fs.statSync(abs).size });
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.results.files.find((f) => f.path === abs)?.status).toBe("path-invalid");
+  });
+
+  it("报告引用错 attempt → reference-invalid / fail", () => {
+    const fx = buildFixture();
+    const qa = readJson(fx.qaPath);
+    qa.delivery.playtest.report = `${PACK_ID}/run/v1/playtest/v1/result.json`;
+    qa.delivery.evidence.find((e: { ref: string }) => e.ref === "playtest-result").path = qa.delivery.playtest.report;
+    writeJson(fx.qaPath, qa);
+    rehash(fx, fx.qaPath);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.results.consistency.some((c) => c.id === "references.report" && c.status === "fail")).toBe(true);
+  });
+
+  it("审核材料集合不一致 → fail", () => {
+    const fx = buildFixture();
+    const record = readJson(fx.reviewPath);
+    record.materials.runningScreenshots = ["shots/missing.png"];
+    writeJson(fx.reviewPath, record);
+    rehash(fx, fx.reviewPath);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.results.consistency.some((c) => c.id === "visual.materials.collection" && c.status === "fail")).toBe(true);
+  });
+
+  it("结论过期：声明 pass，当前必需证据失效 → 不再 pass", () => {
+    const fx = buildFixture();
+    fs.rmSync(path.join(fx.roots["out"]!, PACK_ID, "site", `v${SITE_VERSION}`, "index.html"));
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.declared.verdict).toBe("pass");
+    expect(report.status).not.toBe("pass");
+    expect(report.recomputed.verdict).not.toBe("pass");
+  });
+
+  it("只读性：校验前后 fixture 全量哈希不变", () => {
+    const fx = buildFixture();
+    const before = treeHashes(fx.dir);
+    verifyDeliveryEvidence(fx.manifestPath);
+    expect(treeHashes(fx.dir)).toEqual(before);
   });
 
   it("重复执行结果一致（除 generatedAt）", () => {

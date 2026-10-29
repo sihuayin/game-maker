@@ -1,6 +1,6 @@
 {
   "format": "delivery-evidence-manifest/v1",
-  "generatedAt": "2026-10-29T03:51:39.849Z",
+  "generatedAt": "2026-10-29T04:29:17.366Z",
   "generatedBy": ".scratch/evidence-integrity-v1/tools/build-manifest.mjs",
   "note": "一次性生成、人工审查后随 git 固定；校验器只读、绝不回写。信任边界：能发现相对本清单的改动，发现不了清单与被验证据一起被改并提交。",
   "subject": {
@@ -118,6 +118,14 @@
       "required": true,
       "bytes": 10010,
       "sha256": "sha256:fc928631a2e12b9353e4427409a37966cabc60edae5769a8ab4fc270e4636a93"
+    },
+    {
+      "root": "fa04",
+      "path": "chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:a415848dbd888d6a68cd4d8110778ce2e6b12e56fc042df16e9af1b8df65b381"
     },
     {
       "root": "fa04",
@@ -321,11 +329,35 @@
     },
     {
       "root": "fa05",
+      "path": "regression/test.log",
+      "role": "log",
+      "required": false,
+      "bytes": 15771,
+      "sha256": "sha256:1397f2f0e9f88310c31b8c292d54dc20730b2362eab860fa3dc5dfab8f777b52"
+    },
+    {
+      "root": "fa05",
       "path": "regression/typecheck.exit",
       "role": "acceptance-record",
       "required": true,
       "bytes": 2,
       "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa05",
+      "path": "regression/typecheck.log",
+      "role": "log",
+      "required": false,
+      "bytes": 1037,
+      "sha256": "sha256:34079e0854a892735b87bd72afc41ff8a54312214e9f7f28e52e8b09ba52f1ec"
+    },
+    {
+      "root": "fa06",
+      "path": "free-acceptance/probe/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2164,
+      "sha256": "sha256:a62df5b45b0f38382434c71b0ffe339f5351b85e8744728d253e6729cbc0013e"
     },
     {
       "root": "fa06",
@@ -400,6 +432,22 @@
       "sha256": "sha256:34079e0854a892735b87bd72afc41ff8a54312214e9f7f28e52e8b09ba52f1ec"
     },
     {
+      "root": "fa06",
+      "path": "self-test-run/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 8893,
+      "sha256": "sha256:84240cd28ea86962aa138d0c6a99d23b6cf20dd9864df73fcb6e0773ebf87064"
+    },
+    {
+      "root": "fa06",
+      "path": "self-test-run/report/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 17275,
+      "sha256": "sha256:1e6f2b4c30011255925b7bc2f153846c18c5c7d455ae759b516958ddae5a3b2e"
+    },
+    {
       "root": "gp",
       "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/console.json",
       "role": "playtest-attempt",
@@ -454,6 +502,14 @@
       "required": true,
       "bytes": 233421,
       "sha256": "sha256:a28e3a684d2523f3cb8c176ff975b428e76d3b6055901ea99ee9a317ad6f9bba"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2178,
+      "sha256": "sha256:f1405dfd25c616f8e781ba680a907468e7ed29d9045398cbf4168f8f46ad2e4d"
     },
     {
       "root": "gp",
@@ -529,6 +585,14 @@
     },
     {
       "root": "gp",
+      "path": "06-attempt-2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2324,
+      "sha256": "sha256:8771adaeecacd5c91280a9e88a5c6290c3db9bf4b186cc5bef552658222e2da4"
+    },
+    {
+      "root": "gp",
       "path": "06-attempt-2/attempt-v1/result.json",
       "role": "playtest-attempt",
       "required": true,
@@ -545,6 +609,46 @@
     },
     {
       "root": "gp",
+      "path": "07-acceptance/probe/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2178,
+      "sha256": "sha256:97ee871c034a643a8bc7cac542310126a647b548b48a22e20162637c0b32452b"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/acceptance.log",
+      "role": "log",
+      "required": false,
+      "bytes": 1278,
+      "sha256": "sha256:eee1de1142dc2936f3a9a8f7e51374a9098f22ed517943b8ad90c59d8528fcae"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/playtest.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2960,
+      "sha256": "sha256:f4c672123e962b4288df019a57a2b960d33bb6edbe5c8f0dd10456f5ce6fd77c"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/test.log",
+      "role": "log",
+      "required": false,
+      "bytes": 21804,
+      "sha256": "sha256:009b4dffc38aa82a03c7781638972e5acd674fdf5e49fe53877c197936f6cde5"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/typecheck.log",
+      "role": "log",
+      "required": false,
+      "bytes": 1037,
+      "sha256": "sha256:08cc46f3578feb49f75253d157c290a0f9adb899a2de66774a5c6ee70500561b"
+    },
+    {
+      "root": "gp",
       "path": "09-review-materials.json",
       "role": "visual-supplement",
       "required": true,
@@ -558,6 +662,22 @@
       "required": true,
       "bytes": 7433,
       "sha256": "sha256:f237fa795fee74976a706f4e2b9f50235ea7df992fea38f088db39a9a893c5a7"
+    },
+    {
+      "root": "gp",
+      "path": "self-test-run/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 11217,
+      "sha256": "sha256:12c824a4f9df173dcecabe1594194033bcf040c4281b33895be5d070bc94370c"
+    },
+    {
+      "root": "gp",
+      "path": "self-test-run/report/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 19599,
+      "sha256": "sha256:6109cf64192f3139f827aa7d9c438dc3212534ff4a9d62f23d9b152b8bed3ec1"
     },
     {
       "root": "out",
@@ -737,6 +857,14 @@
     },
     {
       "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2374,
+      "sha256": "sha256:8ff8c61d8b8a55dfc8de59fe81f5eb0ddc6681cc56afed78e8d828a2ba998fbc"
+    },
+    {
+      "root": "out",
       "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/harness-determinism.json",
       "role": "playtest-historical",
       "required": false,
@@ -833,6 +961,14 @@
     },
     {
       "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10655,
+      "sha256": "sha256:6e9584893f9f1758184a47b47a4149e519abfd3721e2a226bd393db2ba97c3d8"
+    },
+    {
+      "root": "out",
       "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
       "role": "playtest",
       "required": true,
@@ -918,6 +1054,14 @@
       "required": true,
       "bytes": 67,
       "sha256": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:aad011ec4a822cbbc6899d8c671105fc97244e1a367d8b20096ad6d10f765649"
     },
     {
       "root": "reference",
@@ -1022,6 +1166,86 @@
       "required": false,
       "bytes": 7698,
       "sha256": "sha256:2d0f26e865c61aeaabbc6276241fbef4827e90b793d8d316be241470b84ef5f5"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-clear-patroller-2-after-fix-v2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:60745deabbdd52774a0d092fe782cd611213a286fa2e85acc4df61a3444882f7"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-clear-patroller-2-after-fix/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:14e5c52c6a20ef683fae8c15d37f3574f9beb0d66e4a35cfe61981150af293b8"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-clear-patroller-2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10793,
+      "sha256": "sha256:b27447857f9324eefd32c4ac14065659e934c31702705d7fa8a4863700c339e3"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-real/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:28ee47642e71de4d41f96facef2f17ab9571a9f6fcbbd0af77857864a4d3d614"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-1/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10939,
+      "sha256": "sha256:e5a5e49fe5b02001a7f047e74b7fa8c0ebdb22d08791c81373237fdfb8e134bf"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:f61ee1eacdf97d7725812a5769c469048f6c40280e50893bad060d599980adec"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-determinism/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:d627c4ded239e0c22d5ab02e12e26fb4b46bbcc774b749587b74d07e8b61d282"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-determinism/attempt-v2/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2178,
+      "sha256": "sha256:6e5115faf143b1ced81ffcf47573bc07eb9e0fd7b4888f37472e4dc79b60e4e3"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-final/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10655,
+      "sha256": "sha256:fdbc69bbaba19d02372c1383d29160871d8e5153ab6dd670973b2fb5bdc2665d"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-final/attempt-v2/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10655,
+      "sha256": "sha256:02a152e8c8ae281affe4eb4d5473f08c4e3cfad3d2c9334c782221d1aacc2ffb"
     },
     {
       "root": "runs",

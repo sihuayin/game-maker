@@ -77,3 +77,12 @@ optional：snapshot-run 16 · reference 13 · playtest-historical 12 · rejectio
   `c168ba6c874b917db0faa2320e0b74d03522fca67f008c0de89ba581c01ed797`。
 - 清单的 roots / subject / records / D1–D12 规则不变；这是**完成度修正**（把交付侧站点纳入证据），
   不是规则变更。旧 sha `6efd248c…` 作废。
+
+## Revision 2（2026-10-29，票 06 负向测试时）
+
+- `qa-report.delivery.evidence` 引用了 `chrome.log` 等日志；按 Q6「被引用但未列入清单 ⇒ reference-invalid」，
+  以及 D12 的允许做法，把 `*.log` 以 **`required:false`** 纳入清单（28 条，role=`log`）：
+  只做本地核对，**不在 git 信任边界内**（`.gitignore` 的 `*.log` 仍不入库）。
+- 重新冻结：**223 文件（151 required / 72 optional）**，sha256
+  `ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd`。
+- roots / subject / records / D1–D12 规则不变；新增的只有「可选日志」这一类。
