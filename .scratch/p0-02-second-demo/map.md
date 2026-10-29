@@ -33,7 +33,7 @@ Effort: p0-02-second-demo
 ## Notes
 
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
-- **预算闸（Q2 c）**：票 01 已裁定**未授权**；真正的执行闸是票 13（成本估算与超限停止机制）→ 票 14（货币上限授权）。票 14 未通过前，任何可能调用文本/生图上游的命令都不得运行。
+- **预算闸（Q2 c）**：票 01/14 已裁定未授权（票 14 仅选定 $6.00 目标）；真正的执行闸 = 票 18（零付费核验端点/计价/护栏）→ 票 19（预算授权 v3）。票 19 未通过前，任何可能调用文本/生图上游的命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
 - **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17；票 17 接受前，票 05 不得运行。
 - **成功判据（Q5/Q8）**：`create`/`build` exit 0；QA pass；发布闸；site；production shell 写 delivery；`playtest` SUCCESS；人工视觉 pass；新交付身份冻结。任一失败按证据记 `fail`/`blocked`，不修到通过。
@@ -59,6 +59,8 @@ Effort: p0-02-second-demo
 - [裁定参考图生成路径](issues/15-reference-image-path.md)：**已收口（HITL）** —— 路径 **(a) 新建 effort-local 脚本** `.scratch/p0-02-second-demo/tools/generate-reference.mjs`，复用 `draw.mjs`，零付费/确定性/可复现生成 480×270 黄昏屋顶城市；不改生产代码、现有 `generate.mjs`、fixtures 或历史实验；保留屋顶信使 + 4 封信 + 可选信箱；生成后检查尺寸/色彩/provenance/视觉效果，票 17 由用户验收；票 17 接受前不运行 `create` checkpoint。详见 [rulings-2026-10-29.md](rulings-2026-10-29.md)。
 
 - [调用成本估算与超限停止机制](issues/13-cost-model-and-stop-mechanism.md)：**已收口（research）** —— 官方价可核实但**端点未核实**：checkpoint ≈$0.073、build ≈$0.535、全量 ≈$0.608、A（16 图）≈$0.68；生图占 77%。结构性最坏 87 趟 ≈$4.32（A 16 图 ≈$4.59；24 图 ≈$5.67）。**不能提供“下一次调用前”可靠动态护栏**（run ledger 阶段末才落盘）；可行的是 Prepay/静态上限 ≥ 最坏/checkpoint 两段闸/staging watcher + `--concurrency-image 1`（有界超射 1–2 张）。`22 次调用`不是货币上限。票 14 需端点主机名、计价档、provider 硬上限与验证方式、金额/覆盖阶段、生图批准、`ANTHROPIC_*` env 处理、重试政策。详见 [research/13-cost-model.md](research/13-cost-model.md)。
+
+- [预算授权 v2（货币上限 + 成本护栏）](issues/14-budget-authorization-v2.md)：**已收口（HITL）· 目标 $6.00 USD 已选但未授权** —— Q1 **c** 端点/计价档未核实；Q2 **a** $6.00 作为单次完整 A 运行的目标上限，尚未生效；Q3 **c** 硬限额未验证前不授权（官方 spend cap/Prepay 有计费延迟，不能当严格 $6 硬停止）；Q4 **b** 暂不批准付费生图；Q5 **a** 执行前移除 `ANTHROPIC_*` 影响并验证 Gemini 文本路径；Q6 **a** 默认重采样、第二次完整运行另行 HITL 批准。**执行仍阻塞**：下一道闸门 = 票 18「零付费核验 provider 端点、计价与护栏」→ 票 19「预算授权 v3」；票 05/06/09 已改为阻塞在 19。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md)。
 
 ## Not yet specified
 
