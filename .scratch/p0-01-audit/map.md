@@ -57,6 +57,8 @@ Effort: p0-01-audit
 
 - [梳理真实生成管线与入口](issues/03-map-real-pipeline.md)：**已收口（research）** —— 两条生产链：横版 `create/build → 理解六步 → runBuild（pack→verify→config→QA→机制覆盖）→ 发布闸 → site → delivery`；塔防 `需求+包 → compile-td-game → td-config → site`（无设计层/QA/delivery/playtest）。CLI 15 命令 vs MCP 8 工具，MCP 仅 `create_game` 能走完横版全链；独立 `site` 不写 delivery ⇒ 手工 plan/pack/compile/site 不可试玩；真实 E3 为 `040b907` 生成、`5b8283f` 冻结的 wasteland 横版（playtest harness v1，HEAD 已 v2；冻结 delivery 由 effort 脚本初始化，非当前 `buildAndSite`）；HEAD `verify-delivery` 只重算冻结证据。详见 [research/03-real-pipeline.md](research/03-real-pipeline.md)。
 
+- [冻结审计基准](issues/01-freeze-audit-baseline.md)：**已收口** —— 生产代码基线 **`2c1a9d5`**（`main`）；当前 HEAD `e5dc05e` 仅新增本期 effort 文件（12 files / 684 insertions），生产代码 diff 为空；工作区仅未跟踪 PRD（`sha256:9ac9e120…92f4a7`）；10 包 / 6,877 受跟踪文件 / 149 测试文件；未读本地凭据与忽略构建产物；零生产修改。详见 [research/01-baseline.md](research/01-baseline.md)。
+
 ## Not yet specified
 
 - 第二个 Demo 若不可进入实施，后续 P0-02 应以什么粒度、拆几张需求另立（取决于候选比较与缺口分类的结论）。
