@@ -35,7 +35,7 @@ Effort: p0-02-second-demo
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
 - **预算闸（Q2 c）**：票 01 已裁定**未授权**；真正的执行闸是票 13（成本估算与超限停止机制）→ 票 14（货币上限授权）。票 14 未通过前，任何可能调用文本/生图上游的命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
-- **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。
+- **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17；票 17 接受前，票 05 不得运行。
 - **成功判据（Q5/Q8）**：`create`/`build` exit 0；QA pass；发布闸；site；production shell 写 delivery；`playtest` SUCCESS；人工视觉 pass；新交付身份冻结。任一失败按证据记 `fail`/`blocked`，不修到通过。
 - **重试（Q6）**：首次运行只用管线默认重采样；第二次完整运行须单独批准，只换输入；不得把两次运行拼成一次全绿。
 - **证据（Q7）**：冻结新 `run/pack/site` 只读快照 + 逐文件 sha256 + 交付身份；保留 delivery/playtest/视觉记录；正式清单/`verify-delivery` 是后续缺口，不在本期伪装为已解决。
@@ -53,6 +53,10 @@ Effort: p0-02-second-demo
 - [冻结 P0-02 起始基线](issues/02-freeze-p0-02-baseline.md)：**已收口** —— 起始 HEAD **`4f3bc69`**；生产代码与 P0-01 基线 `2c1a9d5` 零差异（`2c1a9d5..4f3bc69` 仅 21 个 P0-01 文档/effort 文件、3,078 insertions）；工作区仅未跟踪 P0-02 effort + PRD；10 包 / 6,886 tracked / 149 测试；关键输入 sha256 已绑定；未读本地凭据；零生产修改。详见 [research/02-baseline.md](research/02-baseline.md)。
 
 - [起草 A 的 intent 与关卡概念](issues/03-draft-a-inputs.md)：**已收口（起草）** —— **屋顶信使**：黄昏城市天际线，4 封信 `collect-pickup` + `reach-goal`；5 段屋顶，台阶 ≤50px、缺口 ≤55px（在 60.5/66 上限内）；无 hazard/danger/moving；16 色视觉；资源表 12 项 + 可选信箱；新参考图要求已列。零付费、零生成、零生产修改。待票 04 HITL 批准输入与参考图。详见 [inputs/a-intent.md](inputs/a-intent.md) · [a-level-concept.md](inputs/a-level-concept.md) · [a-assets.md](inputs/a-assets.md)。
+
+- [批准 A 的输入与新参考图](issues/04-approve-a-inputs-and-reference.md)：**已收口（HITL）** —— 概念/输入继续；Q1 **b** 程序化生成新的黄昏屋顶城市参考图（零付费、确定性、可复现，生成后先检查再验收）；Q2 **a** 保持 4 封信 + 可选信箱；Q3 **a** 全部边界确认。核对发现现有 `generate.mjs` 硬编码为黄昏山间列车小站、无参数，参考图路径升级为票 15「裁定参考图生成路径」→ 16「生成并检查」→ 17「验收参考图」；票 05 已阻塞在 17。付费执行仍阻塞于预算 v2。
+
+- [裁定参考图生成路径](issues/15-reference-image-path.md)：**已收口（HITL）** —— 路径 **(a) 新建 effort-local 脚本** `.scratch/p0-02-second-demo/tools/generate-reference.mjs`，复用 `draw.mjs`，零付费/确定性/可复现生成 480×270 黄昏屋顶城市；不改生产代码、现有 `generate.mjs`、fixtures 或历史实验；保留屋顶信使 + 4 封信 + 可选信箱；生成后检查尺寸/色彩/provenance/视觉效果，票 17 由用户验收；票 17 接受前不运行 `create` checkpoint。详见 [rulings-2026-10-29.md](rulings-2026-10-29.md)。
 
 ## Not yet specified
 
