@@ -35,7 +35,7 @@ Effort: p0-02-second-demo
 - **基线**：P0-02 起始生产代码 HEAD（票 02 记录完整 SHA）；必须与 P0-01 基线 `2c1a9d5` 做生产代码 diff，确认零变更。
 - **预算闸（Q2 c）**：票 01/14 已裁定未授权（票 14 仅选定 $6.00 目标）；真正的执行闸 = 票 18（零付费核验端点/计价/护栏）→ 票 19（预算授权 v3）。票 19 未通过前，任何可能调用文本/生图上游的命令都不得运行。
 - **执行路径（Q3）**：两段式 `create`（不带 `--yes`）→ checkpoint 人工审查 → `build`。checkpoint 应提供 design / recipe / plan；材料缺失即暂停并报告，不绕过。
-- **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17；票 17 接受前，票 05 不得运行。
+- **输入（Q4）**：代理起草 intent 与关卡概念；参考图必须用户提供/批准；scenario 在最终 config 后起草、用户批准；未经批准不得付费生图。**参考图闸**：票 15 → 16 → 17 已收口（用户接受 `rooftop-dusk.png`）；票 05 现在只阻塞在预算授权 v3（票 19）。
 - **成功判据（Q5/Q8）**：`create`/`build` exit 0；QA pass；发布闸；site；production shell 写 delivery；`playtest` SUCCESS；人工视觉 pass；新交付身份冻结。任一失败按证据记 `fail`/`blocked`，不修到通过。
 - **重试（Q6）**：首次运行只用管线默认重采样；第二次完整运行须单独批准，只换输入；不得把两次运行拼成一次全绿。
 - **证据（Q7）**：冻结新 `run/pack/site` 只读快照 + 逐文件 sha256 + 交付身份；保留 delivery/playtest/视觉记录；正式清单/`verify-delivery` 是后续缺口，不在本期伪装为已解决。
@@ -61,6 +61,10 @@ Effort: p0-02-second-demo
 - [调用成本估算与超限停止机制](issues/13-cost-model-and-stop-mechanism.md)：**已收口（research）** —— 官方价可核实但**端点未核实**：checkpoint ≈$0.073、build ≈$0.535、全量 ≈$0.608、A（16 图）≈$0.68；生图占 77%。结构性最坏 87 趟 ≈$4.32（A 16 图 ≈$4.59；24 图 ≈$5.67）。**不能提供“下一次调用前”可靠动态护栏**（run ledger 阶段末才落盘）；可行的是 Prepay/静态上限 ≥ 最坏/checkpoint 两段闸/staging watcher + `--concurrency-image 1`（有界超射 1–2 张）。`22 次调用`不是货币上限。票 14 需端点主机名、计价档、provider 硬上限与验证方式、金额/覆盖阶段、生图批准、`ANTHROPIC_*` env 处理、重试政策。详见 [research/13-cost-model.md](research/13-cost-model.md)。
 
 - [预算授权 v2（货币上限 + 成本护栏）](issues/14-budget-authorization-v2.md)：**已收口（HITL）· 目标 $6.00 USD 已选但未授权** —— Q1 **c** 端点/计价档未核实；Q2 **a** $6.00 作为单次完整 A 运行的目标上限，尚未生效；Q3 **c** 硬限额未验证前不授权（官方 spend cap/Prepay 有计费延迟，不能当严格 $6 硬停止）；Q4 **b** 暂不批准付费生图；Q5 **a** 执行前移除 `ANTHROPIC_*` 影响并验证 Gemini 文本路径；Q6 **a** 默认重采样、第二次完整运行另行 HITL 批准。**执行仍阻塞**：下一道闸门 = 票 18「零付费核验 provider 端点、计价与护栏」→ 票 19「预算授权 v3」；票 05/06/09 已改为阻塞在 19。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md)。
+
+- [生成并检查参考图](issues/16-generate-and-check-reference.md)：**已收口（待验收）** —— 新建 effort-local `tools/generate-reference.mjs`，复用 `draw.mjs`，零付费/确定性生成 `inputs/reference/rooftop-dusk.png`（480×270、16 唯一色、每像素在色板内、sha `1b926a5b…f6f2`，两次运行一致）；不改现有 `generate.mjs`/fixtures/历史实验；视觉验收待票 17 由用户确认。详见 [research/16-reference-image.md](research/16-reference-image.md)。
+
+- [验收参考图](issues/17-accept-reference-image.md)：**已收口（HITL）** —— 用户**接受** `inputs/reference/rooftop-dusk.png` 作为 P0-02 参考图输入；480×270、16 唯一色、sha `1b926a5b…f6f2`；接受不等于预算授权。`create` checkpoint 仍只阻塞在预算授权 v3（票 19）。逐字裁定：[rulings-2026-10-29.md](rulings-2026-10-29.md) §6。
 
 ## Not yet specified
 

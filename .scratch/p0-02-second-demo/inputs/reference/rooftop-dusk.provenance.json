@@ -1,0 +1,52 @@
+{
+  "format": "reference-image-provenance/v2",
+  "artifact": "rooftop-dusk.png",
+  "artifactSha256": "sha256:1b926a5bb052bd434893007b7ccc21f580c597a7c857ce582dbd8b4ad719f6f2",
+  "world": "黄昏城市屋顶（屋顶信使 A）",
+  "composition": "分层剖面：天空 / 远景城市 / 中景建筑 / 前景屋顶 + 水塔 + 天线 + 钟楼；一名信使剪影",
+  "how": {
+    "generator": ".scratch/p0-02-second-demo/tools/generate-reference.mjs",
+    "technique": "Node + 仓库自己的 canvas 原语 / RasterImage / encodePNG；零第三方依赖、零付费、无需浏览器",
+    "reproduce": "node .scratch/p0-02-second-demo/tools/generate-reference.mjs",
+    "size": {
+      "w": 480,
+      "h": 270
+    }
+  },
+  "palette": {
+    "size": 16,
+    "namedEntries": 18,
+    "values": [
+      "#1b243a",
+      "#2e4a66",
+      "#4a6076",
+      "#c98b5e",
+      "#f2d98b",
+      "#2a3442",
+      "#3b4a5c",
+      "#4a5a6e",
+      "#5f7084",
+      "#1b2027",
+      "#2f353f",
+      "#565b60",
+      "#7a7f84",
+      "#d9a441",
+      "#3f5c3a",
+      "#e6e2d6"
+    ],
+    "usedInImage": 16,
+    "property": "图上每个像素都是这 16 个唯一色之一（18 个命名槽位，其中 2 组同色）；没有插值、抗锯齿或重编码。"
+  },
+  "verification": {
+    "width": 480,
+    "height": 270,
+    "allPixelsInPalette": true,
+    "alphaOpaque": true,
+    "sha256": "sha256:1b926a5bb052bd434893007b7ccc21f580c597a7c857ce582dbd8b4ad719f6f2"
+  },
+  "limits": [
+    "它是程序化插图，不是真实游戏截图；不代表最终画面密度。",
+    "它只用于 A 的视觉世界参考；不代表参考图已通过视觉验收（票 17 由用户验收）。",
+    "尺寸/色板/像素可复现；上游重编码仍可能让提取出的 palette 有偏差。"
+  ]
+}

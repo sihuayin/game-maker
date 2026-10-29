@@ -1,7 +1,7 @@
 # 生成并检查参考图
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 15
 
 ## Question
@@ -15,3 +15,15 @@ Blocked by: 15
 - 不调用付费生图服务；不改生产代码/历史实验。
 
 产物：`.scratch/p0-02-second-demo/inputs/reference/`（PNG + provenance JSON）+ `research/16-reference-image.md`。
+
+## Answer
+
+**已生成（2026-10-29，零付费、确定性）。** 产物：`.scratch/p0-02-second-demo/inputs/reference/rooftop-dusk.png` + provenance JSON。
+
+- 脚本：`.scratch/p0-02-second-demo/tools/generate-reference.mjs`（新建 effort-local，复用 `draw.mjs`；未改现有 `generate.mjs`/`draw.mjs`/fixtures/历史实验）。
+- 尺寸 480×270 RGBA；3.1 KiB；18 命名槽位 / **16 唯一色**；每像素在色板内、alpha 全不透明。
+- sha256 `1b926a5b…f6f2`；连续两次运行 sha 相同。
+- 视觉：黄昏城市、落日、远景/中景建筑、暖窗、水塔、天线、钟楼、信使剪影；无文字/UI。
+- **视觉验收尚未通过**；票 17 由用户接受/拒绝。零付费、零生产修改。
+
+详见 [../research/16-reference-image.md](../research/16-reference-image.md)
