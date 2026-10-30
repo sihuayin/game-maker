@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
+  auditReferences, carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
   parseGameConfig, parseRecipe, QA_JUDGEMENTS, QAReportSchema, qaVerdict,
   buildMechanicCoverage, mechanicCoverageProblem, RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
@@ -138,6 +138,10 @@ export type BuildInput = {
    * 从而证明 `verifyPack` 真的**在链上、在这个位置**（而不是只被单元测试直接调过）。
    */
   verify?: (opts: { packDir: string; outRoot?: string }) => CommandResult;
+  /** **复用已有包现场**（P0-02 v2 票 18）：透传给 `packAssets`，零文本/生图调用。 */
+  reuseFrom?: string;
+  /** **复用已有 config**（P0-02 v2 票 20）：pack 后、config 编译前读取；校验后直接写入 run，跳过 `compileRuntime`。 */
+  reuseConfig?: string;
 };
 
 export type BuildResult = {
@@ -473,6 +477,17 @@ function inspectUnavailableReason(e: unknown, _packDir: string): string {
  * ⚠️ **QA 默认跑**（票 20 的 Q3）：`input.qa` 省略 ⇒ 用 `@game-maker/qa` 的合成器；
  *   显式 `null` ⇒ 关掉。它的硬失败在**报告落盘之后**抛 `invalid`（见 `assertQaPassed`）。
  */
+/** 复用 config 的校验（P0-02 v2 票 20）：schema 必须过，且所有 asset 引用都在新 pack manifest 里。
+ *  ⚠️ 纯函数：不读盘、不写盘；CLI/runBuild 负责读取与原子写入。 */
+export function parseReusedConfig(raw: unknown, manifest: AssetPackManifest): GameConfig {
+  const parsed = parseGameConfig(raw);
+  if (!parsed.ok) throw new CommandError("invalid", `reuseConfig 不过 game-config/v1：${parsed.errors.slice(0, 4).join("；")}`);
+  const refs = auditReferences(parsed.value, manifest).filter((i) => i.severity === "error");
+  if (refs.length > 0)
+    throw new CommandError("invalid", `reuseConfig 的引用校验失败：${refs.slice(0, 6).map((i) => `${i.where}: ${i.message}`).join("；")}`);
+  return parsed.value;
+}
+
 export async function runBuild(input: BuildInput): Promise<BuildResult> {
   const runDir = path.isAbsolute(input.runDir) ? input.runDir : path.join(input.outRoot, input.runDir);
   const runVersion = parseRunVersion(runDir);
@@ -527,6 +542,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     ...(input.imageTransport !== undefined ? { imageTransport: input.imageTransport } : {}),
     ...(input.concurrency !== undefined ? { concurrency: input.concurrency } : {}),
     ...(input.fetchImpl !== undefined ? { fetchImpl: input.fetchImpl } : {}),
+    ...(input.reuseFrom !== undefined ? { reuseFrom: input.reuseFrom } : {}),
     ...(input.onProgress !== undefined
       ? { onProgress: (done, all, assetId) => input.onProgress!({ step: "pack", index: 1, total, detail: `${assetId}（${done}/${all}）` }) }
       : {}),
@@ -544,35 +560,55 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   //   ⚠️ 放在 `say("config")` 之前：进度条上它就是「包之后的第一件事」，不是配置的一部分。
   (input.verify ?? verifyPack)({ packDir, outRoot: input.outRoot });
 
+  // ⚠️ 包 manifest 在 config 之前读回来（P0-02 v2 票 20）：复用 config 时要用它核对 asset 引用。
+  const manifest = parseAssetPack(readRunJson(packDir, "manifest.json"));
+  if (!manifest.ok) throw new Error(`包里的 manifest 读不回来：${manifest.errors.slice(0, 3).join("；")}`);
+
   say("config");
   // ⚠️ 配置编译器也是**文件进出**的（它写 `<outRoot>/<id>/game-configs/`）—— 同样先落 staging，
   //   再把那一个文件搬进 run（§13 要的是 `run/v<N>/game-config.json`）。
   //   ⚠️ **它是「最新一次 attempt 的」那一份**：重跑构建会覆盖它（run 的目录名不再变），
   //   而历次 attempt 各自的配置本来就能从各自的包重编译出来（派生量，不丢信息）。
-  const staging = fs.mkdtempSync(path.join(input.outRoot, ".config-"));
+  //   ⚠️ **复用 config**（P0-02 v2 票 20）：给了 `reuseConfig` 就跳过编译，校验后原子写入 run。
   let configPath: string;
-  try {
-    const compiled = await compileRuntime({
-      designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
-      packDir,
-      outRoot: staging,
-      transport: input.transport,
-      ...(input.fetchImpl !== undefined ? { fetchImpl: input.fetchImpl } : {}),
-      ...(input.viewport !== undefined ? { viewport: input.viewport } : {}),
-      ...(input.hudLineHeight !== undefined ? { hudLineHeight: input.hudLineHeight } : {}),
-    });
-    ledger.push(...ledgerOf(compiled.data));
-    const produced = path.join(staging, compiled.artifacts[0]!.path);
+  if (input.reuseConfig !== undefined) {
+    const reusePath = path.resolve(input.reuseConfig);
+    let raw: unknown;
+    try { raw = JSON.parse(fs.readFileSync(reusePath, "utf8")); }
+    catch (e) { throw new CommandError("invalid", `reuseConfig 读不出 JSON（${reusePath}）：${e instanceof Error ? e.message : String(e)}`); }
+    const reused = parseReusedConfig(raw, manifest.value);
     configPath = path.join(runDir, RUN_ARTIFACT.config);
-    fs.renameSync(produced, configPath);
-  } finally {
-    fs.rmSync(staging, { recursive: true, force: true });
+    const tmp = `${configPath}.tmp-${process.pid}`;
+    try {
+      writeJson(tmp, reused);
+      fs.renameSync(tmp, configPath);
+    } catch (e) {
+      try { fs.rmSync(tmp, { force: true }); } catch {}
+      throw e;
+    }
+  } else {
+    const staging = fs.mkdtempSync(path.join(input.outRoot, ".config-"));
+    try {
+      const compiled = await compileRuntime({
+        designPath: path.join(runDir, RUN_ARTIFACT.gameDesign),
+        packDir,
+        outRoot: staging,
+        transport: input.transport,
+        ...(input.fetchImpl !== undefined ? { fetchImpl: input.fetchImpl } : {}),
+        ...(input.viewport !== undefined ? { viewport: input.viewport } : {}),
+        ...(input.hudLineHeight !== undefined ? { hudLineHeight: input.hudLineHeight } : {}),
+      });
+      ledger.push(...ledgerOf(compiled.data));
+      const produced = path.join(staging, compiled.artifacts[0]!.path);
+      configPath = path.join(runDir, RUN_ARTIFACT.config);
+      fs.renameSync(produced, configPath);
+    } finally {
+      fs.rmSync(staging, { recursive: true, force: true });
+    }
   }
 
   // ⚠️ 两份都**从磁盘读回来**（Q6 的「对象 + 路径都给」里那半个「对象」）：
   //   它们刚刚才被写下去，而读回来的那个形状才是**判据认过**的那一份。
-  const manifest = parseAssetPack(readRunJson(packDir, "manifest.json"));
-  if (!manifest.ok) throw new Error(`包里的 manifest 读不回来：${manifest.errors.slice(0, 3).join("；")}`);
   const config = parseGameConfig(readRunJson(runDir, RUN_ARTIFACT.config));
   if (!config.ok) throw new Error(`刚写下的 config 读不回来：${config.errors.slice(0, 3).join("；")}`);
 

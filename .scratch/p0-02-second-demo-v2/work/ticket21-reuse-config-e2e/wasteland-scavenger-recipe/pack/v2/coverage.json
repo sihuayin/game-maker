@@ -1,0 +1,39 @@
+{
+  "format": "assetpack-coverage/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 2,
+  "layers": [
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.sky",
+      "w": 480,
+      "h": 270,
+      "opaque": 129600,
+      "ratio": 1
+    },
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.ruins",
+      "w": 480,
+      "h": 270,
+      "opaque": 75861,
+      "ratio": 0.5853472222222222
+    },
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.wall",
+      "w": 480,
+      "h": 270,
+      "opaque": 58507,
+      "ratio": 0.45144290123456793
+    },
+    {
+      "asset": "wasteland-bg",
+      "frame": "wasteland-bg.railway",
+      "w": 480,
+      "h": 270,
+      "opaque": 53126,
+      "ratio": 0.40992283950617286
+    }
+  ]
+}

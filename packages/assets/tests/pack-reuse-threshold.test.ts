@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import type { AssetRecipe, StyleSpec } from "@game-maker/contracts";
-import { buildAssetPack, encodePNG, keyColorFor, verifyPack, type ImageGenerator } from "../src/index.js";
+import { buildAssetPack, encodePNG, keyColorFor, packAssets, verifyPack, type ImageGenerator } from "../src/index.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const STYLE: StyleSpec = JSON.parse(readFileSync(ROOT + ".scratch/game-creation-v1/experiments/style-transfer-from-test-png/stylespec.json", "utf8"));
@@ -110,5 +110,73 @@ describe("§ 票 18：minLargestShare（多部件道具）", () => {
     const r = await build(0.5);
     expect(r.manifest.assets[0]!.frames).toHaveLength(1);
     expect(verifyPack({ packDir: r.packDir }).data.ok).toBe(true);
+  });
+});
+
+describe("§ 票 19：packAssets 的 reuseFrom 接线与身份护栏", () => {
+  const writeReuse = (dir: string, id = "reuse-test", withFrames = true) => {
+    writeFileSync(path.join(dir, "manifest.json"), JSON.stringify({ id, version: 1, assets: [], files: [] }) + "\n");
+    if (withFrames) {
+      const gen = path.join(dir, "authoring/generated");
+      mkdirSync(gen, { recursive: true });
+      const img = imageOf(64, 96, [{ x0: 16, y0: 14, x1: 48, y1: 86 }]);
+      for (const name of ["hero.idle1.png", "hero.idle2.png"]) writeFileSync(path.join(gen, name), encodePNG(img));
+    }
+  };
+
+  it("reuseFrom ⇒ 零文本/生图调用，pack 成立", async () => {
+    const base = tmp();
+    const recipeDir = path.join(base, "recipe");
+    mkdirSync(recipeDir, { recursive: true });
+    writeFileSync(path.join(recipeDir, "style.json"), JSON.stringify(STYLE) + "\n");
+    const recipe = { ...frameRecipe(), styleRef: "style.json" };
+    const recipePath = path.join(recipeDir, "recipe.json");
+    writeFileSync(recipePath, JSON.stringify(recipe) + "\n");
+    const reuse = path.join(base, "reuse");
+    mkdirSync(reuse, { recursive: true });
+    writeReuse(reuse);
+    const outRoot = path.join(base, "out");
+    const r = await packAssets({
+      recipePath, outRoot, transport: { baseUrl: "http://stub.invalid", apiKey: "stub" },
+      imageTransport: { protocol: "openai", baseUrl: "http://stub.invalid", apiKey: "stub" },
+      fetchImpl: (() => { throw new Error("reuse 模式不应调用上游"); }) as unknown as typeof fetch,
+      reuseFrom: reuse, concurrency: { text: 1, image: 1 },
+    });
+    expect(r.data).toBeDefined();
+    const packDir = path.join(outRoot, "reuse-test", "pack", "v1");
+    expect(verifyPack({ packDir }).data.ok).toBe(true);
+  });
+
+  it("reuseFrom 的 manifest id 与 recipe.id 不符 ⇒ exit 4 / invalid", async () => {
+    const base = tmp();
+    const recipeDir = path.join(base, "recipe");
+    mkdirSync(recipeDir, { recursive: true });
+    writeFileSync(path.join(recipeDir, "style.json"), JSON.stringify(STYLE) + "\n");
+    const recipe = { ...frameRecipe(), styleRef: "style.json" };
+    const recipePath = path.join(recipeDir, "recipe.json");
+    writeFileSync(recipePath, JSON.stringify(recipe) + "\n");
+    const reuse = path.join(base, "reuse");
+    mkdirSync(reuse, { recursive: true });
+    writeReuse(reuse, "other");
+    await expect(packAssets({
+      recipePath, outRoot: path.join(base, "out"), transport: { baseUrl: "http://stub.invalid", apiKey: "stub" },
+      imageTransport: { protocol: "openai", baseUrl: "http://stub.invalid", apiKey: "stub" },
+      reuseFrom: reuse,
+    })).rejects.toThrow(/不一致/);
+  });
+
+  it("reuseFrom 缺 manifest ⇒ 拒绝", async () => {
+    const base = tmp();
+    const recipeDir = path.join(base, "recipe");
+    mkdirSync(recipeDir, { recursive: true });
+    writeFileSync(path.join(recipeDir, "style.json"), JSON.stringify(STYLE) + "\n");
+    const recipe = { ...frameRecipe(), styleRef: "style.json" };
+    const recipePath = path.join(recipeDir, "recipe.json");
+    writeFileSync(recipePath, JSON.stringify(recipe) + "\n");
+    await expect(packAssets({
+      recipePath, outRoot: path.join(base, "out"), transport: { baseUrl: "http://stub.invalid", apiKey: "stub" },
+      imageTransport: { protocol: "openai", baseUrl: "http://stub.invalid", apiKey: "stub" },
+      reuseFrom: path.join(base, "nope"),
+    })).rejects.toThrow(/manifest/);
   });
 });

@@ -26,9 +26,9 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
 用法：
   game-maker create --style <一张参考图> --intent <需求文本 | 需求.md> [--yes] [--style-id <slug>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
-  game-maker build  <run 目录> [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
+  game-maker build  <run 目录> [--reuse-from <packDir>] [--reuse-config <config>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
   game-maker plan   --design <game-design.json> --visual-world <visual-world.json> [--out <目录>] [--json]
-  game-maker pack   --recipe <清单.json> [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
+  game-maker pack   --recipe <清单.json> [--reuse-from <packDir>] [--visual-world <visual-world.json>] [--version <n>] [--out <目录>] [--concurrency <n>] [--concurrency-image <n>] [--json]
   game-maker compile-runtime --design <game-design.json> --pack <资源包目录> [--out <目录>] [--json]
   game-maker compile-td-game --requirement <需求.md> --pack <资源包目录> [--out <目录>] [--json]
   game-maker site   <资源包目录> --config <关卡配置> [--qa-report <报告路径>] [--shell <shell.js>] [--out <目录>] [--json]
@@ -128,7 +128,7 @@ export function parseArgs(argv: readonly string[]): Parsed {
     // 票 09（P0-02b）：`site` 的显式 QA 报告（外部包 / 非规范 out 树）
     "qa-report",
     // 票 10（FPVS-V1-P1）：`review-verdict` 的视觉评审结论
-    "verdict", "reviewer", "note", "review-record", "spec",
+    "verdict", "reviewer", "note", "review-record", "spec", "reuse-from", "reuse-config",
     // Playtest V1 票 09：基线晋升
     "report", "second-report", "coverage", "reason", "dir",
     // FA-01D：试玩场景目录（默认五态）
@@ -254,6 +254,10 @@ async function buildAndSite(o: {
   env: NodeJS.ProcessEnv; cwd: string; io: CliIo; concurrency?: Concurrency; fetchImpl?: typeof fetch;
   /** 显式指定外壳 bundle（与 `site` 命令同款）—— 独立安装时按仓库布局找不到它。 */
   shellJsPath?: string;
+  /** 复用已有包现场（P0-02 v2 票 18）：透传给 `runBuild`/`packAssets`，零文本/生图调用。 */
+  reuseFrom?: string;
+  /** 复用已有 config（P0-02 v2 票 20）：跳过 `compileRuntime`，校验后写入 run。 */
+  reuseConfig?: string;
 }): Promise<{ built: Awaited<ReturnType<typeof runBuild>>; site: CommandResult; delivery: DeliveryReport }> {
   const img = resolveImageTransport({ env: o.env, cwd: o.cwd });
   for (const w of img.warnings) o.io.err(`⚠️ ${w}\n`);
@@ -262,6 +266,8 @@ async function buildAndSite(o: {
     ...(img.transport ? { imageTransport: img.transport } : {}),
     ...(o.fetchImpl === undefined ? {} : { fetchImpl: o.fetchImpl }),
     ...(o.concurrency === undefined ? {} : { concurrency: o.concurrency }),
+    ...(o.reuseFrom === undefined ? {} : { reuseFrom: o.reuseFrom }),
+    ...(o.reuseConfig === undefined ? {} : { reuseConfig: o.reuseConfig }),
     viewport: VIEWPORT, hudLineHeight: HUD_LINE_HEIGHT,
     onProgress: progressTo(o.io),
   });
@@ -619,6 +625,8 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         const runDir = path.resolve(dir);
         const { built, site, delivery } = await buildAndSite({ outRoot, runDir, transport, env, cwd, io, ...up,
           ...concurrencyArg(flags),
+          ...(typeof flags["reuse-from"] === "string" ? { reuseFrom: path.resolve(cwd, flags["reuse-from"]) } : {}),
+          ...(typeof flags["reuse-config"] === "string" ? { reuseConfig: path.resolve(cwd, flags["reuse-config"]) } : {}),
           ...(typeof flags.shell === "string" ? { shellJsPath: path.resolve(cwd, flags.shell) } : {}) });
         result = buildComplete(built, site, delivery, outRoot);
         break;
@@ -656,6 +664,7 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
           //   那个位置已经摆着东西时，`pack` 会**拒**（「禁止覆盖」在子树同样成立）。
           ...(typeof flags["visual-world"] === "string" ? { visualWorldPath: flags["visual-world"] } : {}),
           ...(typeof flags.version === "string" ? { version: parseVersion(flags.version) } : {}),
+          ...(typeof flags["reuse-from"] === "string" ? { reuseFrom: path.resolve(cwd, flags["reuse-from"]) } : {}),
         });
         break;
       }

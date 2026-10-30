@@ -4,7 +4,8 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: p0-02-second-demo-v2
 
-> **本图 2026-10-29 开。** 旧图 [`p0-02-second-demo`](../p0-02-second-demo/map.md) 已按用户裁定 (e) 暂停并保持只读；本图不改写旧图、旧 effort 或任何历史产物。
+> **本图 2026-10-29 开；2026-10-30 暂停（票 22）。** 阶段 B 无限期 BLOCKED；本图无 open tickets；重启需新的 HITL 预算/硬护栏授权。
+> 旧图 [`p0-02-second-demo`](../p0-02-second-demo/map.md) 已按用户裁定 (e) 暂停并保持只读；本图不改写旧图、旧 effort 或任何历史产物。
 > **终点形态（用户 2026-10-29 逐字裁定 Q1 = b）**：**承载阶段 A 的零付费执行** —— 在冻结 `wasteland-scavenger` Demo 上收敛六项正确性/证据链缺口；阶段 B（第二个独立 Demo 付费试跑）作为下游阻塞，本图不调用付费服务。
 > **方向裁定 Q1–Q9（用户 2026-10-29 逐字）**：Q1 b · Q2 b · Q3 b · Q4 a · Q5 a · Q6 a · Q7 a · Q8 a · Q9 a。逐字记录见 [rulings-2026-10-29.md](rulings-2026-10-29.md)；本图只引用，不复述全文。
 > **三条约束（用户 2026-10-29 逐字）**：① 免费测试不等于真实生成证据；② 不以修复数量作为验收标准；③ 不扩大本轮范围（Q3(b) 之外的 P1 不并入）。
@@ -75,6 +76,9 @@ E2 = 可复现测试；E3 = 真实免费运行 + 命令 / 退出码 / 路径 / �
 
 只有同时满足才可启动：明确预算与单次成本上限；明确付费执行授权；明确执行护栏与停止条件；确认阶段 A 证据足以支撑第二个 Demo 试跑。条件满足前不调用付费服务，也不预拆 build / playtest / visual / freeze / verdict 详细票。
 
+- **2026-10-30 票 16 裁定**：阶段 B 保持 **BLOCKED**；不授权预算/付费/生图；不接受有界超射、不恢复 LiteLLM、$6 非授权。
+- **阶段 B 状态（2026-10-30 票 22）**：**无限期 BLOCKED**。零付费 buildAndSite E2E 已通过（票 21）；第 4 项证据满足（带限制）；预算、硬护栏、付费授权未定；本图暂停，无 open tickets；重启需新的 HITL 硬限额方案与明确授权。
+
 ### 证据分级
 
 E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + 退出码 + 路径 + 身份）。阶段 A 的 E3 只证明冻结 Demo 上实际覆盖的行为，不外推到第二个独立 Demo。
@@ -97,17 +101,26 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 - [清单生产实施](issues/13-manifest-production-implementation.md): 新增 `build-evidence-manifest --spec/--out [--force]` 与 spec 生成核心（确定性、subject 实算校验、out 在 root 外、拒绝覆盖）；阶段 A 清单 217 文件 / 6 records，`verify-delivery` exit 0 / 诊断 0；纳入旧 fa04 视觉记录与 `mechanic-coverage` record。
 - [Playtest v2 写回 E3](issues/14-playtest-v2-writeback-e3.md): 阶段 A 可写副本上真实 playtest **exit 0 / 20s / attempt v3**；默认 `success-basic` SUCCESS；身份六字段 + harness/rules v2；撤销后恢复 `playable-smoke=pass`、`verdict=pass`；旧 v2 引用被 v3 替换；历史零改动。
 - [阶段 A 收口：回归、冻结与逐缺口结论](issues/15-stage-a-closure.md): 7 项缺口全部 closed（限制见 final-report §5）；回归三件套全绿；freeze 112 文件只读 + 最终清单 231 文件 / 6 records + `verify-delivery` pass / 诊断 0；旧 work/快照/旧 effort 零改动；零付费、未提交；票 16 解锁但未授权付费。
+- [阶段 B 启动闸：预算、护栏、授权与阶段 A 证据](issues/16-stage-b-start-gate.md): 裁定 **(b) 保持 BLOCKED**；不授权预算/付费/生图；不接受有界超射、不恢复 LiteLLM、$6 非授权；先做 [零付费 buildAndSite dry run](issues/17-zero-paid-build-site-dry-run.md)；阶段 A 证据尚不足。
+- [零付费 buildAndSite 壳级 dry run](issues/17-zero-paid-build-site-dry-run.md): 尝试后**被阻塞**——`build` 总会重新生成 image/drawlist；15 次生图 + 8 次文本请求全部被本地 fail-closed stub 以 503 拒绝，零真实 provider 调用、零付费；`pack.ts` 已有 `reuseFrom` 但未暴露给 `packAssets`/CLI；新票 [复用路径](issues/18-zero-paid-build-reuse-path.md)。
+- [零付费 buildAndSite：复用已有资源的路径](issues/18-zero-paid-build-reuse-path.md): 裁定 **(a) 暴露 `reuseFrom`**；批准 `PackOptions`/`BuildInput`/`packAssets`/`runBuild` 与 `build`/`pack` 的 `--reuse-from`；源 pack manifest 必须 `id === recipe.id`、版本可不同、不符 exit 4；零付费 stub 断言；E2E 后阶段 B 仍需新 HITL 裁定。
+- [复用路径实施与零付费 E2E](issues/19-reuse-from-implementation-e2e.md): `reuseFrom` 接入 `PackOptions`/`BuildInput`/`runBuild`/`build`/`pack`，源包 id 校验、测试全绿；E2E 中 pack 复用已做到 0 上游请求（pack v2 生成），但 `compileRuntime` 仍调用文本上游（1 次 stub 503）；零付费 buildAndSite 还差 config 复用，新票 [config 复用](issues/20-zero-paid-build-config-reuse.md)。
+- [零付费 build：复用已有 config](issues/20-zero-paid-build-config-reuse.md): 裁定 **(a) 显式 `build --reuse-config`**；批准 `BuildInput.reuseConfig` + CLI；pack 后/config 前读取，跳过 `compileRuntime`；`parseGameConfig` + `auditReferences` 校验，失败 exit 4 不跑 QA/site；零付费 E2E 要求 ledger 0 / stub 0 POST；成功后阶段 B 仍需新 HITL 裁定。
+- [config 复用实施与零付费 E2E](issues/21-reuse-config-implementation-e2e.md): `BuildInput.reuseConfig` + `build --reuse-config` 落地；`parseGameConfig` + `auditReferences` 校验；零付费 E2E **exit 0 / 6s / stub 0 POST**，pack v3 → config 复用（sha 455d…）→ QA 7/7 → site v3 → delivery incomplete；历史零改动；阶段 B 仍需新的 HITL 裁定。
+- [阶段 B 启动裁定（零付费 buildAndSite E2E 后）](issues/22-stage-b-gate-after-dry-run.md): 裁定 **(b) 阶段 B 继续 BLOCKED**；第 4 项证据由票 21 满足（带限制：复用资源/诊断母版/复用 config，不代表新 Demo 完整生成）；**(i) 暂停在此**，无限期等待新的预算/硬护栏 HITL 裁定；$6 非授权、严格硬停止未建立、不接受有界超射、不恢复 LiteLLM。
 
 ## Not yet specified
 
-- **阶段 B 的具体执行链**：新 intent、参考图、资源包、`create` checkpoint、付费 `build`、Playtest 场景、人工视觉、冻结与最终 verdict；只保留票 16 启动闸，细节等阶段 A 结果与新输入。
+> 本图 2026-10-30 暂停（票 22）；以下 fog 不主动推进，重启时再复看。
+
+- **阶段 B 的具体执行链**：新 intent、参考图、资源包、`create` checkpoint、付费 `build`、Playtest 场景、人工视觉、冻结与最终 verdict；零付费 E2E 已完成（票 21），启动裁定由票 22；预算/护栏/授权仍未定。
 - **清单生成器与 `test:evidence` / CI 的集成方式**：是否把阶段 A 冻结交付纳入正式回归；生成器形状已由票 07 定死，集成方式由票 13 / 15 决定。
 - **阶段 A 结果后的 P1 排序**：可通关求解器、moving-platform 全链、全面错误语义、nonce/版本强制；不预切。
 - **是否在阶段 A 后重访旧 P0-02 的付费范围**：由票 16 与后续 HITL 决定。
 
 ## Out of scope
 
-- 本图内的一切付费模型/生图调用；阶段 B 的 `build` 与新独立 Demo 生成。
+- 本图内的一切付费模型/生图调用；阶段 B 的**付费** `build` 与新独立 Demo 生成（零付费 buildAndSite dry run 不在此列）。
 - 改写旧 `p0-02-second-demo` effort、旧 work、历史 run/pack/site/delivery/验收报告。
 - Q3(b) 之外的 P1：可通关求解器、moving-platform 全链、全面错误语义治理、nonce/版本强制；阶段 A 结果后再单独排序。
 - 把 B 作为 Demo 候选；本图只处理 B 假绿链中的 correctness 半边（hazard / 覆盖门禁），不重开 B 试跑。

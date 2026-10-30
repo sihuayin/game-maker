@@ -1,0 +1,38 @@
+{
+  "id": "style",
+  "identity": [
+    "2D side-scrolling pixel art style",
+    "Post-apocalyptic wasteland and abandoned rail station theme",
+    "Low-resolution blocky sprites with clean flat shapes"
+  ],
+  "camera": {},
+  "composition": {},
+  "palette": [
+    "#1b2027",
+    "#2a3442",
+    "#4a3222",
+    "#2e3b4e",
+    "#3b4a5c",
+    "#6b4a33",
+    "#565b60",
+    "#4a6076",
+    "#8a6244",
+    "#7a7f84",
+    "#c98b5e",
+    "#9aa0a5",
+    "#d9a441",
+    "#e8c39e",
+    "#f2d98b",
+    "#e6e2d6"
+  ],
+  "lighting": {},
+  "shapeLanguage": [],
+  "material": [],
+  "environment": [],
+  "characterStyle": [],
+  "constraints": [
+    "Strict 2D side-view platformer layout.",
+    "Hard-edged pixel artwork with limited flat palette."
+  ],
+  "confidence": 0.95
+}

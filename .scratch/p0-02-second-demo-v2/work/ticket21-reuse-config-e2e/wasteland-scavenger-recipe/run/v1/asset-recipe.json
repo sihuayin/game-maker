@@ -1,0 +1,297 @@
+{
+  "format": "asset-recipe/v1",
+  "id": "wasteland-scavenger-recipe",
+  "styleRef": "stylespec.json",
+  "referenceImage": "reference.png",
+  "assets": [
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "scavenger-hero",
+        "role": "玩家角色动画",
+        "description": "8位元复古风格的废土拾荒者主角，头戴宽檐帽，身穿金色腰带深色制服，比例为2头身Q版。包含待机、奔跑与跳跃动作。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "scavenger-hero",
+        "masterAsset": "master-scavenger-hero",
+        "animations": [
+          {
+            "name": "idle",
+            "frames": 4,
+            "sheet": {
+              "columns": 2,
+              "rows": 2
+            },
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "frames": 4,
+            "sheet": {
+              "columns": 2,
+              "rows": 2
+            },
+            "fps": 8,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "frames": 2,
+            "fps": 6,
+            "loop": false
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "animation",
+        "id": "wasteland-patroller",
+        "role": "巡逻敌人动画",
+        "description": "在废弃城市与轨道平台巡逻的废土巡逻敌人，方头机械质感身躯，警戒与行走动画。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 24,
+          "h": 32
+        },
+        "required": true,
+        "characterId": "wasteland-patroller",
+        "masterAsset": "master-wasteland-patroller",
+        "animations": [
+          {
+            "name": "walk",
+            "frames": 4,
+            "sheet": {
+              "columns": 2,
+              "rows": 2
+            },
+            "fps": 6,
+            "loop": true
+          },
+          {
+            "name": "idle",
+            "frames": 2,
+            "fps": 4,
+            "loop": true
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wasteland-chest",
+        "role": "可交互废土宝箱",
+        "description": "废土废墟中可开启的木质金属加固宝箱，内含物资奖励。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 1
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wasteland-scraps",
+        "role": "可拾取废料物资",
+        "description": "散落在废墟地面与轨道上的废旧零件与物资碎片，发着微微金属光泽。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "sprite",
+        "id": "wasteland-platform-tile",
+        "role": "可平铺地面与平台砖块",
+        "description": "废土废墟结构的质感木质与粗糙碎石平台砖块，可横向拼接作为实体地面与台阶。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 32,
+          "h": 32
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "background",
+        "id": "wasteland-bg",
+        "role": "分层废土关卡背景",
+        "description": "废弃城市废土关卡的多层视视差背景，包含夜空、远景废墟剪影、近景木墙与底端铁轨暗色碎石层。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 480,
+          "h": 270
+        },
+        "required": true,
+        "layers": [
+          {
+            "name": "sky",
+            "parallax": 0,
+            "description": "深色夜空与分层水平平铺色调"
+          },
+          {
+            "name": "ruins",
+            "parallax": 0.3,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "远处废弃城市与废墟结构的暗色剪影"
+          },
+          {
+            "name": "wall",
+            "parallax": 0.6,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "木质墙面结构与简单矩形镂空边框"
+          },
+          {
+            "name": "railway",
+            "parallax": 1,
+            "tileable": {
+              "x": true,
+              "y": false
+            },
+            "description": "底端碎石路基与铁轨轨道平面"
+          }
+        ]
+      },
+      "source": {
+        "kind": "image"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-panel",
+        "role": "屏幕空间HUD通用面板底框",
+        "description": "废土风格屏幕空间HUD拉伸面板，暗色废土质感带有复古像素边框。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "size": {
+          "w": 64,
+          "h": 64
+        },
+        "required": true,
+        "ninePatch": {
+          "left": 8,
+          "right": 8,
+          "top": 8,
+          "bottom": 8
+        }
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    },
+    {
+      "spec": {
+        "kind": "ui",
+        "id": "hud-icon-scrap",
+        "role": "屏幕空间HUD废料数量小图标",
+        "description": "屏幕空间HUD顶部物资数量指示图标，固定尺寸废料像素小图标。",
+        "styleId": "style",
+        "anchor": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "size": {
+          "w": 16,
+          "h": 16
+        },
+        "required": true
+      },
+      "source": {
+        "kind": "drawlist"
+      }
+    }
+  ],
+  "authoring": [
+    {
+      "id": "master-scavenger-hero",
+      "role": "主角创作态母版",
+      "description": "废土拾荒者主角母版设定图，方头双头身，宽檐帽、金色腰带与暗色制服正向站姿。",
+      "source": {
+        "kind": "import",
+        "ref": "masters/master-scavenger-hero.png"
+      },
+      "characterId": "scavenger-hero",
+      "size": {
+        "w": 24,
+        "h": 32
+      }
+    },
+    {
+      "id": "master-wasteland-patroller",
+      "role": "巡逻敌人创作态母版",
+      "description": "废土巡逻敌人母版设定图，方头硬朗机械质感废土警卫。",
+      "source": {
+        "kind": "import",
+        "ref": "masters/master-wasteland-patroller.png"
+      },
+      "characterId": "wasteland-patroller",
+      "size": {
+        "w": 24,
+        "h": 32
+      }
+    }
+  ],
+  "characterRef": "character-dna.json"
+}

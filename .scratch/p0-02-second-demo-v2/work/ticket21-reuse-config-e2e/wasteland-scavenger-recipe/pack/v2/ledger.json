@@ -1,0 +1,11 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 2,
+  "createdAt": "2026-10-30T05:22:23.000Z",
+  "run": {
+    "wallClockMs": 5876,
+    "byStep": {}
+  },
+  "calls": []
+}

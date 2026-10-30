@@ -1562,6 +1562,9 @@ export type PackOptions = {
    * 不给就用 `DEFAULT_CONCURRENCY`；设 1 就是旧的串行行为。
    */
   concurrency?: { text?: number; image?: number };
+  /** **复用已有包现场**（P0-02 v2 票 18）：drawlist/generated 已存在的直接读，缺文件即抛；
+   *  不调用文本/生图。源包 manifest 的 id 必须与 recipe.id 一致（版本可不同）。 */
+  reuseFrom?: string;
 };
 
 /**
@@ -1686,8 +1689,22 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
   // ⚠️ **票 29 的闸**：在这之前这一行是 `JSON.parse(...) as StyleSpec` —— 一句编译期的谎。
   const style = readStyle(styleAbs);
 
+  // ⚠️ **票 18：复用现场的身份护栏**（在生成之前免费拒）。版本可不同，id 必须一致。
+  let reuseFrom: string | undefined;
+  if (opts.reuseFrom !== undefined) {
+    reuseFrom = path.resolve(opts.reuseFrom);
+    const reuseManifestPath = path.join(reuseFrom, "manifest.json");
+    if (!fs.existsSync(reuseManifestPath))
+      throw new CommandError("invalid", `--reuse-from 指向的包缺 manifest.json：${reuseManifestPath}`);
+    let reuseManifest: { id?: unknown };
+    try { reuseManifest = JSON.parse(fs.readFileSync(reuseManifestPath, "utf8")) as { id?: unknown }; }
+    catch (e) { throw new CommandError("invalid", `--reuse-from 的 manifest.json 不可解析：${e instanceof Error ? e.message : String(e)}`); }
+    if (reuseManifest.id !== r.value.id)
+      throw new CommandError("invalid", `--reuse-from 的包 id=${String(reuseManifest.id)} 与 recipe.id=${r.value.id} 不一致`);
+  }
+
   const needsImage = r.value.assets.some((a) => a.source.kind === "image" || a.source.kind === "frames");
-  if (needsImage && !opts.imageTransport)
+  if (needsImage && !opts.imageTransport && reuseFrom === undefined)
     throw new CommandError("usage",
       `这份清单里有 source.kind="image" 的资源，但**没配生图凭据** —— ` +
       `写 game-maker.local.json（已 gitignore）或设 GAME_MAKER_IMAGE_* 环境变量。`);
@@ -1743,6 +1760,7 @@ export async function packAssets(opts: PackOptions): Promise<CommandResult> {
         : {}),
       ...(opts.onProgress ? { onProgress: opts.onProgress } : {}),
       ...(opts.concurrency ? { concurrency: opts.concurrency } : {}),
+      ...(reuseFrom === undefined ? {} : { reuseFrom }),
     });
   } catch (e) {
     // ⚠️ 生成失败**就是**「上游不可达」（3），不是「失败」（1）。

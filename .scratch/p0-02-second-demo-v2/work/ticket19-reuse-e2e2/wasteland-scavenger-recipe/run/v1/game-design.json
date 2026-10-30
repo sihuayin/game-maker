@@ -1,0 +1,109 @@
+{
+  "format": "game-design/v1",
+  "game": {
+    "title": "废土寻宝者",
+    "genre": "platformer",
+    "camera": "side",
+    "runtimeProfile": {
+      "id": "platformer",
+      "version": "1"
+    }
+  },
+  "coreLoopSteps": [
+    "在废弃城市的街道与轨道层进行横版移动与平台跳跃探索",
+    "寻找并收集散落的废土物资与可开启的宝箱",
+    "规避与躲避沿途巡逻的危险敌人",
+    "抵达区域安全撤离点完成关卡目标"
+  ],
+  "player": {
+    "id": "scavenger-hero",
+    "role": "废土拾荒者",
+    "abilities": [
+      "横版左右移动",
+      "平台跳跃"
+    ],
+    "goals": [
+      "在废弃城市中探索搜集废料与宝箱",
+      "躲避巡逻敌人并安全抵达撤离点"
+    ]
+  },
+  "enemies": [
+    {
+      "id": "wasteland-patroller",
+      "behavior": "在废弃城市地面与平台间沿设定路径定时往复巡逻",
+      "threat": "触碰会导致伤害并打断探索进程"
+    }
+  ],
+  "npcs": [],
+  "interactables": [
+    {
+      "id": "wasteland-chest",
+      "type": "chest",
+      "behavior": "玩家靠近后进行交互可打开并获取宝箱内的物资"
+    }
+  ],
+  "resources": [
+    {
+      "id": "wasteland-scraps",
+      "purpose": "废弃城市中散落的基础物资，收集可增加生存资源与通关结算评分"
+    }
+  ],
+  "world": {
+    "theme": "废土荒凉与危险未知的探索氛围",
+    "setting": "废弃城市的铁路轨道与木质废墟建筑层",
+    "structure": "Railway tracks and dark floor plane at bottom. · Scavenger character standing on platform in front of wall. · Dark sky with layered horizontal flat tones. · Human-scale props (bench, framed picture, lamp post, signs). · Low to moderate density with clean horizontal banding."
+  },
+  "levels": [
+    {
+      "id": "wasteland-level-1",
+      "purpose": "让玩家熟悉基础移动跳跃、资源搜集与躲避敌人的废土生存寻宝体验",
+      "layout": "从最左侧废墟起点出发，向右跨越铁轨与高低木质平台，途中收集废料与宝箱，绕过巡逻敌人，最终抵达最右侧出口。",
+      "entities": [
+        "scavenger-hero",
+        "wasteland-patroller",
+        "wasteland-chest",
+        "wasteland-scraps"
+      ]
+    }
+  ],
+  "progression": {
+    "model": "linear-exploration",
+    "description": "通过搜集废弃城市中的物资与宝箱积累生存资源，安全撤离后解禁更具挑战的废墟区域。"
+  },
+  "mechanics": [
+    {
+      "id": "horizontal-move",
+      "mechanic": "run"
+    },
+    {
+      "id": "jump-action",
+      "mechanic": "jump"
+    },
+    {
+      "id": "find-resources",
+      "mechanic": "collect-pickup"
+    },
+    {
+      "id": "find-chests",
+      "mechanic": "open-chest"
+    },
+    {
+      "id": "dodge-hazards",
+      "mechanic": "avoid-danger"
+    }
+  ],
+  "winConditions": [
+    "收集散落物资与宝箱后安全抵达关卡终点撤离区"
+  ],
+  "loseConditions": [
+    "生命值因触碰危险敌人归零"
+  ],
+  "runtimeRequirements": [
+    "input:keyboard",
+    "camera:side-scroll",
+    "collision:aabb",
+    "motion:cyclic",
+    "objective:collect-then-reach",
+    "hud:screen-space"
+  ]
+}

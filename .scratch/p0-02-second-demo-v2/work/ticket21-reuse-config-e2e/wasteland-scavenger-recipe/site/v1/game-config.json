@@ -1,0 +1,203 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 1440,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "wasteland-bg"
+    }
+  },
+  "player": {
+    "asset": "scavenger-hero",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 240
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 240,
+      "w": 1440,
+      "h": 30
+    }
+  ],
+  "entities": [
+    {
+      "id": "scrap-1",
+      "sourceIntent": "wasteland-scraps",
+      "kind": "pickup",
+      "at": {
+        "x": 220,
+        "y": 232
+      },
+      "asset": "wasteland-scraps"
+    },
+    {
+      "id": "patroller-1",
+      "sourceIntent": "wasteland-patroller",
+      "kind": "hazard",
+      "at": {
+        "x": 340,
+        "y": 240
+      },
+      "asset": "wasteland-patroller",
+      "anim": "walk",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 100,
+        "periodMs": 3000
+      }
+    },
+    {
+      "id": "platform-1",
+      "kind": "solid",
+      "at": {
+        "x": 450,
+        "y": 190
+      },
+      "asset": "wasteland-platform-tile"
+    },
+    {
+      "id": "platform-2",
+      "kind": "solid",
+      "at": {
+        "x": 482,
+        "y": 190
+      },
+      "asset": "wasteland-platform-tile"
+    },
+    {
+      "id": "chest-1",
+      "sourceIntent": "wasteland-chest",
+      "kind": "chest",
+      "at": {
+        "x": 498,
+        "y": 190
+      },
+      "asset": "wasteland-chest"
+    },
+    {
+      "id": "scrap-2",
+      "sourceIntent": "wasteland-scraps",
+      "kind": "pickup",
+      "at": {
+        "x": 466,
+        "y": 150
+      },
+      "asset": "wasteland-scraps"
+    },
+    {
+      "id": "patroller-2",
+      "sourceIntent": "wasteland-patroller",
+      "kind": "hazard",
+      "at": {
+        "x": 720,
+        "y": 240
+      },
+      "asset": "wasteland-patroller",
+      "anim": "walk",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 120,
+        "periodMs": 3500
+      }
+    },
+    {
+      "id": "chest-2",
+      "sourceIntent": "wasteland-chest",
+      "kind": "chest",
+      "at": {
+        "x": 850,
+        "y": 240
+      },
+      "asset": "wasteland-chest"
+    },
+    {
+      "id": "scrap-3",
+      "sourceIntent": "wasteland-scraps",
+      "kind": "pickup",
+      "at": {
+        "x": 850,
+        "y": 200
+      },
+      "asset": "wasteland-scraps"
+    },
+    {
+      "id": "platform-3",
+      "kind": "solid",
+      "at": {
+        "x": 1020,
+        "y": 190
+      },
+      "asset": "wasteland-platform-tile"
+    },
+    {
+      "id": "platform-4",
+      "kind": "solid",
+      "at": {
+        "x": 1052,
+        "y": 190
+      },
+      "asset": "wasteland-platform-tile"
+    },
+    {
+      "id": "scrap-4",
+      "sourceIntent": "wasteland-scraps",
+      "kind": "pickup",
+      "at": {
+        "x": 1052,
+        "y": 150
+      },
+      "asset": "wasteland-scraps"
+    },
+    {
+      "id": "exit-gate",
+      "kind": "goal",
+      "at": {
+        "x": 1380,
+        "y": 208
+      },
+      "asset": "wasteland-platform-tile"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "hud-panel",
+      "at": {
+        "x": 10,
+        "y": 10
+      },
+      "size": {
+        "w": 80,
+        "h": 30
+      }
+    },
+    "pip": {
+      "asset": "hud-icon-scrap",
+      "at": {
+        "x": 25,
+        "y": 25
+      },
+      "step": {
+        "x": 16,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "exit-gate"
+  }
+}

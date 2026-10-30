@@ -1,0 +1,81 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 2,
+  "createdAt": "2026-10-30T05:12:23.000Z",
+  "run": {
+    "wallClockMs": 105,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 6
+      },
+      "image": {
+        "calls": 3,
+        "attempts": 9
+      },
+      "drawlist": {
+        "calls": 2,
+        "attempts": 8
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-scavenger-hero",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 45,
+      "requestedModel": "stub"
+    },
+    {
+      "step": "master",
+      "target": "master-wasteland-patroller",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 32,
+      "requestedModel": "stub"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-chest",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 30,
+      "requestedModel": "stub"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-scraps",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 24,
+      "requestedModel": "stub"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-platform-tile",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 18,
+      "requestedModel": "stub"
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 11,
+      "attempts": 4,
+      "requestedModel": "deepseek-v4-pro"
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-icon-scrap",
+      "upstream": "messages",
+      "ms": 10,
+      "attempts": 4,
+      "requestedModel": "deepseek-v4-pro"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":0,"seq":0,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":1833,"seq":1,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":1885,"seq":2,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":3124,"seq":3,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":5024,"seq":4,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":5024,"seq":5,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":5075,"seq":6,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":6380,"seq":7,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":6432,"seq":8,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":7220,"seq":9,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":7271,"seq":10,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":9467,"seq":11,"source":"move_to"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":9542,"seq":12,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":9543,"seq":13,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":9594,"seq":14,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":10304,"seq":15,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":10358,"seq":16,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":11068,"seq":17,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":11120,"seq":18,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":12094,"seq":19,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":12145,"seq":20,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":13045,"seq":21,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":13096,"seq":22,"source":"move_to"}
+{"type":"keyDown","key":" ","code":"Space","t":13883,"seq":23,"source":"move_to"}
+{"type":"keyUp","key":" ","code":"Space","t":13935,"seq":24,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":17299,"seq":25,"source":"move_to"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":17301,"seq":26,"source":"cleanup"}

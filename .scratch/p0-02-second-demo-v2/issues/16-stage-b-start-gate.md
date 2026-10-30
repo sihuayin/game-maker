@@ -1,7 +1,7 @@
 # 阶段 B 启动闸：预算、护栏、授权与阶段 A 证据
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 15
 
 ## Question
@@ -27,4 +27,22 @@ HITL：阶段 B（第二个独立 Demo 付费试跑）的启动闸。只有以�
 
 ## Answer
 
-（未收口）
+**2026-10-30 HITL 收口。** 逐字裁定见 [rulings-2026-10-29.md 第 10 节](../rulings-2026-10-29.md)。
+
+### 裁定
+
+| 项 | 决定 |
+|---|---|
+| Q1 启动闸 | **(b) 保持 BLOCKED**，不调用任何付费服务 |
+| Q2 下一步 | **(ii) 零付费 `buildAndSite` 壳级 dry run**（冻结副本或已有资源的新 Demo）；不引入付费 API，不改冻结证据 |
+| Q3 阶段 A 证据 | **(b) 尚不足**：先补真实 `create/build → site → delivery` 链路证据，再讨论付费启动 |
+| 有界超射 | 不接受 |
+| LiteLLM | 不恢复 |
+| $6.00 | 不是预算授权 |
+| dry run 环境 | 必须验证 `ANTHROPIC_*` 不会把 text 路由到本地代理，并记录实际 provider/endpoint |
+| 本轮授权 | **不授权预算、付费执行或生图调用** |
+
+### 结论
+
+- 阶段 B 仍 **BLOCKED**；本票关闭**不构成**任何付费授权。
+- 新建 [零付费 buildAndSite 壳级 dry run](../issues/17-zero-paid-build-site-dry-run.md) 作为下一张 task 票；完成并复核后，再重新评估四项启动条件。

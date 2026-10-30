@@ -1,0 +1,37 @@
+{
+  "format": "assetpack-master-ratios/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 1,
+  "masters": [
+    {
+      "master": "master-scavenger-hero",
+      "requested": {
+        "w": 24,
+        "h": 32
+      },
+      "returned": {
+        "w": 896,
+        "h": 1200
+      },
+      "requestedRatio": 0.75,
+      "returnedRatio": 0.7466666666666667,
+      "ratioDelta": -0.004444444444444399,
+      "match": false
+    },
+    {
+      "master": "master-wasteland-patroller",
+      "requested": {
+        "w": 24,
+        "h": 32
+      },
+      "returned": {
+        "w": 896,
+        "h": 1200
+      },
+      "requestedRatio": 0.75,
+      "returnedRatio": 0.7466666666666667,
+      "ratioDelta": -0.004444444444444399,
+      "match": false
+    }
+  ]
+}

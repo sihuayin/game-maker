@@ -1,0 +1,132 @@
+{
+  "format": "visual-world/v1",
+  "styleIdentity": {
+    "styleName": "Side-Scrolling Pixel Wasteland",
+    "keywords": [
+      "pixel art",
+      "side-scroller",
+      "platformer",
+      "wasteland",
+      "retro 8-bit"
+    ],
+    "description": "Retro 2D pixel-art side-scroller with flat geometric structures, muted earth tones, dark night sky, and crisp blocky characters."
+  },
+  "camera": {
+    "mode": "side",
+    "angle": 0
+  },
+  "composition": {
+    "foreground": "Railway tracks and dark floor plane at bottom.",
+    "midground": "Scavenger character standing on platform in front of wall.",
+    "background": "Dark sky with layered horizontal flat tones.",
+    "objectScale": "Human-scale props (bench, framed picture, lamp post, signs).",
+    "characterScale": "Small sprite relative to environment height (~1/4 screen height).",
+    "density": "Low to moderate density with clean horizontal banding."
+  },
+  "palette": {
+    "primary": [
+      "palette:2",
+      "palette:5",
+      "palette:8"
+    ],
+    "secondary": [
+      "palette:1",
+      "palette:1",
+      "palette:9"
+    ],
+    "accent": [
+      "palette:14",
+      "palette:15",
+      "palette:10"
+    ],
+    "background": [
+      "palette:1",
+      "palette:4",
+      "palette:2",
+      "palette:5"
+    ],
+    "shadow": [
+      "palette:0",
+      "palette:0",
+      "palette:1"
+    ],
+    "highlight": [
+      "palette:15",
+      "palette:15"
+    ]
+  },
+  "lighting": {
+    "direction": "Ambient flat lighting with local accent highlights.",
+    "softness": "Hard-edged flat pixel lighting without soft gradients.",
+    "contrast": "Moderate contrast between dark backgrounds and gold accent lights.",
+    "mood": "Muted nocturnal atmospheric tone."
+  },
+  "materials": {},
+  "character": {
+    "proportions": "Chibi 2-head-tall pixel sprite with blocky limbs.",
+    "silhouette": "Blocky, square-headed humanoid silhouette.",
+    "poseLanguage": "Frontal standing pose with rigid vertical stance.",
+    "clothing": "Dark uniform with gold belt, wide-brim hat, dark pants.",
+    "faceAbstraction": "Minimalist pixel face with simple dark eye pixels on pale square head."
+  },
+  "environment": {
+    "architecture": "Flat wooden-walled structures with simple rectangular cutouts and frames.",
+    "terrain": "Flat platform surface above dark gravel rail bed.",
+    "props": "Wooden benches, framed posters, circular lamp posts, railway lines.",
+    "textureDensity": "Low pixel texture density using solid fill blocks and flat shading."
+  },
+  "shapeLanguage": [
+    "Rectangular building modules and wide horizontal bands.",
+    "Simple triangles for distant peaks and posters.",
+    "Small circular accents for lights and clock icons."
+  ],
+  "constraints": [
+    "Use 2D side-view orthographic perspective for platformer alignment.",
+    "Maintain crisp pixel grid without anti-aliasing or smoothing filters.",
+    "Keep color palette constrained to defined flat tones and stepped shades.",
+    "Ensure character and interactive props contrast clearly against backgrounds."
+  ],
+  "styleReferences": [
+    {
+      "path": "style.png"
+    }
+  ],
+  "style": {
+    "id": "style",
+    "identity": [
+      "2D side-scrolling pixel art style",
+      "Post-apocalyptic wasteland and abandoned rail station theme",
+      "Low-resolution blocky sprites with clean flat shapes"
+    ],
+    "camera": {},
+    "composition": {},
+    "palette": [
+      "#1b2027",
+      "#2a3442",
+      "#4a3222",
+      "#2e3b4e",
+      "#3b4a5c",
+      "#6b4a33",
+      "#565b60",
+      "#4a6076",
+      "#8a6244",
+      "#7a7f84",
+      "#c98b5e",
+      "#9aa0a5",
+      "#d9a441",
+      "#e8c39e",
+      "#f2d98b",
+      "#e6e2d6"
+    ],
+    "lighting": {},
+    "shapeLanguage": [],
+    "material": [],
+    "environment": [],
+    "characterStyle": [],
+    "constraints": [
+      "Strict 2D side-view platformer layout.",
+      "Hard-edged pixel artwork with limited flat palette."
+    ],
+    "confidence": 0.95
+  }
+}

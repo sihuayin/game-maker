@@ -1,0 +1,33 @@
+{
+  "format": "assetpack-ledger/v1",
+  "packId": "wasteland-scavenger-recipe",
+  "packVersion": 2,
+  "createdAt": "2026-10-30T05:21:02.000Z",
+  "run": {
+    "wallClockMs": 3909,
+    "byStep": {
+      "master": {
+        "calls": 2,
+        "attempts": 6
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "master",
+      "target": "master-scavenger-hero",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 55,
+      "requestedModel": "stub"
+    },
+    {
+      "step": "master",
+      "target": "master-wasteland-patroller",
+      "attempts": 3,
+      "upstream": "openai",
+      "ms": 44,
+      "requestedModel": "stub"
+    }
+  ]
+}

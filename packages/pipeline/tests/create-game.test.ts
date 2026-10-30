@@ -9,7 +9,7 @@ import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { CommandError, DESIGN_ATTEMPTS_FILE, PLAYER_ACTION_NAMES, RUN_LEDGER_FORMAT, VISUAL_WORLD_ATTEMPTS_FILE, exitCodeOfError, parseAssetPlan, parseDesignAttempts, parseRecipe, parseVisualWorldAttempts, QA_JUDGEMENTS, qaVerdict, type AssetRecipe, type AssetSpec, type CharacterDNAFile, type QaContext, type QAReport, type StyleSpec } from "@game-maker/contracts";
 import { buildAssetPack, decodePNG, encodePNG, framePlan, verifyPack, type DrawListGenerator } from "@game-maker/assets";
-import { createGame, runBuild, runUnderstanding } from "../src/index.js";
+import { createGame, parseReusedConfig, runBuild, runUnderstanding } from "../src/index.js";
 import { CANNED, fakeUpstream, tinyPng } from "./upstream.js";
 
 const dirs: string[] = [];
@@ -135,6 +135,19 @@ describe("§第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15）", 
     expect(fs.existsSync(b.paths.packDir)).toBe(true);
     expect(b.manifest.id).toBe("wasteland");
     expect(b.config.scene.background.asset).toBe("bg-dusk");
+  });
+
+  it("parseReusedConfig：有效 config 通过；坏 schema / 缺 asset ⇒ invalid（票 21）", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    const cfg = readJson(b.paths.config);
+    const manifest = readJson(path.join(b.paths.packDir, "manifest.json"));
+    expect(() => parseReusedConfig(cfg, manifest as never)).not.toThrow();
+    expect(() => parseReusedConfig({ format: "x" }, manifest as never)).toThrow(/game-config/);
+    const bad = JSON.parse(JSON.stringify(cfg)) as { player: { asset: string } };
+    bad.player.asset = "missing-asset";
+    expect(() => parseReusedConfig(bad, manifest as never)).toThrow(/引用校验|包里没有/);
   });
 
   it("构建返回机制覆盖核心：config 层来自实际 config；probe 未执行（票 08）", async () => {

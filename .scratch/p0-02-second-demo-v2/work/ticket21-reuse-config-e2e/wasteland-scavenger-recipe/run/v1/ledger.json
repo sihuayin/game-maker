@@ -1,0 +1,285 @@
+{
+  "format": "run-ledger/v1",
+  "gameId": "wasteland-scavenger-recipe",
+  "runVersion": 1,
+  "createdAt": "2026-10-30T05:42:37.613Z",
+  "run": {
+    "wallClockMs": 6415,
+    "byStep": {
+      "analyze-reference": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "analyze-intent": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "compile-design": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "character-dna": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "plan-assets": {
+        "calls": 1,
+        "attempts": 1
+      },
+      "master": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "image": {
+        "calls": 12,
+        "attempts": 12
+      },
+      "drawlist": {
+        "calls": 2,
+        "attempts": 2
+      },
+      "compile-runtime": {
+        "calls": 1,
+        "attempts": 1
+      }
+    }
+  },
+  "calls": [
+    {
+      "step": "analyze-reference",
+      "target": "style",
+      "upstream": "messages",
+      "ms": 18729,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 3335,
+        "outputTokens": 1101,
+        "reasoningTokens": 1542
+      }
+    },
+    {
+      "step": "analyze-intent",
+      "target": "game-intent",
+      "upstream": "messages",
+      "ms": 16190,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 3008,
+        "outputTokens": 503,
+        "reasoningTokens": 2350
+      }
+    },
+    {
+      "step": "compile-design",
+      "target": "game-design",
+      "upstream": "messages",
+      "ms": 15796,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 4268,
+        "outputTokens": 766,
+        "reasoningTokens": 1956
+      }
+    },
+    {
+      "step": "character-dna",
+      "target": "character-dna",
+      "upstream": "messages",
+      "ms": 20503,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 2875,
+        "outputTokens": 644,
+        "reasoningTokens": 2075
+      }
+    },
+    {
+      "step": "plan-assets",
+      "target": "recipe",
+      "upstream": "messages",
+      "ms": 22024,
+      "attempts": 1,
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 7731,
+        "outputTokens": 1442,
+        "reasoningTokens": 2926
+      }
+    },
+    {
+      "step": "master",
+      "target": "master-scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 47391,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "master",
+      "target": "master-wasteland-patroller",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 42530,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 71548,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-patroller",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 70534,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-chest",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 63965,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-icon-scrap",
+      "upstream": "messages",
+      "ms": 16612,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 1368,
+        "outputTokens": 452,
+        "reasoningTokens": 2504
+      }
+    },
+    {
+      "step": "drawlist",
+      "target": "hud-panel",
+      "upstream": "messages",
+      "ms": 26035,
+      "attempts": 1,
+      "requestedModel": "gemini-3.5-flash",
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 1481,
+        "outputTokens": 1153,
+        "reasoningTokens": 4601
+      }
+    },
+    {
+      "step": "image",
+      "target": "wasteland-scraps",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 56754,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-platform-tile",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 48920,
+      "requestedSize": "aspect 1:1",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 35272,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-patroller",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 66051,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 49249,
+      "requestedSize": "aspect 3:4",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 48351,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "scavenger-hero",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 75447,
+      "requestedSize": "aspect 3:2",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 50468,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "image",
+      "target": "wasteland-bg",
+      "attempts": 1,
+      "upstream": "gemini",
+      "ms": 63429,
+      "requestedSize": "aspect 16:9",
+      "requestedModel": "gemini-3.1-flash-lite-image"
+    },
+    {
+      "step": "compile-runtime",
+      "target": "game-config",
+      "upstream": "messages",
+      "ms": 41883,
+      "attempts": 1,
+      "model": "gemini-3.6-flash",
+      "usage": {
+        "inputTokens": 5583,
+        "outputTokens": 883,
+        "reasoningTokens": 5895
+      }
+    }
+  ]
+}

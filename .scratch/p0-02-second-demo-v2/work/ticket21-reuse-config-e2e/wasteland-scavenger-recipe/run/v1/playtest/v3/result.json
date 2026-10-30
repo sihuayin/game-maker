@@ -1,0 +1,178 @@
+{
+  "reportVersion": "playtest-report/v1",
+  "identity": {
+    "scenarioFormatVersion": "playtest-scenario/v1",
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "packChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+    "shellVersion": "2",
+    "harnessVersion": "playtest-harness/v2",
+    "rulesVersion": "playtest-rules/v2"
+  },
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/site/v1 --scenario-dir /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/playtest/.tmp-13847-1793335751533/scenarios --out /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/playtest/.tmp-13847-1793335751533/harness",
+  "exitCode": 0,
+  "startedAt": "2026-10-30T04:49:12.603Z",
+  "finishedAt": "2026-10-30T04:49:31.409Z",
+  "execution": "executed",
+  "scenarios": [
+    {
+      "scenarioId": "success-basic",
+      "scenarioVersion": 1,
+      "required": true,
+      "harnessCondition": "none",
+      "expectedOutcome": "SUCCESS",
+      "baselineEligible": true,
+      "execution": "executed",
+      "terminationReached": true,
+      "assertions": [
+        {
+          "id": "initial-pickups",
+          "kind": "state",
+          "requires": [
+            "initialActivePickups"
+          ],
+          "result": "pass",
+          "observed": 4,
+          "expect": {
+            "kind": "state",
+            "path": "initialActivePickups",
+            "op": "eq",
+            "value": 4
+          },
+          "withinMs": 45000,
+          "evidence": []
+        },
+        {
+          "id": "all-collected",
+          "kind": "state",
+          "requires": [
+            "collected"
+          ],
+          "result": "pass",
+          "observed": 6,
+          "expect": {
+            "kind": "state",
+            "path": "collected",
+            "op": "eq",
+            "value": 6
+          },
+          "withinMs": 45000,
+          "evidence": []
+        },
+        {
+          "id": "won",
+          "kind": "state",
+          "requires": [
+            "won"
+          ],
+          "result": "pass",
+          "observed": true,
+          "expect": {
+            "kind": "state",
+            "path": "won",
+            "op": "eq",
+            "value": true
+          },
+          "withinMs": 45000,
+          "evidence": []
+        }
+      ],
+      "assertionAggregate": "pass",
+      "endState": {
+        "collected": 6,
+        "won": true,
+        "hits": 0,
+        "chestsOpened": 2,
+        "activePickups": 0,
+        "playerX": 1369.5
+      },
+      "initialState": {
+        "collected": 0,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 4,
+        "playerX": 40
+      },
+      "actions": [
+        {
+          "kind": "move_to",
+          "outcome": "completed",
+          "durationMs": 17300,
+          "steps": 451
+        },
+        {
+          "kind": "wait_until",
+          "outcome": "completed",
+          "durationMs": 1,
+          "steps": 452
+        }
+      ],
+      "outcome": "SUCCESS",
+      "comparableEvents": [
+        "pickup",
+        "win",
+        "chest-open"
+      ],
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 4,
+        "win": 1,
+        "chest-open": 2,
+        "danger-hit": 0,
+        "danger-erupt": 0,
+        "land": 10,
+        "jump": 10,
+        "reset": 0,
+        "runtime-error": 0
+      },
+      "evidence": [
+        "playtest-success-basic-events",
+        "playtest-success-basic-trace",
+        "playtest-success-basic-input",
+        "playtest-success-basic-console",
+        "playtest-success-basic-exceptions"
+      ],
+      "durationMs": 17676,
+      "steps": 453
+    }
+  ],
+  "aggregate": "SUCCESS",
+  "runtime": {
+    "pollIntervalMs": 50,
+    "stepDelayMs": 35,
+    "scenarioTimeoutMs": 45000,
+    "viewport": {
+      "w": 1000,
+      "h": 600
+    },
+    "deviceScaleFactor": 1,
+    "chromeFlags": [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-background-timer-throttling",
+      "--disable-renderer-backgrounding",
+      "--disable-backgrounding-occluded-windows",
+      "--hide-scrollbars",
+      "--window-size=1000,600"
+    ]
+  },
+  "evidence": [
+    "playtest-result",
+    "playtest-site-integrity",
+    "playtest-chrome",
+    "playtest-success-basic-events",
+    "playtest-success-basic-trace",
+    "playtest-success-basic-input",
+    "playtest-success-basic-console",
+    "playtest-success-basic-exceptions"
+  ]
+}

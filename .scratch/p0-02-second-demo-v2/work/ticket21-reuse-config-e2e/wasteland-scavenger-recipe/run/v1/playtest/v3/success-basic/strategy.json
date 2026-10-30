@@ -1,0 +1,107 @@
+{
+  "stop": null,
+  "limits": {
+    "NO_PROGRESS_STEPS": 300,
+    "RESET_BUDGET": 5,
+    "WAIT_STEPS": 120,
+    "JUMP_VERIFY_STEPS": 3,
+    "JUMP_UNVERIFIED_BUDGET": 3,
+    "JUMP_FAILURE_BUDGET": 5
+  },
+  "progress": {
+    "maxX": 1369.5,
+    "collected": 6,
+    "chests": 2,
+    "gate": true,
+    "won": true
+  },
+  "noProgressSteps": 1,
+  "resets": 0,
+  "waits": 0,
+  "jump": {
+    "failures": 0,
+    "unverified": 0,
+    "degraded": false,
+    "pending": null
+  },
+  "lastObservation": {
+    "x": 1369.5,
+    "bottom": 240,
+    "onFloor": true,
+    "vy": 0,
+    "collected": 6,
+    "won": true
+  },
+  "notes": [
+    {
+      "step": 52,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 51
+      }
+    },
+    {
+      "step": 136,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 135
+      }
+    },
+    {
+      "step": 171,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 170
+      }
+    },
+    {
+      "step": 192,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 191
+      }
+    },
+    {
+      "step": 253,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 252
+      }
+    },
+    {
+      "step": 272,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 271
+      }
+    },
+    {
+      "step": 291,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 290
+      }
+    },
+    {
+      "step": 317,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 316
+      }
+    },
+    {
+      "step": 341,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 340
+      }
+    },
+    {
+      "step": 362,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 361
+      }
+    }
+  ]
+}
