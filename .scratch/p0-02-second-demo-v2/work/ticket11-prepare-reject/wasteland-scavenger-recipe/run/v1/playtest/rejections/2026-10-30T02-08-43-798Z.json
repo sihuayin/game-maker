@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-30T02:08:43.798Z",
+  "reason": "站点配置不存在：wasteland-scavenger-recipe/site/v1/game-config.json",
+  "runDir": "wasteland-scavenger-recipe/run/v1",
+  "invalidation": {
+    "record": "wasteland-scavenger-recipe/run/v1/playtest/invalidations/2026-10-30T02-08-43-798Z.json",
+    "before": {
+      "playableSmoke": "pass",
+      "verdict": "pass",
+      "playtestReport": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "playtestRefs": [
+        "playtest-result",
+        "playtest-site-integrity",
+        "playtest-chrome",
+        "playtest-acceptance-win-wasteland-v1-events",
+        "playtest-acceptance-win-wasteland-v1-trace",
+        "playtest-acceptance-win-wasteland-v1-input",
+        "playtest-acceptance-win-wasteland-v1-console",
+        "playtest-acceptance-win-wasteland-v1-exceptions"
+      ]
+    },
+    "after": {
+      "playableSmoke": "blocked",
+      "verdict": "blocked"
+    }
+  }
+}

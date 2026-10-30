@@ -1,0 +1,65 @@
+{
+  "format": "evidence-acceptance-run/v1",
+  "generatedAt": "2026-10-30T01:34:33.565Z",
+  "command": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --out .scratch/p0-02-second-demo-v2/runs/evidence --json",
+  "manifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "manifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "exitCode": 0,
+  "durationMs": 1682,
+  "reportDir": ".scratch/p0-02-second-demo-v2/runs/evidence/2026-10-30T01-34-33-546Z-delivery-verification",
+  "reportSha256": "sha256:6ba5bdf6fa48a187404c89e862ffbbcac49a1716e88f06cf7b6e225af3f469b4",
+  "reportJsonBytes": 139125,
+  "files": {
+    "total": 223,
+    "required": 151,
+    "optional": 72
+  },
+  "records": 13,
+  "manifestFiles": 223,
+  "manifestBytes": 20207992,
+  "status": "pass",
+  "declaredVerdict": "pass",
+  "recomputedVerdict": "pass",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "config",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "qa",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "site",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "playable-smoke",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "visual-review",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    }
+  ],
+  "diagnostics": 0,
+  "pass": true,
+  "problems": [],
+  "stderr": null
+}

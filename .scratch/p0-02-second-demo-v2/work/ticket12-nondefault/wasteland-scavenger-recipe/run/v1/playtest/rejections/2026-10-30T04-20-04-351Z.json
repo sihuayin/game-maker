@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-30T04:20:04.351Z",
+  "reason": "默认五态场景只服务 wasteland-scavenger-recipe v1；当前 pack=other-demo v1、site=v1、pickup=4、chest=2（config=wasteland-scavenger-recipe/site/v1/game-config.json）。请用 --scenario-dir 提供本 Demo 的必需场景（至少含 siteVersion 与 initialActivePickups 断言）。",
+  "runDir": "wasteland-scavenger-recipe/run/v1",
+  "invalidation": {
+    "record": "wasteland-scavenger-recipe/run/v1/playtest/invalidations/2026-10-30T04-20-04-350Z.json",
+    "before": {
+      "playableSmoke": "pass",
+      "verdict": "pass",
+      "playtestReport": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "playtestRefs": [
+        "playtest-result",
+        "playtest-site-integrity",
+        "playtest-chrome",
+        "playtest-acceptance-win-wasteland-v1-events",
+        "playtest-acceptance-win-wasteland-v1-trace",
+        "playtest-acceptance-win-wasteland-v1-input",
+        "playtest-acceptance-win-wasteland-v1-console",
+        "playtest-acceptance-win-wasteland-v1-exceptions"
+      ]
+    },
+    "after": {
+      "playableSmoke": "blocked",
+      "verdict": "blocked"
+    }
+  }
+}

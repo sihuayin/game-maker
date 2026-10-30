@@ -37,7 +37,7 @@ import crypto from "node:crypto";
 import { z } from "zod";
 import {
   CommandError, deriveDeliveryVerdict, mapPlaytest, playtestSummaryOf, playtestProjectionOf, samePlaytestProjection, qaVerdict,
-  QAReportSchema, PlaytestReportSchema,
+  QAReportSchema, PlaytestReportSchema, MechanicCoverageReportSchema,
   type DeliveryCheckStatus, type QAReport,
 } from "@game-maker/contracts";
 import { verifyPack } from "@game-maker/assets";
@@ -69,7 +69,7 @@ export const EvidenceManifestRecordSchema = z.strictObject({
 });
 export type EvidenceManifestRecord = z.infer<typeof EvidenceManifestRecordSchema>;
 
-const ManifestSubjectSchema = z.strictObject({
+export const ManifestSubjectSchema = z.strictObject({
   packId: z.string().min(1),
   packVersion: z.number().int().positive(),
   siteVersion: z.number().int().positive(),
@@ -959,6 +959,45 @@ function visualConsistency(index: Index, records: JsonRecord[]): { results: Cons
   return { results, diagnostics };
 }
 
+/** 机制覆盖报告 v2 的内容核验（P0-02 v2 票 02 Q8）：
+ *   记录存在时，必须 `probe.executed=true`、`verdict=satisfied`，且 subject 与清单 subject 六字段一致。
+ *   ⚠️ 记录**缺席**时不在这里判失败：历史清单没有这个角色，强制要求会把历史验收一并打红；
+ *      正式清单生成器（票 13）负责把 required record 写进去。 */
+function mechanicCoverageConsistency(
+  records: JsonRecord[], subject: ManifestSubject,
+): { results: ConsistencyResult[]; diagnostics: Array<{ rule: string; message: string; status: "fail" | "blocked" }> } {
+  const rec = records.find((r) => r.record.role === "mechanic-coverage");
+  if (rec === undefined) return { results: [], diagnostics: [] };
+  const tag = `${rec.record.root}:${rec.record.path}`;
+  const blocked = (detail: string) => ({
+    results: [{ id: "mechanic-coverage", rule: "机制覆盖报告", status: "blocked" as const, detail }],
+    diagnostics: [{ rule: "mechanic-coverage.blocked", message: detail, status: "blocked" as const }],
+  });
+  const fail = (detail: string) => ({
+    results: [{ id: "mechanic-coverage", rule: "机制覆盖报告", status: "fail" as const, detail }],
+    diagnostics: [{ rule: "mechanic-coverage.fail", message: detail, status: "fail" as const }],
+  });
+  if (rec.file.status === "missing" || rec.file.status === "unreadable" || rec.file.status === "optional-missing")
+    return blocked(`${tag}：${rec.file.status}`);
+  if (rec.file.status !== "verified") return fail(`${tag}：${rec.file.status}`);
+  if (rec.parseError !== undefined || rec.readError !== undefined)
+    return fail(`${tag}：${rec.parseError ?? rec.readError}`);
+  if (rec.json === undefined) return blocked(`${tag}：不可读`);
+  const parsed = MechanicCoverageReportSchema.safeParse(rec.json);
+  if (!parsed.success)
+    return fail(`${tag} 不过 mechanic-coverage/v2：${parsed.error.issues.slice(0, 3).map((i) => i.message).join("；")}`);
+  const r = parsed.data;
+  const problems: string[] = [];
+  if (!r.probe.executed) problems.push("probe.executed=false");
+  if (r.verdict !== "satisfied") problems.push(`verdict=${r.verdict}`);
+  const fields = ["packId", "packVersion", "siteVersion", "shellVersion", "manifestChecksum", "configChecksum"] as const;
+  for (const f of fields)
+    if (String(r.subject[f]) !== String(subject[f]))
+      problems.push(`${f} 不一致：报告 ${String(r.subject[f])} / 清单 ${String(subject[f])}`);
+  if (problems.length > 0) return fail(`${tag}：${problems.join("；")}`);
+  return { results: [{ id: "mechanic-coverage", rule: "机制覆盖报告", status: "verified" }], diagnostics: [] };
+}
+
 function recomputeChecks(opts: {
   manifest: EvidenceManifest;
   index: Index;
@@ -1195,11 +1234,12 @@ export function verifyDeliveryEvidence(manifestPath: string): DeliveryVerificati
   const references = reportReferences(index, qa);
   const visual = visualConsistency(index, records);
   const play = playtestConsistency(records, qa);
+  const coverage = mechanicCoverageConsistency(records, manifest.subject);
   const recompute = recomputeChecks({ manifest, index, qa, records });
 
   // 一致性状态
-  const consistencyAll = [...three.results, ...site.results, ...references.results, ...visual.results, ...play.results];
-  const consistencyDiagnostics = [...three.diagnostics, ...site.diagnostics, ...references.diagnostics, ...visual.diagnostics, ...play.diagnostics];
+  const consistencyAll = [...three.results, ...site.results, ...references.results, ...visual.results, ...play.results, ...coverage.results];
+  const consistencyDiagnostics = [...three.diagnostics, ...site.diagnostics, ...references.diagnostics, ...visual.diagnostics, ...play.diagnostics, ...coverage.diagnostics];
   const consistencyStatus: DeliveryCheckStatus = consistencyDiagnostics.some((d) => d.status === "fail") || consistencyAll.some((r) => r.status === "fail")
     ? "fail" : consistencyDiagnostics.some((d) => d.status === "blocked") || consistencyAll.some((r) => r.status === "blocked") ? "blocked" : "pass";
 

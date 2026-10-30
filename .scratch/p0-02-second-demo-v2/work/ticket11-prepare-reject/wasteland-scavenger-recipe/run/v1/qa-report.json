@@ -1,0 +1,142 @@
+{
+  "format": "qa-report/v1",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+  },
+  "checked": [
+    "palette-binding",
+    "constructive-constraint",
+    "layer-coverage",
+    "reference-resolution",
+    "reachability",
+    "intent-coverage",
+    "visual-config-coherence"
+  ],
+  "failures": [
+    {
+      "target": "wasteland-patroller",
+      "detail": "视觉设计里 \"wasteland-patroller\" 的构图为 16×16，配置几何为 24×32 —— 尺寸有差（只报、不阻断）",
+      "severity": "warning",
+      "judgement": "visual-config-coherence"
+    },
+    {
+      "target": "wasteland-chest",
+      "detail": "视觉设计里 \"wasteland-chest\" 的构图为 16×16，配置几何为 32×32 —— 尺寸有差（只报、不阻断）",
+      "severity": "warning",
+      "judgement": "visual-config-coherence"
+    }
+  ],
+  "observations": [
+    {
+      "source": "inspect",
+      "outcome": "ok",
+      "lines": [
+        "wasteland-scavenger-recipe v1 · generated",
+        "8 个资源 · 4 张图集",
+        "  scavenger-hero · animation · 24×32 · generated/quantized · 10 帧 · 动画 idle(4) run(4) jump(2) · 用色 11/16",
+        "  wasteland-patroller · animation · 24×32 · generated/quantized · 6 帧 · 动画 walk(4) idle(2) · 用色 10/16",
+        "  wasteland-chest · sprite · 32×32 · generated/quantized · 1 帧 · 用色 13/16",
+        "  wasteland-scraps · sprite · 16×16 · generated/quantized · 1 帧 · 用色 15/16",
+        "  wasteland-platform-tile · sprite · 32×32 · generated/quantized · 1 帧 · 用色 10/16",
+        "  wasteland-bg · background · 480×270 · generated/quantized · 4 帧 · 用色 15/16",
+        "  hud-panel · ui · 64×64 · generated/exact · 1 帧 · 用色 11/16",
+        "  hud-icon-scrap · ui · 16×16 · generated/exact · 1 帧 · 用色 10/16",
+        "源图 / 目标尺寸（**观察，不是判据** —— 顺序始终源图 → 目标）：",
+        "  scavenger-hero.idle            源图 896×1200 (0.747) → 目标 48×64 (0.750) · 长宽比差 +0.4%",
+        "  scavenger-hero.run             源图 742×1032 (0.719) → 目标 48×64 (0.750) · 长宽比差 +4.3%",
+        "  scavenger-hero.jump            源图 867×519 (1.671) → 目标 48×32 (1.500) · 长宽比差 -10.2%",
+        "  wasteland-patroller.walk       源图 670×1059 (0.633) → 目标 48×64 (0.750) · 长宽比差 +18.5%",
+        "  wasteland-patroller.idle       源图 927×670 (1.384) → 目标 48×32 (1.500) · 长宽比差 +8.4%",
+        "  wasteland-chest                源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+        "  wasteland-scraps               源图 1024×1024 (1.000) → 目标 16×16 (1.000) · 长宽比差 0.0%",
+        "  wasteland-platform-tile        源图 1024×1024 (1.000) → 目标 32×32 (1.000) · 长宽比差 0.0%",
+        "  wasteland-bg.sky               源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  wasteland-bg.ruins             源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  wasteland-bg.wall              源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  wasteland-bg.railway           源图 1376×768 (1.792) → 目标 480×270 (1.778) · 长宽比差 -0.8%",
+        "  master-scavenger-hero          源图 896×1200 (0.747) → 目标 24×32 (0.750) · 长宽比差 +0.4%",
+        "  master-wasteland-patroller     源图 896×1200 (0.747) → 目标 24×32 (0.750) · 长宽比差 +0.4%",
+        "背景层：整帧有多少像素是真画了东西的（**只报数** —— 层覆盖是一条判据，判决在 QA 那边）：",
+        "  wasteland-bg.sky         480×270  100.0%",
+        "  wasteland-bg.ruins       480×270  58.5%",
+        "  wasteland-bg.wall        480×270  45.1%",
+        "  wasteland-bg.railway     480×270  41.0%",
+        "色板 16 色 · 交付态实际用到的像素分布（**观察，不是判据**）：",
+        "  #1b2027 · 8/8 个资源用到 · 占全部不透明像素 24.9%",
+        "  #2a3442 · 8/8 个资源用到 · 占全部不透明像素 7.7%",
+        "  #4a3222 · 7/8 个资源用到 · 占全部不透明像素 7.3%",
+        "  #2e3b4e · 7/8 个资源用到 · 占全部不透明像素 6.2%",
+        "  #3b4a5c · 8/8 个资源用到 · 占全部不透明像素 5.7%",
+        "  #6b4a33 · 8/8 个资源用到 · 占全部不透明像素 10.8%",
+        "  #565b60 · 6/8 个资源用到 · 占全部不透明像素 10.9%",
+        "  #4a6076 · 2/8 个资源用到 · 占全部不透明像素 6.5%",
+        "  #8a6244 · 8/8 个资源用到 · 占全部不透明像素 3.6%",
+        "  #7a7f84 · 6/8 个资源用到 · 占全部不透明像素 7.9%",
+        "  #c98b5e · 8/8 个资源用到 · 占全部不透明像素 1.4%",
+        "  #9aa0a5 · 4/8 个资源用到 · 占全部不透明像素 6.6%",
+        "  #d9a441 · 5/8 个资源用到 · 占全部不透明像素 0.3%",
+        "  #e8c39e · 4/8 个资源用到 · 占全部不透明像素 0.1%",
+        "  #f2d98b · 4/8 个资源用到 · 占全部不透明像素 0.1%",
+        "  #e6e2d6 · 2/8 个资源用到 · 占全部不透明像素 0.0%",
+        "色板外像素 0 个 · 占全部不透明像素 0.00%（**观察，不是判据** —— 对不上可以是设计）"
+      ]
+    },
+    {
+      "source": "review",
+      "outcome": "unavailable",
+      "reason": "这次创建链没有跑 `reviewPack`（它是**人工主动调用的诊断命令** —— `game-maker review <run 目录>` 那一支，**不由创建链自动调用**；而执行它还会产生**一次视觉调用**的成本） —— 没有可原样搬来的观察，而**空不等于「比过了、没差异」**"
+    }
+  ],
+  "delivery": {
+    "runId": "wasteland-scavenger-recipe/run/v1",
+    "pack": {
+      "packId": "wasteland-scavenger-recipe",
+      "packVersion": 1,
+      "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+    },
+    "config": {
+      "file": "wasteland-scavenger-recipe/run/v1/game-config.json"
+    },
+    "site": {
+      "version": 1,
+      "shell": "2"
+    },
+    "checks": [
+      {
+        "key": "asset-pack",
+        "status": "pass"
+      },
+      {
+        "key": "config",
+        "status": "pass"
+      },
+      {
+        "key": "qa",
+        "status": "pass"
+      },
+      {
+        "key": "site",
+        "status": "pass"
+      },
+      {
+        "key": "playable-smoke",
+        "status": "blocked",
+        "detail": "旧试玩结果已撤销：新的 attempt 正在进行"
+      },
+      {
+        "key": "visual-review",
+        "status": "pass"
+      }
+    ],
+    "verdict": "blocked",
+    "visualReview": {
+      "status": "pass",
+      "reviewer": "人（本次会话用户）",
+      "reviewedAt": "2026-10-28T08:12:51.004Z",
+      "note": "P0-06 六项人工对照通过：整体风格 / 色彩与明暗 / 角色 / 场景 / 关键物件 / 实际运行效果。材料绑定 pack/v1 · site/v1 · shell 2，真实按键通关截图 9 张（0 reset、站点字节未改），见 runs/2026-10-28-visual-review/。"
+    },
+    "evidence": []
+  }
+}

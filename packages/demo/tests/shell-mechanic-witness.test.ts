@@ -66,6 +66,13 @@ describe("§见证：机制词表的 `supported` 逐条指得到外壳的一行"
     }
   });
 
+  it("hazard 命中计数在 overlap 分支递增，READ_STATE 暴露 hits（P0-02 v2 票 03）", () => {
+    const scene = stripComments(read("../src/shell/scene.ts"));
+    expect(scene).toContain("hazard.hits += 1");
+    const harness = stripComments(read("../probe/probe-harness.mjs"));
+    expect(harness).toContain("hits: h.hits ?? 0");
+  });
+
   it("`moving-platform` 推导为 `experimental`（它是**唯一**声明了却没有运行时实现的那条）", () => {
     expect(deriveMechanicStatus("moving-platform")).toBe("experimental");
     expect(RUNTIME_IMPLEMENTED_MECHANICS).not.toContain("moving-platform");

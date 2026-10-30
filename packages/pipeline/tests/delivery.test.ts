@@ -194,33 +194,13 @@ describe("writeVisualReviewToReport（票 10：视觉评审写回）", () => {
     expect(d.site).toEqual({ version: 1, shell: "2" }); // 站点身份没动
   });
 
-  it("缺 delivery：初始化一份（不伪造站点版本），QA 层保留", () => {
+  it("缺 delivery ⇒ 拒绝（票 04：不再初始化交付结论）", () => {
     const out = tmp();
     const runDir = runDirOf(out);
     fs.mkdirSync(runDir, { recursive: true });
     fs.writeFileSync(path.join(runDir, "qa-report.json"), JSON.stringify(qaReport(), null, 2) + "\n"); // 无 delivery
 
-    writeVisualReviewToReport({ outRoot: out, runDir, review: { status: "fail", note: "参考风格对不上" } });
-
-    const raw = JSON.parse(fs.readFileSync(path.join(runDir, "qa-report.json"), "utf8")) as Record<string, unknown>;
-    const d = raw.delivery as Record<string, unknown>;
-    expect(d).toBeDefined();
-    expect((d.visualReview as Record<string, unknown>).status).toBe("fail");
-    expect(d.site).toBeUndefined(); // 不伪造站点版本
-    expect((d.checks as Array<Record<string, unknown>>).find((c) => c.key === "site")!.status).toBe("incomplete");
-    expect((d.checks as Array<Record<string, unknown>>).find((c) => c.key === "visual-review")!.status).toBe("fail");
-    expect(d.verdict).toBe("fail"); // 视觉明确不通过 = fail
-  });
-
-  it("报告没有 subject → 拒绝（无法初始化）", () => {
-    const out = tmp();
-    const runDir = runDirOf(out);
-    fs.mkdirSync(runDir, { recursive: true });
-    const noSubject = qaReport();
-    delete noSubject.subject;
-    fs.writeFileSync(path.join(runDir, "qa-report.json"), JSON.stringify(noSubject, null, 2) + "\n");
-
-    expect(() => writeVisualReviewToReport({ outRoot: out, runDir, review: { status: "pass" } })).toThrow();
+    expect(() => writeVisualReviewToReport({ outRoot: out, runDir, review: { status: "fail", note: "参考风格对不上" } })).toThrow(/delivery/);
   });
 
   it("原子替换：写完后没有 .tmp 残留", () => {
@@ -228,6 +208,10 @@ describe("writeVisualReviewToReport（票 10：视觉评审写回）", () => {
     const runDir = runDirOf(out);
     fs.mkdirSync(runDir, { recursive: true });
     fs.writeFileSync(path.join(runDir, "qa-report.json"), JSON.stringify(qaReport(), null, 2) + "\n");
+    writeDeliveryToReport(runDir, buildSiteSuccessDelivery({
+      outRoot: out, runDir, packDir: PACK, manifest: manifest(), configPath: configPathOf(out),
+      siteVersion: 1, shellVersion: "2",
+    }));
 
     writeVisualReviewToReport({ outRoot: out, runDir, review: { status: "pass" } });
 

@@ -100,6 +100,7 @@ export * from "./game-design.js";
 export * from "./intent-coverage.js";
 // ⚠️ 机制覆盖报告（票 07）—— 三层矩阵 + 门禁，独立于六判据。
 export * from "./mechanic-coverage.js";
+export * from "./visual-review-record.js";
 // ⚠️ 角色基因（票 04）—— 落 `run/v<N>/character-dna.json`，**不交付**。
 //   它的消费者是 R13 的资源级重生成：没有它，修复会**静默换掉角色**。
 export * from "./character-dna.js";

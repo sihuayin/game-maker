@@ -1,0 +1,102 @@
+{
+  "format": "mechanic-coverage/v2",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+  },
+  "mechanics": [
+    {
+      "mechanic": "run",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "config": {
+        "status": "satisfied",
+        "requiredEntityKinds": [],
+        "found": {}
+      },
+      "qa": "not-tested"
+    },
+    {
+      "mechanic": "jump",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "config": {
+        "status": "satisfied",
+        "requiredEntityKinds": [],
+        "found": {}
+      },
+      "qa": "not-tested"
+    },
+    {
+      "mechanic": "collect-pickup",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "config": {
+        "status": "satisfied",
+        "requiredEntityKinds": [
+          "pickup"
+        ],
+        "found": {
+          "pickup": 4
+        }
+      },
+      "qa": "satisfied"
+    },
+    {
+      "mechanic": "open-chest",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "config": {
+        "status": "satisfied",
+        "requiredEntityKinds": [
+          "chest"
+        ],
+        "found": {
+          "chest": 2
+        }
+      },
+      "qa": "satisfied"
+    },
+    {
+      "mechanic": "avoid-danger",
+      "design": "satisfied",
+      "runtime": "satisfied",
+      "config": {
+        "status": "satisfied",
+        "requiredEntityKinds": [
+          "danger",
+          "hazard"
+        ],
+        "found": {
+          "danger": 0,
+          "hazard": 2
+        }
+      },
+      "qa": "satisfied"
+    }
+  ],
+  "probe": {
+    "executed": true,
+    "ranAt": "2026-10-30T00:51:21.879Z",
+    "summaryPath": "mechanic-probe/summary.json",
+    "results": [
+      {
+        "mechanic": "collect-pickup",
+        "passed": true
+      },
+      {
+        "mechanic": "open-chest",
+        "passed": true
+      },
+      {
+        "mechanic": "avoid-danger",
+        "passed": true
+      }
+    ]
+  },
+  "verdict": "satisfied"
+}

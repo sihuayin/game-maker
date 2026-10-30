@@ -1,0 +1,76 @@
+{
+  "format": "p0-02-v2-stage-a-verdict/v1",
+  "at": "2026-10-30T04:55:00.000Z",
+  "head": "f0411e676309fede8f20b79d9f8e44e5ac479ef6",
+  "sourceState": "uncommitted-working-tree",
+  "stageA": "closed_with_known_limitations",
+  "gaps": [
+    { "id": "G3-2/G4-2", "status": "closed", "evidence": "research/08-coverage-gate-evidence.md" },
+    { "id": "G3-5/G4-1", "status": "closed", "evidence": "research/09-hazard-assertion-evidence.md" },
+    { "id": "G3-9/G5-2-identity", "status": "closed", "evidence": "research/10-writeback-identity-evidence.md" },
+    { "id": "G3-9/G5-2-rerun", "status": "closed", "evidence": "research/11-rerun-revocation-evidence.md" },
+    { "id": "G2-2", "status": "closed", "evidence": "research/14-playtest-v2-writeback-e3.md" },
+    { "id": "G3-3", "status": "closed", "evidence": "research/12-default-scenario-evidence.md" },
+    { "id": "G5-3", "status": "closed", "evidence": "research/13-manifest-production-evidence.md" }
+  ],
+  "regression": {
+    "test": { "exit": 0, "files": 155, "tests": 2279, "durationSeconds": 30 },
+    "typecheck": { "exit": 0, "durationSeconds": 10 },
+    "evidenceAcceptance": { "exit": 0, "files": 223, "records": 13, "diagnostics": 0, "durationSeconds": 2 }
+  },
+  "freeze": {
+    "snapshot": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe",
+    "files": 112,
+    "hashes": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+    "readOnly": true,
+    "identity": {
+      "packId": "wasteland-scavenger-recipe",
+      "packVersion": 1,
+      "siteVersion": 1,
+      "shellVersion": "2",
+      "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+      "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "playtestReport": "wasteland-scavenger-recipe/run/v1/playtest/v3/result.json",
+      "harnessVersion": "playtest-harness/v2",
+      "rulesVersion": "playtest-rules/v2",
+      "verdict": "pass"
+    }
+  },
+  "manifest": {
+    "path": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+    "sha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "files": 231,
+    "required": 137,
+    "records": 6
+  },
+  "verifyDelivery": {
+    "status": "pass",
+    "exit": 0,
+    "diagnostics": { "fail": 0, "blocked": 0 },
+    "report": ".scratch/p0-02-second-demo-v2/runs/final-verify/2026-10-30T04-54-52-237Z-delivery-verification/report.json"
+  },
+  "history": {
+    "oldWork": "unchanged",
+    "frozenSnapshot": "unchanged",
+    "oldEffort": "not-written",
+    "committed": false,
+    "pushed": false
+  },
+  "paidCalls": 0,
+  "stageB": {
+    "ticket": "16-stage-b-start-gate",
+    "status": "unlocked_but_not_authorized",
+    "paidExecutionAuthorized": false
+  },
+  "limitations": [
+    "E3 仅覆盖冻结 wasteland Demo，不外推到第二个 Demo",
+    "阶段 A 不做新人工视觉；visual-review 为旧记录历史身份绑定",
+    "create/build 写盘路径无真实 E3（避免触碰付费生成链）",
+    "无结果/硬崩溃撤销仅单元测试覆盖",
+    "probe 使用 last-train 夹具；冻结脚本使用只读快照原样 config",
+    "verify-delivery mechanic-coverage 核验仅在清单声明该 record 时生效",
+    "最终清单含旧 work 94 个 optional 历史材料",
+    "默认场景身份不检测同版本内容漂移",
+    "阶段 A 清单未接入 test:evidence / CI"
+  ]
+}

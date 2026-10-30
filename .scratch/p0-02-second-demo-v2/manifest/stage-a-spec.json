@@ -1,0 +1,104 @@
+{
+  "format": "delivery-evidence-manifest-spec/v1",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+  },
+  "roots": {
+    "out": "../work",
+    "fa04": "../../fpvs-v1-final/runs/2026-10-28-visual-review",
+    "oldWork": "../../fpvs-v1-final/work"
+  },
+  "entries": [
+    {
+      "kind": "dir",
+      "root": "out",
+      "path": "wasteland-scavenger-recipe",
+      "role": "delivery",
+      "required": true,
+      "excludeExt": [
+        ".log"
+      ],
+      "excludeDirs": []
+    },
+    {
+      "kind": "dir",
+      "root": "fa04",
+      "path": ".",
+      "role": "visual-evidence",
+      "required": true,
+      "excludeExt": [
+        ".log"
+      ],
+      "excludeDirs": []
+    },
+    {
+      "kind": "file",
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/chrome.log",
+      "role": "playtest",
+      "required": false
+    },
+    {
+      "kind": "dir",
+      "root": "oldWork",
+      "path": "wasteland-scavenger-recipe",
+      "role": "old-work",
+      "required": false,
+      "excludeExt": [
+        ".log"
+      ],
+      "excludeDirs": []
+    }
+  ],
+  "records": [
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/qa-report.json",
+      "role": "qa-report",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "role": "playtest-result",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/mechanic-coverage.json",
+      "role": "mechanic-coverage",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa04",
+      "path": "review-record.json",
+      "role": "visual-review",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa04",
+      "path": "materials.json",
+      "role": "visual-materials",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa04",
+      "path": "capture.json",
+      "role": "visual-capture",
+      "required": true,
+      "identity": true
+    }
+  ],
+  "generatedBy": "p0-02-second-demo-v2 stage A spec",
+  "note": "阶段 A 正式清单：冻结 wasteland Demo + 覆盖报告 + 旧 fa04 视觉记录（历史身份绑定，不重新审核）"
+}

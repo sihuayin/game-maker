@@ -14,5 +14,8 @@ export * from "./publish-gate.js";
 export * from "./review.js";
 export * from "./delivery.js";
 export * from "./playtest.js";
+export * from "./playtest-invalidation.js";
 export * from "./playtest-baseline.js";
 export * from "./evidence-integrity.js";
+export * from "./evidence-manifest.js";
+export * from "./mechanic-coverage.js";

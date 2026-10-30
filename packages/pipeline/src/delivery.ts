@@ -10,11 +10,13 @@
 //   站点确定性失败由壳 catch 后落 `delivery`。pack/config 生成失败**不强行造报告**（没有 QA 报告可并）。
 //
 // ⚠️ **收尾异常不覆盖原始失败**：写 `delivery` 失败只记日志、不掩盖原来的 QA/站点失败（票 04 Q4 末行）。
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import {
   applyVisualReview, buildDeliveryReport, CommandError, DELIVERY_CHECK_LABELS, QAReportSchema, qaVerdict, visualReviewToCheck,
   type AssetPackManifest, type DeliveryCheckKey, type DeliveryReport, type DeliveryVisualReview, type QAReport,
+  type VisualReviewRecord,
 } from "@game-maker/contracts";
 import { RUN_ARTIFACT, writeJson } from "./artifacts.js";
 import { manifestChecksumOf } from "./publish-gate.js";
@@ -144,10 +146,12 @@ export function tryWriteDelivery(runDir: string, delivery: DeliveryReport): bool
 //   不同：它**不整体重写** `delivery`，而是**只动视觉评审那三处**（`visualReview` 对象、`visual-review`
 //   检查项、`verdict`）—— 其余字段（身份/站点/证据/已知限制）原样保留，QA 层更是一个字都不碰。
 
+const sha256File = (p: string): string => `sha256:${crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex")}`;
+
 /**
  * 把一次视觉评审并进 `run/v<N>/qa-report.json`：
- *   · 已有 `delivery` → `applyVisualReview`（只改视觉评审三处）；
- *   · 没有 `delivery` → 初始化一份（身份从 `subject` + runDir 推，**不伪造站点版本**）。
+ *   · **必须有 delivery**（票 04：不再从无到有初始化交付结论）；
+ *   · `applyVisualReview` 只改视觉评审三处。
  * ⚠️ **原子替换**：先写 `.tmp` 再 rename（票 06 Q2「不就地覆写」），中断不会留下半截报告。
  */
 export function writeVisualReviewToReport(opts: {
@@ -163,38 +167,100 @@ export function writeVisualReviewToReport(opts: {
     throw new Error(`读不出 \`${RUN_ARTIFACT.qaReport}\`（${p}）：${(e as Error).message}`);
   }
   const report = QAReportSchema.parse(raw);
-  const delivery = report.delivery === undefined
-    ? initialDeliveryWithReview(opts.outRoot, opts.runDir, report, opts.review)
-    : applyVisualReview(report.delivery, opts.review);
+  if (report.delivery === undefined)
+    throw new CommandError("invalid", "这份 qa-report 没有 delivery —— 不能写视觉评审（票 04：不再初始化交付结论）");
+  const delivery = applyVisualReview(report.delivery, opts.review);
   writeJsonAtomic(p, { ...report, delivery });
 }
 
-/** 没有 `delivery` 时初始化一份（票 10 项 1）：构建段三查（资源/配置/QA）按「报告已到 QA」记，
- *  站点/试玩记 `incomplete`（未做）、视觉用本次评审。⚠️ **不伪造站点版本**：`site` 省略、`site` 检查项 `incomplete`。 */
-function initialDeliveryWithReview(
-  outRoot: string, runDir: string, report: QAReport, review: DeliveryVisualReview,
-): DeliveryReport {
-  const subject = report.subject;
-  if (subject === undefined)
-    throw new CommandError("invalid", "这份报告没有 `subject`（包身份），无法初始化交付结论 —— 重跑 `build` 会生成带身份的");
-  return buildDeliveryReport({
-    runId: rel(outRoot, runDir),
-    pack: {
-      packId: subject.packId,
-      packVersion: subject.packVersion,
-      ...(subject.manifestChecksum === undefined ? {} : { manifestChecksum: subject.manifestChecksum }),
-    },
-    config: { file: rel(outRoot, path.join(runDir, RUN_ARTIFACT.config)) },
-    checks: [
-      { key: "asset-pack", status: "pass" },
-      { key: "config", status: "pass" },
-      { key: "qa", status: qaVerdict(report) },
-      { key: "site", status: "incomplete" },
-      { key: "playable-smoke", status: "incomplete" },
-      { key: "visual-review", status: visualReviewToCheck(review.status) },
-    ],
-    visualReview: review,
-  });
+/**
+ * **带审核记录的视觉写回**（P0-02 v2 票 04）：
+ *   · 记录是权威来源（reviewer/reviewedAt/note）；
+ *   · `overall` 必须等于 `--verdict`；
+ *   · subject 必须与 delivery 的 pack/site/shell + 实际 pack/config 字节一致；
+ *   · 只改视觉评审三处，qa-report 其余字段原样。
+ */
+export function writeVisualReviewRecordToReport(opts: {
+  outRoot: string;
+  runDir: string;
+  record: VisualReviewRecord;
+  verdict: "pass" | "fail";
+}): DeliveryReport {
+  if (opts.record.overall !== opts.verdict)
+    throw new CommandError("invalid", `视觉审核记录 overall=${opts.record.overall} 与 --verdict=${opts.verdict} 不一致`);
+  const p = path.join(opts.runDir, RUN_ARTIFACT.qaReport);
+  let raw: unknown;
+  try { raw = JSON.parse(fs.readFileSync(p, "utf8")); }
+  catch (e) { throw new CommandError("invalid", `读不出 \`${RUN_ARTIFACT.qaReport}\`（${p}）：${(e as Error).message}`); }
+  const report = QAReportSchema.parse(raw);
+  const d = report.delivery;
+  if (d === undefined) throw new CommandError("invalid", "这份 qa-report 没有 delivery —— 不能写视觉评审");
+  if (d.site === undefined) throw new CommandError("invalid", "delivery.site 缺席 —— 站点尚未装配，不能写视觉评审");
+
+  const gameId = path.basename(path.dirname(path.dirname(opts.runDir)));
+  const packDir = path.join(opts.outRoot, gameId, "pack", `v${d.pack.packVersion}`);
+  let packChecksum: string;
+  try { packChecksum = manifestChecksumOf(packDir); }
+  catch (e) { throw new CommandError("invalid", `算不出 pack manifest checksum（${packDir}）：${(e as Error).message}`); }
+  if (d.pack.manifestChecksum !== undefined && d.pack.manifestChecksum !== packChecksum)
+    throw new CommandError("invalid", `delivery.pack.manifestChecksum 与实际包不一致：delivery ${d.pack.manifestChecksum} / 实际 ${packChecksum}`);
+
+  const configPath = path.resolve(opts.outRoot, d.config.file);
+  if (!fs.existsSync(configPath)) throw new CommandError("invalid", `delivery.config 指向的配置不存在：${d.config.file}`);
+  const configChecksum = sha256File(configPath);
+
+  const siteDir = path.join(opts.outRoot, gameId, "site", `v${d.site.version}`);
+  const siteJsonPath = path.join(siteDir, "site.json");
+  if (!fs.existsSync(siteJsonPath)) throw new CommandError("invalid", `站点缺 site.json：${path.relative(opts.outRoot, siteJsonPath)}`);
+  const siteJson = JSON.parse(fs.readFileSync(siteJsonPath, "utf8")) as Record<string, unknown>;
+  if (String(siteJson["shell"]) !== d.site.shell)
+    throw new CommandError("invalid", `site.json 的 shell=${String(siteJson["shell"])} 与 delivery.site.shell=${d.site.shell} 不一致`);
+  if (String(siteJson["pack"]) !== `v${d.pack.packVersion}`)
+    throw new CommandError("invalid", `site.json 的 pack=${String(siteJson["pack"])} 与 delivery.pack v${d.pack.packVersion} 不一致`);
+  if (typeof siteJson["config"] !== "string" || siteJson["config"].length === 0)
+    throw new CommandError("invalid", "site.json 缺 config 文件名");
+  const siteConfigPath = path.join(siteDir, siteJson["config"]);
+  if (!fs.existsSync(siteConfigPath) || sha256File(siteConfigPath) !== configChecksum)
+    throw new CommandError("invalid", "站点实际消费的 config 与 delivery.config 不一致");
+
+  const expected = {
+    packId: d.pack.packId, packVersion: d.pack.packVersion,
+    siteVersion: d.site.version, shellVersion: d.site.shell,
+    manifestChecksum: packChecksum, configChecksum,
+  };
+  const fields = ["packId", "packVersion", "siteVersion", "shellVersion", "manifestChecksum", "configChecksum"] as const;
+  const bad = fields.filter((f) => String(opts.record.subject[f]) !== String(expected[f]));
+  if (bad.length > 0)
+    throw new CommandError("invalid", `视觉审核记录的 subject 与当前交付不一致：${bad.map((f) => `${f} 记录 ${String(opts.record.subject[f])} / 当前 ${String(expected[f])}`).join("；")}`);
+
+  const review: DeliveryVisualReview = {
+    status: opts.record.overall,
+    reviewer: opts.record.reviewer,
+    reviewedAt: opts.record.reviewedAt,
+    ...(opts.record.note === undefined ? {} : { note: opts.record.note }),
+  };
+  const delivery = applyVisualReview(d, review);
+  writeJsonAtomic(p, { ...report, delivery });
+  return delivery;
+}
+
+/** 视觉写回失败的独立诊断记录（run 内，不改 qa-report）。返回是否写成功。 */
+export function writeReviewVerdictError(runDir: string, error: unknown): boolean {
+  const p = path.join(runDir, "review-verdict-error.json");
+  const tmp = `${p}.tmp-${process.pid}`;
+  const body = {
+    at: new Date().toISOString(),
+    message: error instanceof Error ? error.message : String(error),
+    ...(error instanceof Error && error.stack !== undefined ? { stack: error.stack } : {}),
+  };
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(body, null, 2) + "\n");
+    fs.renameSync(tmp, p);
+    return true;
+  } catch {
+    try { fs.rmSync(tmp, { force: true }); } catch {}
+    return false;
+  }
 }
 
 /** **原子替换**（票 06 Q2「不就地覆写」）：先写 `.tmp` 再 `rename`。 */

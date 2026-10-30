@@ -59,7 +59,7 @@ export function slimState(st) {
     vx: st.vx, vy: st.vy, onFloor: st.onFloor, blockedRight: st.blockedRight, touchingRight: st.touchingRight,
     collected: st.collected, won: st.won,
     pickups: st.pickups.map((p) => ({ x: p.x, y: p.y, active: p.active })),
-    hazards: st.hazards.map((h) => ({ x: h.x, y: h.y })),
+    hazards: st.hazards.map((h) => ({ x: h.x, y: h.y, hits: h.hits ?? 0 })),
     chests: st.chests.map((c) => ({ x: c.x, y: c.y, opened: c.opened })),
     dangers: st.dangers.map((d) => ({ x: d.x, y: d.y, state: d.state, hits: d.hits })),
     gate: st.gate,
@@ -229,6 +229,8 @@ export const READ_STATE = `(()=>{
       const hb = h.sprite.body;
       return {
         x: h.sprite.x, y: h.sprite.y, axis: h.axis, distance: h.distance, periodMs: h.periodMs, t0: h.t0,
+        // P0-02 v2 票 03：hazard 真实命中计数（只读；复位语义不变）。
+        hits: h.hits ?? 0,
         // FA-02：策略需要危险物的几何足迹（盒），不能从精灵尺寸反推。只读，不改站点。
         left: hb ? hb.x : h.sprite.x - h.sprite.displayWidth / 2,
         right: hb ? hb.x + hb.width : h.sprite.x + h.sprite.displayWidth / 2,

@@ -1,0 +1,76 @@
+{
+  "startedAt": "2026-10-30T02:08:49.762Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/site/v1 --scenario-dir /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/playtest/.tmp-6013-1793326129671/scenarios --out /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/playtest/.tmp-6013-1793326129671/harness",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/pack/v1",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/playtest/.tmp-6013-1793326129671/scenarios",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/playtest/.tmp-6013-1793326129671/harness",
+  "repeat": 1,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/playtest/.tmp-6013-1793326129671/harness/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "success-basic",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": true,
+          "steps": 448
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 1,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "success-basic",
+        "runs": 1,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "success-basic",
+            "outcome": null,
+            "stopReason": null,
+            "assertions": [
+              {
+                "id": "initial-pickups",
+                "result": "pass"
+              },
+              {
+                "id": "all-collected",
+                "result": "pass"
+              },
+              {
+                "id": "won",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 6,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 2,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 4,
+              "win": 1,
+              "chest-open": 2
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

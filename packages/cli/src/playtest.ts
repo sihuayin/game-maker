@@ -16,11 +16,34 @@ import {
   type PlaytestAttributionResult, type PlaytestBaselineCompareResult, type PlaytestOutcome,
   type PlaytestReport, type PlaytestScenarioReport, type PlaytestScenario,
 } from "@game-maker/contracts";
-import { manifestChecksumOf, writePlaytestToReport, writePlaytestWritebackError } from "@game-maker/pipeline";
+import { invalidatePlayableSmoke, manifestChecksumOf, writePlaytestToReport, writePlaytestWritebackError } from "@game-maker/pipeline";
 import { RUN_ARTIFACT } from "@game-maker/pipeline";
 import type { CommandResult } from "@game-maker/contracts";
 
 const SCENARIO_DIR = path.resolve(process.cwd(), "packages/demo/probe/playtest/scenarios/five-state");
+
+/** 默认五态场景只服务**冻结 wasteland Demo**（P0-02 v2 票 06）。
+ *  ⚠️ 显式 `--scenario-dir` 绕过这个身份检查（用户明确选择）。 */
+export const DEFAULT_SCENARIO_DEMO = { packId: "wasteland-scavenger-recipe", packVersion: 1 } as const;
+
+/** 未传 `--scenario-dir` 时，目标 pack 不是默认 Demo ⇒ 返回可诊断文本；是默认 Demo ⇒ `undefined`。 */
+export function defaultScenarioIdentityProblem(
+  delivery: DeliveryReport, siteVersion: number, configPath: string, configLabel: string = configPath,
+): string | undefined {
+  if (delivery.pack.packId === DEFAULT_SCENARIO_DEMO.packId && delivery.pack.packVersion === DEFAULT_SCENARIO_DEMO.packVersion)
+    return undefined;
+  let pickups: number | "?" = "?";
+  let chests: number | "?" = "?";
+  try {
+    const cfg = readJson(configPath) as { entities?: Array<{ kind?: unknown }> };
+    const entities = Array.isArray(cfg.entities) ? cfg.entities : [];
+    pickups = entities.filter((e) => e.kind === "pickup").length;
+    chests = entities.filter((e) => e.kind === "chest").length;
+  } catch { /* 读不出就显示 ?；不掩盖身份问题 */ }
+  return `默认五态场景只服务 ${DEFAULT_SCENARIO_DEMO.packId} v${DEFAULT_SCENARIO_DEMO.packVersion}；`
+    + `当前 pack=${delivery.pack.packId} v${delivery.pack.packVersion}、site=v${siteVersion}、pickup=${pickups}、chest=${chests}（config=${configLabel}）。`
+    + `请用 --scenario-dir 提供本 Demo 的必需场景（至少含 siteVersion 与 initialActivePickups 断言）。`;
+}
 const HARNESS_SCRIPT = path.resolve(process.cwd(), "packages/demo/probe/playtest/playtest.mjs");
 const HARNESS_TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -103,7 +126,7 @@ export function selectScenarios(
 }
 
 /** 票 06 Q4 的六项准备校验；任何一项不满足都不执行试玩。 */
-function resolveTarget(outRoot: string, runDirInput: string, scenarioDir: string = SCENARIO_DIR): Target {
+function resolveTarget(outRoot: string, runDirInput: string, scenarioDir: string = SCENARIO_DIR, usingDefaultScenarios = false): Target {
   const runDir = path.resolve(runDirInput);
   if (!/\/v\d+$/.test(runDir))
     throw new CommandError("usage", `"${runDirInput}" 不是一次运行的目录（要 <gameId>/run/v<N> 的形状）`);
@@ -156,6 +179,13 @@ function resolveTarget(outRoot: string, runDirInput: string, scenarioDir: string
   const deliveryConfig = path.resolve(outRoot, delivery.config.file);
   if (!fs.existsSync(deliveryConfig) || sha256File(deliveryConfig) !== configChecksum)
     throw new CommandError("invalid", "delivery.config 指向的配置与站点实际消费的配置不一致");
+
+  // ⚠️ **默认 Demo 身份门禁**（P0-02 v2 票 06）：未传 `--scenario-dir` 时，默认五态目录只服务
+  //   `wasteland-scavenger-recipe` v1；其他 Demo 在这里快速失败，不猜 `collected` 等玩法语义。
+  if (usingDefaultScenarios) {
+    const problem = defaultScenarioIdentityProblem(delivery, siteVersion, configPath, rel(outRoot, configPath));
+    if (problem !== undefined) throw new CommandError("invalid", problem);
+  }
 
   // 场景契约：只取游戏场景（harness 条件场景不进交付聚合）。
   // FA-01D：目录可由 `--scenario-dir` 覆盖；默认仍是五态目录。
@@ -346,9 +376,25 @@ export function runPlaytestCommand(opts: { outRoot: string; runDirInput: string;
   const outRoot = path.resolve(opts.outRoot);
   // FA-01D：场景目录是输入；相对路径按 cwd 解析，绝对路径原样使用（path.resolve 同时满足）。
   const resolvedScenarioDir = opts.scenarioDir === undefined ? SCENARIO_DIR : path.resolve(process.cwd(), opts.scenarioDir);
+
+  // ⚠️ **票 05 / 票 11：先撤销旧 pass**。只要 runDir 合法 + qa-report 可读且带 delivery，
+  //   就在任何准备校验之前移除 delivery.playtest / 旧 playtest-* 引用并把 playable-smoke 置 blocked。
+  //   之后无论准备拒绝、harness 崩溃、写回失败还是进程被杀，旧 pass 都不会回来。
+  const runDirForInvalidation = path.resolve(opts.runDirInput);
+  const relForInvalidation = path.relative(outRoot, runDirForInvalidation);
+  let invalidation: ReturnType<typeof invalidatePlayableSmoke> | undefined;
+  if (/\/v\d+$/.test(runDirForInvalidation) && relForInvalidation !== "" &&
+      !relForInvalidation.startsWith("..") && !path.isAbsolute(relForInvalidation)) {
+    try {
+      invalidation = invalidatePlayableSmoke(runDirForInvalidation, "旧试玩结果已撤销：新的 attempt 正在进行");
+    } catch (e) {
+      invalidation = { ok: false, reason: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
   let target: Target;
   try {
-    target = resolveTarget(outRoot, opts.runDirInput, resolvedScenarioDir);
+    target = resolveTarget(outRoot, opts.runDirInput, resolvedScenarioDir, opts.scenarioDir === undefined);
   } catch (e) {
     // 准备拒绝：如果 run 目录 + qa-report 已经可读，留一条拒绝记录（不伪造 attempt、不写 delivery）。
     try {
@@ -357,8 +403,16 @@ export function runPlaytestCommand(opts: { outRoot: string; runDirInput: string;
       if (fs.existsSync(qa)) {
         fs.mkdirSync(path.join(runDir, "playtest", "rejections"), { recursive: true });
         const at = new Date().toISOString();
+        const inv = invalidation === undefined ? null : invalidation.ok
+          ? {
+              record: invalidation.recordPath === undefined ? null : path.relative(outRoot, invalidation.recordPath),
+              before: invalidation.before,
+              after: invalidation.after,
+              ...(invalidation.recordError === undefined ? {} : { recordError: invalidation.recordError }),
+            }
+          : { ok: false, reason: invalidation.reason };
         fs.writeFileSync(path.join(runDir, "playtest", "rejections", `${at.replace(/[:.]/g, "-")}.json`),
-          JSON.stringify({ at, reason: e instanceof Error ? e.message : String(e), runDir: path.relative(outRoot, runDir) }, null, 2) + "\n");
+          JSON.stringify({ at, reason: e instanceof Error ? e.message : String(e), runDir: path.relative(outRoot, runDir), invalidation: inv }, null, 2) + "\n");
       }
     } catch { /* 记录失败不掩盖原始准备错误 */ }
     throw e;

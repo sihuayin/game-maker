@@ -172,6 +172,54 @@ const probes = [
       return fail;
     },
   },
+
+  {
+    mechanicId: 'hazard-contact',
+    config: () => {
+      const c = baseConfig();
+      c.entities = [
+        // 先放一个 pickup（objective 要求至少一件可收集物），再摆静止 hazard 在右前方。
+        { id: 'p1', kind: 'pickup', at: { x: 80, y: 240 }, asset: 'pickup-suitcase' },
+        // 静止 hazard 摆在玩家右前方；按住右键走进去即可确定性命中。
+        { id: 'hazard-1', kind: 'hazard', at: { x: 160, y: 240 }, asset: 'hazard-sweeping-carriage' },
+        GOAL,
+      ];
+      return c;
+    },
+    run: async (page) => {
+      const samples = [];
+      await page.keyDownRight();
+      try {
+        const t0 = Date.now();
+        while (Date.now() - t0 < 15000) {
+          const st = await page.readState();
+          if (st) samples.push(st);
+          if (st && (st.hazards[0]?.hits ?? 0) > 0) break;
+          await delay(40);
+        }
+      } finally {
+        await page.keyUpRight().catch(() => {});
+      }
+      // 松开后再采一帧：命中复位到 spawn 之后，玩家不应继续往 hazard 走。
+      await delay(150);
+      const after = await page.readState();
+      if (after) samples.push(after);
+      return { samples };
+    },
+    assert: ({ samples }) => {
+      const fail = [];
+      const spawnX = samples[0]?.x ?? 40;
+      const hits = Math.max(0, ...samples.map((st) => st.hazards[0]?.hits ?? 0));
+      if (hits < 1) fail.push(`hazard 命中计数=${hits} < 1（没有真实碰到 hazard）`);
+      const maxX = Math.max(...samples.map((st) => st.x));
+      // hazard 的 body 比精灵宽，命中点可能在 x≈110；这里只证明玩家确实离开过 spawn。
+      if (maxX <= spawnX + 20) fail.push(`玩家没有移动（maxX=${maxX}，spawn=${spawnX}）`);
+      const hitFrames = samples.filter((st) => (st.hazards[0]?.hits ?? 0) > 0);
+      if (!hitFrames.some((st) => Math.abs(st.x - spawnX) <= 5))
+        fail.push(`命中后没有观察到复位到 spawn（spawn x=${spawnX}）`);
+      return fail;
+    },
+  },
 ];
 
 // ── 主流程 ──────────────────────────────────────────────────────────────────

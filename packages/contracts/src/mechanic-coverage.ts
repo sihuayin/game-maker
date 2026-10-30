@@ -1,113 +1,215 @@
-// **机制覆盖报告**（票 07）—— 意图→机制契约的收口：每个**设计声明要做的机制**，
-//   在三层上各落一个状态（设计 / 运行时 / QA），合并成一份「哪些机制端到端齐了」的报告。
+// **机制覆盖报告**（票 07 / P0-02 v2 票 02）—— 意图→机制契约的收口：每个**设计声明要做的机制**，
+//   在四层上各落一个状态（设计 / 运行时 / config / QA），合并成一份「哪些机制端到端齐了」的报告。
 //
-// ⚠️ 它与 `qa.ts` 的六条判据**不是一回事**（票 06 裁定）：六判据是**产物级**判据
-//   （`intent-coverage` 判的是「意图的实体/机制在设计里有没有对家」——**集合差**）；
-//   这份报告是**机制级**的三层矩阵（那条机制在设计里 claimed 了、外壳实现了、probe 证过了）。
-//   ⇒ 它**不做成第 7 判据**（`pixel.ts:56` 政策），是**独立报告 + 门禁**（[票 08] 消费）。
+// ⚠️ v2（2026-10-29 用户裁定）：
+//   · 新增 **config 层**：机制 → 必需 entity kind 的检查结果（显式可审计）；
+//   · 新增 **probe 块**：是否执行、何时执行、摘要路径、逐机制结果；
+//   · 新增 **subject**：报告绑定 pack/site/shell/config 六字段身份；
+//   · 缺 probe 时 `qa=not-tested`，**绝不再默认 passed**；声明的受 probe 机制缺结果 ⇒ `qa=failed`。
+//   · 生产代码不保留 v1 解析器；历史 v1 产物只作为历史文件存在。
 //
-// ── 三层分别由什么填 ──────────────────────────────────────────────────────────
-//   · **design（设计覆盖）**：`deriveMechanicStatus` —— 机制**状态**（supported 才能拿来做正式游戏）。
-//     这是 R12 `mechanic-experimental` 那条硬约束的**结果**（`build-design.ts` 已用它拦）。
-//   · **runtime（运行时覆盖）**：`RUNTIME_IMPLEMENTED_MECHANICS` —— **运行时实现见证**（源码转录）。
-//   · **qa（QA 覆盖）**：`QA_PROBED_MECHANICS` —— **行为级 probe**（真 Chrome 里跑通），
-//     或调用方传进来的 `probeResults`（probe 那一发真跑的结果，能分出 `failed`）。
-//
-// ⚠️ design 与 runtime **今天**等价（`DEPRECATED_MECHANICS` 为空 ⇒ supported ⟺ 有运行时实现），
-//   但**不是同一个问题**：design 问「这一代能不能拿它做正式游戏」（状态），runtime 问
-//   「外壳源码里有没有它那一行」（见证）。哪天有机制退役（deprecated），两格就分叉。
-//
-// ⚠️ **单个必需机制失败不被总体通过掩盖**（FR-07 末）：`verdict` 是「**全部**三层 satisfied」，
-//   不是「大多数」；门禁读它，任一机制任一格非 satisfied 即失败。
+// ⚠️ 单个必需机制失败不被总体通过掩盖（FR-07 末）：`verdict` 是「**全部**可阻断层 satisfied」，
+//   不是「大多数」；门禁读它，任一机制任一格可阻断状态即失败。
 import { z } from "zod/v4";
 import {
   QA_PROBED_MECHANICS, RUNTIME_IMPLEMENTED_MECHANICS, deriveMechanicStatus,
   MechanicSchema, type Mechanic,
 } from "./vocabulary.js";
+import type { GameConfig } from "./game-config.js";
 import type { GameDesignSpec } from "./game-design.js";
 
-export const MECHANIC_COVERAGE_FORMAT = "mechanic-coverage/v1" as const;
+export const MECHANIC_COVERAGE_FORMAT = "mechanic-coverage/v2" as const;
 
-/** 三层合用的封闭状态枚举（FR-07 末要求的五态）。⚠️ 每层只用到它的一子集
- *  （design/runtime：satisfied·unsupported；qa：satisfied·not-tested·failed），
- *   但**枚举只有一个** —— 合并成一个五态，门禁那侧不用记「哪一层有哪几个值」。 */
+/** 四层合用的封闭状态枚举（design/runtime/config：satisfied·missing·unsupported·not-tested；qa：satisfied·not-tested·failed）。 */
 export const MECHANIC_COVERAGE_STATUSES = ["satisfied", "missing", "unsupported", "not-tested", "failed"] as const;
 export const MechanicCoverageStatusSchema = z.enum(MECHANIC_COVERAGE_STATUSES);
 export type MechanicCoverageStatus = z.infer<typeof MechanicCoverageStatusSchema>;
 
-export const MechanicCoverageSchema = z.object({
+/** config 层只使用这三态：满足 / 缺必需实体 / 没有映射规则（未来机制；不阻断但必须可见）。 */
+export const MECHANIC_CONFIG_STATUSES = ["satisfied", "missing", "not-tested"] as const;
+export const MechanicConfigStatusSchema = z.enum(MECHANIC_CONFIG_STATUSES);
+export type MechanicConfigStatus = z.infer<typeof MechanicConfigStatusSchema>;
+
+export const MechanicConfigCheckSchema = z.strictObject({
+  status: MechanicConfigStatusSchema,
+  /** 需求 token：entity kind（`pickup` / `chest` / `danger` / `hazard` / `goal` / `terrain`）
+   *  或能力 token（`motion:cycle` / `objective:collect-then-reach`）。 */
+  requiredEntityKinds: z.array(z.string().min(1)),
+  /** 每个 required token 在**实际 config** 里的读数（缺失记 0）。 */
+  found: z.record(z.string(), z.number().int().nonnegative()),
+});
+export type MechanicConfigCheck = z.infer<typeof MechanicConfigCheckSchema>;
+
+export const MechanicCoverageSchema = z.strictObject({
   /** 机制的封闭枚举 id（不是意图的自由文本）。 */
   mechanic: MechanicSchema,
   design: MechanicCoverageStatusSchema,
   runtime: MechanicCoverageStatusSchema,
+  config: MechanicConfigCheckSchema,
   qa: MechanicCoverageStatusSchema,
 }).strict();
 
-export const MechanicCoverageReportSchema = z.object({
+const Sha256 = z.string().regex(/^sha256:[0-9a-f]{64}$/, "形如 sha256:<64 位小写十六进制>");
+
+/** 报告身份：与正式证据清单 `subject` 同形（六字段）。 */
+export const MechanicCoverageSubjectSchema = z.strictObject({
+  packId: z.string().min(1),
+  packVersion: z.number().int().positive(),
+  siteVersion: z.number().int().positive(),
+  shellVersion: z.string().min(1),
+  manifestChecksum: Sha256,
+  configChecksum: Sha256,
+});
+export type MechanicCoverageSubject = z.infer<typeof MechanicCoverageSubjectSchema>;
+
+export const MechanicProbeResultSchema = z.strictObject({
+  mechanic: MechanicSchema,
+  passed: z.boolean(),
+});
+export type MechanicProbeResult = z.infer<typeof MechanicProbeResultSchema>;
+
+export const MechanicProbeEvidenceSchema = z.strictObject({
+  /** `true` = 这一版报告经历过 probe 执行（即使失败/缺结果）；`false` = 还没跑。 */
+  executed: z.boolean(),
+  ranAt: z.string().min(1).optional(),
+  /** 相对 run 目录的摘要路径（例如 `mechanic-probe/summary.json`）。 */
+  summaryPath: z.string().min(1).optional(),
+  results: z.array(MechanicProbeResultSchema),
+});
+export type MechanicProbeEvidence = z.infer<typeof MechanicProbeEvidenceSchema>;
+
+export const MechanicCoverageReportSchema = z.strictObject({
   format: z.literal(MECHANIC_COVERAGE_FORMAT),
+  subject: MechanicCoverageSubjectSchema,
   mechanics: z.array(MechanicCoverageSchema),
-  /** `satisfied` = 每条机制三层全 satisfied；否则 `failed`。 */
+  probe: MechanicProbeEvidenceSchema,
+  /** `satisfied` = 每条机制的 design/runtime/config satisfied 且 qa 非 failed；否则 `failed`。 */
   verdict: z.enum(["satisfied", "failed"]),
 }).strict();
 
 export type MechanicCoverage = z.infer<typeof MechanicCoverageSchema>;
 export type MechanicCoverageReport = z.infer<typeof MechanicCoverageReportSchema>;
+/** 不含 subject 的「报告核心」：纯函数产出，写盘层补身份。 */
+export type MechanicCoverageCore = Omit<MechanicCoverageReport, "subject">;
 
-/** probe 结果（票 15 的 `{ mechanicId, passed }`）。缺省时回落到 `QA_PROBED_MECHANICS`（全当 passed）。 */
+/** probe 结果（`{ mechanic, passed }`）。缺省 = 还没跑 probe（不是「全过」）。 */
 export type ProbeResult = { mechanic: Mechanic; passed: boolean };
 
-/** 门禁语义（票 08）：**missing / unsupported / failed 阻断，`not-tested` 不阻断**。
- *  ⚠️ `not-tested` = 这条机制**没有行为级 probe**（基线机制，靠 witness + 既有金字塔盖住），
- *   不是「查漏了」—— 所以它过门禁；而 `failed` = **有 probe 却红了**，那是真失败。
- *  ⚠️ 「必须有通过的 probe」由**免费验收**强制（`pnpm test:mechanic` 对 `QA_PROBED_MECHANICS`
- *   全绿，红了非 0），不是门禁在这里再数一遍。 */
+/** 门禁语义（票 02）：design/runtime/config `missing`/`unsupported` 与 qa `failed` 阻断；
+ *  `not-tested` 不阻断（基线机制靠 witness + 既有金字塔盖住），但必须可见。 */
 const isGateBlocking = (m: MechanicCoverage): boolean =>
-  m.design !== "satisfied" || m.runtime !== "satisfied" || m.qa === "failed";
+  m.design !== "satisfied" || m.runtime !== "satisfied" || m.config.status === "missing" || m.qa === "failed";
+
+type ConfigRule = {
+  tokens: string[];
+  satisfied: (found: Record<string, number>) => boolean;
+};
+
+/** 机制 → config 需求（票 02 Q2 的全套映射）。⚠️ 只读 config，不读意图/设计。 */
+const CONFIG_RULES: Record<Mechanic, ConfigRule> = {
+  run: { tokens: [], satisfied: () => true },
+  jump: { tokens: [], satisfied: () => true },
+  gravity: { tokens: [], satisfied: () => true },
+  "collide-terrain": { tokens: ["terrain"], satisfied: (f) => (f["terrain"] ?? 0) > 0 },
+  "collect-pickup": { tokens: ["pickup"], satisfied: (f) => (f["pickup"] ?? 0) > 0 },
+  "moving-platform": { tokens: ["motion:cycle"], satisfied: (f) => (f["motion:cycle"] ?? 0) > 0 },
+  "hazard-contact": { tokens: ["hazard"], satisfied: (f) => (f["hazard"] ?? 0) > 0 },
+  "reach-goal": {
+    tokens: ["goal", "objective:collect-then-reach"],
+    satisfied: (f) => (f["goal"] ?? 0) > 0 && (f["objective:collect-then-reach"] ?? 0) > 0,
+  },
+  "open-chest": { tokens: ["chest"], satisfied: (f) => (f["chest"] ?? 0) > 0 },
+  // ⚠️ 运行时 hazard 与 danger 都走 `hitHazard()`；设计 id 本身是 `dodge-hazards`。
+  //   ⇒ 任一存在即满足 config 层（冻结 wasteland 的 2 个 hazard 因此为 satisfied）。
+  "avoid-danger": {
+    tokens: ["danger", "hazard"],
+    satisfied: (f) => (f["danger"] ?? 0) > 0 || (f["hazard"] ?? 0) > 0,
+  },
+};
+
+/** 从实际 config 读每个规则 token 的计数。 */
+function configCounts(config: GameConfig): Record<string, number> {
+  const kinds: Record<string, number> = {};
+  for (const e of config.entities ?? []) kinds[e.kind] = (kinds[e.kind] ?? 0) + 1;
+  const motionCycle = (config.entities ?? []).filter((e) => (e as { motion?: { kind?: string } }).motion?.kind === "cycle").length;
+  return {
+    terrain: config.terrain?.length ?? 0,
+    pickup: kinds["pickup"] ?? 0,
+    chest: kinds["chest"] ?? 0,
+    hazard: kinds["hazard"] ?? 0,
+    danger: kinds["danger"] ?? 0,
+    goal: kinds["goal"] ?? 0,
+    "motion:cycle": motionCycle,
+    "objective:collect-then-reach": config.objective?.kind === "collect-then-reach" ? 1 : 0,
+  };
+}
+
+function configCheckOf(mechanic: Mechanic, counts: Record<string, number>): MechanicConfigCheck {
+  const rule = CONFIG_RULES[mechanic];
+  if (rule === undefined)
+    return { status: "not-tested", requiredEntityKinds: [], found: {} };
+  const found = Object.fromEntries(rule.tokens.map((t) => [t, counts[t] ?? 0]));
+  return {
+    status: rule.satisfied(found) ? "satisfied" : "missing",
+    requiredEntityKinds: [...rule.tokens],
+    found,
+  };
+}
 
 /**
- * 由**设计**（R12 已过的那份）产 per-mechanic 覆盖报告。
+ * 由**设计** + **实际 config** 产 per-mechanic 覆盖核心。
  *
- * ⚠️ 输入只有 `design` —— 因为这份报告活在**门禁**那一环（QA 之后），那时 R12 已经
- *   保证「意图 ⊆ 设计」（缺机制、串机制都在设计段被拒了）。所以这里的「必需机制」=
- *   `design.mechanics`（设计声明要做的机制），缺机制不是这份报告的事。
+ * ⚠️ `probeResults` 缺省（`undefined`）⇒ `probe.executed=false`、所有机制 `qa=not-tested`；
+ *   **不会**再把 `QA_PROBED_MECHANICS` 默认当 passed。
+ * ⚠️ 传入 `probeResults`（哪怕是空数组）⇒ `probe.executed=true`；设计声明的受 probe 机制
+ *   若缺结果 ⇒ `qa=failed`（「应有 probe 却缺失」不能吸收进 not-tested）。
  */
 export function buildMechanicCoverage(
   design: GameDesignSpec,
-  probeResults: readonly ProbeResult[] = [],
-): MechanicCoverageReport {
-  const probed = new Map(probeResults.map((p) => [p.mechanic, p.passed]));
-  const defaultProbed = probeResults.length === 0
-    ? new Map(QA_PROBED_MECHANICS.map((m) => [m, true]))
-    : null;
+  config: GameConfig,
+  probeResults?: readonly ProbeResult[],
+): MechanicCoverageCore {
+  const counts = configCounts(config);
+  const probed = probeResults === undefined ? undefined : new Map(probeResults.map((p) => [p.mechanic, p.passed]));
 
   const mechanics: MechanicCoverage[] = design.mechanics.map((m) => {
     const status = deriveMechanicStatus(m.mechanic);
-    const qaPassed = defaultProbed
-      ? defaultProbed.get(m.mechanic)
-      : probed.get(m.mechanic);
+    let qa: MechanicCoverageStatus;
+    if (probed === undefined) qa = "not-tested";
+    else if (!QA_PROBED_MECHANICS.includes(m.mechanic)) qa = "not-tested";
+    else {
+      const passed = probed.get(m.mechanic);
+      qa = passed === undefined ? "failed" : passed ? "satisfied" : "failed";
+    }
     return {
       mechanic: m.mechanic,
       design: status === "supported" ? "satisfied" : "unsupported",
       runtime: RUNTIME_IMPLEMENTED_MECHANICS.includes(m.mechanic) ? "satisfied" : "unsupported",
-      qa: qaPassed === undefined ? "not-tested" : qaPassed ? "satisfied" : "failed",
+      config: configCheckOf(m.mechanic, counts),
+      qa,
     };
   });
 
   return {
     format: MECHANIC_COVERAGE_FORMAT,
     mechanics,
+    probe: {
+      executed: probeResults !== undefined,
+      results: [...(probeResults ?? [])],
+    },
     verdict: mechanics.every((m) => !isGateBlocking(m)) ? "satisfied" : "failed",
   };
 }
 
-/** 门禁那一半（票 08 消费）：哪条机制在哪一层掉了，**逐条**说清楚；全绿 = `undefined`。 */
-export function mechanicCoverageProblem(report: MechanicCoverageReport): string | undefined {
+/** 门禁那一半：哪条机制在哪一层掉了，**逐条**说清楚；全绿 = `undefined`。 */
+export function mechanicCoverageProblem(report: Pick<MechanicCoverageReport, "mechanics">): string | undefined {
   const bad = report.mechanics.filter(isGateBlocking);
   if (bad.length === 0) return undefined;
   const lines = bad.map((m) => {
     const parts = [
       m.design !== "satisfied" ? `设计层 ${m.design}` : null,
       m.runtime !== "satisfied" ? `运行时层 ${m.runtime}` : null,
+      m.config.status === "missing" ? `config 层缺 ${m.config.requiredEntityKinds.join(" / ")}` : null,
       m.qa === "failed" ? `QA 层 ${m.qa}` : null,
     ].filter(Boolean);
     return `  · \`${m.mechanic}\`：${parts.join("；")}`;

@@ -21,7 +21,7 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
     private solids?: Phaser.Physics.Arcade.StaticGroup;
     private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
     private keys?: Record<string, Phaser.Input.Keyboard.Key>;
-    private hazards: { sprite: Phaser.GameObjects.Image; start: number; axis: "x" | "y"; distance: number; periodMs: number; t0: number }[] = [];
+    private hazards: { sprite: Phaser.GameObjects.Image; start: number; axis: "x" | "y"; distance: number; periodMs: number; t0: number; hits: number }[] = [];
     private pickups: Phaser.GameObjects.Image[] = [];
     private chests: { sprite: Phaser.GameObjects.Image; box: Box; range: number; openFrame?: string; opened: boolean }[] = [];
     private dangers: { sprite: Phaser.GameObjects.Image; box: Box; idleFrame: string; activeFrame?: string; periodMs: number; activeMs: number; t: number; state: "idle" | "active"; hits: number; hitThisWindow: boolean }[] = [];
@@ -156,8 +156,11 @@ export function createScene(world: WorldDescription): new () => Phaser.Scene {
         }
         case "hazard": {
           this.physics.add.existing(sprite, true);
-          this.hazards.push({ sprite, start: e.motion?.axis === "y" ? d.at.y : d.at.x, axis: e.motion?.axis ?? "x", distance: e.motion?.distance ?? 0, periodMs: e.motion?.periodMs ?? 1000, t0: 0 });
-          this.physics.add.overlap(this.playerOrStub(), sprite, () => this.hitHazard());
+          // ⚠️ 命中计数（P0-02 v2 票 03）：probe 用它把「真实碰到 hazard」与「被复位」分开；
+          //   只读暴露在 READ_STATE，不改变复位语义。
+          const hazard = { sprite, start: e.motion?.axis === "y" ? d.at.y : d.at.x, axis: e.motion?.axis ?? "x", distance: e.motion?.distance ?? 0, periodMs: e.motion?.periodMs ?? 1000, t0: 0, hits: 0 };
+          this.hazards.push(hazard);
+          this.physics.add.overlap(this.playerOrStub(), sprite, () => { hazard.hits += 1; this.hitHazard(); });
           break;
         }
         case "goal": {

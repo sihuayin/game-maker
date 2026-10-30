@@ -1,0 +1,6 @@
+{
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site /Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/site/v1 --scenario-dir /Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/.tmp-86433-1793160043086/scenarios --out /Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/.tmp-86433-1793160043086/harness",
+  "exitCode": 0,
+  "at": "2026-10-28T04:01:03.675Z",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/playtest/.tmp-86433-1793160043086/harness"
+}

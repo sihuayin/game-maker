@@ -8,7 +8,7 @@
  *   ③ 覆盖报告：open-chest / avoid-danger 三层（设计 / 运行时 / QA）全 `satisfied`。
  *
  *   证据：`<out>/vitest.log`（命令 + 退出码）· `<out>/probe/summary.json`（probe 真跑结果）·
- *         `<out>/mechanic-coverage.json`（覆盖报告）· `<out>/free-acceptance.json`（总判据）。
+ *         `<out>/mechanic-coverage.core.json`（覆盖核心；完整 v2 报告需要 run 身份）· `<out>/free-acceptance.json`（总判据）。
  *
  * 用法：`node packages/demo/probe/free-acceptance.mjs [--out <dir>]`（前置 `pnpm build`）。
  */
@@ -47,6 +47,18 @@ const WASTELAND_MECHANICS = [
 const fixtureDesign = () => ({
   mechanics: WASTELAND_MECHANICS.map((mechanic, i) => ({ id: `m-${i}`, mechanic })),
 });
+/** 只供 config 层检查的最小 config（pickup/chest/hazard/danger/goal/terrain/objective 都在）。 */
+const fixtureConfig = () => ({
+  entities: [
+    { id: 'p1', kind: 'pickup', at: { x: 200, y: 240 } },
+    { id: 'c1', kind: 'chest', at: { x: 300, y: 240 } },
+    { id: 'h1', kind: 'hazard', at: { x: 340, y: 240 }, motion: { kind: 'cycle', axis: 'x', distance: 100, periodMs: 3000 } },
+    { id: 'd1', kind: 'danger', at: { x: 100, y: 250 } },
+    { id: 'g1', kind: 'goal', at: { x: 440, y: 230 } },
+  ],
+  terrain: [{ x: 0, y: 250, w: 480, h: 20 }],
+  objective: { kind: 'collect-then-reach', gate: 'g1' },
+});
 
 function run(name, cmd, args, logFile) {
   fs.mkdirSync(path.dirname(logFile), { recursive: true });
@@ -79,15 +91,15 @@ async function main() {
   try {
     const probeSummary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
     const probeResults = (probeSummary.probes ?? []).map((p) => ({ mechanic: p.mechanicId, passed: p.passed }));
-    coverage = buildMechanicCoverage(fixtureDesign(), probeResults);
+    coverage = buildMechanicCoverage(fixtureDesign(), fixtureConfig(), probeResults);
     coverageProblem = mechanicCoverageProblem(coverage);
     const required = ['open-chest', 'avoid-danger'];
     const fullySatisfied = required.every((id) => {
       const m = coverage.mechanics.find((x) => x.mechanic === id);
-      return m && m.design === 'satisfied' && m.runtime === 'satisfied' && m.qa === 'satisfied';
+      return m && m.design === 'satisfied' && m.runtime === 'satisfied' && m.config.status === 'satisfied' && m.qa === 'satisfied';
     });
     coverageOk = coverage.verdict === 'satisfied' && coverageProblem === undefined && fullySatisfied;
-    writeJson(path.join(OUT, 'mechanic-coverage.json'), coverage);
+    writeJson(path.join(OUT, 'mechanic-coverage.core.json'), coverage);
     checks.push({
       name: 'mechanic-coverage',
       ok: coverageOk,

@@ -1,0 +1,2025 @@
+{
+  "mechanicId": "avoid-danger",
+  "passed": true,
+  "failures": [],
+  "durationMs": 2643,
+  "out": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/runs/09-probe-all/avoid-danger",
+  "samples": [
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 0
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 1
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 2
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": false,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "active",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    },
+    {
+      "x": 40,
+      "y": 247.6,
+      "bottom": 250,
+      "top": 202,
+      "left": 24,
+      "right": 56,
+      "vx": 0,
+      "vy": 0,
+      "onFloor": true,
+      "blockedRight": false,
+      "touchingRight": false,
+      "collected": 0,
+      "won": false,
+      "pickups": [
+        {
+          "x": 300,
+          "y": 240,
+          "active": true
+        }
+      ],
+      "hazards": [],
+      "chests": [],
+      "dangers": [
+        {
+          "x": 100,
+          "y": 250,
+          "state": "idle",
+          "hits": 3
+        }
+      ],
+      "gate": {
+        "x": 440,
+        "y": 230
+      }
+    }
+  ]
+}

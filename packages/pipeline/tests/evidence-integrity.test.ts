@@ -170,6 +170,17 @@ function buildFixture(): Fixture {
   const qaPath = path.join(runDir, "qa-report.json");
   writeJson(qaPath, qa);
 
+  // 机制覆盖报告 v2（P0-02 v2 票 08）：默认全绿；负向用例再逐项破坏。
+  const coveragePath = path.join(runDir, "mechanic-coverage.json");
+  const coverage = {
+    format: "mechanic-coverage/v2",
+    subject,
+    mechanics: [],
+    probe: { executed: true, ranAt: "2026-10-29T00:00:00.000Z", summaryPath: "mechanic-probe/summary.json", results: [] },
+    verdict: "satisfied",
+  };
+  writeJson(coveragePath, coverage);
+
   // FA-04 / FA-05 / FA-06 / 06 / 09 记录
   const reviewPath = path.join(roots.fa04, "review-record.json");
   writeJson(reviewPath, {
@@ -234,6 +245,7 @@ function buildFixture(): Fixture {
     { root: "gp", path: "09-review-record.supplement.json", role: "visual-supplement", required: true, identity: true },
     { root: "gp", path: "09-review-materials.json", role: "visual-supplement-materials", required: true, identity: true },
     { root: "artifacts", path: "identity.json", role: "identity", required: true, identity: true },
+    { root: "out", path: `${PACK_ID}/run/v1/mechanic-coverage.json`, role: "mechanic-coverage", required: true, identity: true },
   ];
 
   const manifestPath = path.join(dir, "manifest", "expected-hashes.json");
@@ -290,6 +302,60 @@ describe("verifyDeliveryEvidence", () => {
     expect(report.diagnostics).toEqual([]);
     expect(report.results.identities.every((i) => i.status === "verified")).toBe(true);
     expect(renderVerificationMarkdown(report)).toContain("结论：**pass**");
+  });
+
+  it("失败重跑撤销后：playable-smoke 声明 blocked 与重算一致", () => {
+    const fx = buildFixture();
+    const qaPath = fx.qaPath;
+    const qa = readJson(qaPath);
+    delete qa.delivery.playtest;
+    qa.delivery.checks = qa.delivery.checks.map((c: { key: string; status: string; detail?: string }) =>
+      c.key === "playable-smoke" ? { key: c.key, status: "blocked", detail: "attempt 进行中" } : c);
+    qa.delivery.verdict = "blocked";
+    writeJson(qaPath, qa);
+    rehash(fx, qaPath);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    const smoke = report.comparison.checks.find((c) => c.key === "playable-smoke")!;
+    expect(smoke.declared).toBe("blocked");
+    expect(smoke.recomputed).toBe("blocked");
+    expect(smoke.match).toBe(true);
+    expect(report.recomputed.verdict).toBe("blocked");
+  });
+
+  it("机制覆盖报告 probe.executed=false → fail（即使哈希已同步）", () => {
+    const fx = buildFixture();
+    const p = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "mechanic-coverage.json");
+    const c = readJson(p);
+    c.probe.executed = false;
+    writeJson(p, c);
+    rehash(fx, p);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.results.consistency.some((x) => x.id === "mechanic-coverage" && x.status === "fail")).toBe(true);
+  });
+
+  it("机制覆盖报告 verdict=failed → fail", () => {
+    const fx = buildFixture();
+    const p = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "mechanic-coverage.json");
+    const c = readJson(p);
+    c.verdict = "failed";
+    writeJson(p, c);
+    rehash(fx, p);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.diagnostics.some((d) => d.rule === "mechanic-coverage.fail")).toBe(true);
+  });
+
+  it("机制覆盖报告 subject 与清单不符 → fail", () => {
+    const fx = buildFixture();
+    const p = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "mechanic-coverage.json");
+    const c = readJson(p);
+    c.subject.configChecksum = "sha256:" + "f".repeat(64);
+    writeJson(p, c);
+    rehash(fx, p);
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.status).toBe("fail");
+    expect(report.diagnostics.some((d) => d.rule === "mechanic-coverage.fail")).toBe(true);
   });
 
   it("内容篡改 → hash-mismatch / fail", () => {

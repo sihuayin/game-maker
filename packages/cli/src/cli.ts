@@ -14,11 +14,13 @@ import { PlaytestBaselineCoverageSchema, QA_JUDGEMENTS, QA_JUDGEMENT_LABELS, qaV
 import { masterRatioNotes } from "@game-maker/assets";
 // ⚠️ **图单元的那把尺子**（票 40）：检查点报的数与 `pack` 真发出去的次数**共用它** ——
 //   两处以前各切各的，检查点因此报小了 2.2 倍（11 个 image 源资产 vs 真发的 24 次）。
-import { imageCallsOf, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
-import { assertPublishableQa, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, promotePlaytestBaseline, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeVisualReviewToReport, type CreateStep } from "@game-maker/pipeline";
+import { imageCallsOf, VisualReviewRecordSchema, type AssetRecipe, type ImageCalls } from "@game-maker/contracts";
+import { assertPublishableQa, buildMechanicCoverageReport, buildSiteFailureDelivery, buildSiteSuccessDelivery, deliverySummaryOf, mechanicCoverageSubjectFor, promotePlaytestBaseline, reviewRun, runBuild, runUnderstanding, styleRefOf, tryWriteDelivery, writeMechanicCoverageReport, writeReviewVerdictError, writeVisualReviewRecordToReport, type CreateStep } from "@game-maker/pipeline";
 import { inspectDigestLines, inspectObservationOf } from "./inspect-digest.js";
 import { runPlaytestCommand } from "./playtest.js";
 import { runVerifyDeliveryCommand } from "./evidence.js";
+import { runVerifyMechanicsCommand } from "./verify-mechanics.js";
+import { runBuildEvidenceManifestCommand } from "./manifest.js";
 
 const USAGE = `game-maker —— 图片驱动的游戏资源工具链
 
@@ -34,9 +36,11 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker inspect <资源包目录> [--json]
   game-maker accept <资源包目录> [--baseline <baseline 目录>] [--out <目录>] [--json]
   game-maker review <run 目录> [--json]
-  game-maker review-verdict <run 目录> --verdict pass|fail [--reviewer <名字>] [--note "..."] [--json]
+  game-maker review-verdict <run 目录> --verdict pass|fail --review-record <记录.json> [--json]
   game-maker playtest <run 目录> [--out <目录>] [--scenario-dir <目录>] [--json]
   game-maker playtest-baseline promote <baselineId> --report <result.json> --second-report <result.json> --coverage <coverage.json> --reason "..." [--dir <目录>] [--replace] [--json]
+  game-maker build-evidence-manifest --spec <spec.json> --out <manifest.json> [--force] [--json]
+  game-maker verify-mechanics <run 目录> [--out <目录>] [--json]
   game-maker verify-delivery --manifest <清单文件> [--out <目录>] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
@@ -45,9 +49,10 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   ⚠️ 它**不打分、不判定通过与否、也不阻断任何产物** —— 拿不到结果就当没有。
   ⚠️ 花了的那一发**记进 <run 目录>/ledger.json**（run 级那份）。
 
-\`review-verdict\` 是**视觉人工对照的写回**（FPVS-V1-P1 · 票 10）：人看过后，把结论写进那个
-  run 的 \`qa-report.json\` 的 \`delivery.visualReview\`（仅 CLI、不加 MCP）。**不碰 QA 层、不伪造站点版本**；
-  reviewer 缺省取 \`git config user.name\`。
+\`review-verdict\` 是**视觉人工对照的写回**（FPVS-V1-P1 · 票 10 / P0-02 v2 票 04）：人看过后，
+  用 \`--review-record\` 指向一份 \`visual-review-record/v1\` 记录；记录是**权威来源**（reviewer/reviewedAt/note
+  都从记录取），subject 必须与当前交付及实际 pack/config 字节一致。仅 CLI、不加 MCP；**不碰 QA 层**；
+  \`--reviewer\` / \`--note\` 已移除。
 
 \`playtest\` 是 Playtest V1 的**试玩**（仅 CLI、不加 MCP；票 06）：对一个已经装配好的 run 执行固定场景，
   观测运行事件/状态、产出可复现证据，并把五态归因写回 \`qa-report.json\` 的 \`delivery.playtest\`。
@@ -123,7 +128,7 @@ export function parseArgs(argv: readonly string[]): Parsed {
     // 票 09（P0-02b）：`site` 的显式 QA 报告（外部包 / 非规范 out 树）
     "qa-report",
     // 票 10（FPVS-V1-P1）：`review-verdict` 的视觉评审结论
-    "verdict", "reviewer", "note",
+    "verdict", "reviewer", "note", "review-record", "spec",
     // Playtest V1 票 09：基线晋升
     "report", "second-report", "coverage", "reason", "dir",
     // FA-01D：试玩场景目录（默认五态）
@@ -279,6 +284,14 @@ async function buildAndSite(o: {
       // ⚠️ **同一个 N**（票 15 的 Q16/Q17：父指定、子不自算）—— 这次运行的三样产物同一个版本号。
       siteVersion: built.packVersion,
     });
+    // ⚠️ **机制覆盖报告 v2**（P0-02 v2 票 02 / 票 08）：站点装配成功后才写 —— subject 要 siteVersion/shellVersion。
+    //   `probe.executed=false`、`qa=not-tested`；`verify-mechanics` 事后原子重写。重跑 build 一律重置 probe。
+    if (built.coverage === undefined)
+      throw new CommandError("invalid", "构建没有产出机制覆盖核心 —— 不能写 mechanic-coverage/v2 报告");
+    writeMechanicCoverageReport(built.runDir, buildMechanicCoverageReport(built.coverage, mechanicCoverageSubjectFor({
+      manifest: built.manifest, packDir: built.paths.packDir, configPath: built.paths.config,
+      siteVersion: site.data.siteVersion as number, shellVersion: site.data.shellVersion as string,
+    })));
     // ⚠️ 交付摘要要它（票 13）：buildSiteSuccessDelivery 的产物既落盘、又给摘要用。
     const delivery = buildSiteSuccessDelivery({
       outRoot: o.outRoot, runDir: built.runDir, packDir: built.paths.packDir,
@@ -782,39 +795,68 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         break;
       }
       case "review-verdict": {
-        // ⚠️ **视觉人工评审写回**（FPVS-V1-P1 票 10）：仅 CLI、不加 MCP。人看过的结论写进
-        //   `delivery.visualReview` —— 不碰 QA 层、不碰 delivery 其余字段（票 06 Q3 评审字段最小化）。
+        // ⚠️ **视觉人工评审写回**（FPVS-V1-P1 票 10 / P0-02 v2 票 04）：记录是权威来源。
         const dir = positionals[0];
         if (dir === undefined)
           throw new CommandError("usage", "review-verdict 需要一个 run 目录（<out>/<gameId>/run/v<N>）");
         const runDir = path.resolve(dir);
-        // ⚠️ **校验归属**（票 06 Q2）：目标必须是有效 run（v<N>）+ 报告存在 + verdict 合法。
         if (!/\/v\d+$/.test(runDir))
           throw new CommandError("usage", `"${dir}" 不是一次运行的目录（要 <gameId>/run/v<N> 的形状）`);
+        if (flags.reviewer !== undefined || flags.note !== undefined)
+          throw new CommandError("usage", "--reviewer / --note 已移除：reviewer 与 note 请写进 --review-record 指向的记录");
+        if (typeof flags["review-record"] !== "string")
+          throw new CommandError("usage", "review-verdict 需要 --review-record <visual-review-record.json>");
         const qaReportPath = path.join(runDir, "qa-report.json");
         if (!fs.existsSync(qaReportPath))
           throw new CommandError("usage", `找不到 QA 报告：${qaReportPath} —— 先跑 build（QA 在 build 里跑）`);
         const verdict = flags.verdict;
         if (verdict !== "pass" && verdict !== "fail")
           throw new CommandError("usage", "review-verdict 需要 --verdict pass|fail");
-        // ⚠️ `flags.verdict` 的类型是 `string | boolean | undefined`（noUncheckedIndexedAccess），
-        //   `!==` 窄化后 TypeScript 仍把它读成 `string` —— 这里显式收窄（上面的判断已保证 pass|fail）。
         const status: "pass" | "fail" = verdict;
-        const reviewer = typeof flags.reviewer === "string" ? flags.reviewer : gitUserName();
-        const reviewedAt = new Date().toISOString();
-        const review = {
-          status,
-          ...(reviewer === undefined ? {} : { reviewer }),
-          reviewedAt,
-          ...(typeof flags.note === "string" ? { note: flags.note } : {}),
-        };
-        writeVisualReviewToReport({ outRoot, runDir, review });
-        result = {
-          command: "review-verdict",
-          summary: [`视觉评审 ${status}：已写入 ${relPath(outRoot, qaReportPath)}`],
-          data: { runDir: relPath(outRoot, runDir), status, ...(reviewer === undefined ? {} : { reviewer }), reviewedAt },
-          artifacts: [{ path: relPath(outRoot, qaReportPath), kind: "qa-report" }],
-        };
+        const recordPath = path.resolve(cwd, flags["review-record"]);
+        try {
+          let record;
+          try {
+            const raw: unknown = JSON.parse(fs.readFileSync(recordPath, "utf8"));
+            record = VisualReviewRecordSchema.parse(raw);
+          } catch (e) {
+            throw new CommandError("invalid", `视觉审核记录不可用（${recordPath}）：${e instanceof Error ? e.message : String(e)}`);
+          }
+          const delivery = writeVisualReviewRecordToReport({ outRoot, runDir, record, verdict: status });
+          result = {
+            command: "review-verdict",
+            summary: [`视觉评审 ${status}：已写入 ${relPath(outRoot, qaReportPath)}（记录 ${relPath(cwd, recordPath)}）`],
+            data: { runDir: relPath(outRoot, runDir), status, reviewer: record.reviewer, reviewedAt: record.reviewedAt, deliveryVerdict: delivery.verdict },
+            artifacts: [{ path: relPath(outRoot, qaReportPath), kind: "qa-report" }],
+          };
+        } catch (e) {
+          writeReviewVerdictError(runDir, e);
+          throw e;
+        }
+        break;
+      }
+      case "build-evidence-manifest": {
+        // P0-02 v2 票 07 / 票 13：spec → 正式 delivery-evidence-manifest/v1。
+        if (typeof flags.spec !== "string") throw new CommandError("usage", "build-evidence-manifest 需要 --spec <spec.json>");
+        if (typeof flags.out !== "string") throw new CommandError("usage", "build-evidence-manifest 需要 --out <manifest.json>");
+        const cmd = runBuildEvidenceManifestCommand({
+          specPath: path.resolve(cwd, flags.spec),
+          outPath: path.resolve(cwd, flags.out),
+          force: flags.force === true,
+          cwd,
+        });
+        result = cmd.result;
+        exitCode = cmd.exitCode;
+        break;
+      }
+      case "verify-mechanics": {
+        // P0-02 v2 票 02 / 票 08：独立跑机制 probe，写 `run/v<N>/mechanic-coverage.json`（v2）。
+        // ⚠️ 它会启动本地 Chrome；零付费。身份不合法 ⇒ 4 且不写报告；probe 失败 ⇒ 1 且照写失败报告。
+        const dir = positionals[0];
+        if (!dir) throw new CommandError("usage", "verify-mechanics 需要一个 run 目录（<out>/<gameId>/run/v<N>）");
+        const cmd = runVerifyMechanicsCommand({ outRoot, runDirInput: dir, cwd });
+        result = cmd.result;
+        exitCode = cmd.exitCode;
         break;
       }
       case "verify-delivery": {

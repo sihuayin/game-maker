@@ -9,10 +9,11 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import {
-  applyPlaytest, CommandError, QAReportSchema,
+  applyPlaytest, CommandError, PLAYTEST_HARNESS_VERSION, PLAYTEST_RULES_VERSION, QAReportSchema,
   type DeliveryEvidence, type DeliveryReport, type PlaytestReport,
 } from "@game-maker/contracts";
 import { jstr } from "./artifacts.js";
+import { manifestChecksumOf } from "./publish-gate.js";
 
 const sha256File = (p: string): string => `sha256:${crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex")}`;
 
@@ -54,12 +55,30 @@ export function writePlaytestToReport(opts: {
   if (!fs.existsSync(configPath))
     throw new CommandError("invalid", `delivery.config 指向的配置不存在：${d.config.file}`);
   const configChecksum = sha256File(configPath);
-  if (opts.report.identity.configChecksum !== undefined && opts.report.identity.configChecksum !== configChecksum)
+  const id = opts.report.identity;
+  // ⚠️ 票 04：字段必须存在 —— 旧报告/缺身份不再「带才比」。
+  if (id.configChecksum === undefined)
+    throw new CommandError("invalid", "试玩报告缺 configChecksum —— 身份不完整，拒绝写回");
+  if (id.packChecksum === undefined)
+    throw new CommandError("invalid", "试玩报告缺 packChecksum —— 身份不完整，拒绝写回");
+  if (id.configChecksum !== configChecksum)
     throw new CommandError("invalid",
-      `试玩报告的 config 身份与当前 run 不一致：报告 ${opts.report.identity.configChecksum} / 当前 ${configChecksum}`);
-  if (d.pack.manifestChecksum !== undefined && opts.report.identity.packChecksum !== undefined &&
-      d.pack.manifestChecksum !== opts.report.identity.packChecksum)
-    throw new CommandError("invalid", "试玩报告的 pack checksum 与当前 delivery 不一致");
+      `试玩报告的 config 身份与当前 run 不一致：报告 ${id.configChecksum} / 当前 ${configChecksum}`);
+
+  const gameId = path.basename(path.dirname(path.dirname(opts.runDir)));
+  const packDir = path.join(opts.outRoot, gameId, "pack", `v${d.pack.packVersion}`);
+  let packChecksum: string;
+  try { packChecksum = manifestChecksumOf(packDir); }
+  catch (e) { throw new CommandError("invalid", `算不出包 manifest checksum（${packDir}）：${e instanceof Error ? e.message : String(e)}`); }
+  if (id.packChecksum !== packChecksum)
+    throw new CommandError("invalid", `试玩报告的 pack 身份与当前包不一致：报告 ${id.packChecksum} / 当前 ${packChecksum}`);
+  if (d.pack.manifestChecksum !== undefined && d.pack.manifestChecksum !== packChecksum)
+    throw new CommandError("invalid", `delivery.pack.manifestChecksum 与实际包不一致：delivery ${d.pack.manifestChecksum} / 实际 ${packChecksum}`);
+
+  if (id.harnessVersion !== PLAYTEST_HARNESS_VERSION)
+    throw new CommandError("invalid", `试玩报告的 harnessVersion=${id.harnessVersion} 与当前 ${PLAYTEST_HARNESS_VERSION} 不一致`);
+  if (id.rulesVersion !== PLAYTEST_RULES_VERSION)
+    throw new CommandError("invalid", `试玩报告的 rulesVersion=${id.rulesVersion} 与当前 ${PLAYTEST_RULES_VERSION} 不一致`);
 
   const next = applyPlaytest(d, opts.report, opts.evidence);
 

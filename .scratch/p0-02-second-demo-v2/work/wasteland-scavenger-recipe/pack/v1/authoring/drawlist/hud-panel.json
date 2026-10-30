@@ -1,0 +1,458 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "hud-panel",
+  "frame": "hud-panel",
+  "viewBox": [
+    0,
+    0,
+    64,
+    64
+  ],
+  "expectedSize": [
+    64,
+    64
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 1,
+      "y": 1,
+      "w": 62,
+      "h": 62
+    },
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 8,
+      "y": 8,
+      "w": 48,
+      "h": 48
+    },
+    {
+      "op": "dither",
+      "x": 8,
+      "y": 8,
+      "w": 48,
+      "h": 48,
+      "colors": [
+        "palette:0",
+        "palette:1"
+      ],
+      "ratio": 0.5,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 8,
+      "y": 1,
+      "w": 48,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:12",
+      "x": 8,
+      "y": 3,
+      "w": 48,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 8,
+      "y": 4,
+      "w": 48,
+      "h": 3
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 8,
+      "y1": 7,
+      "x2": 56,
+      "y2": 7
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 8,
+      "y1": 56,
+      "x2": 56,
+      "y2": 56
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 8,
+      "y": 57,
+      "w": 48,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 8,
+      "y": 59,
+      "w": 48,
+      "h": 1
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 8,
+      "y": 60,
+      "w": 48,
+      "h": 3
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 1,
+      "y": 8,
+      "w": 2,
+      "h": 48
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 3,
+      "y": 8,
+      "w": 1,
+      "h": 48
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 4,
+      "y": 8,
+      "w": 3,
+      "h": 48
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 7,
+      "y1": 8,
+      "x2": 7,
+      "y2": 56
+    },
+    {
+      "op": "line",
+      "stroke": "palette:0",
+      "strokeWidth": 1,
+      "x1": 56,
+      "y1": 8,
+      "x2": 56,
+      "y2": 56
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 57,
+      "y": 8,
+      "w": 3,
+      "h": 48
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 60,
+      "y": 8,
+      "w": 1,
+      "h": 48
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 61,
+      "y": 8,
+      "w": 2,
+      "h": 48
+    },
+    {
+      "op": "poly",
+      "fill": "palette:0",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          0,
+          8
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:8",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "x": 2,
+      "y": 2,
+      "w": 4,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:14",
+      "x": 3,
+      "y": 3,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "poly",
+      "fill": "palette:0",
+      "points": [
+        [
+          56,
+          0
+        ],
+        [
+          64,
+          0
+        ],
+        [
+          64,
+          8
+        ],
+        [
+          62,
+          8
+        ],
+        [
+          56,
+          2
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:8",
+      "points": [
+        [
+          57,
+          1
+        ],
+        [
+          63,
+          1
+        ],
+        [
+          63,
+          7
+        ],
+        [
+          62,
+          7
+        ],
+        [
+          57,
+          2
+        ]
+      ]
+    },
+    {
+      "op": "rect",
+      "fill": "palette:10",
+      "x": 58,
+      "y": 2,
+      "w": 4,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:14",
+      "x": 59,
+      "y": 3,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "poly",
+      "fill": "palette:0",
+      "points": [
+        [
+          0,
+          56
+        ],
+        [
+          2,
+          56
+        ],
+        [
+          8,
+          62
+        ],
+        [
+          8,
+          64
+        ],
+        [
+          0,
+          64
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:5",
+      "points": [
+        [
+          1,
+          57
+        ],
+        [
+          2,
+          57
+        ],
+        [
+          7,
+          62
+        ],
+        [
+          7,
+          63
+        ],
+        [
+          1,
+          63
+        ]
+      ]
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 2,
+      "y": 58,
+      "w": 4,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 3,
+      "y": 59,
+      "w": 2,
+      "h": 2
+    },
+    {
+      "op": "poly",
+      "fill": "palette:0",
+      "points": [
+        [
+          62,
+          56
+        ],
+        [
+          64,
+          56
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          56,
+          64
+        ],
+        [
+          56,
+          62
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:5",
+      "points": [
+        [
+          62,
+          57
+        ],
+        [
+          63,
+          57
+        ],
+        [
+          63,
+          63
+        ],
+        [
+          57,
+          63
+        ],
+        [
+          57,
+          62
+        ]
+      ]
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 58,
+      "y": 58,
+      "w": 4,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:8",
+      "x": 59,
+      "y": 59,
+      "w": 2,
+      "h": 2
+    }
+  ]
+}

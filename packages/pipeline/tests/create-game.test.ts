@@ -137,6 +137,24 @@ describe("§第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15）", 
     expect(b.config.scene.background.asset).toBe("bg-dusk");
   });
 
+  it("构建返回机制覆盖核心：config 层来自实际 config；probe 未执行（票 08）", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    expect(b.coverage).toBeDefined();
+    const core = b.coverage!;
+    expect(core.format).toBe("mechanic-coverage/v2");
+    expect(core.probe.executed).toBe(false);
+    expect(core.probe.results).toEqual([]);
+    expect(core.mechanics.every((m) => m.qa === "not-tested")).toBe(true);
+    // config 层确实读了实际 config（wasteland 有 pickup/chest/hazard/terrain/goal）
+    const by = Object.fromEntries(core.mechanics.map((m) => [m.mechanic, m]));
+    if (by["collect-pickup"] !== undefined) expect(by["collect-pickup"].config.found.pickup).toBeGreaterThan(0);
+    if (by["collide-terrain"] !== undefined) expect(by["collide-terrain"].config.found.terrain).toBeGreaterThan(0);
+    // 报告由壳在站点装配后写；pipeline 只返回核心
+    expect(fs.existsSync(path.join(b.runDir, "mechanic-coverage.json"))).toBe(false);
+  });
+
   it("⚠️ 包内带一份 `authoring/visual-world.json`，而且它**进了 `files[]`**（Q15 α：靠 files[] 白拿 checksum）", async () => {
     const h = harness();
     const u = await understand(h);

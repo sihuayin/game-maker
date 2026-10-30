@@ -19,6 +19,7 @@ import {
   parseGameConfig, parseRecipe, QA_JUDGEMENTS, QAReportSchema, qaVerdict,
   buildMechanicCoverage, mechanicCoverageProblem, RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
+  type MechanicCoverageCore,
   type CommandResult, type GameIntentSpec, type LedgerCall, type MasterRatio, type Observation,
   type QAReport, type QaRunner, type RunLedger, type RuntimeProfileRef, type VisualWorldSpec,
 } from "@game-maker/contracts";
@@ -77,6 +78,8 @@ export type UnderstandingPaths = {
 /** 第二段写下的那几项。⚠️ `qaReport` 缺席 = **QA 没跑**（不是「跑了没问题」）。 */
 export type BuildPaths = {
   runDir: string; packDir: string; config: string; qaReport?: string; ledger: string;
+  /** 机制覆盖报告（v2；站点装配成功后才写）。 */
+  mechanicCoverage?: string;
 };
 
 /**
@@ -158,6 +161,8 @@ export type BuildResult = {
    *   不是「量了、全对」（全对是 `match: true` 的记录，照样在数组里）。
    */
   masterRatios?: MasterRatio[];
+  /** 机制覆盖核心（design/runtime/config + probe 占位）；站点装配成功后由壳补 subject 写盘。 */
+  coverage?: MechanicCoverageCore;
   paths: BuildPaths;
   ledger: LedgerCall[];
 };
@@ -574,6 +579,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   // ── QA：**默认跑**（票 20 的 Q3），而它的硬失败**阻断**（R3 · 票 20 的 Q4）──────────
   let qa: QAReport | undefined;
   let inspectData: InspectData | undefined;
+  let coverage: MechanicCoverageCore | undefined;
   if (runner !== undefined) {
     say("qa");
     // ⚠️ **免费 inspect 观察**（v3 视觉 QA 接口）：pack 已经落盘；只报数、不判。
@@ -644,7 +650,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
       // ── 机制覆盖门禁（票 08）：六判据是**产物级**，这一条是**机制级**端到端能力 ——
       //   每条设计声明要做的机制，设计/运行时/QA 三层缺一即拒（FR-07 末：单条失败不被总体掩盖）。
       //   ⚠️ 接在 `assertQaPassed` 之后：六判据先放行，再查「机制齐不齐」。
-      const coverage = buildMechanicCoverage(designParsed.data);
+      coverage = buildMechanicCoverage(designParsed.data, config.value);
       const coverageProblem = mechanicCoverageProblem(coverage);
       if (coverageProblem !== undefined)
         throw new CommandError("invalid", coverageProblem);
@@ -674,10 +680,12 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     ...(qa !== undefined ? { qa } : {}),
     ...(inspectData === undefined ? {} : { inspectData }),
     ...(masterRatios === undefined ? {} : { masterRatios }),
+    ...(coverage === undefined ? {} : { coverage }),
     paths: {
       runDir, packDir,
       config: path.join(runDir, RUN_ARTIFACT.config),
       ...(qa !== undefined ? { qaReport: path.join(runDir, RUN_ARTIFACT.qaReport) } : {}),
+      ...(coverage === undefined ? {} : { mechanicCoverage: path.join(runDir, RUN_ARTIFACT.mechanicCoverage) }),
       ledger: path.join(runDir, RUN_ARTIFACT.ledger),
     },
     ledger: union,

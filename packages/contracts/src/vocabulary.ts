@@ -114,7 +114,8 @@ export function deriveMechanicStatus(mechanic: Mechanic): MechanicStatus {
 export const QA_PROBED_MECHANICS: readonly Mechanic[] = [
   "collect-pickup",
   "open-chest",
-  "avoid-danger"
+  "avoid-danger",
+  "hazard-contact"
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

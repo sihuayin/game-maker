@@ -1,0 +1,6 @@
+{
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/site/v1 --scenario-dir /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/playtest/.tmp-11293-1793334008534/scenarios --out /Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/playtest/.tmp-11293-1793334008534/harness",
+  "exitCode": 0,
+  "at": "2026-10-30T04:20:27.685Z",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/playtest/.tmp-11293-1793334008534/harness"
+}
