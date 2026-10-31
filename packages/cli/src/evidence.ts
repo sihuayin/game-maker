@@ -18,6 +18,7 @@ export function runVerifyDeliveryCommand(opts: {
   cwd?: string;
   expectedManifestSha256?: string;
   baseManifestPath?: string;
+  anchorMode?: "digest" | "digest+base" | "baseline-update";
 }): { result: CommandResult; exitCode: number } {
   const cwd = opts.cwd ?? process.cwd();
   const roots = evidenceRootPaths(opts.manifestPath);
@@ -26,6 +27,7 @@ export function runVerifyDeliveryCommand(opts: {
   const report = verifyDeliveryEvidence(opts.manifestPath, {
     ...(opts.expectedManifestSha256 === undefined ? {} : { expectedManifestSha256: opts.expectedManifestSha256 }),
     ...(opts.baseManifestPath === undefined ? {} : { baseManifestPath: opts.baseManifestPath }),
+    ...(opts.anchorMode === undefined ? {} : { anchorMode: opts.anchorMode }),
   });
   const written = writeVerificationReport({ report, outDir: opts.outRoot });
   const relDir = rel(opts.outRoot, written.dir);

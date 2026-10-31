@@ -28,6 +28,7 @@ const MANIFEST = flag("manifest", path.join(ROOT, ".scratch/evidence-integrity-v
 const OUT = flag("out", path.join(ROOT, ".scratch/evidence-integrity-v1/runs"));
 const EXPECTED_MANIFEST_SHA = rawFlag("expected-manifest-sha", undefined);
 const BASE_MANIFEST = flag("base-manifest", undefined);
+const ANCHOR_MODE = rawFlag("anchor-mode", undefined);
 const CLI = path.join(ROOT, "packages/cli/dist/cli.mjs");
 const sha256 = (p) => "sha256:" + crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
 
@@ -50,6 +51,7 @@ try {
     "--manifest", MANIFEST,
     ...(EXPECTED_MANIFEST_SHA === undefined ? [] : ["--expected-manifest-sha", EXPECTED_MANIFEST_SHA]),
     ...(BASE_MANIFEST === undefined ? [] : ["--base-manifest", BASE_MANIFEST]),
+    ...(ANCHOR_MODE === undefined ? [] : ["--anchor-mode", ANCHOR_MODE]),
     "--out", OUT, "--json",
   ], {
     encoding: "utf8", cwd: ROOT, stdio: ["ignore", "pipe", "pipe"],
@@ -101,6 +103,7 @@ const summary = {
   manifestSha256: sha256(MANIFEST),
   expectedManifestSha256: EXPECTED_MANIFEST_SHA ?? null,
   baseManifest: BASE_MANIFEST === undefined ? null : path.relative(ROOT, BASE_MANIFEST),
+  anchorMode: ANCHOR_MODE ?? null,
   exitCode,
   durationMs,
   reportDir: newest === undefined ? null : path.relative(ROOT, newest),

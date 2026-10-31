@@ -85,6 +85,12 @@ jobs:
           cache: pnpm
           cache-dependency-path: base/pnpm-lock.yaml
 
+      - name: Verify base Manifest update log
+        env:
+          BASE_LOG: ${{ github.workspace }}/base/.scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md
+          BASE_MANIFEST: ${{ github.workspace }}/base/.scratch/evidence-integrity-v1/manifest/expected-hashes.json
+        run: node base/scripts/check-manifest-updates.mjs --log "$BASE_LOG" --manifest "$BASE_MANIFEST"
+
       - name: Build trusted base CLI
         working-directory: base
         run: |

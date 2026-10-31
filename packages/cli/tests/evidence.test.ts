@@ -185,3 +185,22 @@ describe("N15（P0-03-02）", () => {
     expect(fs.existsSync(fx.outDir)).toBe(false);
   });
 });
+
+describe("verify-delivery CLI baseline-update anchor mode（P0-03-05）", () => {
+  const newest = (outDir: string): Record<string, unknown> => {
+    const dirs = reportDirs(outDir);
+    expect(dirs.length).toBe(1);
+    return JSON.parse(fs.readFileSync(path.join(outDir, dirs[0]!, "report.json"), "utf8"));
+  };
+  it("--anchor-mode baseline-update ⇒ trust.mode=baseline-update", async () => {
+    const fx = makeMinimal();
+    const digest = sha(fx.manifestPath);
+    const { code } = await runC([
+      "verify-delivery", "--manifest", fx.manifestPath,
+      "--expected-manifest-sha", digest, "--anchor-mode", "baseline-update", "--out", fx.outDir,
+    ]);
+    expect(code).toBe(1); // 最小 fixture 六项前置缺失；锚点匹配不改变 blocked
+    const report = newest(fx.outDir);
+    expect(report.trust).toMatchObject({ mode: "baseline-update", result: "matched" });
+  });
+});

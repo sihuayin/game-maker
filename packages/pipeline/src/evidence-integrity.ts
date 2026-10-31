@@ -178,7 +178,7 @@ const CheckComparisonSchema = z.strictObject({
 
 /** 信任锚点：本次运行是否把当前清单钉在外部提供的 SHA-256 上（Q13）。 */
 const AnchorResultSchema = z.strictObject({
-  mode: z.enum(["digest", "digest+base"]),
+  mode: z.enum(["digest", "digest+base", "baseline-update"]),
   source: z.literal("cli"),
   expectedSha256: Sha256,
   actualSha256: Sha256,
@@ -1235,6 +1235,8 @@ export type AnchorOptions = {
   expectedManifestSha256?: string;
   /** 可信 base 清单路径；给了就要求与当前清单一字节不差。 */
   baseManifestPath?: string;
+  /** 显式锚点模式；不传时按是否给 base 推断。baseline-update 只用于 owner 专用基线验证。 */
+  anchorMode?: "digest" | "digest+base" | "baseline-update";
 };
 
 function normalizeExpectedSha(value: string): string {
@@ -1264,6 +1266,14 @@ function readBaseManifestRaw(baseManifestPath: string): Buffer {
 export function verifyDeliveryEvidence(manifestPath: string, anchor?: AnchorOptions): DeliveryVerificationReport {
   if (anchor?.baseManifestPath !== undefined && anchor.expectedManifestSha256 === undefined)
     throw new CommandError("usage", "--base-manifest 需要同时给 --expected-manifest-sha");
+  if (anchor?.anchorMode !== undefined && !["digest", "digest+base", "baseline-update"].includes(anchor.anchorMode))
+    throw new CommandError("usage", "--anchor-mode 只能是 digest / digest+base / baseline-update");
+  if (anchor?.anchorMode === "digest" && anchor.baseManifestPath !== undefined)
+    throw new CommandError("usage", "--anchor-mode digest 不接受 --base-manifest");
+  if (anchor?.anchorMode === "digest+base" && anchor.baseManifestPath === undefined)
+    throw new CommandError("usage", "--anchor-mode digest+base 需要 --base-manifest");
+  if (anchor?.anchorMode === "baseline-update" && anchor.baseManifestPath !== undefined)
+    throw new CommandError("usage", "--anchor-mode baseline-update 不接受 --base-manifest");
   const { manifest, absPath: absManifest, raw } = readEvidenceManifest(manifestPath);
   const actualManifestSha = sha256Of(raw);
   let anchorResult: AnchorResult | undefined;
@@ -1278,11 +1288,12 @@ export function verifyDeliveryEvidence(manifestPath: string, anchor?: AnchorOpti
         const baseRaw = readBaseManifestRaw(baseAbs);
         return { path: displayPathOf(baseAbs), sha256: sha256Of(baseRaw), byteEqual: raw.equals(baseRaw) };
       })();
+    const mode = anchor.anchorMode ?? (base === undefined ? "digest" : "digest+base");
     const digestMatch = expected === actualManifestSha;
-    const baseOk = base === undefined || (base.byteEqual && base.sha256 === expected);
+    const baseOk = mode === "baseline-update" ? true : base === undefined || (base.byteEqual && base.sha256 === expected);
     const result = digestMatch && baseOk ? "matched" : "mismatch";
     anchorResult = {
-      mode: base === undefined ? "digest" : "digest+base",
+      mode,
       source: "cli",
       expectedSha256: expected,
       actualSha256: actualManifestSha,
