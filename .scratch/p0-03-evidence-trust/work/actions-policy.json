@@ -1,0 +1,18 @@
+{
+  "name": "p0-03-evidence-pull-request-target",
+  "enforcement": "active",
+  "conditions": {
+    "workflow_path": {
+      "include": [".github/workflows/evidence.yml"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "restrict_action_events",
+      "parameters": {
+        "allowed_events": ["pull_request_target"]
+      }
+    }
+  ]
+}

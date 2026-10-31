@@ -1,0 +1,40 @@
+{
+  "effort": "p0-03-evidence-trust",
+  "generatedAt": "2026-10-31T13:54:00.000Z",
+  "mainSha": "2cf31cbe1d2fee2d9e7cb4f9ec587e376c22a605",
+  "verdict": "pass",
+  "destinationReached": true,
+  "finalRecheck": {
+    "status": "pass",
+    "exitCode": 0,
+    "files": { "total": 223, "required": 151, "optional": 72 },
+    "records": 13,
+    "diagnostics": 0,
+    "requiredNonVerified": 0,
+    "optionalMissingLocal": 0,
+    "trustAnchor": {
+      "mode": "digest+base",
+      "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "baseManifestByteEqual": true,
+      "result": "matched"
+    },
+    "protectedFileDiff": 0
+  },
+  "realPRs": {
+    "red": { "pr": 8, "state": "closed", "headSha": "570ec5c5e8c8a96f88fe01cbdaa4fc873ccb2d21", "evidenceCheckRunId": 124554574052, "mergeStateStatus": "BLOCKED", "evidenceConclusion": "failure" },
+    "green": { "pr": 9, "state": "merged", "headSha": "95f85b442a2a5e1a43ffa28ba9b941d3aa21f62e", "mergeCommit": "2cf31cbe1d2fee2d9e7cb4f9ec587e376c22a605", "mergeStateStatus": "CLEAN", "checks": { "check": 124555213186, "test": 124555213199, "typecheck": 124555212999, "evidence": 124555212654 } }
+  },
+  "ruleset": { "id": 26268801, "requiredChecks": ["check", "test", "typecheck", "evidence"], "appId": 15368, "ownerBypass": "pull_request", "directPushBlocked": true },
+  "baselineUpdateDispatch": { "runId": 41205281023, "candidateSha": "e44c62a783b8835890a9fa04673dc331d8b60ffd", "mode": "baseline-update", "result": "pass" },
+  "constraints": { "modelCalls": 0, "imageCalls": 0, "paidE2E": 0, "productionDeliveryModified": false, "historyOverwritten": false },
+  "limitations": [
+    "威胁模型不防御管理员、GitHub 管理权限或 CI 执行环境被攻陷",
+    "个人账号仓库没有完整 organization audit log",
+    "只有一个冻结 Demo，不能泛化到第二个独立 Demo",
+    "28 条 optional 日志在干净 checkout 中可能缺失（CI 实测 27 条），逐项报告且不失败",
+    "baseline-update dispatch dry-run 的 candidate 与 base 相同，未真正改变基线",
+    "Actions 存在 Node 20 deprecation 提示",
+    "证据完整性通过不等于人工视觉质量或全部游戏功能验收"
+  ]
+}

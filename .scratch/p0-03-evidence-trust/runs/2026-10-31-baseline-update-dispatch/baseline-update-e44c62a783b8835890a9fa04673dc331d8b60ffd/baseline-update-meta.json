@@ -1,0 +1,8 @@
+{
+  "candidateSha": "e44c62a783b8835890a9fa04673dc331d8b60ffd",
+  "baseRef": "refs/heads/main",
+  "baseSha": "e44c62a783b8835890a9fa04673dc331d8b60ffd",
+  "runId": "41205281023",
+  "workflow": "baseline-update",
+  "mode": "baseline-update"
+}

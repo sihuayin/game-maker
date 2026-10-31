@@ -1,0 +1,92 @@
+{
+  "command": "verify-delivery",
+  "summary": [
+    "✗ 证据完整性验收：fail（退出码 1）",
+    "  清单：.scratch/p0-03-evidence-trust/runs/2026-10-31-n06-n07/n07-clean/manifest.tampered.json · sha256 sha256:9a7f9ab3709b8419e88dd699b4c018e05a44ea8183aee7b1f671f541321d776a",
+    "  subject：fixture v1 · site v1 · shell 1",
+    "  范围：1 文件（required 1 / optional 0）· 0 条记录",
+    "  结论：声明 — / 重算 blocked（六项一致：否）",
+    "  锚点：mismatch（digest+base）",
+    "  诊断：fail 2 · blocked 3",
+    "  报告：2026-10-31T10-34-42-080Z-delivery-verification/report.json · 2026-10-31T10-34-42-080Z-delivery-verification/report.md"
+  ],
+  "data": {
+    "status": "fail",
+    "declaredVerdict": null,
+    "recomputedVerdict": "blocked",
+    "verdictMatch": false,
+    "checks": [
+      {
+        "key": "asset-pack",
+        "declared": null,
+        "recomputed": "blocked",
+        "match": false
+      },
+      {
+        "key": "config",
+        "declared": null,
+        "recomputed": "blocked",
+        "match": false
+      },
+      {
+        "key": "qa",
+        "declared": null,
+        "recomputed": "blocked",
+        "match": false
+      },
+      {
+        "key": "site",
+        "declared": null,
+        "recomputed": "blocked",
+        "match": false
+      },
+      {
+        "key": "playable-smoke",
+        "declared": null,
+        "recomputed": "blocked",
+        "match": false
+      },
+      {
+        "key": "visual-review",
+        "declared": null,
+        "recomputed": "blocked",
+        "match": false
+      }
+    ],
+    "files": {
+      "total": 1,
+      "required": 1,
+      "optional": 0
+    },
+    "records": 0,
+    "diagnostics": {
+      "total": 5,
+      "fail": 2,
+      "blocked": 3
+    },
+    "report": "2026-10-31T10-34-42-080Z-delivery-verification/report.json",
+    "reportMarkdown": "2026-10-31T10-34-42-080Z-delivery-verification/report.md",
+    "trustAnchor": {
+      "mode": "digest+base",
+      "source": "cli",
+      "expectedSha256": "sha256:aabdc23167f64877cad8371d9f06d91b35561c61d43d586436d4b16dab0b6e73",
+      "actualSha256": "sha256:9a7f9ab3709b8419e88dd699b4c018e05a44ea8183aee7b1f671f541321d776a",
+      "baseManifest": {
+        "path": ".scratch/p0-03-evidence-trust/runs/2026-10-31-n06-n07/n07-clean/manifest.base.json",
+        "sha256": "sha256:aabdc23167f64877cad8371d9f06d91b35561c61d43d586436d4b16dab0b6e73",
+        "byteEqual": false
+      },
+      "result": "mismatch"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "2026-10-31T10-34-42-080Z-delivery-verification/report.json",
+      "kind": "delivery-verification-report"
+    },
+    {
+      "path": "2026-10-31T10-34-42-080Z-delivery-verification/report.md",
+      "kind": "delivery-verification-report-markdown"
+    }
+  ]
+}
