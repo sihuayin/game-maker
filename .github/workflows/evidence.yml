@@ -1,8 +1,8 @@
 name: evidence
 
-# P0-03-00 占位 workflow：只验证 GitHub Actions event policy 允许
-# `.github/workflows/evidence.yml` 使用 pull_request_target。
-# 它不 checkout、不读取、不执行任何 PR 代码；03 票会用真正的 trusted evidence workflow 替换它。
+# P0-03-03：base-only trusted evidence。
+# 可信执行逻辑（workflow / CLI / 验收脚本 / Manifest / 摘要）全部来自受保护 base；
+# PR head 只作为不可信数据被读取，绝不执行。
 on:
   pull_request_target:
     branches: [main]
@@ -12,23 +12,112 @@ permissions:
   contents: read
 
 concurrency:
-  group: evidence-policy-placeholder-${{ github.event.pull_request.number }}
+  group: evidence-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   evidence:
     name: evidence
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     steps:
-      - name: Confirm trusted event context only
+      - name: Assert PR base is main
         env:
-          BASE_REF: ${{ github.base_ref }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          echo "event=$GITHUB_EVENT_NAME"
-          echo "base_ref=$BASE_REF"
-          echo "pr=$PR_NUMBER"
-          echo "head_sha=$HEAD_SHA"
-          echo "placeholder: no PR code checked out or executed"
+          test "$BASE_REF" = "main" || {
+            echo "::error::base branch is '$BASE_REF'; this gate only protects main"
+            exit 1
+          }
+
+      - name: Checkout trusted base
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          sparse-checkout: |
+            packages
+            scripts
+            .scratch/evidence-integrity-v1/manifest
+
+      - name: Checkout PR head as data only
+        uses: actions/checkout@v7
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          path: pr
+          persist-credentials: false
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          allow-unsafe-pr-checkout: true
+          sparse-checkout: |
+            .scratch/fpvs-v1-final/work
+            .scratch/fpvs-v1-final/artifacts
+            .scratch/fpvs-v1-final/runs
+            .scratch/generic-playtest-v1/evidence
+            .scratch/evidence-integrity-v1/manifest
+
+      - name: Verify PR head did not move during checkout
+        working-directory: pr
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          ACTUAL_HEAD="$(git rev-parse HEAD)"
+          if [ "$ACTUAL_HEAD" != "$EXPECTED_HEAD" ]; then
+            echo "::error::PR head moved or checkout mismatch: expected $EXPECTED_HEAD, got $ACTUAL_HEAD"
+            exit 1
+          fi
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.1
+          run_install: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Build trusted base CLI
+        working-directory: base
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Verify base Manifest and anchor
+        env:
+          BASE_DIGEST_FILE: ${{ github.workspace }}/base/.scratch/evidence-integrity-v1/manifest/expected-hashes.sha256
+          BASE_MANIFEST: ${{ github.workspace }}/base/.scratch/evidence-integrity-v1/manifest/expected-hashes.json
+          PR_MANIFEST: ${{ github.workspace }}/pr/.scratch/evidence-integrity-v1/manifest/expected-hashes.json
+          OUT_DIR: ${{ runner.temp }}/evidence-runs
+        run: |
+          set -euo pipefail
+          for f in "$BASE_DIGEST_FILE" "$BASE_MANIFEST" "$PR_MANIFEST"; do
+            test -f "$f" || { echo "::error::missing required trusted input: $f"; exit 1; }
+          done
+          BASE_DIGEST="$(tr -d '\r\n' < "$BASE_DIGEST_FILE")"
+          if ! cmp -s "$BASE_MANIFEST" "$PR_MANIFEST"; then
+            echo "::error::PR Manifest differs from base Manifest; ordinary PRs may not change expected values."
+            exit 1
+          fi
+          mkdir -p "$OUT_DIR"
+          node base/scripts/evidence-acceptance.mjs \
+            --manifest "$PR_MANIFEST" \
+            --expected-manifest-sha "$BASE_DIGEST" \
+            --base-manifest "$BASE_MANIFEST" \
+            --out "$OUT_DIR"
+
+      - name: Upload evidence report and summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-${{ github.event.pull_request.number }}
+          path: ${{ runner.temp }}/evidence-runs
+          retention-days: 30
+          if-no-files-found: warn

@@ -41,7 +41,7 @@ const USAGE = `game-maker —— 图片驱动的游戏资源工具链
   game-maker playtest-baseline promote <baselineId> --report <result.json> --second-report <result.json> --coverage <coverage.json> --reason "..." [--dir <目录>] [--replace] [--json]
   game-maker build-evidence-manifest --spec <spec.json> --out <manifest.json> [--force] [--json]
   game-maker verify-mechanics <run 目录> [--out <目录>] [--json]
-  game-maker verify-delivery --manifest <清单文件> [--out <目录>] [--json]
+  game-maker verify-delivery --manifest <清单文件> [--expected-manifest-sha <sha256:…>] [--base-manifest <路径>] [--out <目录>] [--json]
 
 \`review\` 是**人主动跑的事后抽查**（票 78）：对一个 run 最新那个包做**一次付费的视觉调用** ——
   把包的联系表与**原图**一起喂给视觉模型，要一份「哪里不像」的观察清单。
@@ -135,6 +135,8 @@ export function parseArgs(argv: readonly string[]): Parsed {
     "scenario-dir",
     // Evidence Integrity V1：`verify-delivery` 的输入清单
     "manifest",
+    // P0-03-01：可信锚点（清单摘要 + 可选 base 清单）
+    "expected-manifest-sha", "base-manifest",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -873,7 +875,17 @@ export async function run(argv: readonly string[], io: CliIo = REAL_IO, deps: Cl
         //   判断全在 pipeline；壳只解析参数、映射退出码。
         if (typeof flags.manifest !== "string")
           throw new CommandError("usage", "verify-delivery 需要 --manifest <清单文件>");
-        const cmd = runVerifyDeliveryCommand({ manifestPath: path.resolve(cwd, flags.manifest), outRoot, cwd });
+        const expectedManifestSha256 = typeof flags["expected-manifest-sha"] === "string"
+          ? flags["expected-manifest-sha"].trim() : undefined;
+        const baseManifestPath = typeof flags["base-manifest"] === "string"
+          ? path.resolve(cwd, flags["base-manifest"]) : undefined;
+        if (baseManifestPath !== undefined && expectedManifestSha256 === undefined)
+          throw new CommandError("usage", "verify-delivery 的 --base-manifest 需要同时给 --expected-manifest-sha");
+        const cmd = runVerifyDeliveryCommand({
+          manifestPath: path.resolve(cwd, flags.manifest), outRoot, cwd,
+          ...(expectedManifestSha256 === undefined ? {} : { expectedManifestSha256 }),
+          ...(baseManifestPath === undefined ? {} : { baseManifestPath }),
+        });
         result = cmd.result;
         exitCode = cmd.exitCode;
         break;

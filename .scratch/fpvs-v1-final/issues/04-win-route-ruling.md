@@ -92,7 +92,7 @@ FA-01B 已确认并修复 gate 停点（诊断运行 `won=true`，但该运行�
   （`artifacts/identity.json` 的 `verification.workVsSnapshot.same=true`）。
 - `site-integrity.json` 前后哈希一致；config checksum 与 `identity.json` 一致；snapshot 零写入。
 - gate 修复本身在 harness（`policy.mjs` / `observe.mjs`），不在验收产物。
-- 报告：[runs/2026-10-27-gate-stop/README.md](../../runs/2026-10-27-gate-stop/README.md)。
+- 报告：[runs/2026-10-27-gate-stop/README.md](../runs/2026-10-27-gate-stop/README.md)。
 
 ### FA-02 开工前置（用户 2026-10-28 逐字）—— 已确认
 

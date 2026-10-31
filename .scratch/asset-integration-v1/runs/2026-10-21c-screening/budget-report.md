@@ -5,7 +5,7 @@
 
 ## 结论先说
 
-- 短名单（[13](../research/alternative-animation-models-2026-10-21.md)）：**Gemini 3 Pro**（Interactions/JPEG，
+- 短名单（[13](../../research/alternative-animation-models-2026-10-21.md)）：**Gemini 3 Pro**（Interactions/JPEG，
   现有 key + 7890）与 **OpenAI gpt-image-2.5**（PNG，接入路径需人裁）。
 - 筛查样本：`scavenger-actor.idle1/idle2`，同一组提示词 / 参考图；2 帧 / 候选；≤$0.50 / 候选。
 - 候选 A：2 × $0.134 输出 + 输入 ≈ **$0.28**；≤3 发 ≈ **≤$0.42**；上限 **≤$0.50**。

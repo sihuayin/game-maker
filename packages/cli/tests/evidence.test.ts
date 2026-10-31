@@ -104,3 +104,84 @@ describe("verify-delivery CLI", () => {
     expect(reportDirs(fx.outDir).length).toBe(2);
   });
 });
+
+describe("verify-delivery CLI trust anchor（P0-03-01）", () => {
+  const readNewestReport = (outDir: string): Record<string, unknown> => {
+    const dirs = reportDirs(outDir);
+    expect(dirs.length).toBe(1);
+    return JSON.parse(fs.readFileSync(path.join(outDir, dirs[0]!, "report.json"), "utf8"));
+  };
+
+  it("--expected-manifest-sha 匹配 ⇒ trust.anchor=matched，报告记录", async () => {
+    const fx = makeMinimal();
+    const digest = sha(fx.manifestPath);
+    const { code } = await runC([
+      "verify-delivery", "--manifest", fx.manifestPath, "--expected-manifest-sha", digest, "--out", fx.outDir,
+    ]);
+    expect(code).toBe(1); // 最小 fixture 的六项前置缺失 ⇒ blocked；锚点匹配不改变它
+    const report = readNewestReport(fx.outDir);
+    expect(report.trust).toMatchObject({ mode: "digest", source: "cli", expectedSha256: digest, result: "matched" });
+  });
+
+  it("摘要不匹配 ⇒ fail + anchor.manifest-digest", async () => {
+    const fx = makeMinimal();
+    const { code } = await runC([
+      "verify-delivery", "--manifest", fx.manifestPath,
+      "--expected-manifest-sha", "sha256:" + "f".repeat(64), "--out", fx.outDir,
+    ]);
+    expect(code).toBe(1);
+    const report = readNewestReport(fx.outDir);
+    expect(report.status).toBe("fail");
+    expect(report.trust).toMatchObject({ result: "mismatch" });
+    expect((report.diagnostics as Array<{ rule: string }>).some((d) => d.rule === "anchor.manifest-digest")).toBe(true);
+  });
+
+  it("摘要格式错 ⇒ usage 2，且不写报告", async () => {
+    const fx = makeMinimal();
+    const { code, io } = await runC([
+      "verify-delivery", "--manifest", fx.manifestPath, "--expected-manifest-sha", "deadbeef", "--out", fx.outDir,
+    ]);
+    expect(code).toBe(2);
+    expect(io.errors.join("")).toContain("--expected-manifest-sha");
+    expect(fs.existsSync(fx.outDir)).toBe(false);
+  });
+
+  it("--base-manifest 没有摘要 ⇒ usage 2", async () => {
+    const fx = makeMinimal();
+    const base = path.join(fx.dir, "base.json");
+    fs.copyFileSync(fx.manifestPath, base);
+    const { code } = await runC([
+      "verify-delivery", "--manifest", fx.manifestPath, "--base-manifest", base, "--out", fx.outDir,
+    ]);
+    expect(code).toBe(2);
+    expect(fs.existsSync(fx.outDir)).toBe(false);
+  });
+
+  it("--base-manifest 字节一致 ⇒ digest+base matched", async () => {
+    const fx = makeMinimal();
+    const digest = sha(fx.manifestPath);
+    const base = path.join(fx.dir, "base.json");
+    fs.copyFileSync(fx.manifestPath, base);
+    const { code } = await runC([
+      "verify-delivery", "--manifest", fx.manifestPath, "--expected-manifest-sha", digest,
+      "--base-manifest", base, "--out", fx.outDir,
+    ]);
+    expect(code).toBe(1);
+    const report = readNewestReport(fx.outDir);
+    expect(report.trust).toMatchObject({
+      mode: "digest+base", result: "matched", baseManifest: { sha256: digest, byteEqual: true },
+    });
+  });
+});
+
+describe("N15（P0-03-02）", () => {
+  it("重复文件清单 ⇒ invalid 4，且不写报告", async () => {
+    const fx = makeMinimal();
+    const manifest = JSON.parse(fs.readFileSync(fx.manifestPath, "utf8"));
+    manifest.files.push({ ...manifest.files[0] });
+    fs.writeFileSync(fx.manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+    const { code } = await runC(["verify-delivery", "--manifest", fx.manifestPath, "--out", fx.outDir]);
+    expect(code).toBe(4);
+    expect(fs.existsSync(fx.outDir)).toBe(false);
+  });
+});

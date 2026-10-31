@@ -47,8 +47,8 @@ cc-switch 把 provider 映射成 `deepseek-flash` 导致的能力不足？把能
 证据权重：**provider/转译丢数据（高）≈ 映射→弱模型（高）>> schema 太大（低，基本被推翻）**。
 
 「票 27」悬空引用已定位：出处是 `game-maker-v2` 的
-[票 27](../game-maker-v2/issues/27-json-via-tool-choice.md) + 探针
-[`tool-choice-probe/`](../game-maker-v2/experiments/tool-choice-probe/README.md)
+[票 27](../../game-maker-v2/issues/27-json-via-tool-choice.md) + 探针
+[`tool-choice-probe/`](../../game-maker-v2/experiments/tool-choice-probe/README.md)
 （`raw/01-tool-choice-r1.json`：`emit_visual_world` · 1463 in / 1135 out · `input={}` · served=deepseek-flash）。
 它证明「入参在代理侧会静默丢失」，但场景是**小 schema**，不能用来支持「大 schema 丢数据」。
 

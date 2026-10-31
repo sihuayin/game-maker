@@ -16,12 +16,17 @@ export function runVerifyDeliveryCommand(opts: {
   manifestPath: string;
   outRoot: string;
   cwd?: string;
+  expectedManifestSha256?: string;
+  baseManifestPath?: string;
 }): { result: CommandResult; exitCode: number } {
   const cwd = opts.cwd ?? process.cwd();
   const roots = evidenceRootPaths(opts.manifestPath);
   assertOutOutsideRoots(opts.outRoot, roots);
 
-  const report = verifyDeliveryEvidence(opts.manifestPath);
+  const report = verifyDeliveryEvidence(opts.manifestPath, {
+    ...(opts.expectedManifestSha256 === undefined ? {} : { expectedManifestSha256: opts.expectedManifestSha256 }),
+    ...(opts.baseManifestPath === undefined ? {} : { baseManifestPath: opts.baseManifestPath }),
+  });
   const written = writeVerificationReport({ report, outDir: opts.outRoot });
   const relDir = rel(opts.outRoot, written.dir);
   const fails = report.diagnostics.filter((d) => d.severity === "fail").length;
@@ -38,6 +43,7 @@ export function runVerifyDeliveryCommand(opts: {
         `  范围：${report.scope.files.total} 文件（required ${report.scope.files.required} / optional ${report.scope.files.optional}）· ${report.scope.records} 条记录`,
         `  结论：声明 ${report.declared.verdict ?? "—"} / 重算 ${report.recomputed.verdict}` +
           `（六项一致：${report.comparison.checks.every((c) => c.match) ? "是" : "否"}）`,
+        ...(report.trust === undefined ? [] : [`  锚点：${report.trust.result}（${report.trust.mode}）`]),
         `  诊断：fail ${fails} · blocked ${blocked}`,
         `  报告：${relDir}/report.json · ${relDir}/report.md`,
       ],
@@ -52,6 +58,7 @@ export function runVerifyDeliveryCommand(opts: {
         diagnostics: { total: report.diagnostics.length, fail: fails, blocked },
         report: `${relDir}/report.json`,
         reportMarkdown: `${relDir}/report.md`,
+        ...(report.trust === undefined ? {} : { trustAnchor: report.trust }),
       },
       artifacts: [
         { path: `${relDir}/report.json`, kind: "delivery-verification-report" },
