@@ -83,6 +83,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: base/pnpm-lock.yaml
 
       - name: Build trusted base CLI
         working-directory: base
