@@ -332,7 +332,7 @@ E0/E1 不得写成已验收。
 | W6 E2E | [research/w6-e2e-evidence.md](../../.scratch/p0-00-audit/research/w6-e2e-evidence.md) |
 | HEAD 重放 | [runs/2026-10-20a-head-replay/](../../.scratch/p0-00-audit/runs/2026-10-20a-head-replay/) |
 | 最终包 v7 | [pack/v7](../../.scratch/asset-integration-v1/runs/2026-10-20f-lurker/ruin-scavenger-extraction-assets/pack/v7/) |
-| 最终站点 v3 | [site/v3](../../.scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v3/) |
+| 最终站点 v3（`out/` 构建产物不入库） | [运行目录](../../.scratch/asset-integration-v1/runs/2026-10-20e-site/) |
 | 归档完整单跑 | [run-2026-10-17d.json](../../.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-2026-10-17d.json) |
 | 视觉裁定 | [08-visual-comparison-rulings.md](../../.scratch/p0-00-audit/issues/08-visual-comparison-rulings.md) |
 
