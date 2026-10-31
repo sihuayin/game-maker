@@ -1,0 +1,75 @@
+{
+  "format": "evidence-acceptance-run/v1",
+  "generatedAt": "2026-10-31T12:16:15.684Z",
+  "command": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --out .scratch/p0-03-evidence-trust/runs/2026-10-31-baseline-update-e3 --json",
+  "manifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "manifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "expectedManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "baseManifest": null,
+  "anchorMode": "baseline-update",
+  "exitCode": 0,
+  "durationMs": 1602,
+  "reportDir": ".scratch/p0-03-evidence-trust/runs/2026-10-31-baseline-update-e3/2026-10-31T12-16-15-676Z-delivery-verification",
+  "reportSha256": "sha256:da75ab24d30295e50d1ada11e88384004f083243c9e6d8885b84cdfe3dce8c07",
+  "reportJsonBytes": 139661,
+  "files": {
+    "total": 223,
+    "required": 151,
+    "optional": 72
+  },
+  "records": 13,
+  "manifestFiles": 223,
+  "manifestBytes": 20207992,
+  "status": "pass",
+  "declaredVerdict": "pass",
+  "recomputedVerdict": "pass",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "config",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "qa",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "site",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "playable-smoke",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "visual-review",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    }
+  ],
+  "diagnostics": 0,
+  "trustAnchor": {
+    "mode": "baseline-update",
+    "source": "cli",
+    "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "result": "matched"
+  },
+  "pass": true,
+  "problems": [],
+  "stderr": null
+}

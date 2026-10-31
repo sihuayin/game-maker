@@ -1,0 +1,80 @@
+{
+  "format": "evidence-acceptance-run/v1",
+  "generatedAt": "2026-10-31T13:54:03.934Z",
+  "command": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --out .scratch/p0-03-evidence-trust/runs/2026-10-31-final-acceptance-post-green --json",
+  "manifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "manifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "expectedManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "baseManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "anchorMode": null,
+  "exitCode": 0,
+  "durationMs": 507,
+  "reportDir": ".scratch/p0-03-evidence-trust/runs/2026-10-31-final-acceptance-post-green/2026-10-31T13-54-03-918Z-delivery-verification",
+  "reportSha256": "sha256:8dc03407bbb645144027f2df603479fa86ba9fe0a39b3fe3b5fa53ae5ec554d5",
+  "reportJsonBytes": 139879,
+  "files": {
+    "total": 223,
+    "required": 151,
+    "optional": 72
+  },
+  "records": 13,
+  "manifestFiles": 223,
+  "manifestBytes": 20207992,
+  "status": "pass",
+  "declaredVerdict": "pass",
+  "recomputedVerdict": "pass",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "config",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "qa",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "site",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "playable-smoke",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "visual-review",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    }
+  ],
+  "diagnostics": 0,
+  "trustAnchor": {
+    "mode": "digest+base",
+    "source": "cli",
+    "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "baseManifest": {
+      "path": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "sha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "byteEqual": true
+    },
+    "result": "matched"
+  },
+  "pass": true,
+  "problems": [],
+  "stderr": null
+}

@@ -1,0 +1,86 @@
+{
+  "format": "evidence-acceptance-run/v1",
+  "generatedAt": "2026-10-31T13:48:22.356Z",
+  "command": "node packages/cli/dist/cli.mjs verify-delivery --manifest ../pr/.scratch/evidence-integrity-v1/manifest/expected-hashes.json --out ../../../_temp/evidence-runs --json",
+  "manifest": "../pr/.scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "manifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "expectedManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "baseManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "anchorMode": null,
+  "exitCode": 1,
+  "durationMs": 276,
+  "reportDir": "../../../_temp/evidence-runs/2026-10-31T13-48-22-333Z-delivery-verification",
+  "reportSha256": "sha256:455fe4e012ef43f6317413a6eb881bc8f6303e50fe4a8eacf6414b34b69298fe",
+  "reportJsonBytes": 134963,
+  "files": {
+    "total": 223,
+    "required": 151,
+    "optional": 72
+  },
+  "records": 13,
+  "manifestFiles": 223,
+  "manifestBytes": 20207992,
+  "status": "fail",
+  "declaredVerdict": null,
+  "recomputedVerdict": "blocked",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "declared": null,
+      "recomputed": "pass",
+      "match": false
+    },
+    {
+      "key": "config",
+      "declared": null,
+      "recomputed": "blocked",
+      "match": false
+    },
+    {
+      "key": "qa",
+      "declared": null,
+      "recomputed": "blocked",
+      "match": false
+    },
+    {
+      "key": "site",
+      "declared": null,
+      "recomputed": "pass",
+      "match": false
+    },
+    {
+      "key": "playable-smoke",
+      "declared": null,
+      "recomputed": "blocked",
+      "match": false
+    },
+    {
+      "key": "visual-review",
+      "declared": null,
+      "recomputed": "blocked",
+      "match": false
+    }
+  ],
+  "diagnostics": 9,
+  "trustAnchor": {
+    "mode": "digest+base",
+    "source": "cli",
+    "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "baseManifest": {
+      "path": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "sha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "byteEqual": true
+    },
+    "result": "matched"
+  },
+  "pass": false,
+  "problems": [
+    "CLI 退出码 1（期望 0）",
+    "report.status=fail（期望 pass）",
+    "recomputed.verdict=blocked",
+    "declared verdict 与 recomputed 不一致",
+    "六项检查存在 declared↔recomputed 不一致"
+  ],
+  "stderr": null
+}

@@ -1,0 +1,92 @@
+{
+  "command": "verify-delivery",
+  "summary": [
+    "✅ 证据完整性验收：pass（退出码 0）",
+    "  清单：.scratch/evidence-integrity-v1/manifest/expected-hashes.json · sha256 sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "  subject：wasteland-scavenger-recipe v1 · site v1 · shell 2",
+    "  范围：223 文件（required 151 / optional 72）· 13 条记录",
+    "  结论：声明 pass / 重算 pass（六项一致：是）",
+    "  锚点：matched（digest+base）",
+    "  诊断：fail 0 · blocked 0",
+    "  报告：2026-10-31T02-33-21-202Z-delivery-verification/report.json · 2026-10-31T02-33-21-202Z-delivery-verification/report.md"
+  ],
+  "data": {
+    "status": "pass",
+    "declaredVerdict": "pass",
+    "recomputedVerdict": "pass",
+    "verdictMatch": true,
+    "checks": [
+      {
+        "key": "asset-pack",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "config",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "qa",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "site",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "playable-smoke",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "visual-review",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      }
+    ],
+    "files": {
+      "total": 223,
+      "required": 151,
+      "optional": 72
+    },
+    "records": 13,
+    "diagnostics": {
+      "total": 0,
+      "fail": 0,
+      "blocked": 0
+    },
+    "report": "2026-10-31T02-33-21-202Z-delivery-verification/report.json",
+    "reportMarkdown": "2026-10-31T02-33-21-202Z-delivery-verification/report.md",
+    "trustAnchor": {
+      "mode": "digest+base",
+      "source": "cli",
+      "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "baseManifest": {
+        "path": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+        "sha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+        "byteEqual": true
+      },
+      "result": "matched"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "2026-10-31T02-33-21-202Z-delivery-verification/report.json",
+      "kind": "delivery-verification-report"
+    },
+    {
+      "path": "2026-10-31T02-33-21-202Z-delivery-verification/report.md",
+      "kind": "delivery-verification-report-markdown"
+    }
+  ]
+}

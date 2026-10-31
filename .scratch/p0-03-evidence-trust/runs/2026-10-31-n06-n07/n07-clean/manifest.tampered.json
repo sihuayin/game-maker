@@ -1,0 +1,26 @@
+{
+  "format": "delivery-evidence-manifest/v1",
+  "generatedAt": "2026-10-31T00:00:00.000Z",
+  "subject": {
+    "packId": "fixture",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "1",
+    "manifestChecksum": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "configChecksum": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "roots": {
+    "delivery": "delivery"
+  },
+  "files": [
+    {
+      "root": "delivery",
+      "path": "a.json",
+      "role": "fixture",
+      "required": true,
+      "bytes": 21,
+      "sha256": "sha256:a54397609b96771f2b584a80b10c4e2a0eef7f502d43179cff4209722a93e6ab"
+    }
+  ],
+  "records": []
+}

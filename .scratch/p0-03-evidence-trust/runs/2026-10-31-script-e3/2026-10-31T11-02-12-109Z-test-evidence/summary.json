@@ -1,0 +1,79 @@
+{
+  "format": "evidence-acceptance-run/v1",
+  "generatedAt": "2026-10-31T11:02:14.019Z",
+  "command": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --out .scratch/p0-03-evidence-trust/runs/2026-10-31-script-e3 --json",
+  "manifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "manifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "expectedManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "baseManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "exitCode": 0,
+  "durationMs": 1909,
+  "reportDir": ".scratch/p0-03-evidence-trust/runs/2026-10-31-script-e3/2026-10-31T11-02-13-997Z-delivery-verification",
+  "reportSha256": "sha256:cc4cfefbe2254aade5ebc2a2ae6aa77b5fe72016dd6392d379eb1ee809e4a5cc",
+  "reportJsonBytes": 139879,
+  "files": {
+    "total": 223,
+    "required": 151,
+    "optional": 72
+  },
+  "records": 13,
+  "manifestFiles": 223,
+  "manifestBytes": 20207992,
+  "status": "pass",
+  "declaredVerdict": "pass",
+  "recomputedVerdict": "pass",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "config",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "qa",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "site",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "playable-smoke",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "visual-review",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    }
+  ],
+  "diagnostics": 0,
+  "trustAnchor": {
+    "mode": "digest+base",
+    "source": "cli",
+    "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "baseManifest": {
+      "path": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "sha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "byteEqual": true
+    },
+    "result": "matched"
+  },
+  "pass": true,
+  "problems": [],
+  "stderr": null
+}

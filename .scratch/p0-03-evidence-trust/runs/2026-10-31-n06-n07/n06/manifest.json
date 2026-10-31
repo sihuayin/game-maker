@@ -1,0 +1,1904 @@
+{
+  "format": "delivery-evidence-manifest/v1",
+  "generatedAt": "2026-10-29T04:29:17.366Z",
+  "generatedBy": ".scratch/evidence-integrity-v1/tools/build-manifest.mjs",
+  "note": "一次性生成、人工审查后随 git 固定；校验器只读、绝不回写。信任边界：能发现相对本清单的改动，发现不了清单与被验证据一起被改并提交。",
+  "subject": {
+    "packId": "wasteland-scavenger-recipe",
+    "packVersion": 1,
+    "siteVersion": 1,
+    "shellVersion": "2",
+    "manifestChecksum": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+    "configChecksum": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+  },
+  "roots": {
+    "out": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/work",
+    "snapshot": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe",
+    "reference": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/artifacts/reference",
+    "artifacts": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/artifacts",
+    "fa04": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-visual-review",
+    "fa05": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance",
+    "fa06": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure",
+    "runs": "/Volumes/shy/some-projects/game-maker/.scratch/fpvs-v1-final/runs",
+    "gp": "/Volumes/shy/some-projects/game-maker/.scratch/generic-playtest-v1/evidence"
+  },
+  "files": [
+    {
+      "root": "artifacts",
+      "path": "hashes.json",
+      "role": "freeze-manifest",
+      "required": true,
+      "bytes": 29850,
+      "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "root": "artifacts",
+      "path": "identity.json",
+      "role": "identity",
+      "required": true,
+      "bytes": 7425,
+      "sha256": "sha256:abf0047a355bf82cc8b688940faa64512d3b06105c147a95a903c676810c12ad"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/background-frames.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 66843,
+      "sha256": "sha256:f641ac9b0839eea26094589e3c8adfd6b3f00d02f01f563c7d15bd05965b3377"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/character-frames.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 41445,
+      "sha256": "sha256:90db8918aa19735e1e08792e031b54cf431629a29886479bac6e1f7238cdf047"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/hud-in-game.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 2781,
+      "sha256": "sha256:b3d6a917963e295b47445231d2487849852654709c0fcb94800f5d0f3a6ee157"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/objects-frames.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 38992,
+      "sha256": "sha256:93726f55e1ee590c95df3e3911701e89375279fc279739a64390fef4dbe71406"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/patroller-frames.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 33956,
+      "sha256": "sha256:65bbe8651a3a0670b18568e3c4ae1bc9be1bc0d8087ba215e7742d1ed81ac58e"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/player-in-game.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 53044,
+      "sha256": "sha256:b38edc588ea418f2cfc37e4c0697ffbffd8996362e638196c2880aab1a0d4675"
+    },
+    {
+      "root": "fa04",
+      "path": "assets/reference-vs-gameplay.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 46539,
+      "sha256": "sha256:bd6127bf27763b065e935040b247e60d69a51215da669c2e7846afc8d9637400"
+    },
+    {
+      "root": "fa04",
+      "path": "build-materials.mjs",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 5385,
+      "sha256": "sha256:a5bb9c85476740677cd0dc3085109bbd117d5af786829c8268b8441b34d1c78c"
+    },
+    {
+      "root": "fa04",
+      "path": "capture.json",
+      "role": "visual-record",
+      "required": true,
+      "bytes": 5684,
+      "sha256": "sha256:8a27db7e81e0e6dede1a8b2ebaa80d0b4e0f9f1947af001f67db02be38276f58"
+    },
+    {
+      "root": "fa04",
+      "path": "capture.mjs",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 10010,
+      "sha256": "sha256:fc928631a2e12b9353e4427409a37966cabc60edae5769a8ab4fc270e4636a93"
+    },
+    {
+      "root": "fa04",
+      "path": "chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:a415848dbd888d6a68cd4d8110778ce2e6b12e56fc042df16e9af1b8df65b381"
+    },
+    {
+      "root": "fa04",
+      "path": "console.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "root": "fa04",
+      "path": "events.jsonl",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 3434,
+      "sha256": "sha256:115710a3df66e392ece22763c82d923a0d98e155359a325d9d322915bb96d518"
+    },
+    {
+      "root": "fa04",
+      "path": "exceptions.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "fa04",
+      "path": "input.jsonl",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 3034,
+      "sha256": "sha256:19a849a3cb651d69420cc2b2a93e375d430cdf867dc6c96a7bd669ab1043e85f"
+    },
+    {
+      "root": "fa04",
+      "path": "materials.json",
+      "role": "visual-record",
+      "required": true,
+      "bytes": 24678,
+      "sha256": "sha256:060debc46fcd52b99f6863d254fe8e964f471eacd93d2c2fb8c6659284f469af"
+    },
+    {
+      "root": "fa04",
+      "path": "README.md",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 7623,
+      "sha256": "sha256:31872f663d60e69549fb2681b65e5e54d9f8a1f7d79ff1a6cb446fea1c7dd4cb"
+    },
+    {
+      "root": "fa04",
+      "path": "review-record.json",
+      "role": "visual-record",
+      "required": true,
+      "bytes": 4469,
+      "sha256": "sha256:a1602021720ed1a984913094eebff3a9b29ad5ef09f2ef7347c620ea0d93a0c1"
+    },
+    {
+      "root": "fa04",
+      "path": "review.html",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 10568,
+      "sha256": "sha256:9facbc3f7e03559071c31c7887979ada9d0e00226e5709f76ed2efae842b1706"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/01-startup.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 20139,
+      "sha256": "sha256:71e544d9b357df6e72e4b50b6f45fa05310a8ddcbb8bf74cfe188f6fdbe65c2c"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/02-movement.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 20466,
+      "sha256": "sha256:0170124c187fa13a28a74b8c9314d21421da36385ec18b00dffaeb6b684082c1"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/03-jump.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 20628,
+      "sha256": "sha256:462fc8584459ecfb52008c367c741e09fd27edc3be14848434cfe89ebe987973"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/04-pickup.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 20465,
+      "sha256": "sha256:328fc7a9cca5d423327962831e870321255930c83d5a76c989ba1e23660f7276"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/05-chest-open.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 21028,
+      "sha256": "sha256:29e1f93199f580d3838eccf73c07ec198c53c14c1d824727cb25a41d2e44139b"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/06-hazard-wait.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 21510,
+      "sha256": "sha256:9b5744c8b903610f78ac47499b07e8e3c02a48109cc6f067c332f9e0fe5039ee"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/07-hazard-cross.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 21640,
+      "sha256": "sha256:92e1a04f620184dd7613c43eb42fabced1844a5816f9a0dc4cc13f443fcca48b"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/08-goal.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 23105,
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7"
+    },
+    {
+      "root": "fa04",
+      "path": "shots/09-final.png",
+      "role": "visual-shot",
+      "required": true,
+      "bytes": 23105,
+      "sha256": "sha256:b5cbe0e711a55e25f31d6bd76500cd8b3b2962792a829e318d457f2b01113db7"
+    },
+    {
+      "root": "fa04",
+      "path": "trace.jsonl",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 224892,
+      "sha256": "sha256:d21e424c078eeaa9eee3c061dd0af60b0a5f39b5396a4e73836d15c23b50ac74"
+    },
+    {
+      "root": "fa05",
+      "path": "build-evidence.mjs",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 8032,
+      "sha256": "sha256:4b351f1d1cf3cfa0fbf1fc72f4c39844686dddccb7bf78016c6c8ea34ae46113"
+    },
+    {
+      "root": "fa05",
+      "path": "consistency.json",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 6467,
+      "sha256": "sha256:b1191e17e1c19c419277d8ad4114b7091d1359fc113fc4c8a8e096cd4cd3e1cb"
+    },
+    {
+      "root": "fa05",
+      "path": "consistency.mjs",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 7342,
+      "sha256": "sha256:293bb71a1f4bcb679c7937f95995c20f0d2bcd532786cec2656545397b0791c2"
+    },
+    {
+      "root": "fa05",
+      "path": "evidence.json",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 14305,
+      "sha256": "sha256:f38a57a2c93e140f91c1a2695fe6fc94a2410c68864d3e108be040a921e257ba"
+    },
+    {
+      "root": "fa05",
+      "path": "final-acceptance.md",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 16425,
+      "sha256": "sha256:ec9c73a1cff3d9660e58a192a943975c91b56da1db8c75ab520add3b51d61ba4"
+    },
+    {
+      "root": "fa05",
+      "path": "qa-report.json",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 9802,
+      "sha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6"
+    },
+    {
+      "root": "fa05",
+      "path": "regression/test.exit",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa05",
+      "path": "regression/test.log",
+      "role": "log",
+      "required": false,
+      "bytes": 15771,
+      "sha256": "sha256:1397f2f0e9f88310c31b8c292d54dc20730b2362eab860fa3dc5dfab8f777b52"
+    },
+    {
+      "root": "fa05",
+      "path": "regression/typecheck.exit",
+      "role": "acceptance-record",
+      "required": true,
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa05",
+      "path": "regression/typecheck.log",
+      "role": "log",
+      "required": false,
+      "bytes": 1037,
+      "sha256": "sha256:34079e0854a892735b87bd72afc41ff8a54312214e9f7f28e52e8b09ba52f1ec"
+    },
+    {
+      "root": "fa06",
+      "path": "free-acceptance/probe/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2164,
+      "sha256": "sha256:a62df5b45b0f38382434c71b0ffe339f5351b85e8744728d253e6729cbc0013e"
+    },
+    {
+      "root": "fa06",
+      "path": "regression.json",
+      "role": "regression",
+      "required": true,
+      "bytes": 1135,
+      "sha256": "sha256:fa2c63e1bcb251837e1dae74013e3426c2386b69a33cff8d5e920488fb369873"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/acceptance.exit",
+      "role": "regression",
+      "required": true,
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/acceptance.txt",
+      "role": "regression",
+      "required": true,
+      "bytes": 1301,
+      "sha256": "sha256:d784ce545bfe8d56d16977a44f87f18769c090ec520be309d97b7acdbc194c09"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/playtest.exit",
+      "role": "regression",
+      "required": true,
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/playtest.txt",
+      "role": "regression",
+      "required": true,
+      "bytes": 2795,
+      "sha256": "sha256:396d86100145dafc9bab85acbad15f0d1abeb45ddfebe911ef3b488703fc10bb"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/test.exit",
+      "role": "regression",
+      "required": true,
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/test.txt",
+      "role": "regression",
+      "required": true,
+      "bytes": 17136,
+      "sha256": "sha256:eaf135e99c3db26d1560b9af26f1db63a646363a8418ff849e3620628ec0465a"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/typecheck.exit",
+      "role": "regression",
+      "required": true,
+      "bytes": 2,
+      "sha256": "sha256:9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "root": "fa06",
+      "path": "regression/typecheck.txt",
+      "role": "regression",
+      "required": true,
+      "bytes": 1037,
+      "sha256": "sha256:34079e0854a892735b87bd72afc41ff8a54312214e9f7f28e52e8b09ba52f1ec"
+    },
+    {
+      "root": "fa06",
+      "path": "self-test-run/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 8893,
+      "sha256": "sha256:84240cd28ea86962aa138d0c6a99d23b6cf20dd9864df73fcb6e0773ebf87064"
+    },
+    {
+      "root": "fa06",
+      "path": "self-test-run/report/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 17275,
+      "sha256": "sha256:1e6f2b4c30011255925b7bc2f153846c18c5c7d455ae759b516958ddae5a3b2e"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/console.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/events.jsonl",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 3207,
+      "sha256": "sha256:6a050019fcefa0c2065a6974a1d7c99140f66f27c45d194e763a98b187bf33c9"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/exceptions.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/input.jsonl",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 2858,
+      "sha256": "sha256:0461453aec3e1d8bd17ff3f7d9d1e14e3a1b6d5dc41e0ed993acf636daae36e0"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/setup.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/strategy.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 1615,
+      "sha256": "sha256:77e2a990609826ad0fdc945cdefa9b9f1b5a0ac64309c6f51cf6fd79a857b8c7"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/acceptance-win-wasteland-v1/trace.jsonl",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 233421,
+      "sha256": "sha256:a28e3a684d2523f3cb8c176ff975b428e76d3b6055901ea99ee9a317ad6f9bba"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2178,
+      "sha256": "sha256:f1405dfd25c616f8e781ba680a907468e7ed29d9045398cbf4168f8f46ad2e4d"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/result.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 7152,
+      "sha256": "sha256:f80d2b8907b4e875905c7c0cae9a714744001309a741d1e46bec40a7af987eb6"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/site-integrity.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/console.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/events.jsonl",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 3425,
+      "sha256": "sha256:a721407000ae253ab54abdf75e8ffb9645eb69a3687fd3a66ab8c37196fa0df6"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/exceptions.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/input.jsonl",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 3018,
+      "sha256": "sha256:413c469b52d772849f7b40d5ebf0f60abc322183d8c12a2fb7e8ed0e4754e06f"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/setup.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/strategy.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 1728,
+      "sha256": "sha256:48467036264a47eca6d4d779a473cbdf30d834816f3388419759c1b8f3ef5bd1"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/acceptance-win-wasteland-v1/trace.jsonl",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 233437,
+      "sha256": "sha256:8f428c3c274688a703e470c7907aa7ae73c7b1945eb988ae6f534b31310f9ef6"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2324,
+      "sha256": "sha256:8771adaeecacd5c91280a9e88a5c6290c3db9bf4b186cc5bef552658222e2da4"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/result.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 7157,
+      "sha256": "sha256:f8c9f372ef980fb9135f6ed80d6fd1f20b6683bf846f6318e1b40fee27148733"
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/site-integrity.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f"
+    },
+    {
+      "root": "gp",
+      "path": "07-acceptance/probe/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2178,
+      "sha256": "sha256:97ee871c034a643a8bc7cac542310126a647b548b48a22e20162637c0b32452b"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/acceptance.log",
+      "role": "log",
+      "required": false,
+      "bytes": 1278,
+      "sha256": "sha256:eee1de1142dc2936f3a9a8f7e51374a9098f22ed517943b8ad90c59d8528fcae"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/playtest.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2960,
+      "sha256": "sha256:f4c672123e962b4288df019a57a2b960d33bb6edbe5c8f0dd10456f5ce6fd77c"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/test.log",
+      "role": "log",
+      "required": false,
+      "bytes": 21804,
+      "sha256": "sha256:009b4dffc38aa82a03c7781638972e5acd674fdf5e49fe53877c197936f6cde5"
+    },
+    {
+      "root": "gp",
+      "path": "07-regression/typecheck.log",
+      "role": "log",
+      "required": false,
+      "bytes": 1037,
+      "sha256": "sha256:08cc46f3578feb49f75253d157c290a0f9adb899a2de66774a5c6ee70500561b"
+    },
+    {
+      "root": "gp",
+      "path": "09-review-materials.json",
+      "role": "visual-supplement",
+      "required": true,
+      "bytes": 7499,
+      "sha256": "sha256:a5d0f9409ea963b41853720ffc3f5872bfc91e6cbcdaddc5c4c6f62b1b916b21"
+    },
+    {
+      "root": "gp",
+      "path": "09-review-record.supplement.json",
+      "role": "visual-supplement",
+      "required": true,
+      "bytes": 7433,
+      "sha256": "sha256:f237fa795fee74976a706f4e2b9f50235ea7df992fea38f088db39a9a893c5a7"
+    },
+    {
+      "root": "gp",
+      "path": "self-test-run/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 11217,
+      "sha256": "sha256:12c824a4f9df173dcecabe1594194033bcf040c4281b33895be5d070bc94370c"
+    },
+    {
+      "root": "gp",
+      "path": "self-test-run/report/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 19599,
+      "sha256": "sha256:6109cf64192f3139f827aa7d9c438dc3212534ff4a9d62f23d9b152b8bed3ec1"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/authoring/stylespec.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 758,
+      "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/authoring/visual-world.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 3970,
+      "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 6681,
+      "sha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 6750,
+      "sha256": "sha256:5e7a24e2e60715b7e4c5112d1cc767f1d20a06a2c0ebc92660f4433468712c8e"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.backgrounds.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 1832,
+      "sha256": "sha256:5a3407c8da3736df07c1187fed84232e1af229e53787aa5abe95fe57ae111b17"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.backgrounds.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 39525,
+      "sha256": "sha256:f3aa1d6089c21e68497a2c56cb7ae73700b40f36edcc4805c97093f788c6422c"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.sprites.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 1407,
+      "sha256": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.sprites.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 1690,
+      "sha256": "sha256:3d27b1221ef23a6ac38303f533afcf8bdb4587aa4a055392e08c779d4c28a671"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.ui.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 1088,
+      "sha256": "sha256:6a053faeb99119a140a44cad751498cc3b67f25015fbf5fd0dd4e30aea2a9559"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/delivery/atlas.ui.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 516,
+      "sha256": "sha256:4f94ab9adaa627cf823da3074e53677659dba50be05d3e1a85fed5903d685a71"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 19477,
+      "sha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/game-config.json",
+      "role": "delivery",
+      "required": true,
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/game-design.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 3202,
+      "sha256": "sha256:208788094f4fabfd5a88ea78e5eb20ac6db40d12e26a09c3b7567b447bcd1ebe"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/rejections/2026-10-28T03-42-56-915Z.json",
+      "role": "playtest-rejection",
+      "required": false,
+      "bytes": 225,
+      "sha256": "sha256:c7291c3c1d5d13c09501144680bdacabfa2d1473ccbc1c1832204ff3a1cc9756"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/rejections/2026-10-28T03-42-57-011Z.json",
+      "role": "playtest-rejection",
+      "required": false,
+      "bytes": 275,
+      "sha256": "sha256:5e3e1480e267d0721ae7aa83b34fc48d6acde1b013904f3ff1bcba009c44e296"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/rejections/2026-10-28T03-43-10-190Z.json",
+      "role": "playtest-rejection",
+      "required": false,
+      "bytes": 225,
+      "sha256": "sha256:20008cd93c3b47949edb6929adb3d66309345380a7ffda3a47d38e809a909c88"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/acceptance-win-wasteland-v1/console.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/acceptance-win-wasteland-v1/events.jsonl",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 3205,
+      "sha256": "sha256:4b5f5c2335c42a7baf95ebb85741f96cc7250aa1137fc422ba2dba7aba29365a"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/acceptance-win-wasteland-v1/exceptions.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/acceptance-win-wasteland-v1/input.jsonl",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 2856,
+      "sha256": "sha256:b91b53b189735c8360c3c7bde7298fd6364302c55a71fc0acd9a449d8c0321cd"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/acceptance-win-wasteland-v1/setup.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/acceptance-win-wasteland-v1/trace.jsonl",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 233790,
+      "sha256": "sha256:036510e7c4db966b79f16017443e16f70976f7b643060afd8b00be152be2ba5a"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2374,
+      "sha256": "sha256:8ff8c61d8b8a55dfc8de59fe81f5eb0ddc6681cc56afed78e8d828a2ba998fbc"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/harness-determinism.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 1383,
+      "sha256": "sha256:36a2b941b7bdbda8f9bee12b2f0e6d8353efdb2ed2e750fceb419ac67de77375"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/harness-exit.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 729,
+      "sha256": "sha256:1820b6ccce7dee3aab1258b13b0b5d315bc35586f9021f442d14f275733f4d47"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/harness-rejections.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/harness-summary.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 3312,
+      "sha256": "sha256:4f21ad62d8cc43b8e25634eaccd2967060927b54dd4beacdfca14d1e71a04058"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/result.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 7764,
+      "sha256": "sha256:0ed043f259a4d1667fca24578b6a154448dd5f47103c55278a958b3f2ebb0063"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v1/site-integrity.json",
+      "role": "playtest-historical",
+      "required": false,
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/console.json",
+      "role": "playtest",
+      "required": true,
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/events.jsonl",
+      "role": "playtest",
+      "required": true,
+      "bytes": 3206,
+      "sha256": "sha256:6ca7262ca072bc95c08b45de6f4e4a54b33fa71fa6cee263c1b047d9e10ad82a"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/exceptions.json",
+      "role": "playtest",
+      "required": true,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/input.jsonl",
+      "role": "playtest",
+      "required": true,
+      "bytes": 2857,
+      "sha256": "sha256:365bd8471dfcd78e40a9ac5e0d3cd24a1676dade578bf25a58c49c22186fc0e5"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/setup.json",
+      "role": "playtest",
+      "required": true,
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/acceptance-win-wasteland-v1/trace.jsonl",
+      "role": "playtest",
+      "required": true,
+      "bytes": 233948,
+      "sha256": "sha256:787f5454f4e7e6daca5d231c3a82c7d1161ccfc2602efe3ae02761957d85af09"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10655,
+      "sha256": "sha256:6e9584893f9f1758184a47b47a4149e519abfd3721e2a226bd393db2ba97c3d8"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "role": "playtest",
+      "required": true,
+      "bytes": 7764,
+      "sha256": "sha256:1826a5e1b429e52016d5738ffc299b69f30d79aa2de7c55786a785384a3ed28c"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/site-integrity.json",
+      "role": "playtest",
+      "required": true,
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/qa-report.json",
+      "role": "delivery",
+      "required": true,
+      "bytes": 9802,
+      "sha256": "sha256:dc20e3013044ddac0f9dc6c720384945448628dd628db369da4d6b98d66c5ee6"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/reference.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/style.png",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/stylespec.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 758,
+      "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/visual-world.json",
+      "role": "visual-material",
+      "required": true,
+      "bytes": 3970,
+      "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/game-config.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/index.html",
+      "role": "protected",
+      "required": true,
+      "bytes": 285,
+      "sha256": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/shell.js",
+      "role": "protected",
+      "required": true,
+      "bytes": 1612305,
+      "sha256": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1"
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/site/v1/site.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 67,
+      "sha256": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:aad011ec4a822cbbc6899d8c671105fc97244e1a367d8b20096ad6d10f765649"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/harness-determinism.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 880,
+      "sha256": "sha256:390fb124a747b1b95f5edfe81eae21ad000f7a957c63f2de87779e321b17f479"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/harness-exit.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 849,
+      "sha256": "sha256:b9de9d6edfffe0d5ffc51fe6dc8776d138a72608e0e6f6d9e10ad8cb4e28be0a"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/harness-rejections.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/harness-summary.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 3000,
+      "sha256": "sha256:daf48246c8c816b95f1c147af74eaae6116806bd75a6342fa4921e78dcb8c490"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/result.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 5967,
+      "sha256": "sha256:afe634d0ac2a949cf23b61e4539b45a12afb4139e6ba9ae8ac981eeede80b616"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/site-integrity.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 809,
+      "sha256": "sha256:1e350adee6ab726527ef66794730829f8092a7ae22512ad9ac55ac2f27d96c4f"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/success-basic/console.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 537,
+      "sha256": "sha256:fb1bddd1d06648dbccda5804797c11339b6bab3dcda7b35b5e8baaac2af09558"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/success-basic/events.jsonl",
+      "role": "reference",
+      "required": false,
+      "bytes": 13863,
+      "sha256": "sha256:4e114bfc4bb24dbd4ea35993e2dee9abcb47f062699e07c63878c3cca9d31ab3"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/success-basic/exceptions.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 3,
+      "sha256": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/success-basic/input.jsonl",
+      "role": "reference",
+      "required": false,
+      "bytes": 9175,
+      "sha256": "sha256:25581fd6c5656febdb4bb29e009760fa5bcc01b6e955c40c0053983799e652b5"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/success-basic/setup.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 40,
+      "sha256": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2"
+    },
+    {
+      "root": "reference",
+      "path": "playtest-v1/attempt-v1/success-basic/trace.jsonl",
+      "role": "reference",
+      "required": false,
+      "bytes": 591361,
+      "sha256": "sha256:15ea530583b143dcd3e811ed6aede89c2ac368858da4b588866454b2515c2547"
+    },
+    {
+      "root": "reference",
+      "path": "prior-delivery-stage-c/qa-report.json",
+      "role": "reference",
+      "required": false,
+      "bytes": 7698,
+      "sha256": "sha256:2d0f26e865c61aeaabbc6276241fbef4827e90b793d8d316be241470b84ef5f5"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-clear-patroller-2-after-fix-v2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:60745deabbdd52774a0d092fe782cd611213a286fa2e85acc4df61a3444882f7"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-clear-patroller-2-after-fix/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:14e5c52c6a20ef683fae8c15d37f3574f9beb0d66e4a35cfe61981150af293b8"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-clear-patroller-2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10793,
+      "sha256": "sha256:b27447857f9324eefd32c4ac14065659e934c31702705d7fa8a4863700c339e3"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-27-gate-stop/harness-real/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10647,
+      "sha256": "sha256:28ee47642e71de4d41f96facef2f17ab9571a9f6fcbbd0af77857864a4d3d614"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-1/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10939,
+      "sha256": "sha256:e5a5e49fe5b02001a7f047e74b7fa8c0ebdb22d08791c81373237fdfb8e134bf"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-2/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:f61ee1eacdf97d7725812a5769c469048f6c40280e50893bad060d599980adec"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-determinism/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:d627c4ded239e0c22d5ab02e12e26fb4b46bbcc774b749587b74d07e8b61d282"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-determinism/attempt-v2/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 2178,
+      "sha256": "sha256:6e5115faf143b1ced81ffcf47573bc07eb9e0fd7b4888f37472e4dc79b60e4e3"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-final/attempt-v1/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10655,
+      "sha256": "sha256:fdbc69bbaba19d02372c1383d29160871d8e5153ab6dd670973b2fb5bdc2665d"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/harness-final/attempt-v2/chrome.log",
+      "role": "log",
+      "required": false,
+      "bytes": 10655,
+      "sha256": "sha256:02a152e8c8ae281affe4eb4d5473f08c4e3cfad3d2c9334c782221d1aacc2ffb"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-acceptance/README.md",
+      "role": "acceptance-evidence",
+      "required": true,
+      "bytes": 7977,
+      "sha256": "sha256:d55988fa1c5302e12fb7bd7f27c1a760242f25b2ead0d283a87a1ff500a4f6d5"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-attribution/attribution.json",
+      "role": "acceptance-evidence",
+      "required": true,
+      "bytes": 8151,
+      "sha256": "sha256:be5212a8a0c0a0cab4738afda146a43281f8c5b35a1aaba53d3cc118d48e5776"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-attribution/README.md",
+      "role": "acceptance-evidence",
+      "required": true,
+      "bytes": 11295,
+      "sha256": "sha256:b086d61460f4590647e96297aa28ee76f4f12303a2f9636a23c6867070f3a7b8"
+    },
+    {
+      "root": "runs",
+      "path": "2026-10-28-attribution/verify.mjs",
+      "role": "acceptance-evidence",
+      "required": true,
+      "bytes": 20802,
+      "sha256": "sha256:0903782563461b2a16807047275e7abe89c00c3de970079f60895184532ab2eb"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/drawlist/hud-icon-scrap.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 2678,
+      "sha256": "sha256:c618a9137be7e8801af600a283854351866d0e036b2e671ac4cfac12a377a0c3"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/drawlist/hud-panel.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 6222,
+      "sha256": "sha256:d3768321bb48c496b7585546ca00470cc9f3c831f46b6db19dd4a70b861377dd"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/scavenger-hero.idle.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1220095,
+      "sha256": "sha256:e78fcac820e5d7074f1ab8c6b2c09e1dee97b6acfff24d0f20a8033a852ebcf1"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/scavenger-hero.idle.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4681,
+      "sha256": "sha256:d111b6521eb506df9fd2a944ccbb7c2b069bf3779e8b0c0c0c2b5ca0a98b6503"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/scavenger-hero.jump.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 899552,
+      "sha256": "sha256:f8dd635738210b4700d8cabad57394f582c72b2d2bb51e8ba38192a7467a7d61"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/scavenger-hero.jump.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4117,
+      "sha256": "sha256:8a49d3bf56c2d48d2452a820d0032d3cdf69b5c96b4fa8b722662d374483a1c4"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/scavenger-hero.run.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1163990,
+      "sha256": "sha256:7693eea270d58b44fb1890ae07beec91977458f44aa3175e0ef85fd8fbc7dd16"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/scavenger-hero.run.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4679,
+      "sha256": "sha256:bf26ddd77d6db4beb03a31cd556f9f4b90b0f161f733e8053a33ec47990dd3db"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.railway.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 960341,
+      "sha256": "sha256:8ec54773b515e1105463c024b245e8c3fa6e027b6881a3e2ed6b779d4c6cd5aa"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.railway.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1784,
+      "sha256": "sha256:83f2b2f61d2a46c174a44511861ecd10bd687b04a1eb3d8fc596f8d58a659940"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.ruins.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 949307,
+      "sha256": "sha256:f5dcd906fcd112bd2cbf229c93754c7b64e0c00d1f20a1878b592587b05f8be7"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.ruins.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1791,
+      "sha256": "sha256:47ced24bf1008cbdc7fde7774e0e2650f5d8938a7be67d5443de5d5ef5e0bb2f"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.sky.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 469926,
+      "sha256": "sha256:42321f8202db5d1ee0ffcb4b38bb71a0f990b28ffd6107b5323a2c4ee32ed5f5"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.sky.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1892,
+      "sha256": "sha256:56a04135e59593a8f2715f7f8cc2a155d219634df187237387c579a219f03a7e"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.wall.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1063866,
+      "sha256": "sha256:e1062eb8446bd1397d43f429be76b2e82fbcea926579e91467ff6c0256bda146"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-bg.wall.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1787,
+      "sha256": "sha256:e68776390d4b5ab1b9df0c25d74d8ec4c4cfc949de26821a4d795e0c9ebd276a"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-chest.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1195183,
+      "sha256": "sha256:292273183bea394e8101ed76bd2047a9c94473e24219b1f1ef6232be19a54cf9"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-chest.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1860,
+      "sha256": "sha256:ac3fad3ef2cb616c040df726f9950919fc6837bedacf329f2f1c2e3d21f32566"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-patroller.idle.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 991046,
+      "sha256": "sha256:4f5f8448a13483ea5992e46f5eda8f87785cc0e10e2d7a33c4861d906295f5e3"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-patroller.idle.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4119,
+      "sha256": "sha256:0fdebaed308eab3e9348c0e3d40787af725e103bf38d6bd4b7db5bd90da27600"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-patroller.walk.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1058989,
+      "sha256": "sha256:0bc433effc3bf32869463b7ddb81daf52bfb96034625bce2858213c9787075d5"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-patroller.walk.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4683,
+      "sha256": "sha256:f09251c75b66f746056453b362df108e8f1c1a166e3a938ee38f26ec477c679e"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-platform-tile.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 982887,
+      "sha256": "sha256:556ef1450ac37cceed25c9e10f5471003351b4c3ebebb47baa8f63c26d2619ef"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-platform-tile.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1902,
+      "sha256": "sha256:601e76f20dacd5a8fb58630b4a45b98a5fbad4fe3bdc688d0b8c4042b2f8be10"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-scraps.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1152515,
+      "sha256": "sha256:4eb01c42030f7549847f27d28e2b8ecce0bf1bf2d917bd6180c3dddc067ac33f"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/generated/wasteland-scraps.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 1878,
+      "sha256": "sha256:95b92348c5b18efe7c9c16e74f23e54c8126ed36d0c62310876e0a31e7354df2"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/masters/master-scavenger-hero.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 928461,
+      "sha256": "sha256:8de0ed0ee9def603d16111cfe1a20216a22a132dc074fd23c500ec84e0607947"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/masters/master-scavenger-hero.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4118,
+      "sha256": "sha256:6b292229456e9dbd091ac16f8353fca8af98b01e705dd4897776df31cff2d31e"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/masters/master-scavenger-hero.ratio.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 445,
+      "sha256": "sha256:285d942faabf31696ad735a85f8b0a88697dcd173fd8b439736c16b4f56165f1"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/masters/master-wasteland-patroller.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 822182,
+      "sha256": "sha256:55d8ae3d4cf8c519bf91954ef0c909b3a7596341e28957e270dfd6467e88f927"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/masters/master-wasteland-patroller.prompt.txt",
+      "role": "protected",
+      "required": true,
+      "bytes": 4090,
+      "sha256": "sha256:dff4e12893d861e37d235c594541662b7ee15fd064ccc983a1b24d6fdef61396"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/masters/master-wasteland-patroller.ratio.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 450,
+      "sha256": "sha256:4113f126a44f2be623bd4484657284ce591c1e2aef0818953e42765dff1bc514"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/stylespec.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 758,
+      "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/authoring/visual-world.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 3970,
+      "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/coverage.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 785,
+      "sha256": "sha256:d9d626534fde2ebd08b7965a091fc561b702bee618f5995ccb84028184ca3dbc"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.animations.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 6681,
+      "sha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.animations.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 6750,
+      "sha256": "sha256:5e7a24e2e60715b7e4c5112d1cc767f1d20a06a2c0ebc92660f4433468712c8e"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.backgrounds.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 1832,
+      "sha256": "sha256:5a3407c8da3736df07c1187fed84232e1af229e53787aa5abe95fe57ae111b17"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.backgrounds.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 39525,
+      "sha256": "sha256:f3aa1d6089c21e68497a2c56cb7ae73700b40f36edcc4805c97093f788c6422c"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.sprites.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 1407,
+      "sha256": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.sprites.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 1690,
+      "sha256": "sha256:3d27b1221ef23a6ac38303f533afcf8bdb4587aa4a055392e08c779d4c28a671"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.ui.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 1088,
+      "sha256": "sha256:6a053faeb99119a140a44cad751498cc3b67f25015fbf5fd0dd4e30aea2a9559"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/delivery/atlas.ui.png",
+      "role": "protected",
+      "required": true,
+      "bytes": 516,
+      "sha256": "sha256:4f94ab9adaa627cf823da3074e53677659dba50be05d3e1a85fed5903d685a71"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/ledger.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 4349,
+      "sha256": "sha256:435f63a3f80595b7eea719654438a83bddd35e8394831c63201d71471e3283fa"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/manifest.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 19477,
+      "sha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3"
+    },
+    {
+      "root": "snapshot",
+      "path": "pack/v1/master-ratios.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 769,
+      "sha256": "sha256:eb885be323088342ef818f7e33d2c432950d3976b3ae863bc2ead01340b431b3"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/asset-recipe.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 7243,
+      "sha256": "sha256:81906164bfa36a7ae0bd082835950f7e2ccbc31eb2f4381f322532c1af0cc93b"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/asset-recipe.plan.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 2947,
+      "sha256": "sha256:c296f7ed39c45e94e90cc4e772865ae2f6ec6afb744c65a3048514775dc3cc65"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/character-dna.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 2463,
+      "sha256": "sha256:25742be75eacb4c804e72f32782d27fa009c466e7224f89b79a2dc9986576059"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/game-config.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/game-design.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 3202,
+      "sha256": "sha256:208788094f4fabfd5a88ea78e5eb20ac6db40d12e26a09c3b7567b447bcd1ebe"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/game-intent.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 2087,
+      "sha256": "sha256:9388055e6492e134ba8e453efec4974d508e2eaef2281942879e2debd4d05d5b"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/intent.md",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 257,
+      "sha256": "sha256:314efbd6b46b3b899b38de35c8bba89dc0ea01e5bb66c2791dabf309f40b7eb1"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/ledger.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 6749,
+      "sha256": "sha256:42ed224e4a6356b1db94dac749d0b5502d7e24976d9e5154932823ffa2921a4d"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/qa-report.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 5987,
+      "sha256": "sha256:ac342549c65af368ad5c1947bda051885eab09035fec72c218b8557d8e9c2345"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/reference.png",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/style.png",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 2228,
+      "sha256": "sha256:76ed648ec71dfffe3274dc16ab0d8ab1d242502511db947ce630ee75a47f89d0"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/stylespec.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 758,
+      "sha256": "sha256:b5bea27bd8e882a6f9979244d938ec84c5d19311bf5811baafc2ffb5e62c89c2"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/visual-design.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 1778,
+      "sha256": "sha256:60824c960ee1d5b17f210f86a53047b61cdd8c669d71bae107b7c60670a1a8da"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/visual-design/preview/scene.png",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 1077,
+      "sha256": "sha256:83806b6d7185f05de36513a44cfeb308e74b71346b278a4d93f9fa527aa57ede"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/visual-design/svg/scene.svg",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 712,
+      "sha256": "sha256:5d77e3ef4a8953294a51711379601fd7eb7b0e08ae06239652bf19f821446461"
+    },
+    {
+      "root": "snapshot",
+      "path": "run/v1/visual-world.json",
+      "role": "snapshot-run",
+      "required": false,
+      "bytes": 3970,
+      "sha256": "sha256:e142b90aa63cd4e3fd89fe385c374aec577e37a0ba659c5123fffeb99b013524"
+    },
+    {
+      "root": "snapshot",
+      "path": "site/v1/game-config.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 3559,
+      "sha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd"
+    },
+    {
+      "root": "snapshot",
+      "path": "site/v1/index.html",
+      "role": "protected",
+      "required": true,
+      "bytes": 285,
+      "sha256": "sha256:66224879ac42eedce3262c0d909d7e96ebdbeb02784135996361e2149366e7b3"
+    },
+    {
+      "root": "snapshot",
+      "path": "site/v1/shell.js",
+      "role": "protected",
+      "required": true,
+      "bytes": 1612305,
+      "sha256": "sha256:ff748de9bcd32ca41adf08bd252bc30583af6382958f7a16dc11deb3243ed3a1"
+    },
+    {
+      "root": "snapshot",
+      "path": "site/v1/site.json",
+      "role": "protected",
+      "required": true,
+      "bytes": 67,
+      "sha256": "sha256:e220ca283eacc27c27108f14b09af012b52b158e88bfd8fd93096f424ead0896"
+    }
+  ],
+  "records": [
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/qa-report.json",
+      "role": "qa-report",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "out",
+      "path": "wasteland-scavenger-recipe/run/v1/playtest/v2/result.json",
+      "role": "playtest-result",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-1/attempt-v1/result.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "gp",
+      "path": "06-attempt-2/attempt-v1/result.json",
+      "role": "playtest-attempt",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa04",
+      "path": "review-record.json",
+      "role": "visual-review",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa04",
+      "path": "capture.json",
+      "role": "visual-capture",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa04",
+      "path": "materials.json",
+      "role": "visual-materials",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa05",
+      "path": "evidence.json",
+      "role": "acceptance-evidence",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "fa05",
+      "path": "consistency.json",
+      "role": "acceptance-consistency",
+      "required": true,
+      "identity": false
+    },
+    {
+      "root": "fa06",
+      "path": "regression.json",
+      "role": "regression",
+      "required": true,
+      "identity": false
+    },
+    {
+      "root": "gp",
+      "path": "09-review-record.supplement.json",
+      "role": "visual-supplement",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "gp",
+      "path": "09-review-materials.json",
+      "role": "visual-supplement-materials",
+      "required": true,
+      "identity": true
+    },
+    {
+      "root": "artifacts",
+      "path": "identity.json",
+      "role": "identity",
+      "required": true,
+      "identity": true
+    }
+  ]
+}
