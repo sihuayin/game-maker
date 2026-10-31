@@ -1,0 +1,34 @@
+name: evidence
+
+# P0-03-00 占位 workflow：只验证 GitHub Actions event policy 允许
+# `.github/workflows/evidence.yml` 使用 pull_request_target。
+# 它不 checkout、不读取、不执行任何 PR 代码；03 票会用真正的 trusted evidence workflow 替换它。
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidence-policy-placeholder-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  evidence:
+    name: evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Confirm trusted event context only
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "base_ref=$BASE_REF"
+          echo "pr=$PR_NUMBER"
+          echo "head_sha=$HEAD_SHA"
+          echo "placeholder: no PR code checked out or executed"
