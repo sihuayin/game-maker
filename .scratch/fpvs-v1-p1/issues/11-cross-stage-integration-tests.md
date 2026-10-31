@@ -36,4 +36,4 @@ Map: ../map.md
 
 **范围注**：票 11 项 3（跨版本不误用）由 `publish-gate.test.ts` 的「多个候选按 subject 精确匹配」覆盖（`assertPublishableQa`
 已挡旧包报告给新包放行），本票不重复；项 5（报告生成异常不静默成功）由 `tryWriteDelivery`（票 08）+ QA 失败路径的
-`try/catch` 收尾覆盖。smoke 真实 result.json 的读盘写盘留待 [12 阶段C 真实产物验收](issues/12-stage-c-real-artifact-acceptance.md)。
+`try/catch` 收尾覆盖。smoke 真实 result.json 的读盘写盘留待 [12 阶段C 真实产物验收](12-stage-c-real-artifact-acceptance.md)。

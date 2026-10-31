@@ -290,6 +290,11 @@ function treeHashes(root: string): Record<string, string> {
   return Object.fromEntries(walk(root).map((p) => [path.relative(root, p).split(path.sep).join("/"), SHA(p)]).sort());
 }
 
+function expectFailure(report: ReturnType<typeof verifyDeliveryEvidence>, status: "fail" | "blocked" = "fail"): void {
+  expect(report.exitCode).toBe(1);
+  expect(report.status).toBe(status);
+}
+
 describe("verifyDeliveryEvidence", () => {
   it("完整未变化的证据 → pass，六项声明与重算一致", () => {
     const fx = buildFixture();
@@ -330,7 +335,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(p, c);
     rehash(fx, p);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.consistency.some((x) => x.id === "mechanic-coverage" && x.status === "fail")).toBe(true);
   });
 
@@ -342,7 +347,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(p, c);
     rehash(fx, p);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.diagnostics.some((d) => d.rule === "mechanic-coverage.fail")).toBe(true);
   });
 
@@ -354,7 +359,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(p, c);
     rehash(fx, p);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.diagnostics.some((d) => d.rule === "mechanic-coverage.fail")).toBe(true);
   });
 
@@ -362,7 +367,7 @@ describe("verifyDeliveryEvidence", () => {
     const fx = buildFixture();
     write(fx.siteIndexPath, "<html>tampered</html>");
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     const hit = report.results.files.find((f) => f.path.endsWith("index.html"));
     expect(hit?.status).toBe("hash-mismatch");
   });
@@ -371,7 +376,7 @@ describe("verifyDeliveryEvidence", () => {
     const fx = buildFixture();
     fs.rmSync(path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "game-config.json"));
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("blocked");
+    expectFailure(report, "blocked");
     const hit = report.results.files.find((f) => f.path.endsWith("run/v1/game-config.json"));
     expect(hit?.status).toBe("missing");
   });
@@ -383,7 +388,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(fx.reviewPath, record);
     rehash(fx, fx.reviewPath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     const hit = report.results.identities.find((i) => i.record === "fa04:review-record.json");
     expect(hit?.status).toBe("mismatch");
   });
@@ -401,7 +406,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(supPath, sup);
     rehash(fx, supPath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("blocked");
+    expectFailure(report, "blocked");
     const hit = report.results.identities.find((i) => i.record === "fa04:review-record.json");
     expect(hit?.status).toBe("missing");
   });
@@ -413,7 +418,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(fx.evidencePath, ev);
     rehash(fx, fx.evidencePath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.consistency.some((c) => c.id === "evidence.self-hash" && c.status === "fail")).toBe(true);
   });
 
@@ -425,7 +430,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(fx.qaPath, qa);
     rehash(fx, fx.qaPath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.comparison.checks.find((c) => c.key === "qa")?.match).toBe(false);
   });
 
@@ -435,7 +440,7 @@ describe("verifyDeliveryEvidence", () => {
     m.files.push({ root: "out", path: "../escape.txt", role: "fixture", required: true, sha256: "sha256:" + "0".repeat(64) });
     writeJson(fx.manifestPath, m);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.files.find((f) => f.path === "../escape.txt")?.status).toBe("path-invalid");
   });
 
@@ -444,7 +449,7 @@ describe("verifyDeliveryEvidence", () => {
     fs.rmSync(fx.siteIndexPath);
     fs.mkdirSync(fx.siteIndexPath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("blocked");
+    expectFailure(report, "blocked");
     expect(report.results.files.find((f) => f.path.endsWith("/site/v1/index.html"))?.status).toBe("unreadable");
   });
 
@@ -456,7 +461,7 @@ describe("verifyDeliveryEvidence", () => {
     fs.symlinkSync(outside, link);
     addManifestEntry(fx, { root: "out", path: "escape.json" });
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.files.find((f) => f.path === "escape.json")?.status).toBe("path-invalid");
   });
 
@@ -466,7 +471,7 @@ describe("verifyDeliveryEvidence", () => {
     fs.symlinkSync(path.join(fx.roots["out"]!, "nope.json"), link);
     addManifestEntry(fx, { root: "out", path: "dangling.json" });
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.files.find((f) => f.path === "dangling.json")?.status).toBe("path-invalid");
   });
 
@@ -485,7 +490,7 @@ describe("verifyDeliveryEvidence", () => {
     const abs = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "game-config.json");
     addManifestEntry(fx, { root: "out", path: abs, sha256: SHA(abs), bytes: fs.statSync(abs).size });
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.files.find((f) => f.path === abs)?.status).toBe("path-invalid");
   });
 
@@ -497,7 +502,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(fx.qaPath, qa);
     rehash(fx, fx.qaPath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.consistency.some((c) => c.id === "references.report" && c.status === "fail")).toBe(true);
   });
 
@@ -508,7 +513,7 @@ describe("verifyDeliveryEvidence", () => {
     writeJson(fx.reviewPath, record);
     rehash(fx, fx.reviewPath);
     const report = verifyDeliveryEvidence(fx.manifestPath);
-    expect(report.status).toBe("fail");
+    expectFailure(report);
     expect(report.results.consistency.some((c) => c.id === "visual.materials.collection" && c.status === "fail")).toBe(true);
   });
 
@@ -516,6 +521,7 @@ describe("verifyDeliveryEvidence", () => {
     const fx = buildFixture();
     fs.rmSync(path.join(fx.roots["out"]!, PACK_ID, "site", `v${SITE_VERSION}`, "index.html"));
     const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.exitCode).toBe(1);
     expect(report.declared.verdict).toBe("pass");
     expect(report.status).not.toBe("pass");
     expect(report.recomputed.verdict).not.toBe("pass");
@@ -534,5 +540,143 @@ describe("verifyDeliveryEvidence", () => {
     const b = verifyDeliveryEvidence(fx.manifestPath);
     const strip = (r: { generatedAt?: string }) => { const x = { ...r }; delete x.generatedAt; return x; };
     expect(strip(a)).toEqual(strip(b));
+  });
+});
+
+describe("trust anchor（P0-03-01）", () => {
+  it("未传锚点 → 不产生 trust，旧行为不变", () => {
+    const fx = buildFixture();
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expect(report.trust).toBeUndefined();
+    expect(report.status).toBe("pass");
+  });
+
+  it("摘要匹配 → trust.anchor=matched，报告与 Markdown 都记录", () => {
+    const fx = buildFixture();
+    const digest = SHA(fx.manifestPath);
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: digest });
+    expect(report.trust).toMatchObject({
+      mode: "digest", source: "cli", expectedSha256: digest, actualSha256: digest, result: "matched",
+    });
+    expect(report.status).toBe("pass");
+    expect(renderVerificationMarkdown(report)).toContain("信任锚点：**matched**");
+  });
+
+  it("摘要不匹配 → fail + anchor.manifest-digest", () => {
+    const fx = buildFixture();
+    const expected = "sha256:" + "f".repeat(64);
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: expected });
+    expectFailure(report);
+    expect(report.exitCode).toBe(1);
+    expect(report.trust).toMatchObject({ mode: "digest", result: "mismatch" });
+    expect(report.diagnostics.some((d) => d.category === "anchor" && d.rule === "anchor.manifest-digest")).toBe(true);
+  });
+
+  it("base manifest 字节一致 → digest+base matched", () => {
+    const fx = buildFixture();
+    const digest = SHA(fx.manifestPath);
+    const base = path.join(fx.dir, "base-manifest.json");
+    fs.copyFileSync(fx.manifestPath, base);
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: digest, baseManifestPath: base });
+    expect(report.trust).toMatchObject({
+      mode: "digest+base", result: "matched", baseManifest: { sha256: digest, byteEqual: true },
+    });
+    expect(report.status).toBe("pass");
+  });
+
+  it("base manifest 字节不同 → fail + anchor.base-manifest", () => {
+    const fx = buildFixture();
+    const digest = SHA(fx.manifestPath);
+    const base = path.join(fx.dir, "base-manifest.json");
+    fs.copyFileSync(fx.manifestPath, base);
+    fs.appendFileSync(base, " ");
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: digest, baseManifestPath: base });
+    expectFailure(report);
+    expect(report.trust).toMatchObject({ mode: "digest+base", result: "mismatch", baseManifest: { byteEqual: false } });
+    expect(report.diagnostics.some((d) => d.rule === "anchor.base-manifest")).toBe(true);
+  });
+
+  it("base manifest 读不出 → invalid", () => {
+    const fx = buildFixture();
+    expect(() => verifyDeliveryEvidence(fx.manifestPath, {
+      expectedManifestSha256: SHA(fx.manifestPath),
+      baseManifestPath: path.join(fx.dir, "missing.json"),
+    })).toThrow(/读不出 base manifest/);
+  });
+
+  it("--base-manifest 没有摘要 → usage error", () => {
+    const fx = buildFixture();
+    const base = path.join(fx.dir, "base-manifest.json");
+    fs.copyFileSync(fx.manifestPath, base);
+    expect(() => verifyDeliveryEvidence(fx.manifestPath, { baseManifestPath: base })).toThrow(/--base-manifest/);
+  });
+
+  it("格式错误的摘要 → usage error", () => {
+    const fx = buildFixture();
+    expect(() => verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: "deadbeef" })).toThrow(/--expected-manifest-sha/);
+  });
+});
+
+describe("N01–N17 负向测试矩阵（P0-03-02）", () => {
+  it("N03 Playtest 报告篡改 → hash-mismatch / fail，定位到 playtest result", () => {
+    const fx = buildFixture();
+    const p = path.join(fx.roots["out"]!, PACK_ID, "run", "v1", "playtest", "v2", "result.json");
+    fs.appendFileSync(p, " ");
+    const report = verifyDeliveryEvidence(fx.manifestPath);
+    expectFailure(report);
+    expect(report.exitCode).toBe(1);
+    const hit = report.results.files.find((f) => f.path.endsWith("playtest/v2/result.json"));
+    expect(hit?.status).toBe("hash-mismatch");
+    expect(report.diagnostics.some((d) => d.rule === "file.hash-mismatch" && d.path?.endsWith("playtest/v2/result.json"))).toBe(true);
+  });
+
+  it("N06 Manifest 篡改（可信摘要未变）→ anchor mismatch / fail", () => {
+    const fx = buildFixture();
+    const trusted = SHA(fx.manifestPath);
+    const m = readJson(fx.manifestPath);
+    m.files[0].sha256 = "sha256:" + "0".repeat(64);
+    writeJson(fx.manifestPath, m);
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: trusted });
+    expectFailure(report);
+    expect(report.exitCode).toBe(1);
+    expect(report.trust).toMatchObject({ result: "mismatch", expectedSha256: trusted });
+    expect(report.trust?.actualSha256).not.toBe(trusted);
+    expect(report.diagnostics.some((d) => d.category === "anchor" && d.rule === "anchor.manifest-digest")).toBe(true);
+  });
+
+  it("N07 证据 + Manifest 同时篡改（可信摘要未变）→ 文件 verified 但 anchor mismatch / fail", () => {
+    const fx = buildFixture();
+    const trusted = SHA(fx.manifestPath);
+    const p = fx.siteIndexPath;
+    write(p, "<html>double-tampered</html>");
+    const rel = path.relative(fx.roots["out"]!, p).split(path.sep).join("/");
+    const m = readJson(fx.manifestPath);
+    const entry = m.files.find((f: { root: string; path: string }) => f.root === "out" && f.path === rel);
+    if (entry === undefined) throw new Error(`manifest entry missing: ${rel}`);
+    entry.sha256 = SHA(p);
+    entry.bytes = fs.statSync(p).size;
+    writeJson(fx.manifestPath, m);
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: trusted });
+    expectFailure(report);
+    expect(report.exitCode).toBe(1);
+    expect(report.trust).toMatchObject({ result: "mismatch" });
+    expect(report.results.files.find((f) => f.path === rel)?.status).toBe("verified");
+    expect(report.diagnostics.some((d) => d.category === "anchor" && d.rule === "anchor.manifest-digest")).toBe(true);
+  });
+
+  it("N15 Manifest 重复文件 → 正式入口拒绝（invalid）", () => {
+    const fx = buildFixture();
+    const m = readJson(fx.manifestPath);
+    m.files.push({ ...m.files[0] });
+    writeJson(fx.manifestPath, m);
+    expect(() => verifyDeliveryEvidence(fx.manifestPath)).toThrow(/文件重复/);
+  });
+
+  it("N15 Manifest 重复记录 → 正式入口拒绝（invalid）", () => {
+    const fx = buildFixture();
+    const m = readJson(fx.manifestPath);
+    m.records.push({ ...m.records[0] });
+    writeJson(fx.manifestPath, m);
+    expect(() => verifyDeliveryEvidence(fx.manifestPath)).toThrow(/记录重复/);
   });
 });

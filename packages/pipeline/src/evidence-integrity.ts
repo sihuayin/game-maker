@@ -176,6 +176,21 @@ const CheckComparisonSchema = z.strictObject({
   match: z.boolean(),
 });
 
+/** 信任锚点：本次运行是否把当前清单钉在外部提供的 SHA-256 上（Q13）。 */
+const AnchorResultSchema = z.strictObject({
+  mode: z.enum(["digest", "digest+base"]),
+  source: z.literal("cli"),
+  expectedSha256: Sha256,
+  actualSha256: Sha256,
+  baseManifest: z.strictObject({
+    path: z.string().min(1),
+    sha256: Sha256,
+    byteEqual: z.boolean(),
+  }).optional(),
+  result: z.enum(["matched", "mismatch"]),
+});
+export type AnchorResult = z.infer<typeof AnchorResultSchema>;
+
 export const DeliveryVerificationReportSchema = z.strictObject({
   format: z.literal("delivery-verification/v1"),
   generatedAt: z.string().min(1),
@@ -183,6 +198,8 @@ export const DeliveryVerificationReportSchema = z.strictObject({
     manifest: z.strictObject({ path: z.string().min(1), sha256: Sha256 }),
     subject: ManifestSubjectSchema,
   }),
+  /** 只在显式传入可信摘要时出现；旧报告没有这个字段仍然合法。 */
+  trust: AnchorResultSchema.optional(),
   scope: z.strictObject({
     roots: z.record(z.string().min(1), z.string().min(1)),
     files: z.strictObject({ total: z.number().int().nonnegative(), required: z.number().int().nonnegative(), optional: z.number().int().nonnegative() }),
@@ -207,7 +224,7 @@ export const DeliveryVerificationReportSchema = z.strictObject({
     consistency: z.array(ConsistencyResultSchema),
   }),
   diagnostics: z.array(z.strictObject({
-    category: z.enum(["files", "identity", "consistency", "verdict"]),
+    category: z.enum(["files", "identity", "consistency", "verdict", "anchor"]),
     severity: z.enum(["fail", "blocked"]),
     rule: z.string().min(1),
     message: z.string().min(1),
@@ -1126,7 +1143,7 @@ function recomputeChecks(opts: {
 // 八、总装
 // ─────────────────────────────────────────────────────────────────────────────
 
-const TRUST_BOUNDARY = "能发现相对清单的改动；发现不了清单与被验证据一起被改并提交 —— 后者由 git 提交历史与人工审查负责。三方哈希核对只增加内部矛盾检测，不增加防篡改强度。";
+const TRUST_BOUNDARY = "能发现相对清单的改动；发现不了清单与被验证据一起被改并提交 —— 后者由 git 提交历史与人工审查负责。三方哈希核对只增加内部矛盾检测，不增加防篡改强度。若启用 trust.anchor，另行记录当前清单与外部摘要的匹配结果；摘要来源的可信性由调用方（CI/base）负责。";
 
 function groupStatus(files: VerificationFileResult[]): DeliveryCheckStatus {
   const required = files.filter((f) => f.required);
@@ -1213,8 +1230,75 @@ export function writeVerificationReport(opts: { report: DeliveryVerificationRepo
   }
 }
 
-export function verifyDeliveryEvidence(manifestPath: string): DeliveryVerificationReport {
+export type AnchorOptions = {
+  /** 可信清单摘要，形如 `sha256:<64 位小写十六进制>`。 */
+  expectedManifestSha256?: string;
+  /** 可信 base 清单路径；给了就要求与当前清单一字节不差。 */
+  baseManifestPath?: string;
+};
+
+function normalizeExpectedSha(value: string): string {
+  const parsed = Sha256.safeParse(value.trim());
+  if (!parsed.success)
+    throw new CommandError("usage", "--expected-manifest-sha 必须是 sha256:<64 位小写十六进制>");
+  return parsed.data;
+}
+
+/** 报告里的路径：能相对 cwd 表示就相对，否则绝对。 */
+function displayPathOf(absPath: string): string {
+  const rel = path.relative(process.cwd(), absPath);
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel)
+    ? rel.split(path.sep).join("/")
+    : absPath;
+}
+
+function readBaseManifestRaw(baseManifestPath: string): Buffer {
+  const abs = path.resolve(baseManifestPath);
+  try {
+    return fs.readFileSync(abs);
+  } catch (e) {
+    throw new CommandError("invalid", `读不出 base manifest：${abs}（${e instanceof Error ? e.message : String(e)}）`);
+  }
+}
+
+export function verifyDeliveryEvidence(manifestPath: string, anchor?: AnchorOptions): DeliveryVerificationReport {
+  if (anchor?.baseManifestPath !== undefined && anchor.expectedManifestSha256 === undefined)
+    throw new CommandError("usage", "--base-manifest 需要同时给 --expected-manifest-sha");
   const { manifest, absPath: absManifest, raw } = readEvidenceManifest(manifestPath);
+  const actualManifestSha = sha256Of(raw);
+  let anchorResult: AnchorResult | undefined;
+  let anchorStatus: DeliveryCheckStatus = "pass";
+  const anchorDiagnostics: Array<{ category: "anchor"; severity: "fail"; rule: string; message: string }> = [];
+  if (anchor?.expectedManifestSha256 !== undefined) {
+    const expected = normalizeExpectedSha(anchor.expectedManifestSha256);
+    const base = anchor.baseManifestPath === undefined
+      ? undefined
+      : (() => {
+        const baseAbs = path.resolve(anchor.baseManifestPath);
+        const baseRaw = readBaseManifestRaw(baseAbs);
+        return { path: displayPathOf(baseAbs), sha256: sha256Of(baseRaw), byteEqual: raw.equals(baseRaw) };
+      })();
+    const digestMatch = expected === actualManifestSha;
+    const baseOk = base === undefined || (base.byteEqual && base.sha256 === expected);
+    const result = digestMatch && baseOk ? "matched" : "mismatch";
+    anchorResult = {
+      mode: base === undefined ? "digest" : "digest+base",
+      source: "cli",
+      expectedSha256: expected,
+      actualSha256: actualManifestSha,
+      ...(base === undefined ? {} : { baseManifest: base }),
+      result,
+    };
+    if (!digestMatch) anchorDiagnostics.push({
+      category: "anchor", severity: "fail", rule: "anchor.manifest-digest",
+      message: `清单 sha256 ${actualManifestSha} 与可信摘要 ${expected} 不匹配`,
+    });
+    if (base !== undefined && !baseOk) anchorDiagnostics.push({
+      category: "anchor", severity: "fail", rule: "anchor.base-manifest",
+      message: `base manifest ${base.path} sha256 ${base.sha256}，byteEqual=${base.byteEqual}，期望摘要 ${expected}`,
+    });
+    if (result === "mismatch") anchorStatus = "fail";
+  }
   const manifestDir = path.dirname(absManifest);
   const roots = loadRoots(manifest, manifestDir);
   const fileResults = manifest.files.map((f) => verifyOneFile(f, roots));
@@ -1266,9 +1350,11 @@ export function verifyDeliveryEvidence(manifestPath: string): DeliveryVerificati
     { status: identityStatus, required: true },
     { status: consistencyStatus, required: true },
     { status: verdictStatus, required: true },
+    { status: anchorStatus, required: true },
   ]);
 
   const diagnostics = [
+    ...anchorDiagnostics,
     ...fileResults.filter((f) => f.required && f.status !== "verified")
       .map((f) => ({
         category: "files" as const,
@@ -1297,14 +1383,12 @@ export function verifyDeliveryEvidence(manifestPath: string): DeliveryVerificati
     }] : []),
   ];
 
-  const displayManifestPath = (() => {
-    const rel = path.relative(process.cwd(), absManifest);
-    return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel) ? rel.split(path.sep).join("/") : absManifest;
-  })();
+  const displayManifestPath = displayPathOf(absManifest);
   const report: DeliveryVerificationReport = {
     format: "delivery-verification/v1",
     generatedAt: new Date().toISOString(),
-    input: { manifest: { path: displayManifestPath, sha256: sha256Of(raw) }, subject: manifest.subject },
+    input: { manifest: { path: displayManifestPath, sha256: actualManifestSha }, subject: manifest.subject },
+    ...(anchorResult === undefined ? {} : { trust: anchorResult }),
     scope: {
       roots: Object.fromEntries([...roots.values()].map((r) => [r.id, r.declared])),
       files: { total: fileResults.length, required: fileResults.filter((f) => f.required).length, optional: fileResults.filter((f) => !f.required).length },
@@ -1322,6 +1406,7 @@ export function verifyDeliveryEvidence(manifestPath: string): DeliveryVerificati
       "本报告由已有证据重导出，不重新构建游戏、不重新执行 QA、不重新启动浏览器试玩。",
       "visual-review 只校验记录完整性与一致性，不重判人工视觉结论。",
       "信任边界：能发现相对清单的改动；发现不了清单与被验证据一起被改并提交。",
+      ...(anchorResult === undefined ? [] : ["锚点校验只证明当前清单匹配给定摘要；摘要本身的可信来源由 CI/base 负责。"]),
       "本版不做：五态真实 E2E、第二个 Demo 的泛化、MCP 镜像。",
     ],
   };
@@ -1338,6 +1423,13 @@ export function renderVerificationMarkdown(report: DeliveryVerificationReport): 
   lines.push(`- 结论：**${report.status}**（退出码 ${report.exitCode}）`, `- 生成时间：${report.generatedAt}`);
   lines.push(`- 清单：\`${report.input.manifest.path}\``, `  sha256：\`${report.input.manifest.sha256}\``);
   lines.push(`- subject：${report.input.subject.packId} v${report.input.subject.packVersion} · site v${report.input.subject.siteVersion} · shell ${report.input.subject.shellVersion}`);
+  if (report.trust !== undefined) {
+    lines.push(`- 信任锚点：**${report.trust.result}**（${report.trust.mode}）`,
+      `  expected：\`${report.trust.expectedSha256}\``,
+      `  actual：\`${report.trust.actualSha256}\``);
+    if (report.trust.baseManifest !== undefined)
+      lines.push(`  base manifest：\`${report.trust.baseManifest.path}\` · sha256 \`${report.trust.baseManifest.sha256}\` · byteEqual ${report.trust.baseManifest.byteEqual}`);
+  }
   lines.push(`- 范围：${report.scope.files.total} 文件（required ${report.scope.files.required} / optional ${report.scope.files.optional}）· ${report.scope.records} 条记录`, "");
   lines.push(`## 声明 vs 重算`, "", "| 检查 | 声明 | 重算 | 一致 |", "|---|---|---|---|");
   for (const c of report.comparison.checks) lines.push(`| ${c.key} | ${c.declared ?? "—"} | ${c.recomputed} | ${c.match ? "✓" : "✗"} |`);

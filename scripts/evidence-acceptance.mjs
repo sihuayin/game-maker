@@ -19,8 +19,15 @@ const flag = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i >= 0 && args[i + 1] !== undefined ? path.resolve(ROOT, args[i + 1]) : fallback;
 };
+// ⚠️ 摘要是 `sha256:<hex>`，不是路径 —— 不能走 `flag` 的 path.resolve。
+const rawFlag = (name, fallback) => {
+  const i = args.indexOf(`--${name}`);
+  return i >= 0 && args[i + 1] !== undefined ? args[i + 1] : fallback;
+};
 const MANIFEST = flag("manifest", path.join(ROOT, ".scratch/evidence-integrity-v1/manifest/expected-hashes.json"));
 const OUT = flag("out", path.join(ROOT, ".scratch/evidence-integrity-v1/runs"));
+const EXPECTED_MANIFEST_SHA = rawFlag("expected-manifest-sha", undefined);
+const BASE_MANIFEST = flag("base-manifest", undefined);
 const CLI = path.join(ROOT, "packages/cli/dist/cli.mjs");
 const sha256 = (p) => "sha256:" + crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
 
@@ -38,7 +45,13 @@ const startedAt = new Date();
 const t0 = Date.now();
 let stdout = "", stderr = "", exitCode = 0;
 try {
-  stdout = execFileSync(process.execPath, [CLI, "verify-delivery", "--manifest", MANIFEST, "--out", OUT, "--json"], {
+  stdout = execFileSync(process.execPath, [
+    CLI, "verify-delivery",
+    "--manifest", MANIFEST,
+    ...(EXPECTED_MANIFEST_SHA === undefined ? [] : ["--expected-manifest-sha", EXPECTED_MANIFEST_SHA]),
+    ...(BASE_MANIFEST === undefined ? [] : ["--base-manifest", BASE_MANIFEST]),
+    "--out", OUT, "--json",
+  ], {
     encoding: "utf8", cwd: ROOT, stdio: ["ignore", "pipe", "pipe"],
   });
 } catch (e) {
@@ -86,6 +99,8 @@ const summary = {
   command: `node packages/cli/dist/cli.mjs verify-delivery --manifest ${path.relative(ROOT, MANIFEST)} --out ${path.relative(ROOT, OUT)} --json`,
   manifest: path.relative(ROOT, MANIFEST),
   manifestSha256: sha256(MANIFEST),
+  expectedManifestSha256: EXPECTED_MANIFEST_SHA ?? null,
+  baseManifest: BASE_MANIFEST === undefined ? null : path.relative(ROOT, BASE_MANIFEST),
   exitCode,
   durationMs,
   reportDir: newest === undefined ? null : path.relative(ROOT, newest),
@@ -100,6 +115,7 @@ const summary = {
   recomputedVerdict: report?.recomputed?.verdict ?? null,
   checks: report?.comparison?.checks ?? [],
   diagnostics: report?.diagnostics?.length ?? null,
+  trustAnchor: report?.trust ?? null,
   pass,
   problems,
   stderr: stderr.trim() === "" ? null : stderr.trim().slice(0, 4000),

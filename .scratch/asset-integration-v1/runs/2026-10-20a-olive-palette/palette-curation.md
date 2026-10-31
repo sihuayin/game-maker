@@ -18,7 +18,7 @@
 图 43 的绿色只占 **0.14%**（1,427 / 1,048,576），且是正绿（如 `#36673a`）；
 外套橄榄 `#59503b` 离参考绿 ≈42、离现有棕 `#685247` ≈19。
 把参考绿加进色板后，外套仍会吸附到棕色 —— 要恢复外套，必须追加**橄榄/卡其色本身**。
-证据见 [票 04](../issues/04-palette-coat-review.md) 与
+证据见 [票 04](../../issues/04-palette-coat-review.md) 与
 `.scratch/asset-integration-v1/issues/04-evidence/player-raw-current-olive.png`。
 
 ## 可复现依据
