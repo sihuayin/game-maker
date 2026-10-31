@@ -680,3 +680,29 @@ describe("N01–N17 负向测试矩阵（P0-03-02）", () => {
     expect(() => verifyDeliveryEvidence(fx.manifestPath)).toThrow(/记录重复/);
   });
 });
+
+describe("baseline-update anchor mode（P0-03-05）", () => {
+  it("digest 匹配 + baseline-update → matched，不要求 base", () => {
+    const fx = buildFixture();
+    const digest = SHA(fx.manifestPath);
+    const report = verifyDeliveryEvidence(fx.manifestPath, { expectedManifestSha256: digest, anchorMode: "baseline-update" });
+    expect(report.trust).toMatchObject({ mode: "baseline-update", result: "matched" });
+    expect(report.status).toBe("pass");
+  });
+
+  it("baseline-update + base manifest → usage", () => {
+    const fx = buildFixture();
+    const base = path.join(fx.dir, "base.json");
+    fs.copyFileSync(fx.manifestPath, base);
+    expect(() => verifyDeliveryEvidence(fx.manifestPath, {
+      expectedManifestSha256: SHA(fx.manifestPath), baseManifestPath: base, anchorMode: "baseline-update",
+    })).toThrow(/baseline-update/);
+  });
+
+  it("digest+base 没有 base → usage", () => {
+    const fx = buildFixture();
+    expect(() => verifyDeliveryEvidence(fx.manifestPath, {
+      expectedManifestSha256: SHA(fx.manifestPath), anchorMode: "digest+base",
+    })).toThrow(/digest\+base/);
+  });
+});

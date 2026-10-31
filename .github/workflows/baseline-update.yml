@@ -1,0 +1,128 @@
+name: baseline-update
+
+# P0-03-05：owner 专用基线验证。
+# 从受保护 base 运行可信 workflow/CLI/script；候选 commit 只作为数据读取，不执行候选代码。
+# 本 job 不是 required check；它只产出验证产物，不自动合并、不改 base。
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Candidate baseline commit SHA (40 lowercase hex)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: baseline-update
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Validate candidate SHA
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          case "$CANDIDATE_SHA" in
+            *[!0-9a-f]*|"") echo "::error::candidate_sha must be 40 lowercase hex"; exit 1 ;;
+          esac
+          test "${#CANDIDATE_SHA}" -eq 40 || { echo "::error::candidate_sha must be 40 lowercase hex"; exit 1; }
+
+      - name: Checkout trusted base
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          path: base
+          persist-credentials: false
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          sparse-checkout: |
+            packages
+            scripts
+            .scratch/evidence-integrity-v1/manifest
+
+      - name: Checkout candidate as data only
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          path: candidate
+          persist-credentials: false
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+          sparse-checkout: |
+            .scratch/fpvs-v1-final/work
+            .scratch/fpvs-v1-final/artifacts
+            .scratch/fpvs-v1-final/runs
+            .scratch/generic-playtest-v1/evidence
+            .scratch/evidence-integrity-v1/manifest
+
+      - name: Verify candidate checkout SHA
+        working-directory: candidate
+        env:
+          EXPECTED: ${{ inputs.candidate_sha }}
+        run: |
+          ACTUAL="$(git rev-parse HEAD)"
+          test "$ACTUAL" = "$EXPECTED" || {
+            echo "::error::candidate checkout mismatch: expected $EXPECTED, got $ACTUAL"
+            exit 1
+          }
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.1
+          run_install: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: base/pnpm-lock.yaml
+
+      - name: Build trusted base CLI
+        working-directory: base
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Validate candidate baseline
+        env:
+          CANDIDATE_MANIFEST: ${{ github.workspace }}/candidate/.scratch/evidence-integrity-v1/manifest/expected-hashes.json
+          CANDIDATE_DIGEST_FILE: ${{ github.workspace }}/candidate/.scratch/evidence-integrity-v1/manifest/expected-hashes.sha256
+          CANDIDATE_LOG: ${{ github.workspace }}/candidate/.scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md
+          OUT_DIR: ${{ runner.temp }}/baseline-update-runs
+        run: |
+          set -euo pipefail
+          for f in "$CANDIDATE_MANIFEST" "$CANDIDATE_DIGEST_FILE" "$CANDIDATE_LOG"; do
+            test -f "$f" || { echo "::error::missing candidate baseline file: $f"; exit 1; }
+          done
+          node base/scripts/check-manifest-updates.mjs --log "$CANDIDATE_LOG" --manifest "$CANDIDATE_MANIFEST"
+          CANDIDATE_DIGEST="$(tr -d '\r\n' < "$CANDIDATE_DIGEST_FILE")"
+          mkdir -p "$OUT_DIR"
+          node base/scripts/evidence-acceptance.mjs \
+            --manifest "$CANDIDATE_MANIFEST" \
+            --expected-manifest-sha "$CANDIDATE_DIGEST" \
+            --anchor-mode baseline-update \
+            --out "$OUT_DIR"
+
+      - name: Write baseline update metadata
+        if: always()
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          OUT_DIR: ${{ runner.temp }}/baseline-update-runs
+        run: |
+          mkdir -p "$OUT_DIR"
+          node -e 'const fs = require("fs"); const path = process.env.OUT_DIR + "/baseline-update-meta.json"; fs.writeFileSync(path, JSON.stringify({ candidateSha: process.env.CANDIDATE_SHA, baseRef: process.env.GITHUB_REF, baseSha: process.env.GITHUB_SHA, runId: process.env.GITHUB_RUN_ID, workflow: process.env.GITHUB_WORKFLOW, mode: "baseline-update" }, null, 2) + "\n");'
+
+      - name: Upload baseline update artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-update-${{ inputs.candidate_sha }}
+          path: ${{ runner.temp }}/baseline-update-runs
+          retention-days: 30
+          if-no-files-found: warn
