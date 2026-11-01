@@ -1,0 +1,79 @@
+{
+  "command": "verify-delivery",
+  "summary": [
+    "✅ 证据完整性验收：pass（退出码 0）",
+    "  清单：.scratch/p0-02-second-demo-v2/manifest/final-manifest.json · sha256 sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "  subject：wasteland-scavenger-recipe v1 · site v1 · shell 2",
+    "  范围：231 文件（required 137 / optional 94）· 6 条记录",
+    "  结论：声明 pass / 重算 pass（六项一致：是）",
+    "  诊断：fail 0 · blocked 0",
+    "  报告：2026-11-01T12-30-40-895Z-delivery-verification/report.json · 2026-11-01T12-30-40-895Z-delivery-verification/report.md"
+  ],
+  "data": {
+    "status": "pass",
+    "declaredVerdict": "pass",
+    "recomputedVerdict": "pass",
+    "verdictMatch": true,
+    "checks": [
+      {
+        "key": "asset-pack",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "config",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "qa",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "site",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "playable-smoke",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      },
+      {
+        "key": "visual-review",
+        "declared": "pass",
+        "recomputed": "pass",
+        "match": true
+      }
+    ],
+    "files": {
+      "total": 231,
+      "required": 137,
+      "optional": 94
+    },
+    "records": 6,
+    "diagnostics": {
+      "total": 0,
+      "fail": 0,
+      "blocked": 0
+    },
+    "report": "2026-11-01T12-30-40-895Z-delivery-verification/report.json",
+    "reportMarkdown": "2026-11-01T12-30-40-895Z-delivery-verification/report.md"
+  },
+  "artifacts": [
+    {
+      "path": "2026-11-01T12-30-40-895Z-delivery-verification/report.json",
+      "kind": "delivery-verification-report"
+    },
+    {
+      "path": "2026-11-01T12-30-40-895Z-delivery-verification/report.md",
+      "kind": "delivery-verification-report-markdown"
+    }
+  ]
+}
