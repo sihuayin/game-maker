@@ -110,7 +110,7 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 
 - [Registry 信任边界与双基线独立性研究](issues/02-registry-trust-boundary-research.md)：**已收口** —— registry 只是路由表，信任仍来自 base + 各自 Manifest/Anchor；head registry 建议字节相等 FAIL（03 待裁定）；A/B 有 73 个绝对路径重叠（28 个双方 required），07 负向样本必须用各自独占 required 路径；更新通道建议 owner PR + 只读 dispatch；18 项 OD 交给 03。研究全文：[registry-trust-boundary.md](research/registry-trust-boundary.md)。
 
-- [只读审计：基线 A/B 身份与冻结不变性](issues/01-readonly-dual-baseline-audit.md)：**PASS** —— A 223/151/72/13、`sha256:ba7a485b…36fd`（= Anchor = 更新日志）；B 231/137/94/6、`sha256:07866e0e…b9ab`（= final-verdict）；454 个清单条目全部 verified；freeze 112/112 哈希一致，差集 2 个 chrome.log 为旧 attempt 日志（spec `.log` 排除，v3 显式 optional）；A/B 73 路径重叠（28 双方 required）；CLI A/B 均 exit 0 / pass / 0 诊断。[报告](runs/2026-11-01T12-28-50Z-baseline-audit/report.md)。
+- [只读审计：基线 A/B 身份与冻结不变性](issues/01-readonly-dual-baseline-audit.md)：**PASS** —— A 223/151/72/13、`sha256:ba7a485b…36fd`（= Anchor = 更新日志）；B 231/137/94/6、`sha256:07866e0e…b9ab`（= final-verdict）；454 个清单条目全部 verified；freeze 112/112 哈希一致，差集 2 个 chrome.log 为旧 attempt 日志（spec `.log` 排除，v3 显式 optional）；A/B 73 路径重叠（28 双方 required）；CLI A/B 均 exit 0 / pass / 0 诊断。[报告](runs/2026-11-01T12-28-50Z-baseline-audit/report.md) · [PR #11](https://github.com/sihuayin/game-maker/pull/11)。
 
 ## Not yet specified
 

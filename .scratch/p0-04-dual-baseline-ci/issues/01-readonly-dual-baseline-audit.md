@@ -48,6 +48,7 @@ Blocked by: —
 **结论：PASS（2026-11-01）。** 01 硬门槛通过；未发现身份或哈希不一致，未修改任何冻结文件。03 及后续可进入。
 
 - 运行目录：[2026-11-01T12-28-50Z-baseline-audit](../runs/2026-11-01T12-28-50Z-baseline-audit/)
+- PR：[#11](https://github.com/sihuayin/game-maker/pull/11)
 - 人工报告：[report.md](../runs/2026-11-01T12-28-50Z-baseline-audit/report.md) · 机器可读：[facts.json](../runs/2026-11-01T12-28-50Z-baseline-audit/facts.json)
 - 审计 HEAD：`25985daf618aa845d5ee0667b92a16e6edaad53e`；审计脚本只写本目录，证据/配置在审计前后哈希零变化。
 
