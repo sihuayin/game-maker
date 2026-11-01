@@ -1,0 +1,107 @@
+{
+  "format": "p0-04-evidence-ci-e3-facts/v1",
+  "generatedAt": "2026-11-01T15:28:41Z",
+  "verdict": "PASS",
+  "bootstrap": {
+    "runId": 41320891133,
+    "runUrl": "https://github.com/sihuayin/game-maker/actions/runs/41320891133",
+    "baseRef": "main",
+    "baseSha": "77ee10a698f86530bb83e50154e9b0d06a62aed6",
+    "candidateSha": "fe38ec697f37014fcf1f9443ad6e3ce974457145",
+    "conclusion": "success",
+    "note": "base old workflow validated candidate before 05 merge"
+  },
+  "implementation": {
+    "pr": 14,
+    "url": "https://github.com/sihuayin/game-maker/pull/14",
+    "mergeSha": "7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3",
+    "checks": "check/test/typecheck/evidence all success"
+  },
+  "probe": {
+    "pr": 15,
+    "url": "https://github.com/sihuayin/game-maker/pull/15",
+    "baseSha": "7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3",
+    "headSha": "55d10f81d97cec6317abd19525343192e8aa54eb",
+    "mergedAs": "8e963c37824893762672ff63d6405a0c5cd4f63e",
+    "evidenceRunId": 41321106019,
+    "evidenceRunUrl": "https://github.com/sihuayin/game-maker/actions/runs/41321106019",
+    "checks": {
+      "check": "pass 37s",
+      "test": "pass 2m19s",
+      "typecheck": "pass 51s",
+      "evidence": "pass 28s"
+    },
+    "artifacts": [
+      {
+        "name": "evidence-a-15",
+        "bytes": 18077
+      },
+      {
+        "name": "evidence-b-15",
+        "bytes": 18134
+      },
+      {
+        "name": "evidence-aggregate-15",
+        "bytes": 437
+      }
+    ],
+    "steps": [
+      "Materialize base and head freeze hash lists",
+      "Validate trusted baseline configuration",
+      "Build trusted base CLI",
+      "Verify baseline A",
+      "Verify baseline B",
+      "Verify baseline B freeze snapshot",
+      "Aggregate dual-baseline results",
+      "Upload baseline A artifact",
+      "Upload baseline B artifact",
+      "Upload dual-baseline aggregate artifact"
+    ],
+    "aggregate": {
+      "format": "dual-baseline-aggregate/v1",
+      "generatedAt": "2026-11-01T15:25:23.750Z",
+      "registry": ".scratch/baselines/registry.json",
+      "outcomes": {
+        "A": "success",
+        "B": "success",
+        "BFreeze": "success"
+      },
+      "summaries": {
+        "A": "/home/runner/work/_temp/evidence-a/2026-11-01T15-25-23-194Z-test-evidence/summary.json",
+        "B": "/home/runner/work/_temp/evidence-b/2026-11-01T15-25-23-432Z-test-evidence/summary.json"
+      },
+      "reports": {
+        "A": "/home/runner/work/_temp/evidence-a/2026-11-01T15-25-23-371Z-delivery-verification/report.json",
+        "B": "/home/runner/work/_temp/evidence-b/2026-11-01T15-25-23-616Z-delivery-verification/report.json"
+      },
+      "freeze": "/home/runner/work/_temp/evidence-b/freeze-verification.json",
+      "problems": [],
+      "pass": true
+    },
+    "freeze": {
+      "format": "freeze-snapshot-verification/v1",
+      "generatedAt": "2026-11-01T15:25:23.707Z",
+      "baselineId": "p0-02-second-demo-v2",
+      "hashList": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+      "freezeRoot": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe",
+      "count": 112,
+      "verified": 112,
+      "missing": [],
+      "mismatched": [],
+      "extra": [],
+      "pass": true
+    }
+  },
+  "e2": {
+    "runDir": ".scratch/p0-04-dual-baseline-ci/runs/2026-11-01T15-18-06Z-evidence-ci/report.md",
+    "verdict": "PASS",
+    "tests": "160 files / 2341 tests",
+    "protectedFiles": 499,
+    "changed": []
+  },
+  "limitations": [
+    "owner-only probe；07 再做正式红绿负向 PR。",
+    "probe 是 docs-only 正常 PR，不是负向验收。",
+    "owner 仍有 bypass；未证明非管理员无法绕过。"
+  ]
+}
