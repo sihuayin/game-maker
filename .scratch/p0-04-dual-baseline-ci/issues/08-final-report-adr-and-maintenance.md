@@ -27,8 +27,20 @@ Blocked by: 07
 6. **回归**：`pnpm test`、`pnpm typecheck`、`pnpm check:links` 全绿；不引入付费调用。
 7. **本票一个 PR**。
 
+### 03 裁定输入（2026-11-01）
+
+- AC 矩阵必须**单列** `freezeHashes` 不可被普通更新改写（03 Q3/Q8）；不得用其他 AC 通过抵消。
+- 112 冻结文件完整性必须由 `freeze-sha256.txt` 逐条复核；2 个 `chrome.log` 虽不在 231 Manifest，也属于冻结身份边界（03 Q8）。
+- 如实披露 A/B head-side 信任元数据检查**非对称**：A 只比 Manifest，B 比 Manifest + Anchor + 更新日志 + `freezeHashes`；Registry 字节相等（03 Q2）。不得声称 A/B head-side 检查完全对称。
+- Registry schema、未知字段拒绝、A/B 路径交叉、集合断言与单元测试必须记录（03 Q1/Q10）；Registry 不纳入 `pnpm check` 的决定也要写明。
+- 更新通道必须记录 owner PR + 只读 dispatch、`baseline` 必填、非目标字节相等、无自动写回、审计字段使用 `github.actor_id`/`triggering_actor`（03 Q3）。
+- 负向样本记录 03 Q11 指定路径与“B setup.json 为 B-only required”的复核证据；披露 73 路径重叠（28 双方 required）与 optional 94 = `oldWork` 93 + `v3/chrome.log` 1。
+- 回归：04 的 B Anchor 可复算记录、05 的 bootstrap dispatch、06 的 `freezeHashes` 拦截证据都必须进入 AC 矩阵。
+
 ## 验收标准
 
 - AC-01–AC-16 全部有证据；任何安全相关项失败不得用其他项通过抵消。
 - 报告不夸大、不把证据完整性通过解释为游戏功能验收。
+- AC 矩阵覆盖 03 的冻结覆盖、非对称 head-side 检查、Registry 校验、更新通道与负向样本要求；`freezeHashes` 独立 AC 有证据。
+- 不声称 A/B 的 head-side 信任元数据检查完全对称；不声称普通更新通道可以改写 `freeze-sha256.txt`。
 - 文档足以让后续维护者独立执行一次基线更新与一次负向 PR 验收。

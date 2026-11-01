@@ -16,14 +16,20 @@ Blocked by: 03
    - 初始值必须**独立复算**，不能只抄人工常量；记录完整摘要、计算对象、计算命令、计算时间与冻结来源；
    - 预期摘要 `sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab`，若复算不一致 ⇒ 停止并报告，不写入。
 2. **B 更新日志**：在 B 的 manifest 目录新建 `MANIFEST-UPDATES.md`，按 A 的格式写初始 freeze 条目：
-   - reason / subject / oldSha256（none）/ newSha256 / evidence（231 文件，137 required / 94 optional，6 records）/ verifiedBy / recordedIn；
+   - reason / subject / oldSha256（none）/ newSha256 / evidence（231 文件，137 required / 94 optional，6 records；另有 112 冻结文件由 `freeze-sha256.txt` 覆盖）/ verifiedBy / recordedIn；
    - 只追加；最后一条 `newSha256` 必须与当前 B Manifest 原始字节一致。
-3. **格式校验**：按 03 的裁定扩展 `scripts/check-manifest-updates.mjs`（或新增等价脚本）：
-   - 拒绝缺失字段、重复字段、非法摘要格式、最后一条与 Manifest 不匹配；
-   - 支持 A/B 两个日志；A 的现有调用与行为不变。
+3. **格式校验（03 Q6 已裁定）**：`scripts/check-manifest-updates.mjs` **零改动**；04 用现有脚本分别对 A/B 执行原命令，记录 stdout/stderr/退出码。B 日志的严格字段校验与 Registry 驱动 wrapper（`scripts/check-baseline-updates.mjs`）由 05 实现，04 不提前改脚本，也不重构旧脚本。
 4. **测试**：A 回归、B 正例、格式错误、摘要不匹配、缺失日志、重复条目；`pnpm test` / `pnpm typecheck` 全绿。
 5. **E3**：对 A、B 各跑一次真实校验，记录命令、退出码、摘要；B 的 anchor 与 log 必须通过；A 的 anchor/log 零改动。
 6. **PR**：本票一个 PR；不修改 B 的 Manifest、`freeze/` 或 A 文件；不重新生成 Manifest。
+
+### 03 裁定输入（2026-11-01）
+
+- **Q7**：B Anchor 使用与 A 对称的单行 `sha256:<64 hex>`；身份由 Registry `id` + 路径绑定，Anchor 自身不加必填 ID。
+- **Q7**：04 必须留下完整 64 位摘要、被计算文件的精确路径、原始字节计算方式、独立复算命令与结果、冻结来源及对应 commit SHA；`sha256:07866e0e…b9ab` 不得作为未验证常量直接写入。
+- **Q7**：B 更新日志为 Markdown 追加；初始 freeze 条目使用 A 兼容字段（reason/subject/oldSha256/newSha256/evidence/verifiedBy/recordedIn），可追加 `baselineId`/`operator`/`commitSha`/`recordedAt`，但不得要求 A 历史记录补字段。
+- **Q6**：旧 `check-manifest-updates.mjs` 零改动；04 必须验证现有脚本对 A 原调用与 B 新日志调用的输出、退出码和失败行为；wrapper 由 05 实现。
+- **Q9**：Registry 由 05 引入；04 只做 B 的 Anchor + 更新日志，不创建 registry。
 
 ### 研究输入（02）
 
@@ -37,4 +43,5 @@ Blocked by: 03
 - B 拥有独立 Anchor 与更新日志；A 的三件文件字节零变化。
 - B Anchor 有可复核来源（命令 + 对象 + 方式 + 来源），不是人工常量。
 - 任一 Manifest 被篡改时能被发现；仅改 PR 中的 Manifest/Anchor 不能让验收通过（由 05 验证）。
-- 原 A 的 `check-manifest-updates` 行为不回退。
+- 原 A 的 `check-manifest-updates` 行为不回退：脚本文件零改动，A 原调用输出/退出码/失败行为与 P0-03 一致。
+- B 的 `check-baseline-updates` wrapper 与 strict 字段校验由 05 实现；04 只用现有脚本验证 B 新日志。
