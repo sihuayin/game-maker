@@ -1,7 +1,7 @@
 # 基线 B 独立信任锚与更新日志
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: 03
 
 ## Question
@@ -19,7 +19,7 @@ Blocked by: 03
    - reason / subject / oldSha256（none）/ newSha256 / evidence（231 文件，137 required / 94 optional，6 records；另有 112 冻结文件由 `freeze-sha256.txt` 覆盖）/ verifiedBy / recordedIn；
    - 只追加；最后一条 `newSha256` 必须与当前 B Manifest 原始字节一致。
 3. **格式校验（03 Q6 已裁定）**：`scripts/check-manifest-updates.mjs` **零改动**；04 用现有脚本分别对 A/B 执行原命令，记录 stdout/stderr/退出码。B 日志的严格字段校验与 Registry 驱动 wrapper（`scripts/check-baseline-updates.mjs`）由 05 实现，04 不提前改脚本，也不重构旧脚本。
-4. **测试**：A 回归、B 正例、格式错误、摘要不匹配、缺失日志、重复条目；`pnpm test` / `pnpm typecheck` 全绿。
+4. **测试**：A 回归、B 正例、非法摘要格式、摘要不匹配、缺失日志；严格重复字段/多日志 schema 由 05 的 wrapper 测试。`pnpm test` / `pnpm typecheck` 全绿。
 5. **E3**：对 A、B 各跑一次真实校验，记录命令、退出码、摘要；B 的 anchor 与 log 必须通过；A 的 anchor/log 零改动。
 6. **PR**：本票一个 PR；不修改 B 的 Manifest、`freeze/` 或 A 文件；不重新生成 Manifest。
 
@@ -45,3 +45,53 @@ Blocked by: 03
 - 任一 Manifest 被篡改时能被发现；仅改 PR 中的 Manifest/Anchor 不能让验收通过（由 05 验证）。
 - 原 A 的 `check-manifest-updates` 行为不回退：脚本文件零改动，A 原调用输出/退出码/失败行为与 P0-03 一致。
 - B 的 `check-baseline-updates` wrapper 与 strict 字段校验由 05 实现；04 只用现有脚本验证 B 新日志。
+
+## Answer
+
+**结论：PASS（2026-11-01）。** B 已拥有独立 Anchor 与更新日志；A 三件文件与 B Manifest/freeze 零改动；旧校验脚本零改动。
+
+- 运行目录：[2026-11-01T14-40-03Z-b-anchor](../runs/2026-11-01T14-40-03Z-b-anchor/)
+- 报告：[report.md](../runs/2026-11-01T14-40-03Z-b-anchor/report.md) · [facts.json](../runs/2026-11-01T14-40-03Z-b-anchor/facts.json)
+
+### 新建文件
+
+- `.scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256`：72 B，单行 `sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab`。
+- `.scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md`：954 B，Markdown 追加；初始 freeze 条目使用 A 兼容字段 + `baselineId`。
+
+### 独立复算
+
+| 方法 | 结果 |
+|---|---|
+| 期望值 | `sha256:07866e0e…b9ab` |
+| `shasum -a 256` | `sha256:07866e0e…b9ab` |
+| Node `crypto` 原始字节 | `sha256:07866e0e…b9ab` |
+| Python `hashlib` 原始字节 | `sha256:07866e0e…b9ab` |
+| 一致 | **True** |
+
+- 被计算文件：`.scratch/p0-02-second-demo-v2/manifest/final-manifest.json`，66,336 B。
+- 计算方式：对**原始文件字节**做 SHA-256，不重新序列化 JSON。
+- 冻结来源：commit `21632ef62e5d043f98baa834a14a40aa38dff064`（P0-02 v2 阶段 A 收口）；B `final-report.md` 记录的代码基线为 `f0411e676309fede8f20b79d9f8e44e5ac479ef6`（生成时工作树未提交，冻结文件由 21632ef 入库）。
+
+### 现有脚本校验（`scripts/check-manifest-updates.mjs` 零改动）
+
+| 用例 | 期望 | 实际 | 结果 |
+|---|---|---|---|
+| B 正例 | 0 | 0 | PASS |
+| A 原调用 | 0 | 0 | PASS |
+| B 日志 vs A Manifest | 1 | 1 | PASS |
+| 缺失日志 | 1 | 1 | PASS |
+| 非法摘要 | 1 | 1 | PASS |
+| 空日志 | 1 | 1 | PASS |
+| 重复条目（现状） | n/a | 0 | 现有脚本只校验最后一条；严格重复字段由 05 wrapper 负责 |
+
+### verify-delivery（带 Anchor）
+
+- A：exit 0 · status=pass · diagnostics=0 · `trust.result=matched`。
+- B：exit 0 · status=pass · diagnostics=0 · `trust.result=matched`。
+
+### 回归与零改动
+
+- `pnpm test`：exit 0；`pnpm typecheck`：exit 0。
+- 受保护文件快照 120 个（A 三件、B Manifest/spec、`freeze-sha256.txt`、final-report/verdict、112 冻结文件）：**零变化**。
+- 未修改 B Manifest、B `freeze/`、A 文件或任何交付证据；未创建 registry（05）、未新增 wrapper（05）。
+- 本票一个 PR；旧 `check-manifest-updates.mjs` 未改动。

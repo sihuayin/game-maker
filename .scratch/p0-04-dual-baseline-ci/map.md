@@ -11,6 +11,7 @@ Effort: p0-04-dual-baseline-ci
 > **02 已收口（2026-11-01）**：研究产出 [registry-trust-boundary.md](research/registry-trust-boundary.md)；18 项待裁定问题已交给 03；关键事实（A/B 73 个路径重叠）已回灌 05/07。
 > **01 已收口（2026-11-01，PASS）**：A 223/151/72/13 与 B 231/137/94/6 全部逐文件 verified；A `sha256:ba7a485b…36fd` = Anchor = 更新日志，B `sha256:07866e0e…b9ab` = final-verdict；freeze 112/112 哈希一致，2 个 chrome.log 已解释；A/B 73 路径重叠已复核；CLI A/B 均 exit 0 / pass / 0 诊断。报告：[report.md](runs/2026-11-01T12-28-50Z-baseline-audit/report.md)。
 > **03 已收口（2026-11-01）**：Q1–Q11 全部裁定 —— 集中式 Registry + `freezeHashes`（B 必填）；A 保持 Manifest-only、B 全量比较；owner PR + 只读 dispatch；单 job 双 step 完整聚合；`evidence-acceptance` 可选 `baselineId`；旧 `check-manifest-updates` 零改动 + 新 wrapper；112 冻结文件全部按 required 验证；05 引入 Registry，06 依赖 05。详见 [03](issues/03-registry-shape-and-isolation-ruling.md)。
+> **04 已收口（2026-11-01，PASS）**：B 新建独立 Anchor `sha256:07866e0e…b9ab` 与更新日志；独立复算（shasum / Node / Python 原始字节）一致；A 三件与 B Manifest/freeze 零改动；旧校验脚本零改动；CLI A/B 带 anchor 均 pass / matched；`pnpm test` / `typecheck` 通过。报告：[report.md](runs/2026-11-01T14-40-03Z-b-anchor/report.md)。
 
 ## Destination
 
@@ -43,8 +44,8 @@ Effort: p0-04-dual-baseline-ci
 | A Anchor / 更新日志 | `.scratch/evidence-integrity-v1/manifest/expected-hashes.sha256` / `MANIFEST-UPDATES.md`（最后一条 `newSha256` 与当前 Manifest 匹配） |
 | 基线 B Manifest | `.scratch/p0-02-second-demo-v2/manifest/final-manifest.json` |
 | B 规模 / 摘要 | 231 文件（137 required / 94 optional）· 6 records · 3 roots；原始字节 SHA-256 `sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab`；66,336 B |
-| B 当前验收 | `verify-delivery` **exit 0 / status=pass / diagnostics 0**（2026-11-01 01 审计复验，未带 anchor；报告 `runs/2026-11-01T12-28-50Z-baseline-audit/cli/B/`） |
-| B Anchor / 更新日志 | **均不存在**（04 票新建；Q6/R2-Q6 对称布局） |
+| B 当前验收 | `verify-delivery` **exit 0 / status=pass / diagnostics 0 / trust.anchor=matched**（2026-11-01 04 复验，带 B Anchor；报告 `runs/2026-11-01T14-40-03Z-b-anchor/cli-b/`）；01 审计无 anchor 复验亦 pass |
+| B Anchor / 更新日志 | `.scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256` / `MANIFEST-UPDATES.md`（04 已新建；单行 `sha256:07866e0e…b9ab`；初始 freeze 条目与 Manifest 原始字节一致） |
 | B 冻结快照 | `.scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/`，**112 文件**（只读），逐文件哈希 `freeze-sha256.txt` |
 | B 三个 root | `fa04` → `.scratch/fpvs-v1-final/runs/2026-10-28-visual-review`（28，全 required）；`oldWork` → `.scratch/fpvs-v1-final/work`（93，全 optional）；`out` → B `freeze/`（110：109 required + 1 optional）；合计约 **33 MB** |
 | 冻结 vs 清单差异 | freeze **112** = 清单 `out` **110**（109 required + 1 optional）+ **2** 个旧 attempt 的 Chrome 日志（`run/v1/playtest/v1/chrome.log`、`run/v1/playtest/v2/chrome.log`）；2 个日志被 spec `excludeExt: [".log"]` 排除，仅由 `freeze-sha256.txt`（112/112 哈希一致）覆盖；成功 attempt 的 `v3/chrome.log` 由 spec 显式列为 **optional**。清单“列了但磁盘没有” = 0。**`freeze-sha256.txt` 本身未被 231 清单或 Anchor 钉住；03/05 必须裁定或显式记录。** |
@@ -118,6 +119,8 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 - [只读审计：基线 A/B 身份与冻结不变性](issues/01-readonly-dual-baseline-audit.md)：**PASS** —— A 223/151/72/13、`sha256:ba7a485b…36fd`（= Anchor = 更新日志）；B 231/137/94/6、`sha256:07866e0e…b9ab`（= final-verdict）；454 个清单条目全部 verified；freeze 112/112 哈希一致，差集 2 个 chrome.log 为旧 attempt 日志（spec `.log` 排除，v3 显式 optional）；A/B 73 路径重叠（28 双方 required）；CLI A/B 均 exit 0 / pass / 0 诊断。[报告](runs/2026-11-01T12-28-50Z-baseline-audit/report.md) · [PR #11](https://github.com/sihuayin/game-maker/pull/11)。
 
 - [Registry 形状、双基线隔离与更新通道裁定](issues/03-registry-shape-and-isolation-ruling.md)：**已收口** —— 集中式 `.scratch/baselines/registry.json` + 严格 schema + `freezeHashes`（B 必填、A 不需要）；Registry 字节相等、A 只比 Manifest、B 比 Manifest+Anchor+日志+`freezeHashes`；owner PR + 只读 dispatch，`baseline` 必填、diff 白名单、`freezeHashes` 不是普通更新目标；单 job 双 step 完整聚合 + 三份 artifact；`evidence-acceptance` 可选 `baselineId`；旧 `check-manifest-updates` 零改动 + 新 wrapper；112 冻结文件全部按 required 验证；05 引入 Registry，06 依赖 05。
+
+- [基线 B 独立信任锚与更新日志](issues/04-baseline-b-anchor-and-update-log.md)：**PASS** —— 新建 B Anchor（单行 `sha256:07866e0e…b9ab`）与 Markdown 更新日志；三种独立复算一致；现有 `check-manifest-updates.mjs` 零改动，B/A 正例 exit 0、B log vs A manifest / 缺失 / 非法 / 空日志均按预期 exit 1；CLI A/B 带 anchor 均 exit 0 / pass / 诊断 0 / matched；`pnpm test` / `typecheck` exit 0；120 个受保护文件零变化。报告：[report.md](runs/2026-11-01T14-40-03Z-b-anchor/report.md)。
 
 ## Not yet specified
 

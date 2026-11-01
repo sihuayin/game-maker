@@ -1,0 +1,244 @@
+{
+  "format": "p0-04-b-anchor-facts/v1",
+  "startedAt": "2026-11-01T14:40:33Z",
+  "finishedAt": "2026-11-01T14:41:26Z",
+  "verdict": "PASS",
+  "failures": [],
+  "recompute": {
+    "expected": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "shasum": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "nodeRawBytes": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "pythonRawBytes": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "allMatch": true,
+    "object": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+    "method": "SHA-256 over raw file bytes; no JSON reserialization",
+    "sizeBytes": 66336
+  },
+  "newFiles": {
+    "anchor": {
+      "path": ".scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256",
+      "bytes": 72,
+      "content": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+      "formatOk": true,
+      "matchesManifest": true
+    },
+    "updateLog": {
+      "path": ".scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md",
+      "bytes": 954,
+      "entries": 1,
+      "last": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+      "matchesManifest": true
+    }
+  },
+  "freezeSource": {
+    "manifestPath": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+    "freezeFiles": 112,
+    "freezeHashList": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+    "freezeCommit": "21632ef62e5d043f98baa834a14a40aa38dff064",
+    "freezeCommitSubject": "P0-02 v2 阶段 A 收口：六项缺口零付费收敛 + 正式清单",
+    "finalReportCodeBaseline": "f0411e676309fede8f20b79d9f8e44e5ac479ef6",
+    "finalVerdict": ".scratch/p0-02-second-demo-v2/final-verdict.json"
+  },
+  "existingScript": {
+    "B_positive": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log .scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 0,
+      "expectedExit": 0,
+      "pass": true,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab）\n",
+      "stderrTail": ""
+    },
+    "A_positive": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log .scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "exit": 0,
+      "expectedExit": 0,
+      "pass": true,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd）\n",
+      "stderrTail": ""
+    },
+    "B_log_vs_A_manifest": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log .scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "exit": 1,
+      "expectedExit": 1,
+      "pass": true,
+      "stdoutTail": "",
+      "stderrTail": "✗ 最后一条 newSha256 sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab 不等于当前 Manifest sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd\n"
+    },
+    "missing_log": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/does-not-exist.md --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 1,
+      "expectedExit": 1,
+      "pass": true,
+      "stdoutTail": "",
+      "stderrTail": "✗ 读不出 MANIFEST-UPDATES：/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/does-not-exist.md（ENOENT: no such file or directory, open '/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/does-not-exist.md'）\n"
+    },
+    "invalid_digest": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/bad-digest.log --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 1,
+      "expectedExit": 1,
+      "pass": true,
+      "stdoutTail": "",
+      "stderrTail": "✗ 最后一条 newSha256 格式不合法：sha256:xyz\n"
+    },
+    "empty_log": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/empty.log --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 1,
+      "expectedExit": 1,
+      "pass": true,
+      "stdoutTail": "",
+      "stderrTail": "✗ MANIFEST-UPDATES 没有 `- newSha256:` 记录\n"
+    },
+    "duplicate_entries_current_behavior": {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/duplicate.log --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 0,
+      "note": "现有脚本只校验最后一条；严格重复字段校验由 05 wrapper 负责",
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab）\n",
+      "stderrTail": ""
+    }
+  },
+  "cli": {
+    "A": {
+      "cmd": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --expected-manifest-sha sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd --anchor-mode digest --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/cli-a --json",
+      "exit": 0,
+      "report": "cli-a/2026-11-01T14-40-36-330Z-delivery-verification/report.json",
+      "status": "pass",
+      "diagnostics": 0,
+      "verdictMatch": true,
+      "trust": {
+        "mode": "digest",
+        "source": "cli",
+        "expectedSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+        "actualSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+        "result": "matched"
+      }
+    },
+    "B": {
+      "cmd": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --expected-manifest-sha sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab --anchor-mode digest --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/cli-b --json",
+      "exit": 0,
+      "report": "cli-b/2026-11-01T14-40-36-459Z-delivery-verification/report.json",
+      "status": "pass",
+      "diagnostics": 0,
+      "verdictMatch": true,
+      "trust": {
+        "mode": "digest",
+        "source": "cli",
+        "expectedSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+        "actualSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+        "result": "matched"
+      }
+    }
+  },
+  "regression": {
+    "test": {
+      "cmd": "pnpm test",
+      "exit": 0,
+      "durationMs": 34256,
+      "stdoutTail": " packages/contracts/tests/carried-error.test.ts (14 tests) 11ms\n ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 4ms\n ✓ packages/game-design/tests/build-design.test.ts (20 tests) 18ms\n ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 4ms\n ✓ packages/contracts/tests/design-attempts.test.ts (15 tests) 5ms\n ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 7ms\n ✓ packages/cli/tests/playtest-invalidation.test.ts (1 test) 15ms\n ✓ packages/contracts/tests/game-design-gate.test.ts (18 tests) 11ms\n ✓ packages/contracts/tests/animation-acceptance.test.ts (18 tests) 7ms\n ✓ packages/contracts/tests/image-units.test.ts (9 tests) 10ms\n ✓ packages/assets/tests/planner-masters.test.ts (7 tests) 12ms\n ✓ packages/assets/tests/master.test.ts (20 tests) 8ms\n ✓ packages/contracts/tests/runtime-profile.test.ts (14 tests) 13ms\n ✓ packages/assets/tests/sheet-grid.test.ts (16 tests) 11ms\n ✓ packages/contracts/tests/mechanic-coverage.test.ts (13 tests) 6ms\n ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 6ms\n ✓ packages/demo/tests/shell-hud-declared-size.test.ts (8 tests) 8ms\n ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 2ms\n ✓ packages/contracts/tests/vocabulary.test.ts (17 tests) 10ms\n ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 12ms\n ✓ packages/contracts/tests/intent-coverage.test.ts (11 tests) 3ms\n ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms\n ✓ packages/game-design/tests/dna-prompts.test.ts (16 tests) 9ms\n ✓ packages/contracts/tests/recipe-config-acceptance.test.ts (1 test) 4ms\n ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 2ms\n ✓ packages/visual-design/tests/svg.test.ts (24 tests) 7ms\n ✓ packages/contracts/tests/gemini-call.test.ts (9 tests) 6ms\n ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 3ms\n ✓ packages/assets/tests/speck.test.ts (4 tests) 6ms\n ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/playtest-attribution.test.ts (19 tests) 3ms\n ✓ packages/game-design/tests/prompts.test.ts (18 tests) 8ms\n ✓ packages/vision/tests/prompts.test.ts (9 tests) 7ms\n ✓ packages/cli/tests/reuse-from.test.ts (1 test) 1ms\n ✓ packages/assets/tests/acceptance.test.ts (18 tests) 22362ms\n   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  22323ms\n ✓ packages/mcp/tests/server.test.ts (11 tests) 17902ms\n   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  17838ms\n ✓ packages/cli/tests/cli.test.ts (29 tests) 20652ms\n   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  18157ms\n   ✓ accept · v7 + 冻结 baseline > `--json` 与人类输出**同源**：JSON = summary + artifacts 的那一份  1419ms\n   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  359ms\n\n Test Files  156 passed (156)\n      Tests  2307 passed (2307)\n   Start at  22:40:39\n   Duration  31.40s (transform 21.90s, setup 0ms, collect 85.75s, tests 110.89s, environment 16ms, prepare 11.66s)\n\n",
+      "stderrTail": ""
+    },
+    "typecheck": {
+      "cmd": "pnpm typecheck",
+      "exit": 0,
+      "durationMs": 14856,
+      "stdoutTail": "\n> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker\n> tsc -b && pnpm -r --if-present typecheck\n\nScope: 10 of 11 workspace projects\npackages/contracts typecheck$ tsc -p tsconfig.spec.json\npackages/contracts typecheck: Done\npackages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json\npackages/game-design typecheck$ tsc -p tsconfig.spec.json\npackages/assets typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck: Done\npackages/vision typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck: Done\npackages/vision typecheck: Done\npackages/demo typecheck: Done\npackages/assets typecheck: Done\npackages/visual-design typecheck$ tsc -p tsconfig.spec.json\npackages/visual-design typecheck: Done\npackages/pipeline typecheck$ tsc -p tsconfig.spec.json\npackages/pipeline typecheck: Done\npackages/mcp typecheck$ tsc -p tsconfig.spec.json\npackages/cli typecheck$ tsc -p tsconfig.spec.json\npackages/mcp typecheck: Done\npackages/cli typecheck: Done\n",
+      "stderrTail": ""
+    }
+  },
+  "immutability": {
+    "changed": [],
+    "protectedFiles": 120
+  },
+  "commands": [
+    {
+      "cmd": "shasum -a 256 .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 0,
+      "durationMs": 33,
+      "stdoutTail": "07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab  .scratch/p0-02-second-demo-v2/manifest/final-manifest.json\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node -e const fs=require('fs'),c=require('crypto');process.stdout.write('sha256:'+c.createHash('sha256').update(fs.readFileSync(process.argv[1])).digest('hex')+'\\n') .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 0,
+      "durationMs": 130,
+      "stdoutTail": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log .scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 0,
+      "durationMs": 31,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab）\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log .scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "exit": 0,
+      "durationMs": 23,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd）\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log .scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "exit": 1,
+      "durationMs": 23,
+      "stdoutTail": "",
+      "stderrTail": "✗ 最后一条 newSha256 sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab 不等于当前 Manifest sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd\n"
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/does-not-exist.md --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 1,
+      "durationMs": 23,
+      "stdoutTail": "",
+      "stderrTail": "✗ 读不出 MANIFEST-UPDATES：/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/does-not-exist.md（ENOENT: no such file or directory, open '/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/does-not-exist.md'）\n"
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/bad-digest.log --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 1,
+      "durationMs": 22,
+      "stdoutTail": "",
+      "stderrTail": "✗ 最后一条 newSha256 格式不合法：sha256:xyz\n"
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/empty.log --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 1,
+      "durationMs": 25,
+      "stdoutTail": "",
+      "stderrTail": "✗ MANIFEST-UPDATES 没有 `- newSha256:` 记录\n"
+    },
+    {
+      "cmd": "node scripts/check-manifest-updates.mjs --log /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/duplicate.log --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "exit": 0,
+      "durationMs": 23,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab）\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --expected-manifest-sha sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd --anchor-mode digest --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/cli-a --json",
+      "exit": 0,
+      "durationMs": 1764,
+      "stdoutTail": "{\n  \"command\": \"verify-delivery\",\n  \"summary\": [\n    \"✅ 证据完整性验收：pass（退出码 0）\",\n    \"  清单：.scratch/evidence-integrity-v1/manifest/expected-hashes.json · sha256 sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd\",\n    \"  subject：wasteland-scavenger-recipe v1 · site v1 · shell 2\",\n    \"  范围：223 文件（required 151 / optional 72）· 13 条记录\",\n    \"  结论：声明 pass / 重算 pass（六项一致：是）\",\n    \"  锚点：matched（digest）\",\n    \"  诊断：fail 0 · blocked 0\",\n    \"  报告：2026-11-01T14-40-36-330Z-delivery-verification/report.json · 2026-11-01T14-40-36-330Z-delivery-verification/report.md\"\n  ],\n  \"data\": {\n    \"status\": \"pass\",\n    \"declaredVerdict\": \"pass\",\n    \"recomputedVerdict\": \"pass\",\n    \"verdictMatch\": true,\n    \"checks\": [\n      {\n        \"key\": \"asset-pack\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"config\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"qa\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"site\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"playable-smoke\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"visual-review\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      }\n    ],\n    \"files\": {\n      \"total\": 223,\n      \"required\": 151,\n      \"optional\": 72\n    },\n    \"records\": 13,\n    \"diagnostics\": {\n      \"total\": 0,\n      \"fail\": 0,\n      \"blocked\": 0\n    },\n    \"report\": \"2026-11-01T14-40-36-330Z-delivery-verification/report.json\",\n    \"reportMarkdown\": \"2026-11-01T14-40-36-330Z-delivery-verification/report.md\",\n    \"trustAnchor\": {\n      \"mode\": \"digest\",\n      \"source\": \"cli\",\n      \"expectedSha256\": \"sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd\",\n      \"actualSha256\": \"sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd\",\n      \"result\": \"matched\"\n    }\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"2026-11-01T14-40-36-330Z-delivery-verification/report.json\",\n      \"kind\": \"delivery-verification-report\"\n    },\n    {\n      \"path\": \"2026-11-01T14-40-36-330Z-delivery-verification/report.md\",\n      \"kind\": \"delivery-verification-report-markdown\"\n    }\n  ]\n}\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node packages/cli/dist/cli.mjs verify-delivery --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --expected-manifest-sha sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab --anchor-mode digest --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-01T14-40-03Z-b-anchor/cli-b --json",
+      "exit": 0,
+      "durationMs": 124,
+      "stdoutTail": "{\n  \"command\": \"verify-delivery\",\n  \"summary\": [\n    \"✅ 证据完整性验收：pass（退出码 0）\",\n    \"  清单：.scratch/p0-02-second-demo-v2/manifest/final-manifest.json · sha256 sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab\",\n    \"  subject：wasteland-scavenger-recipe v1 · site v1 · shell 2\",\n    \"  范围：231 文件（required 137 / optional 94）· 6 条记录\",\n    \"  结论：声明 pass / 重算 pass（六项一致：是）\",\n    \"  锚点：matched（digest）\",\n    \"  诊断：fail 0 · blocked 0\",\n    \"  报告：2026-11-01T14-40-36-459Z-delivery-verification/report.json · 2026-11-01T14-40-36-459Z-delivery-verification/report.md\"\n  ],\n  \"data\": {\n    \"status\": \"pass\",\n    \"declaredVerdict\": \"pass\",\n    \"recomputedVerdict\": \"pass\",\n    \"verdictMatch\": true,\n    \"checks\": [\n      {\n        \"key\": \"asset-pack\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"config\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"qa\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"site\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"playable-smoke\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      },\n      {\n        \"key\": \"visual-review\",\n        \"declared\": \"pass\",\n        \"recomputed\": \"pass\",\n        \"match\": true\n      }\n    ],\n    \"files\": {\n      \"total\": 231,\n      \"required\": 137,\n      \"optional\": 94\n    },\n    \"records\": 6,\n    \"diagnostics\": {\n      \"total\": 0,\n      \"fail\": 0,\n      \"blocked\": 0\n    },\n    \"report\": \"2026-11-01T14-40-36-459Z-delivery-verification/report.json\",\n    \"reportMarkdown\": \"2026-11-01T14-40-36-459Z-delivery-verification/report.md\",\n    \"trustAnchor\": {\n      \"mode\": \"digest\",\n      \"source\": \"cli\",\n      \"expectedSha256\": \"sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab\",\n      \"actualSha256\": \"sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab\",\n      \"result\": \"matched\"\n    }\n  },\n  \"artifacts\": [\n    {\n      \"path\": \"2026-11-01T14-40-36-459Z-delivery-verification/report.json\",\n      \"kind\": \"delivery-verification-report\"\n    },\n    {\n      \"path\": \"2026-11-01T14-40-36-459Z-delivery-verification/report.md\",\n      \"kind\": \"delivery-verification-report-markdown\"\n    }\n  ]\n}\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm test",
+      "exit": 0,
+      "durationMs": 34256,
+      "stdoutTail": " packages/contracts/tests/carried-error.test.ts (14 tests) 11ms\n ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 4ms\n ✓ packages/game-design/tests/build-design.test.ts (20 tests) 18ms\n ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 4ms\n ✓ packages/contracts/tests/design-attempts.test.ts (15 tests) 5ms\n ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 7ms\n ✓ packages/cli/tests/playtest-invalidation.test.ts (1 test) 15ms\n ✓ packages/contracts/tests/game-design-gate.test.ts (18 tests) 11ms\n ✓ packages/contracts/tests/animation-acceptance.test.ts (18 tests) 7ms\n ✓ packages/contracts/tests/image-units.test.ts (9 tests) 10ms\n ✓ packages/assets/tests/planner-masters.test.ts (7 tests) 12ms\n ✓ packages/assets/tests/master.test.ts (20 tests) 8ms\n ✓ packages/contracts/tests/runtime-profile.test.ts (14 tests) 13ms\n ✓ packages/assets/tests/sheet-grid.test.ts (16 tests) 11ms\n ✓ packages/contracts/tests/mechanic-coverage.test.ts (13 tests) 6ms\n ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 6ms\n ✓ packages/demo/tests/shell-hud-declared-size.test.ts (8 tests) 8ms\n ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 2ms\n ✓ packages/contracts/tests/vocabulary.test.ts (17 tests) 10ms\n ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 12ms\n ✓ packages/contracts/tests/intent-coverage.test.ts (11 tests) 3ms\n ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms\n ✓ packages/game-design/tests/dna-prompts.test.ts (16 tests) 9ms\n ✓ packages/contracts/tests/recipe-config-acceptance.test.ts (1 test) 4ms\n ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 2ms\n ✓ packages/visual-design/tests/svg.test.ts (24 tests) 7ms\n ✓ packages/contracts/tests/gemini-call.test.ts (9 tests) 6ms\n ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 3ms\n ✓ packages/assets/tests/speck.test.ts (4 tests) 6ms\n ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/playtest-attribution.test.ts (19 tests) 3ms\n ✓ packages/game-design/tests/prompts.test.ts (18 tests) 8ms\n ✓ packages/vision/tests/prompts.test.ts (9 tests) 7ms\n ✓ packages/cli/tests/reuse-from.test.ts (1 test) 1ms\n ✓ packages/assets/tests/acceptance.test.ts (18 tests) 22362ms\n   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  22323ms\n ✓ packages/mcp/tests/server.test.ts (11 tests) 17902ms\n   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  17838ms\n ✓ packages/cli/tests/cli.test.ts (29 tests) 20652ms\n   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  18157ms\n   ✓ accept · v7 + 冻结 baseline > `--json` 与人类输出**同源**：JSON = summary + artifacts 的那一份  1419ms\n   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  359ms\n\n Test Files  156 passed (156)\n      Tests  2307 passed (2307)\n   Start at  22:40:39\n   Duration  31.40s (transform 21.90s, setup 0ms, collect 85.75s, tests 110.89s, environment 16ms, prepare 11.66s)\n\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm typecheck",
+      "exit": 0,
+      "durationMs": 14856,
+      "stdoutTail": "\n> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker\n> tsc -b && pnpm -r --if-present typecheck\n\nScope: 10 of 11 workspace projects\npackages/contracts typecheck$ tsc -p tsconfig.spec.json\npackages/contracts typecheck: Done\npackages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json\npackages/game-design typecheck$ tsc -p tsconfig.spec.json\npackages/assets typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck: Done\npackages/vision typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck: Done\npackages/vision typecheck: Done\npackages/demo typecheck: Done\npackages/assets typecheck: Done\npackages/visual-design typecheck$ tsc -p tsconfig.spec.json\npackages/visual-design typecheck: Done\npackages/pipeline typecheck$ tsc -p tsconfig.spec.json\npackages/pipeline typecheck: Done\npackages/mcp typecheck$ tsc -p tsconfig.spec.json\npackages/cli typecheck$ tsc -p tsconfig.spec.json\npackages/mcp typecheck: Done\npackages/cli typecheck: Done\n",
+      "stderrTail": ""
+    }
+  ]
+}
