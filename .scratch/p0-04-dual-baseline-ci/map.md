@@ -12,6 +12,7 @@ Effort: p0-04-dual-baseline-ci
 > **01 已收口（2026-11-01，PASS）**：A 223/151/72/13 与 B 231/137/94/6 全部逐文件 verified；A `sha256:ba7a485b…36fd` = Anchor = 更新日志，B `sha256:07866e0e…b9ab` = final-verdict；freeze 112/112 哈希一致，2 个 chrome.log 已解释；A/B 73 路径重叠已复核；CLI A/B 均 exit 0 / pass / 0 诊断。报告：[report.md](runs/2026-11-01T12-28-50Z-baseline-audit/report.md)。
 > **03 已收口（2026-11-01）**：Q1–Q11 全部裁定 —— 集中式 Registry + `freezeHashes`（B 必填）；A 保持 Manifest-only、B 全量比较；owner PR + 只读 dispatch；单 job 双 step 完整聚合；`evidence-acceptance` 可选 `baselineId`；旧 `check-manifest-updates` 零改动 + 新 wrapper；112 冻结文件全部按 required 验证；05 引入 Registry，06 依赖 05。详见 [03](issues/03-registry-shape-and-isolation-ruling.md)。
 > **04 已收口（2026-11-01，PASS）**：B 新建独立 Anchor `sha256:07866e0e…b9ab` 与更新日志；独立复算（shasum / Node / Python 原始字节）一致；A 三件与 B Manifest/freeze 零改动；旧校验脚本零改动；CLI A/B 带 anchor 均 pass / matched；`pnpm test` / `typecheck` 通过。报告：[report.md](runs/2026-11-01T14-40-03Z-b-anchor/report.md)。
+> **05 已收口（2026-11-01，PASS）**：Registry + wrapper + freeze verifier + aggregate + 双基线 evidence workflow 已落成；bootstrap run `41320891133` success；E3 PR #15（base `7cd7cd4` / head `55d10f8`）evidence run `41321106019` 全 steps success，aggregate PASS，freeze 112/112，A/B/aggregate 三份 artifact；merged `8e963c3`。报告：[report.md](runs/2026-11-01T15-28-31Z-evidence-e3/report.md)。
 
 ## Destination
 
@@ -44,17 +45,18 @@ Effort: p0-04-dual-baseline-ci
 | A Anchor / 更新日志 | `.scratch/evidence-integrity-v1/manifest/expected-hashes.sha256` / `MANIFEST-UPDATES.md`（最后一条 `newSha256` 与当前 Manifest 匹配） |
 | 基线 B Manifest | `.scratch/p0-02-second-demo-v2/manifest/final-manifest.json` |
 | B 规模 / 摘要 | 231 文件（137 required / 94 optional）· 6 records · 3 roots；原始字节 SHA-256 `sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab`；66,336 B |
-| B 当前验收 | `verify-delivery` **exit 0 / status=pass / diagnostics 0 / trust.anchor=matched**（2026-11-01 04 复验，带 B Anchor；报告 `runs/2026-11-01T14-40-03Z-b-anchor/cli-b/`）；01 审计无 anchor 复验亦 pass |
+| B 当前验收 | `verify-delivery` **exit 0 / status=pass / diagnostics 0 / trust.anchor=matched**（04 本地复验；01 审计无 anchor 复验亦 pass）；05 E3 CI 双基线 B pass，freeze 112/112（run `41321106019`） |
 | B Anchor / 更新日志 | `.scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256` / `MANIFEST-UPDATES.md`（04 已新建；单行 `sha256:07866e0e…b9ab`；初始 freeze 条目与 Manifest 原始字节一致） |
 | B 冻结快照 | `.scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/`，**112 文件**（只读），逐文件哈希 `freeze-sha256.txt` |
 | B 三个 root | `fa04` → `.scratch/fpvs-v1-final/runs/2026-10-28-visual-review`（28，全 required）；`oldWork` → `.scratch/fpvs-v1-final/work`（93，全 optional）；`out` → B `freeze/`（110：109 required + 1 optional）；合计约 **33 MB** |
 | 冻结 vs 清单差异 | freeze **112** = 清单 `out` **110**（109 required + 1 optional）+ **2** 个旧 attempt 的 Chrome 日志（`run/v1/playtest/v1/chrome.log`、`run/v1/playtest/v2/chrome.log`）；2 个日志被 spec `excludeExt: [".log"]` 排除，仅由 `freeze-sha256.txt`（112/112 哈希一致）覆盖；成功 attempt 的 `v3/chrome.log` 由 spec 显式列为 **optional**。清单“列了但磁盘没有” = 0。**`freeze-sha256.txt` 本身未被 231 清单或 Anchor 钉住；03/05 必须裁定或显式记录。** |
 | A/B 路径重叠 | **73 个绝对路径重叠**：28 个双方 required（`fa04`）、30 个 A required / B optional（`fpvs-v1-final/work`）、15 个双方 optional；B 独占 109 个 required（`out`/freeze）。01 审计复核：28 / 30 / 15，重叠文件哈希 0 不一致。**07 的 A/B 负向样本必须使用各自独占 required 路径，否则无法证明“不相互掩盖”。** |
 | 01 审计 | **PASS** · [report.md](runs/2026-11-01T12-28-50Z-baseline-audit/report.md) · `facts.json`；审计前后证据/配置哈希 **0 变化**；`git status` 仅新增本 effort `runs/` 下 4 个 CLI 报告 |
-| 现有 workflow | `.github/workflows/ci.yml`（check/test/typecheck）、`evidence.yml`（base-only `pull_request_target`）、`baseline-update.yml`（owner `workflow_dispatch`，只验证候选、不写回） |
+| 现有 workflow | `.github/workflows/ci.yml`（check/test/typecheck）、`evidence.yml`（05 起 base-only 双基线 A/B `pull_request_target`）、`baseline-update.yml`（仍 A-only，06 扩展） |
 | 现有 required checks | `check` / `test` / `typecheck` / `evidence`；app id `15368`；ruleset `26268801` active；owner `pull_request` bypass |
-| 现有 evidence 体积 | sparse tracked 约 51–57 MiB；加 B 三个 root 约 +33 MB，仍远低于 30 分钟超时 |
-| Registry 目标位置 | `.scratch/baselines/registry.json`（R2-Q3 a）：只声明基线 ID、Manifest/Anchor/更新日志路径与身份信息，**不存摘要** |
+| 现有 evidence 体积 | 双基线 sparse A+B；E3 `evidence` run 实际 28s；A/B/aggregate artifact 约 18 KB / 18 KB / 437 B；远低于 30 分钟超时 |
+| Registry | `.scratch/baselines/registry.json` 已落成：A/B entry、B `freezeHashes`、严格 schema、不存摘要/counts；05 E3 已实际读取 |
+| 05 E3 | PR [#15](https://github.com/sihuayin/game-maker/pull/15) · base `7cd7cd4` / head `55d10f8` · run [41321106019](https://github.com/sihuayin/game-maker/actions/runs/41321106019) · aggregate PASS · freeze 112/112 · merged `8e963c3` |
 | ADR | `docs/adr/0001-evidence-trust-boundary.md` 已存在；08 票决定是否续写/新增 |
 | 词汇表 | `CONTEXT.md` 目前无“交付基线 / 信任锚 / registry”词条；是否新增由 03/08 决定 |
 
@@ -122,9 +124,10 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 
 - [基线 B 独立信任锚与更新日志](issues/04-baseline-b-anchor-and-update-log.md)：**PASS** —— 新建 B Anchor（单行 `sha256:07866e0e…b9ab`）与 Markdown 更新日志；三种独立复算一致；现有 `check-manifest-updates.mjs` 零改动，B/A 正例 exit 0、B log vs A manifest / 缺失 / 非法 / 空日志均按预期 exit 1；CLI A/B 带 anchor 均 exit 0 / pass / 诊断 0 / matched；`pnpm test` / `typecheck` exit 0；120 个受保护文件零变化。报告：[report.md](runs/2026-11-01T14-40-03Z-b-anchor/report.md)。
 
+- [Evidence CI 双基线验收](issues/05-evidence-ci-dual-baseline.md)：**PASS** —— Registry + wrapper + freeze verifier + aggregate + 双基线 workflow；E2 160 文件 / 2,341 tests、499 受保护文件零变化；bootstrap run `41320891133` success；E3 PR #15（base `7cd7cd4` / head `55d10f8`）evidence run `41321106019` 全 steps success，aggregate PASS，freeze 112/112，A/B/aggregate 三份 artifact；merged `8e963c3`。报告：[report.md](runs/2026-11-01T15-28-31Z-evidence-e3/report.md)。
+
 ## Not yet specified
 
-- **05 合并后首次真实 B step 的探测方式**：`pull_request_target` 使“引入 B 检查的 PR”本身仍跑旧 base workflow；05 合并后用哪个 PR 做首次真实 B 探测（临时正常 PR 还是 07 的绿色 PR）取决于 05 的 E3 安排与授权。
 - **08 如何披露 A/B 共享 73 个路径**：“逻辑独立、物理证据部分重叠”的具体措辞与 AC 映射，要等 07 的真实失败归属证据。
 
 ## Out of scope

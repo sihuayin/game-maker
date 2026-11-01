@@ -1,7 +1,7 @@
 # Evidence CI 双基线验收
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 03, 04
 
 ## Question
@@ -70,3 +70,53 @@ Blocked by: 03, 04
 - Registry schema/集合断言/未知字段/交叉绑定测试通过；Registry 尚未合并时不污染 `pnpm check`。
 - B 的 112 个冻结文件（含 2 个 `chrome.log`）缺失或哈希不符 ⇒ B FAIL；`freezeHashes` 被 PR 修改 ⇒ B FAIL。
 - Wrapper 不改变 A 原调用输出/退出码/失败行为；bootstrap 由 base 旧 workflow 的 owner dispatch 验证候选。
+
+## Answer
+
+**结论：PASS（2026-11-01）。** E2 本地模拟与 E3 真实 GitHub PR 均通过。
+
+- E3 证据：[report.md](../runs/2026-11-01T15-28-31Z-evidence-e3/report.md) · [facts.json](../runs/2026-11-01T15-28-31Z-evidence-e3/facts.json)
+- E2 证据：[report.md](../runs/2026-11-01T15-18-06Z-evidence-ci/report.md)
+
+### Bootstrap（03 Q9 / Q2 硬条件）
+
+- owner dispatch：run [41320891133](https://github.com/sihuayin/game-maker/actions/runs/41320891133) · **success**。
+- base `main` / base SHA `77ee10a`；候选 SHA `fe38ec6`；使用 base 旧 workflow 验证候选，base workflow 与候选 head 明确区分，候选未自证。
+
+### 实施 PR
+
+- [#14 P0-04-05: dual-baseline evidence CI](https://github.com/sihuayin/game-maker/pull/14) → squash `7cd7cd4`。
+- `check` / `test` / `typecheck` / `evidence` 全 success。
+
+### E3 真实 PR（新 workflow）
+
+- [#15 post-merge evidence probe](https://github.com/sihuayin/game-maker/pull/15)：base `7cd7cd4` · head `55d10f8` · merged `8e963c3`。
+- evidence run：[41321106019](https://github.com/sihuayin/game-maker/actions/runs/41321106019)。
+- 所有新步骤 success：freeze hash materialize、trust config、A、B、B freeze、aggregate、三份 artifact upload。
+- checks：`check` pass 37s · `test` pass 2m19s · `typecheck` pass 51s · `evidence` pass 28s。
+- artifacts：`evidence-a-15`（18,077 B）· `evidence-b-15`（18,134 B）· `evidence-aggregate-15`（437 B）。
+- aggregate：`pass=true`，outcomes `{A:success, B:success, BFreeze:success}`，problems `[]`。
+- freeze snapshot：`112/112 verified`，missing `0`，mismatched `0`，extra `0`。
+- summaries 均含 `baselineId`（`fpvs-v1` / `p0-02-second-demo-v2`），status `pass`，exitCode `0`。
+
+### 实现交付
+
+- `.scratch/baselines/registry.json`：严格 schema，A/B 必需集合，B `freezeHashes`，不存摘要/counts。
+- `scripts/validate-baseline-registry.mjs` + `scripts/lib/baseline-registry.mjs`。
+- `scripts/check-baseline-updates.mjs` + `scripts/lib/update-log.mjs`：旧 `check-manifest-updates.mjs` 零改动；B 严格字段、A 兼容。
+- `scripts/verify-freeze-snapshot.mjs` + `scripts/lib/freeze-snapshot.mjs`：112 冻结文件逐条复算，全部按 required。
+- `scripts/dual-baseline-aggregate.mjs` + `scripts/lib/dual-baseline-aggregate.mjs`：完整 outcome/summary/report/trust/path/freeze 判定。
+- `.github/workflows/evidence.yml`：base-only 双 A/B step、sparse 覆盖、trust-config 字节比较、aggregate、三份 artifact、`if-no-files-found: error`；无 job 级 `if`/paths 过滤。
+- `scripts/evidence-acceptance.mjs`：可选 `--baseline-id`；`verify-delivery` 未改。
+- 3 个被 `.gitignore` 忽略的 `chrome.log` 显式纳入 git（内容零变化），使 CI 能看到全部 112 个冻结文件。
+
+### E2 回归
+
+- 本地 E2E（base=head）：registry / wrapper / freeze / A / B / aggregate 全 exit 0；aggregate PASS。
+- `pnpm test`：160 文件 / 2,341 tests；`pnpm typecheck`；`pnpm check:links` 均通过。
+- 499 个受保护文件（A/B 全部清单文件、Manifest、Anchor、更新日志、registry、112 冻结文件）零变化。
+
+### 限制
+
+- 本票的 E3 是 **docs-only 正常 PR**；负向红绿（A/B 篡改、B Manifest+Anchor 联合、验收规则篡改）由 07 票验证。
+- owner-only：owner 仍有 bypass；本票不声称已证明非管理员无法绕过。

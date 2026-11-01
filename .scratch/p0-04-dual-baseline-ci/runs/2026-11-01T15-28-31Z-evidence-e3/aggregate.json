@@ -1,0 +1,21 @@
+{
+  "format": "dual-baseline-aggregate/v1",
+  "generatedAt": "2026-11-01T15:25:23.750Z",
+  "registry": ".scratch/baselines/registry.json",
+  "outcomes": {
+    "A": "success",
+    "B": "success",
+    "BFreeze": "success"
+  },
+  "summaries": {
+    "A": "/home/runner/work/_temp/evidence-a/2026-11-01T15-25-23-194Z-test-evidence/summary.json",
+    "B": "/home/runner/work/_temp/evidence-b/2026-11-01T15-25-23-432Z-test-evidence/summary.json"
+  },
+  "reports": {
+    "A": "/home/runner/work/_temp/evidence-a/2026-11-01T15-25-23-371Z-delivery-verification/report.json",
+    "B": "/home/runner/work/_temp/evidence-b/2026-11-01T15-25-23-616Z-delivery-verification/report.json"
+  },
+  "freeze": "/home/runner/work/_temp/evidence-b/freeze-verification.json",
+  "problems": [],
+  "pass": true
+}
