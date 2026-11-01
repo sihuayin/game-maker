@@ -1,7 +1,7 @@
 # Evidence CI 双基线验收
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: 03, 04
 
 ## Question

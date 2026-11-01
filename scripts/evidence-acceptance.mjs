@@ -4,7 +4,7 @@
 // ⚠️ 它不是单元测试：会读约 18 MB 证据、跑 `verify-delivery` 的完整校验；不要把 `pnpm test` 扩成它。
 // ⚠️ 每次运行写到新目录（CLI 原子分配 + 本脚本的 summary 目录都绝不覆盖历史）。
 //
-// 用法：node scripts/evidence-acceptance.mjs [--manifest <清单>] [--out <目录>]
+// 用法：node scripts/evidence-acceptance.mjs [--manifest <清单>] [--baseline-id <id>] [--out <目录>]
 //   · 默认清单：`.scratch/evidence-integrity-v1/manifest/expected-hashes.json`（票 03 冻结的基线）
 //   · 默认输出：`.scratch/evidence-integrity-v1/runs`
 import fs from "node:fs";
@@ -29,6 +29,7 @@ const OUT = flag("out", path.join(ROOT, ".scratch/evidence-integrity-v1/runs"));
 const EXPECTED_MANIFEST_SHA = rawFlag("expected-manifest-sha", undefined);
 const BASE_MANIFEST = flag("base-manifest", undefined);
 const ANCHOR_MODE = rawFlag("anchor-mode", undefined);
+const BASELINE_ID = rawFlag("baseline-id", undefined);
 const CLI = path.join(ROOT, "packages/cli/dist/cli.mjs");
 const sha256 = (p) => "sha256:" + crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
 
@@ -104,6 +105,7 @@ const summary = {
   expectedManifestSha256: EXPECTED_MANIFEST_SHA ?? null,
   baseManifest: BASE_MANIFEST === undefined ? null : path.relative(ROOT, BASE_MANIFEST),
   anchorMode: ANCHOR_MODE ?? null,
+  ...(BASELINE_ID === undefined ? {} : { baselineId: BASELINE_ID }),
   exitCode,
   durationMs,
   reportDir: newest === undefined ? null : path.relative(ROOT, newest),
