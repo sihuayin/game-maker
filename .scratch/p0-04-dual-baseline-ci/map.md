@@ -10,6 +10,7 @@ Effort: p0-04-dual-baseline-ci
 > **结构**：8 张票 —— 01 只读审计（硬门槛）、02 registry 研究、03 registry/更新通道裁定（HITL）、04 B 锚点、05 Evidence CI、06 Baseline Update、07 真实 PR 红绿、08 收口。
 > **02 已收口（2026-11-01）**：研究产出 [registry-trust-boundary.md](research/registry-trust-boundary.md)；18 项待裁定问题已交给 03；关键事实（A/B 73 个路径重叠）已回灌 05/07。
 > **01 已收口（2026-11-01，PASS）**：A 223/151/72/13 与 B 231/137/94/6 全部逐文件 verified；A `sha256:ba7a485b…36fd` = Anchor = 更新日志，B `sha256:07866e0e…b9ab` = final-verdict；freeze 112/112 哈希一致，2 个 chrome.log 已解释；A/B 73 路径重叠已复核；CLI A/B 均 exit 0 / pass / 0 诊断。报告：[report.md](runs/2026-11-01T12-28-50Z-baseline-audit/report.md)。
+> **03 已收口（2026-11-01）**：Q1–Q11 全部裁定 —— 集中式 Registry + `freezeHashes`（B 必填）；A 保持 Manifest-only、B 全量比较；owner PR + 只读 dispatch；单 job 双 step 完整聚合；`evidence-acceptance` 可选 `baselineId`；旧 `check-manifest-updates` 零改动 + 新 wrapper；112 冻结文件全部按 required 验证；05 引入 Registry，06 依赖 05。详见 [03](issues/03-registry-shape-and-isolation-ruling.md)。
 
 ## Destination
 
@@ -95,10 +96,14 @@ Effort: p0-04-dual-baseline-ci
 | [02 Registry 信任边界研究](issues/02-registry-trust-boundary-research.md) | 双基线独立性与 registry 自证风险 | research (AFK) | — | 研究文档（已收口） |
 | [03 Registry 形状、隔离与更新通道裁定](issues/03-registry-shape-and-isolation-ruling.md) | schema、位置、更新语义、base-only 约束 | grilling (HITL) | 01, 02 | HITL 裁定 |
 | [04 基线 B 独立锚点与更新日志](issues/04-baseline-b-anchor-and-update-log.md) | B Anchor + B 更新日志 + 格式校验 | task | 03 | E2 + E3（独立复算） |
-| [05 Evidence CI 双基线验收](issues/05-evidence-ci-dual-baseline.md) | workflow、sparse、A/B steps、汇总、测试 | task | 03, 04 | E2 + E3（真实 run） |
-| [06 Baseline Update 双基线通道](issues/06-baseline-update-dual-channel.md) | 显式 target、身份/一致性校验、原子性 | task | 03, 04 | E2 + E3（dispatch） |
+| [05 Evidence CI 双基线验收](issues/05-evidence-ci-dual-baseline.md) | Registry + workflow、sparse、A/B steps、汇总、wrapper、测试 | task | 03, 04 | E2 + E3（真实 run） |
+| [06 Baseline Update 双基线通道](issues/06-baseline-update-dual-channel.md) | 显式 target、身份/一致性校验、原子性、`freezeHashes` 不可被普通更新改写 | task | 03, 04, 05 | E2 + E3（dispatch） |
 | [07 真实 GitHub PR 红绿验收](issues/07-real-pr-red-green-acceptance.md) | 1 绿 + 4 红，记录 URL/SHA/run/check | task (HITL) | 05, 06 | E3 |
 | [08 最终验收报告、ADR 与维护文档](issues/08-final-report-adr-and-maintenance.md) | AC 矩阵、双基线结论、限制 | task | 07 | E2 + E3（汇总） |
+
+### 依赖顺序（03 裁定）
+
+`01, 02 → 03 → 04 → 05 → 06 → 07 → 08`；05 引入 Registry，06 依赖 05；05 的 bootstrap 由可信 base 上的旧 workflow 执行 owner dispatch 验证候选。
 
 ### 证据分级
 
@@ -112,9 +117,10 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 
 - [只读审计：基线 A/B 身份与冻结不变性](issues/01-readonly-dual-baseline-audit.md)：**PASS** —— A 223/151/72/13、`sha256:ba7a485b…36fd`（= Anchor = 更新日志）；B 231/137/94/6、`sha256:07866e0e…b9ab`（= final-verdict）；454 个清单条目全部 verified；freeze 112/112 哈希一致，差集 2 个 chrome.log 为旧 attempt 日志（spec `.log` 排除，v3 显式 optional）；A/B 73 路径重叠（28 双方 required）；CLI A/B 均 exit 0 / pass / 0 诊断。[报告](runs/2026-11-01T12-28-50Z-baseline-audit/report.md) · [PR #11](https://github.com/sihuayin/game-maker/pull/11)。
 
+- [Registry 形状、双基线隔离与更新通道裁定](issues/03-registry-shape-and-isolation-ruling.md)：**已收口** —— 集中式 `.scratch/baselines/registry.json` + 严格 schema + `freezeHashes`（B 必填、A 不需要）；Registry 字节相等、A 只比 Manifest、B 比 Manifest+Anchor+日志+`freezeHashes`；owner PR + 只读 dispatch，`baseline` 必填、diff 白名单、`freezeHashes` 不是普通更新目标；单 job 双 step 完整聚合 + 三份 artifact；`evidence-acceptance` 可选 `baselineId`；旧 `check-manifest-updates` 零改动 + 新 wrapper；112 冻结文件全部按 required 验证；05 引入 Registry，06 依赖 05。
+
 ## Not yet specified
 
-- **07 负向样本的具体独占路径**：已确定必须用 A-only / B-only required，但具体选哪个文件要等 01 审计确认文件存在与 05 的 sparse 覆盖；不预先指定。
 - **05 合并后首次真实 B step 的探测方式**：`pull_request_target` 使“引入 B 检查的 PR”本身仍跑旧 base workflow；05 合并后用哪个 PR 做首次真实 B 探测（临时正常 PR 还是 07 的绿色 PR）取决于 05 的 E3 安排与授权。
 - **08 如何披露 A/B 共享 73 个路径**：“逻辑独立、物理证据部分重叠”的具体措辞与 AC 映射，要等 07 的真实失败归属证据。
 
@@ -128,6 +134,7 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 - 付费 API、生图、模型调用、新的 Provider 或 Provider Switch；修改现有游戏生成管线业务逻辑。
 - 签名、外部时间戳、仓库外锚；对管理员/GitHub 管理权限/CI 执行环境被攻陷的防御。
 - 自动修复证据、回写 Manifest、自动更新基线；普通 PR 获得 trust root 修改能力。
+- 通过普通基线更新通道重写 B 的 `freeze-sha256.txt` 或重新冻结 112 文件快照；若未来需要，另立裁定与新的冻结版本（03 Q3 锁定）。
 - 把 P0-04 解释为“第二个独立 Demo 已完成端到端生成验收”。
 - 修改 `docs/v7.6/接入.md`；直接 push `main`；合并任何负向 PR。
 - 将人工视觉审核自动化；把证据完整性通过解释为游戏全部功能验收。

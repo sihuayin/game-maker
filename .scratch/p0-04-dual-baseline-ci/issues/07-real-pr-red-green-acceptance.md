@@ -25,14 +25,20 @@ Blocked by: 05, 06
 - 每个 PR 保留：PR URL、Base SHA、Head SHA、Workflow Run URL、Required Checks 结果、关键日志/失败诊断、最终结论。
 - 不得用本地模拟替代真实 PR；不得用一个负向 PR 替代另一个。
 
-### 负向样本路径（研究 02 §5.2 的硬约束）
+### 负向样本路径（03 Q11 已裁定）
 
 A/B 两个 Manifest 有 **73 个绝对路径重叠**，其中 28 个双方 required（`fa04`），30 个 A required / B optional（`fpvs-v1-final/work`），15 个双方 optional；B 独占 109 个 required（`out`/freeze）。
 
-- **A 篡改**：必须选 A 独占的 required 路径（例如 `snapshot` / `gp` / `runs` 等 A 独有 root），不得用 `fa04` 或 `fpvs-v1-final/work`。
-- **B 篡改**：必须选 B `out` root（`freeze/...`）下的独占 required 路径。
-- 创建 PR 前，用两个 Manifest 计算 required 路径交集，记录选中路径与“为何独占”的证明；报告里附交集数量与排除的共享路径。
-- 若误用共享路径，A/B 会同时失败，只能证明“整体 FAIL”，**不能**证明“A PASS 不掩盖 B FAIL”或反之，视为验收不合格。
+| 负向 PR | 样本路径 | 身份 |
+|---|---|---|
+| A 篡改 | `.scratch/fpvs-v1-final/runs/2026-10-28-final-acceptance/regression/test.exit` | A-only required（root `fa05`，2 B，内容 `0`） |
+| B 篡改 | `.scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/run/v1/playtest/v3/success-basic/setup.json` | B-only required（root `out`，40 B） |
+| B Manifest + Anchor 联合篡改 | `final-manifest.json` + 04 创建的 B Anchor | B Manifest/Anchor 自身 |
+| 验收规则篡改 | `.github/workflows/evidence.yml`（可叠加 `scripts/evidence-acceptance.mjs`） | 可信 base 规则 |
+
+- 创建 PR 前必须再次确认目标文件在最终冻结 Manifest 中的 Required 身份和 SHA-256；尤其是 B 的 `setup.json`，必须确认它是 B-only Required，而非仅仅目录属于 B。
+- 报告里附选中路径、Manifest 记录、独占比对与排除的共享路径。
+- 若误用共享路径（`fa04` / `fpvs-v1-final/work`），A/B 会同时失败，只能证明“整体 FAIL”，**不能**证明“A PASS 不掩盖 B FAIL”或反之，视为验收不合格。
 
 ### 产出
 
@@ -41,5 +47,5 @@ A/B 两个 Manifest 有 **73 个绝对路径重叠**，其中 28 个双方 requi
 ## 验收标准
 
 - 1 绿 + 4 红全部有真实 PR 与 run 证据；绿色 PR 合并成功，红色 PR 均 `mergeable_state=BLOCKED` 或等价且未合并。
-- A/B 失败归属清晰，无相互掩盖。
+- A/B 失败归属清晰，无相互掩盖；使用 03 Q11 指定路径，创建前复核 Required 身份与 SHA-256，未使用共享 `fa04` / `oldWork`。
 - 报告如实写明 owner-only 限制：保护非管理员，owner 仍有 bypass；不得声称已证明非管理员无法绕过。
