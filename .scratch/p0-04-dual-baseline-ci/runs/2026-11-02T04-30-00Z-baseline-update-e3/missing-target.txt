@@ -1,0 +1,2 @@
+gh workflow run baseline-update.yml --ref main --field candidate_sha=20739d2... (baseline omitted / empty)
+HTTP 422: Required input 'baseline' not provided

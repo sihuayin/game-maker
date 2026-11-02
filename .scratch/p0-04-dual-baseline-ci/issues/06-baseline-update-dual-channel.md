@@ -1,7 +1,7 @@
 # Baseline Update 双基线通道
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 03, 04
 
 ## Question
@@ -63,3 +63,45 @@ B 的 `freeze-sha256.txt` 是 112 文件冻结快照的身份依据，**不是�
 - 候选 diff 只允许目标基线三件 + Registry 目标 entry；非目标基线与非目标 entry 字节相等，否则拒绝。
 - dispatch 不写回 base；更新记录包含 `github.actor_id`/`triggering_actor`，不使用 actor allowlist。
 - 旧 `check-manifest-updates.mjs` 零改动；使用 05 的 wrapper。
+
+## Answer
+
+**结论：PASS（2026-11-02）。** E2 本地 + E3 真实 owner dispatch 均通过。
+
+- E3 证据：[report.md](../runs/2026-11-02T04-30-00Z-baseline-update-e3/report.md) · [facts.json](../runs/2026-11-02T04-30-00Z-baseline-update-e3/facts.json)
+- E2 证据：[report.md](../runs/2026-11-02T03-43-49Z-baseline-update-e2/report.md)
+
+### E3（真实 dispatch）
+
+| 场景 | 候选 SHA | 结果 | Run |
+|---|---|---|---|
+| target=A（无操作） | `20739d2` | **success** / meta pass | [41385937629](https://github.com/sihuayin/game-maker/actions/runs/41385937629) |
+| target=B（无操作） | `20739d2` | **success** / meta pass | [41385962594](https://github.com/sihuayin/game-maker/actions/runs/41385962594) |
+| 缺省 target | — | **rejected**：HTTP 422 `Required input 'baseline' not provided` | — |
+| 目标身份不匹配 | `3826713` | **failure** / `registry.identity-mismatch` | [41388656648](https://github.com/sihuayin/game-maker/actions/runs/41388656648) |
+| `freezeHashes` 篡改 | `f76ee66` | **failure** / `candidate.freezeHashes-changed` | [41388668495](https://github.com/sihuayin/game-maker/actions/runs/41388668495) |
+| 合法 B 更新 | `7afe791` | **success** / meta pass；`07866e0e…` → `d64c623e…`；evidence success | [41388674222](https://github.com/sihuayin/game-maker/actions/runs/41388674222) |
+
+- target A/B meta 均含 `operator.actorId=1635996`、`triggeringActor=sihuayin`、run ID、old/new；A/B 无操作 old=new。
+- 合法 B 更新 old/new 不同，evidence outcome success，result pass。
+- 身份不匹配被 `registry.identity-mismatch` 拦截；`freezeHashes` 改动被 `candidate.freezeHashes-changed` 拦截；两者 meta result=fail。
+- main 前后均为 `20739d2`；dispatch 无 commit/push，未写回 base。
+
+### E2
+
+- 本地 A/B 无操作候选校验通过；meta result pass。
+- `pnpm test`：161 文件 / 2,350 tests；`pnpm typecheck`；`pnpm check:links` 通过。
+- 120 个受保护文件零变化。
+
+### 实现
+
+- `baseline-update.yml`：`baseline` 必填、`candidate_sha` 必填；base-only；候选只作为数据。
+- `scripts/validate-baseline-candidate.mjs` + `scripts/lib/baseline-candidate.mjs`：目标隔离、非目标字节相等、diff 白名单、`freezeHashes` 拦截。
+- `scripts/write-baseline-update-meta.mjs`：operator/actor_id/triggering_actor、target、old/new、candidate SHA、run ID、result。
+- 旧 `check-manifest-updates.mjs` 零改动；使用 05 的 wrapper。
+- 不增加 actor allowlist；dispatch 只读，不自动写回。
+
+### 限制
+
+- owner-only；07 做正式负向 PR。
+- 候选分支仅用于 dispatch 验证，不合并；本票不声称非管理员无法绕过。

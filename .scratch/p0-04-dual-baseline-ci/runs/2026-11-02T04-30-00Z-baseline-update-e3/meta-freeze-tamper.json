@@ -1,0 +1,34 @@
+{
+  "format": "baseline-update-meta/v1",
+  "generatedAt": "2026-11-02T04:28:58.132Z",
+  "baseline": "p0-02-second-demo-v2",
+  "candidateSha": "f76ee668fbb545bf5b5b6c42d756c3e7b777c4a8",
+  "baseSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+  "baseRef": "refs/heads/main",
+  "runId": "41388668495",
+  "workflow": "baseline-update",
+  "operator": {
+    "actor": "sihuayin",
+    "actorId": "1635996",
+    "triggeringActor": "sihuayin"
+  },
+  "oldManifestSha256": null,
+  "newManifestSha256": null,
+  "targetManifest": null,
+  "targetAnchor": null,
+  "targetUpdateLog": null,
+  "freezeHashes": null,
+  "validation": {
+    "outcome": "failure",
+    "result": "fail",
+    "error": {
+      "code": "candidate.freezeHashes-changed",
+      "message": "freezeHashes 是冻结快照身份依据，不能被普通基线更新改写"
+    }
+  },
+  "evidence": {
+    "outcome": "skipped"
+  },
+  "mode": "baseline-update",
+  "result": "fail"
+}

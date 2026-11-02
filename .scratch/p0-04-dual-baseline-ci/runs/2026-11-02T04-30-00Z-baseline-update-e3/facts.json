@@ -1,0 +1,140 @@
+{
+  "format": "p0-04-baseline-update-e3-facts/v1",
+  "generatedAt": "2026-11-02T04:30:12Z",
+  "verdict": "PASS",
+  "implementation": {
+    "pr": 17,
+    "url": "https://github.com/sihuayin/game-maker/pull/17",
+    "mergeSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6"
+  },
+  "targetA": {
+    "runId": 41385937629,
+    "url": "https://github.com/sihuayin/game-maker/actions/runs/41385937629",
+    "candidateSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+    "conclusion": "success",
+    "meta": {
+      "format": "baseline-update-meta/v1",
+      "generatedAt": "2026-11-02T03:59:32.811Z",
+      "baseline": "fpvs-v1",
+      "candidateSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+      "baseSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+      "baseRef": "refs/heads/main",
+      "runId": "41385937629",
+      "workflow": "baseline-update",
+      "operator": {
+        "actor": "sihuayin",
+        "actorId": "1635996",
+        "triggeringActor": "sihuayin"
+      },
+      "oldManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "newManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+      "targetManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+      "targetAnchor": ".scratch/evidence-integrity-v1/manifest/expected-hashes.sha256",
+      "targetUpdateLog": ".scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md",
+      "freezeHashes": null,
+      "validation": {
+        "outcome": "success",
+        "result": "pass",
+        "error": null
+      },
+      "evidence": {
+        "outcome": "success"
+      },
+      "mode": "baseline-update",
+      "result": "pass"
+    }
+  },
+  "targetB": {
+    "runId": 41385962594,
+    "url": "https://github.com/sihuayin/game-maker/actions/runs/41385962594",
+    "candidateSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+    "conclusion": "success",
+    "meta": {
+      "format": "baseline-update-meta/v1",
+      "generatedAt": "2026-11-02T03:59:49.215Z",
+      "baseline": "p0-02-second-demo-v2",
+      "candidateSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+      "baseSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+      "baseRef": "refs/heads/main",
+      "runId": "41385962594",
+      "workflow": "baseline-update",
+      "operator": {
+        "actor": "sihuayin",
+        "actorId": "1635996",
+        "triggeringActor": "sihuayin"
+      },
+      "oldManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+      "newManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+      "targetManifest": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "targetAnchor": ".scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256",
+      "targetUpdateLog": ".scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md",
+      "freezeHashes": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+      "validation": {
+        "outcome": "success",
+        "result": "pass",
+        "error": null
+      },
+      "evidence": {
+        "outcome": "success"
+      },
+      "mode": "baseline-update",
+      "result": "pass"
+    }
+  },
+  "missingTarget": {
+    "result": "rejected at dispatch",
+    "httpStatus": 422,
+    "error": "Required input 'baseline' not provided",
+    "evidence": "missing-target.txt"
+  },
+  "identityMismatch": {
+    "runId": 41388656648,
+    "url": "https://github.com/sihuayin/game-maker/actions/runs/41388656648",
+    "candidateSha": "3826713d614eb064714442d46eef49c6595d2714",
+    "conclusion": "failure",
+    "validationError": {
+      "code": "registry.identity-mismatch",
+      "message": "/home/runner/work/game-maker/game-maker/candidate/.scratch/baselines/registry.json:fpvs-v1: identity.packVersion=99 与 Manifest subject.packVersion=1 不一致"
+    },
+    "metaResult": "fail"
+  },
+  "freezeTamper": {
+    "runId": 41388668495,
+    "url": "https://github.com/sihuayin/game-maker/actions/runs/41388668495",
+    "candidateSha": "f76ee668fbb545bf5b5b6c42d756c3e7b777c4a8",
+    "conclusion": "failure",
+    "validationError": {
+      "code": "candidate.freezeHashes-changed",
+      "message": "freezeHashes 是冻结快照身份依据，不能被普通基线更新改写"
+    },
+    "metaResult": "fail"
+  },
+  "validB": {
+    "runId": 41388674222,
+    "url": "https://github.com/sihuayin/game-maker/actions/runs/41388674222",
+    "candidateSha": "7afe791bdd078bfc1e128b1b8ff32e7b6e037d3c",
+    "conclusion": "success",
+    "oldManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "newManifestSha256": "sha256:d64c623ee53580f80d3a7c5b38b0bfdf0114f89e0d36c6bb4b48c989a8656b3b",
+    "evidence": {
+      "outcome": "success"
+    },
+    "metaResult": "pass"
+  },
+  "noWriteback": {
+    "mainShaBefore": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+    "mainShaAfter": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+    "note": "dispatch only reads base and candidate; no commit/push step"
+  },
+  "e2": {
+    "runDir": ".scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/report.md",
+    "tests": "161 files / 2350 tests",
+    "protectedFiles": 120,
+    "changed": []
+  },
+  "limitations": [
+    "owner-only dispatch；07 做正式负向 PR。",
+    "候选分支仅用于 dispatch 验证，不合并。",
+    "未证明非管理员无法绕过。"
+  ]
+}
