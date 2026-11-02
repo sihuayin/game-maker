@@ -1,11 +1,15 @@
 name: baseline-update
 
-# P0-03-05：owner 专用基线验证。
-# 从受保护 base 运行可信 workflow/CLI/script；候选 commit 只作为数据读取，不执行候选代码。
+# P0-04-06：owner 专用双基线候选验证。
+# 从受保护 base 运行可信 workflow/CLI/scripts；候选 commit 只作为数据读取，不执行候选代码。
 # 本 job 不是 required check；它只产出验证产物，不自动合并、不改 base。
 on:
   workflow_dispatch:
     inputs:
+      baseline:
+        description: "Baseline ID from .scratch/baselines/registry.json"
+        required: true
+        type: string
       candidate_sha:
         description: "Candidate baseline commit SHA (40 lowercase hex)"
         required: true
@@ -20,10 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Validate candidate SHA
+      - name: Validate inputs
         env:
+          BASELINE: ${{ inputs.baseline }}
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
         run: |
+          set -euo pipefail
+          test -n "$BASELINE" || { echo "::error::baseline is required"; exit 1; }
           case "$CANDIDATE_SHA" in
             *[!0-9a-f]*|"") echo "::error::candidate_sha must be 40 lowercase hex"; exit 1 ;;
           esac
@@ -32,7 +39,7 @@ jobs:
       - name: Checkout trusted base
         uses: actions/checkout@v7
         with:
-          ref: main
+          ref: ${{ github.sha }}
           path: base
           persist-credentials: false
           fetch-depth: 1
@@ -41,7 +48,9 @@ jobs:
           sparse-checkout: |
             packages
             scripts
+            .scratch/baselines
             .scratch/evidence-integrity-v1/manifest
+            .scratch/p0-02-second-demo-v2/manifest
 
       - name: Checkout candidate as data only
         uses: actions/checkout@v7
@@ -53,11 +62,14 @@ jobs:
           lfs: false
           submodules: false
           sparse-checkout: |
+            .scratch/baselines
+            .scratch/evidence-integrity-v1/manifest
             .scratch/fpvs-v1-final/work
             .scratch/fpvs-v1-final/artifacts
             .scratch/fpvs-v1-final/runs
             .scratch/generic-playtest-v1/evidence
-            .scratch/evidence-integrity-v1/manifest
+            .scratch/p0-02-second-demo-v2/manifest
+            .scratch/p0-02-second-demo-v2/freeze
 
       - name: Verify candidate checkout SHA
         working-directory: candidate
@@ -69,6 +81,17 @@ jobs:
             echo "::error::candidate checkout mismatch: expected $EXPECTED, got $ACTUAL"
             exit 1
           }
+
+      - name: Materialize base and candidate freeze hash lists
+        run: |
+          set -euo pipefail
+          BASE_FREEZE="$GITHUB_WORKSPACE/base/.scratch/p0-02-second-demo-v2/freeze-sha256.txt"
+          CAND_FREEZE="$GITHUB_WORKSPACE/candidate/.scratch/p0-02-second-demo-v2/freeze-sha256.txt"
+          mkdir -p "$(dirname "$BASE_FREEZE")" "$(dirname "$CAND_FREEZE")"
+          git -C "$GITHUB_WORKSPACE/base" show "HEAD:.scratch/p0-02-second-demo-v2/freeze-sha256.txt" > "$BASE_FREEZE"
+          git -C "$GITHUB_WORKSPACE/candidate" show "HEAD:.scratch/p0-02-second-demo-v2/freeze-sha256.txt" > "$CAND_FREEZE"
+          test -s "$BASE_FREEZE"
+          test -s "$CAND_FREEZE"
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -83,6 +106,20 @@ jobs:
           cache: pnpm
           cache-dependency-path: base/pnpm-lock.yaml
 
+      - name: Compute candidate diff
+        env:
+          BASE_SHA: ${{ github.sha }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          CHANGED: ${{ runner.temp }}/changed-paths.txt
+        run: |
+          set -euo pipefail
+          if [ "$CANDIDATE_SHA" != "$BASE_SHA" ]; then
+            git -C base fetch --no-tags --depth=1 origin "$CANDIDATE_SHA"
+          fi
+          git -C base diff --name-only "$BASE_SHA" "$CANDIDATE_SHA" > "$CHANGED"
+          echo "candidate diff:"
+          cat "$CHANGED"
+
       - name: Build trusted base CLI
         working-directory: base
         run: |
@@ -90,39 +127,88 @@ jobs:
           pnpm build
 
       - name: Validate candidate baseline
+        id: validate
         env:
-          CANDIDATE_MANIFEST: ${{ github.workspace }}/candidate/.scratch/evidence-integrity-v1/manifest/expected-hashes.json
-          CANDIDATE_DIGEST_FILE: ${{ github.workspace }}/candidate/.scratch/evidence-integrity-v1/manifest/expected-hashes.sha256
-          CANDIDATE_LOG: ${{ github.workspace }}/candidate/.scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md
+          BASE: ${{ github.workspace }}/base
+          CANDIDATE: ${{ github.workspace }}/candidate
+          BASELINE: ${{ inputs.baseline }}
+          CHANGED: ${{ runner.temp }}/changed-paths.txt
           OUT_DIR: ${{ runner.temp }}/baseline-update-runs
         run: |
           set -euo pipefail
-          for f in "$CANDIDATE_MANIFEST" "$CANDIDATE_DIGEST_FILE" "$CANDIDATE_LOG"; do
-            test -f "$f" || { echo "::error::missing candidate baseline file: $f"; exit 1; }
-          done
-          node base/scripts/check-manifest-updates.mjs --log "$CANDIDATE_LOG" --manifest "$CANDIDATE_MANIFEST"
-          CANDIDATE_DIGEST="$(tr -d '\r\n' < "$CANDIDATE_DIGEST_FILE")"
           mkdir -p "$OUT_DIR"
-          node base/scripts/evidence-acceptance.mjs \
+          node "$BASE/scripts/validate-baseline-candidate.mjs" \
+            --base-root "$BASE" \
+            --candidate-root "$CANDIDATE" \
+            --baseline "$BASELINE" \
+            --changed-paths "$CHANGED" \
+            --out "$OUT_DIR/candidate-validation.json"
+
+      - name: Verify candidate delivery evidence
+        id: evidence
+        if: steps.validate.outcome == 'success'
+        env:
+          BASE: ${{ github.workspace }}/base
+          CANDIDATE: ${{ github.workspace }}/candidate
+          BASELINE: ${{ inputs.baseline }}
+          OUT_DIR: ${{ runner.temp }}/baseline-update-runs
+          VALIDATION: ${{ runner.temp }}/baseline-update-runs/candidate-validation.json
+        run: |
+          set -euo pipefail
+          TARGET_MANIFEST="$(node -p "JSON.parse(require('fs').readFileSync(process.env.VALIDATION,'utf8')).targetManifest")"
+          TARGET_ANCHOR="$(node -p "JSON.parse(require('fs').readFileSync(process.env.VALIDATION,'utf8')).targetAnchor")"
+          CANDIDATE_MANIFEST="$CANDIDATE/$TARGET_MANIFEST"
+          CANDIDATE_ANCHOR="$CANDIDATE/$TARGET_ANCHOR"
+          test -f "$CANDIDATE_MANIFEST"
+          test -f "$CANDIDATE_ANCHOR"
+          CANDIDATE_DIGEST="$(tr -d '\r\n' < "$CANDIDATE_ANCHOR")"
+          node "$BASE/scripts/evidence-acceptance.mjs" \
             --manifest "$CANDIDATE_MANIFEST" \
             --expected-manifest-sha "$CANDIDATE_DIGEST" \
             --anchor-mode baseline-update \
+            --baseline-id "$BASELINE" \
             --out "$OUT_DIR"
 
       - name: Write baseline update metadata
         if: always()
         env:
-          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          BASE: ${{ github.workspace }}/base
           OUT_DIR: ${{ runner.temp }}/baseline-update-runs
+          VALIDATION: ${{ runner.temp }}/baseline-update-runs/candidate-validation.json
+          BASELINE: ${{ inputs.baseline }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          BASE_SHA: ${{ github.sha }}
+          BASE_REF: ${{ github.ref }}
+          RUN_ID: ${{ github.run_id }}
+          WORKFLOW: ${{ github.workflow }}
+          ACTOR: ${{ github.actor }}
+          ACTOR_ID: ${{ github.actor_id }}
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+          VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
+          EVIDENCE_OUTCOME: ${{ steps.evidence.outcome }}
         run: |
+          set -euo pipefail
           mkdir -p "$OUT_DIR"
-          node -e 'const fs = require("fs"); const path = process.env.OUT_DIR + "/baseline-update-meta.json"; fs.writeFileSync(path, JSON.stringify({ candidateSha: process.env.CANDIDATE_SHA, baseRef: process.env.GITHUB_REF, baseSha: process.env.GITHUB_SHA, runId: process.env.GITHUB_RUN_ID, workflow: process.env.GITHUB_WORKFLOW, mode: "baseline-update" }, null, 2) + "\n");'
+          node "$BASE/scripts/write-baseline-update-meta.mjs" \
+            --out "$OUT_DIR/baseline-update-meta.json" \
+            --baseline "$BASELINE" \
+            --candidate-sha "$CANDIDATE_SHA" \
+            --base-sha "$BASE_SHA" \
+            --base-ref "$BASE_REF" \
+            --run-id "$RUN_ID" \
+            --workflow "$WORKFLOW" \
+            --actor "$ACTOR" \
+            --actor-id "$ACTOR_ID" \
+            --triggering-actor "$TRIGGERING_ACTOR" \
+            --validation "$VALIDATION" \
+            --validation-outcome "$VALIDATION_OUTCOME" \
+            --evidence-outcome "$EVIDENCE_OUTCOME"
 
       - name: Upload baseline update artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: baseline-update-${{ inputs.candidate_sha }}
+          name: baseline-update-${{ inputs.baseline || 'missing' }}-${{ inputs.candidate_sha }}
           path: ${{ runner.temp }}/baseline-update-runs
           retention-days: 30
-          if-no-files-found: warn
+          if-no-files-found: error

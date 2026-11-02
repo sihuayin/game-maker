@@ -1,0 +1,13 @@
+{
+  "format": "baseline-candidate-validation/v1",
+  "generatedAt": "2026-11-02T03:43:49.999Z",
+  "baselineId": "p0-02-second-demo-v2",
+  "oldManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+  "newManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+  "targetManifest": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+  "targetAnchor": ".scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256",
+  "targetUpdateLog": ".scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md",
+  "freezeHashes": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+  "changedPaths": [],
+  "result": "pass"
+}

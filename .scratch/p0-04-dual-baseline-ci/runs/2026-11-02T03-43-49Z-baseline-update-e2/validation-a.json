@@ -1,0 +1,13 @@
+{
+  "format": "baseline-candidate-validation/v1",
+  "generatedAt": "2026-11-02T03:43:49.968Z",
+  "baselineId": "fpvs-v1",
+  "oldManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "newManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "targetManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "targetAnchor": ".scratch/evidence-integrity-v1/manifest/expected-hashes.sha256",
+  "targetUpdateLog": ".scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md",
+  "freezeHashes": null,
+  "changedPaths": [],
+  "result": "pass"
+}

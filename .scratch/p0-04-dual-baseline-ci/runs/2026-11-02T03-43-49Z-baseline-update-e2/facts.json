@@ -1,0 +1,176 @@
+{
+  "format": "p0-04-baseline-update-e2-facts/v1",
+  "startedAt": "2026-11-02T03:43:49Z",
+  "finishedAt": "2026-11-02T03:44:35Z",
+  "verdict": "PASS",
+  "failures": [],
+  "results": {
+    "validateA": {
+      "cmd": "node scripts/validate-baseline-candidate.mjs --base-root . --candidate-root . --baseline fpvs-v1 --changed-paths /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/empty-changed-paths.txt --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-a.json",
+      "exit": 0,
+      "durationMs": 30,
+      "stdoutTail": "✅ baseline candidate fpvs-v1: sha256:ba7a485b195f… -> sha256:ba7a485b195f…\n",
+      "stderrTail": ""
+    },
+    "validateB": {
+      "cmd": "node scripts/validate-baseline-candidate.mjs --base-root . --candidate-root . --baseline p0-02-second-demo-v2 --changed-paths /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/empty-changed-paths.txt --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-b.json",
+      "exit": 0,
+      "durationMs": 30,
+      "stdoutTail": "✅ baseline candidate p0-02-second-demo-v2: sha256:07866e0e3d9f… -> sha256:07866e0e3d9f…\n",
+      "stderrTail": ""
+    },
+    "metaA": {
+      "cmd": "node scripts/write-baseline-update-meta.mjs --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/meta-a.json --baseline fpvs-v1 --candidate-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-ref refs/heads/main --run-id e2 --workflow baseline-update --actor sihuayin --actor-id 0 --triggering-actor sihuayin --validation /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-a.json --validation-outcome success --evidence-outcome success",
+      "exit": 0,
+      "durationMs": 24,
+      "stdoutTail": "✅ baseline update meta: fpvs-v1 · pass\n",
+      "stderrTail": ""
+    },
+    "metaB": {
+      "cmd": "node scripts/write-baseline-update-meta.mjs --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/meta-b.json --baseline p0-02-second-demo-v2 --candidate-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-ref refs/heads/main --run-id e2 --workflow baseline-update --actor sihuayin --actor-id 0 --triggering-actor sihuayin --validation /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-b.json --validation-outcome success --evidence-outcome success",
+      "exit": 0,
+      "durationMs": 22,
+      "stdoutTail": "✅ baseline update meta: p0-02-second-demo-v2 · pass\n",
+      "stderrTail": ""
+    },
+    "test": {
+      "cmd": "pnpm test",
+      "exit": 0,
+      "durationMs": 27196,
+      "stdoutTail": "aster.test.ts (20 tests) 4ms\n ✓ packages/contracts/tests/game-intent.test.ts (12 tests) 11ms\n ✓ packages/demo/probe/playtest/tests/scenarios.test.mjs (4 tests) 10ms\n ✓ packages/assets/tests/sheet-grid.test.ts (16 tests) 9ms\n ✓ packages/contracts/tests/gemini-call.test.ts (9 tests) 4ms\n ✓ packages/contracts/tests/animation-acceptance.test.ts (18 tests) 12ms\n ✓ packages/contracts/tests/visual-world-gate.test.ts (8 tests) 10ms\n ✓ packages/demo/probe/playtest/tests/danger-forms.test.mjs (18 tests) 7ms\n ✓ packages/contracts/tests/game-design.test.ts (15 tests) 9ms\n ✓ packages/contracts/tests/game-intent-gate.test.ts (24 tests) 8ms\n ✓ packages/contracts/tests/character-dna.test.ts (23 tests) 9ms\n ✓ packages/qa/tests/pixel.test.ts (13 tests) 5ms\n ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms\n ✓ packages/assets/tests/generate.test.ts (30 tests) 15ms\n ✓ packages/visual-design/tests/svg.test.ts (24 tests) 10ms\n ✓ packages/contracts/tests/image-units.test.ts (9 tests) 6ms\n ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 10ms\n ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 5ms\n ✓ packages/vision/tests/prompts-wire.test.ts (8 tests) 10ms\n ✓ packages/game-design/tests/prompts.test.ts (18 tests) 3ms\n ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 5ms\n ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 5ms\n ✓ packages/demo/tests/shell-hud-declared-size.test.ts (8 tests) 35ms\n ✓ packages/contracts/tests/vocabulary.test.ts (17 tests) 6ms\n ✓ packages/contracts/tests/playtest-attribution.test.ts (19 tests) 4ms\n ✓ packages/contracts/tests/mechanic-coverage.test.ts (13 tests) 6ms\n ✓ packages/assets/tests/speck.test.ts (4 tests) 4ms\n ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 7ms\n ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/visual-world-attempts.test.ts (20 tests) 7ms\n ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 3ms\n ✓ packages/vision/tests/prompts.test.ts (9 tests) 4ms\n ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 2ms\n ✓ packages/contracts/tests/recipe-config-acceptance.test.ts (1 test) 2ms\n ✓ packages/cli/tests/reuse-from.test.ts (1 test) 1ms\n ✓ packages/assets/tests/acceptance.test.ts (18 tests) 21904ms\n   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  21844ms\n ✓ packages/mcp/tests/server.test.ts (11 tests) 17819ms\n   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  17788ms\n ✓ packages/cli/tests/cli.test.ts (29 tests) 18964ms\n   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  17744ms\n   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  311ms\n\n Test Files  161 passed (161)\n      Tests  2350 passed (2350)\n   Start at  11:43:50\n   Duration  26.85s (transform 22.85s, setup 0ms, collect 83.88s, tests 109.15s, environment 14ms, prepare 7.10s)\n\n",
+      "stderrTail": ""
+    },
+    "typecheck": {
+      "cmd": "pnpm typecheck",
+      "exit": 0,
+      "durationMs": 11109,
+      "stdoutTail": "\n> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker\n> tsc -b && pnpm -r --if-present typecheck\n\nScope: 10 of 11 workspace projects\npackages/contracts typecheck$ tsc -p tsconfig.spec.json\npackages/contracts typecheck: Done\npackages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json\npackages/game-design typecheck$ tsc -p tsconfig.spec.json\npackages/assets typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck: Done\npackages/vision typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck: Done\npackages/vision typecheck: Done\npackages/assets typecheck: Done\npackages/demo typecheck: Done\npackages/visual-design typecheck$ tsc -p tsconfig.spec.json\npackages/visual-design typecheck: Done\npackages/pipeline typecheck$ tsc -p tsconfig.spec.json\npackages/pipeline typecheck: Done\npackages/mcp typecheck$ tsc -p tsconfig.spec.json\npackages/cli typecheck$ tsc -p tsconfig.spec.json\npackages/mcp typecheck: Done\npackages/cli typecheck: Done\n",
+      "stderrTail": ""
+    },
+    "links": {
+      "cmd": "pnpm check:links",
+      "exit": 0,
+      "durationMs": 6682,
+      "stdoutTail": "\n> game-maker@0.0.0 check:links /Volumes/shy/some-projects/game-maker\n> node scripts/check-links.mjs\n\n✅ 相对链接零断裂（925 份文档 · 3078 条链接）\n",
+      "stderrTail": ""
+    }
+  },
+  "metaA": {
+    "format": "baseline-update-meta/v1",
+    "generatedAt": "2026-11-02T03:43:50.024Z",
+    "baseline": "fpvs-v1",
+    "candidateSha": "7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3",
+    "baseSha": "7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3",
+    "baseRef": "refs/heads/main",
+    "runId": "e2",
+    "workflow": "baseline-update",
+    "operator": {
+      "actor": "sihuayin",
+      "actorId": "0",
+      "triggeringActor": "sihuayin"
+    },
+    "oldManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "newManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "targetManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+    "targetAnchor": ".scratch/evidence-integrity-v1/manifest/expected-hashes.sha256",
+    "targetUpdateLog": ".scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md",
+    "freezeHashes": null,
+    "validation": {
+      "outcome": "success",
+      "result": "pass",
+      "error": null
+    },
+    "evidence": {
+      "outcome": "success"
+    },
+    "mode": "baseline-update",
+    "result": "pass"
+  },
+  "metaB": {
+    "format": "baseline-update-meta/v1",
+    "generatedAt": "2026-11-02T03:43:50.046Z",
+    "baseline": "p0-02-second-demo-v2",
+    "candidateSha": "7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3",
+    "baseSha": "7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3",
+    "baseRef": "refs/heads/main",
+    "runId": "e2",
+    "workflow": "baseline-update",
+    "operator": {
+      "actor": "sihuayin",
+      "actorId": "0",
+      "triggeringActor": "sihuayin"
+    },
+    "oldManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "newManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "targetManifest": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+    "targetAnchor": ".scratch/p0-02-second-demo-v2/manifest/expected-hashes.sha256",
+    "targetUpdateLog": ".scratch/p0-02-second-demo-v2/manifest/MANIFEST-UPDATES.md",
+    "freezeHashes": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+    "validation": {
+      "outcome": "success",
+      "result": "pass",
+      "error": null
+    },
+    "evidence": {
+      "outcome": "success"
+    },
+    "mode": "baseline-update",
+    "result": "pass"
+  },
+  "immutability": {
+    "changed": [],
+    "protectedFiles": 120
+  },
+  "note": "本地 E2；真实 dispatch E3 在 06 合并后执行。",
+  "commands": [
+    {
+      "cmd": "node scripts/validate-baseline-candidate.mjs --base-root . --candidate-root . --baseline fpvs-v1 --changed-paths /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/empty-changed-paths.txt --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-a.json",
+      "exit": 0,
+      "durationMs": 30,
+      "stdoutTail": "✅ baseline candidate fpvs-v1: sha256:ba7a485b195f… -> sha256:ba7a485b195f…\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/validate-baseline-candidate.mjs --base-root . --candidate-root . --baseline p0-02-second-demo-v2 --changed-paths /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/empty-changed-paths.txt --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-b.json",
+      "exit": 0,
+      "durationMs": 30,
+      "stdoutTail": "✅ baseline candidate p0-02-second-demo-v2: sha256:07866e0e3d9f… -> sha256:07866e0e3d9f…\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/write-baseline-update-meta.mjs --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/meta-a.json --baseline fpvs-v1 --candidate-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-ref refs/heads/main --run-id e2 --workflow baseline-update --actor sihuayin --actor-id 0 --triggering-actor sihuayin --validation /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-a.json --validation-outcome success --evidence-outcome success",
+      "exit": 0,
+      "durationMs": 24,
+      "stdoutTail": "✅ baseline update meta: fpvs-v1 · pass\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/write-baseline-update-meta.mjs --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/meta-b.json --baseline p0-02-second-demo-v2 --candidate-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-sha 7cd7cd4957588f6fe2d39849a7d80dfa2641b0d3 --base-ref refs/heads/main --run-id e2 --workflow baseline-update --actor sihuayin --actor-id 0 --triggering-actor sihuayin --validation /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T03-43-49Z-baseline-update-e2/validation-b.json --validation-outcome success --evidence-outcome success",
+      "exit": 0,
+      "durationMs": 22,
+      "stdoutTail": "✅ baseline update meta: p0-02-second-demo-v2 · pass\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm test",
+      "exit": 0,
+      "durationMs": 27196,
+      "stdoutTail": "aster.test.ts (20 tests) 4ms\n ✓ packages/contracts/tests/game-intent.test.ts (12 tests) 11ms\n ✓ packages/demo/probe/playtest/tests/scenarios.test.mjs (4 tests) 10ms\n ✓ packages/assets/tests/sheet-grid.test.ts (16 tests) 9ms\n ✓ packages/contracts/tests/gemini-call.test.ts (9 tests) 4ms\n ✓ packages/contracts/tests/animation-acceptance.test.ts (18 tests) 12ms\n ✓ packages/contracts/tests/visual-world-gate.test.ts (8 tests) 10ms\n ✓ packages/demo/probe/playtest/tests/danger-forms.test.mjs (18 tests) 7ms\n ✓ packages/contracts/tests/game-design.test.ts (15 tests) 9ms\n ✓ packages/contracts/tests/game-intent-gate.test.ts (24 tests) 8ms\n ✓ packages/contracts/tests/character-dna.test.ts (23 tests) 9ms\n ✓ packages/qa/tests/pixel.test.ts (13 tests) 5ms\n ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms\n ✓ packages/assets/tests/generate.test.ts (30 tests) 15ms\n ✓ packages/visual-design/tests/svg.test.ts (24 tests) 10ms\n ✓ packages/contracts/tests/image-units.test.ts (9 tests) 6ms\n ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 10ms\n ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 5ms\n ✓ packages/vision/tests/prompts-wire.test.ts (8 tests) 10ms\n ✓ packages/game-design/tests/prompts.test.ts (18 tests) 3ms\n ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 5ms\n ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 5ms\n ✓ packages/demo/tests/shell-hud-declared-size.test.ts (8 tests) 35ms\n ✓ packages/contracts/tests/vocabulary.test.ts (17 tests) 6ms\n ✓ packages/contracts/tests/playtest-attribution.test.ts (19 tests) 4ms\n ✓ packages/contracts/tests/mechanic-coverage.test.ts (13 tests) 6ms\n ✓ packages/assets/tests/speck.test.ts (4 tests) 4ms\n ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 7ms\n ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/visual-world-attempts.test.ts (20 tests) 7ms\n ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 3ms\n ✓ packages/vision/tests/prompts.test.ts (9 tests) 4ms\n ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 2ms\n ✓ packages/contracts/tests/recipe-config-acceptance.test.ts (1 test) 2ms\n ✓ packages/cli/tests/reuse-from.test.ts (1 test) 1ms\n ✓ packages/assets/tests/acceptance.test.ts (18 tests) 21904ms\n   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  21844ms\n ✓ packages/mcp/tests/server.test.ts (11 tests) 17819ms\n   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  17788ms\n ✓ packages/cli/tests/cli.test.ts (29 tests) 18964ms\n   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  17744ms\n   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  311ms\n\n Test Files  161 passed (161)\n      Tests  2350 passed (2350)\n   Start at  11:43:50\n   Duration  26.85s (transform 22.85s, setup 0ms, collect 83.88s, tests 109.15s, environment 14ms, prepare 7.10s)\n\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm typecheck",
+      "exit": 0,
+      "durationMs": 11109,
+      "stdoutTail": "\n> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker\n> tsc -b && pnpm -r --if-present typecheck\n\nScope: 10 of 11 workspace projects\npackages/contracts typecheck$ tsc -p tsconfig.spec.json\npackages/contracts typecheck: Done\npackages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json\npackages/game-design typecheck$ tsc -p tsconfig.spec.json\npackages/assets typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck: Done\npackages/vision typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck: Done\npackages/vision typecheck: Done\npackages/assets typecheck: Done\npackages/demo typecheck: Done\npackages/visual-design typecheck$ tsc -p tsconfig.spec.json\npackages/visual-design typecheck: Done\npackages/pipeline typecheck$ tsc -p tsconfig.spec.json\npackages/pipeline typecheck: Done\npackages/mcp typecheck$ tsc -p tsconfig.spec.json\npackages/cli typecheck$ tsc -p tsconfig.spec.json\npackages/mcp typecheck: Done\npackages/cli typecheck: Done\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm check:links",
+      "exit": 0,
+      "durationMs": 6682,
+      "stdoutTail": "\n> game-maker@0.0.0 check:links /Volumes/shy/some-projects/game-maker\n> node scripts/check-links.mjs\n\n✅ 相对链接零断裂（925 份文档 · 3078 条链接）\n",
+      "stderrTail": ""
+    }
+  ]
+}
