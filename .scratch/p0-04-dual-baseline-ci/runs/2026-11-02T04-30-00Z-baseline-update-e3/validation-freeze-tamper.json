@@ -1,0 +1,10 @@
+{
+  "format": "baseline-candidate-validation/v1",
+  "generatedAt": "2026-11-02T04:28:58.090Z",
+  "baselineId": "p0-02-second-demo-v2",
+  "result": "fail",
+  "error": {
+    "code": "candidate.freezeHashes-changed",
+    "message": "freezeHashes 是冻结快照身份依据，不能被普通基线更新改写"
+  }
+}
