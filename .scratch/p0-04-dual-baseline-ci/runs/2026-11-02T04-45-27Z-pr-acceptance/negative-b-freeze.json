@@ -1,0 +1,19 @@
+{
+  "format": "freeze-snapshot-verification/v1",
+  "generatedAt": "2026-11-02T04:52:16.019Z",
+  "baselineId": "p0-02-second-demo-v2",
+  "hashList": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+  "freezeRoot": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe",
+  "count": 112,
+  "verified": 111,
+  "missing": [],
+  "mismatched": [
+    {
+      "path": "run/v1/playtest/v3/success-basic/setup.json",
+      "expected": "sha256:7d94d491ae0370d57849a89404429202465aa0f171ca3758198ae74f58565de2",
+      "actual": "sha256:c9e273bbe796d7ed98a83408c31aad8b932661d33e2f15b2ea6d06430bbc033b"
+    }
+  ],
+  "extra": [],
+  "pass": false
+}

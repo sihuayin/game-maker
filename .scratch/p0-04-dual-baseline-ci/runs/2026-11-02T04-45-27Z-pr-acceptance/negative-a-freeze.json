@@ -1,0 +1,13 @@
+{
+  "format": "freeze-snapshot-verification/v1",
+  "generatedAt": "2026-11-02T04:52:07.060Z",
+  "baselineId": "p0-02-second-demo-v2",
+  "hashList": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+  "freezeRoot": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe",
+  "count": 112,
+  "verified": 112,
+  "missing": [],
+  "mismatched": [],
+  "extra": [],
+  "pass": true
+}
