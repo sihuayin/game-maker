@@ -1,0 +1,25 @@
+{
+  "format": "dual-baseline-aggregate/v1",
+  "generatedAt": "2026-11-02T04:52:07.107Z",
+  "registry": ".scratch/baselines/registry.json",
+  "outcomes": {
+    "A": "failure",
+    "B": "success",
+    "BFreeze": "success"
+  },
+  "summaries": {
+    "A": "",
+    "B": "/home/runner/work/_temp/evidence-b/2026-11-02T04-52-06-749Z-test-evidence/summary.json"
+  },
+  "reports": {
+    "A": "",
+    "B": "/home/runner/work/_temp/evidence-b/2026-11-02T04-52-06-965Z-delivery-verification/report.json"
+  },
+  "freeze": "/home/runner/work/_temp/evidence-b/freeze-verification.json",
+  "problems": [
+    "A outcome=failure（期望 success）",
+    "A summary 路径缺失",
+    "A report 路径缺失"
+  ],
+  "pass": false
+}
