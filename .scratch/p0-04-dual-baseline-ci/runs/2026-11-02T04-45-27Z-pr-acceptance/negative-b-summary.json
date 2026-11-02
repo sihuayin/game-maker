@@ -1,0 +1,84 @@
+{
+  "format": "evidence-acceptance-run/v1",
+  "generatedAt": "2026-11-02T04:52:15.926Z",
+  "command": "node packages/cli/dist/cli.mjs verify-delivery --manifest ../pr/.scratch/p0-02-second-demo-v2/manifest/final-manifest.json --out ../../../_temp/evidence-b --json",
+  "manifest": "../pr/.scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+  "manifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+  "expectedManifestSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+  "baseManifest": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+  "anchorMode": "digest+base",
+  "baselineId": "p0-02-second-demo-v2",
+  "exitCode": 1,
+  "durationMs": 279,
+  "reportDir": "../../../_temp/evidence-b/2026-11-02T04-52-15-907Z-delivery-verification",
+  "reportSha256": "sha256:f0a4540e241383a6daabbfd1378229f8087625548f820bed1f8c6c87b9303c93",
+  "reportJsonBytes": 125529,
+  "files": {
+    "total": 231,
+    "required": 137,
+    "optional": 94
+  },
+  "records": 6,
+  "manifestFiles": 231,
+  "manifestBytes": 33448793,
+  "status": "fail",
+  "declaredVerdict": "pass",
+  "recomputedVerdict": "pass",
+  "checks": [
+    {
+      "key": "asset-pack",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "config",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "qa",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "site",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "playable-smoke",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    },
+    {
+      "key": "visual-review",
+      "declared": "pass",
+      "recomputed": "pass",
+      "match": true
+    }
+  ],
+  "diagnostics": 1,
+  "trustAnchor": {
+    "mode": "digest+base",
+    "source": "cli",
+    "expectedSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "actualSha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "baseManifest": {
+      "path": ".scratch/p0-02-second-demo-v2/manifest/final-manifest.json",
+      "sha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+      "byteEqual": true
+    },
+    "result": "matched"
+  },
+  "pass": false,
+  "problems": [
+    "CLI 退出码 1（期望 0）",
+    "report.status=fail（期望 pass）"
+  ],
+  "stderr": null
+}
