@@ -15,6 +15,7 @@ Effort: p0-04-dual-baseline-ci
 > **05 已收口（2026-11-01，PASS）**：Registry + wrapper + freeze verifier + aggregate + 双基线 evidence workflow 已落成；bootstrap run `41320891133` success；E3 PR #15（base `7cd7cd4` / head `55d10f8`）evidence run `41321106019` 全 steps success，aggregate PASS，freeze 112/112，A/B/aggregate 三份 artifact；merged `8e963c3`。报告：[report.md](runs/2026-11-01T15-28-31Z-evidence-e3/report.md)。
 > **06 已收口（2026-11-02，PASS）**：Baseline Update 双基线通道已落成；E2 161 文件 / 2,350 tests；E3 target A/B success、缺省 target 422、身份不匹配与 freezeHashes 篡改被拦截、合法 B 更新 success；main 未写回。报告：[report.md](runs/2026-11-02T04-30-00Z-baseline-update-e3/report.md)。
 > **07 已收口（2026-11-02，PASS）**：1 绿 + 4 红真实 PR；green #19 merged `eedd15b`；负向 #20–#23 均 `evidence` FAIL、BLOCKED、未合并；A/B 独占 required 样本与 112 freeze 校验均生效。报告：[report.md](runs/2026-11-02T04-45-27Z-pr-acceptance/report.md)。
+> **08 已收口（2026-11-02，PASS）**：AC-01–AC-16 + AC-07b 全部 PASS；双基线可信交付能力收口；[final-report.md](final-report.md) · [final-verdict.json](final-verdict.json)。**本图所有票据已 resolved；destination reached。**
 
 ## Destination
 
@@ -134,9 +135,11 @@ E0 推测 / E1 源码 / E2 测试 / E3 真实产物 + 运行证据（命令 + �
 
 - [真实 GitHub PR 双基线红绿验收](issues/07-real-pr-red-green-acceptance.md)：**PASS** —— green #19（base `f126406` / head `e8869c7` / run `41390243462`）四项 checks 全绿并 merged `eedd15b`；negative #20 A 篡改（A fail/B pass）、#21 B 篡改（A pass/B fail/freeze 111/112）、#22 B Manifest+Anchor（trust-config fail）、#23 规则绕过 + A 篡改（base 规则执行/head bypass 未执行）均 evidence FAIL、BLOCKED、未合并；A/B 独占 required 样本已复核。报告：[report.md](runs/2026-11-02T04-45-27Z-pr-acceptance/report.md)。
 
+- [最终验收报告、ADR 与维护文档](issues/08-final-report-adr-and-maintenance.md)：**PASS** —— AC-01–AC-16 + AC-07b 全 PASS；A 223/151/72/13、B 231/137/94/6、freeze 112/112、501 受保护文件零变化；ruleset `26268801` 四 checks 不变；`pnpm test` 161/2,350；新增 ADR 0002 与维护说明；结论限定为“双基线可信交付能力”，不扩展为第二个 Demo 生成验收。报告：[final-report.md](final-report.md)。
+
 ## Not yet specified
 
-<!-- 07 的真实失败归属证据已回灌 08；当前无 fog。 -->
+<!-- 无 fog；所有票据已 resolved。 -->
 
 ## Out of scope
 

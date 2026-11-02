@@ -1,0 +1,21 @@
+{
+  "format": "dual-baseline-aggregate/v1",
+  "generatedAt": "2026-11-02T06:45:54.050Z",
+  "registry": ".scratch/baselines/registry.json",
+  "outcomes": {
+    "A": "success",
+    "B": "success",
+    "BFreeze": "success"
+  },
+  "summaries": {
+    "A": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-650Z-test-evidence/summary.json",
+    "B": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-883Z-test-evidence/summary.json"
+  },
+  "reports": {
+    "A": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-844Z-delivery-verification/report.json",
+    "B": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-991Z-delivery-verification/report.json"
+  },
+  "freeze": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/freeze-verification.json",
+  "problems": [],
+  "pass": true
+}

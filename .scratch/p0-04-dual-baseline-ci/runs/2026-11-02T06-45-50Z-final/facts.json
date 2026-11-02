@@ -1,0 +1,202 @@
+{
+  "format": "p0-04-final-verify/v1",
+  "startedAt": "2026-11-02T06:45:51Z",
+  "finishedAt": "2026-11-02T06:46:50Z",
+  "verdict": "PASS",
+  "failures": [],
+  "a": {
+    "files": 223,
+    "required": 151,
+    "optional": 72,
+    "records": 13,
+    "roots": 9,
+    "sha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd"
+  },
+  "b": {
+    "files": 231,
+    "required": 137,
+    "optional": 94,
+    "records": 6,
+    "roots": 3,
+    "sha256": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab"
+  },
+  "bOptionalByRoot": {
+    "oldWork": 93,
+    "out": 1
+  },
+  "overlap": {
+    "count": 73,
+    "bothRequired": 28,
+    "aRequiredBOptional": 30,
+    "aOptionalBRequired": 0,
+    "bothOptional": 15
+  },
+  "results": {
+    "registry": {
+      "cmd": "node scripts/validate-baseline-registry.mjs --registry .scratch/baselines/registry.json --repo-root . --require-ids fpvs-v1,p0-02-second-demo-v2 --exact-ids",
+      "exit": 0,
+      "durationMs": 124,
+      "stdoutTail": "✅ baseline registry：2 套基线\n   - fpvs-v1: manifest sha256:ba7a485b195f… · anchor matched · update log matched\n   - p0-02-second-demo-v2: manifest sha256:07866e0e3d9f… · anchor matched · update log matched · freezeHashes 112 条\n",
+      "stderrTail": ""
+    },
+    "updateLogs": {
+      "cmd": "node scripts/check-baseline-updates.mjs --registry .scratch/baselines/registry.json --repo-root .",
+      "exit": 0,
+      "durationMs": 71,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd）\n✅ fpvs-v1: update log ok\n✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab）\n✅ p0-02-second-demo-v2: update log ok\n",
+      "stderrTail": ""
+    },
+    "freeze": {
+      "cmd": "node scripts/verify-freeze-snapshot.mjs --registry .scratch/baselines/registry.json --baseline-id p0-02-second-demo-v2 --repo-root . --head-root . --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/freeze-verification.json",
+      "exit": 0,
+      "durationMs": 51,
+      "stdoutTail": "✅ freeze snapshot p0-02-second-demo-v2: 112/112 verified · missing 0 · mismatch 0 · extra 0\n",
+      "stderrTail": ""
+    },
+    "verifyA": {
+      "cmd": "node scripts/evidence-acceptance.mjs --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --expected-manifest-sha sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd --base-manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --baseline-id fpvs-v1 --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a",
+      "exit": 0,
+      "durationMs": 271,
+      "stdoutTail": "✅ 证据完整性基线验收：pass · exit 0 · 202ms\n   清单：.scratch/evidence-integrity-v1/manifest/expected-hashes.json · 223 文件 / 19.3 MB · sha sha256:ba7a485b195f…\n   报告：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-844Z-delivery-verification/report.json · 223 文件（required 151）· 13 条记录 · 诊断 0\n   本次运行记录：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-650Z-test-evidence/summary.json\n",
+      "stderrTail": ""
+    },
+    "verifyB": {
+      "cmd": "node scripts/evidence-acceptance.mjs --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --expected-manifest-sha sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab --base-manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --anchor-mode digest+base --baseline-id p0-02-second-demo-v2 --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b",
+      "exit": 0,
+      "durationMs": 145,
+      "stdoutTail": "✅ 证据完整性基线验收：pass · exit 0 · 115ms\n   清单：.scratch/p0-02-second-demo-v2/manifest/final-manifest.json · 231 文件 / 31.9 MB · sha sha256:07866e0e3d9f…\n   报告：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-991Z-delivery-verification/report.json · 231 文件（required 137）· 6 条记录 · 诊断 0\n   本次运行记录：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-883Z-test-evidence/summary.json\n",
+      "stderrTail": ""
+    },
+    "aggregate": {
+      "cmd": "node scripts/dual-baseline-aggregate.mjs --registry .scratch/baselines/registry.json --repo-root . --a-outcome success --b-outcome success --b-freeze-outcome success --a-summary /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-650Z-test-evidence/summary.json --b-summary /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-883Z-test-evidence/summary.json --a-report /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-844Z-delivery-verification/report.json --b-report /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-991Z-delivery-verification/report.json --a-manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --b-manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --b-freeze /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/freeze-verification.json --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/aggregate.json",
+      "exit": 0,
+      "durationMs": 49,
+      "stdoutTail": "✅ dual-baseline aggregate: PASS\n",
+      "stderrTail": ""
+    },
+    "test": {
+      "cmd": "pnpm test",
+      "exit": 0,
+      "durationMs": 34251,
+      "stdoutTail": "tion-acceptance.test.ts (18 tests) 9ms\n ✓ packages/cli/tests/playtest-scenario-dir.test.ts (9 tests) 40ms\n ✓ packages/contracts/tests/game-intent.test.ts (12 tests) 8ms\n ✓ packages/visual-design/tests/svg.test.ts (24 tests) 11ms\n ✓ packages/cli/tests/playtest-invalidation.test.ts (1 test) 28ms\n ✓ packages/demo/probe/playtest/tests/scenarios.test.mjs (4 tests) 25ms\n ✓ packages/vision/tests/prompts-wire.test.ts (8 tests) 7ms\n ✓ packages/contracts/tests/visual-world-gate.test.ts (8 tests) 10ms\n ✓ packages/assets/tests/prompt.test.ts (37 tests) 8ms\n ✓ packages/contracts/tests/runtime-profile.test.ts (14 tests) 8ms\n ✓ packages/contracts/tests/recipe-graph.test.ts (15 tests) 8ms\n ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 9ms\n ✓ packages/contracts/tests/game-design.test.ts (15 tests) 12ms\n ✓ packages/contracts/tests/carried-error.test.ts (14 tests) 9ms\n ✓ packages/contracts/tests/character-dna.test.ts (23 tests) 17ms\n ✓ packages/contracts/tests/intent-coverage.test.ts (11 tests) 3ms\n ✓ packages/game-design/tests/build-design.test.ts (20 tests) 10ms\n ✓ packages/assets/tests/sheet-grid.test.ts (16 tests) 13ms\n ✓ packages/contracts/tests/delivery.test.ts (36 tests) 43ms\n ✓ packages/contracts/tests/game-intent-gate.test.ts (24 tests) 8ms\n ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms\n ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 9ms\n ✓ packages/contracts/tests/qa.test.ts (34 tests) 17ms\n ✓ packages/assets/tests/planner-masters.test.ts (7 tests) 13ms\n ✓ packages/contracts/tests/asset-spec.test.ts (38 tests) 20ms\n ✓ packages/contracts/tests/visual-world-attempts.test.ts (20 tests) 28ms\n ✓ packages/vision/tests/build-visual-world.test.ts (10 tests) 22ms\n ✓ packages/demo/probe/playtest/tests/danger-forms.test.mjs (18 tests) 10ms\n ✓ packages/contracts/tests/visual-design.test.ts (14 tests) 14ms\n ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 9ms\n ✓ packages/contracts/tests/image-units.test.ts (9 tests) 9ms\n ✓ packages/contracts/tests/vocabulary.test.ts (17 tests) 18ms\n ✓ packages/game-design/tests/build-character-dna.test.ts (22 tests) 34ms\n ✓ packages/contracts/tests/mechanic-coverage.test.ts (13 tests) 153ms\n ✓ packages/game-design/tests/dna-prompts.test.ts (16 tests) 4ms\n ✓ packages/qa/tests/pixel.test.ts (13 tests) 8ms\n ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 5ms\n ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 8ms\n ✓ packages/vision/tests/prompts.test.ts (9 tests) 5ms\n ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/gemini-call.test.ts (9 tests) 9ms\n ✓ packages/assets/tests/speck.test.ts (4 tests) 11ms\n ✓ packages/contracts/tests/playtest-attribution.test.ts (19 tests) 8ms\n ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 5ms\n ✓ packages/assets/tests/master.test.ts (20 tests) 6ms\n ✓ packages/game-design/tests/prompts.test.ts (18 tests) 11ms\n ✓ packages/contracts/tests/recipe-config-acceptance.test.ts (1 test) 2ms\n ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 2ms\n ✓ packages/cli/tests/reuse-from.test.ts (1 test) 1ms\n ✓ packages/mcp/tests/server.test.ts (11 tests) 18286ms\n   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  18225ms\n ✓ packages/assets/tests/acceptance.test.ts (18 tests) 22551ms\n   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  22490ms\n ✓ packages/cli/tests/cli.test.ts (29 tests) 20875ms\n   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  18529ms\n   ✓ accept · v7 + 冻结 baseline > `--json` 与人类输出**同源**：JSON = summary + artifacts 的那一份  1312ms\n   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  307ms\n\n Test Files  161 passed (161)\n      Tests  2350 passed (2350)\n   Start at  14:45:56\n   Duration  31.73s (transform 26.60s, setup 0ms, collect 91.75s, tests 112.37s, environment 22ms, prepare 11.96s)\n\n",
+      "stderrTail": ""
+    },
+    "typecheck": {
+      "cmd": "pnpm typecheck",
+      "exit": 0,
+      "durationMs": 13199,
+      "stdoutTail": "\n> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker\n> tsc -b && pnpm -r --if-present typecheck\n\nScope: 10 of 11 workspace projects\npackages/contracts typecheck$ tsc -p tsconfig.spec.json\npackages/contracts typecheck: Done\npackages/assets typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck$ tsc -p tsconfig.spec.json\npackages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json\npackages/qa typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck: Done\npackages/vision typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck: Done\npackages/vision typecheck: Done\npackages/demo typecheck: Done\npackages/assets typecheck: Done\npackages/visual-design typecheck$ tsc -p tsconfig.spec.json\npackages/visual-design typecheck: Done\npackages/pipeline typecheck$ tsc -p tsconfig.spec.json\npackages/pipeline typecheck: Done\npackages/mcp typecheck$ tsc -p tsconfig.spec.json\npackages/cli typecheck$ tsc -p tsconfig.spec.json\npackages/mcp typecheck: Done\npackages/cli typecheck: Done\n",
+      "stderrTail": ""
+    },
+    "links": {
+      "cmd": "pnpm check:links",
+      "exit": 0,
+      "durationMs": 6827,
+      "stdoutTail": "\n> game-maker@0.0.0 check:links /Volumes/shy/some-projects/game-maker\n> node scripts/check-links.mjs\n\n✅ 相对链接零断裂（931 份文档 · 3090 条链接）\n",
+      "stderrTail": ""
+    }
+  },
+  "freeze": {
+    "format": "freeze-snapshot-verification/v1",
+    "generatedAt": "2026-11-02T06:45:53.582Z",
+    "baselineId": "p0-02-second-demo-v2",
+    "hashList": ".scratch/p0-02-second-demo-v2/freeze-sha256.txt",
+    "freezeRoot": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe",
+    "count": 112,
+    "verified": 112,
+    "missing": [],
+    "mismatched": [],
+    "extra": [],
+    "pass": true
+  },
+  "aggregate": {
+    "format": "dual-baseline-aggregate/v1",
+    "generatedAt": "2026-11-02T06:45:54.050Z",
+    "registry": ".scratch/baselines/registry.json",
+    "outcomes": {
+      "A": "success",
+      "B": "success",
+      "BFreeze": "success"
+    },
+    "summaries": {
+      "A": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-650Z-test-evidence/summary.json",
+      "B": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-883Z-test-evidence/summary.json"
+    },
+    "reports": {
+      "A": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-844Z-delivery-verification/report.json",
+      "B": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-991Z-delivery-verification/report.json"
+    },
+    "freeze": "/Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/freeze-verification.json",
+    "problems": [],
+    "pass": true
+  },
+  "immutability": {
+    "changed": [],
+    "protectedFiles": 501
+  },
+  "commands": [
+    {
+      "cmd": "node scripts/validate-baseline-registry.mjs --registry .scratch/baselines/registry.json --repo-root . --require-ids fpvs-v1,p0-02-second-demo-v2 --exact-ids",
+      "exit": 0,
+      "durationMs": 124,
+      "stdoutTail": "✅ baseline registry：2 套基线\n   - fpvs-v1: manifest sha256:ba7a485b195f… · anchor matched · update log matched\n   - p0-02-second-demo-v2: manifest sha256:07866e0e3d9f… · anchor matched · update log matched · freezeHashes 112 条\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/check-baseline-updates.mjs --registry .scratch/baselines/registry.json --repo-root .",
+      "exit": 0,
+      "durationMs": 71,
+      "stdoutTail": "✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd）\n✅ fpvs-v1: update log ok\n✅ MANIFEST-UPDATES：最后一条 newSha256 与当前 Manifest 一致（sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab）\n✅ p0-02-second-demo-v2: update log ok\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/verify-freeze-snapshot.mjs --registry .scratch/baselines/registry.json --baseline-id p0-02-second-demo-v2 --repo-root . --head-root . --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/freeze-verification.json",
+      "exit": 0,
+      "durationMs": 51,
+      "stdoutTail": "✅ freeze snapshot p0-02-second-demo-v2: 112/112 verified · missing 0 · mismatch 0 · extra 0\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/evidence-acceptance.mjs --manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --expected-manifest-sha sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd --base-manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --baseline-id fpvs-v1 --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a",
+      "exit": 0,
+      "durationMs": 271,
+      "stdoutTail": "✅ 证据完整性基线验收：pass · exit 0 · 202ms\n   清单：.scratch/evidence-integrity-v1/manifest/expected-hashes.json · 223 文件 / 19.3 MB · sha sha256:ba7a485b195f…\n   报告：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-844Z-delivery-verification/report.json · 223 文件（required 151）· 13 条记录 · 诊断 0\n   本次运行记录：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-650Z-test-evidence/summary.json\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/evidence-acceptance.mjs --manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --expected-manifest-sha sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab --base-manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --anchor-mode digest+base --baseline-id p0-02-second-demo-v2 --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b",
+      "exit": 0,
+      "durationMs": 145,
+      "stdoutTail": "✅ 证据完整性基线验收：pass · exit 0 · 115ms\n   清单：.scratch/p0-02-second-demo-v2/manifest/final-manifest.json · 231 文件 / 31.9 MB · sha sha256:07866e0e3d9f…\n   报告：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-991Z-delivery-verification/report.json · 231 文件（required 137）· 6 条记录 · 诊断 0\n   本次运行记录：.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-883Z-test-evidence/summary.json\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "node scripts/dual-baseline-aggregate.mjs --registry .scratch/baselines/registry.json --repo-root . --a-outcome success --b-outcome success --b-freeze-outcome success --a-summary /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-650Z-test-evidence/summary.json --b-summary /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-883Z-test-evidence/summary.json --a-report /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-a/2026-11-02T06-45-53-844Z-delivery-verification/report.json --b-report /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/evidence-b/2026-11-02T06-45-53-991Z-delivery-verification/report.json --a-manifest .scratch/evidence-integrity-v1/manifest/expected-hashes.json --b-manifest .scratch/p0-02-second-demo-v2/manifest/final-manifest.json --b-freeze /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/freeze-verification.json --out /Volumes/shy/some-projects/game-maker/.scratch/p0-04-dual-baseline-ci/runs/2026-11-02T06-45-50Z-final/aggregate.json",
+      "exit": 0,
+      "durationMs": 49,
+      "stdoutTail": "✅ dual-baseline aggregate: PASS\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm test",
+      "exit": 0,
+      "durationMs": 34251,
+      "stdoutTail": "tion-acceptance.test.ts (18 tests) 9ms\n ✓ packages/cli/tests/playtest-scenario-dir.test.ts (9 tests) 40ms\n ✓ packages/contracts/tests/game-intent.test.ts (12 tests) 8ms\n ✓ packages/visual-design/tests/svg.test.ts (24 tests) 11ms\n ✓ packages/cli/tests/playtest-invalidation.test.ts (1 test) 28ms\n ✓ packages/demo/probe/playtest/tests/scenarios.test.mjs (4 tests) 25ms\n ✓ packages/vision/tests/prompts-wire.test.ts (8 tests) 7ms\n ✓ packages/contracts/tests/visual-world-gate.test.ts (8 tests) 10ms\n ✓ packages/assets/tests/prompt.test.ts (37 tests) 8ms\n ✓ packages/contracts/tests/runtime-profile.test.ts (14 tests) 8ms\n ✓ packages/contracts/tests/recipe-graph.test.ts (15 tests) 8ms\n ✓ packages/contracts/tests/playtest-baseline.test.ts (11 tests) 9ms\n ✓ packages/contracts/tests/game-design.test.ts (15 tests) 12ms\n ✓ packages/contracts/tests/carried-error.test.ts (14 tests) 9ms\n ✓ packages/contracts/tests/character-dna.test.ts (23 tests) 17ms\n ✓ packages/contracts/tests/intent-coverage.test.ts (11 tests) 3ms\n ✓ packages/game-design/tests/build-design.test.ts (20 tests) 10ms\n ✓ packages/assets/tests/sheet-grid.test.ts (16 tests) 13ms\n ✓ packages/contracts/tests/delivery.test.ts (36 tests) 43ms\n ✓ packages/contracts/tests/game-intent-gate.test.ts (24 tests) 8ms\n ✓ packages/assets/tests/route-resolver.test.ts (17 tests) 8ms\n ✓ packages/demo/probe/playtest/tests/observe.test.mjs (11 tests) 9ms\n ✓ packages/contracts/tests/qa.test.ts (34 tests) 17ms\n ✓ packages/assets/tests/planner-masters.test.ts (7 tests) 13ms\n ✓ packages/contracts/tests/asset-spec.test.ts (38 tests) 20ms\n ✓ packages/contracts/tests/visual-world-attempts.test.ts (20 tests) 28ms\n ✓ packages/vision/tests/build-visual-world.test.ts (10 tests) 22ms\n ✓ packages/demo/probe/playtest/tests/danger-forms.test.mjs (18 tests) 10ms\n ✓ packages/contracts/tests/visual-design.test.ts (14 tests) 14ms\n ✓ packages/cli/tests/inspect-digest.test.ts (8 tests) 9ms\n ✓ packages/contracts/tests/image-units.test.ts (9 tests) 9ms\n ✓ packages/contracts/tests/vocabulary.test.ts (17 tests) 18ms\n ✓ packages/game-design/tests/build-character-dna.test.ts (22 tests) 34ms\n ✓ packages/contracts/tests/mechanic-coverage.test.ts (13 tests) 153ms\n ✓ packages/game-design/tests/dna-prompts.test.ts (16 tests) 4ms\n ✓ packages/qa/tests/pixel.test.ts (13 tests) 8ms\n ✓ packages/contracts/tests/zod-issues.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/asset-plan.test.ts (5 tests) 5ms\n ✓ packages/game-design/tests/design-prompts.test.ts (18 tests) 8ms\n ✓ packages/vision/tests/prompts.test.ts (9 tests) 5ms\n ✓ packages/demo/tests/shell-scene-wiring.test.ts (4 tests) 4ms\n ✓ packages/contracts/tests/gemini-call.test.ts (9 tests) 9ms\n ✓ packages/assets/tests/speck.test.ts (4 tests) 11ms\n ✓ packages/contracts/tests/playtest-attribution.test.ts (19 tests) 8ms\n ✓ packages/contracts/tests/layer-coverage.test.ts (12 tests) 5ms\n ✓ packages/assets/tests/master.test.ts (20 tests) 6ms\n ✓ packages/game-design/tests/prompts.test.ts (18 tests) 11ms\n ✓ packages/contracts/tests/recipe-config-acceptance.test.ts (1 test) 2ms\n ✓ packages/assets/tests/cross-stage-sample.test.ts (5 tests) 2ms\n ✓ packages/cli/tests/reuse-from.test.ts (1 test) 1ms\n ✓ packages/mcp/tests/server.test.ts (11 tests) 18286ms\n   ✓ accept_asset_pack（与 CLI 共用同一份验收 core） > v7 + baseline：结构全绿，报告落盘且 structuredContent 与报告同源  18225ms\n ✓ packages/assets/tests/acceptance.test.ts (18 tests) 22551ms\n   ✓ 票 05 · v7 正例（结构 + baseline 指标） > v7 结构全绿；idle 的 7 项读数与冻结 baseline 一致  22490ms\n ✓ packages/cli/tests/cli.test.ts (29 tests) 20875ms\n   ✓ accept · v7 + 冻结 baseline > exit 0：报告落在临时 out 的 v1，且能被 parseAnimationAcceptance 解析  18529ms\n   ✓ accept · v7 + 冻结 baseline > `--json` 与人类输出**同源**：JSON = summary + artifacts 的那一份  1312ms\n   ✓ accept · 负例与退出码 > 有 error findings ⇒ 1（报告照样落盘，不是 4）  307ms\n\n Test Files  161 passed (161)\n      Tests  2350 passed (2350)\n   Start at  14:45:56\n   Duration  31.73s (transform 26.60s, setup 0ms, collect 91.75s, tests 112.37s, environment 22ms, prepare 11.96s)\n\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm typecheck",
+      "exit": 0,
+      "durationMs": 13199,
+      "stdoutTail": "\n> game-maker@0.0.0 typecheck /Volumes/shy/some-projects/game-maker\n> tsc -b && pnpm -r --if-present typecheck\n\nScope: 10 of 11 workspace projects\npackages/contracts typecheck$ tsc -p tsconfig.spec.json\npackages/contracts typecheck: Done\npackages/assets typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck$ tsc -p tsconfig.spec.json\npackages/demo typecheck$ tsc -p tsconfig.spec.json && tsc -p tsconfig.shell.json\npackages/qa typecheck$ tsc -p tsconfig.spec.json\npackages/qa typecheck: Done\npackages/vision typecheck$ tsc -p tsconfig.spec.json\npackages/game-design typecheck: Done\npackages/vision typecheck: Done\npackages/demo typecheck: Done\npackages/assets typecheck: Done\npackages/visual-design typecheck$ tsc -p tsconfig.spec.json\npackages/visual-design typecheck: Done\npackages/pipeline typecheck$ tsc -p tsconfig.spec.json\npackages/pipeline typecheck: Done\npackages/mcp typecheck$ tsc -p tsconfig.spec.json\npackages/cli typecheck$ tsc -p tsconfig.spec.json\npackages/mcp typecheck: Done\npackages/cli typecheck: Done\n",
+      "stderrTail": ""
+    },
+    {
+      "cmd": "pnpm check:links",
+      "exit": 0,
+      "durationMs": 6827,
+      "stdoutTail": "\n> game-maker@0.0.0 check:links /Volumes/shy/some-projects/game-maker\n> node scripts/check-links.mjs\n\n✅ 相对链接零断裂（931 份文档 · 3090 条链接）\n",
+      "stderrTail": ""
+    }
+  ]
+}
