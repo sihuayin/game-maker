@@ -1,7 +1,7 @@
 # Baseline Update 双基线通道
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: 03, 04
 
 ## Question
