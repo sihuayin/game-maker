@@ -1,0 +1,28 @@
+{
+  "format": "dual-baseline-aggregate/v1",
+  "generatedAt": "2026-11-02T04:52:09.835Z",
+  "registry": ".scratch/baselines/registry.json",
+  "outcomes": {
+    "A": "skipped",
+    "B": "failure",
+    "BFreeze": "success"
+  },
+  "summaries": {
+    "A": "",
+    "B": ""
+  },
+  "reports": {
+    "A": "",
+    "B": ""
+  },
+  "freeze": "/home/runner/work/_temp/evidence-b/freeze-verification.json",
+  "problems": [
+    "A outcome=skipped（期望 success）",
+    "B outcome=failure（期望 success）",
+    "A summary 路径缺失",
+    "B summary 路径缺失",
+    "A report 路径缺失",
+    "B report 路径缺失"
+  ],
+  "pass": false
+}
