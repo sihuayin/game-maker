@@ -1,0 +1,10 @@
+{
+  "format": "baseline-candidate-validation/v1",
+  "generatedAt": "2026-11-02T04:28:49.865Z",
+  "baselineId": "fpvs-v1",
+  "result": "fail",
+  "error": {
+    "code": "registry.identity-mismatch",
+    "message": "/home/runner/work/game-maker/game-maker/candidate/.scratch/baselines/registry.json:fpvs-v1: identity.packVersion=99 与 Manifest subject.packVersion=1 不一致"
+  }
+}
