@@ -1,0 +1,237 @@
+{
+  "format": "p0-04-final-verdict/v1",
+  "at": "2026-11-02T06:48:20Z",
+  "base": "343920286697d6d001d051c1b8f953eb25c7e5ba",
+  "conclusions": {
+    "baselineA": "FPVS-V1 trusted delivery verified",
+    "baselineB": "P0-02 Second Demo V2 trusted delivery verified",
+    "dualBaselineCi": "both baselines protected by the same ordinary-PR-resistant trusted CI",
+    "notClaimed": "second independent game Demo end-to-end generation acceptance"
+  },
+  "ac": [
+    {
+      "id": "AC-01",
+      "result": "PASS",
+      "evidence": [
+        "A 223/151/72/13; sha256:ba7a485b…36fd",
+        "runs/2026-11-01T12-28-50Z-baseline-audit/report.md",
+        "runs/2026-11-02T06-45-50Z-final/report.md"
+      ]
+    },
+    {
+      "id": "AC-02",
+      "result": "PASS",
+      "evidence": [
+        "B 231/137/94/6; sha256:07866e0e…b9ab; freeze 112/112",
+        "runs/2026-11-01T12-28-50Z-baseline-audit/report.md",
+        "runs/2026-11-02T06-45-50Z-final/report.md"
+      ]
+    },
+    {
+      "id": "AC-03",
+      "result": "PASS",
+      "evidence": [
+        "registry independent entries; A/B manifests distinct; 73 path overlap disclosed",
+        "issues/05-evidence-ci-dual-baseline.md"
+      ]
+    },
+    {
+      "id": "AC-04",
+      "result": "PASS",
+      "evidence": [
+        "A anchor sha256:ba7a485b…36fd; B anchor sha256:07866e0e…b9ab",
+        "issues/04-baseline-b-anchor-and-update-log.md"
+      ]
+    },
+    {
+      "id": "AC-05",
+      "result": "PASS",
+      "evidence": [
+        "run 41321106019; negative PRs #20–#23 executed by base rules",
+        "https://github.com/sihuayin/game-maker/actions/runs/41321106019"
+      ]
+    },
+    {
+      "id": "AC-06",
+      "result": "PASS",
+      "evidence": [
+        "run 41321106019; green #19 run 41390243462",
+        "https://github.com/sihuayin/game-maker/actions/runs/41390243462"
+      ]
+    },
+    {
+      "id": "AC-07",
+      "result": "PASS",
+      "evidence": [
+        "06 E3 target A/B success; identity/freeze tamper blocked; valid B success; no writeback",
+        "https://github.com/sihuayin/game-maker/actions/runs/41385937629",
+        "https://github.com/sihuayin/game-maker/actions/runs/41385962594",
+        "https://github.com/sihuayin/game-maker/actions/runs/41388674222"
+      ]
+    },
+    {
+      "id": "AC-07b",
+      "result": "PASS",
+      "evidence": [
+        "06 E3 freezeHashes tamper rejected: candidate.freezeHashes-changed",
+        "https://github.com/sihuayin/game-maker/actions/runs/41388668495"
+      ]
+    },
+    {
+      "id": "AC-08",
+      "result": "PASS",
+      "evidence": [
+        "negative A PR #20; A fail/B pass; test.exit hash-mismatch",
+        "https://github.com/sihuayin/game-maker/pull/20",
+        "https://github.com/sihuayin/game-maker/actions/runs/41390763321"
+      ]
+    },
+    {
+      "id": "AC-09",
+      "result": "PASS",
+      "evidence": [
+        "negative B PR #21; A pass/B fail; freeze 111/112; setup.json hash-mismatch",
+        "https://github.com/sihuayin/game-maker/pull/21",
+        "https://github.com/sihuayin/game-maker/actions/runs/41390771481"
+      ]
+    },
+    {
+      "id": "AC-10",
+      "result": "PASS",
+      "evidence": [
+        "negative C PR #22; B Manifest differs from base Manifest",
+        "https://github.com/sihuayin/game-maker/pull/22",
+        "https://github.com/sihuayin/game-maker/actions/runs/41390785603"
+      ]
+    },
+    {
+      "id": "AC-11",
+      "result": "PASS",
+      "evidence": [
+        "negative D PR #23; base workflow executed, head bypass not executed; A fail/B pass",
+        "https://github.com/sihuayin/game-maker/pull/23",
+        "https://github.com/sihuayin/game-maker/actions/runs/41390792355"
+      ]
+    },
+    {
+      "id": "AC-12",
+      "result": "PASS",
+      "evidence": [
+        "green PR #19 merged eedd15b; four checks green",
+        "https://github.com/sihuayin/game-maker/pull/19",
+        "https://github.com/sihuayin/game-maker/actions/runs/41390243462"
+      ]
+    },
+    {
+      "id": "AC-13",
+      "result": "PASS",
+      "evidence": [
+        "ruleset 26268801 active; required checks check/test/typecheck/evidence; strict policy true"
+      ]
+    },
+    {
+      "id": "AC-14",
+      "result": "PASS",
+      "evidence": [
+        "optional 94 = oldWork 93 + v3/chrome.log 1; B evidence reports each optional; missing does not fail required"
+      ]
+    },
+    {
+      "id": "AC-15",
+      "result": "PASS",
+      "evidence": [
+        "501 protected files zero changes; A/B manifests/anchors/logs and 112 freeze files unchanged",
+        "runs/2026-11-02T06-45-50Z-final/report.md"
+      ]
+    },
+    {
+      "id": "AC-16",
+      "result": "PASS",
+      "evidence": [
+        "zero paid API/image/model calls; no provider changes"
+      ]
+    }
+  ],
+  "keyShas": {
+    "A_manifest": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "A_anchor": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+    "B_manifest": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "B_anchor": "sha256:07866e0e3d9ffa7f4223157ed31037907522db445c3ad17a9cf91b82bd78b9ab",
+    "B_freezeHashes": "sha256:1a6ae93b112651ee819ba7ec5d4b4e51dba3ff2d77cba002e3cd7fc77891decb",
+    "registry": "sha256:df6d54ff47f1130e7e89cf27ad62d7b6a31d364456e7ec0ab41128ad42d12b70"
+  },
+  "counts": {
+    "A": {
+      "files": 223,
+      "required": 151,
+      "optional": 72,
+      "records": 13,
+      "roots": 9
+    },
+    "B": {
+      "files": 231,
+      "required": 137,
+      "optional": 94,
+      "records": 6,
+      "roots": 3
+    },
+    "BFreeze": {
+      "files": 112,
+      "verified": 112
+    },
+    "overlap": 73,
+    "overlapBothRequired": 28
+  },
+  "prs": {
+    "01": 11,
+    "03": 12,
+    "04": 13,
+    "05": 14,
+    "05probe": 15,
+    "05close": 16,
+    "06": 17,
+    "06close": 18,
+    "07green": 19,
+    "07negativeA": 20,
+    "07negativeB": 21,
+    "07negativeC": 22,
+    "07negativeD": 23,
+    "07close": 24
+  },
+  "runs": {
+    "05E2": "runs/2026-11-01T15-18-06Z-evidence-ci",
+    "05E3": 41321106019,
+    "06E3": [
+      "41385937629",
+      "41385962594",
+      "41388656648",
+      "41388668495",
+      "41388674222"
+    ],
+    "07green": 41390243462,
+    "07negativeA": 41390763321,
+    "07negativeB": 41390771481,
+    "07negativeC": 41390785603,
+    "07negativeD": 41390792355,
+    "final": "runs/2026-11-02T06-45-50Z-final"
+  },
+  "zeroPaid": true,
+  "zeroPaidStatement": "No paid API, image generation, model calls, new Provider or Provider Switch; no game generation pipeline business-logic changes.",
+  "docs": {
+    "adr": "docs/adr/0002-dual-baseline-trust-boundary.md",
+    "maintenance": ".scratch/p0-04-dual-baseline-ci/maintenance.md",
+    "finalReport": ".scratch/p0-04-dual-baseline-ci/final-report.md",
+    "context": "unchanged; no new glossary terms"
+  },
+  "limitations": [
+    "owner-only; owner retains PR bypass; non-admin bypass not proven.",
+    "A head-side comparison is Manifest-only; B compares Manifest + Anchor + update log + freezeHashes; not symmetric.",
+    "A/B have 73 absolute path overlaps (28 both required); logical isolation, partial physical overlap.",
+    "Optional missing is reported, not required-failing; optional 94 = oldWork 93 + v3/chrome.log 1.",
+    "v1/v2 chrome.log are outside the 231 manifest but covered by the 112 freeze hash list; the hash list is CI-pinned via registry, not an ordinary update target.",
+    "Re-freezing the 112 snapshot requires a new ruling/version; out of P0-04 scope.",
+    "Negative PRs #20–#23 remain OPEN/BLOCKED by design and are not merged.",
+    "Evidence completeness is not game functionality, mechanic coverage, or human visual review.",
+    "A third baseline is out of scope; workflow asserts exact A/B set."
+  ]
+}
