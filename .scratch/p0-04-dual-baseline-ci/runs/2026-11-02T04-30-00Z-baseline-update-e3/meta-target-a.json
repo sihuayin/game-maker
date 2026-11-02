@@ -1,0 +1,31 @@
+{
+  "format": "baseline-update-meta/v1",
+  "generatedAt": "2026-11-02T03:59:32.811Z",
+  "baseline": "fpvs-v1",
+  "candidateSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+  "baseSha": "20739d2e1f5f684632c1e1cc2ca3d0a5293187f6",
+  "baseRef": "refs/heads/main",
+  "runId": "41385937629",
+  "workflow": "baseline-update",
+  "operator": {
+    "actor": "sihuayin",
+    "actorId": "1635996",
+    "triggeringActor": "sihuayin"
+  },
+  "oldManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "newManifestSha256": "sha256:ba7a485b195fe3d362fd4cb244d397c844d4e07fb0d2ccc89f914043bf4d36fd",
+  "targetManifest": ".scratch/evidence-integrity-v1/manifest/expected-hashes.json",
+  "targetAnchor": ".scratch/evidence-integrity-v1/manifest/expected-hashes.sha256",
+  "targetUpdateLog": ".scratch/evidence-integrity-v1/manifest/MANIFEST-UPDATES.md",
+  "freezeHashes": null,
+  "validation": {
+    "outcome": "success",
+    "result": "pass",
+    "error": null
+  },
+  "evidence": {
+    "outcome": "success"
+  },
+  "mode": "baseline-update",
+  "result": "pass"
+}
