@@ -175,8 +175,12 @@ describe("⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落
   it("⚠️ 而**锚点语义**下 `at.y = 地面线` 的写法**不该被误报**（票 48 修掉的那个 bug）", async () => {
     const d = tmp();
     const bad = structuredClone(GOOD);
-    (bad.entities as Record<string, unknown>[])[3]!.at = { x: 500, y: 210 };
-    (bad.entities as Record<string, unknown>[])[4]!.at = { x: 800, y: 202 };
+    // ⚠️ 底边锚点 ⇒ `at.y` 就是盒底：摆在地面线 250 上 ⇒ 盒底 250。旧判据算 `at.y + h`
+    //   （250 + 40 / 250 + 48 > 270）会误报「落在世界之外」—— 这条正是票 48 的那个 bug。
+    //   ⚠️ B-02 之后同一份布局还要过可达性：悬空 40px 的 40×40 实心块会真的挡住路
+    //   （玩家高 48 钻不过、顶点 60.5 又上不去），所以这里必须**贴地**摆。
+    (bad.entities as Record<string, unknown>[])[3]!.at = { x: 500, y: 250 };
+    (bad.entities as Record<string, unknown>[])[4]!.at = { x: 800, y: 250 };
     const r = await run(d, bad); // 过得了 ⇒ 它会成功落盘
     expect(r.data.ok).toBe(true);
   });
@@ -634,6 +638,43 @@ describe("⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 
     const r = await run(d, one, { packDir: pack65() });
     expect(r.data.ok).toBe(true);
     expect(fs.existsSync(fileOf(d)), "过了就得照常落盘").toBe(true);
+  });
+});
+
+// ── B-02：这一关走不通 ⇒ 编译期硬拒、**不重采样**、不落盘 ────────────────────
+//
+// ⚠️ 失败阶段前移：以前只有 QA 报这条；现在编译期就拒（退出码仍是 `invalid`(4)）。
+//   而它**不进**重采样 —— 「走不通」是布局 / 地形层面的确定性缺陷，再抽一次 config 改不了。
+describe("§B-02：不可达的 config 在编译期硬拒、不重采样", () => {
+  /** 一道占满世界高的墙：右侧的终点 / 拾取物一律够不到。 */
+  const walledOff = () => {
+    const bad = structuredClone(GOOD);
+    (bad.terrain as { x: number; y: number; w: number; h: number }[])
+      .push({ x: 300, y: 0, w: 100, h: bad.world.size.h });
+    return bad;
+  };
+
+  it("`invalid` · **只发一趟** · 不落盘 · 文案指向布局 / 地形，不写「模型错」", async () => {
+    const d = tmp();
+    const e = await run(d, walledOff()).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    const m = (e as CommandError).message;
+    expect(m).toMatch(/够不到/);
+    expect(m).toMatch(/布局/);
+    expect(m).toMatch(/确定性失败/);
+    expect(m).not.toMatch(/模型错/);
+    expect(fs.existsSync(path.join(d, "out")), "坏配置比没配置更坏").toBe(false);
+    const ledger = (e as CommandError).ledger as { attempts: number; failures?: string[] }[];
+    expect(ledger[0]!.attempts, "不可达不是重采样能救的事").toBe(1);
+    expect(ledger[0]!.failures ?? [], "账上不出现 schema / 重采样失败").toEqual([]);
+  });
+
+  it("可达的 `last-train` 夹具：编译照常通过（不误拒）", async () => {
+    const d = tmp();
+    const r = await run(d, GOOD);
+    expect(r.data.ok).toBe(true);
+    expect(fs.existsSync(fileOf(d))).toBe(true);
   });
 });
 

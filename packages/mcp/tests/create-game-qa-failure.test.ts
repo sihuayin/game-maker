@@ -1,7 +1,9 @@
-// MCP `create_game` 的 QA 失败路径（P0-02b · 票 09）。
+// MCP `create_game` 的不可达配置路径（P0-02b · 票 09；B-02 起失败阶段前移）。
 //
 // ⚠️ 真链、离线、零付费：假上游把拾取物摆到跳不到的高度 ⇒ `reachability` 报 error。
-//   要钉的是**发布语义**：报错、退 4、**站点不产**、而报告**照样在盘**（它是诊断）。
+//   **B-02 之后**它进了 `deterministic` ⇒ 在 `config` 步就硬拒，走不到 QA。
+//   要钉的**发布语义**不变：报错、退 4、**站点不产**；区别是**没有** qa-report
+//   （QA 根本没跑，不是报告丢了）。报告先落盘、再阻断那条顺序由 pipeline 的注入式测试钉着。
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -106,8 +108,8 @@ const tinyPng = (): Buffer => {
   return encodePNG({ width: w, height: h, data });
 };
 
-describe("§MCP create_game：QA 失败 ⇒ 退 4、站点不产、报告在盘", () => {
-  it("reachability error 挡住发布", async () => {
+describe("§MCP create_game：不可达 config ⇒ 退 4、站点不产、在 config 步被拒", () => {
+  it("reachability error 在 `config` 步挡住发布（QA 没到达）", async () => {
     process.env.ANTHROPIC_BASE_URL = "http://up.test";
     process.env.ANTHROPIC_AUTH_TOKEN = "k";
     process.env.GAME_MAKER_IMAGE_PROTOCOL = "gemini";
@@ -131,18 +133,12 @@ describe("§MCP create_game：QA 失败 ⇒ 退 4、站点不产、报告在盘"
     const r = out.find((x) => x.id === 9)!;
     expect(r.result.isError).toBe(true);
     expect(r.result._exitCode).toBe(4);
-    expect(r.result.content[0].text).toMatch(/QA 判据没过/);
-    expect(r.result.content[0].text).toMatch(/\[reachability\]/);
+    expect(r.result.content[0].text).toMatch(/够不到/);
+    expect(r.result.content[0].text).toMatch(/确定性失败/);
+    expect(r.result.content[0].text).not.toMatch(/QA 判据没过/);
 
-    // ⚠️ **站点不产**，而报告**在盘**（诊断先落盘，再阻断）
+    // ⚠️ **站点不产**；⚠️ B-02：QA 没跑 ⇒ **没有** qa-report（不是报告丢了）
     expect(fs.existsSync(path.join(outDir, "wasteland", "site"))).toBe(false);
-    const report = JSON.parse(fs.readFileSync(path.join(outDir, "wasteland", "run", "v1", "qa-report.json"), "utf8")) as {
-      checked: string[];
-      failures: { judgement: string; severity: string }[];
-      subject?: { packId: string; packVersion: number };
-    };
-    expect(report.failures).toContainEqual(expect.objectContaining({ judgement: "reachability", severity: "error" }));
-    expect(report.checked).toContain("reachability");
-    expect(report.subject).toMatchObject({ packId: "wasteland", packVersion: 1 });
+    expect(fs.existsSync(path.join(outDir, "wasteland", "run", "v1", "qa-report.json"))).toBe(false);
   }, 120_000);
 });

@@ -1236,12 +1236,12 @@ ${SKELETON_SHAPE_NOTE}
 
   const config = checked.value;
 
-  // ── ⚠️ **确定性校验：层覆盖，不重采样、不落盘**（票 65 提前到这里的「层盖不住世界」）────
+  // ── ⚠️ **确定性校验：层覆盖 + 可达性，不重采样、不落盘**（票 65 的「层盖不住世界」；B-02 的 reachability）────
   //
   //   ⚠️ 引用族 / 自洽族 / HUD 屏幕空间那几条「模型错」已经在**重采样循环里**判了（票 10）；
-  //   这里只剩「层盖不住世界」这一条**确定性**判据 —— 它由「背景资源尺寸 + world.size」决定，
-  //   **重抽 config 改不了**（config 在 pack 之后，图已经买完），所以仍不重采样、不落盘。
-  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**。
+  //   这里剩两族**确定性**判据：①「层盖不住世界」由背景资源尺寸 + world.size 决定；
+  //   ②「这一关通不通」由地形 / 布局决定（B-02）。两者**重抽 config 改不了**，所以不重采样、不落盘。
+  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts` / `reachability.ts`），站点装配调的是**同一个函数**。
   const issues: ConfigIssue[] = auditConfigPipeline(config, {
     manifest, design, levelId: level.id, viewport: vp,
     ...(opts.hudLineHeight !== undefined ? { hudLineHeight: opts.hudLineHeight } : {}),
@@ -1251,8 +1251,8 @@ ${SKELETON_SHAPE_NOTE}
     throw new CommandError("invalid",
       `编译出来的配置**过不了校验**（${hard.length} 条硬失败）：\n` +
       hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
-      "\n⚠️ **层盖不住世界是确定性的** —— 由背景资源尺寸 + world.size 决定，重抽 config 改不了，也不落盘。" +
-      "要去的地方：资源清单（换一个盖得住世界的背景），不是再抽一次 config。",
+      "\n⚠️ 这是**确定性失败** —— 重抽 config 改不了，也不落盘。" +
+      "按上面每一条的提示改布局 / 配置或资源清单，不是再抽一次 config。",
       ledgerCarrying(call.record()));
 
   const dir = path.join(opts.outRoot, manifest.id, "game-configs");

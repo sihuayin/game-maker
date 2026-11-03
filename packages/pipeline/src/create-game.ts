@@ -633,7 +633,7 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
     throw new CommandError("invalid",
       `运行目录里的 config **过不了确定性复验**（${pipelineIssues.length} 条硬失败；reuseConfig 与编译两条路径共用这一关）：\n` +
       pipelineIssues.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
-      "\n⚠️ 这一关不重采样、不落盘 —— 改配置或改清单，不是再去抽一次 config。");
+      "\n⚠️ 这一关不重采样、不落盘 —— 改配置、布局或清单，不是再去抽一次 config。");
 
 
   // ── QA：**默认跑**（票 20 的 Q3），而它的硬失败**阻断**（R3 · 票 20 的 Q4）──────────

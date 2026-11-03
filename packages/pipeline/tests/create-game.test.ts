@@ -744,18 +744,26 @@ describe("§QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3）", ()
 });
 
 describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的 Q4）", () => {
-  /** 一个**真链上会响**的现场：把拾取物摆到跳不到的高处 ⇒ `reachability` 报一条 error。
-   *  ⚠️ 世界是平的、跳跃顶点只有 40.5px（`180²/(2×400)`），而 y=60 离脚下的 200 有一大截。 */
-  function unreachableHarness() {
-    const config = structuredClone(CANNED.gameConfig) as { entities: { id: string; at: { x: number; y: number } }[] };
-    config.entities.find((e) => e.id === "e-pickup-1")!.at = { x: 120, y: 60 };
-    return harness({ override: { emit_game_config: config } });
+  /** ⚠️ **B-02 之后**：真实的 reachability 失败在**汇合点**就被硬拒，走不到 QA（失败阶段前移）。
+   *  这里注入一份**合法**的失败报告 —— 这一节要测的是 QA 段的**顺序**
+   *  （报告先落盘、再阻断、异常里带报告路径），不是那条判据本身（判据本体在
+   *  `packages/qa/tests/gameplay.test.ts`）。 */
+  function failingQa(): QAReport {
+    return {
+      format: "qa-report/v1",
+      checked: [...QA_JUDGEMENTS],
+      failures: [{ judgement: "reachability", target: 'entity "e-pickup-1"', detail: "够不到", severity: "error" }],
+      observations: [
+        { source: "inspect", outcome: "unavailable", reason: "测试用：没跑" },
+        { source: "review", outcome: "unavailable", reason: "测试用：没跑" },
+      ],
+    };
   }
 
-  it("⚠️ 真链上响一次 ⇒ 抛 `invalid`（= 退出码 4），而报告**已经在磁盘上**", async () => {
-    const h = unreachableHarness();
+  it("⚠️ QA 报硬失败 ⇒ 抛 `invalid`（= 退出码 4），而报告**已经在磁盘上**", async () => {
+    const h = harness();
     const u = await understand(h);
-    await expect(build(h, u.run.dir)).rejects.toMatchObject({ kind: "invalid" });
+    await expect(build(h, u.run.dir, { qa: async () => failingQa() })).rejects.toMatchObject({ kind: "invalid" });
 
     // ⚠️ **落盘在阻断之前**：判据说不行了，正是最该读它的时候（也是修复循环要读的那一份）
     const report = readJson(runPath(h, "qa-report.json")) as {
@@ -786,11 +794,11 @@ describe("§QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的
   });
 
   it("⚠️ 文案里带着**报告路径**与失败详情 —— 走异常那一路也丢不掉它（票 20 的 Q5）", async () => {
-    const h = unreachableHarness();
+    const h = harness();
     const u = await understand(h);
     // ⚠️ 转型在**外面**：`build()` 正常那一路返回 `BuildResult`，`.catch` 的返回类型于是是
     //    `BuildResult | Error` —— 在 catch 里转型，`e.message` 仍会撞在 `BuildResult` 上（TS2339）。
-    const e = (await build(h, u.run.dir).catch((x: unknown) => x)) as Error;
+    const e = (await build(h, u.run.dir, { qa: async () => failingQa() }).catch((x: unknown) => x)) as Error;
     expect(e.message).toMatch(/qa-report\.json/);          // 报告路径
     expect(e.message).toMatch(/\[reachability\]/);         // 哪条判据
     expect(e.message).toMatch(/QA 判据没过/);
@@ -1039,6 +1047,26 @@ describe("§P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入�
     expect((e as CommandError).kind).toBe("invalid");
     expect((e as CommandError).message).toMatch(/hud\.panel\.size/);
     expect((e as CommandError).message).toMatch(/下界/);
+  });
+
+  it("阴性：reuseConfig 带**不可达**（地形被一道满高的墙切断）⇒ invalid（退出码 4），在 QA 之前", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    const cfg = readJson(b.paths.config) as {
+      world: { size: { w: number; h: number } };
+      terrain: { x: number; y: number; w: number; h: number }[];
+    };
+    cfg.terrain.push({ x: 300, y: 0, w: 100, h: cfg.world.size.h });
+    const p = configFile(h, "bad-reachability.json", cfg);
+    const e = await build(h, u.run.dir, { reuseConfig: p }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect(exitCodeOfError(e)).toBe(4);
+    // ⚠️ B-02：reachability 进了 `deterministic` ⇒ 汇合点（早于 QA）就硬失败。
+    expect((e as CommandError).message).toMatch(/确定性复验/);
+    expect((e as CommandError).message).toMatch(/够不到/);
+    expect((e as CommandError).message).toMatch(/布局/);
   });
 
   it("阳性：原样复用一份合法 config ⇒ 照常构建（不误拒）", async () => {
