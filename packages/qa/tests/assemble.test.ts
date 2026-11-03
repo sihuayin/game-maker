@@ -229,7 +229,7 @@ describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）
     return c;
   };
   /** ⚠️ 1:N 那两条自己拼 config，同样要补 `r-scrap` 的回指。 */
-  const withScrap = (c: { entities: { id: string; sourceIntent?: string }[] }) => {
+  const withScrap = <T extends { entities: { id: string; sourceIntent?: string }[] }>(c: T): T => {
     c.entities.find((e) => e.id === "suitcase-1")!.sourceIntent = "r-scrap";
     return c;
   };

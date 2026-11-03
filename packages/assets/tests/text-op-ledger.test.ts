@@ -20,8 +20,8 @@ import { CommandError, compileRuntime, planAssets } from "../src/index.js";
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const STYLE = path.join(ROOT, "fixtures/style-spec.halt-dusk.json");
 /** ⚠️ P1 · Q6a：HUD 闸**无条件**要求两件 ui（config 的 `hud` 结构上必填）—— 夹具补上占位面板/图标。 */
-const withHud = (doc: Record<string, unknown>): Record<string, unknown> => {
-  const out = structuredClone(doc) as { assets: unknown[] };
+const withHud = <T,>(doc: T): T => {
+  const out = structuredClone(doc) as T & { assets: unknown[] };
   out.assets.push({
     spec: {
       kind: "ui", id: "ui-hud", role: "HUD 面板", description: "占位面板",
