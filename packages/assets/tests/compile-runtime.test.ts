@@ -8,7 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_PLAYER_MOVE, auditScreenSpace, entityBox, jumpSpan, maxJumpHeight, parseGameConfig, STRUCTURED_CALL_ATTEMPTS, type GameDesignSpec } from "@game-maker/contracts";
-import { CommandError, DEFAULT_VIEWPORT, compileRuntime, gameConfigExample } from "../src/index.js";
+import { CommandError, DEFAULT_VIEWPORT, compileRuntime, compileTdGame, gameConfigExample } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 /** ⚠️ 真产物：票 40 的包 + 票 33 的配置（那份配置**本身就是**一份合法正例）。 */
@@ -68,6 +68,21 @@ const NINE_ANCHORS = [
   { x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 },
   { x: 0.5, y: 0 }, { x: 0.5, y: 1 }, { x: 0, y: 0.5 }, { x: 1, y: 0.5 }, { x: 0.5, y: 0.5 },
 ] as const;
+
+
+/** 读一份包的 manifest（D-02 的 role 判据要拿它当期望值）。 */
+const manifestOf = (pack = PACK) =>
+  JSON.parse(fs.readFileSync(path.join(pack, "manifest.json"), "utf8")) as {
+    assets: { id: string; role: string }[];
+  };
+/** 复制一份 manifest 到临时包目录并就地改 —— 换行 / 空 role 的边界用例用。 */
+const packWithRoles = (mutate: (m: ReturnType<typeof manifestOf>) => void) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gm-role-pack-"));
+  const m = manifestOf();
+  mutate(m);
+  fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(m));
+  return dir;
+};
 
 describe("⚠️ 提示词里的示例**必须自己先过 schema**（旧票 40 那条守门人，原样保留）", () => {
   it("`gameConfigExample` 是一份合法的 game-config", () => {
@@ -416,6 +431,92 @@ describe("§问话面：发出去的那一发", () => {
     const sprite = lineOf(sp.seen[0]!.messages[0].content[0].text, "prop-luggage-pile");
     expect(sprite).toContain("锚点");
     expect(sprite).not.toContain("九宫格");
+  });
+});
+
+// ── D-02：`role` 那一截两份清单都要印 ────────────────────────────────────────
+//
+// ⚠️ 判据是「**每条资产行**都印了该资产在 manifest 里的 role」—— 不是「整份 prompt 里出现过 role」：
+//   后者会被别的资产的 role 冒充（票 80 / 84 立的纪律：断的是那一行）。
+describe("§资源清单：每条资产行都带 manifest 的 `role`（D-02）", () => {
+  const spy = (input: unknown = GOOD) => {
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({ content: [{ type: "tool_use", name: "emit_game_config", input }], stop_reason: "tool_use" }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    return { f, seen };
+  };
+  const lineOf = (text: string, id: string) =>
+    text.split("\n").find((l) => l.startsWith(`- \`${id}\``)) ?? "";
+
+  it("横版清单：**每条资产行**都带 manifest 的 role（正向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    for (const a of manifestOf().assets) expect(lineOf(text, a.id), a.id).toContain(a.role);
+  });
+
+  it("同一 fixture 包：横版与塔防 body 印的是**同一组 role**（parity）", async () => {
+    // ⚠️ 塔防那一发借**同一个包**（横版包）的清单：它只验清单的渲染，不验那份关卡对这个包合不合法
+    //   （关卡的资产引用对不上 ⇒ 校验会报，但请求体已经发出去了）。
+    const tdGood = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/td-configs/counter-siege.json"), "utf8"));
+    const d = tmp();
+    fs.writeFileSync(path.join(d, "requirement.md"), "做一个守着柜台的塔防小关卡。");
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({
+          content: [
+            { type: "tool_use", name: "emit_game_config", input: GOOD },
+            { type: "text", text: JSON.stringify(tdGood) },
+          ],
+          stop_reason: "tool_use",
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+
+    await run(d, GOOD, { fetchImpl: f });
+    await compileTdGame({
+      requirementPath: path.join(d, "requirement.md"), packDir: PACK, outRoot: path.join(d, "out"),
+      transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: f,
+    });
+
+    const side: string = seen[0]!.messages[0].content[0].text;
+    const td = String(seen[1]!.messages[0].content);
+    for (const a of manifestOf().assets) {
+      expect(lineOf(side, a.id), `横版 · ${a.id}`).toContain(a.role);
+      expect(lineOf(td, a.id), `塔防 · ${a.id}`).toContain(a.role);
+    }
+  });
+
+  it("role 里的换行折成单空格 —— 清单保持「一行一资源」（边界）", async () => {
+    const first = manifestOf().assets[0]!;
+    const pack = packWithRoles((m) => { m.assets[0]!.role = "第一行\n第二行"; });
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { packDir: pack, fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    expect(lineOf(text, first.id)).toContain("第一行 第二行 · ");
+    expect(text).not.toContain("第一行\n第二行");
+  });
+
+  it("空 role 印 `（role 为空）`，行结构不破（边界）", async () => {
+    const first = manifestOf().assets[0]!;
+    const pack = packWithRoles((m) => { m.assets[0]!.role = ""; });
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { packDir: pack, fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    const line = lineOf(text, first.id);
+    expect(line).toContain("（role 为空） · ");
+    expect(line).toContain("动画：");   // 后面那几截还在 —— 不是整行被吞
   });
 });
 

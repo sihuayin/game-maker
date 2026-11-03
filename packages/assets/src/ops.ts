@@ -949,7 +949,23 @@ const nineSliceNote = (a: AssetPackEntry): string =>
       ? "**九宫格**（声明尺寸可与包内尺寸不同） · "
       : "**非九宫格**（声明尺寸必须与包内尺寸一致） · ";
 
-/** 把资源包渲染成模型能读的一张清单：id / 种类 / 尺寸 / **锚点落点** / 动画名 / 背景层。 */
+/**
+ * 把 `AssetPackEntry.role` 渲染成清单里那一截（D-02）。
+ *
+ * ⚠️ **两份清单共用这一份**：`role` 是契约里的必填字段，而从前只有塔防清单印它 ——
+ *   同一份包，模型在横版清单里看不见「这件是干什么的」。⚠️ 别就地把这句抄进任一份模板：
+ *   抄开之后两处就能漂，而**没有判据会红**（`nineSliceNote` 上面那段是同一个教训）。
+ *
+ * ⚠️ 连续空白折成单空格、去首尾：`role` 是自由文本，换行会把「一行一资源」的清单结构撕开。
+ * ⚠️ 返回值带着它后面那个 `· ` 分隔符（与 `nineSliceNote` 同款），空值印 `（role 为空）`，
+ *   保持一行一资源的结构（`role` 字段本身允许空串）。
+ */
+const roleNote = (a: AssetPackEntry): string => {
+  const role = a.role.replace(/\s+/g, " ").trim();
+  return role === "" ? "（role 为空） · " : `${role} · `;
+};
+
+/** 把资源包渲染成模型能读的一张清单：id / 种类 / 尺寸 / **role** / **锚点落点** / 动画名 / 背景层。 */
 function resourceBrief(manifest: AssetPackManifest): string {
   const lines: string[] = [];
   for (const a of manifest.assets) {
@@ -957,7 +973,7 @@ function resourceBrief(manifest: AssetPackManifest): string {
     const animText = anims.length === 0
       ? "（无动画，引用时不必给 anim）"
       : anims.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ");
-    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · 动画：${animText}`);
+    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${roleNote(a)}动画：${animText}`);
     if (a.layers && a.layers.length > 0)
       lines.push(`    背景层（远→近）：${a.layers.map((l) => `${l.name}(parallax ${l.parallax}${l.tileable?.x ? " 可平铺" : ""})`).join(" · ")}`);
   }
@@ -1362,6 +1378,7 @@ export const tdConfigExample = {
  * 资源包清单 —— `resourceBrief` 的塔防版。
  *
  * ⚠️ 带上 `role`（模型靠它认出「**哪个是砖**」）、**锚点**与**尺寸**。
+ *   ⚠️ `role` 那一截**不在这里写**：它由 `roleNote` 出，**两份清单共用同一份**（D-02）。
  *   ⚠️ 锚点那一项是补上的：第一版只写了 kind/size/role/animation，把锚点**悄悄丢了** ——
  *   而那正是「两份实现必然漂」的样子（横版那份是带锚点的）。
  *   塔防这边尤其不能丢：**砖的锚点必须正中**（票 07），而模型得看得到它才能照做。
@@ -1374,7 +1391,7 @@ function tdResourceBrief(m: AssetPackManifest): string {
   return m.assets.map((a) => {
     const anim = a.animations?.length ? `动画：${a.animations.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ")}` : "（无动画）";
     const layers = a.layers?.length ? ` · 背景层（远→近）：${a.layers.map((l) => l.name).join(" → ")}` : "";
-    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${a.role} · ${anim}${layers}`;
+    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${roleNote(a)}${anim}${layers}`;
   }).join("\n");
 }
 
