@@ -65,7 +65,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 
 ### 票流
 
-1. [01 D-02](issues/01-d02-role-prompt-parity.md)（task，AFK）
+1. [01 D-02](issues/01-d02-role-prompt-parity.md)（task，AFK）— **resolved**
 2. [02 B-02](issues/02-b02-deterministic-reachability.md)（task，AFK，blocked by 01）
 3. [03 publish-gate](issues/03-publish-gate-reachability.md)（task，AFK，blocked by 02）
 4. [04 D-01](issues/04-d01-viewport-passthrough.md)（task，AFK，blocked by 03）
@@ -78,6 +78,8 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 ## Decisions so far
 
 <!-- the index: one line per closed ticket, enough to judge relevance, then zoom the link for the detail the ticket holds -->
+
+- [01 D-02](issues/01-d02-role-prompt-parity.md)：`roleNote` 共享渲染，横版与塔防清单每条资产行都印 manifest `role`（空白折叠、空值占位）；commit `09e2b53`。
 
 ## Not yet specified
 
