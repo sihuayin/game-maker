@@ -66,7 +66,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 ### 票流
 
 1. [01 D-02](issues/01-d02-role-prompt-parity.md)（task，AFK）— **resolved**
-2. [02 B-02](issues/02-b02-deterministic-reachability.md)（task，AFK，blocked by 01）
+2. [02 B-02](issues/02-b02-deterministic-reachability.md)（task，AFK，blocked by 01）— **resolved**
 3. [03 publish-gate](issues/03-publish-gate-reachability.md)（task，AFK，blocked by 02）
 4. [04 D-01](issues/04-d01-viewport-passthrough.md)（task，AFK，blocked by 03）
 5. [05 D-03](issues/05-d03-modelhard-attribution.md)（task，AFK，blocked by 04）
@@ -80,6 +80,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 <!-- the index: one line per closed ticket, enough to judge relevance, then zoom the link for the detail the ticket holds -->
 
 - [01 D-02](issues/01-d02-role-prompt-parity.md)：`roleNote` 共享渲染，横版与塔防清单每条资产行都印 manifest `role`（空白折叠、空值占位）；commit `09e2b53`。
+- [02 B-02](issues/02-b02-deterministic-reachability.md)：`auditReachability` 进 `deterministic`（不进 `resampleable`），编译 / 汇合点硬拒；语料 152 份 config 新增 error 0；commit `2377716`。
 
 ## Not yet specified
 
