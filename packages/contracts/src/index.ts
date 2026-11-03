@@ -140,6 +140,7 @@ export * from "./visual-design.js";
 // 「一个文件 = 一个关卡」这条本来就允许关卡文件是不同形状，而判别式会让磁盘上
 // 已经存在的每一份横版关卡当场读不出来（那个坑 assetpack 的 v1→v2 踩过一次）。
 export * from "./game-config.js";
+export * from "./config-audit.js";
 export * from "./td-config.js";
 // ⚠️ **可达性**住 contracts 而**不在 `demo` 的纯层**（票 18 的裁决）：`packages/qa` 的白名单
 //   只有 `contracts`，而它要用 `entityBox` / `playerMoveOf` / `maxJumpHeight` 那三样原语 ——

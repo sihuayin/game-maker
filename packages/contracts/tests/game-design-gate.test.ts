@@ -140,13 +140,26 @@ describe("⚠️ 结构性空值 + 层内引用族 gate（票 10 的 Q4）", () 
 });
 
 describe("⚠️ 明确**不进** gate 的那几格 —— 空是设计陈述，不是偷懒", () => {
-  it("四个桶**全空**放行 —— 障碍跑式关卡（只有平台）是真的（与意图层把 `entities: []` 划出去同一条理由）", () => {
+  it("`enemies` / `npcs` / `interactables` **全空**放行 —— 障碍跑式关卡（只有平台）是真的（与意图层把 `entities: []` 划出去同一条理由）", () => {
     const r = parse({
-      enemies: [], npcs: [], interactables: [], resources: [],
-      levels: [{ ...DESIGN.levels[0], entities: [] }],
+      enemies: [], npcs: [], interactables: [],
+      levels: [{ ...DESIGN.levels[0], entities: ["r-part"] }],
       // ⚠️ 桶空了，引用就得跟着空 —— 这是 gate ⑥ 与「桶可空」两条**共存**的样子
     });
     expect(r.success).toBe(true);
+  });
+
+  it("⚠️ **`resources` 是唯一例外**（P1 · Q6b）：空数组拒、path 指得到那一格 —— config 的 objective 强制 N ≥ 1", () => {
+    const r = parse({
+      enemies: [], npcs: [], interactables: [], resources: [],
+      levels: [{ ...DESIGN.levels[0], entities: [] }],
+    });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      const hit = r.error.issues.find((i) => i.path.join(".") === "resources");
+      expect(hit, "必须有一条 path 指向 resources").toBeDefined();
+      expect(hit!.message).toMatch(/objective|pickup|chest/);
+    }
   });
 
   it("`winConditions` / `loseConditions` 为空放行；`difficulty` 整个缺席也放行（它是唯一可选字段）", () => {

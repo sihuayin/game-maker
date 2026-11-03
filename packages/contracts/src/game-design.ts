@@ -282,6 +282,24 @@ export const GameDesignSpecSchema = z.strictObject({
   for (const [label, n] of nonEmpty)
     if (n === 0) issue(label.split("."), `\`${label}\` 是空数组 —— 这一层说的就是「我们做成了什么」，做成了零条就是没干活`);
 
+  // ④b **至少一个 resource**（P1 · Q6b：design-to-config-residual-audit-v1 票 05 的 B1）
+  //
+  //   ⚠️ **它补的是设计层与 config 层之间的一处矛盾**：`game-config/v1` 的 objective 是
+  //     「捡齐 N 件再到达终点」，`N = pickup + chest`，而 `auditGameConfig` **强制** N ≥ 1；
+  //     设计层却允许 `resources: []`（提示词原文「可为空」）。⇒ 一份**合法**的设计会让 config
+  //     一步连拒 3 发后 `invalid`，已烧掉 3 次文本调用。
+  //   ⚠️ **为什么落在设计层、而不是放行 config**：`interactables` 可能落成 goal / solid
+  //     （purpose 是开放文本，不可机读），不能保证产出一个 pickup/chest；只有 `resources` 桶
+  //     在语义上承诺「可拾取之物」。⇒ 要求设计**至少写一个 resource** 是唯一可机械判定的修法。
+  //   ⚠️ 它是 `schema` 档（重采样）：模型看得到自己的设计、三发内可补；
+  //     与 `game-design/src/compile-design.ts` 的失败分档同款，不改下游任何契约。
+  //   ⚠️ 语料自证（2026-11-03）：37/37 份真实设计 `resources` 非空 ⇒ 零误伤。
+  if (v.resources.length === 0)
+    issue(["resources"],
+      "`resources` 是空数组 —— 本代 config 的 objective 是「捡齐 N 件再到达终点」，" +
+      "而 N = pickup + chest，契约强制 N ≥ 1；`interactables` 可能落成 goal / solid，不能保证。" +
+      "请至少写一个 `resources[]` 条目（可拾取之物）。");
+
   // ⑤ id 在「`player` + 四桶」上唯一（一个实体只有一种身份：票 03 Q3 · **票 42 Q7 并入 `player`**）
   //
   //   ⚠️ **2026-10-13（票 42）：`player` 原本不在这个集合里。** 它是个独立的 `strictObject`

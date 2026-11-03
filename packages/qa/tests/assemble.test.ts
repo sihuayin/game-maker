@@ -47,6 +47,9 @@ function stage(): QaContext {
   const configPath = path.join(runDir, "game-config.json");
   const cfg = JSON.parse(fs.readFileSync(configPath, "utf8")) as { entities: { id: string; sourceIntent?: string }[] };
   cfg.entities.find((e) => e.id === "carriage")!.sourceIntent = "e-drone";
+  // ⚠️ P1 · Q6b 起设计层要求 `resources` 非空：CANNED.design 补了 `r-scrap`，
+  //   交叉验证要 config 与 VDS 都覆盖它（bounds 与 `suitcase-1` 的盒子逐像素相同 ⇒ 无几何警告）。
+  cfg.entities.find((e) => e.id === "suitcase-1")!.sourceIntent = "r-scrap";
   write(runDir, "game-config.json", cfg);
   write(runDir, "game-intent.json", CANNED.intent);
   write(runDir, "game-design.json", CANNED.design);
@@ -58,6 +61,7 @@ function stage(): QaContext {
     objects: [
       { id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" },
       { id: "e-drone", role: "hazard", bounds: { x: 768, y: 202, w: 64, h: 48 }, layer: 10, fill: "palette:1", sourceIntent: "e-drone" },
+      { id: "r-scrap-vds", role: "pickup", bounds: { x: 292, y: 224, w: 16, h: 16 }, layer: 10, fill: "palette:2", sourceIntent: "r-scrap" },
     ],
   });
   return {
@@ -208,15 +212,25 @@ describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）
   // 设计（CANNED.design）的 enemies 桶里有 e-drone；这里给 config 造一个 id 相同的实体。
   const ID = "e-drone";
   const drone = { id: ID, role: "hazard", bounds: { x: 100, y: 200, w: 16, h: 16 }, layer: 10, fill: "palette:0", sourceIntent: ID };
+  // ⚠️ P1 · Q6b：CANNED.design 的 `resources` 里有一条 `r-scrap` —— 本组每组现场都要
+  //   给它一个 config 实体 + 一个 VDS object，否则会多出一条与本组无关的「缺失」。
+  //   `suitcase-1` 的盒子是 (292,224) 16×16 ⇒ 尺寸逐像素相同，不产生几何警告。
+  const scrap = { id: "r-scrap-vds", role: "pickup", bounds: { x: 292, y: 224, w: 16, h: 16 }, layer: 10, fill: "palette:1", sourceIntent: "r-scrap" };
   const vds = (objects: unknown[]) => ({
     format: "visual-design/v1", viewport: { w: 480, h: 270 },
-    style: { visualWorldFormat: "visual-world/v1" }, objects,
+    style: { visualWorldFormat: "visual-world/v1" }, objects: [...objects, scrap],
   });
   /** 真 config（last-train）+ 可选一个 `sourceIntent=ID` 的实体（kind 由参数给；null = 不加 ⇒ 制造「缺失」）。 */
   const configWith = (kind: string | null) => {
     const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
+    c.entities.find((e: { id: string }) => e.id === "suitcase-1").sourceIntent = "r-scrap";
     // ⚠️ entity-identity-v1 票 04：join 键是 `sourceIntent`（不再是 `id`），实体要带它才查得到。
     if (kind !== null) c.entities.push({ id: ID, sourceIntent: ID, kind, at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
+    return c;
+  };
+  /** ⚠️ 1:N 那两条自己拼 config，同样要补 `r-scrap` 的回指。 */
+  const withScrap = (c: { entities: { id: string; sourceIntent?: string }[] }) => {
+    c.entities.find((e) => e.id === "suitcase-1")!.sourceIntent = "r-scrap";
     return c;
   };
   const vcFindings = (r: QAReport) => r.failures.filter((f) => f.judgement === "visual-config-coherence");
@@ -257,7 +271,7 @@ describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）
 
   it("entity-identity-v1 票 04：1:N 合法 —— 同 sourceIntent 多个实体都 kind 在允许集合 ⇒ 无 error", async () => {
     const ctx = stage();
-    const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
+    const c = withScrap(JSON.parse(fs.readFileSync(CONFIG, "utf8")));
     c.entities.push({ id: "e-drone-a", sourceIntent: ID, kind: "hazard", at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
     c.entities.push({ id: "e-drone-b", sourceIntent: ID, kind: "hazard", at: { x: 760, y: 230 }, asset: "hazard-sweeping-carriage" });
     write(ctx.runDir, "game-config.json", c);
@@ -267,7 +281,7 @@ describe("§票 07 · VDS↔GameConfig 交叉验证（设计桶↔kind 家族）
 
   it("entity-identity-v1 票 04：1:N 串桶 —— 其中一个实体 kind 越界 ⇒ error", async () => {
     const ctx = stage();
-    const c = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
+    const c = withScrap(JSON.parse(fs.readFileSync(CONFIG, "utf8")));
     c.entities.push({ id: "e-drone-a", sourceIntent: ID, kind: "hazard", at: { x: 720, y: 230 }, asset: "hazard-sweeping-carriage" });
     c.entities.push({ id: "e-drone-b", sourceIntent: ID, kind: "decor", at: { x: 760, y: 230 }, asset: "hazard-sweeping-carriage" });
     write(ctx.runDir, "game-config.json", c);

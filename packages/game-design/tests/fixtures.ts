@@ -47,7 +47,7 @@ export const designFromModel = (over: Partial<GameDesignSpec> = {}): GameDesignS
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑", "跳"], goals: ["在天黑前抵达"] },
   enemies: [{ id: "e-drone", behavior: "沿月台往复巡逻", threat: "接触即伤" }],
   npcs: [], interactables: [],
-  resources: [],
+  resources: [{ id: "r-part", purpose: "收集目标" }],
   world: { theme: "废土", setting: "铁轨旁的废墟", structure: "三条横带：铁轨 / 月台 / 远山" },
   levels: [{ id: "l-1", purpose: "教学", layout: "左侧出发，右侧终点", entities: ["e-drone"] }],
   progression: { model: "linear", description: "三关" },

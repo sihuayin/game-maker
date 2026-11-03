@@ -412,4 +412,13 @@ describe("背景画布覆盖：提示词把视口高/宽的下限写给模型（
     expect(prompt).toMatch(/高框/);
     expect(prompt).toMatch(/方框/);
   });
+
+  it("⚠️ P1 · Q6a：HUD 要求**无条件**出现 —— 设计要求里没有 `hud:screen-space` 也一样", () => {
+    const noHud = { ...DESIGN, runtimeRequirements: DESIGN.runtimeRequirements.filter((c) => c !== "hud:screen-space") };
+    const p = assetPlanPrompt({ design: noHud, vws: VWS, echo: { styleRef: "stylespec.json", styleId: "wasteland" }, viewport: { w: 480, h: 270 } });
+    // ⚠️ 理由是 **config 的 `hud` 结构上必填** —— 不是设计声明了能力
+    expect(p).toMatch(/`hud` 结构上必填/);
+    expect(p).toMatch(/ninePatch/);
+    expect(p).toMatch(/kind:"ui"/);
+  });
 });

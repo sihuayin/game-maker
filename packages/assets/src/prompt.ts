@@ -916,11 +916,10 @@ export function assetPlanPrompt(input: {
 
 # 要做的是一个什么样的游戏（GameDesignSpec）
 ${designBrief(design)}
-${design.runtimeRequirements.includes("hud:screen-space") ? `
-⚠️ **本代外壳有屏幕空间 HUD**（\`runtimeRequirements\` 含 \`hud:screen-space\`）—— 清单**必须**产出两件 \`kind:"ui"\` 资源：
+⚠️ **本代 config 的 \`hud\` 结构上必填**（与设计有没有声明 \`hud:screen-space\` 无关）—— 清单**必须**产出两件 \`kind:"ui"\` 资源：
 1. 一件**带 \`ninePatch\`** 的 ui **面板**（HUD 面板要能被拉伸到任意尺寸）；
 2. 一件**不带 \`ninePatch\`** 的 ui **图标**（点亮 pip，固定尺寸、与资源尺寸一致）。
-缺它们，config 那一步只能拿 sprite 顶 HUD、必被「要的是 ui」拒收。` : ""}
+缺它们，config 那一步只能拿 sprite 顶 HUD、必被「要的是 ui」拒收。
 
 # 这个世界长什么样（VisualWorldSpec）
 ⚠️ 「该造哪些东西、它们该有什么气质」**照它写** —— 尤其是**空间分层**（背景几层、每层是什么）

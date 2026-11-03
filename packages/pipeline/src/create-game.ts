@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  auditReferences, carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
+  auditConfigPipeline, auditReferences, DEFAULT_HUD_LINE_HEIGHT, carryOnError, CommandError, DESIGN_ATTEMPTS_FILE, designAttemptsOfError, formatIssues, GameDesignSpecSchema, parseAssetPack,
   parseGameConfig, parseRecipe, QA_JUDGEMENTS, QAReportSchema, qaVerdict,
   buildMechanicCoverage, mechanicCoverageProblem, RUN_LEDGER_FORMAT, summarizeCalls, VISUAL_WORLD_ATTEMPTS_FILE, visualWorldAttemptsOfError,
   type AssetPackManifest, type AssetRecipe, type CharacterDNAFile, type GameConfig, type GameDesignSpec,
@@ -611,6 +611,30 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
   //   它们刚刚才被写下去，而读回来的那个形状才是**判据认过**的那一份。
   const config = parseGameConfig(readRunJson(runDir, RUN_ARTIFACT.config));
   if (!config.ok) throw new Error(`刚写下的 config 读不回来：${config.errors.slice(0, 3).join("；")}`);
+
+  // ── ⚠️ **汇合点的统一确定性复验**（P1 · Q5：design-to-config-residual-audit-v1 票 05）──────
+  //
+  //   ⚠️ **两条路径都在这里汇合**：`reuseConfig`（只过了 schema + 引用族）与 `compileRuntime`
+  //   （过完自己的审计再落盘）。以前汇合点**什么都不跑** ⇒ 人工改配置 / 改清单复验时，
+  //   引用族以外的确定性判据全被绕过（屏幕空间、身份、层覆盖、kind 锁……）。
+  //   ⇒ 只调 `auditConfigPipeline` 那**一个**入口：两条路径同一份实现、同一个顺序。
+  //   ⚠️ 取 `deterministic` 那一档：编译路径已经在重采样循环里跑过 `resampleable`，
+  //      这里再跑一次是**幂等**的；而 `reuseConfig` 没有重采样可言 ⇒ 直接硬失败、不落盘。
+  //   ⚠️ 多关卡：`BuildInput` 今天没有 `levelId`，与 `compileRuntime` 一致取 `levels[0]`
+  //      （多关卡贯通是已知限制，另立 effort）。
+  const pipelineIssues = auditConfigPipeline(config.value, {
+    manifest: manifest.value,
+    design: designParsed.data,
+    levelId: designParsed.data.levels[0]?.id,
+    viewport: input.viewport ?? DEFAULT_VIEWPORT,
+    ...(input.hudLineHeight !== undefined ? { hudLineHeight: input.hudLineHeight } : {}),
+  }).deterministic.filter((i) => i.severity === "error");
+  if (pipelineIssues.length > 0)
+    throw new CommandError("invalid",
+      `运行目录里的 config **过不了确定性复验**（${pipelineIssues.length} 条硬失败；reuseConfig 与编译两条路径共用这一关）：\n` +
+      pipelineIssues.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
+      "\n⚠️ 这一关不重采样、不落盘 —— 改配置或改清单，不是再去抽一次 config。");
+
 
   // ── QA：**默认跑**（票 20 的 Q3），而它的硬失败**阻断**（R3 · 票 20 的 Q4）──────────
   let qa: QAReport | undefined;

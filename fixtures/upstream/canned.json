@@ -126,7 +126,12 @@
     ],
     "npcs": [],
     "interactables": [],
-    "resources": [],
+    "resources": [
+      {
+        "id": "r-scrap",
+        "purpose": "散落在废墟中的可拾取废料，收集后计入终点条件"
+      }
+    ],
     "world": {
       "theme": "废土",
       "setting": "铁轨旁的废墟",
@@ -138,7 +143,8 @@
         "purpose": "教学",
         "layout": "左侧出发、右侧终点",
         "entities": [
-          "e-drone"
+          "e-drone",
+          "r-scrap"
         ]
       }
     ],
@@ -237,7 +243,8 @@
           "x": 120,
           "y": 220
         },
-        "asset": "ui-pip"
+        "asset": "r-scrap",
+        "sourceIntent": "r-scrap"
       },
       {
         "id": "e-drone",
@@ -256,7 +263,7 @@
           "x": 440,
           "y": 220
         },
-        "asset": "ui-pip"
+        "asset": "e-drone"
       }
     ],
     "hud": {
@@ -372,7 +379,13 @@
             "w": 48,
             "h": 8
           },
-          "required": true
+          "required": true,
+          "ninePatch": {
+            "left": 2,
+            "right": 2,
+            "top": 2,
+            "bottom": 2
+          }
         },
         "source": {
           "kind": "drawlist"
@@ -413,6 +426,27 @@
           "size": {
             "w": 32,
             "h": 32
+          },
+          "required": true
+        },
+        "source": {
+          "kind": "drawlist"
+        }
+      },
+      {
+        "spec": {
+          "kind": "sprite",
+          "id": "r-scrap",
+          "role": "废料",
+          "description": "一小堆可拾取的废料",
+          "styleId": "halt-dusk",
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "size": {
+            "w": 16,
+            "h": 16
           },
           "required": true
         },

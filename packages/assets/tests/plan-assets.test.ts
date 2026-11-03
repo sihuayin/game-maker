@@ -35,6 +35,22 @@ const withCoverage = (recipe: unknown): Record<string, unknown> => {
       source: { kind: "drawlist" },
     });
   }
+  // ⚠️ P1 · Q6a：HUD 闸**无条件**要求两件 ui（config 的 `hud` 结构上必填）——
+  //   这两件是测试响应的占位，不参与本文件任何被测协议。
+  doc.assets.push({
+    spec: {
+      kind: "ui", id: "ui-hud", role: "HUD 面板", description: "占位面板",
+      styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 48, h: 8 }, required: true,
+      ninePatch: { left: 2, right: 2, top: 2, bottom: 2 },
+    },
+    source: { kind: "drawlist" },
+  }, {
+    spec: {
+      kind: "ui", id: "ui-pip", role: "HUD 图标", description: "占位图标",
+      styleId: "style-ref", anchor: { x: 0, y: 0 }, size: { w: 4, h: 4 }, required: true,
+    },
+    source: { kind: "drawlist" },
+  });
   return doc;
 };
 
