@@ -98,6 +98,10 @@ Predecessors:
    [02 D 类当前源码复核](issues/02-d-class-audit.md)（research）并行。
 2. [03 统一裁定](issues/03-disposition-ruling.md)（grilling，HITL，依赖 01/02）逐原子项处置。
 3. [03 统一裁定](issues/03-disposition-ruling.md) 已收口：4 项修复、7 项推迟、0 剔除、0 范围变更。方案票与收口票的切法留到下一轮；裁定不构成实施授权。
+4. [04 publish-gate 的 config 身份绑定](issues/04-publish-gate-config-identity.md)（research，AFK）核实 B-02 第二半是否构成独立缺口。
+5. [05 方案票切法](issues/05-plan-ticket-slicing.md)（grilling，HITL，依赖 04）决定 4 项修复如何开票；按决定创建方案票。本图仍停在审批门前。
+6. [06 合并方案](issues/06-consolidated-plan.md)（grilling，HITL）产出五项修复的决策就绪方案 `plan.md`。
+7. [07 收口 / P1 审批包](issues/07-closeout-approval-package.md)（grilling，HITL，依赖 06）汇总方案、逐项契约批准问题与实施授权边界。
 
 ## Decisions so far
 
@@ -105,14 +109,12 @@ Predecessors:
 - [B 类当前源码复核：Q2 / Q7 / Q10(a)(b)(c) / interactables / decor](issues/01-b-class-audit.md)：B-01…B-07 在 P1 后全部仍成立，P1 未消除任何一项。Q2 仍无 `sprite` 内部语义（`semanticClass` 必填会缺 1599 件资产）；`reachability` 仍只在 QA（134 对重判 0 新 error）；地形/layout 仍是 prose、无 slope 槽位；`interactables` 同桶误归属与 `decor` 无锁仍是既有冻结限制（`decor` 锁 `sprite|animation` 会误伤 39 个 config 副本，排除 background 则 0）。E2 194 tests、E3 5243 JSON 重判。**处置未定，归 03。**
 - [D 类当前源码复核：viewport / role / modelHard / 设计 goal 桶](issues/02-d-class-audit.md)：D-01…D-04 在 P1 后仍全部成立（E1+E2/E3）。viewport 仍有规划/VDS/compile/site 参数分叉（常量同值 480×270，生产壳无可观察失败；E3 500×280 复现）；横版清单不打印 `role`、塔防打印；三发 body 逐字相同、`lastError` 不回灌，包根因仍写「模型错」；设计无 goal 桶且 `winConditions` 可为空，config 靠孤儿 gate，设计侧判据 43/43 误伤。**处置未定，归 03。**
 - [统一裁定：B/D 11 个原子项的处置](issues/03-disposition-ruling.md)：10 个口径问题收敛为 4 修复（B-02 deterministic、D-01 贯通 viewport、D-02 打印 role、D-03 限定归因/反馈）、7 推迟、0 剔除、0 范围变更；D-03 不新增对外归因码；B-02 第二半 publish-gate 身份绑定独立待核实；方案票切法留到下一轮。
+- [publish-gate 的 config 身份绑定](issues/04-publish-gate-config-identity.md)：**独立于 B-02 的真实缺口**（E1+E2+E3）。只有 standalone `site` / `assemble_site` 中招；`build` / `create --yes` / MCP `create_game` 的 QA 与站点用同一 config。零成本复现：config A 的绿报告发布带 100px 墙的 config B，exit 0（B 有 3 条 reachability error）。实际漏网点是 `reachability` 与第七条 `visual-config-coherence`（基线实为 **7** 条判据，非 6 条；站点不重跑这两条）。`QAReport.subject` 是 strict 三字段，承载 config 身份须 Q5 单列；不改契约的替代是 gate 现场重跑 `auditReachability`。归属未裁定，归 05。
+- [方案票切法：4 项修复如何开票](issues/05-plan-ticket-slicing.md)：裁定一份**合并方案票**（5 个修复章节：B-02、D-01、D-02、D-03、publish-gate reachability）+ 一张**收口 / P1 审批包票**；publish-gate 作为独立第五项（范围 4→5），只修 `reachability`，第七条 `visual-config-coherence` 按 Q8 交接；契约候选全部保持未批准，批准留到收口；零付费验证 ≠ 付费模型效果验收。
 
 ## Not yet specified
 
-- **方案票的数量与切法**：03 已确认 4 项修复（B-02、D-01、D-02、D-03），但按用户裁定，分组 / 逐项开票留到下一轮；不得预先展开为实施承诺。
-- **收口票与 P1 审批包形态**：是否沿用 P0 的 `final-report.md` + 审批问题清单，留到下一轮。
-- **付费模型验证的方案边界**：D-02 / D-03 的收益需付费验证；方案须写清零付费可验证内容、付费验证要回答的问题、预算与授权门槛、回退 / 停止条件。具体问题清单待方案票起草时确定。
-- **B-02 第二半：publish-gate 的 config 身份绑定**：`publish-gate` 只钉 pack、不钉 config；不得视为被 reachability 修复自动解决。待核实是否构成独立缺口、是否需修复或另立 effort；不并入 B-02 修改范围。
-- **是否出现新的 B/D 原子项**：03 裁定 publish-gate 一项暂记待核实，不加入 11 项原子集；若后续核实构成独立缺口，按 Q3 记录证据与归属后再决定。
+（无。已知可裁问题已全部进入 06 / 07；07 的审批包形态在 06 完成后由 HITL 决定。）
 
 ## Out of scope
 
@@ -124,4 +126,5 @@ Predecessors:
 - **Level Playability V1 本身**：本图只在推迟项里留交接说明，不替它做决定。
 - **静默重开既有裁定**：`entity-identity-v1.1` 的 `interactables` 已知限制、P0/P1 已裁定项与
   P0 `final-report.md` 的 Out-of-scope 列表。
+- **publish-gate 的完整身份体系**：第七条 `visual-config-coherence`、VDS/design 身份、runDir 跨阶段一致性，以及手写 config 工作流的身份策略；第五项只修 `reachability`，其余按 Q8 交接 / 后续 effort。
 - **推送 `main`、`reset`/`clean`、覆盖历史 run/pack/site、改写历史验收证据**。
