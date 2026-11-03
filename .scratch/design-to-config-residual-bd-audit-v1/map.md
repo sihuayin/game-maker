@@ -100,12 +100,13 @@ Predecessors:
 3. [03 统一裁定](issues/03-disposition-ruling.md) 已收口：4 项修复、7 项推迟、0 剔除、0 范围变更。方案票与收口票的切法留到下一轮；裁定不构成实施授权。
 4. [04 publish-gate 的 config 身份绑定](issues/04-publish-gate-config-identity.md)（research，AFK）核实 B-02 第二半是否构成独立缺口。
 5. [05 方案票切法](issues/05-plan-ticket-slicing.md)（grilling，HITL，依赖 04）决定 4 项修复如何开票；按决定创建方案票。本图仍停在审批门前。
-6. [06 合并方案](issues/06-consolidated-plan.md)（grilling，HITL）产出五项修复的决策就绪方案 `plan.md`。
-7. [07 收口 / P1 审批包](issues/07-closeout-approval-package.md)（grilling，HITL，依赖 06）汇总方案、逐项契约批准问题与实施授权边界。
+6. [06 合并方案](issues/06-consolidated-plan.md)（grilling，HITL）**已收口**：产出 [`plan.md`](plan.md)，五项按风险顺序成文；D-01 全链含站点、API 增量必须进 07；D-03 只改编译循环且归因不确定一律 config 可修；publish-gate 共享 gate 现场复验；付费验证写入但不执行。
+7. [07 收口 / P1 审批包](issues/07-closeout-approval-package.md)（grilling，HITL，依赖 06）**依赖已满足，当前 frontier**：汇总方案、逐项契约批准问题与实施授权边界。
 
 ## Decisions so far
 
 <!-- the index: one line per closed ticket, enough to judge relevance, then zoom the link for the detail the ticket holds -->
+- [合并方案：五项修复的决策就绪方案](issues/06-consolidated-plan.md)：D-02 / B-02 / publish-gate / D-01 / D-03 五项按风险顺序形成 [plan.md](plan.md)；D-01 全链含站点、`viewport` API 增量必须进 07；D-03 只改编译循环、归因不确定一律 config 可修；publish-gate 共享 `assertPublishableQa` 现场复验 reachability；付费验证写入但不执行。
 - [B 类当前源码复核：Q2 / Q7 / Q10(a)(b)(c) / interactables / decor](issues/01-b-class-audit.md)：B-01…B-07 在 P1 后全部仍成立，P1 未消除任何一项。Q2 仍无 `sprite` 内部语义（`semanticClass` 必填会缺 1599 件资产）；`reachability` 仍只在 QA（134 对重判 0 新 error）；地形/layout 仍是 prose、无 slope 槽位；`interactables` 同桶误归属与 `decor` 无锁仍是既有冻结限制（`decor` 锁 `sprite|animation` 会误伤 39 个 config 副本，排除 background 则 0）。E2 194 tests、E3 5243 JSON 重判。**处置未定，归 03。**
 - [D 类当前源码复核：viewport / role / modelHard / 设计 goal 桶](issues/02-d-class-audit.md)：D-01…D-04 在 P1 后仍全部成立（E1+E2/E3）。viewport 仍有规划/VDS/compile/site 参数分叉（常量同值 480×270，生产壳无可观察失败；E3 500×280 复现）；横版清单不打印 `role`、塔防打印；三发 body 逐字相同、`lastError` 不回灌，包根因仍写「模型错」；设计无 goal 桶且 `winConditions` 可为空，config 靠孤儿 gate，设计侧判据 43/43 误伤。**处置未定，归 03。**
 - [统一裁定：B/D 11 个原子项的处置](issues/03-disposition-ruling.md)：10 个口径问题收敛为 4 修复（B-02 deterministic、D-01 贯通 viewport、D-02 打印 role、D-03 限定归因/反馈）、7 推迟、0 剔除、0 范围变更；D-03 不新增对外归因码；B-02 第二半 publish-gate 身份绑定独立待核实；方案票切法留到下一轮。

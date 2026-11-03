@@ -1,8 +1,8 @@
 # 合并方案：五项修复的决策就绪方案
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber · 2026-11-03
 Blocked by: —
 Map: ../map.md
 
@@ -72,3 +72,45 @@ Map: ../map.md
 - 本票 `## Answer` 记录方案摘要与文件指针；`Status` 改 `resolved`。
 - 本票是 HITL：技术研究可由代理起草，但第五节范围、契约候选、跨项排序与最终接受
   必须由用户确认。
+
+## Answer
+
+**裁定日期**：2026-11-03 · **裁定人**：amber · **性质**：HITL。
+**产出**：[`../plan.md`](../plan.md)（五项各一节 + 公共章节；章节顺序即实施顺序）。
+
+### 1. Q1–Q6 裁定
+
+| 问题 | 裁定 |
+|---|---|
+| Q1 D-01 修复面 | **A：全链贯通，包含站点**；`UnderstandingInput.viewport?`、`AssembleOptions.viewport?`、`SiteOptions.viewport?`，并让 `buildWorld` / `buildTdWorld` 接受可选 viewport；CLI/MCP 不加参数、默认不变、不改 Runtime。站点不得留给 Q8。 |
+| Q2 D-03 归因与循环 | **只改编译循环**（`ops.ts:1174-1215`）；规划循环、塔防循环推迟并 Q8 交接。归因采用**保守兜底**：能力不明确、实体 id 不在 config、decor 无 kind 锁等不确定情形一律 config 可修，不硬拒；只有明确清单根因才把 `attempts` 从 3 降为 1。 |
+| Q3 publish-gate | **A：共享 `assertPublishableQa`**；非 TD、`configPath` 存在时现场重跑 `auditReachability`；缺省跳过（四个真实发布入口都传 `configPath`，实现时须逐入口复核）；不改契约、不扩第七条。 |
+| Q4 契约候选 | 全部维持原状态：B-02 可选 `unreachable` 码提出但不默认采用；**D-01 API 增量必须进入 07 单列审批**；publish-gate `subject.configChecksum` 仅备选；D-03 对外归因码不纳入。D-01 若审批不通过 ⇒ **标记推迟**，不得退化成只合并常量后声称完成。 |
+| Q5 付费验证 | 写入方案：2 场景（config 可修反馈 / 清单根因硬拒）、≤6 次文本调用、零生图、零站点重建、既有 fixture；**本轮不授权执行**。D-03 反馈不通过 ⇒ 只回退反馈部分，保留归因与硬拒。 |
+| Q6 实施顺序 | **A：D-02 → B-02 → publish-gate → D-01 → D-03**；每项独立测试、独立回退；B-02 与 publish-gate 复用 `auditReachability` 但各自保留独立入口测试。 |
+
+### 2. D-03 保守归因的六条细则（写入 `plan.md` §5.2）
+
+1. 所需能力先从 config 语义与 `where` 推导，`where` 只作索引；
+2. `entity "<id>"` 必须在 config 中确认实体语义类型，确认不了 ⇒ config 可修；
+3. `entity-state-frames` 必须确认 code 命中且实体 kind 确实是 `chest` / `danger`，才追加「≥2 帧」条件；
+4. `hud.panel` / `hud.pip`、`player` / `player.anims.*`、`scene.background` 使用明确结构映射；
+5. 只有「能力明确 + manifest 无任何满足能力的资产 + 错误确实无法由 config 满足」三者同时成立 ⇒ 清单根因；
+6. 任何不确定 ⇒ config 可修，不硬拒。
+
+**明确不归包根因**：包里没有某个 id、但 manifest 有同 kind 资产 —— 可能是幻觉 id，模型可换一个；
+只有所需能力在 manifest 中完全不存在（如 hud 需要 ui 而整包无 ui）才硬拒。
+
+### 3. 方案边界
+
+- `plan.md` 是**决策就绪方案**，不构成实施授权；生产代码修改、契约批准、付费验证各自另批。
+- 五项进入同一份方案 ≠ 一次性批准；允许逐项批准、逐项实施、逐项回退。
+- publish-gate 只处理 `reachability`；第七条 `visual-config-coherence` 按 Q8 交接。
+- D-03 归因不确定时不得硬拒；只有明确清单根因才能减少重采样次数。
+- 零付费验证 ≠ 付费模型效果验收；D-02 只证明 body 含 `role`。
+- 未修改生产代码 / 测试 / fixture / 契约 / 历史证据；未 commit、未建分支、未推送；零付费、零模型调用、零生图。
+
+### 4. 下一轮
+
+- [07 收口 / P1 审批包](07-closeout-approval-package.md) 的 blocker（本票）已满足，成为当前 frontier。
+- 07 需要的输入：`plan.md` 的五项摘要、§9 契约候选清单、§11 待审批问题清单、§10 Q8 交接。
