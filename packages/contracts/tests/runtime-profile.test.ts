@@ -85,7 +85,7 @@ describe("§注册表与解析（R4 的「成族」· 票 05 Q9）", () => {
       format: GAME_DESIGN_FORMAT,
       game: { title: "t", genre: "platformer", camera: "side", runtimeProfile: { id: PLATFORMER_V1.id, version: PLATFORMER_V1.version } },
       coreLoopSteps: ["走"], player: { id: "p", role: "r", abilities: ["run"], goals: ["走到头"] },
-      enemies: [], npcs: [], interactables: [], resources: [],
+      enemies: [], npcs: [], interactables: [], resources: [{ id: "r", purpose: "p" }],
       world: { theme: "t", setting: "s", structure: "st" },
       levels: [{ id: "l-1", purpose: "p", layout: "左到右", entities: [] }],
       progression: { model: "m", description: "d" },

@@ -117,3 +117,61 @@ describe("§空色板前移（CAP-SPEC-17 · 单独 `plan` 入口）", () => {
     expect(recipeFiles(x)).toHaveLength(0);
   });
 });
+
+// ── P1 · Q8（design-to-config-residual-audit-v1 票 05）：覆盖闸也看 **kind** ──────
+//
+// ⚠️ 阶段理由（用户 2026-11-02 的裁定）：下游 config 的 kind 锁在**生图之后**拦错，
+//   覆盖闸在**付费生图之前**拦错 —— 同一条事实、两个阶段，不能互相替代。
+// ⚠️ 桶→kind 由 `DESIGN_BUCKET_ASSET_KINDS` 从 `DESIGN_BUCKET_KINDS` 派生（`npcs`/`decor` 豁免）。
+describe("§P1 · Q8：覆盖闸的 kind 检查", () => {
+  it("阴性：敌人那件被改成 ui（id 不变）⇒ 拒，点名 id 与期望 kinds，三发 schema，不落盘", async () => {
+    const recipe = structuredClone(RECIPE);
+    const enemy = recipe.assets.find((a) => a.spec.id === "enemy-wasteland")!;
+    // `UiSpec` 不许带 animations（`AssetSpecSchema` 的硬规则）；其余字段照旧。
+    const { animations: _drop, ...rest } = enemy.spec as typeof enemy.spec & { animations?: unknown };
+    void _drop;
+    enemy.spec = { ...rest, kind: "ui" } as typeof enemy.spec;
+    const x = stage(recipe);
+    const e = await run(x).catch((err: unknown) => err);
+    expect(e).toBeInstanceOf(CommandError);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect((e as CommandError).message).toMatch(/enemy-wasteland/);
+    expect((e as CommandError).message).toMatch(/sprite \/ animation/);
+    expect(x.seen).toHaveLength(STRUCTURED_CALL_ATTEMPTS);
+    expect(recipeFiles(x), "一页都不落盘").toHaveLength(0);
+  });
+
+  it("阴性：**`characterId` 覆盖**了、但覆盖它的那件 kind 错 ⇒ 同样拒", async () => {
+    const recipe = structuredClone(RECIPE);
+    recipe.assets = recipe.assets.filter((a) => a.spec.id !== "enemy-wasteland");
+    recipe.assets.push({
+      spec: {
+        kind: "ui", id: "drone-ui", role: "无人机图标", description: "拿 UI 顶敌人",
+        styleId: "wasteland", anchor: { x: 0.5, y: 1 }, size: { w: 32, h: 32 }, required: true,
+        characterId: "enemy-wasteland",
+      },
+      source: { kind: "drawlist" },
+    } as unknown as (typeof recipe.assets)[number]);
+    const x = stage(recipe);
+    const e = await run(x).catch((err: unknown) => err);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect((e as CommandError).message).toMatch(/enemy-wasteland/);
+    expect((e as CommandError).message).toMatch(/覆盖它的是 .*（ui）/);
+  });
+
+  it("阳性：`npcs` 桶由 ui 覆盖 ⇒ 放行（`decor` 豁免，不误拒）", async () => {
+    const design = structuredClone(DESIGN);
+    design.npcs = [{ id: "n-trader", role: "废土商人", interaction: "用零件换补给" }];
+    const recipe = structuredClone(RECIPE);
+    recipe.assets.push({
+      spec: {
+        kind: "ui", id: "n-trader", role: "商人头像", description: "按设计桶的豁免走 ui",
+        styleId: "wasteland", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true,
+      },
+      source: { kind: "drawlist" },
+    } as unknown as (typeof recipe.assets)[number]);
+    const x = stage(recipe, design);
+    await run(x);
+    expect(recipeFiles(x).some((n) => /^v\d+\.json$/.test(n))).toBe(true);
+  });
+});

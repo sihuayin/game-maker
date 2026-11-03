@@ -34,9 +34,11 @@ const DESIGN: GameDesignSpec = {
   coreLoopSteps: ["探索废墟", "收集零件"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑", "跳"], goals: ["在天黑前抵达"] },
   enemies: [],
-  npcs: [], interactables: [], resources: [],
+  npcs: [], interactables: [],
+  // ⚠️ P1 · Q6b：设计层要求至少一个 resource；`pickup-can` 是夹具里真实存在的 sprite。
+  resources: [{ id: "pickup-can", purpose: "可拾取的补给品" }],
   world: { theme: "废土", setting: "铁轨旁的废墟", structure: "三条横带：铁轨 / 月台 / 远山" },
-  levels: [{ id: "l-1", purpose: "教学关", layout: "左侧出发，右侧终点", entities: [] }],
+  levels: [{ id: "l-1", purpose: "教学关", layout: "左侧出发，右侧终点", entities: ["pickup-can"] }],
   progression: { model: "linear", description: "三关" },
   mechanics: [{ id: "m-jump", mechanic: "jump" }],
   winConditions: ["抵达终点"], loseConditions: [], runtimeRequirements: ["input:keyboard"],
@@ -66,7 +68,28 @@ const stage = () => {
 };
 
 /** 记下**发出去的那一发**，并回一份给定的清单。 */
-const capture = (input: unknown) => {
+/** ⚠️ P1 · Q6a：HUD 闸**无条件**要求两件 ui（config 的 `hud` 结构上必填）——
+ *  夹具清单里没有，补齐它们再回给 planner；不参与本文件任何被测判据。 */
+const withHud = (input: unknown): unknown => {
+  const doc = structuredClone(input) as { assets: unknown[] };
+  doc.assets.push({
+    spec: {
+      kind: "ui", id: "ui-hud", role: "HUD 面板", description: "占位面板",
+      styleId: "halt-dusk", anchor: { x: 0, y: 0 }, size: { w: 48, h: 8 }, required: true,
+      ninePatch: { left: 2, right: 2, top: 2, bottom: 2 },
+    },
+    source: { kind: "drawlist" },
+  }, {
+    spec: {
+      kind: "ui", id: "ui-pip", role: "HUD 图标", description: "占位图标",
+      styleId: "halt-dusk", anchor: { x: 0, y: 0 }, size: { w: 4, h: 4 }, required: true,
+    },
+    source: { kind: "drawlist" },
+  });
+  return doc;
+};
+const capture = (raw: unknown) => {
+  const input = withHud(raw);
   const seen: Record<string, any>[] = [];
   const f = (async (_url: string, init: RequestInit) => {
     seen.push(JSON.parse(String(init.body)));

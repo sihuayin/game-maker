@@ -9,10 +9,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditGameConfig, auditEntityIdentity, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR,
+  auditConfigPipeline, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR,
   formatIssues, GameDesignSpecSchema,
   jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
   parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, PLATFORMER_V1,
+  DESIGN_BUCKET_ASSET_KINDS,
   PLAYER_ACTION_NAMES,
   RecipeToolSchema, resolveRuntimeProfile, runtimeProfileRef, EMPTY_INPUT_ATTEMPTS, STRUCTURED_CALL_ATTEMPTS,
   StyleSpecSchema, summarizeCalls, VisualWorldSpecSchema,
@@ -40,7 +41,7 @@ import { assetPlanPrompt, assetTask, CONFIG_TOOL_DESCRIPTION, CONFIG_TOOL_NAME, 
 
 // ⚠️ **2026-09-29 搬到 `@game-maker/contracts`**（票 33）—— `site` 装配住在 `demo`，
 //   而依赖图里 demo 只能依赖 contracts。这里**引入 + 原样再导出**，调用方一行都不用改。
-import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditLayerCoverage, auditScreenSpace, backgroundLayerEntries, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
+import { CommandError, EXIT, DEFAULT_HUD_LINE_HEIGHT, auditScreenSpace, auditTdConfig, auditTdWorldSize, carryOnError, failureDirOfError, gameHudScreenItems, parseTdConfig, tdHudScreenItems, tdResolveConfig, type CommandResult, type TdConfig } from "@game-maker/contracts";
 export { asCommandError, CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, type CommandResult } from "@game-maker/contracts";
 export type Transport = TextTransport;
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -264,24 +265,33 @@ function playerAnimationGate(spec: AssetRecipe, playerId: string): string | null
  *   三发用完才 `invalid`（退出码 4）。这一层没有「模型说不需要」的豁免。
  */
 export function designCoverageGate(recipe: AssetRecipe, design: GameDesignSpec): string | null {
-  const byId = new Set(recipe.assets.map((e) => e.spec.id));
-  const byCharacter = new Set(
-    recipe.assets.flatMap((e) => (e.spec.characterId === undefined ? [] : [e.spec.characterId])),
-  );
   const missing: string[] = [];
-  const needAsset = (bucket: string, ids: readonly string[]) => {
-    for (const id of ids)
-      if (!byId.has(id) && !byCharacter.has(id))
-        missing.push(`${bucket} "${id}" —— 没有一件资产的 \`id\`（或 \`characterId\`）等于它`);
+  const needAsset = (bucket: "enemies" | "npcs" | "interactables" | "resources", label: string, ids: readonly string[]) => {
+    const allowedKinds = DESIGN_BUCKET_ASSET_KINDS[bucket];
+    for (const id of ids) {
+      // ⚠️ 覆盖的第一条判据不变：`spec.id` 或 `spec.characterId` **逐字**相等（不做前缀、不改名）。
+      const covering = recipe.assets.filter((e) => e.spec.id === id || e.spec.characterId === id);
+      if (covering.length === 0) {
+        missing.push(`${label} "${id}" —— 没有一件资产的 \`id\`（或 \`characterId\`）等于它`);
+        continue;
+      }
+      // ⚠️ **P1 · Q8**：覆盖之后再看 kind —— 错误 kind 的资源**先付费生成**、到 config 才被下游
+      //   kind 锁拒（钱已经花了，`plan` 的重采样也救不回来）。同一函数、同一档、同一条重采样路。
+      //   ⚠️ 桶→kind 由 `DESIGN_BUCKET_ASSET_KINDS` 派生（`npcs`/`decor` 豁免），不另写一份。
+      if (allowedKinds !== undefined && !covering.some((e) => allowedKinds.includes(e.spec.kind))) {
+        const got = covering.map((e) => `"${e.spec.id}"（${e.spec.kind}）`).join(" / ");
+        missing.push(`${label} "${id}" —— 覆盖它的是 ${got}，这里要的是 ${allowedKinds.join(" / ")}`);
+      }
+    }
   };
-  needAsset("enemies[]", design.enemies.map((e) => e.id));
-  needAsset("npcs[]", design.npcs.map((e) => e.id));
-  needAsset("interactables[]", design.interactables.map((e) => e.id));
-  needAsset("resources[]", design.resources.map((e) => e.id));
+  needAsset("enemies", "enemies[]", design.enemies.map((e) => e.id));
+  needAsset("npcs", "npcs[]", design.npcs.map((e) => e.id));
+  needAsset("interactables", "interactables[]", design.interactables.map((e) => e.id));
+  needAsset("resources", "resources[]", design.resources.map((e) => e.id));
   if (missing.length === 0) return null;
   return "清单没有覆盖设计层的全部实体（资源不完整）：\n"
     + missing.map((m) => `  · ${m}`).join("\n")
-    + "\n⚠️ 设计层列出的每个 id 都必须有一件资产**逐字**覆盖它（不改名、不省略）；"
+    + "\n⚠️ 设计层列出的每个 id 都必须有一件资产**逐字**覆盖它（不改名、不省略），且资源 kind 必须能担起那个桶；"
     + "这一层没有「不需要资源」的豁免。请补齐后重出这份清单。";
 }
 
@@ -291,14 +301,15 @@ export function designCoverageGate(recipe: AssetRecipe, design: GameDesignSpec):
  *   `kind:"ui"`（`game-config.ts:361-362`）。清单若没有这两类 ui 资源，config 那一步只能拿 sprite 顶，
  *   必被「是 sprite，这里要的是 ui」拒收（付费重跑 5 条硬失败的 3 条就是这么来的）。
  *
- * ⚠️ **只当设计声明 `hud:screen-space` 时触发**（`runtimeRequirements` 含它）—— 设计没要 HUD 的清单
- *   不硬塞 ui（config 结构上要 hud 与设计层「要不要 HUD」是两个事实，这里以设计为准）。
+ * ⚠️ **无条件触发**（P1 · Q6a）：`game-config/v1` 的 `hud` **结构上必填**，所以不论设计有没有在
+ *   `runtimeRequirements` 里声明 `hud:screen-space`，config 都要求 `hud.panel` / `hud.pip` 是 `ui`。
+ *   以前「只在设计声明时触发」⇒ 一份没声明能力的**合法**设计会让清单缺 ui，config 连拒 3 发后
+ *   `invalid`，已烧掉 3 次文本调用。⇒ 以 **config 的结构要求**为准，闸门提前到规划期。
  * ⚠️ 判据是**两类各 ≥1**：面板要 `ninePatch`（九宫格才允许「声明尺寸 ≠ 资源尺寸」、把面板拉到能装下
  *   N 个 pip 槽；非九宫格时 `auditPanelSize` 要求两数相等、没法放大），pip 是固定尺寸图标、不要 `ninePatch`。
  * ⚠️ 与覆盖闸 / 玩家闸**同一档**（`schema`、重采样）：缺了算「模型没生成好」，三发内可补。
  */
-function hudUiGate(recipe: AssetRecipe, design: GameDesignSpec): string | null {
-  if (!design.runtimeRequirements.includes("hud:screen-space")) return null;
+function hudUiGate(recipe: AssetRecipe): string | null {
   const uis = recipe.assets.flatMap((e) => (e.spec.kind === "ui" ? [e.spec] : []));
   const panel = uis.filter((u) => u.ninePatch !== undefined);
   const pip = uis.filter((u) => u.ninePatch === undefined);
@@ -308,7 +319,7 @@ function hudUiGate(recipe: AssetRecipe, design: GameDesignSpec): string | null {
   if (pip.length === 0)
     missing.push("一件不带 `ninePatch` 的 `ui` 图标（点亮 pip，固定尺寸、与资源尺寸一致）");
   if (missing.length === 0) return null;
-  return "清单缺 HUD 用的 `ui` 资源（本代外壳有屏幕空间 HUD，`hud.panel` 与 `hud.pip` 的 asset 都必须 `kind:\"ui\"`）：\n"
+  return "清单缺 HUD 用的 `ui` 资源（本代 config 的 `hud` **结构上必填**，`hud.panel` 与 `hud.pip` 的 asset 都必须 `kind:\"ui\"`）：\n"
     + missing.map((m) => `  · ${m}`).join("\n")
     + "\n⚠️ 缺它们，config 那一步只能拿 sprite 顶 HUD（会被「是 sprite，这里要的是 ui」拒收）。请补这两类 ui 资源后重出清单。";
 }
@@ -477,9 +488,10 @@ export async function planAssets(opts: PlanAssetsOptions): Promise<CommandResult
       continue;
     }
     // ⚠️ **票 04（recipe-config-gap-v1）：HUD ui 资源闸** —— 与覆盖闸 / 玩家闸同一档（`schema`、重采样）。
-    //   设计声明 `hud:screen-space` 时，清单必须有带 ninePatch 的 ui 面板 + 不带 ninePatch 的 ui 图标；
+    //   **P1 · Q6a 起无条件**：只要走 `game-config/v1`，清单就必须有带 ninePatch 的 ui 面板 + 不带
+    //   ninePatch 的 ui 图标（config 的 `hud` 结构上必填，与设计声明无关）；
     //   否则 config 那一步只能拿 sprite 顶 HUD、必被拒。缺了算「模型没生成好」，三发内可补。
-    const hudErr = hudUiGate(truth.value, design);
+    const hudErr = hudUiGate(truth.value);
     if (hudErr !== null) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = hudErr;
@@ -1190,12 +1202,10 @@ ${SKELETON_SHAPE_NOTE}
     // ⚠️ **recipe-config-gap-v1 票 10**：业务校验里「模型错」那一族（引用 + 自洽 + HUD 屏幕空间）
     //   移进**重采样循环** —— 与 schema 失败同档，模型下一发可能写对。而「层盖不住世界」那一条
     //   （由背景资源尺寸 + world.size 决定）**不**移进来，仍是确定性失败（见循环后那一段）。
-    const modelHard = [
-      ...auditGameConfig(truth.value, manifest),
-      ...auditEntityIdentity(design, truth.value, level.id),
-      ...auditScreenSpace(vp, gameHudScreenItems(truth.value, manifest,
-        { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
-    ].filter((i) => i.severity === "error");
+    const modelHard = auditConfigPipeline(truth.value, {
+      manifest, design, levelId: level.id, viewport: vp,
+      ...(opts.hudLineHeight !== undefined ? { hudLineHeight: opts.hudLineHeight } : {}),
+    }).resampleable.filter((i) => i.severity === "error");
     if (modelHard.length > 0) {
       call.trip({ spent: once.spent });
       lastError = `配置过不了业务校验（模型错，${STRUCTURED_CALL_ATTEMPTS} 发重采样后仍没写对，最后一次）：\n` +
@@ -1216,14 +1226,10 @@ ${SKELETON_SHAPE_NOTE}
   //   这里只剩「层盖不住世界」这一条**确定性**判据 —— 它由「背景资源尺寸 + world.size」决定，
   //   **重抽 config 改不了**（config 在 pack 之后，图已经买完），所以仍不重采样、不落盘。
   //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**。
-  const issues: ConfigIssue[] = [
-    ...auditGameConfig(config, manifest),
-    ...auditEntityIdentity(design, config, level.id),
-    ...auditScreenSpace(vp, gameHudScreenItems(config, manifest,
-      { lineHeight: opts.hudLineHeight ?? DEFAULT_HUD_LINE_HEIGHT })),
-    ...auditLayerCoverage(vp, config.world.size,
-      backgroundLayerEntries(config.scene.background.asset, config.world.size, manifest.assets))
-  ];
+  const issues: ConfigIssue[] = auditConfigPipeline(config, {
+    manifest, design, levelId: level.id, viewport: vp,
+    ...(opts.hudLineHeight !== undefined ? { hudLineHeight: opts.hudLineHeight } : {}),
+  }).deterministic;
   const hard = issues.filter((i) => i.severity === "error");
   if (hard.length > 0)
     throw new CommandError("invalid",

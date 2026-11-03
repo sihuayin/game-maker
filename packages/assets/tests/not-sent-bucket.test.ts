@@ -62,7 +62,7 @@ const DESIGN: GameDesignSpec = {
   coreLoopSteps: ["探索废墟"],
   player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑"], goals: ["在天黑前抵达"] },
   enemies: [],
-  npcs: [], interactables: [], resources: [],
+  npcs: [], interactables: [], resources: [{ id: "r-part", purpose: "收集目标" }],
   world: { theme: "废土", setting: "废墟", structure: "三段式" },
   levels: [{ id: "l-1", purpose: "教学", layout: "左到右", entities: [] }],
   progression: { model: "linear", description: "三关" },

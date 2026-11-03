@@ -39,6 +39,9 @@ function stage(): QaContext {
   const configPath = path.join(runDir, "game-config.json");
   const cfg = JSON.parse(fs.readFileSync(configPath, "utf8")) as { entities: { id: string; sourceIntent?: string }[] };
   cfg.entities.find((e) => e.id === "carriage")!.sourceIntent = "e-drone";
+  // ⚠️ P1 · Q6b 起设计层要求 `resources` 非空：CANNED.design 补了 `r-scrap`，
+  //   交叉验证要 config 与 VDS 都覆盖它（bounds 与 `suitcase-1` 的盒子逐像素相同 ⇒ 无几何警告）。
+  cfg.entities.find((e) => e.id === "suitcase-1")!.sourceIntent = "r-scrap";
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2) + "\n");
   writeJson(runDir, "game-design.json", CANNED.design);
   // 合成 VDS：background（无 sourceIntent，装饰不参与）+ e-drone（sourceIntent，bounds 与
@@ -49,6 +52,7 @@ function stage(): QaContext {
     objects: [
       { id: "background", role: "background", bounds: { x: 0, y: 0, w: 480, h: 270 }, layer: 0, fill: "palette:0" },
       { id: "e-drone", role: "hazard", bounds: { x: 768, y: 202, w: 64, h: 48 }, layer: 10, fill: "palette:1", sourceIntent: "e-drone" },
+      { id: "r-scrap-vds", role: "pickup", bounds: { x: 292, y: 224, w: 16, h: 16 }, layer: 10, fill: "palette:2", sourceIntent: "r-scrap" },
     ],
   });
   return {

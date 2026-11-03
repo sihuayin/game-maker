@@ -279,7 +279,7 @@ describe("§invariant 3 · recipe 磁盘真相", () => {
       assets: [...doc.assets, { spec: { kind: "sprite", id: "crate-2", role: "第二只箱子", description: "又一只木条箱", styleId: "halt-dusk", anchor: { x: 0.5, y: 1 }, size: { w: 16, h: 16 }, required: true, characterId: "p-scavenger" }, source: { kind: "drawlist" } }],
     }, null, 2) + "\n");
     const b = await build(h, u.run.dir);
-    expect(b.manifest.assets.map((a) => a.id).sort()).toEqual(["bg-dusk", "crate-2", "e-drone", "p-body", "ui-hud", "ui-pip"]);
+    expect(b.manifest.assets.map((a) => a.id).sort()).toEqual(["bg-dusk", "crate-2", "e-drone", "p-body", "r-scrap", "ui-hud", "ui-pip"]);
   });
 
   // ── 票 01（P0-04）· 设计 → 清单的覆盖闸（CAP-SPEC-12）────────────────────────
@@ -910,7 +910,7 @@ describe("§v3 视觉 QA 接口：free inspect 观察进 QA 报告", () => {
     expect(inspect.lines!.join("\n")).toMatch(/源图 .* → 目标 /);
     // v3 终端摘要：结构化数据同时交到 BuildResult（不落盘、不进报告）
     expect(b.inspectData).toBeDefined();
-    expect(b.inspectData!.assets.length).toBe(5);
+    expect(b.inspectData!.assets.length).toBe(6);
     expect(b.inspectData!.layerCoverage.length).toBe(1);       // drawlist 背景只有一帧
     expect(b.inspectData!.paletteUsage.offPalette.pixels).toBe(0);
     expect(report.observations.find((o) => o.source === "review")!.outcome).toBe("unavailable");
@@ -997,5 +997,58 @@ describe("§P0-05b 像素阈值入 QA（票 03 裁定 A+）", () => {
     expect(b.packVersion).toBe(1);
     const text = reportOf(h).observations.find((o) => o.source === "inspect")!.lines!.join("\n");
     expect(text).toMatch(/源图 \/ 目标尺寸：没跑（unavailable）/);
+  });
+});
+
+// ── P1 · Q5（design-to-config-residual-audit-v1 票 05）：汇合点的统一确定性复验 ────────
+//
+// ⚠️ 以前 `reuseConfig` 只跑 schema + 引用族，`runBuild` 汇合点**什么都不跑** ⇒ 人工改配置 /
+//   改清单复验时，屏幕空间、九宫格下界、身份对账、层覆盖全被绕过。下面两条钉的是
+//   「**parseReusedConfig 拦不住的那几族**现在真的在汇合点响了」，而不是重复引用族。
+describe("§P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入口", () => {
+  /** 把一份合法 config 写到临时文件，返回路径（`reuseConfig` 吃路径）。 */
+  const configFile = (h: ReturnType<typeof harness>, name: string, cfg: unknown) => {
+    const p = path.join(h.cwd, name);
+    fs.writeFileSync(p, JSON.stringify(cfg, null, 2) + "\n");
+    return p;
+  };
+
+  it("阴性：reuseConfig 带**屏幕空间越界**（schema + 引用族都过）⇒ invalid（退出码 4）", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    const cfg = readJson(b.paths.config) as { hud: { panel: { at: { x: number; y: number } } } };
+    cfg.hud.panel.at = { x: 1000, y: 4 };          // 视口 480×270，盒子整个跑到外面
+    const p = configFile(h, "bad-screen-space.json", cfg);
+    const e = await build(h, u.run.dir, { reuseConfig: p }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect(exitCodeOfError(e)).toBe(4);
+    expect((e as CommandError).message).toMatch(/hud\.panel/);
+    expect((e as CommandError).message).toMatch(/屏幕空间/);
+  });
+
+  it("阴性：reuseConfig 把九宫格声明改成 1×1（Q4 的新判据）⇒ invalid，点名 hud.panel.size", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    const cfg = readJson(b.paths.config) as { hud: { panel: { size: { w: number; h: number } } } };
+    cfg.hud.panel.size = { w: 1, h: 1 };           // ui-hud 的边框和是 4×4
+    const p = configFile(h, "bad-panel-size.json", cfg);
+    const e = await build(h, u.run.dir, { reuseConfig: p }).catch((x: unknown) => x);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect((e as CommandError).message).toMatch(/hud\.panel\.size/);
+    expect((e as CommandError).message).toMatch(/下界/);
+  });
+
+  it("阳性：原样复用一份合法 config ⇒ 照常构建（不误拒）", async () => {
+    const h = harness();
+    const u = await understand(h);
+    const b = await build(h, u.run.dir);
+    const cfg = readJson(b.paths.config);
+    const p = configFile(h, "good-reuse.json", cfg);
+    const again = await build(h, u.run.dir, { reuseConfig: p });
+    expect(again.config).toEqual(b.config);
+    expect(fs.existsSync(path.join(again.runDir, "game-config.json"))).toBe(true);
   });
 });

@@ -125,3 +125,21 @@ describe("§契约支持覆盖度判据（票 19 的地基）", () => {
     //   一次求差，两个判据 —— 这正是票 03 Q1(b) 花一个字段换来的东西。
   });
 });
+
+// ── P1 · Q6b（design-to-config-residual-audit-v1 票 05）：设计层必须至少一个 resource ──
+describe("§P1 · Q6b：`resources` 至少一条（config 的 objective 强制 N ≥ 1）", () => {
+  it("阴性：`resources: []` ⇒ 拒，且 path 指到 `resources`", () => {
+    const r = parse({ resources: [] });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      const hit = r.error.issues.find((i) => i.path.join(".") === "resources");
+      expect(hit, "必须有一条 path 指向 resources").toBeDefined();
+      expect(hit!.message).toMatch(/pickup|chest|objective/);
+    }
+  });
+
+  it("阳性：≥1 resource 照常过（既有夹具就是）", () => {
+    expect(parse().success).toBe(true);
+    expect((DESIGN as { resources: unknown[] }).resources.length).toBeGreaterThan(0);
+  });
+});

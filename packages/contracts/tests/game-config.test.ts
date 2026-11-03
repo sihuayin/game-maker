@@ -631,3 +631,143 @@ describe("auditEntityIdentity：关卡作用域（票 03 B1/B4 + 票 05）", () 
       .toMatch(/level-none.*没有对应关卡/);
   });
 });
+
+// ── P1 · design-to-config-residual-audit-v1 票 05（Q1 / Q3 / Q4 / Q11）────────────
+//
+// ⚠️ 下面这些判据的共同形状：**错的不是引用解不开，而是解开的那个东西担不起这个槽位**。
+//   以前它们一条都报不出来（kind 只锁了 5 个槽位；chest/danger 不看帧数；九宫格只放行不检查）。
+describe("P1 · Q1：实体槽位的 asset-kind 锁（`ENTITY_ASSET_KINDS` 单一来源）", () => {
+  /** 某条 kind 错误（按 `code` 取；既有错误没有 code）。 */
+  const kindErrs = (c: unknown) => errs(c).filter((i) => i.code === "entity-asset-kind");
+
+  it("阳性：pickup（sprite）/ hazard（animation）/ goal（animation）照常过", () => {
+    expect(kindErrs(base())).toEqual([]);
+  });
+
+  it("阴性：pickup → ui ⇒ error，点名实体，code=entity-asset-kind", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, asset: "hud-lost-slots" };   // ui
+    const hit = kindErrs(c);
+    expect(hit).toHaveLength(1);
+    expect(hit[0]!.where).toBe('entity "suitcase-1"');
+    expect(hit[0]!.message).toMatch(/是 ui，这里要的是 sprite \/ animation/);
+  });
+
+  it("阴性：hazard → background ⇒ error", () => {
+    const c = base();
+    c.entities[4] = { ...c.entities[4]!, asset: "bg-dusk-halt" };
+    expect(kindErrs(c).map((i) => i.message).join()).toMatch(/是 background，这里要的是 sprite \/ animation/);
+  });
+
+  it("阴性：goal → ui ⇒ error", () => {
+    const c = base();
+    c.entities[5] = { ...c.entities[5]!, asset: "hud-pip" };
+    expect(kindErrs(c).map((i) => i.message).join()).toMatch(/是 ui，这里要的是 sprite \/ animation/);
+  });
+
+  it("回归：`decor` **不加锁** —— ui 与 animation 都照过（v7 真配置这么用）", () => {
+    const c = base();
+    c.entities.push({ id: "d-ui", kind: "decor", at: { x: 200, y: 220 }, asset: "hud-pip" });
+    c.entities.push({ id: "d-anim", kind: "decor", at: { x: 260, y: 220 }, asset: "hazard-sweeping-carriage", anim: "sweep" });
+    expect(kindErrs(c)).toEqual([]);
+  });
+
+  it("Q11/E02：`slope-1` 用玩家 animation 作 solid ⇒ error（同 E01，独立用例）", () => {
+    const c = base();
+    c.entities.push({ id: "slope-1", kind: "solid", at: { x: 200, y: 220 }, asset: "player-traveler" });
+    const hit = errs(c).filter((i) => i.where === 'entity "slope-1"');
+    expect(hit.map((i) => i.message).join()).toMatch(/是 animation，这里要的是 sprite/);
+    expect(hit[0]!.code).toBe("entity-asset-kind");
+  });
+
+  it("Q11/E03/E04：`hud.panel` ← sprite、`hud.pip` ← 资源 sprite ⇒ 「这里要的是 ui」（各自独立断言）", () => {
+    const panel = base();
+    panel.hud = { ...panel.hud, panel: { ...panel.hud.panel, asset: "prop-luggage-pile" } };
+    expect(errs(panel).filter((i) => i.where === "hud.panel").map((i) => i.message).join())
+      .toMatch(/是 sprite，这里要的是 ui/);
+    const pip = base();
+    pip.hud = { ...pip.hud, pip: { ...pip.hud.pip, asset: "pickup-suitcase" } };
+    expect(errs(pip).filter((i) => i.where === "hud.pip").map((i) => i.message).join())
+      .toMatch(/是 sprite，这里要的是 ui/);
+  });
+
+  it("⚠️ 既有错误**不带 code**（条件式 A：不 retrofit 历史构造点）", () => {
+    const c = base();
+    c.entities[0] = { ...c.entities[0]!, asset: "no-such-asset" };
+    const hit = errs(c).find((i) => i.where === 'entity "suitcase-1"')!;
+    expect(hit.message).toMatch(/包里没有资源/);
+    expect(hit.code).toBeUndefined();
+  });
+});
+
+describe("P1 · Q3：`chest` / `danger` 至少需要两个状态帧", () => {
+  const stateErrs = (c: unknown) => errs(c).filter((i) => i.code === "entity-state-frames");
+
+  it("阳性：chest / danger 引用 2 帧动画 ⇒ 不报（恰好两帧 = 下界）", () => {
+    const c = base();
+    c.entities.push({ id: "chest-1", kind: "chest", at: { x: 600, y: 240 }, asset: "hazard-sweeping-carriage", anim: "sweep" });
+    c.entities.push({ id: "danger-1", kind: "danger", at: { x: 650, y: 240 }, asset: "hazard-sweeping-carriage", anim: "sweep",
+      strike: { periodMs: 2000, activeMs: 500 } });
+    expect(stateErrs(c)).toEqual([]);
+  });
+
+  it("阴性：chest → 单帧 sprite ⇒ error（外壳的 `openFrame` 是 undefined）", () => {
+    const c = base();
+    c.entities.push({ id: "chest-1", kind: "chest", at: { x: 600, y: 240 }, asset: "pickup-suitcase" });
+    const hit = stateErrs(c);
+    expect(hit).toHaveLength(1);
+    expect(hit[0]!.where).toBe('entity "chest-1"');
+    expect(hit[0]!.message).toMatch(/至少需要两帧/);
+  });
+
+  it("阴性：danger → 单帧 sprite ⇒ error（`activeFrame` 是 undefined）", () => {
+    const c = base();
+    c.entities.push({ id: "danger-1", kind: "danger", at: { x: 650, y: 240 }, asset: "pickup-suitcase",
+      strike: { periodMs: 2000, activeMs: 500 } });
+    const hit = stateErrs(c);
+    expect(hit).toHaveLength(1);
+    expect(hit[0]!.where).toBe('entity "danger-1"');
+    expect(hit[0]!.message).toMatch(/至少需要两帧/);
+  });
+
+  it("⚠️ 其他槽位不受这条约束（pickup 单帧是常态）", () => {
+    expect(stateErrs(base())).toEqual([]);
+  });
+});
+
+describe("P1 · Q4：九宫格声明的**下界**（中央区与边框和）", () => {
+  const panelErrs = (c: GameConfig, manifest: AssetPackManifest = MANIFEST) =>
+    auditGameConfig(c, manifest).filter((i) => i.code === "hud-panel-size");
+  const withPanel = (panel: GameConfig["hud"]["panel"]) => base({ hud: { ...base().hud, panel } });
+  /** 只改包里某一件的 `scale9Borders`（模拟「中央区放不进资源」）。 */
+  const manifestWithBorders = (b: { x: number; y: number; w: number; h: number }) => {
+    const m = structuredClone(MANIFEST) as AssetPackManifest;
+    m.assets.find((a) => a.id === "hud-lost-slots")!.scale9Borders = b;
+    return m;
+  };
+
+  it("阴性：九宫格声明 1×1 ⇒ error，code=hud-panel-size（以前零 issue）", () => {
+    const hit = panelErrs(withPanel({ asset: "hud-lost-slots", at: { x: 8, y: 262 }, size: { w: 1, h: 1 } }));
+    expect(hit).toHaveLength(1);
+    expect(hit[0]!.where).toBe("hud.panel.size");
+    expect(hit[0]!.message).toMatch(/下界/);
+  });
+
+  it("阴性：中央区放不进资源（`b.x + b.w > size.w`）⇒ error", () => {
+    const hit = panelErrs(
+      withPanel({ asset: "hud-lost-slots", at: { x: 8, y: 262 }, size: { w: 72, h: 32 } }),
+      manifestWithBorders({ x: 4, y: 4, w: 80, h: 24 }),
+    );
+    expect(hit).toHaveLength(1);
+    expect(hit[0]!.message).toMatch(/中央区 80×24/);
+  });
+
+  it("阳性：声明 == 下界（8×8，边框和 4+4）⇒ 不报", () => {
+    expect(panelErrs(withPanel({ asset: "hud-lost-slots", at: { x: 8, y: 262 }, size: { w: 8, h: 8 } }))).toEqual([]);
+  });
+
+  it("回归：既有真配置（72×32）与拉伸目标（144×40）照过", () => {
+    expect(panelErrs(base())).toEqual([]);
+    expect(panelErrs(withPanel({ asset: "hud-lost-slots", at: { x: 8, y: 262 }, size: { w: 144, h: 40 } }))).toEqual([]);
+  });
+});

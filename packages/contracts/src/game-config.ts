@@ -24,7 +24,7 @@
 //     四边不拉伸、中央拉伸，所以拉伸**不会**破坏像素网格）。
 //     ⚠️ **票 14 给这条禁令补了一条判据**（`tests/game-config.test.ts`）—— 在那之前它**只有**结构性保证。
 import { z } from "zod";
-import { resolvePackRef, type AssetPackEntry, type AssetPackManifest } from "./assetpack.js";
+import { resolvePackRef, type AssetKind, type AssetPackEntry, type AssetPackManifest } from "./assetpack.js";
 import type { GameDesignSpec } from "./game-design.js";
 
 export const GAME_CONFIG_FORMAT = "game-config/v1" as const;
@@ -49,6 +49,25 @@ export const Rect = z.object({ x: Coord, y: Coord, w: z.number().int().positive(
  * 所以一块看得见的静态碰撞体（一摞行李、一段台阶）是 `solid`，**只写一次**。
  */
 export const EntityKind = z.enum(["solid", "pickup", "hazard", "goal", "chest", "danger", "decor"]);
+
+/**
+ * 实体槽位 → 允许引用的资源 kind（P1 · Q1：design-to-config-residual-audit-v1 票 05）。
+ *
+ * ⚠️ **单一来源**：`auditReferences` 的实体循环与 `DESIGN_BUCKET_ASSET_KINDS`（清单覆盖闸）
+ *   都从这一张表派生，别另写一份。
+ * ⚠️ `decor` **不加锁**：它是纯装饰，动画（吊着的 lurker）与 ui（血条图标）都是合法引用
+ *   （v7 真配置就这么用）。其余五个槽位在真实产物里从不用 `ui` / `background`
+ *   —— 语料自证 120 份 config 零误伤。
+ */
+export const ENTITY_ASSET_KINDS: Readonly<Record<EntityKind, readonly AssetKind[] | undefined>> = {
+  solid: ["sprite"],
+  pickup: ["sprite", "animation"],
+  hazard: ["sprite", "animation"],
+  goal: ["sprite", "animation"],
+  chest: ["sprite", "animation"],
+  danger: ["sprite", "animation"],
+  decor: undefined,
+};
 
 /**
  * 实体怎么动。**它与 `kind` 正交** —— `kind` 说**碰到会怎样**，`motion` 说**它怎么动**。
@@ -283,7 +302,19 @@ export type ConfigIssue = {
   /** 出问题的位置（实体 id / 字段路径）。 */
   where: string;
   message: string;
+  /**
+   * 可机读的错误码（P1 · design-to-config-residual-audit-v1 票 03 的「条件式 A」）。
+   *
+   * ⚠️ 只给本图**新增或加强**的错误写码（Q1 / Q3 / Q4 三处），**不 retrofit** 既有构造点 ——
+   *   既有错误对象上这个键**缺席**，那是刻意的回归基线，不是遗漏。
+   * ⚠️ 不改 `message` / `severity` / `where` 的既有格式；`code` 只做**附加**。
+   */
+  code?: ConfigIssueCode;
 };
+
+/** `ConfigIssue.code` 的闭集（contracts 拥有）。新增一码 = 改这里，别在下游散写字符串。 */
+export const CONFIG_ISSUE_CODES = ["entity-asset-kind", "entity-state-frames", "hud-panel-size"] as const;
+export type ConfigIssueCode = (typeof CONFIG_ISSUE_CODES)[number];
 
 /**
  * 三族校验：**引用**（硬失败）· **自洽**（硬失败）· **可通关**（警告）。
@@ -303,7 +334,8 @@ export type ConfigIssue = {
  */
 export function auditReferences(config: GameConfig, manifest: AssetPackManifest): ConfigIssue[] {
   const out: ConfigIssue[] = [];
-  const err = (where: string, message: string) => out.push({ severity: "error", where, message });
+  const err = (where: string, message: string, code?: ConfigIssueCode) =>
+    out.push({ severity: "error", where, message, ...(code === undefined ? {} : { code }) });
 
   /**
    * **只看种类**：这个 id 在不在包里、是不是该有的那一类。**不解引用。**
@@ -314,21 +346,21 @@ export function auditReferences(config: GameConfig, manifest: AssetPackManifest)
    *   （`resolvePackRef` 先失败），于是「你拿三层背景当玩家了」被报成「缺 anim」——
    *   一个把人指向不存在出路的消息。
    */
-  const kindOf = (where: string, assetId: string, kinds: readonly string[]) => {
+  const kindOf = (where: string, assetId: string, kinds: readonly string[], code?: ConfigIssueCode) => {
     const asset = manifest.assets.find((a) => a.id === assetId);
     // 措辞与 `resolvePackRef` 一致 —— 同一个事实在哪里说都是同一句话
     if (!asset) { err(where, `包里没有资源 "${assetId}"`); return null; }
     if (!kinds.includes(asset.kind)) {
-      err(where, `"${assetId}" 是 ${asset.kind}，这里要的是 ${kinds.join(" / ")}`);
+      err(where, `"${assetId}" 是 ${asset.kind}，这里要的是 ${kinds.join(" / ")}`, code);
       return null;
     }
     return asset;
   };
 
   /** 解一个引用，顺带核对它是不是该有的资源种类。 */
-  const ref = (where: string, r: { asset: string; anim?: string }, kinds?: readonly string[]) => {
+  const ref = (where: string, r: { asset: string; anim?: string }, kinds?: readonly string[], code?: ConfigIssueCode) => {
     // 先判种类、后解引用 —— 理由见 `kindOf`
-    if (kinds && !kindOf(where, r.asset, kinds)) return null;
+    if (kinds && !kindOf(where, r.asset, kinds, code)) return null;
     const res = resolvePackRef(r, manifest);
     if (!res.ok) { err(where, res.error); return null; }
     return res;
@@ -367,9 +399,22 @@ export function auditReferences(config: GameConfig, manifest: AssetPackManifest)
   //   加 kind 锁把「拿玩家动画当地形」从「多动画缺 anim」这种间接失败变成「是 animation，这里要的是 sprite」
   //   的**构建期 kind 拒绝**（与 player/hud 同口径）。⚠️ `decor` **不加锁**：它是纯装饰，动画（吊着的
   //   lurker）与 ui（血条图标）都是合法引用（v7 真配置就这么用）。
-  for (const e of config.entities)
-    ref(`entity "${e.id}"`, { asset: e.asset, ...(e.anim ? { anim: e.anim } : {}) },
-      e.kind === "solid" ? ["sprite"] : undefined);
+  // ⚠️ **P1 · Q1**：五个实体槽位的 kind 锁由 `ENTITY_ASSET_KINDS` 派生（`solid` 那段注释见上）。
+  //   **P1 · Q3**：`chest` / `danger` 的状态切换由外壳取**最后一帧**（`scene.ts` 的 `openFrame` /
+  //   `activeFrame`）—— 只解出 1 帧时状态切换没有任何画面变化，是确定性缺口。
+  for (const e of config.entities) {
+    const allowed = ENTITY_ASSET_KINDS[e.kind];
+    const resolved = ref(`entity "${e.id}"`, { asset: e.asset, ...(e.anim ? { anim: e.anim } : {}) },
+      allowed, "entity-asset-kind");
+    if (resolved !== null && (e.kind === "chest" || e.kind === "danger") && resolved.frames.length < 2)
+      err(
+        `entity "${e.id}"`,
+        `${e.kind} 实体 "${e.id}" 引用的是 "${e.asset}"，解析出 ${resolved.frames.length} 帧 —— ` +
+        `外壳把最后一帧当作「${e.kind === "chest" ? "已开" : "激活"}」状态帧，单帧时状态切换没有画面变化。` +
+        `至少需要两帧（\`anim\` 指向一个 ≥2 帧的动画，或引用一个 ≥2 帧的资源）。`,
+        "entity-state-frames",
+      );
+  }
   ref("hud.panel", { asset: config.hud.panel.asset }, ["ui"]);
   ref("hud.pip", { asset: config.hud.pip.asset }, ["ui"]);
 
@@ -409,7 +454,33 @@ export function auditPanelSize(
   // 引用族已经报过「包里没有这件 / 种类不对」—— 这里不抢它的活
   if (!asset) return null;
   // 九宫格：声明值就是被拉伸的目标，与资源真实尺寸**本来就不该相等**
-  if (asset.scale9Borders !== undefined) return null;
+  //
+  // ⚠️ **P1 · Q4**：放行之前先判两条下界 ——
+  //   ① 中央区放得进资源（`b.x + b.w <= size.w`、`b.y + b.h <= size.h`）；
+  //   ② 声明尺寸 ≥ 边框和（`declared.w >= size.w - b.w`、`declared.h >= size.h - b.h`）。
+  //   以前直接 `return null` ⇒ 声明 1×1 也零 issue，而 Phaser 会把九宫格宽高**钳到边框和**
+  //   （`NineSlice.js`）—— 于是 `auditScreenSpace` 用声明尺寸算的盒子和实际画出来的盒子不是同一个。
+  //   ⚠️ 横版与塔防共用这一份实现（`auditPanelSize` 的调用点）。
+  if (asset.scale9Borders !== undefined) {
+    const b = asset.scale9Borders;
+    const centerOut = b.x + b.w > asset.size.w || b.y + b.h > asset.size.h;
+    const minW = asset.size.w - b.w;   // 左 + 右
+    const minH = asset.size.h - b.h;   // 上 + 下
+    if (centerOut || declared.w < minW || declared.h < minH)
+      return {
+        severity: "error",
+        where,
+        code: "hud-panel-size",
+        message:
+          `声明的九宫格尺寸 ${declared.w}×${declared.h} 放不进 "${asset.id}" 的九宫格下界 ${minW}×${minH}：` +
+          `资源 ${asset.size.w}×${asset.size.h}，中央区 ${b.w}×${b.h} @ (${b.x},${b.y})` +
+          `（左 ${b.x} + 右 ${asset.size.w - (b.x + b.w)} · 上 ${b.y} + 下 ${asset.size.h - (b.y + b.h)}）。` +
+          `⚠️ Phaser 会把九宫格宽高**钳到边框和**（中央区不能是负的），声明小于它时` +
+          `\`auditScreenSpace\` 用声明尺寸算的盒子与实际画出来的盒子不是同一个 —— ` +
+          `要么把声明放大到至少 ${minW}×${minH}，要么缩小边框。`,
+      };
+    return null;
+  }
   if (declared.w === asset.size.w && declared.h === asset.size.h) return null;
   return {
     severity: "error",
@@ -537,6 +608,24 @@ export const DESIGN_BUCKET_KINDS: Readonly<Record<DesignBucket, readonly EntityK
   interactables: ["chest", "pickup", "goal", "hazard", "danger", "solid"],
   resources: ["pickup"],
 };
+
+/**
+ * 设计桶 → 允许引用的**资源** kind（P1 · Q8 的清单覆盖闸用）。
+ *
+ * ⚠️ **由 `DESIGN_BUCKET_KINDS` + `ENTITY_ASSET_KINDS` 派生，不另写一份**：
+ *   桶里任一 EntityKind 没有 kind 锁（`decor`）⇒ 整桶不受限；否则取并集。
+ *   结果：`enemies` / `interactables` / `resources` → `["sprite", "animation"]`，`npcs` → `undefined`。
+ * ⚠️ 它在**付费生图之前**拦「资源 kind 与设计桶不匹配」，与下游 config 的 kind 锁阶段不同、不可互替
+ *   （用户 2026-11-02 对 Q8 的裁定）。
+ */
+export const DESIGN_BUCKET_ASSET_KINDS: Readonly<Record<DesignBucket, readonly AssetKind[] | undefined>> =
+  Object.fromEntries(
+    (Object.keys(DESIGN_BUCKET_KINDS) as DesignBucket[]).map((bucket) => {
+      const kinds = DESIGN_BUCKET_KINDS[bucket];
+      if (kinds.some((k) => ENTITY_ASSET_KINDS[k] === undefined)) return [bucket, undefined];
+      return [bucket, [...new Set(kinds.flatMap((k) => ENTITY_ASSET_KINDS[k] ?? []))]];
+    }),
+  ) as Record<DesignBucket, readonly AssetKind[] | undefined>;
 
 /**
  * 实体身份验真（entity-identity-v1 Q2=(c) 的后半）：设计实体 ↔ 配置实体的 `sourceIntent` 对账。

@@ -19,7 +19,26 @@ import { CommandError, compileRuntime, planAssets } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const STYLE = path.join(ROOT, "fixtures/style-spec.halt-dusk.json");
-const RECIPE = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/recipes/shift-change.json"), "utf8"));
+/** ⚠️ P1 · Q6a：HUD 闸**无条件**要求两件 ui（config 的 `hud` 结构上必填）—— 夹具补上占位面板/图标。 */
+const withHud = <T,>(doc: T): T => {
+  const out = structuredClone(doc) as T & { assets: unknown[] };
+  out.assets.push({
+    spec: {
+      kind: "ui", id: "ui-hud", role: "HUD 面板", description: "占位面板",
+      styleId: "halt-dusk", anchor: { x: 0, y: 0 }, size: { w: 48, h: 8 }, required: true,
+      ninePatch: { left: 2, right: 2, top: 2, bottom: 2 },
+    },
+    source: { kind: "drawlist" },
+  }, {
+    spec: {
+      kind: "ui", id: "ui-pip", role: "HUD 图标", description: "占位图标",
+      styleId: "halt-dusk", anchor: { x: 0, y: 0 }, size: { w: 4, h: 4 }, required: true,
+    },
+    source: { kind: "drawlist" },
+  });
+  return out;
+};
+const RECIPE = withHud(JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/recipes/shift-change.json"), "utf8")));
 const PACK = path.join(ROOT, "fixtures/packs/last-train/v2");
 const GAME_CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/game-configs/last-train.json"), "utf8"));
 
@@ -53,7 +72,7 @@ describe("`plan-assets` 的账（它取代了 `derive` —— 而协议从「纯
     coreLoopSteps: ["探索废墟"],
     player: { id: "p-scavenger", role: "拾荒者", abilities: ["跑"], goals: ["在天黑前抵达"] },
     enemies: [],
-    npcs: [], interactables: [], resources: [],
+    npcs: [], interactables: [], resources: [{ id: "pickup-can", purpose: "可拾取的补给" }],
     world: { theme: "废土", setting: "废墟", structure: "三段式" },
     levels: [{ id: "l-1", purpose: "教学", layout: "左到右", entities: [] }],
     progression: { model: "linear", description: "三关" },
@@ -201,7 +220,7 @@ describe("`compile-runtime` 的账（它取代了 `compileGame` —— 协议换
     game: { title: "末班车", genre: "platformer", camera: "side", runtimeProfile: { id: "platformer", version: "1" } },
     coreLoopSteps: ["躲开行李", "捡齐失物", "走到信号灯"],
     player: { id: "p", role: "邮差", abilities: ["跑"], goals: ["赶上末班车"] },
-    enemies: [], npcs: [], interactables: [], resources: [],
+    enemies: [], npcs: [], interactables: [], resources: [{ id: "r-part", purpose: "收集目标" }],
     world: { theme: "黄昏的铁路小站", setting: "月台", structure: "三条横带" },
     levels: [{ id: "l-1", purpose: "唯一一关", layout: "左到右", entities: [] }],
     progression: { model: "linear", description: "一关到底" },

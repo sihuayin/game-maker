@@ -23,9 +23,9 @@ const DESIGN = JSON.parse(fs.readFileSync(path.join(FIX, "game-design.json"), "u
 const WORLD = JSON.parse(fs.readFileSync(path.join(FIX, "visual-world.json"), "utf8")) as VisualWorldSpec;
 const IMAGE = { protocol: "gemini" as const, baseUrl: "http://x", apiKey: "k" };
 
-const stage = (recipe: unknown = RECIPE) => {
+const stage = (recipe: unknown = RECIPE, design: unknown = DESIGN) => {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), "gm-plan-hud-"));
-  fs.writeFileSync(path.join(d, "game-design.json"), JSON.stringify(DESIGN));
+  fs.writeFileSync(path.join(d, "game-design.json"), JSON.stringify(design));
   fs.writeFileSync(path.join(d, "visual-world.json"), JSON.stringify(WORLD));
   fs.copyFileSync(path.join(FIX, "style.png"), path.join(d, "style.png"));
   const seen: Record<string, unknown>[] = [];
@@ -50,6 +50,10 @@ const recipeFiles = (x: ReturnType<typeof stage>) => {
 };
 
 describe("§HUD ui 资源闸（recipe-config-gap-v1 票 04）", () => {
+  /** P1 · Q6a：设计要求里**去掉** `hud:screen-space`（config 的 `hud` 仍然结构上必填）。 */
+  const withoutHudCapability = (): unknown => ({
+    ...DESIGN, runtimeRequirements: DESIGN.runtimeRequirements.filter((c) => c !== "hud:screen-space"),
+  });
   it("阳性：夹具带 ninePatch 面板 + 非 ninePatch 图标 ⇒ 照常落盘", async () => {
     const x = stage();
     await run(x);
@@ -86,5 +90,23 @@ describe("§HUD ui 资源闸（recipe-config-gap-v1 票 04）", () => {
     const e = await run(x).catch((err: unknown) => err);
     expect((e as CommandError).kind).toBe("invalid");
     expect((e as CommandError).message).toMatch(/ui/);
+  });
+
+  it("⚠️ P1 · Q6a：设计要求里**没有** `hud:screen-space`，清单仍必须有 ui ⇒ 拒（不再按设计能力豁免）", async () => {
+    const recipe = structuredClone(RECIPE);
+    recipe.assets = recipe.assets.filter((a) => a.spec.kind !== "ui");
+    const x = stage(recipe, withoutHudCapability());
+    const e = await run(x).catch((err: unknown) => err);
+    expect(e).toBeInstanceOf(CommandError);
+    expect(exitCodeOfError(e)).toBe(4);
+    expect((e as CommandError).message).toMatch(/ui/);
+    expect(x.seen, "重采样三发").toHaveLength(STRUCTURED_CALL_ATTEMPTS);
+    expect(recipeFiles(x), "一页都不落盘").toHaveLength(0);
+  });
+
+  it("⚠️ P1 · Q6a 阳性：设计要求里没有能力、但清单有两件 ui ⇒ 照常落盘", async () => {
+    const x = stage(RECIPE, withoutHudCapability());
+    await run(x);
+    expect(recipeFiles(x).some((n) => /^v\d+\.json$/.test(n))).toBe(true);
   });
 });
