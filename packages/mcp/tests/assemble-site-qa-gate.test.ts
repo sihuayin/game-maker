@@ -53,6 +53,18 @@ function writeReport(outRoot: string, body: Record<string, unknown>, runVersion 
 
 const siteDir = (out: string) => path.join(out, ID, "site");
 
+/** 一份**不可达**的 config：满高的墙把世界切断（P1 · publish-gate 的现场）。 */
+function unreachableConfig(dir: string): string {
+  const c = JSON.parse(fs.readFileSync(CONFIG, "utf8")) as {
+    world: { size: { w: number; h: number } };
+    terrain: { x: number; y: number; w: number; h: number }[];
+  };
+  c.terrain.push({ x: 300, y: 0, w: 100, h: c.world.size.h });
+  const p = path.join(dir, "config-b.json");
+  fs.writeFileSync(p, JSON.stringify(c, null, 2) + "\n");
+  return p;
+}
+
 async function assembleSite(args: Record<string, unknown>): Promise<any> {
   const out: any[] = [];
   await handle({
@@ -128,5 +140,19 @@ describe("§放行：六条全跑、无 error", () => {
     const r = await assembleSite({ packDir: PACK, configPath: CONFIG, shellPath: shellOf(d), outDir: out, qaReportPath: rp });
     expect(r.isError).not.toBe(true);
     expect(fs.existsSync(path.join(siteDir(out), "v1"))).toBe(true);
+  });
+});
+
+// ── P1 · publish-gate：不可达 config 现场复验（B-02 的配套闸）───────────────
+describe("§P1 · publish-gate：不可达 config ⇒ 拒", () => {
+  it("绿报告 + config B ⇒ isError、退 4、站点不产", async () => {
+    const d = tmp("unreachable");
+    const out = path.join(d, "out");
+    writeReport(out, report());
+    const r = await assembleSite({ packDir: PACK, configPath: unreachableConfig(d), shellPath: shellOf(d), outDir: out });
+    expect(r.isError).toBe(true);
+    expect(r._exitCode).toBe(4);
+    expect(r.content[0].text).toMatch(/这份 config 本身不可达/);
+    expect(fs.existsSync(siteDir(out))).toBe(false);
   });
 });

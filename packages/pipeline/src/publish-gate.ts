@@ -7,9 +7,10 @@
 //   （票 05 §8.2 的测试注意）：`assembleSite` / `assembleFromConfig` 是公开导出的库入口，
 //   `packages/demo` 也不许反向依赖 pipeline。库调用方不在本票的「发布路径」定义里。
 //
-// ⚠️ **只钉 pack，不钉 config**（票 05 §8.4 的残余风险）：`reachability` /
-//   `reference-resolution` 吃配置，一份绿色 pack 报告仍可给另一份手写 config 放行。
-//   P0-02 的票面只要求 pack 身份；config 身份另说。
+// ⚠️ **报告身份只钉 pack**（票 05 §8.4 的残余风险）：一份绿色 pack 报告仍不能**证明**
+//   它属于当前这份 config。P1 · publish-gate 的处理不是绑 config 身份，而是**现场重跑**
+//   配置敏感的那条判据（`auditReachability`，B-02 已把它放进 `deterministic`）：
+//   当前 config 自己不可达 ⇒ 拒。剩余洞是报告身份本身（另有交接，见 Q8）。
 //
 // ⚠️ **不在这里跑 `verifyPack`**（2026-10-22 裁定）：字节完整性归 P0-04 ——
 //   create / build 链在 QA 之前已经逐文件校验过；standalone `site` 不重算 checksum，
@@ -21,7 +22,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  CommandError, formatIssues, parseAssetPack, QA_JUDGEMENTS, QAReportSchema, qaVerdict, TD_CONFIG_FORMAT,
+  auditReachability, CommandError, formatIssues, parseAssetPack, parseGameConfig, QA_JUDGEMENTS, QAReportSchema,
+  qaVerdict, TD_CONFIG_FORMAT,
   type AssetPackManifest, type QAReport,
 } from "@game-maker/contracts";
 
@@ -121,6 +123,26 @@ function subjectProblem(report: QAReport, manifest: AssetPackManifest, checksum:
   return undefined;
 }
 
+/** 当前 config 自身的可达性（P1 · publish-gate）。返回 `undefined` = 通 / 跳过。
+ *
+ *  ⚠️ 它回答的是「**这份 config 自己通不通**」，不是「报告属不属于这份 config」——
+ *    报告身份仍只钉 pack（`subjectProblem`）；这一项补的是「config A 的绿报告 + config B」那个洞。
+ *  ⚠️ **解不开的 config 跳过**：schema 错由装配器报它自己的错，不在这里重复 Ownership。
+ *  ⚠️ `configPath` 缺省 ⇒ 跳过（库调用 / 既有测试）；四个发布入口都传它（CLI build/site、
+ *     MCP create_game/assemble_site）—— 缺省不得成为发布入口的逃逸路径。
+ */
+function configProblem(configPath: string | undefined, manifest: AssetPackManifest): string | undefined {
+  if (configPath === undefined) return undefined;
+  let raw: unknown;
+  try { raw = JSON.parse(fs.readFileSync(configPath, "utf8")); } catch { return undefined; }
+  const parsed = parseGameConfig(raw);
+  if (!parsed.ok) return undefined;
+  const hard = auditReachability(parsed.value, manifest).filter((i) => i.severity === "error");
+  if (hard.length === 0) return undefined;
+  return `**这份 config 本身不可达**（${hard.length} 条硬失败）：\n`
+    + hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n");
+}
+
 /** 判据层面的放行条件：**没有 error，且六条全跑过**。
  *  ⚠️ 决策只看 `failures` / `checked`，**不看 `qaVerdict` 的字符串** —— 那是派生量，
  *    这里只是用它来把「没跑」与「跑了不行」分成两句话。 */
@@ -193,6 +215,13 @@ export function assertPublishableQa(opts: PublishGateOptions): PublishGateResult
   if (bad !== undefined)
     throw new CommandError("invalid", `${bad}\n报告：${reportPath}\n${subjectLine}\n`
       + "⚠️ 报告已经落盘 —— 那是这一次运行的**诊断**；重抽一次改不了判据说的事实。");
+
+  // ── config 自身的可达性（P1 · publish-gate）：报告全绿也不能替一份走不通的 config 放行 ──
+  //   ⚠️ 显式报告与 auto 查找两条分支在这里汇合 ⇒ 只调一次。
+  const unreachable = configProblem(opts.configPath, manifest);
+  if (unreachable !== undefined)
+    throw new CommandError("invalid", `${unreachable}\nconfig：${path.resolve(opts.configPath!)}\n报告：${reportPath}\n${subjectLine}\n`
+      + "⚠️ 发布闸会**现场重跑**可达性：报告只钉包身份，不能证明这份 config 走不走得通。");
 
   return { report, reportPath, manifest };
 }

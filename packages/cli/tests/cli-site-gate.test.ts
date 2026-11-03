@@ -63,6 +63,18 @@ function writeReport(outRoot: string, body: Record<string, unknown>, runVersion 
 
 const siteDir = (out: string) => path.join(out, ID, "site");
 
+/** 一份**不可达**的 config：满高的墙把世界切断（P1 · publish-gate 的现场）。 */
+function unreachableConfig(dir: string): string {
+  const c = JSON.parse(fs.readFileSync(CONFIG, "utf8")) as {
+    world: { size: { w: number; h: number } };
+    terrain: { x: number; y: number; w: number; h: number }[];
+  };
+  c.terrain.push({ x: 300, y: 0, w: 100, h: c.world.size.h });
+  const p = path.join(dir, "config-b.json");
+  fs.writeFileSync(p, JSON.stringify(c, null, 2) + "\n");
+  return p;
+}
+
 /** 跑一次 `site --json`，返回退出码与解析后的 JSON。 */
 async function site(argv: string[]): Promise<{ code: number; doc: { error?: string; data?: Record<string, unknown> } }> {
   const io = capture();
@@ -152,5 +164,32 @@ describe("§放行：干净包全绿 ⇒ 产站点；warning 不阻断", () => {
     const { code } = await site([TD_PACK, "--config", TD_CONFIG, "--shell", shellOf(d), "--out", out]);
     expect(code).toBe(EXIT.ok);
     expect(fs.existsSync(path.join(out, "counter-siege", "site", "v1"))).toBe(true);
+  });
+});
+
+// ── P1 · publish-gate：不可达 config 现场复验（B-02 的配套闸）───────────────
+//
+// ⚠️ 补的洞：绿报告属于 config A，仍能给不可达的 config B 放行。闸在这里**现场重跑**
+//   `auditReachability`：config B 自己走不通 ⇒ 退 4、站点不产。
+describe("§P1 · publish-gate：不可达 config ⇒ 拒（显式报告与 auto 查找两条）", () => {
+  it("显式 `--qa-report`：绿报告 + config B ⇒ 退 4、站点不产", async () => {
+    const d = tmp("unreachable-explicit");
+    const out = path.join(d, "out");
+    const rp = writeReport(out, report());
+    const { code, doc } = await site([PACK, "--config", unreachableConfig(d), "--shell", shellOf(d), "--out", out, "--qa-report", rp]);
+    expect(code).toBe(EXIT.invalid);
+    expect(doc.error).toMatch(/这份 config 本身不可达/);
+    expect(doc.error).toMatch(/够不到/);
+    expect(fs.existsSync(siteDir(out))).toBe(false);
+  });
+
+  it("auto 查找报告：同样拒绝", async () => {
+    const d = tmp("unreachable-auto");
+    const out = path.join(d, "out");
+    writeReport(out, report());
+    const { code, doc } = await site([PACK, "--config", unreachableConfig(d), "--shell", shellOf(d), "--out", out]);
+    expect(code).toBe(EXIT.invalid);
+    expect(doc.error).toMatch(/这份 config 本身不可达/);
+    expect(fs.existsSync(siteDir(out))).toBe(false);
   });
 });
