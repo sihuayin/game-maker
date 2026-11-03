@@ -3,7 +3,7 @@
 Labels: wayfinder:map
 Tracker: local-markdown
 Effort: design-to-config-residual-bd-audit-v1-p1
-Baseline: 代码基线 `main` @ `3b1b61d`；授权与图表提交：待记录（见「基线记录」）
+Baseline: 代码基线 `main` @ `3b1b61d`；授权与图表提交：`11f0b0a7185d14c334658511afee77679da7a963`（见「基线记录」）
 Status: open · 2026-11-03 开图
 Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)（已收口）
 
@@ -97,5 +97,5 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 ## 基线记录
 
 - **代码基线**：`main` @ `3b1b61d`。
-- **授权与图表提交**：待记录（提交后填写 SHA）。
+- **授权与图表提交**：`11f0b0a7185d14c334658511afee77679da7a963`（`docs: B/D approval package + P1 map and tickets`）。
 - **P1 分支**：`p1/design-to-config-residual-bd-audit`（从上述提交创建）。
