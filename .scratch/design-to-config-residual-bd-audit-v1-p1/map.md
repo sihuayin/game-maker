@@ -67,7 +67,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 
 1. [01 D-02](issues/01-d02-role-prompt-parity.md)（task，AFK）— **resolved**
 2. [02 B-02](issues/02-b02-deterministic-reachability.md)（task，AFK，blocked by 01）— **resolved**
-3. [03 publish-gate](issues/03-publish-gate-reachability.md)（task，AFK，blocked by 02）
+3. [03 publish-gate](issues/03-publish-gate-reachability.md)（task，AFK，blocked by 02）— **resolved**
 4. [04 D-01](issues/04-d01-viewport-passthrough.md)（task，AFK，blocked by 03）
 5. [05 D-03](issues/05-d03-modelhard-attribution.md)（task，AFK，blocked by 04）
 6. [06 验收与报告](issues/06-acceptance-report.md)（task，AFK，blocked by 05）
@@ -81,6 +81,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 
 - [01 D-02](issues/01-d02-role-prompt-parity.md)：`roleNote` 共享渲染，横版与塔防清单每条资产行都印 manifest `role`（空白折叠、空值占位）；commit `09e2b53`。
 - [02 B-02](issues/02-b02-deterministic-reachability.md)：`auditReachability` 进 `deterministic`（不进 `resampleable`），编译 / 汇合点硬拒；语料 152 份 config 新增 error 0；commit `2377716`。
+- [03 publish-gate](issues/03-publish-gate-reachability.md)：非 TD 且给 `configPath` 时发布闸现场重跑 reachability，有 error 即退 4；四个发布入口均传参；语料 23 组新增 0；commit `4e6d866`。
 
 ## Not yet specified
 
