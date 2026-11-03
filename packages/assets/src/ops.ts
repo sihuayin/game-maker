@@ -97,7 +97,8 @@ export type PlanAssetsOptions = {
   imageTransport?: ImageTransport;
   /**
    * 外壳视口。默认 [[DEFAULT_VIEWPORT]]。⚠️ **背景覆盖闸与提示词的高/宽下限照它算**，
-   *   必须与 `compileRuntime` 那一步用**同一个数**（create 链两处都传 `input.viewport ?? DEFAULT_VIEWPORT`）。
+   *   必须与 `compileRuntime` / 站点装配用**同一个数**（D-01：`runUnderstanding` 把它传给这里
+   *   与 `compileVisualDesign`；两个壳仍只传默认值）。
    */
   viewport?: { w: number; h: number };
   /**

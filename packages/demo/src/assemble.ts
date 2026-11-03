@@ -41,6 +41,8 @@ export type AssembleOptions = {
   gameId?: string;
   /** ⚠️ **显式站点版本号**（票 16，承票 15：「父指定、子不自算」）。给了就不自算、撞名即拒。 */
   siteVersion?: number;
+  /** 外壳视口（D-01）：分派给横版 / 塔防装配器；省略 = 外壳常量 `VIEWPORT`。 */
+  viewport?: { w: number; h: number };
 };
 
 /**

@@ -1080,3 +1080,30 @@ describe("§P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入�
     expect(fs.existsSync(path.join(again.runDir, "game-config.json"))).toBe(true);
   });
 });
+
+// ── D-01：同一次调用的 viewport 贯通理解段与构建段 ─────────────────────────
+//
+// ⚠️ 理解段原先硬编码 `DEFAULT_VIEWPORT`（VDS + 规划提示词），构建段用的是 `input.viewport` ——
+//   同一个调用里两个数。这里用 400×240（小于默认）让假上游的 480×270 背景仍然盖得住视口，
+//   从而整条 `createGame` 能跑完，把「两段同一个数」钉在**真链**上。
+describe("§D-01：自定义 viewport 贯通理解（VDS / 规划提示词）与构建（编译提示词）", () => {
+  it("viewport 400×240：VDS、规划提示词、编译提示词逐次相等；默认路径不变", async () => {
+    const h = harness();
+    const r = await createGame({
+      outRoot: h.outRoot, requirement: "做一个废土横版寻宝游戏",
+      styleReferences: [{ path: "style.png" }],
+      transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd, imageTransport: IMAGE,
+      viewport: { w: 400, h: 240 },
+    });
+
+    const vds = readJson(path.join(h.outRoot, r.paths.visualDesign)) as { viewport: Record<string, number> };
+    expect(vds.viewport).toEqual({ w: 400, h: 240 });
+
+    const body = (x: unknown) => JSON.stringify(x);
+    const plan = h.seen.find((b) => (b as { tool_choice?: { name?: string } }).tool_choice?.name === "emit_asset_recipe");
+    const compile = h.seen.find((b) => (b as { tool_choice?: { name?: string } }).tool_choice?.name === "emit_game_config");
+    expect(body(plan), "规划提示词（背景闸同源）").toContain("400×240");
+    expect(body(compile), "编译提示词").toContain("视口是 400×240");
+    expect(r.paths.qaReport, "QA 照常跑").toBeDefined();
+  });
+});

@@ -40,12 +40,12 @@ const stage = (recipe: unknown = RECIPE) => {
   }) as unknown as typeof fetch;
   return { d, seen, fetchImpl };
 };
-const run = (x: ReturnType<typeof stage>) =>
+const run = (x: ReturnType<typeof stage>, over: Record<string, unknown> = {}) =>
   planAssets({
     designPath: path.join(x.d, "game-design.json"),
     visualWorldPath: path.join(x.d, "visual-world.json"),
     outRoot: path.join(x.d, "out"),
-    transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: x.fetchImpl, imageTransport: IMAGE,
+    transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: x.fetchImpl, imageTransport: IMAGE, ...over,
   });
 const recipeFiles = (x: ReturnType<typeof stage>) => {
   const dir = path.join(x.d, "out", RECIPE.id, "recipes");
@@ -98,5 +98,38 @@ describe("§背景层覆盖闸（票 09）", () => {
     const e = await run(x).catch((err: unknown) => err);
     expect((e as CommandError).kind).toBe("invalid");
     expect((e as CommandError).message).toMatch(/宽 320 < 视口宽 480/);
+  });
+});
+
+// ── D-01：视口进入背景闸与规划提示词 ─────────────────────────────────────────
+describe("§D-01：`planAssets` 的 viewport 进入背景闸与提示词", () => {
+  /** 背景高 280：500×280 放行；640×360 拒绝（默认 480×270 也放行）。 */
+  const bg280 = () => {
+    const recipe = structuredClone(RECIPE);
+    const b = bg(recipe);
+    if (b.spec.kind !== "background") throw new Error("夹具里没找到 background");
+    b.spec.size = { ...b.spec.size, h: 280 };
+    return recipe;
+  };
+
+  it("500×280 ⇒ 通过，且提示词里印的是 500×280", async () => {
+    const x = stage(bg280());
+    await run(x, { viewport: { w: 500, h: 280 } });
+    expect(recipeFiles(x).some((n) => /^v\d+\.json$/.test(n))).toBe(true);
+    expect(JSON.stringify(x.seen[0]), "规划提示词的视口必须是调用方给的那个").toContain("500×280");
+  });
+
+  it("640×360 ⇒ 拒，点名「视口高 360」（证明闸吃的是调用方的数）", async () => {
+    const x = stage(bg280());
+    const e = await run(x, { viewport: { w: 640, h: 360 } }).catch((err: unknown) => err);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).message).toMatch(/高 280 < 视口高 360/);
+    expect(recipeFiles(x), "一页都不落盘").toHaveLength(0);
+  });
+
+  it("默认不传 ⇒ 480×270（280 高的背景照常过；既有语义不变）", async () => {
+    const x = stage(bg280());
+    await run(x);
+    expect(JSON.stringify(x.seen[0])).toContain("480×270");
   });
 });

@@ -324,3 +324,29 @@ describe("⭐ 票 65：层盖不住世界 —— 与 config 步**同一份判据
       .toEqual([[480, 270, 0], [1440, 270, 0.6], [1440, 270, 1]]);
   });
 });
+
+// ── D-01：自定义 viewport 进入装配期的屏幕空间审计 ─────────────────────────
+describe("§D-01：装配器用调用方的 viewport 做屏幕空间审计", () => {
+  it("HUD 右边界 482：默认 480 拒；viewport 500×270 放行（背景/世界仍自洽）", () => {
+    // ⚠️ 真包的 `sky` 层只有 480 宽（非平铺）⇒ 500 的视口会让层覆盖先拒。
+    //   这里用**包的临时副本**把该资源的标称宽改成 600（只动声明，不动像素）——
+    //   于是 500 宽的视口下背景仍盖得住，测的才是**屏幕空间审计拿到了 500**。
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "gm-site-vp-"));
+    const pack = path.join(tmp, "pack");
+    fs.cpSync(PACK, pack, { recursive: true });
+    const manifest = readJson(path.join(pack, "manifest.json")) as {
+      assets: { id: string; size: { w: number; h: number } }[];
+    };
+    const bgAsset = manifest.assets.find((a) => a.id === "bg-dusk-halt")!;
+    bgAsset.size = { ...bgAsset.size, w: 600 };
+    fs.writeFileSync(path.join(pack, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
+
+    const cfg = readJson(CONFIG) as { hud: Record<string, unknown> };
+    // 面板锚点 {0,1}、宽 72：x=410 ⇒ 右边界 482 —— 出 480、在 500 内。
+    const hud = { ...cfg.hud, panel: { ...(cfg.hud["panel"] as Record<string, unknown>), at: { x: 410, y: 262 } } };
+    const h = harness({ hud });
+    expect(() => assembleSite({ ...h.opts, packDir: pack })).toThrow(/屏幕空间|hud\.panel/);
+    const r = assembleSite({ ...h.opts, packDir: pack, viewport: { w: 500, h: 270 } });
+    expect(r.data.siteVersion).toBe(1);
+  });
+});

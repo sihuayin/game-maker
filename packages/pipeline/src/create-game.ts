@@ -63,6 +63,11 @@ export type UnderstandingInput = {
   styleId?: string;
   /** 哪一代外壳。省略 ⇒ 注册表里那一个。 */
   runtimeProfile?: RuntimeProfileRef;
+  /**
+   * 外壳视口（D-01：**同一次调用**在理解 / 构建 / 站点各阶段必须是同一个数）。
+   * 省略 ⇒ [[DEFAULT_VIEWPORT]]。⚠️ 它是外壳的常量，不由资源包 / VWS 推导。
+   */
+  viewport?: { w: number; h: number };
   fetchImpl?: typeof fetch;
   onProgress?: (p: Progress) => void;
   /** 参考图路径相对谁解析（默认 `process.cwd()`）。 */
@@ -377,7 +382,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
     // ⚠️ 旁轨（visual-design-impl-v1 票 06）：确定性布局 → VDS → SVG → PNG，**纯计算**、不闸主链。
     //   失败抛 `CommandError("invalid")`（validator 判据），但产物只写 staging、骑 `commitRun` 的单次
     //   rename 原子落、免费继承「失败不占号」。`visual-design/{svg,preview}/` 子树无需注册（骑 rename）。
-    const vdc = compileVisualDesign({ design: design.spec, vws: world.spec, viewport: DEFAULT_VIEWPORT });
+    const vdc = compileVisualDesign({ design: design.spec, vws: world.spec, viewport: input.viewport ?? DEFAULT_VIEWPORT });
     writeJson(path.join(run.tmpDir, RUN_ARTIFACT.visualDesign), vdc.vds);
     fs.mkdirSync(path.join(run.tmpDir, "visual-design/svg"), { recursive: true });
     fs.mkdirSync(path.join(run.tmpDir, "visual-design/preview"), { recursive: true });
@@ -392,6 +397,7 @@ export async function runUnderstanding(input: UnderstandingInput): Promise<Under
       visualWorldPath: path.join(run.tmpDir, RUN_ARTIFACT.visualWorld),
       outRoot: run.tmpDir,
       transport: input.transport,
+      ...(input.viewport !== undefined ? { viewport: input.viewport } : {}),
       ...(input.imageTransport !== undefined ? { imageTransport: input.imageTransport } : {}),
       ...(input.fetchImpl !== undefined ? { fetchImpl: input.fetchImpl } : {}),
     });

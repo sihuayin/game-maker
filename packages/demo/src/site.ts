@@ -153,6 +153,8 @@ export type SiteOptions = {
   gameId?: string;
   /** ⚠️ **显式站点版本号**（票 16，承票 15 的 Q16/Q17：「父指定、子不自算」）。给了就不自算、撞名即拒。 */
   siteVersion?: number;
+  /** 外壳视口（D-01）。省略 = `VIEWPORT`（480×270）。⚠️ 它必须与 buildWorld / 屏幕空间审计同一个数。 */
+  viewport?: { w: number; h: number };
 };
 
 const jstr = (o: unknown) => JSON.stringify(o, null, 2) + "\n";
@@ -184,6 +186,8 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   const packVersion = `v${manifest.version}`;
   const outRoot = path.resolve(opts.outRoot);
   const gameDir = path.join(outRoot, gameId);
+  // ⚠️ D-01：世界构建与屏幕空间审计**同一个数** —— 只在装配器里解析一次。
+  const viewport = opts.viewport ?? VIEWPORT;
 
   // ── 校验：三族（契约层）+ 第四族（几何）+ 第五族（HUD 屏幕空间）──────────
   //
@@ -203,11 +207,11 @@ export function assembleSite(opts: SiteOptions): CommandResult {
   }
 
   const geometryIssues = auditGeometry(buildWorld(manifest, config, {
-    packBase: `../../pack/${packVersion}/`,
+    packBase: `../../pack/${packVersion}/`, viewport,
   }), coverageLayers);
   // ⚠️ **第五族（HUD 屏幕空间）与它分开、而且共用一份**（票 03）——
   //   「有哪些 HUD 项」只有一份名单，compile 与 site 读的是同一个（票 03 量到两份会各漏各的）。
-  const screenIssues = auditScreenSpace(VIEWPORT, gameHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
+  const screenIssues = auditScreenSpace(viewport, gameHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
   const all = [...audit, ...screenIssues, ...geometryIssues];
   const errors = all.filter((i) => i.severity === "error");
   if (errors.length > 0) failWith("装配期校验不过 —— 硬失败，不产出站点", errors);

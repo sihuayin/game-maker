@@ -275,6 +275,35 @@ describe("坏数据要显形，不许静默（票 32 裁决 3）", () => {
   });
 });
 
+describe("D-01：自定义视口在 buildWorld 内每一处生效", () => {
+  const VP = { w: 500, h: 280 };
+
+  it("世界描述的 `viewport` = 传入值，`worldSize` 仍是 config 的世界", () => {
+    const w = buildWorld(MANIFEST, valid(), { packBase: "../../pack/v2/", viewport: VP });
+    expect(w.viewport).toEqual(VP);
+    expect(w.worldSize).toEqual({ w: 1440, h: 270 });
+  });
+
+  it("「背景」占位符的尺寸跟着视口走（缺资源时 fallback = 视口）", () => {
+    const base = structuredClone(BASE) as { scene: { background: { asset: string } } };
+    base.scene.background.asset = "__没有这个背景__";
+    const w = buildWorld(MANIFEST, base, { packBase: "../../pack/v2/", viewport: VP });
+    expect(w.background[0]!.box).toEqual({ x: 0, y: 0, w: 500, h: 280 });
+    expect(w.background[0]!.draw).toMatchObject({ missing: true, w: 500, h: 280 });
+  });
+
+  it("HUD fallback 盒 = 视口（零数据那一支）", () => {
+    const w = buildWorld(undefined, undefined, { viewport: VP });
+    expect(w.viewport).toEqual(VP);
+    expect(w.hud.panel.box).toEqual({ x: 0, y: 0, w: 500, h: 280 });
+    expect(w.hud.panel.draw).toMatchObject({ missing: true, w: 500, h: 280 });
+  });
+
+  it("默认不传 ⇒ 仍是 480×270（既有语义不变）", () => {
+    expect(build(valid()).viewport).toEqual(VIEWPORT);
+  });
+});
+
 describe("外壳常量", () => {
   it("视口是常量 480×270（票 32 裁决 1）—— 它不该被任何一个资源包改动", () => {
     expect(VIEWPORT).toEqual({ w: 480, h: 270 });
