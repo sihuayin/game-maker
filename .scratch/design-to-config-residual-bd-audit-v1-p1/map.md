@@ -71,7 +71,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 3. [03 publish-gate](issues/03-publish-gate-reachability.md)（task，AFK，blocked by 02）— **resolved**
 4. [04 D-01](issues/04-d01-viewport-passthrough.md)（task，AFK，blocked by 03）— **resolved**
 5. [05 D-03](issues/05-d03-modelhard-attribution.md)（task，AFK，blocked by 04）— **resolved**
-6. [06 验收与报告](issues/06-acceptance-report.md)（task，AFK，blocked by 05）
+6. [06 验收与报告](issues/06-acceptance-report.md)（task，AFK，blocked by 05）— **resolved**
 7. [07 收口](issues/07-closeout-hitol.md)（grilling，HITL，blocked by 06）
 
 本图不创建 research 票：`plan.md` 与 01 / 02 / 04 研究已覆盖全部所需事实。
@@ -85,6 +85,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 - [03 publish-gate](issues/03-publish-gate-reachability.md)：非 TD 且给 `configPath` 时发布闸现场重跑 reachability，有 error 即退 4；四个发布入口均传参；语料 23 组新增 0；commit `4e6d866`。
 - [04 D-01](issues/04-d01-viewport-passthrough.md)：viewport 贯通理解（VDS / 规划）/ 构建提示词 / 站点装配与审计；两个 world builder 逐行去常量；默认仍 480×270；commit `f1e8925`。
 - [05 D-03](issues/05-d03-modelhard-attribution.md)：`classifyConfigIssues` 分离 config 可修 / 包根因；包根因 1 发硬拒、config 可修下一发带摘要；语料 117 份 0 包根因；commit `42a9fca`。
+- [06 验收与报告](issues/06-acceptance-report.md)：build / typecheck / 2425 测试全绿；全局语料新增 error 0、包根因 0；报告见 [report.md](report.md)；commit `0bffe7d`。
 
 ## Not yet specified
 
