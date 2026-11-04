@@ -23,7 +23,7 @@ import {
   type AssetSource, type LayerCoverage,
 } from "@game-maker/contracts";
 import { z as z4 } from "zod/v4";
-import { buildPlainTextRequest, buildTextRequest, geminiUsageOf, parsePlainText, parseTextResponse, textModelOf, textProtocolOf, type TextTransport } from "@game-maker/contracts";
+import { buildPlainTextRequest, buildTextRequest, classifyConfigIssues, geminiUsageOf, parsePlainText, parseTextResponse, textModelOf, textProtocolOf, type TextTransport } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -1065,6 +1065,19 @@ function clampToWorld(config: GameConfig, manifest: AssetPackManifest): void {
   }
 }
 
+/**
+ * **D-03：下一发 prompt 的反馈段**（只带 config 可修的失败）。
+ *
+ * ⚠️ 格式是固定的：一行标题 + 最多 6 条 `- where: message`；每条折成单行、截断 300 字符。
+ *   ⚠️ 不带包根因（那会走硬拒，不进循环）、不带 schema 以外的上游故障（`bad` 不喂回）。
+ */
+const RETRY_FEEDBACK_HEADING = "# 上一发被拒的原因（只改这些，不要重复）";
+function retryFeedback(issues: readonly { where: string; message: string }[]): string {
+  const line = (i: { where: string; message: string }) =>
+    `- ${i.where}: ${i.message.replace(/\s+/g, " ").trim().slice(0, 300)}`;
+  return [RETRY_FEEDBACK_HEADING, ...issues.slice(0, 6).map(line)].join("\n");
+}
+
 export async function compileRuntime(opts: CompileRuntimeOptions): Promise<CommandResult> {
   const readJson = (p: string, what: string): unknown => {
     try { return JSON.parse(fs.readFileSync(p, "utf8")); }
@@ -1188,9 +1201,11 @@ ${SKELETON_SHAPE_NOTE}
   const call = spentCall("compile-runtime", "game-config");
   let checked: ReturnType<typeof parseGameConfig> | null = null;
   let lastError = "";
+  // ⚠️ **D-03**：每发可以带着上一发的失败摘要 —— 基础 prompt 构造一次，反馈只在循环内追加。
+  let attemptPrompt = prompt;
   for (let attempt = 0; attempt < STRUCTURED_CALL_ATTEMPTS; attempt++) {
     const once = await onceThroughTool({
-      transport: opts.transport, prompt, tool: CONFIG_TOOL_NAME, toolDescription: CONFIG_TOOL_DESCRIPTION, schema: ConfigToolSchema, maxTokens: 16_000,
+      transport: opts.transport, prompt: attemptPrompt, tool: CONFIG_TOOL_NAME, toolDescription: CONFIG_TOOL_DESCRIPTION, schema: ConfigToolSchema, maxTokens: 16_000,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
       ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {})
     });
@@ -1205,12 +1220,22 @@ ${SKELETON_SHAPE_NOTE}
     //   （`upstream` / `bad` / `ok`），所以这一行**够不着**；删它得另给工具链单开一个三档类型，
     //   那超出本票「只做 `not-sent` 这一档」的边界。⚠️ 而且它**不是** `not-sent` 的生产者。
     if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
-    if (once.kind === "bad") { call.trip({ failure: once.failure, spent: once.spent }); lastError = once.detail; continue; }
+    if (once.kind === "bad") {
+      call.trip({ failure: once.failure, spent: once.spent });
+      lastError = once.detail;
+      // ⚠️ **schema 失败是 config 形状问题**（工具入参不过线形状）⇒ 摘要喂回；其余 `bad`
+      //   （http / timeout / truncated / empty-input）是上游故障，**不喂回**。
+      if (once.failure === "schema")
+        attemptPrompt = `${prompt}\n\n${retryFeedback([{ where: "schema", message: once.detail }])}`;
+      continue;
+    }
     // ⚠️ **线形状过了不算数**：真正的判据是 v3 那份契约（实体 id 不重复那条 refine 住在它里面）。
     const truth = parseGameConfig(once.result.value);
     if (!truth.ok) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = `配置不过契约：${truth.errors.slice(0, 4).join("；")}`;
+      // ⚠️ schema 失败属于 config 形状问题 ⇒ 摘要喂回下一发（`bad` 那档不喂）。
+      attemptPrompt = `${prompt}\n\n${retryFeedback(truth.errors.map((message) => ({ where: "schema", message })))}`;
       continue;
     }
     // ⚠️ **recipe-config-gap-v1 票 13**：确定性钳位 —— 模型把实体摆出界是**系统性的**（提示词救不了），
@@ -1224,9 +1249,22 @@ ${SKELETON_SHAPE_NOTE}
       ...(opts.hudLineHeight !== undefined ? { hudLineHeight: opts.hudLineHeight } : {}),
     }).resampleable.filter((i) => i.severity === "error");
     if (modelHard.length > 0) {
+      // ── **D-03：先归因，再决定重采样还是硬拒** ─────────────────────────────
+      //   ⚠️ 包根因（清单里根本没有所需能力）**再抽三发也改不了** ⇒ 立即硬拒、`attempts` = 1，
+      //     文案指向清单，**不写「模型错」**（票 06 Q2 的保守兜底：不确定一律 config 可修）。
+      const split = classifyConfigIssues(truth.value, manifest, modelHard);
+      if (split.packRooted.length > 0) {
+        call.trip({ spent: once.spent });
+        throw new CommandError("invalid",
+          `这个包**缺少这份 config 所需的资源**（${split.packRooted.length} 条；config 与资源清单对不上）：\n` +
+          split.packRooted.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
+          "\n⚠️ 重抽 config 改不了 —— 要去的地方：**资源清单 / 包**（换一个能满足这些能力的包），不是再抽一次 config。",
+          ledgerCarrying(call.record()));
+      }
       call.trip({ spent: once.spent });
       lastError = `配置过不了业务校验（模型错，${STRUCTURED_CALL_ATTEMPTS} 发重采样后仍没写对，最后一次）：\n` +
         modelHard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n");
+      attemptPrompt = `${prompt}\n\n${retryFeedback(split.configFixable)}`;
       continue;
     }
     call.trip({ spent: once.spent });

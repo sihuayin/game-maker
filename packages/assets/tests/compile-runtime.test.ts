@@ -751,3 +751,87 @@ describe("entity-identity-v1.1 票 06：错误归属拒绝 + 关卡作用域（�
     expect(fs.existsSync(path.join(d, "out"))).toBe(false);
   });
 });
+
+// ── D-03：归因与受限重采样反馈 ───────────────────────────────────────────────
+//
+// ⚠️ 要钉两件事：① 包根因（清单里根本没有所需能力）⇒ **1 发硬拒**、文案指向清单、不写「模型错」；
+//   ② config 可修 ⇒ 照常重采样，但**下一发带着上一发的 where/message**（schema 失败同理）。
+describe("§D-03：包根因硬拒 / config 可修反馈", () => {
+  const spy = (input: unknown = GOOD) => {
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({ content: [{ type: "tool_use", name: "emit_game_config", input }], stop_reason: "tool_use" }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    return { f, seen };
+  };
+  const promptOf = (b: Record<string, any>) => String(b.messages[0].content[0].text);
+
+  /** 包的临时副本：**删掉全部 ui 资产**（只动 manifest —— 编译根本不读别的文件）。 */
+  const packWithoutUi = () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gm-no-ui-pack-"));
+    const manifest = JSON.parse(fs.readFileSync(path.join(PACK, "manifest.json"), "utf8"));
+    manifest.assets = manifest.assets.filter((a: { kind: string }) => a.kind !== "ui");
+    // ⚠️ 图集也声称包含那些资源 ⇒ 一起删，否则 manifest 自己就不过 schema，测不到归因。
+    manifest.atlases = manifest.atlases.filter((x: { kind: string }) => x.kind !== "ui");
+    fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest));
+    return dir;
+  };
+
+  it("包内无 ui（hud 所需能力不存在）⇒ **1 发**、`invalid`、指向清单、**不写「模型错」**", async () => {
+    const d = tmp();
+    const sp = spy();
+    const e = await run(d, GOOD, { packDir: packWithoutUi(), fetchImpl: sp.f }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect((e as CommandError).message).toMatch(/缺少这份 config 所需的资源/);
+    expect((e as CommandError).message).toMatch(/资源清单/);
+    expect((e as CommandError).message).not.toMatch(/模型错/);
+    expect(sp.seen, "硬拒不重采样").toHaveLength(1);
+    const ledger = (e as CommandError).ledger as { attempts: number }[];
+    expect(ledger[0]!.attempts).toBe(1);
+    expect(fs.existsSync(path.join(d, "out"))).toBe(false);
+  });
+
+  it("config 可修（幻觉 id，但包里**有同 kind 资产**）⇒ 3 发；第 2/3 发带上一发的 where/message", async () => {
+    const d = tmp();
+    const bad = structuredClone(GOOD) as { entities: { asset: string }[] };
+    bad.entities[0]!.asset = "__没有这个__";
+    const sp = spy(bad);
+    const e = await run(d, bad, { fetchImpl: sp.f }).catch((x: unknown) => x);
+    expect((e as CommandError).message).toMatch(/模型错/);          // 仍是模型错，不是包根因
+    expect(sp.seen).toHaveLength(3);
+    expect(promptOf(sp.seen[0]!), "第一发没有反馈段").not.toContain("上一发被拒的原因");
+    for (const b of sp.seen.slice(1)) {
+      const text = promptOf(b);
+      expect(text).toContain("上一发被拒的原因");
+      expect(text).toContain('entity "suitcase-1"');
+      expect(text).toContain("包里没有资源");
+    }
+  });
+
+  it("schema 失败 ⇒ 第 2/3 发带 schema 摘要（不是「模型错」，但形状可修）", async () => {
+    const d = tmp();
+    const sp = spy({ 不是: "一份配置" });
+    await run(d, { 不是: "一份配置" }, { fetchImpl: sp.f }).catch((x: unknown) => x);
+    expect(sp.seen).toHaveLength(3);
+    expect(promptOf(sp.seen[1]!)).toContain("上一发被拒的原因");
+    expect(promptOf(sp.seen[1]!)).toContain("schema:");
+  });
+
+  it("`bad`（上游没交出可用工具调用）**不喂回** —— 三发 body 逐字相同", async () => {
+    const d = tmp();
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(JSON.stringify({ content: [{ type: "text", text: "没有工具调用" }], stop_reason: "end_turn" }),
+        { status: 200, headers: { "content-type": "application/json" } });
+    }) as unknown as typeof fetch;
+    await run(d, GOOD, { fetchImpl: f }).catch((x: unknown) => x);
+    expect(seen).toHaveLength(STRUCTURED_CALL_ATTEMPTS);
+    for (const b of seen) expect(promptOf(b)).not.toContain("上一发被拒的原因");
+  });
+});

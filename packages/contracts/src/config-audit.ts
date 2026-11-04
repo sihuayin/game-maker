@@ -18,11 +18,11 @@
 //     重抽 config 改不了 ⇒ 不重采样、不落盘。
 //   ⇒ `deterministic` **包含** `resampleable`（超集），调用方按需要取哪一档。
 // ⚠️ **顺序与今天的 `ops.ts` 逐条一致**，别重排：报文的次序是测试与使用者的定位线索。
-import { auditEntityIdentity, auditGameConfig, type ConfigIssue, type GameConfig } from "./game-config.js";
+import { auditEntityIdentity, auditGameConfig, ENTITY_ASSET_KINDS, type ConfigIssue, type GameConfig } from "./game-config.js";
 import { auditLayerCoverage, backgroundLayerEntries } from "./layer-coverage.js";
 import { auditScreenSpace, DEFAULT_HUD_LINE_HEIGHT, gameHudScreenItems } from "./screen-space.js";
 import { auditReachability } from "./reachability.js";
-import type { AssetPackManifest } from "./assetpack.js";
+import type { AssetKind, AssetPackManifest } from "./assetpack.js";
 import type { GameDesignSpec } from "./game-design.js";
 
 export type ConfigAuditContext = {
@@ -53,4 +53,82 @@ export function auditConfigPipeline(
     ...auditReachability(config, ctx.manifest),
   ];
   return { resampleable, deterministic };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// **D-03：resampleable 的归因**（内部纯函数，不是契约）
+//
+// ⚠️ 目的只有一个：让编译循环分得开「**模型写错了、下一发可能改对**」与「**包里根本没有这份
+//   config 需要的那类资源**」。后者再抽三发 config 也改不了，却会被记成「模型错」—— 归错账
+//   比不归更贵（人去查模型，而要继续的是清单）。
+//
+// ⚠️ **保守兜底**（票 06 Q2 的裁定）：所需能力必须从 **config 语义**推导（实体存在 + kind +
+//   字段结构），`where` 只作索引；任何不确定 ⇒ **config 可修**、不硬拒。牺牲提前硬拒的机会，
+//   换「不误拒可修复的 config」。
+// ⚠️ 它**不读 message 文本**、不改 `ConfigIssue` / `auditConfigPipeline` 的形状、不新增对外码。
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ConfigIssueAttribution = {
+  /** 下一发 config 可能改对的那一组（含一切无法确定的情况）。 */
+  configFixable: ConfigIssue[];
+  /** 清单层面缺资源：重抽 config 改不了。 */
+  packRooted: ConfigIssue[];
+};
+
+const ENTITY_WHERE = /^entity "(.*)"$/;
+
+/**
+ * 把一组 `resampleable` 的 error 分成「config 可修」与「包根因」。
+ *
+ * @param config  这一发已经过契约的 config（**语义来源**：实体存在 / kind / 字段结构）。
+ * @param manifest 当前资源包（能力来源）。
+ * @param issues  `auditConfigPipeline(...).resampleable` 里的 error。
+ */
+export function classifyConfigIssues(
+  config: GameConfig,
+  manifest: AssetPackManifest,
+  issues: readonly ConfigIssue[],
+): ConfigIssueAttribution {
+  const out: ConfigIssueAttribution = { configFixable: [], packRooted: [] };
+  const hasKind = (kinds: readonly AssetKind[]) => manifest.assets.some((a) => kinds.includes(a.kind));
+  /** 有没有一件**能解出 ≥2 帧**的资产（chest / danger 的状态帧能力）。 */
+  const hasMultiFrame = (kinds: readonly AssetKind[]) =>
+    manifest.assets.some((a) => kinds.includes(a.kind) && (a.animations ?? []).some((x) => x.frames.length >= 2));
+
+  for (const i of issues) {
+    // ⚠️ 只对 error 归因；warning 不是阻断项，按 config 可修（无害）处理。
+    if (i.severity !== "error") { out.configFixable.push(i); continue; }
+
+    const m = ENTITY_WHERE.exec(i.where);
+    if (m !== null) {
+      // ⚠️ 语义必须能从 config 确认：id 不在 config ⇒ 可能是模型幻觉，**config 可修**。
+      const e = config.entities.find((x) => x.id === m[1]);
+      if (e === undefined) { out.configFixable.push(i); continue; }
+      const allowed = ENTITY_ASSET_KINDS[e.kind];
+      // `decor` 的允许集是 `undefined` ⇒ 能力不明确 ⇒ config 可修。
+      if (allowed === undefined) { out.configFixable.push(i); continue; }
+      const needsTwo = i.code === "entity-state-frames" && (e.kind === "chest" || e.kind === "danger");
+      (needsTwo ? hasMultiFrame(allowed) : hasKind(allowed)) ? out.configFixable.push(i) : out.packRooted.push(i);
+      continue;
+    }
+
+    // ⚠️ `where` 的形态有 `hud.panel` / `hud.panel.size` / `hud.pip[0]` —— 三种都算 HUD。
+    if (i.where === "hud.panel" || i.where.startsWith("hud.panel.") || i.where.startsWith("hud.panel[") ||
+        i.where === "hud.pip" || i.where.startsWith("hud.pip.") || i.where.startsWith("hud.pip[")) {
+      (hasKind(["ui"]) ? out.configFixable : out.packRooted).push(i);
+      continue;
+    }
+    if (i.where === "player" || i.where.startsWith("player.")) {
+      (hasKind(["animation"]) ? out.configFixable : out.packRooted).push(i);
+      continue;
+    }
+    if (i.where === "scene.background" || i.where.startsWith("scene.background")) {
+      (hasKind(["background"]) ? out.configFixable : out.packRooted).push(i);
+      continue;
+    }
+
+    // 其它一切：无法可靠确定 ⇒ config 可修（兜底原则 6）。
+    out.configFixable.push(i);
+  }
+  return out;
 }
