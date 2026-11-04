@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: design-to-config-residual-bd-audit-v1-p1
 Baseline: 代码基线 `main` @ `3b1b61d`；授权与图表提交：`11f0b0a7185d14c334658511afee77679da7a963`（见「基线记录」）
-Status: open · 2026-11-03 开图
+Status: closed · 2026-11-03 开图 · 2026-11-04 收口
 Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)（已收口）
 
 > **2026-11-03 开图。** 授权来源：[final-report.md](../design-to-config-residual-bd-audit-v1/final-report.md) §3；
@@ -72,7 +72,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 4. [04 D-01](issues/04-d01-viewport-passthrough.md)（task，AFK，blocked by 03）— **resolved**
 5. [05 D-03](issues/05-d03-modelhard-attribution.md)（task，AFK，blocked by 04）— **resolved**
 6. [06 验收与报告](issues/06-acceptance-report.md)（task，AFK，blocked by 05）— **resolved**
-7. [07 收口](issues/07-closeout-hitol.md)（grilling，HITL，blocked by 06）
+7. [07 收口](issues/07-closeout-hitol.md)（grilling，HITL，blocked by 06）— **resolved**
 
 本图不创建 research 票：`plan.md` 与 01 / 02 / 04 研究已覆盖全部所需事实。
 
@@ -86,6 +86,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 - [04 D-01](issues/04-d01-viewport-passthrough.md)：viewport 贯通理解（VDS / 规划）/ 构建提示词 / 站点装配与审计；两个 world builder 逐行去常量；默认仍 480×270；commit `f1e8925`。
 - [05 D-03](issues/05-d03-modelhard-attribution.md)：`classifyConfigIssues` 分离 config 可修 / 包根因；包根因 1 发硬拒、config 可修下一发带摘要；语料 117 份 0 包根因；commit `42a9fca`。
 - [06 验收与报告](issues/06-acceptance-report.md)：build / typecheck / 2425 测试全绿；全局语料新增 error 0、包根因 0；报告见 [report.md](report.md)；commit `0bffe7d`。
+- [07 收口](issues/07-closeout-hitol.md)：付费验证 **no-go / 推迟 —— D-03 模型效果未验证**；正式 PR [#27](https://github.com/sihuayin/game-maker/pull/27) 已开（不合并）；图关闭。
 
 ## Not yet specified
 
