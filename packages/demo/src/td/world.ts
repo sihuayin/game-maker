@@ -96,12 +96,12 @@ export function pathPointAt(path: { points: Vec[]; cum: number[]; total: number 
 }
 
 /** 空的塔防描述 —— 「零数据也必须起得来」这一条的具体形状。 */
-function emptyDescription(issues: Issue[], atlases: AtlasToLoad[]): TdWorldDescription {
+function emptyDescription(issues: Issue[], atlases: AtlasToLoad[], viewport: { w: number; h: number }): TdWorldDescription {
   const box = (w: number, h: number): Box => ({ x: 0, y: 0, w, h });
   const miss = (label: string, reason: string): Drawn =>
-    ({ missing: true, label, reason, x: 0, y: 0, w: VIEWPORT.w, h: VIEWPORT.h });
+    ({ missing: true, label, reason, x: 0, y: 0, w: viewport.w, h: viewport.h });
   return {
-    shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { ...VIEWPORT },
+    shellVersion: SHELL_VERSION, viewport: { ...viewport }, worldSize: { ...viewport },
     atlases, issues, background: [],
     arena: { cell: 16, cols: 0, rows: 0, tiles: [] },
     path: { points: [], cum: [], total: 0 },
@@ -110,7 +110,7 @@ function emptyDescription(issues: Issue[], atlases: AtlasToLoad[]): TdWorldDescr
     towers: [], enemies: [], waves: [],
     economy: { startScrap: 0, lives: 0, waveBonus: 0 },
     hud: {
-      panel: { draw: miss("hud.panel", "没有可用数据"), box: box(VIEWPORT.w, VIEWPORT.h) },
+      panel: { draw: miss("hud.panel", "没有可用数据"), box: box(viewport.w, viewport.h) },
       buttons: [], start: { draw: miss("hud.start", "没有可用数据"), at: { x: 0, y: 0 }, box: box(1, 1) },
       readout: { at: { x: 0, y: 0 }, step: { x: 0, y: 0 } },
       icons: { scrap: miss("hud.icons.scrap", "没有可用数据"), life: miss("hud.icons.life", "没有可用数据") },
@@ -124,10 +124,12 @@ function emptyDescription(issues: Issue[], atlases: AtlasToLoad[]): TdWorldDescr
  * ⚠️ **它绝不抛。**
  */
 export function buildTdWorld(
-  manifest: unknown, config: unknown, opts: { packBase?: string } = {},
+  manifest: unknown, config: unknown, opts: { packBase?: string; viewport?: { w: number; h: number } } = {},
 ): TdWorldDescription {
   const issues: Issue[] = [];
   const base = opts.packBase ?? "";
+  // ⚠️ D-01：**这一份**是该次调用的视口 —— 函数内不再读外壳常量。
+  const viewport = opts.viewport ?? VIEWPORT;
 
   const mp = parseAssetPack(manifest ?? {});
   const pack: AssetPackManifest | null = mp.ok ? mp.value : null;
@@ -144,7 +146,7 @@ export function buildTdWorld(
       severity: "error", where: pack ? "td-config" : "manifest",
       message: pack ? `没有 td-config（或它不过 schema）—— 场地与机关全用占位符顶上` : `没有资源包 —— 一律画占位符`,
     });
-    return emptyDescription(issues, pack ? atlases : []);
+    return emptyDescription(issues, pack ? atlases : [], viewport);
   }
 
   const W = cfg.world.size.w, H = cfg.world.size.h;
@@ -292,7 +294,7 @@ export function buildTdWorld(
   };
 
   return {
-    shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { w: W, h: H }, atlases, issues,
+    shellVersion: SHELL_VERSION, viewport: { ...viewport }, worldSize: { w: W, h: H }, atlases, issues,
     background: [],
     arena: { cell, cols, rows, tiles },
     path: { points, cum, total },

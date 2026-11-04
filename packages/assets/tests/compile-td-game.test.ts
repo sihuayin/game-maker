@@ -362,4 +362,15 @@ describe("§问话面：发出去的那一发（票 85：清单里「是不是�
     for (const s of ["**九宫格**（声明尺寸可与包内尺寸不同）", "**非九宫格**（声明尺寸必须与包内尺寸一致）"])
       expect(promptOf(sp.seen)).toContain(s);
   });
+
+  // ── D-02：`role` 那一截塔防清单一直有，这里把它钉住（防回退），并保证与横版同形 ──
+  it("清单的**每条资产行**都带 manifest 的 role（D-02 · 正向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const manifest = JSON.parse(fs.readFileSync(path.join(PACK, "manifest.json"), "utf8")) as {
+      assets: { id: string; role: string }[];
+    };
+    for (const a of manifest.assets) expect(lineOf(promptOf(sp.seen), a.id), a.id).toContain(a.role);
+  });
 });

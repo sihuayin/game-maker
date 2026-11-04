@@ -8,7 +8,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { buildDeliveryReport, mapPlaytest } from "@game-maker/contracts";
+import { buildDeliveryReport, mapPlaytest, QA_JUDGEMENTS, type QAReport } from "@game-maker/contracts";
 import {
   buildSiteFailureDelivery, buildSiteSuccessDelivery, runBuild, runUnderstanding,
   writeDeliveryToReport, writeVisualReviewToReport,
@@ -35,26 +35,34 @@ const understand = (h: ReturnType<typeof harness>) =>
     outRoot: h.outRoot, requirement: "做一个废土横版寻宝游戏",
     styleReferences: [{ path: "style.png" }], transport: TRANSPORT, fetchImpl: h.fetchImpl, cwd: h.cwd, imageTransport: IMAGE,
   });
-const build = (h: ReturnType<typeof harness>, runDir: string) =>
-  runBuild({ outRoot: h.outRoot, runDir, transport: TRANSPORT, fetchImpl: h.fetchImpl, imageTransport: IMAGE });
+const build = (h: ReturnType<typeof harness>, runDir: string, over: Record<string, unknown> = {}) =>
+  runBuild({ outRoot: h.outRoot, runDir, transport: TRANSPORT, fetchImpl: h.fetchImpl, imageTransport: IMAGE, ...over });
 
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, unknown>;
 const runPath = (h: ReturnType<typeof harness>, ...rest: string[]) => path.join(h.outRoot, "wasteland", "run", "v1", ...rest);
 const statusOf = (checks: readonly { key: string; status: string }[], key: string): string | undefined =>
   checks.find((c) => c.key === key)?.status;
 
-/** 让 QA 真响一次：把拾取物摆到跳不到的高处 ⇒ `reachability` 报 error（与 create-game.test.ts 同一现场）。 */
-function unreachableHarness() {
-  const config = structuredClone(CANNED.gameConfig) as { entities: { id: string; at: { x: number; y: number } }[] };
-  config.entities.find((e) => e.id === "e-pickup-1")!.at = { x: 120, y: 60 };
-  return harness({ override: { emit_game_config: config } });
+/** 一份**合法**的 QA 失败报告。⚠️ B-02 之后，真实的 reachability 失败在汇合点就被硬拒，
+ *  走不到 QA —— 这一节要测的是「QA 硬失败 ⇒ delivery 提前落盘」这条**接线**，不是判据本身，
+ *  所以注入报告（与 `create-game.test.ts` 同一条理由）。 */
+function failingQa(): QAReport {
+  return {
+    format: "qa-report/v1",
+    checked: [...QA_JUDGEMENTS],
+    failures: [{ judgement: "reachability", target: 'entity "e-pickup-1"', detail: "够不到", severity: "error" }],
+    observations: [
+      { source: "inspect", outcome: "unavailable", reason: "测试用：没跑" },
+      { source: "review", outcome: "unavailable", reason: "测试用：没跑" },
+    ],
+  };
 }
 
 describe("QA 硬失败 → delivery 提前落盘（票 08 接线 · §8.2 跨阶段）", () => {
-  it("真链上响一次 reachability：报告先落盘，且 delivery 记 qa=fail、下游 blocked、最终 fail", async () => {
-    const h = unreachableHarness();
+  it("QA 硬失败（注入一份合法报告）：报告先落盘，且 delivery 记 qa=fail、下游 blocked、最终 fail", async () => {
+    const h = harness();
     const u = await understand(h);
-    await expect(build(h, u.run.dir)).rejects.toMatchObject({ kind: "invalid" });
+    await expect(build(h, u.run.dir, { qa: async () => failingQa() })).rejects.toMatchObject({ kind: "invalid" });
 
     const raw = readJson(runPath(h, "qa-report.json"));
     const delivery = raw["delivery"] as Record<string, unknown>;

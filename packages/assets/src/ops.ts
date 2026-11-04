@@ -23,7 +23,7 @@ import {
   type AssetSource, type LayerCoverage,
 } from "@game-maker/contracts";
 import { z as z4 } from "zod/v4";
-import { buildPlainTextRequest, buildTextRequest, geminiUsageOf, parsePlainText, parseTextResponse, textModelOf, textProtocolOf, type TextTransport } from "@game-maker/contracts";
+import { buildPlainTextRequest, buildTextRequest, classifyConfigIssues, geminiUsageOf, parsePlainText, parseTextResponse, textModelOf, textProtocolOf, type TextTransport } from "@game-maker/contracts";
 import { createDrawListGenerator, GenerationError, stripFences, UPSTREAM_TIMEOUT_MS } from "./generate.js";
 import { DEFAULT_CONCURRENCY } from "./pack.js";
 import { backgroundCoverage } from "./coverage.js";
@@ -97,7 +97,8 @@ export type PlanAssetsOptions = {
   imageTransport?: ImageTransport;
   /**
    * 外壳视口。默认 [[DEFAULT_VIEWPORT]]。⚠️ **背景覆盖闸与提示词的高/宽下限照它算**，
-   *   必须与 `compileRuntime` 那一步用**同一个数**（create 链两处都传 `input.viewport ?? DEFAULT_VIEWPORT`）。
+   *   必须与 `compileRuntime` / 站点装配用**同一个数**（D-01：`runUnderstanding` 把它传给这里
+   *   与 `compileVisualDesign`；两个壳仍只传默认值）。
    */
   viewport?: { w: number; h: number };
   /**
@@ -949,7 +950,23 @@ const nineSliceNote = (a: AssetPackEntry): string =>
       ? "**九宫格**（声明尺寸可与包内尺寸不同） · "
       : "**非九宫格**（声明尺寸必须与包内尺寸一致） · ";
 
-/** 把资源包渲染成模型能读的一张清单：id / 种类 / 尺寸 / **锚点落点** / 动画名 / 背景层。 */
+/**
+ * 把 `AssetPackEntry.role` 渲染成清单里那一截（D-02）。
+ *
+ * ⚠️ **两份清单共用这一份**：`role` 是契约里的必填字段，而从前只有塔防清单印它 ——
+ *   同一份包，模型在横版清单里看不见「这件是干什么的」。⚠️ 别就地把这句抄进任一份模板：
+ *   抄开之后两处就能漂，而**没有判据会红**（`nineSliceNote` 上面那段是同一个教训）。
+ *
+ * ⚠️ 连续空白折成单空格、去首尾：`role` 是自由文本，换行会把「一行一资源」的清单结构撕开。
+ * ⚠️ 返回值带着它后面那个 `· ` 分隔符（与 `nineSliceNote` 同款），空值印 `（role 为空）`，
+ *   保持一行一资源的结构（`role` 字段本身允许空串）。
+ */
+const roleNote = (a: AssetPackEntry): string => {
+  const role = a.role.replace(/\s+/g, " ").trim();
+  return role === "" ? "（role 为空） · " : `${role} · `;
+};
+
+/** 把资源包渲染成模型能读的一张清单：id / 种类 / 尺寸 / **role** / **锚点落点** / 动画名 / 背景层。 */
 function resourceBrief(manifest: AssetPackManifest): string {
   const lines: string[] = [];
   for (const a of manifest.assets) {
@@ -957,7 +974,7 @@ function resourceBrief(manifest: AssetPackManifest): string {
     const animText = anims.length === 0
       ? "（无动画，引用时不必给 anim）"
       : anims.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ");
-    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · 动画：${animText}`);
+    lines.push(`- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${roleNote(a)}动画：${animText}`);
     if (a.layers && a.layers.length > 0)
       lines.push(`    背景层（远→近）：${a.layers.map((l) => `${l.name}(parallax ${l.parallax}${l.tileable?.x ? " 可平铺" : ""})`).join(" · ")}`);
   }
@@ -1046,6 +1063,19 @@ function clampToWorld(config: GameConfig, manifest: AssetPackManifest): void {
     if (box.y + box.h > H) e.at.y -= box.y + box.h - H;
     if (box.x + box.w > W) e.at.x -= box.x + box.w - W;
   }
+}
+
+/**
+ * **D-03：下一发 prompt 的反馈段**（只带 config 可修的失败）。
+ *
+ * ⚠️ 格式是固定的：一行标题 + 最多 6 条 `- where: message`；每条折成单行、截断 300 字符。
+ *   ⚠️ 不带包根因（那会走硬拒，不进循环）、不带 schema 以外的上游故障（`bad` 不喂回）。
+ */
+const RETRY_FEEDBACK_HEADING = "# 上一发被拒的原因（只改这些，不要重复）";
+function retryFeedback(issues: readonly { where: string; message: string }[]): string {
+  const line = (i: { where: string; message: string }) =>
+    `- ${i.where}: ${i.message.replace(/\s+/g, " ").trim().slice(0, 300)}`;
+  return [RETRY_FEEDBACK_HEADING, ...issues.slice(0, 6).map(line)].join("\n");
 }
 
 export async function compileRuntime(opts: CompileRuntimeOptions): Promise<CommandResult> {
@@ -1171,9 +1201,11 @@ ${SKELETON_SHAPE_NOTE}
   const call = spentCall("compile-runtime", "game-config");
   let checked: ReturnType<typeof parseGameConfig> | null = null;
   let lastError = "";
+  // ⚠️ **D-03**：每发可以带着上一发的失败摘要 —— 基础 prompt 构造一次，反馈只在循环内追加。
+  let attemptPrompt = prompt;
   for (let attempt = 0; attempt < STRUCTURED_CALL_ATTEMPTS; attempt++) {
     const once = await onceThroughTool({
-      transport: opts.transport, prompt, tool: CONFIG_TOOL_NAME, toolDescription: CONFIG_TOOL_DESCRIPTION, schema: ConfigToolSchema, maxTokens: 16_000,
+      transport: opts.transport, prompt: attemptPrompt, tool: CONFIG_TOOL_NAME, toolDescription: CONFIG_TOOL_DESCRIPTION, schema: ConfigToolSchema, maxTokens: 16_000,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
       ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {})
     });
@@ -1188,12 +1220,22 @@ ${SKELETON_SHAPE_NOTE}
     //   （`upstream` / `bad` / `ok`），所以这一行**够不着**；删它得另给工具链单开一个三档类型，
     //   那超出本票「只做 `not-sent` 这一档」的边界。⚠️ 而且它**不是** `not-sent` 的生产者。
     if (once.kind === "not-sent") throw new CommandError("upstream", once.error.message);
-    if (once.kind === "bad") { call.trip({ failure: once.failure, spent: once.spent }); lastError = once.detail; continue; }
+    if (once.kind === "bad") {
+      call.trip({ failure: once.failure, spent: once.spent });
+      lastError = once.detail;
+      // ⚠️ **schema 失败是 config 形状问题**（工具入参不过线形状）⇒ 摘要喂回；其余 `bad`
+      //   （http / timeout / truncated / empty-input）是上游故障，**不喂回**。
+      if (once.failure === "schema")
+        attemptPrompt = `${prompt}\n\n${retryFeedback([{ where: "schema", message: once.detail }])}`;
+      continue;
+    }
     // ⚠️ **线形状过了不算数**：真正的判据是 v3 那份契约（实体 id 不重复那条 refine 住在它里面）。
     const truth = parseGameConfig(once.result.value);
     if (!truth.ok) {
       call.trip({ failure: "schema", spent: once.spent });
       lastError = `配置不过契约：${truth.errors.slice(0, 4).join("；")}`;
+      // ⚠️ schema 失败属于 config 形状问题 ⇒ 摘要喂回下一发（`bad` 那档不喂）。
+      attemptPrompt = `${prompt}\n\n${retryFeedback(truth.errors.map((message) => ({ where: "schema", message })))}`;
       continue;
     }
     // ⚠️ **recipe-config-gap-v1 票 13**：确定性钳位 —— 模型把实体摆出界是**系统性的**（提示词救不了），
@@ -1207,9 +1249,22 @@ ${SKELETON_SHAPE_NOTE}
       ...(opts.hudLineHeight !== undefined ? { hudLineHeight: opts.hudLineHeight } : {}),
     }).resampleable.filter((i) => i.severity === "error");
     if (modelHard.length > 0) {
+      // ── **D-03：先归因，再决定重采样还是硬拒** ─────────────────────────────
+      //   ⚠️ 包根因（清单里根本没有所需能力）**再抽三发也改不了** ⇒ 立即硬拒、`attempts` = 1，
+      //     文案指向清单，**不写「模型错」**（票 06 Q2 的保守兜底：不确定一律 config 可修）。
+      const split = classifyConfigIssues(truth.value, manifest, modelHard);
+      if (split.packRooted.length > 0) {
+        call.trip({ spent: once.spent });
+        throw new CommandError("invalid",
+          `这个包**缺少这份 config 所需的资源**（${split.packRooted.length} 条；config 与资源清单对不上）：\n` +
+          split.packRooted.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
+          "\n⚠️ 重抽 config 改不了 —— 要去的地方：**资源清单 / 包**（换一个能满足这些能力的包），不是再抽一次 config。",
+          ledgerCarrying(call.record()));
+      }
       call.trip({ spent: once.spent });
       lastError = `配置过不了业务校验（模型错，${STRUCTURED_CALL_ATTEMPTS} 发重采样后仍没写对，最后一次）：\n` +
         modelHard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n");
+      attemptPrompt = `${prompt}\n\n${retryFeedback(split.configFixable)}`;
       continue;
     }
     call.trip({ spent: once.spent });
@@ -1220,12 +1275,12 @@ ${SKELETON_SHAPE_NOTE}
 
   const config = checked.value;
 
-  // ── ⚠️ **确定性校验：层覆盖，不重采样、不落盘**（票 65 提前到这里的「层盖不住世界」）────
+  // ── ⚠️ **确定性校验：层覆盖 + 可达性，不重采样、不落盘**（票 65 的「层盖不住世界」；B-02 的 reachability）────
   //
   //   ⚠️ 引用族 / 自洽族 / HUD 屏幕空间那几条「模型错」已经在**重采样循环里**判了（票 10）；
-  //   这里只剩「层盖不住世界」这一条**确定性**判据 —— 它由「背景资源尺寸 + world.size」决定，
-  //   **重抽 config 改不了**（config 在 pack 之后，图已经买完），所以仍不重采样、不落盘。
-  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts`），站点装配调的是**同一个函数**。
+  //   这里剩两族**确定性**判据：①「层盖不住世界」由背景资源尺寸 + world.size 决定；
+  //   ②「这一关通不通」由地形 / 布局决定（B-02）。两者**重抽 config 改不了**，所以不重采样、不落盘。
+  //   ⚠️ 判据与规则**都住 `contracts`**（`layer-coverage.ts` / `reachability.ts`），站点装配调的是**同一个函数**。
   const issues: ConfigIssue[] = auditConfigPipeline(config, {
     manifest, design, levelId: level.id, viewport: vp,
     ...(opts.hudLineHeight !== undefined ? { hudLineHeight: opts.hudLineHeight } : {}),
@@ -1235,8 +1290,8 @@ ${SKELETON_SHAPE_NOTE}
     throw new CommandError("invalid",
       `编译出来的配置**过不了校验**（${hard.length} 条硬失败）：\n` +
       hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
-      "\n⚠️ **层盖不住世界是确定性的** —— 由背景资源尺寸 + world.size 决定，重抽 config 改不了，也不落盘。" +
-      "要去的地方：资源清单（换一个盖得住世界的背景），不是再抽一次 config。",
+      "\n⚠️ 这是**确定性失败** —— 重抽 config 改不了，也不落盘。" +
+      "按上面每一条的提示改布局 / 配置或资源清单，不是再抽一次 config。",
       ledgerCarrying(call.record()));
 
   const dir = path.join(opts.outRoot, manifest.id, "game-configs");
@@ -1362,6 +1417,7 @@ export const tdConfigExample = {
  * 资源包清单 —— `resourceBrief` 的塔防版。
  *
  * ⚠️ 带上 `role`（模型靠它认出「**哪个是砖**」）、**锚点**与**尺寸**。
+ *   ⚠️ `role` 那一截**不在这里写**：它由 `roleNote` 出，**两份清单共用同一份**（D-02）。
  *   ⚠️ 锚点那一项是补上的：第一版只写了 kind/size/role/animation，把锚点**悄悄丢了** ——
  *   而那正是「两份实现必然漂」的样子（横版那份是带锚点的）。
  *   塔防这边尤其不能丢：**砖的锚点必须正中**（票 07），而模型得看得到它才能照做。
@@ -1374,7 +1430,7 @@ function tdResourceBrief(m: AssetPackManifest): string {
   return m.assets.map((a) => {
     const anim = a.animations?.length ? `动画：${a.animations.map((x) => `${x.name}(${x.frames.length} 帧)`).join(" · ")}` : "（无动画）";
     const layers = a.layers?.length ? ` · 背景层（远→近）：${a.layers.map((l) => l.name).join(" → ")}` : "";
-    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${a.role} · ${anim}${layers}`;
+    return `- \`${a.id}\` · ${a.kind} · ${a.size.w}×${a.size.h}px · ${nineSliceNote(a)}锚点 {x:${a.anchor.x}, y:${a.anchor.y}} · ${roleNote(a)}${anim}${layers}`;
   }).join("\n");
 }
 

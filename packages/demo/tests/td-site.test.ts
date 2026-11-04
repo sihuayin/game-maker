@@ -274,3 +274,34 @@ describe("**一个入口，两种玩法**：`site` 按 config 的 format 分派"
     expect(fs.existsSync(path.join(siteDirOf(h.outRoot), "td-config.json"))).toBe(true);
   });
 });
+
+// ── D-01：自定义 viewport 进入塔防装配期审计 ───────────────────────────────
+describe("§D-01：塔防装配器用调用方的 viewport 判世界尺寸 / 屏幕空间", () => {
+  it("viewport 500×280 与 config 的 480×270 不一致 ⇒ 拒，点名 500×280（闸吃的是调用方的数）", () => {
+    const h = harness();
+    let msg = "";
+    try { assembleTdSite({ ...h.opts, viewport: { w: 500, h: 280 } }); }
+    catch (e) { msg = (e as Error).message; }
+    expect(msg).toMatch(/视口是 500×280/);
+    expect(fs.existsSync(siteDirOf(h.outRoot))).toBe(false);
+  });
+});
+
+describe("§D-01：buildTdWorld 的视口由调用方传入（世界描述 / 零数据两支）", () => {
+  const VP = { w: 500, h: 280 };
+  const manifest = () => readJson(path.join(PACK, "manifest.json"));
+  const config = () => readJson(CONFIG);
+
+  it("世界描述的 `viewport` = 传入值，世界尺寸仍是 config 的", () => {
+    const w = buildTdWorld(manifest(), config(), { packBase: "../../pack/v4/", viewport: VP });
+    expect(w.viewport).toEqual(VP);
+    expect(w.worldSize).toEqual({ w: 480, h: 270 });
+  });
+
+  it("零数据那一支：viewport 与 HUD 盒都跟着视口走", () => {
+    const w = buildTdWorld(undefined, undefined, { viewport: VP });
+    expect(w.viewport).toEqual(VP);
+    expect(w.hud.panel.box).toEqual({ x: 0, y: 0, w: 500, h: 280 });
+    expect(w.hud.panel.draw).toMatchObject({ missing: true, w: 500, h: 280 });
+  });
+});

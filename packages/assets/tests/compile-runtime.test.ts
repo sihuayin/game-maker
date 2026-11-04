@@ -8,7 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_PLAYER_MOVE, auditScreenSpace, entityBox, jumpSpan, maxJumpHeight, parseGameConfig, STRUCTURED_CALL_ATTEMPTS, type GameDesignSpec } from "@game-maker/contracts";
-import { CommandError, DEFAULT_VIEWPORT, compileRuntime, gameConfigExample } from "../src/index.js";
+import { CommandError, DEFAULT_VIEWPORT, compileRuntime, compileTdGame, gameConfigExample } from "../src/index.js";
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 /** ⚠️ 真产物：票 40 的包 + 票 33 的配置（那份配置**本身就是**一份合法正例）。 */
@@ -68,6 +68,21 @@ const NINE_ANCHORS = [
   { x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 },
   { x: 0.5, y: 0 }, { x: 0.5, y: 1 }, { x: 0, y: 0.5 }, { x: 1, y: 0.5 }, { x: 0.5, y: 0.5 },
 ] as const;
+
+
+/** 读一份包的 manifest（D-02 的 role 判据要拿它当期望值）。 */
+const manifestOf = (pack = PACK) =>
+  JSON.parse(fs.readFileSync(path.join(pack, "manifest.json"), "utf8")) as {
+    assets: { id: string; role: string }[];
+  };
+/** 复制一份 manifest 到临时包目录并就地改 —— 换行 / 空 role 的边界用例用。 */
+const packWithRoles = (mutate: (m: ReturnType<typeof manifestOf>) => void) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gm-role-pack-"));
+  const m = manifestOf();
+  mutate(m);
+  fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(m));
+  return dir;
+};
 
 describe("⚠️ 提示词里的示例**必须自己先过 schema**（旧票 40 那条守门人，原样保留）", () => {
   it("`gameConfigExample` 是一份合法的 game-config", () => {
@@ -160,8 +175,12 @@ describe("⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落
   it("⚠️ 而**锚点语义**下 `at.y = 地面线` 的写法**不该被误报**（票 48 修掉的那个 bug）", async () => {
     const d = tmp();
     const bad = structuredClone(GOOD);
-    (bad.entities as Record<string, unknown>[])[3]!.at = { x: 500, y: 210 };
-    (bad.entities as Record<string, unknown>[])[4]!.at = { x: 800, y: 202 };
+    // ⚠️ 底边锚点 ⇒ `at.y` 就是盒底：摆在地面线 250 上 ⇒ 盒底 250。旧判据算 `at.y + h`
+    //   （250 + 40 / 250 + 48 > 270）会误报「落在世界之外」—— 这条正是票 48 的那个 bug。
+    //   ⚠️ B-02 之后同一份布局还要过可达性：悬空 40px 的 40×40 实心块会真的挡住路
+    //   （玩家高 48 钻不过、顶点 60.5 又上不去），所以这里必须**贴地**摆。
+    (bad.entities as Record<string, unknown>[])[3]!.at = { x: 500, y: 250 };
+    (bad.entities as Record<string, unknown>[])[4]!.at = { x: 800, y: 250 };
     const r = await run(d, bad); // 过得了 ⇒ 它会成功落盘
     expect(r.data.ok).toBe(true);
   });
@@ -419,6 +438,92 @@ describe("§问话面：发出去的那一发", () => {
   });
 });
 
+// ── D-02：`role` 那一截两份清单都要印 ────────────────────────────────────────
+//
+// ⚠️ 判据是「**每条资产行**都印了该资产在 manifest 里的 role」—— 不是「整份 prompt 里出现过 role」：
+//   后者会被别的资产的 role 冒充（票 80 / 84 立的纪律：断的是那一行）。
+describe("§资源清单：每条资产行都带 manifest 的 `role`（D-02）", () => {
+  const spy = (input: unknown = GOOD) => {
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({ content: [{ type: "tool_use", name: "emit_game_config", input }], stop_reason: "tool_use" }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    return { f, seen };
+  };
+  const lineOf = (text: string, id: string) =>
+    text.split("\n").find((l) => l.startsWith(`- \`${id}\``)) ?? "";
+
+  it("横版清单：**每条资产行**都带 manifest 的 role（正向）", async () => {
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    for (const a of manifestOf().assets) expect(lineOf(text, a.id), a.id).toContain(a.role);
+  });
+
+  it("同一 fixture 包：横版与塔防 body 印的是**同一组 role**（parity）", async () => {
+    // ⚠️ 塔防那一发借**同一个包**（横版包）的清单：它只验清单的渲染，不验那份关卡对这个包合不合法
+    //   （关卡的资产引用对不上 ⇒ 校验会报，但请求体已经发出去了）。
+    const tdGood = JSON.parse(fs.readFileSync(path.join(ROOT, "fixtures/td-configs/counter-siege.json"), "utf8"));
+    const d = tmp();
+    fs.writeFileSync(path.join(d, "requirement.md"), "做一个守着柜台的塔防小关卡。");
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({
+          content: [
+            { type: "tool_use", name: "emit_game_config", input: GOOD },
+            { type: "text", text: JSON.stringify(tdGood) },
+          ],
+          stop_reason: "tool_use",
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+
+    await run(d, GOOD, { fetchImpl: f });
+    await compileTdGame({
+      requirementPath: path.join(d, "requirement.md"), packDir: PACK, outRoot: path.join(d, "out"),
+      transport: { baseUrl: "http://x", apiKey: "k" }, fetchImpl: f,
+    });
+
+    const side: string = seen[0]!.messages[0].content[0].text;
+    const td = String(seen[1]!.messages[0].content);
+    for (const a of manifestOf().assets) {
+      expect(lineOf(side, a.id), `横版 · ${a.id}`).toContain(a.role);
+      expect(lineOf(td, a.id), `塔防 · ${a.id}`).toContain(a.role);
+    }
+  });
+
+  it("role 里的换行折成单空格 —— 清单保持「一行一资源」（边界）", async () => {
+    const first = manifestOf().assets[0]!;
+    const pack = packWithRoles((m) => { m.assets[0]!.role = "第一行\n第二行"; });
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { packDir: pack, fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    expect(lineOf(text, first.id)).toContain("第一行 第二行 · ");
+    expect(text).not.toContain("第一行\n第二行");
+  });
+
+  it("空 role 印 `（role 为空）`，行结构不破（边界）", async () => {
+    const first = manifestOf().assets[0]!;
+    const pack = packWithRoles((m) => { m.assets[0]!.role = ""; });
+    const d = tmp();
+    const sp = spy();
+    await run(d, GOOD, { packDir: pack, fetchImpl: sp.f });
+    const text: string = sp.seen[0]!.messages[0].content[0].text;
+    const line = lineOf(text, first.id);
+    expect(line).toContain("（role 为空） · ");
+    expect(line).toContain("动画：");   // 后面那几截还在 —— 不是整行被吞
+  });
+});
+
 describe("§哪一关 / 哪一代外壳", () => {
   it("`levelId` 省略 = 设计层的第一关；给了一个不存在的 ⇒ `usage`", async () => {
     const d = tmp();
@@ -536,6 +641,43 @@ describe("⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 
   });
 });
 
+// ── B-02：这一关走不通 ⇒ 编译期硬拒、**不重采样**、不落盘 ────────────────────
+//
+// ⚠️ 失败阶段前移：以前只有 QA 报这条；现在编译期就拒（退出码仍是 `invalid`(4)）。
+//   而它**不进**重采样 —— 「走不通」是布局 / 地形层面的确定性缺陷，再抽一次 config 改不了。
+describe("§B-02：不可达的 config 在编译期硬拒、不重采样", () => {
+  /** 一道占满世界高的墙：右侧的终点 / 拾取物一律够不到。 */
+  const walledOff = () => {
+    const bad = structuredClone(GOOD);
+    (bad.terrain as { x: number; y: number; w: number; h: number }[])
+      .push({ x: 300, y: 0, w: 100, h: bad.world.size.h });
+    return bad;
+  };
+
+  it("`invalid` · **只发一趟** · 不落盘 · 文案指向布局 / 地形，不写「模型错」", async () => {
+    const d = tmp();
+    const e = await run(d, walledOff()).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    const m = (e as CommandError).message;
+    expect(m).toMatch(/够不到/);
+    expect(m).toMatch(/布局/);
+    expect(m).toMatch(/确定性失败/);
+    expect(m).not.toMatch(/模型错/);
+    expect(fs.existsSync(path.join(d, "out")), "坏配置比没配置更坏").toBe(false);
+    const ledger = (e as CommandError).ledger as { attempts: number; failures?: string[] }[];
+    expect(ledger[0]!.attempts, "不可达不是重采样能救的事").toBe(1);
+    expect(ledger[0]!.failures ?? [], "账上不出现 schema / 重采样失败").toEqual([]);
+  });
+
+  it("可达的 `last-train` 夹具：编译照常通过（不误拒）", async () => {
+    const d = tmp();
+    const r = await run(d, GOOD);
+    expect(r.data.ok).toBe(true);
+    expect(fs.existsSync(fileOf(d))).toBe(true);
+  });
+});
+
 // ── entity-identity-v1.1 票 06（Phase 3 E2E）：真实 pack + 注入映射 → 编译期身份验真 ──
 //
 // ⚠️ 这里走的是**真实 `compileRuntime` 全路径**（真 pack `last-train/v2` + 真设计 + 重采样循环 +
@@ -607,5 +749,89 @@ describe("entity-identity-v1.1 票 06：错误归属拒绝 + 关卡作用域（�
     expect((e as CommandError).message).toMatch(/没有对应实体/);  // level-b 的 e-b/res-b 未覆盖
     expect((e as CommandError).message).toMatch(/wrong-scope/);    // 本关 config 引用了 level-a 的实体
     expect(fs.existsSync(path.join(d, "out"))).toBe(false);
+  });
+});
+
+// ── D-03：归因与受限重采样反馈 ───────────────────────────────────────────────
+//
+// ⚠️ 要钉两件事：① 包根因（清单里根本没有所需能力）⇒ **1 发硬拒**、文案指向清单、不写「模型错」；
+//   ② config 可修 ⇒ 照常重采样，但**下一发带着上一发的 where/message**（schema 失败同理）。
+describe("§D-03：包根因硬拒 / config 可修反馈", () => {
+  const spy = (input: unknown = GOOD) => {
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(
+        JSON.stringify({ content: [{ type: "tool_use", name: "emit_game_config", input }], stop_reason: "tool_use" }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+    return { f, seen };
+  };
+  const promptOf = (b: Record<string, any>) => String(b.messages[0].content[0].text);
+
+  /** 包的临时副本：**删掉全部 ui 资产**（只动 manifest —— 编译根本不读别的文件）。 */
+  const packWithoutUi = () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gm-no-ui-pack-"));
+    const manifest = JSON.parse(fs.readFileSync(path.join(PACK, "manifest.json"), "utf8"));
+    manifest.assets = manifest.assets.filter((a: { kind: string }) => a.kind !== "ui");
+    // ⚠️ 图集也声称包含那些资源 ⇒ 一起删，否则 manifest 自己就不过 schema，测不到归因。
+    manifest.atlases = manifest.atlases.filter((x: { kind: string }) => x.kind !== "ui");
+    fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest));
+    return dir;
+  };
+
+  it("包内无 ui（hud 所需能力不存在）⇒ **1 发**、`invalid`、指向清单、**不写「模型错」**", async () => {
+    const d = tmp();
+    const sp = spy();
+    const e = await run(d, GOOD, { packDir: packWithoutUi(), fetchImpl: sp.f }).catch((x: unknown) => x);
+    expect(e).toBeInstanceOf(CommandError);
+    expect((e as CommandError).kind).toBe("invalid");
+    expect((e as CommandError).message).toMatch(/缺少这份 config 所需的资源/);
+    expect((e as CommandError).message).toMatch(/资源清单/);
+    expect((e as CommandError).message).not.toMatch(/模型错/);
+    expect(sp.seen, "硬拒不重采样").toHaveLength(1);
+    const ledger = (e as CommandError).ledger as { attempts: number }[];
+    expect(ledger[0]!.attempts).toBe(1);
+    expect(fs.existsSync(path.join(d, "out"))).toBe(false);
+  });
+
+  it("config 可修（幻觉 id，但包里**有同 kind 资产**）⇒ 3 发；第 2/3 发带上一发的 where/message", async () => {
+    const d = tmp();
+    const bad = structuredClone(GOOD) as { entities: { asset: string }[] };
+    bad.entities[0]!.asset = "__没有这个__";
+    const sp = spy(bad);
+    const e = await run(d, bad, { fetchImpl: sp.f }).catch((x: unknown) => x);
+    expect((e as CommandError).message).toMatch(/模型错/);          // 仍是模型错，不是包根因
+    expect(sp.seen).toHaveLength(3);
+    expect(promptOf(sp.seen[0]!), "第一发没有反馈段").not.toContain("上一发被拒的原因");
+    for (const b of sp.seen.slice(1)) {
+      const text = promptOf(b);
+      expect(text).toContain("上一发被拒的原因");
+      expect(text).toContain('entity "suitcase-1"');
+      expect(text).toContain("包里没有资源");
+    }
+  });
+
+  it("schema 失败 ⇒ 第 2/3 发带 schema 摘要（不是「模型错」，但形状可修）", async () => {
+    const d = tmp();
+    const sp = spy({ 不是: "一份配置" });
+    await run(d, { 不是: "一份配置" }, { fetchImpl: sp.f }).catch((x: unknown) => x);
+    expect(sp.seen).toHaveLength(3);
+    expect(promptOf(sp.seen[1]!)).toContain("上一发被拒的原因");
+    expect(promptOf(sp.seen[1]!)).toContain("schema:");
+  });
+
+  it("`bad`（上游没交出可用工具调用）**不喂回** —— 三发 body 逐字相同", async () => {
+    const d = tmp();
+    const seen: Record<string, any>[] = [];
+    const f = (async (_url: string, init: RequestInit) => {
+      seen.push(JSON.parse(String(init.body)));
+      return new Response(JSON.stringify({ content: [{ type: "text", text: "没有工具调用" }], stop_reason: "end_turn" }),
+        { status: 200, headers: { "content-type": "application/json" } });
+    }) as unknown as typeof fetch;
+    await run(d, GOOD, { fetchImpl: f }).catch((x: unknown) => x);
+    expect(seen).toHaveLength(STRUCTURED_CALL_ATTEMPTS);
+    for (const b of seen) expect(promptOf(b)).not.toContain("上一发被拒的原因");
   });
 });

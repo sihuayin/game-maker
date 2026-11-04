@@ -81,6 +81,8 @@ export type TdSiteOptions = {
   shellJsPath: string;
   outRoot: string;
   gameId?: string;
+  /** 外壳视口（D-01）。省略 = `VIEWPORT`（480×270）。⚠️ 世界尺寸 / 屏幕空间审计必须用同一个数。 */
+  viewport?: { w: number; h: number };
 };
 
 const rel = (root: string, p: string) => path.relative(root, p).split(path.sep).join("/");
@@ -120,14 +122,16 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   const packVersion = `v${manifest.version}`;
   const outRoot = path.resolve(opts.outRoot);
   const gameDir = path.join(outRoot, gameId);
+  // ⚠️ D-01：世界构建与两条审计**同一个数**。
+  const viewport = opts.viewport ?? VIEWPORT;
 
   // ── 校验：三族 + **世界尺寸**（都在契约层）+ 第四族（几何）+ 第五族（屏幕空间）+ 第六族（可通关）──
   // ⚠️ 场景描述**只构建一次**：几何族校验的那份，就是下面写进 warning 汇总、以及
   //   外壳将要画的那一份。构建两次 = 给了它们漂移的机会，而漂移是静默的。
-  const world = buildTdWorld(manifest, config, { packBase: `../../pack/${packVersion}/` });
+  const world = buildTdWorld(manifest, config, { packBase: `../../pack/${packVersion}/`, viewport });
   // ⚠️ **第五族与几何族分开、且与横版共用一份**（票 03）——
   //   塔防的 `hud` 有**五个**成员，而原先的几何族只覆盖了三个（票 03 量到的那个洞）。
-  const screenIssues = auditScreenSpace(VIEWPORT, tdHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
+  const screenIssues = auditScreenSpace(viewport, tdHudScreenItems(config, manifest, { lineHeight: HUD_LINE_HEIGHT }));
   // ⚠️ **「这一关通不通」也判在这里**（票 11）：那一步需要**模拟器**，而它住在 demo ——
   //   与**几何族**是同一个处境（同样够不着 `contracts`），所以落在同一处。
   //   `compileGame` 自己的注释写着这条分工：「这里跑的是 `site` 要跑的同一批校验（**减去第四族**）」。
@@ -140,7 +144,7 @@ export function assembleTdSite(opts: TdSiteOptions): CommandResult {
   //   `site` 可以对着盘上**手写**的一份配置直接跑，根本不经过编译那一遍。
   const all = [
     ...auditTdConfig(config, manifest),
-    ...auditTdWorldSize(VIEWPORT, config),
+    ...auditTdWorldSize(viewport, config),
     ...screenIssues,
     ...auditTdGeometry(world),
     ...winnable,

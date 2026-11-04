@@ -380,7 +380,8 @@ describe("§⚠️ **两条路的产物等价**（票 16 的 Q9*）", () => {
 
 describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5）", () => {
   /** 一份**够不到终点**的配置：拾取物摆到跳不到的高处（世界是平的、跳跃顶点只有 40.5px）。
-   *  ⚠️ 它过得了配置契约、也过得了 `compile-runtime` 的业务校验 —— 只有 QA 的 `reachability` 看得见。 */
+   *  ⚠️ **B-02 之后**它不再走到 QA：`reachability` 进了 `deterministic`，编译 / 汇合点就硬拒
+   *  （失败阶段前移，退出码仍是 4）。 */
   function unreachable(): Record<string, unknown> {
     const config = structuredClone(CANNED["gameConfig"]!) as { entities: { id: string; at: { x: number; y: number } }[] };
     config.entities.find((e) => e.id === "e-pickup-1")!.at = { x: 120, y: 60 };
@@ -431,23 +432,20 @@ describe("§QA 进壳：裁决 · 报告路径 · 失败详情（票 20 的 Q5�
     expect(text.indexOf("站点：")).toBeGreaterThan(text.indexOf("资源观察摘要"));
   });
 
-  it("⚠️ 判据硬失败 ⇒ 退出码 **4**、**站点不产**、报告**已经落盘**，而文案里有路径与详情", async () => {
+  it("⚠️ 不可达 config ⇒ 退出码 **4**、**站点不产**，且在 `config` 步就被拒（QA 没到达 ⇒ 没有 qa-report）", async () => {
     const s = stage({ config: unreachable() });
     const r = await runC(create(s, ["--yes", "--json"]), s.deps);
     expect(r.code, r.text()).toBe(EXIT.invalid);           // 4 —— 沿用既有的「产物不合法」档，**不新增值**
     // ⚠️ 站点那一步**走不到**：判据说这一版不行，就不该产出一个能打开来玩的站点
     expect(fs.existsSync(path.join(s.outRoot, "wasteland", "site"))).toBe(false);
-    // ⚠️ 而报告**在**（落盘在阻断之前）—— 判据说不行了，正是最该读它的时候
-    const report = jread(path.join(s.outRoot, "wasteland", "run", "v1", "qa-report.json")) as {
-      failures: { judgement: string }[];
-    };
-    expect(report.failures.map((f) => f.judgement)).toContain("reachability");
-
-    // ⚠️ 走异常那一路也丢不掉**报告路径**与**失败详情**（票 20 的 Q5 的明确要求）
+    // ⚠️ **B-02：失败阶段前移** —— QA 根本没跑，所以没有 qa-report（不是「报告丢了」）。
+    //   报告先落盘、再阻断那条顺序仍由 `pipeline/tests/create-game.test.ts`（注入失败报告）钉着。
+    expect(fs.existsSync(path.join(s.outRoot, "wasteland", "run", "v1", "qa-report.json"))).toBe(false);
     const err = jsonOf(r.io);
     expect(err.data).toBeUndefined();
-    expect(String(err.error)).toMatch(/wasteland\/run\/v1\/qa-report\.json/);
-    expect(String(err.error)).toMatch(/\[reachability\]/);
+    expect(String(err.error)).toMatch(/够不到/);
+    expect(String(err.error)).toMatch(/确定性失败/);
+    expect(String(err.error)).not.toMatch(/qa-report\.json/);
   });
 });
 

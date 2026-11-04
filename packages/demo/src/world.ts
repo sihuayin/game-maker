@@ -128,10 +128,12 @@ function floorYOf(box: Box, terrain: Box[], entities: EntityDesc[]): number {
  *   都只会得到一份「全是占位符」的描述 + 一堆 `issues`。零数据也必须起得来（裁决 3）。
  */
 export function buildWorld(
-  manifest: unknown, config: unknown, opts: { packBase?: string } = {},
+  manifest: unknown, config: unknown, opts: { packBase?: string; viewport?: { w: number; h: number } } = {},
 ): WorldDescription {
   const issues: Issue[] = [];
   const base = opts.packBase ?? "";
+  // ⚠️ D-01：**这一份**是该次调用的视口 —— 函数内不再读外壳常量。
+  const viewport = opts.viewport ?? VIEWPORT;
 
   // ── 解析（失败**不抛**，只记 issue）──────────────────────────────────────
   const mp = parseAssetPack(manifest ?? {});
@@ -147,17 +149,17 @@ export function buildWorld(
 
   if (!pack) {
     return {
-      shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { ...VIEWPORT },
+      shellVersion: SHELL_VERSION, viewport: { ...viewport }, worldSize: { ...viewport },
       atlases: [], issues, background: [], terrain: [], entities: [],
-      hud: { panel: { draw: hudFallback("没有资源包"), box: { x: 0, y: 0, w: VIEWPORT.w, h: VIEWPORT.h } }, pips: [] },
+      hud: { panel: { draw: hudFallback("没有资源包", viewport), box: { x: 0, y: 0, w: viewport.w, h: viewport.h } }, pips: [] },
       player: fallbackPlayer(issues), objective: { gate: "", pickupCount: 0 },
     };
   }
   if (!cfg) {
     return {
-      shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { ...VIEWPORT },
+      shellVersion: SHELL_VERSION, viewport: { ...viewport }, worldSize: { ...viewport },
       atlases, issues, background: [], terrain: [], entities: [],
-      hud: { panel: { draw: hudFallback("没有 game-config"), box: { x: 0, y: 0, w: VIEWPORT.w, h: VIEWPORT.h } }, pips: [] },
+      hud: { panel: { draw: hudFallback("没有 game-config", viewport), box: { x: 0, y: 0, w: viewport.w, h: viewport.h } }, pips: [] },
       player: fallbackPlayer(issues), objective: { gate: "", pickupCount: 0 },
     };
   }
@@ -165,7 +167,7 @@ export function buildWorld(
   const W = cfg.world.size.w, H = cfg.world.size.h;
 
   // ── 背景：**一个资源 = 一摞层**（第 i 层 = 第 i 帧，票 24 的 Layer）────────
-  const background = buildBackground(pack, cfg.scene.background.asset, W, H, issues, { w: VIEWPORT.w, h: VIEWPORT.h });
+  const background = buildBackground(pack, cfg.scene.background.asset, W, H, issues, { w: viewport.w, h: viewport.h });
 
   // ── 地形（看不见的碰撞）与实体（看得见的）──────────────────────────────
   const terrain: Box[] = cfg.terrain.map((t) => ({ x: t.x, y: t.y, w: t.w, h: t.h }));
@@ -233,13 +235,13 @@ export function buildWorld(
     issues.push({ severity: "error", where: "objective.gate", message: `找不到 id 为 "${cfg.objective.gate}" 的 goal 实体` });
 
   return {
-    shellVersion: SHELL_VERSION, viewport: { ...VIEWPORT }, worldSize: { w: W, h: H }, atlases, issues,
+    shellVersion: SHELL_VERSION, viewport: { ...viewport }, worldSize: { w: W, h: H }, atlases, issues,
     background, terrain, entities, player,
     hud: { panel: { draw: hudPanel, box: hudBox("hud.panel") }, pips },
     objective: { gate: cfg.objective.gate, pickupCount: pickups },
   };
 }
 
-function hudFallback(reason: string): Missing {
-  return { missing: true, label: "hud.panel", reason, x: 0, y: 0, w: VIEWPORT.w, h: VIEWPORT.h };
+function hudFallback(reason: string, viewport: { w: number; h: number }): Missing {
+  return { missing: true, label: "hud.panel", reason, x: 0, y: 0, w: viewport.w, h: viewport.h };
 }
