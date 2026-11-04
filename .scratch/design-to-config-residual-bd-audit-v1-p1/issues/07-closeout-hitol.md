@@ -67,4 +67,4 @@ Map: ../map.md
 - 决策记录：本节 Q1–Q3。
 - PR URL：https://github.com/sihuayin/game-maker/pull/27（state: OPEN、draft: false、base: main）。
 - 验收报告：[report.md](../report.md)（build / typecheck / 2425 测试全绿；语料新增 error 0、包根因 0）。
-- closeout commit：`P1-closeout: decision, PR, map closure`。
+- closeout commit：`413d993`（`P1-closeout: decision, PR, map closure`），基线 `4511ef8`。
