@@ -48,6 +48,7 @@ Predecessor: [B/D 残余审计](../design-to-config-residual-bd-audit-v1/map.md)
 - 每项一个 commit：`P1-D-02: ...` / `P1-B-02: ...` / `P1-publish-gate: ...` / `P1-D-01: ...` / `P1-D-03: ...`。
 - `06`：`P1-acceptance: ...`；`07`：`P1-closeout: ...`。
 - 实施期间只在本地分支提交；`07` 通过 HITL 后才推送分支并开 PR（走 ClashX 代理）。
+  ⚠️ **2026-11-04 用户指示提前推送分支**（`origin/p1/design-to-config-residual-bd-audit`）；PR 仍留到 07。
 - 不推送 `main`；不自动合并 PR；合并由用户在图外完成。
 
 ### 验收与证据
