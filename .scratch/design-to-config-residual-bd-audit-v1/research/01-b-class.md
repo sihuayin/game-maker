@@ -3,8 +3,8 @@
 - **Date**：2026-11-03
 - **Baseline**：`main` @ `3b1b61d`（当前工作树与基线一致；`git status --short` 只显示本票新建的
   `.scratch/design-to-config-residual-bd-audit-v1/`）
-- **Input**：P0 收口报告 [`final-report.md`](../design-to-config-residual-audit-v1/final-report.md)、
-  P1 实施报告 [`report.md`](../design-to-config-residual-audit-v1-p1/report.md)、
+- **Input**：P0 收口报告 [`final-report.md`](../../design-to-config-residual-audit-v1/final-report.md)、
+  P1 实施报告 [`report.md`](../../design-to-config-residual-audit-v1-p1/report.md)、
   `entity-identity-v1.1` 裁定、`recipe-config-gap-v1` 裁定、当前源码
 - **Nature**：只读研究。**不裁定修复去留**；不修改生产代码、测试、fixture、契约或历史证据；
   零付费、零模型调用、零生图；未 commit / 未建分支 / 未推送。
