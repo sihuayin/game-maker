@@ -32,7 +32,7 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 
 - **PRD（只读冻结）**：[`docs/v7.7/配置.md`](../../docs/v7.7/配置.md)；§13 是本图的启动依据。
 - **开图裁定（冻结输入）**：[rulings-2026-11-04.md](rulings-2026-11-04.md)。Q1–Q7 全 A；逐字边界见该文件，本图不复述全文。
-- **领域词汇**：`CONTEXT.md` 是唯一权威；本图不新增同义词。新术语先在规格中定义，是否写入 `CONTEXT.md` 由 [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md) 决定。
+- **领域词汇**：`CONTEXT.md` 是唯一权威；本图不新增同义词。可玩性术语已于 2026-11-04 写入 `CONTEXT.md`，定义见 [framework.md](framework.md) §0–§2。
 - **前序**：[Design-to-Config Residual B/D Audit](../design-to-config-residual-bd-audit-v1/map.md) · [P1 实施](../design-to-config-residual-bd-audit-v1-p1/map.md)（均已收口）。本图**不重开** B-03 / B-04 / B-05 / D-04 的既有裁定；只在前序边界内审计 **config 侧**可确定的判据。
 - **代码基线**：`main` @ `fa17c14`（PR #27 合并后）。
 
@@ -75,7 +75,7 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 ### 02 审计基线（2026-11-04）
 
 - 现有可玩性判据只有 `auditReachability`（只报「够不到」）加 `auditGameConfig` 的台阶高 / 行程越界 **warning**；其余是引用、身份、HUD、背景、机制存在性。
-- 三态 `PROVEN_UNPLAYABLE` / `INSUFFICIENT_EVIDENCE` / `NO_PROVEN_BLOCKER` 全仓不存在；严格三态需要新结果形状。
+- 三态 `PROVEN_UNPLAYABLE` / `INSUFFICIENT_EVIDENCE` / `NO_PROVEN_BLOCKER` 全仓不存在；承载方式已由 [framework.md](framework.md) §3 定为内部 `PlayabilityVerdict`，不落持久化契约。
 - QA 实际是 7 条判据（`QA_JUDGEMENTS.length`），不是多处注释写的 6 条。
 - 历史语料不能直接重判：171 份 manifest 中 81 份不是 v4；152 份 config 中 21 份唯一、96 份配对；reachability 新增 error 0；0 moving solid / 0 非 hazard motion / 0 `body` 覆盖；53 个 chest 实例 / 5 份唯一 config。
 - 发布闸只重跑 `auditReachability`；新判据若不在该函数内，standalone `site` / `assemble_site` 不会执行。
@@ -86,11 +86,11 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 
 ### 票流
 
-1. [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)（grilling，HITL）— open
+1. [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)（grilling，HITL）— resolved
 2. [现有可玩性能力与缺口源码审计](issues/02-capability-gap-audit.md)（research，AFK）— resolved
-3. [空间布局候选判据](issues/03-spatial-layout-judgments.md)（research，AFK，blocked by 01, 02）— open
-4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK，blocked by 01, 02）— open
-5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK，blocked by 01, 02）— open
+3. [空间布局候选判据](issues/03-spatial-layout-judgments.md)（research，AFK）— open
+4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK）— open
+5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK）— open
 6. [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)（task，AFK）— open
 7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK，blocked by 03, 04, 05）— open
 8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK，blocked by 03, 04, 05, 06）— open
@@ -100,14 +100,12 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 ## Decisions so far
 
 - [现有可玩性能力与缺口源码审计](issues/02-capability-gap-audit.md)：现有判据只有 `auditReachability` + 台阶/行程 warning；chest、收集后返回 gate、hazard/danger 时序、moving solid、低天花板误报均未覆盖；三态不存在；历史语料 96 配对 / 0 新 error。报告见 [02-capability-gap-audit.md](research/02-capability-gap-audit.md)。
+- [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)：输入只吃 config + manifest + `FixedRuntimeProfile`；内部 `PlayabilityVerdict` 三态不落持久化契约；`PROVEN_UNPLAYABLE` 进 `deterministic`；新入口 `auditPlayability` 替换 reachability 并接入发布闸；术语写入 `CONTEXT.md`。规格见 [framework.md](framework.md)。
 
 ## Not yet specified
 
 - 哪些空间布局判据能在**不改契约**的前提下精确可算，且不与 `auditGameConfig` 既有警告重复 —— 02 已给出候选缺口（chest、单向路径、低天花板误报、moving solid、`body` 语义）；具体取舍取决于 [空间布局候选判据](issues/03-spatial-layout-judgments.md)。
 - `danger` 的安全窗口、`motion` 巡逻与跳跃时序能否给出**不误伤**的确定性判据，还是只能落到 `INSUFFICIENT_EVIDENCE` —— 取决于 [机制组合候选判据](issues/04-mechanic-composition-judgments.md)。
-- 三态结果是否需要新的 contracts 形状，还是可完全落在现有 `ConfigIssue[]` + 只读审计报告（02 已确认：严格三态需要新结果形状；`ConfigIssue[]` 只能表达有/无 error）—— 取决于 [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md) 与 [最小实施方案与契约候选](issues/09-implementation-plan.md)。
-- 未来实施是否在编译/汇合点硬拒、失败分档如何变化 —— 取决于同上两票与 [审批包与独立实施交接](issues/10-approval-package.md)。
-- 「可通行性 / 空间可达性 / 机制可通行性 / 关卡完成性」是否写入 `CONTEXT.md` —— 取决于 [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)。
 
 ## Out of scope
 
