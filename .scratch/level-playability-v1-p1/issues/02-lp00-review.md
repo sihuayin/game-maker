@@ -1,8 +1,8 @@
 # LP-00 复核：Runtime 语义证据是否充分
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber · 2026-11-05
 Blocked by: 01
 Map: ../map.md
 
@@ -36,3 +36,50 @@ P4 为 `CONTRADICTED`、P1 带边界、P2/P3 为 `CONFIRMED`。复核必须逐�
 
 - P1–P4 每项有明确处置（证据充分 / 降级 / 阻断）。
 - 通过时能一句话回答：「哪些几何假设现在可以作为确定性判据的基础」。
+
+## Answer
+
+**2026-11-05 · 用户裁定 · PASS WITH BOUNDARIES。**
+
+P4 假设被源码推翻不代表 LP-00 失败；处理方式是修正判据，不是沿用错误假设。复核通过，但必须遵守以下语义边界。
+
+### 五项裁定
+
+1. **P4 出生点 —— 批准降级。** `PLAYABILITY_SPATIAL_SPAWN_IN_TERRAIN` 不得作为确定性阻断判据，降为 `INSUFFICIENT_EVIDENCE` / 仅观察。保留出生点与地形重叠的诊断信息；不得仅凭几何重叠判定出生点不可玩；不得接入确定性阻断。后续若有可靠的 Runtime 行为证据，可单独重新评估。
+2. **P1 尺寸与锚点 —— 有条件接受。** 静态实体使用已确认的 Runtime `entityBox` 语义；帧相关实体必须考虑实际图集帧几何。pack acceptance 已确认时，允许使用对应的几何保证；acceptance 无法确认时使用 `coverage.partial`；缺失图集信息时不得自行用 manifest 尺寸推断为精确碰撞几何。资源尺寸正确，不代表动画每一帧的碰撞几何都正确。
+3. **P2 / P3 —— 确认。** 作为确定性判据的基础，并把 Chest 交互范围四边外扩 `range` 写入统一 Runtime geometry profile：
+
+```text
+collisionBox(entity) = entityBox(entity.at, entity.body ?? entity.size, manifest.anchor)
+
+solid:  body
+chest:  body
+danger: body
+pickup: atlas-frame geometry
+hazard: atlas-frame geometry
+goal:   atlas-frame geometry
+decor:  no collision
+
+chestInteractionBox = expand(chestBox, range)
+chestInteractable   = strictAabbOverlap(playerBox, chestInteractionBox)
+```
+
+   Chest 交互判定必须遵循严格 AABB 相交，不额外要求玩家落地。
+4. **`EntityDesc.box` 分歧 —— 以 Runtime 为准。** 必须查明 `EntityDesc.box` 的现有调用方；审计逻辑使用统一 Runtime geometry profile；pickup / hazard / goal 不再通过 `body` 产生错误的碰撞盒；不得通过修改 Runtime 行为来迁就审计辅助函数。
+5. **hazard body —— 以源码语义为准。** 审计忽略 `hazard.body`，使用 Runtime 实际采用的图集帧几何；pack acceptance 无法确认时标记 `coverage.partial`；不得将配置中的 `hazard.body` 当作替代碰撞盒。证据不足时保守降级，但不退回错误假设。
+
+### 对 LP-01 的强制实现约束
+
+1. 先统一 Runtime geometry profile，各判据不得自行解释碰撞语义。
+2. 几何模型必须区分确定性几何与帧相关几何。
+3. `coverage.partial` 必须能够向上游判据传播。
+4. 出生点重叠不得作为确定性阻断。
+5. 不得使用与 Runtime 不一致的 `EntityDesc.box` 语义。
+
+### 对 LP-02 的约束
+
+Chest / Pickup / Gate 可达性判定继承上述约束，不得为了得到更多检测结果而扩大确定性判据范围。
+
+### 不重开
+
+不重新讨论 P1–P4；不把 P4 降级扩展成 Runtime 修复需求。
