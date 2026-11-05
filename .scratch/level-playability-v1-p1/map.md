@@ -90,7 +90,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 - [LP-00 复核](issues/02-lp00-review.md)：**PASS WITH BOUNDARIES**。P4 降级（`SPAWN_IN_TERRAIN` 仅观察）；P1 有条件接受（acceptance 不确认 ⇒ `coverage.partial`）；P2/P3 确认并写入统一 Runtime geometry profile；`EntityDesc.box` 以 Runtime 为准；`hazard.body` 忽略。LP-01 携带五项强制约束。
 - [LP-01 基础几何模型](issues/03-lp01-geometry.md)：统一 Runtime geometry profile + 共享移动图落地（纯加法，未改既有审计/Runtime）；body 系 vs 帧系几何与 coverage 分离；walk / walk-off / fall / hop 边；19 例新测试、contracts 857 例全绿。`EntityDesc.box` 调用方已清点，审计不消费它。
 - [LP-02 空间可达性判据](issues/04-lp02-spatial.md)：`auditSpatial` 落地（三态 + coverage；BLOCKED 优先、UNREACHABLE 其次；chest range 四边外扩；pickup/goal 忽略 body；出生点只诊断不硬拒）。23 例空间矩阵转生产夹具；冻结语料 20 唯一 config：0 阻断、2 例 gate-missing 证据不足、18 例层内无阻断，对既有 reachability 新增/修复 0。研究矩阵三处修正（#19 降级、#4 subject、#12 gate 实际不可达）见票据 Answer。
-- [LP-02 复核](issues/05-lp02-review.md)：**有条件通过，条件已满足**。UNREACHABLE 必须以「搜索模型无遗漏」为前提；补 mid-air touch-only 保守降级（`cbc93a8`，`PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN`，只降级、不写可达集）。矩阵口径定为 **17 PROVEN / 17 NO_PROVEN / 5 INSUFFICIENT**；层内 verdict / coverage / 整关 aggregate 三者分离。空间 46 例、契约 904 例、全仓 2491 例、typecheck 0；20 唯一 config 回归 0 新增 / 0 修复。
+- [LP-02 复核](issues/05-lp02-review.md)：**有条件通过，条件已满足**。UNREACHABLE 必须以「搜索模型无遗漏」为前提；补 mid-air touch-only 保守降级（`cbc93a8`，`PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN`，只降级、不写可达集）。矩阵口径定为 **17 PROVEN / 17 NO_PROVEN / 5 INSUFFICIENT**；层内 verdict / coverage / 整关 aggregate 三者分离。空间 46 例、契约 904 例、全仓 2491 例、typecheck 0；20 唯一 config 回归 0 新增 / 0 修复。Draft PR [#28](https://github.com/sihuayin/game-maker/pull/28) 已创建。
 
 ## Not yet specified
 

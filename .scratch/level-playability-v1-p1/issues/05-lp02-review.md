@@ -95,7 +95,7 @@ HITL 复核 [LP-02 空间可达性判据](04-lp02-spatial.md)（PRD §4.3 / §6.
 | 5. 无新增不可解释误报 | ✅ 语料与矩阵全部可解释 |
 | 6. 更新复核记录 | ✅ 本 Answer |
 
-**Draft PR：本次记录提交后创建；URL 在后续记录 commit 中补。** 不合并、不推送 `main`、不启动 LP-03。
+**Draft PR：[#28](https://github.com/sihuayin/game-maker/pull/28)（`wayfinder/level-playability-v1` → `main`）。** 不合并、不推送 `main`、不启动 LP-03。
 
 ### 残余观察（不阻塞本次复核）
 
