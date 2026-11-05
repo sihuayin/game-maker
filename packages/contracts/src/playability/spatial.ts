@@ -30,8 +30,19 @@
 //
 //   ⚠️ 判定用**开区间**（贴着不算撞），与 Runtime 的严格 AABB 同义；不再额外外扩 1px ——
 //     外扩会把「脚点刚好贴着实心体顶面」的自由格算进来，反而把真 BLOCKED 判成不 BLOCKED。
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// 五、UNREACHABLE 之前必须排除 mid-air touch-only（LP-02 复核裁定 Q3(a)）
+//
+//   BFS 没找到路径**本身不是**不可达的充分证据：玩家可能只在一条**不落到任何落脚点**的
+//   跳跃弧 / 走出悬崖后的下落弧上碰到目标（碰完就掉出世界）。这种弧不会被 hopEdges /
+//   walk-off 覆盖，却足以让目标「可接触」。
+//
+//   ⇒ 对每个未覆盖、且不被 BLOCKED 封死的目标，扫一遍「不撞实心体、不要求落地」的弧线：
+//     只要存在一条让玩家盒与目标盒严格相交的弧，就降级为 `INSUFFICIENT_EVIDENCE`，
+//     **不**判 UNREACHABLE，也**不**把它写进可达集。这是保护误拒绝，不是扩大可达性模型。
 
-import { playerMoveOf } from "../game-config.js";
+import { jumpSpan, maxJumpHeight, playerMoveOf } from "../game-config.js";
 import type { GameConfig } from "../game-config.js";
 import type { AssetPackManifest } from "../assetpack.js";
 import type { Aabb, Vec } from "./geometry.js";
@@ -39,7 +50,7 @@ import { boxFromFoot, overlapsInclusive, overlapsStrict } from "./geometry.js";
 import {
   buildMovementGraph, hopEdges, movementNeighbors,
 } from "./graph.js";
-import type { MovementGraph } from "./graph.js";
+import type { MovementGraph, MoveParams } from "./graph.js";
 import { FIXED_RUNTIME_PROFILE, chestInteractionBox, runtimeEntityGeometry } from "./profile.js";
 import type { FixedRuntimeProfile } from "./profile.js";
 import type {
@@ -57,6 +68,8 @@ export const SPATIAL_JUDGMENTS = {
   chestBlocked: "PLAYABILITY_SPATIAL_CHEST_BLOCKED",
   gateUnreachable: "PLAYABILITY_SPATIAL_GATE_UNREACHABLE",
   gateBlocked: "PLAYABILITY_SPATIAL_GATE_BLOCKED",
+  /** 未覆盖目标存在不撞实心体的不落地弧线 ⇒ 不能证明不可达（保守降级，见文件头五）。 */
+  midAirUnproven: "PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN",
 } as const;
 
 export type SpatialJudgmentId = (typeof SPATIAL_JUDGMENTS)[keyof typeof SPATIAL_JUDGMENTS];
@@ -68,6 +81,7 @@ export type SpatialJudgmentId = (typeof SPATIAL_JUDGMENTS)[keyof typeof SPATIAL_
 export const SPATIAL_NON_BLOCKING: ReadonlySet<string> = new Set<string>([
   SPATIAL_JUDGMENTS.spawnInTerrain,
   SPATIAL_JUDGMENTS.spawnNoFoothold,
+  SPATIAL_JUDGMENTS.midAirUnproven,
 ]);
 
 /** 建模不了 / 判不了的缺口；不产 issue，只把 coverage 与 verdict 拉向证据不足。 */
@@ -191,6 +205,8 @@ export function auditSpatial(
 
   const seen = new Set<string>();
   const queue: Vec[] = [];
+  /** 走出悬崖的那一步：不落地弧线扫描的起点（`vy = 0`）。 */
+  const walkOffStarts: Vec[] = [];
   const add = (x: number, y: number): void => {
     const key = `${x},${y}`;
     if (seen.has(key)) return;
@@ -208,7 +224,10 @@ export function auditSpatial(
     for (const edge of movementNeighbors(graph, cell.x, cell.y)) {
       if (edge.kind !== "walk") {
         // 迈出悬崖那一步，以及整段竖直下落；中途碰到目标也算够到。
-        if (edge.x !== cell.x) coverAt(edge.x, cell.y);
+        if (edge.x !== cell.x) {
+          coverAt(edge.x, cell.y);
+          if (edge.kind === "walk-off") walkOffStarts.push({ x: edge.x, y: cell.y });
+        }
         for (let y = cell.y + 1; y <= edge.y; y++) coverAt(edge.x, y);
       }
       add(edge.x, edge.y);
@@ -219,12 +238,23 @@ export function auditSpatial(
     }
   }
 
-  // ── 每个没被覆盖的目标：先判 BLOCKED（更强根因），否则 UNREACHABLE ────────
+  // ── 每个没被覆盖的目标：BLOCKED（更强根因）→ mid-air 保守降级 → UNREACHABLE ──
   const reachableSummary = `spawn-bfs/${seen.size}`;
   const reachedTargets = targets.filter((_, i) => covered.has(i)).map((t) => t.id);
+
+  const blockInfo = new Map<number, ReturnType<typeof blockedBySolids>>();
+  const midAirCandidates: number[] = [];
   for (const [i, target] of targets.entries()) {
     if (covered.has(i)) continue;
     const block = blockedBySolids(graph, target.rect);
+    blockInfo.set(i, block);
+    if (!block.blocked) midAirCandidates.push(i);
+  }
+  const midAir = midAirTouchableTargets(graph, queue, walkOffStarts, move, targets, midAirCandidates);
+
+  for (const [i, target] of targets.entries()) {
+    if (covered.has(i)) continue;
+    const block = blockInfo.get(i)!;
     if (block.blocked) {
       evidence.push({
         judgmentId: `PLAYABILITY_SPATIAL_${target.subject}_BLOCKED`,
@@ -239,6 +269,23 @@ export function auditSpatial(
       });
       continue;
     }
+
+    if (midAir.has(i)) {
+      gaps.push({ missing: "mid-air-touch-only", target: target.id });
+      evidence.push({
+        judgmentId: SPATIAL_JUDGMENTS.midAirUnproven,
+        target: `entity "${target.id}"`,
+        detail: `没有证明可达，但也**不能**判不可达：存在一条不撞实心体、不要求落地的弧线，玩家盒能在空中与这个${NOUN[target.subject]}严格相交。` +
+          "⚠️ 这条只是保守降级（mid-air touch-only 不在 V1 的确定性判定范围），不把该弧线写进可达集。",
+        witness: { kind: "coverage-gap", missing: "mid-air-touch-only" },
+        coverage: coverageOf(coverage),
+        assetId: target.assetId,
+        expected: "不存在任何可达的（含不落地）触达弧",
+        actual: "存在不落地触达弧",
+      });
+      continue;
+    }
+
     evidence.push({
       judgmentId: `PLAYABILITY_SPATIAL_${target.subject}_UNREACHABLE`,
       target: `entity "${target.id}"`,
@@ -289,6 +336,85 @@ function blockedBySolids(
     for (let y = y0; y <= y1; y++)
       if (graph.freeAt(x, y)) return { blocked: false, overlapFoot, solids };
   return { blocked: true, overlapFoot, solids };
+}
+
+/**
+ * 未覆盖目标是否存在**不落地弧线**的触达可能（LP-02 复核 Q3(a)）。
+ *
+ * 两类起点：
+ *   jump —— 每个可达落脚点，`vy = jumpVelocity`；
+ *   fall —— 每个 walk-off 悬崖点，`vy = 0`（走出边缘后可以水平漂移）。
+ *
+ * 对每个起点扫 `vx ∈ [-speed, speed]` 的弧线；弧线按 60Hz 采样、逐点查 `blocked`。
+ * 只要某条不撞实心体的弧上，玩家盒与目标盒**严格相交**，就算「合理触达可能」。
+ *
+ * ⚠️ 这是**保守保护**，不是可达性证明：命中只用于把 UNREACHABLE 降级为
+ *   `INSUFFICIENT_EVIDENCE`，绝不把该弧线写进可达集。
+ */
+function midAirTouchableTargets(
+  graph: MovementGraph,
+  jumpStarts: readonly Vec[],
+  walkOffStarts: readonly Vec[],
+  move: MoveParams,
+  targets: readonly SpatialTarget[],
+  candidates: readonly number[],
+): Set<number> {
+  const hits = new Set<number>();
+  if (candidates.length === 0) return hits;
+
+  const pw = graph.player.size.w;
+  const ph = graph.player.size.h;
+  const apex = maxJumpHeight(move);
+  const maxDx = Math.ceil(jumpSpan(move, graph.height));
+  const bottom = graph.height + ph;   // 脚点超过它，玩家盒已完全离开世界
+
+  /** 粗筛：从 `from` 出发的弧线有没有可能碰到目标（边界放宽，宁可多扫）。 */
+  const couldReach = (from: Vec, idx: number): boolean => {
+    const target = targets[idx]!;
+    const left = target.rect.x - pw / 2;
+    const right = target.rect.x + target.rect.w + pw / 2;
+    if (right + maxDx < from.x || left - maxDx > from.x) return false;
+    if (target.rect.y > bottom) return false;
+    if (target.rect.y + target.rect.h + ph < from.y - apex - ph) return false;
+    return true;
+  };
+
+  const scan = (from: Vec, vy0: number, tEnd: number, idxs: readonly number[]): void => {
+    const steps = 32;
+    const n = Math.max(6, Math.min(240, Math.ceil(tEnd * 60)));
+    for (let s = 0; s <= steps; s++) {
+      const vx = -move.speed + (2 * move.speed * s) / steps;
+      for (let i = 1; i <= n; i++) {
+        const t = (tEnd * i) / n;
+        const px = Math.round(from.x + vx * t);
+        const py = Math.round(from.y - (vy0 * t - (move.gravity * t * t) / 2));
+        if (py > bottom) break;
+        // 世界外的采样点当自由空间（Runtime 没有世界边界碰撞）；世界内按 blocked 栅格。
+        if (px >= 0 && px <= graph.width && py >= 0 && py <= graph.height &&
+            graph.blocked[px * graph.stride + py] === 1) break;
+        const playerBox = boxFromFoot({ x: px, y: py }, graph.player.size);
+        for (const idx of idxs)
+          if (!hits.has(idx) && overlapsStrict(playerBox, targets[idx]!.rect)) hits.add(idx);
+        if (hits.size >= candidates.length) return;
+      }
+    }
+  };
+
+  for (const from of jumpStarts) {
+    const idxs = candidates.filter((idx) => !hits.has(idx) && couldReach(from, idx));
+    if (idxs.length === 0) continue;
+    const disc = move.jumpVelocity * move.jumpVelocity + 2 * move.gravity * Math.max(0, bottom - from.y);
+    const tEnd = (move.jumpVelocity + Math.sqrt(disc)) / move.gravity;
+    scan(from, move.jumpVelocity, tEnd, idxs);
+  }
+  for (const from of walkOffStarts) {
+    if (from.y >= bottom) continue;
+    const idxs = candidates.filter((idx) => !hits.has(idx) && couldReach(from, idx));
+    if (idxs.length === 0) continue;
+    const tEnd = Math.sqrt((2 * (bottom - from.y)) / move.gravity);
+    scan(from, 0, tEnd, idxs);
+  }
+  return hits;
 }
 
 /**

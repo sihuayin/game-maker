@@ -150,6 +150,57 @@ describe("§出生点：只诊断，不硬拒", () => {
   });
 });
 
+describe("§mid-air touch-only 保守降级（LP-02 复核 Q3(a)）", () => {
+  /** 左平台 + 右侧无底的坑：浮空 pickup 只能在中途跳过去时碰到，碰完掉出世界。 */
+  const midAirConfig = (): GameConfig => {
+    const c = configOf(caseOf("baseline-last-train").config);
+    c.world.size = { w: 600, h: 270 };
+    c.terrain = [{ x: 0, y: 250, w: 300, h: 20 }];
+    c.player.at = { x: 40, y: 250 };
+    c.entities = [
+      { id: "gate", kind: "goal", at: { x: 100, y: 250 }, asset: "signal-endlight" },
+      { id: "midair", kind: "pickup", at: { x: 350, y: 200 }, asset: "pickup-suitcase" },
+    ];
+    c.objective = { kind: "collect-then-reach", gate: "gate" };
+    return c;
+  };
+
+  it("存在不落地跳跃弧 ⇒ 不判 UNREACHABLE，降级 INSUFFICIENT_EVIDENCE", () => {
+    const result = auditSpatial(midAirConfig(), MANIFEST);
+    expect(result.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(judgmentsOf(result.evidence)).toContain(SPATIAL_JUDGMENTS.midAirUnproven);
+    expect(judgmentsOf(result.evidence)).not.toContain(SPATIAL_JUDGMENTS.pickupUnreachable);
+    expect(result.gaps).toContainEqual({ missing: "mid-air-touch-only", target: "midair" });
+    expect(result.evidence.some((e) => e.judgmentId === SPATIAL_JUDGMENTS.pickupBlocked)).toBe(false);
+  });
+
+  it("被实心墙挡住 ⇒ 没有不落地弧线，仍判 UNREACHABLE", () => {
+    const c = midAirConfig();
+    c.entities = [
+      { id: "gate", kind: "goal", at: { x: 100, y: 250 }, asset: "signal-endlight" },
+      { id: "midair", kind: "pickup", at: { x: 500, y: 200 }, asset: "pickup-suitcase" },
+      { id: "wall", kind: "solid", at: { x: 400, y: 270 }, asset: "prop-awning-steps", body: { w: 20, h: 170 } },
+    ];
+    const result = auditSpatial(c, MANIFEST);
+    expect(result.verdict).toBe("PROVEN_UNPLAYABLE");
+    expect(judgmentsOf(result.evidence)).toContain(SPATIAL_JUDGMENTS.pickupUnreachable);
+    expect(judgmentsOf(result.evidence)).not.toContain(SPATIAL_JUDGMENTS.midAirUnproven);
+  });
+
+  it("正常落地可达的悬空目标仍按覆盖判定（不会被误降级）", () => {
+    const c = configOf(caseOf("baseline-last-train").config);
+    const gate = c.entities.find((e) => e.id === c.objective.gate)!;
+    gate.at = { x: 700, y: 210 };
+    expect(judgmentsOf(auditSpatial(c, MANIFEST).evidence)).not.toContain(SPATIAL_JUDGMENTS.midAirUnproven);
+  });
+
+  it("目标高过跳跃顶点 ⇒ 不存在触达弧，仍判 UNREACHABLE", () => {
+    const result = spatialOf("pickup-120");
+    expect(judgmentsOf(result.evidence)).toContain(SPATIAL_JUDGMENTS.pickupUnreachable);
+    expect(judgmentsOf(result.evidence)).not.toContain(SPATIAL_JUDGMENTS.midAirUnproven);
+  });
+});
+
 describe("§证据不足与覆盖缺口", () => {
   it("玩家资源解不到 ⇒ 不建图、不产 error（归引用族）", () => {
     const config = configOf(caseOf("baseline-last-train").config);
