@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1
 Baseline: `main` @ `fa17c14`
-Status: open · 2026-11-04 开图
+Status: closed · 2026-11-05 审批通过；实施另起 effort `p1/level-playability-v1`
 Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-audit-v1-p1/map.md)（已收口）
 
 > **2026-11-04 开图。** 授权来源：[开图裁定](rulings-2026-11-04.md)（Q1–Q7 全部采纳推荐方案 A）。
@@ -95,7 +95,7 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK）— resolved
 8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK）— resolved
 9. [最小实施方案与契约候选](issues/09-implementation-plan.md)（research，AFK）— resolved
-10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL）— open
+10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL）— resolved
 
 ## Decisions so far
 
@@ -108,10 +108,11 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 - [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)：39 个非生产用例（17 证明不可玩 / 18 合法边界 / 4 证据不足）；巡逻 hazard、被机制包住的收集物、moving-platform 均落 `INSUFFICIENT_EVIDENCE`；矩阵与 fixtures 见 [test-matrix.md](test-matrix.md)、[fixtures/07-matrix](fixtures/07-matrix/)。
 - [历史语料重判](issues/08-corpus-rejudgment.md)：20 份唯一 config；空间新增 0；机制 A 4 命中（3 真实缺陷 + 1 probe 排除，0 误伤）；完成性有效 gate 新增 0；零误伤基线成立，但 3 条真实缺陷待 09/10 决定迁移或例外。报告见 [corpus/rejudgment.md](corpus/rejudgment.md)。
 - [最小实施方案与契约候选](issues/09-implementation-plan.md)：无需新增持久化契约；单一入口 `auditPlayability` + 三处生产接线；LP-00…LP-07 串行实施；C1 加法导出建议批准、C2–C6 不采用；A 待 10 裁定 3 条历史缺陷的迁移/例外。方案见 [plan.md](plan.md)。
+- [审批包与独立实施交接](issues/10-approval-package.md)：规格批准；仅批准 C1；P1–P4 进入规格但以 Runtime 证据为硬前提；3 条历史缺陷记录为已知真实缺陷、不设例外；QA 统一移动模型；LP-00…LP-07 串行授权，三个复核点；零付费；地图关闭。交接件见 [final-report.md](final-report.md)。
 
 ## Not yet specified
 
-<!-- 03–05 已收口，暂无可陈述的雾；剩余未决项已各自成票：04 的 4 个语料命中归 08，profile 缺口与 id 冻结归 09，合法边界归 07。 -->
+<!-- 图已关闭（2026-11-05）；无未决雾。实施移交 final-report.md 与 p1/level-playability-v1 effort。 -->
 
 ## Out of scope
 

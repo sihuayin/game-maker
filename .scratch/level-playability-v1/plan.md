@@ -1,5 +1,9 @@
 # Level Playability V1 — 最小实施方案与契约候选
 
+> ⚠️ **2026-11-05 审批后修订**：票 10 批准了新的权威 LP 序列（LP-00 Runtime 语义核验 … LP-07 收口），
+> 本文件 §6 的旧 LP 编号已被覆盖；编译提示词（`ops.ts`）未分配、未授权。以 [final-report.md](final-report.md) §8.3 为准。
+
+
 - **性质**：调研产物（票 09）。只写方案，**不实施、不改生产代码、不改历史语料、不改 tracker / map**。
 - **基线**：代码事实 `main @ fa17c14`（当前工作树只多 `.scratch/level-playability-v1/**` 的文档 / 脚本 / 夹具）。
 - **冻结输入**：[framework.md](framework.md)、[rulings-2026-11-04.md](rulings-2026-11-04.md)、
