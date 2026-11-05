@@ -1,8 +1,8 @@
 # 空间布局候选判据
 
 Type: research
-Status: open
-Owner: —
+Status: resolved
+Owner: research subagent · 2026-11-05
 Blocked by: 01, 02
 Map: ../map.md
 
@@ -40,3 +40,45 @@ Map: ../map.md
 - 不实现判据；不修改生产代码。
 - 不引入结构化 layout 契约；不重开 B-04。
 - 不把难度/路线优劣纳入判据。
+
+## Answer
+
+研究完成 2026-11-05。报告：[03-spatial-layout-judgments.md](../research/03-spatial-layout-judgments.md)；零付费探针 `03-spatial-probes.mjs`、`03-corpus-spatial.mjs`（均退出 0）。
+
+### 新增确定性 error（仅三类）
+
+| 判据 id | 口径 | 语料新增 |
+|---|---|---|
+| `PLAYABILITY_SPATIAL_CHEST_UNREACHABLE` | chest 作为必需目标进可达图（含 `range` 交互盒）；与 pickup / gate 同一套图 | 0 |
+| `PLAYABILITY_SPATIAL_{PICKUP,CHEST,GATE}_BLOCKED` | 目标完全埋进实心体、无任何自由玩家重叠位置；`BLOCKED` 与 `UNREACHABLE` 同一目标互斥，`BLOCKED` 优先 | 0 |
+| `PLAYABILITY_SPATIAL_SPAWN_IN_TERRAIN` | **窄口径**：脚点 + 锚点 offset + 附近无 standable；纯盒重叠会误伤 11/20，不采用 | 0 |
+
+### 模型原语修正（不新增 id，改变既有 `auditReachability` 质量）
+
+- 真实盒重叠替换 `covers`（不再「一个身位内」算够到）；
+- 补走路 / 净空边，修复低天花板误报（02 probe F 2→0）；
+- `solid + motion` 按运行时静态原位，不再按整段行程当平台；
+- pickup / goal 用运行时几何（忽略 `body`），`body` 被忽略记为观察。
+
+### 不新增 / 不可写
+
+- 出生点卡 `solid` 归 `auditGameConfig`；世界边界归既有 `inWorld`；台阶 / 沟宽 / 走廊宽维持既有 reachability + warning。
+- `PLAYABILITY_SPATIAL_SPAWN_NO_FOOTHOLD` 落 `INSUFFICIENT_EVIDENCE`（缺 kill plane / 掉出世界语义）。
+- 斜坡 / 非 AABB / moving platform / 逐帧 atlas 尺寸 / 设计↔config 空间关系：不可写或 `INSUFFICIENT_EVIDENCE`。
+
+### 误报边界
+
+- 出生点纯盒重叠在 20 份唯一 config 上误伤 11 份；窄口径 0。
+- 不要求目标 standable（运行时只要求 overlap）；`BLOCKED` 必须是「无自由重合位置」，密封腔归 `UNREACHABLE`。
+- chest 在 `range` 可覆盖的实心体内不报。
+
+### 语料
+
+20 份唯一配对 config：三类新 error **0**；0 embedded target；0 chest error；0 moving solid；0 pickup/goal `body` 覆盖。
+
+### 升级 07 / 09
+
+- 07：合法边界与负例清单见报告 §6（spawn 锚点嵌入、低天花板、40px 沟/墙、moving solid 静态、`body` 覆盖等）。
+- 09：`FixedRuntimeProfile` 需新增「出生点与静态几何重叠时的分离行为」与「manifest 标称 size + 资源 anchor = 碰撞几何」；不写入则 spawn-in-terrain / 严格重叠 coverage 只能是 `partial`。
+- 09 需冻结 `BLOCKED` / `UNREACHABLE` 的 id 拆分；05 不得重复报 chest / pickup / gate 的空间不可取得。
+

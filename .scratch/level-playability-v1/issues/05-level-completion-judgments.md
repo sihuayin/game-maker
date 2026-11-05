@@ -1,8 +1,8 @@
 # 关卡完成性候选判据
 
 Type: research
-Status: open
-Owner: —
+Status: resolved
+Owner: research subagent · 2026-11-05
 Blocked by: 01, 02
 Map: ../map.md
 
@@ -45,3 +45,40 @@ Map: ../map.md
 - 不改 `objective` 契约、不改 gate 派生规则。
 - 不把「路线不好」当完成性失败。
 - 不新增 goal 桶（D-04 不在本图）。
+
+## Answer
+
+研究完成 2026-11-05。报告：[05-level-completion-judgments.md](../research/05-level-completion-judgments.md)；零付费探针 `05-completion-probe.mjs`（退出 0）。
+
+### 唯一新注册的 completion id
+
+`PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT`
+
+- **问题**：是否存在一条单次游玩走法，收齐全部必需 pickup / chest（`pickupCount` 同一口径）后到达 gate。
+- **算法**：带标签图 + mask DP；必需集合最多 12 个；hazard / danger 接触加复位边（回 seeds、mask 不变、计数保留）；gate 谓词复用 03，不另造更严格 overlap。
+- **抑制**：同一目标已被 03 的空间判据或 04 的机制判据报过 ⇒ completion 不重复报；coverage 落 `partial`，aggregate verdict 取更基础的 error。
+- **降级**：`k > 12`、负坐标、移动图 partial、mid-air touch-only 未验证 ⇒ `INSUFFICIENT_EVIDENCE`，不硬拒。
+
+### 不注册 / 拒绝
+
+- chest / pickup / gate 的几何不可取得 → 03；
+- 静止 hazard / 全高 danger 封路 → 04；
+- `pickupCount` 与 HUD 计数不一致 → 派生规则，构造上不可能，不是判据；
+- chest 顺序、gate 激活 → 并入唯一 completion 判据，不单列；
+- 目标「站得住」→ 误报陷阱（运行时只要求 overlap），拒绝；
+- 设计层数量 / 可选性 / win 文本 → 结构性不可判，`INSUFFICIENT_EVIDENCE`；
+- gate 缺失 / 指向不存在 id → 既有引用族。
+
+### 合法边界（不会被判）
+
+合法 A→B→gate 顺序；单向坑但 gate 在同层；坑底 hazard 复位后计数保留；一次跳跃收多个 pickup；chest 隔墙 + `range`；悬空 / 跳跃穿过 gate；chest 与 hazard 重叠；难但公平的跳跃。低天花板与 moving solid 扫掠区在 03 修复前必须 `INSUFFICIENT_EVIDENCE`。
+
+### 语料
+
+96 配对 / 20 份唯一：88 可完成；8 份 no-walk 全部是 `config-gate-missing` 负例、归引用族；有效 gate 的 completion error **0**；53 个 chest 实例全部可取得。
+
+### 升级 07 / 09
+
+- 07：合法边界与负例矩阵见报告 §10；既有「goal 埋在行李堆」边界按 03 统一改判，completion 不单独决定。
+- 09：先落 03 的移动图修复与 chest / gate 判据，再启用 completion（`CHEST_BLOCKED` 可先行）；补复位边、去重优先级、`k` 上限；明写 QA standalone 仍只跑 `auditReachability` 的残余风险。
+

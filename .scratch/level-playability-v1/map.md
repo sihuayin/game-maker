@@ -88,12 +88,12 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 
 1. [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)（grilling，HITL）— resolved
 2. [现有可玩性能力与缺口源码审计](issues/02-capability-gap-audit.md)（research，AFK）— resolved
-3. [空间布局候选判据](issues/03-spatial-layout-judgments.md)（research，AFK）— open
-4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK）— open
-5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK）— open
+3. [空间布局候选判据](issues/03-spatial-layout-judgments.md)（research，AFK）— resolved
+4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK）— resolved
+5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK）— resolved
 6. [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)（task，AFK）— open
-7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK，blocked by 03, 04, 05）— open
-8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK，blocked by 03, 04, 05, 06）— open
+7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK）— open
+8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK，blocked by 06）— open
 9. [最小实施方案与契约候选](issues/09-implementation-plan.md)（research，AFK，blocked by 01–08）— open
 10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL，blocked by 09）— open
 
@@ -101,11 +101,13 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 
 - [现有可玩性能力与缺口源码审计](issues/02-capability-gap-audit.md)：现有判据只有 `auditReachability` + 台阶/行程 warning；chest、收集后返回 gate、hazard/danger 时序、moving solid、低天花板误报均未覆盖；三态不存在；历史语料 96 配对 / 0 新 error。报告见 [02-capability-gap-audit.md](research/02-capability-gap-audit.md)。
 - [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)：输入只吃 config + manifest + `FixedRuntimeProfile`；内部 `PlayabilityVerdict` 三态不落持久化契约；`PROVEN_UNPLAYABLE` 进 `deterministic`；新入口 `auditPlayability` 替换 reachability 并接入发布闸；术语写入 `CONTEXT.md`。规格见 [framework.md](framework.md)。
+- [空间布局候选判据](issues/03-spatial-layout-judgments.md)：新增三类确定性 error —— chest 不可取得、目标完全埋进实心体的 `BLOCKED`、出生点埋 terrain 的窄口径；另四项是对既有可达图的模型修正（真实重叠、走路/净空边、solid 静态、运行时几何）。语料 20 份唯一配对新增 **0**。报告见 [03-spatial-layout-judgments.md](research/03-spatial-layout-judgments.md)。
+- [机制组合候选判据](issues/04-mechanic-composition-judgments.md)：只有两条退化确定性判据 —— 非移动 hazard 作不可站立禁区封路、单个全高 danger 墙的安全窗口不足；巡逻 hazard / moving platform / 被包住的收集物 / 多危险物均 `INSUFFICIENT_EVIDENCE`。语料 4 个命中待 08 逐案裁定，裁定前不得硬拒。报告见 [04-mechanic-composition-judgments.md](research/04-mechanic-composition-judgments.md)。
+- [关卡完成性候选判据](issues/05-level-completion-judgments.md)：唯一新 completion id `PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT`（mask DP + 复位边，复用 03 的图与 gate 谓词）；不重复 03/04 的空间与机制根因；语料有效 gate 新增 **0**。报告见 [05-level-completion-judgments.md](research/05-level-completion-judgments.md)。
 
 ## Not yet specified
 
-- 哪些空间布局判据能在**不改契约**的前提下精确可算，且不与 `auditGameConfig` 既有警告重复 —— 02 已给出候选缺口（chest、单向路径、低天花板误报、moving solid、`body` 语义）；具体取舍取决于 [空间布局候选判据](issues/03-spatial-layout-judgments.md)。
-- `danger` 的安全窗口、`motion` 巡逻与跳跃时序能否给出**不误伤**的确定性判据，还是只能落到 `INSUFFICIENT_EVIDENCE` —— 取决于 [机制组合候选判据](issues/04-mechanic-composition-judgments.md)。
+<!-- 03–05 已收口，暂无可陈述的雾；剩余未决项已各自成票：04 的 4 个语料命中归 08，profile 缺口与 id 冻结归 09，合法边界归 07。 -->
 
 ## Out of scope
 
