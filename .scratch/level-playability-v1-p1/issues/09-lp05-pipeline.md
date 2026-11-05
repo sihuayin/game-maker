@@ -35,3 +35,9 @@ Map: ../map.md
 
 - AC-07：确定性不可玩能够阻断发布；非阻断结果保留诊断。
 - AC-11：无未经批准的 Runtime / Contract / CLI / MCP 扩展。
+
+## Context
+
+- LP-01 / LP-02 已落定：`auditReachability` **尚未**改（LP-02 是纯加法），`playability/` 内部桶已含 `verdict` / `spatial`，但**未**从 contracts 根导出。
+- 接线点按 [plan.md](../level-playability-v1/plan.md) §1：`config-audit.ts:53` 的 `deterministic` 替换、`publish-gate.ts:140` 现场复验替换、`index.ts` C1 加法导出。开票时按真实代码复核是否有细节偏差。
+- 层内 verdict 与整关 aggregate 分层（plan R21(a)）：`auditPlayability` 做整关聚合；`coverage.spatial` 在 LP-02 恒为 `partial`（玩家 / 帧几何不可见），整关 aggregate 因此多为 `INSUFFICIENT_EVIDENCE`，但**不得**掩盖 `PROVEN_UNPLAYABLE`。
