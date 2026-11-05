@@ -92,10 +92,10 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK）— resolved
 5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK）— resolved
 6. [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)（task，AFK）— resolved
-7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK）— open
-8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK）— open
-9. [最小实施方案与契约候选](issues/09-implementation-plan.md)（research，AFK，blocked by 01–08）— open
-10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL，blocked by 09）— open
+7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK）— resolved
+8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK）— resolved
+9. [最小实施方案与契约候选](issues/09-implementation-plan.md)（research，AFK）— resolved
+10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL）— open
 
 ## Decisions so far
 
@@ -105,6 +105,9 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 - [机制组合候选判据](issues/04-mechanic-composition-judgments.md)：只有两条退化确定性判据 —— 非移动 hazard 作不可站立禁区封路、单个全高 danger 墙的安全窗口不足；巡逻 hazard / moving platform / 被包住的收集物 / 多危险物均 `INSUFFICIENT_EVIDENCE`。语料 4 个命中待 08 逐案裁定，裁定前不得硬拒。报告见 [04-mechanic-composition-judgments.md](research/04-mechanic-composition-judgments.md)。
 - [关卡完成性候选判据](issues/05-level-completion-judgments.md)：唯一新 completion id `PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT`（mask DP + 复位边，复用 03 的图与 gate 谓词）；不重复 03/04 的空间与机制根因；语料有效 gate 新增 **0**。报告见 [05-level-completion-judgments.md](research/05-level-completion-judgments.md)。
 - [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)：152 份横版 config（21 唯一）、171 份 manifest（90 v4 / 81 旧 schema）、49 设计 / 77 关；结构配对 146、审计可用 150 份 / 96 唯一对；冻结 `sha256:25e6c891…`。清单见 [corpus/inventory.md](corpus/inventory.md)。
+- [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)：39 个非生产用例（17 证明不可玩 / 18 合法边界 / 4 证据不足）；巡逻 hazard、被机制包住的收集物、moving-platform 均落 `INSUFFICIENT_EVIDENCE`；矩阵与 fixtures 见 [test-matrix.md](test-matrix.md)、[fixtures/07-matrix](fixtures/07-matrix/)。
+- [历史语料重判](issues/08-corpus-rejudgment.md)：20 份唯一 config；空间新增 0；机制 A 4 命中（3 真实缺陷 + 1 probe 排除，0 误伤）；完成性有效 gate 新增 0；零误伤基线成立，但 3 条真实缺陷待 09/10 决定迁移或例外。报告见 [corpus/rejudgment.md](corpus/rejudgment.md)。
+- [最小实施方案与契约候选](issues/09-implementation-plan.md)：无需新增持久化契约；单一入口 `auditPlayability` + 三处生产接线；LP-00…LP-07 串行实施；C1 加法导出建议批准、C2–C6 不采用；A 待 10 裁定 3 条历史缺陷的迁移/例外。方案见 [plan.md](plan.md)。
 
 ## Not yet specified
 

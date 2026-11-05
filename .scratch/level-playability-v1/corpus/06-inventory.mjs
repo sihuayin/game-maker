@@ -8,6 +8,7 @@ import crypto from "node:crypto";
 import { parseGameConfig, parseAssetPack } from "../../../packages/contracts/dist/index.js";
 
 const ROOT = path.resolve(import.meta.dirname, "../../..");
+const EXCLUDE_FIXTURES = path.join(ROOT, ".scratch/level-playability-v1/fixtures/07-matrix");
 const OUT_DIR = path.join(ROOT, ".scratch/level-playability-v1/corpus");
 const BASELINE = "main @ fa17c14";
 const DIRS = ["out", "fixtures", ".scratch", "packages/demo/fixtures"];
@@ -18,7 +19,7 @@ const walk = (dir, out) => {
   try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
   for (const d of ents) {
     const p = path.join(dir, d.name);
-    if (d.isDirectory()) { if (!SKIP.has(d.name) && p !== OUT_DIR) walk(p, out); }
+    if (d.isDirectory()) { if (!SKIP.has(d.name) && p !== OUT_DIR && !p.startsWith(EXCLUDE_FIXTURES)) walk(p, out); }
     else if (d.isFile() && d.name.endsWith(".json")) out.push(p);
   }
 };

@@ -1,0 +1,798 @@
+{
+  "uniqueConfigs": 21,
+  "paired": 20,
+  "unpaired": [
+    "packages/demo/fixtures/empty-world.json"
+  ],
+  "stats": {
+    "configsWithHazard": 17,
+    "hazardEntities": 31,
+    "hazardStatic": 12,
+    "hazardWithMotion": 19,
+    "configsWithDanger": 1,
+    "dangerEntities": 1,
+    "dangerWithBodyOverride": 1,
+    "targetIntersectsHazard": 1
+  },
+  "details": [
+    {
+      "file": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json",
+      "hazards": [
+        {
+          "id": "hazard-terrain-1",
+          "at": {
+            "x": 380,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 348,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        },
+        {
+          "id": "enemy-patrol",
+          "at": {
+            "x": 480,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 40,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 456,
+            "y": 202,
+            "w": 48,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "hazard-terrain-1",
+          "at": {
+            "x": 380,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 348,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        },
+        {
+          "id": "enemy-patrol",
+          "at": {
+            "x": 480,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 40,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 456,
+            "y": 202,
+            "w": 48,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "carriage",
+          "at": {
+            "x": 800,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 200,
+            "periodMs": 4000
+          },
+          "body": null,
+          "box": {
+            "x": 768,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": "out/__probe-timeout/last-train/game-configs/v1.json",
+      "hazards": [
+        {
+          "id": "mover",
+          "at": {
+            "x": 900,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 160,
+            "periodMs": 4000
+          },
+          "body": null,
+          "box": {
+            "x": 868,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": "out/__probe-timeout/last-train/game-configs/v2.json",
+      "hazards": [
+        {
+          "id": "sweeper",
+          "at": {
+            "x": 760,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 160,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 728,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": "out/last-train/site/v3/game-config.json",
+      "hazards": [
+        {
+          "id": "sweeping-carriage",
+          "at": {
+            "x": 1080,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 180,
+            "periodMs": 2600
+          },
+          "body": null,
+          "box": {
+            "x": 1048,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json",
+      "hazards": [
+        {
+          "id": "hazard-terrain-1",
+          "at": {
+            "x": 380,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 348,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        },
+        {
+          "id": "enemy-patrol",
+          "at": {
+            "x": 480,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 40,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 456,
+            "y": 202,
+            "w": 48,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "spikes-gap",
+          "at": {
+            "x": 880,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 868,
+            "y": 234,
+            "w": 24,
+            "h": 16
+          }
+        },
+        {
+          "id": "enemy-1",
+          "at": {
+            "x": 1150,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 180,
+            "periodMs": 3600
+          },
+          "body": null,
+          "box": {
+            "x": 1134,
+            "y": 214,
+            "w": 32,
+            "h": 36
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 5,
+      "chests": 1
+    },
+    {
+      "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/avoid-danger/config.json",
+      "hazards": [],
+      "dangers": [
+        {
+          "id": "danger-1",
+          "at": {
+            "x": 100,
+            "y": 250
+          },
+          "body": {
+            "w": 120,
+            "h": 60
+          },
+          "box": {
+            "x": 40,
+            "y": 190,
+            "w": 120,
+            "h": 60
+          },
+          "strike": {
+            "periodMs": 400,
+            "activeMs": 400
+          }
+        }
+      ],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 1,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "patroller-1",
+          "at": {
+            "x": 340,
+            "y": 240
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 100,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 328,
+            "y": 208,
+            "w": 24,
+            "h": 32
+          }
+        },
+        {
+          "id": "patroller-2",
+          "at": {
+            "x": 720,
+            "y": 240
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 120,
+            "periodMs": 3500
+          },
+          "body": null,
+          "box": {
+            "x": 708,
+            "y": 208,
+            "w": 24,
+            "h": 32
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 4,
+      "chests": 2
+    },
+    {
+      "file": ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json",
+      "hazards": [
+        {
+          "id": "hazard-terrain-1",
+          "at": {
+            "x": 380,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 348,
+            "y": 202,
+            "w": 64,
+            "h": 48
+          }
+        },
+        {
+          "id": "enemy-patrol",
+          "at": {
+            "x": 480,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 40,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 456,
+            "y": 202,
+            "w": 48,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "enemy-1",
+          "at": {
+            "x": 380,
+            "y": 230
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 100,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 364,
+            "y": 198,
+            "w": 32,
+            "h": 32
+          }
+        },
+        {
+          "id": "enemy-2",
+          "at": {
+            "x": 880,
+            "y": 230
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 120,
+            "periodMs": 3500
+          },
+          "body": null,
+          "box": {
+            "x": 864,
+            "y": 198,
+            "w": 32,
+            "h": 32
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 5,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "enemy-1",
+          "at": {
+            "x": 600,
+            "y": 230
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 120,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 584,
+            "y": 198,
+            "w": 32,
+            "h": 32
+          }
+        },
+        {
+          "id": "enemy-2",
+          "at": {
+            "x": 1050,
+            "y": 230
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 100,
+            "periodMs": 2500
+          },
+          "body": null,
+          "box": {
+            "x": 1034,
+            "y": 198,
+            "w": 32,
+            "h": 32
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 5,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "hazard-spikes-1",
+          "at": {
+            "x": 880,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 868,
+            "y": 238,
+            "w": 24,
+            "h": 12
+          }
+        },
+        {
+          "id": "enemy-patrol-1",
+          "at": {
+            "x": 960,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 120,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 944,
+            "y": 218,
+            "w": 32,
+            "h": 32
+          }
+        },
+        {
+          "id": "hazard-spikes-2",
+          "at": {
+            "x": 1020,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 1008,
+            "y": 238,
+            "w": 24,
+            "h": 12
+          }
+        },
+        {
+          "id": "hazard-current-1",
+          "at": {
+            "x": 1180,
+            "y": 238
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 1170,
+            "y": 228,
+            "w": 20,
+            "h": 20
+          }
+        },
+        {
+          "id": "hazard-spikes-3",
+          "at": {
+            "x": 1200,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 1188,
+            "y": 238,
+            "w": 24,
+            "h": 12
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 9,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/site/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "spike-1",
+          "at": {
+            "x": 470,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 438,
+            "y": 230,
+            "w": 64,
+            "h": 20
+          }
+        },
+        {
+          "id": "enemy-1",
+          "at": {
+            "x": 620,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 60,
+            "periodMs": 3000
+          },
+          "body": null,
+          "box": {
+            "x": 580,
+            "y": 162,
+            "w": 80,
+            "h": 88
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 6,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/hazard-contact/config.json",
+      "hazards": [
+        {
+          "id": "hazard-1",
+          "at": {
+            "x": 160,
+            "y": 240
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 128,
+            "y": 192,
+            "w": 64,
+            "h": 48
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 1,
+      "chests": 0
+    },
+    {
+      "file": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "enemy-1",
+          "at": {
+            "x": 760,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 160,
+            "periodMs": 3600
+          },
+          "body": null,
+          "box": {
+            "x": 744,
+            "y": 212,
+            "w": 32,
+            "h": 40
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 4,
+      "chests": 1
+    },
+    {
+      "file": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "hazards": [
+        {
+          "id": "hazard-1",
+          "at": {
+            "x": 560,
+            "y": 250
+          },
+          "motion": null,
+          "body": null,
+          "box": {
+            "x": 544,
+            "y": 221,
+            "w": 32,
+            "h": 32
+          }
+        },
+        {
+          "id": "enemy-1",
+          "at": {
+            "x": 960,
+            "y": 250
+          },
+          "motion": {
+            "kind": "cycle",
+            "axis": "x",
+            "distance": 120,
+            "periodMs": 3600
+          },
+          "body": null,
+          "box": {
+            "x": 932,
+            "y": 196,
+            "w": 56,
+            "h": 64
+          }
+        }
+      ],
+      "dangers": [],
+      "baseReachErrors": 0,
+      "staticHazardAdded": [],
+      "fullCutDangerNoWindow": [],
+      "pickups": 3,
+      "chests": 1
+    }
+  ]
+}

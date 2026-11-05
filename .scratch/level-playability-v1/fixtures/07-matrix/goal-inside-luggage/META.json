@@ -1,0 +1,17 @@
+{
+  "caseId": "goal-inside-luggage",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_GATE_BLOCKED",
+  "failureLocation": "entity \"signal\"",
+  "legalPair": "gate-midair-jumpthrough",
+  "evidence": [
+    [
+      "03",
+      "goal-inside-luggage"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/goal-inside-luggage/game-config.json"
+}

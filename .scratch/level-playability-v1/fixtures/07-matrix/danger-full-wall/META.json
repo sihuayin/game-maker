@@ -1,0 +1,17 @@
+{
+  "caseId": "danger-full-wall",
+  "group": "mechanic",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_MECHANIC_PATH_NO_SAFE_WINDOW",
+  "failureLocation": "entity \"suitcase-3\"",
+  "legalPair": "danger-wide-idle",
+  "evidence": [
+    [
+      "04",
+      "dangerFull_crossingMs"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/danger-full-wall/game-config.json"
+}

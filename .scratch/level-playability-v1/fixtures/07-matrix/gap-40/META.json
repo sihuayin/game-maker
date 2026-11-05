@@ -1,0 +1,17 @@
+{
+  "caseId": "gap-40",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "gap-200",
+  "evidence": [
+    [
+      "03",
+      "gap-40"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/gap-40/game-config.json"
+}

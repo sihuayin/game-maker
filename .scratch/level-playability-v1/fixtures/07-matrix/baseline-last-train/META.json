@@ -1,0 +1,17 @@
+{
+  "caseId": "baseline-last-train",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": null,
+  "evidence": [
+    [
+      "03",
+      "baseline-last-train"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/baseline-last-train/game-config.json"
+}

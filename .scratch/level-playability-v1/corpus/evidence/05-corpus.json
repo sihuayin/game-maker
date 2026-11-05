@@ -1,0 +1,4301 @@
+{
+  "corpus": [
+    {
+      "id": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "ms": 113
+    },
+    {
+      "id": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 79
+    },
+    {
+      "id": "out/__probe/last-train/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/__probe/last-train/pack/v2/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 133
+    },
+    {
+      "id": "out/__probe-timeout/last-train/game-configs/v1.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 184076,
+      "gate": "gate",
+      "gatePreCount": 151,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/__probe/empty/pack/v2/manifest.json",
+      "configHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+      "ms": 130
+    },
+    {
+      "id": "out/__probe-timeout/last-train/game-configs/v2.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 184076,
+      "gate": "gate",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/__probe/empty/pack/v2/manifest.json",
+      "configHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+      "ms": 126
+    },
+    {
+      "id": "out/drawlist-coveraged/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/drawlist-coveraged/pack/v17/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 138
+    },
+    {
+      "id": "out/last-train/game-configs/v1.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 184076,
+      "gate": "gate",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/last-train/pack/v17/manifest.json",
+      "configHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+      "ms": 112
+    },
+    {
+      "id": "out/last-train/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/last-train/pack/v17/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 123
+    },
+    {
+      "id": "out/last-train-gpt/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/last-train-gpt/pack/v1/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 119
+    },
+    {
+      "id": "out/r6-drawlist/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/r6-drawlist/pack/v2/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 113
+    },
+    {
+      "id": "out/r6-image/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "out/r6-image/pack/v2/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 112
+    },
+    {
+      "id": "fixtures/game-configs/last-train.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": "fixtures/packs/last-train/v2/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 114
+    },
+    {
+      "id": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+      "configHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+      "ms": 60
+    },
+    {
+      "id": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 59
+    },
+    {
+      "id": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 59
+    },
+    {
+      "id": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+      "ms": 60
+    },
+    {
+      "id": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 40
+      },
+      "k": 6,
+      "kChest": 1,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 183541,
+      "gate": "gate",
+      "gatePreCount": 137,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-4",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-5",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+      "ms": 215
+    },
+    {
+      "id": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 52
+    },
+    {
+      "id": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 47
+    },
+    {
+      "id": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/collect-pickup/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/open-chest/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 133
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "ms": 43
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 48
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 46
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/collect-pickup/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/open-chest/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v2/manifest.json",
+      "configHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "ms": 48
+    },
+    {
+      "id": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 130
+    },
+    {
+      "id": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 32
+      },
+      "k": 5,
+      "kChest": 0,
+      "declaredCollectables": 5,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 180629,
+      "gate": "gate",
+      "gatePreCount": 143,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+      "configHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+      "ms": 152
+    },
+    {
+      "id": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 32
+      },
+      "k": 5,
+      "kChest": 0,
+      "declaredCollectables": 5,
+      "skippedTargets": 0,
+      "nodeCount": 1403,
+      "edgeCount": 175071,
+      "gate": "station-exit-gate",
+      "gatePreCount": 143,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "resource-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "resource-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "resource-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+      "ms": 131
+    },
+    {
+      "id": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 132
+    },
+    {
+      "id": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 136
+    },
+    {
+      "id": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 131
+    },
+    {
+      "id": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 135
+    },
+    {
+      "id": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 185463,
+      "gate": "signal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "suitcase-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "suitcase-3",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/pack/v2/manifest.json",
+      "configHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "ms": 113
+    },
+    {
+      "id": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 32
+      },
+      "k": 9,
+      "kChest": 0,
+      "declaredCollectables": 9,
+      "skippedTargets": 0,
+      "nodeCount": 1407,
+      "edgeCount": 178539,
+      "gate": "goal-1",
+      "gatePreCount": 126,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-water-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-scrap-4",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-water-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-scrap-5",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-water-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/manifest.json",
+      "configHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+      "ms": 928
+    },
+    {
+      "id": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+      "world": {
+        "w": 1920,
+        "h": 270
+      },
+      "player": {
+        "w": 72,
+        "h": 108
+      },
+      "k": 6,
+      "kChest": 0,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1809,
+      "edgeCount": 236175,
+      "gate": "gate-1",
+      "gatePreCount": 133,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-5",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-6",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1/manifest.json",
+      "configHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+      "ms": 172
+    },
+    {
+      "id": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/run/v1/game-config.json",
+      "world": {
+        "w": 1920,
+        "h": 270
+      },
+      "player": {
+        "w": 72,
+        "h": 108
+      },
+      "k": 6,
+      "kChest": 0,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1809,
+      "edgeCount": 236175,
+      "gate": "gate-1",
+      "gatePreCount": 133,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-5",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-6",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/pack/v2/manifest.json",
+      "configHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+      "ms": 173
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/collect-pickup/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/open-chest/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 46
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/self-test-run/gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "ms": 48
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 57
+    },
+    {
+      "id": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 57
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "ms": 39
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 50
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/collect-pickup/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 36
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/open-chest/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/collect-pickup/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 36
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/open-chest/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/open-chest/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 46
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/collect-pickup/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 36
+    },
+    {
+      "id": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/open-chest/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 57
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 130
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/site/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 144
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "ms": 38
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/collect-pickup/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/collect-pickup/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/pack/v2/manifest.json",
+      "configHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "ms": 38
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/open-chest/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/open-chest/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/collect-pickup/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/hazard-contact/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/open-chest/config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 1,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "configHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "ms": 45
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/site/v1/game-config.json",
+      "world": {
+        "w": 480,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 1,
+      "kChest": 0,
+      "declaredCollectables": 1,
+      "skippedTargets": 0,
+      "nodeCount": 481,
+      "edgeCount": 59551,
+      "gate": "goal",
+      "gatePreCount": 131,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "p1",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/pack/v2/manifest.json",
+      "configHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "ms": 37
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket10-reject-old/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket10-reject-old/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 138
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 131
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 130
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 132
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 131
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 132
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 135
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 132
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/pack/v2/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 132
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/pack/v3/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 139
+    },
+    {
+      "id": ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 24,
+        "h": 32
+      },
+      "k": 6,
+      "kChest": 2,
+      "declaredCollectables": 6,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 182645,
+      "gate": "exit-gate",
+      "gatePreCount": 139,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-2",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "scrap-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "configHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "ms": 146
+    },
+    {
+      "id": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/negative-gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "ms": 49
+    },
+    {
+      "id": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 56
+    },
+    {
+      "id": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "ms": 48
+    },
+    {
+      "id": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 57
+    },
+    {
+      "id": ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 57
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-27-self-test/gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "ms": 49
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 58
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 59
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-28-self-test/gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "ms": 51
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 58
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 59
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": null,
+      "gatePreCount": 0,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "no-walk",
+        "reason": "gate-not-reachable-after-collection"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "ms": 49
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 58
+    },
+    {
+      "id": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "world": {
+        "w": 640,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 3,
+      "kChest": 0,
+      "declaredCollectables": 3,
+      "skippedTargets": 0,
+      "nodeCount": 576,
+      "edgeCount": 66367,
+      "gate": "extraction",
+      "gatePreCount": 132,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "scrap-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "water-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "scrap-2",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/pack/v7/manifest.json",
+      "configHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "ms": 59
+    },
+    {
+      "id": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 32,
+        "h": 48
+      },
+      "k": 5,
+      "kChest": 1,
+      "declaredCollectables": 5,
+      "skippedTargets": 0,
+      "nodeCount": 1369,
+      "edgeCount": 170812,
+      "gate": "gate",
+      "gatePreCount": 126,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        },
+        {
+          "id": "pickup-4",
+          "kind": "pickup",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/pack/v4/manifest.json",
+      "configHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+      "ms": 165
+    },
+    {
+      "id": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "world": {
+        "w": 1440,
+        "h": 270
+      },
+      "player": {
+        "w": 48,
+        "h": 64
+      },
+      "k": 4,
+      "kChest": 1,
+      "declaredCollectables": 4,
+      "skippedTargets": 0,
+      "nodeCount": 1441,
+      "edgeCount": 186731,
+      "gate": "gate",
+      "gatePreCount": 147,
+      "spawnBits": 0,
+      "unreachable": [],
+      "collectable": [
+        {
+          "id": "pickup-1",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-2",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "pickup-3",
+          "kind": "pickup",
+          "ok": true
+        },
+        {
+          "id": "chest-1",
+          "kind": "chest",
+          "ok": true
+        }
+      ],
+      "dp": {
+        "status": "completable"
+      },
+      "manifest": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/manifest.json",
+      "configHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+      "ms": 134
+    }
+  ]
+}

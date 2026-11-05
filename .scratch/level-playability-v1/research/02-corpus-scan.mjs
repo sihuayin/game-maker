@@ -11,6 +11,7 @@ import {
 } from "../../../packages/contracts/dist/index.js";
 
 const ROOT = path.resolve(import.meta.dirname, "../../..");
+const EXCLUDE_FIXTURES = path.join(ROOT, ".scratch/level-playability-v1/fixtures/07-matrix");
 const SKIP = new Set(["node_modules", ".git", "dist", ".vite", "coverage"]);
 const JSON_DIRS = ["out", "fixtures", ".scratch", "packages/demo/fixtures"];
 const VIEWPORT = { w: 480, h: 270 };
@@ -21,7 +22,7 @@ function walk(dir, out) {
   for (const d of ents) {
     const p = path.join(dir, d.name);
     if (d.isDirectory()) {
-      if (SKIP.has(d.name)) continue;
+      if (SKIP.has(d.name) || p.startsWith(EXCLUDE_FIXTURES)) continue;
       walk(p, out);
     } else if (d.isFile() && d.name.endsWith(".json")) {
       out.push(p);

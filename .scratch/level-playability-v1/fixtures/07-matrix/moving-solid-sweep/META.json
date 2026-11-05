@@ -1,0 +1,17 @@
+{
+  "caseId": "moving-solid-sweep",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+  "failureLocation": "entity \"high-pickup\"",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "03",
+      "moving-solid-sweep"
+    ]
+  ],
+  "note": "solid + motion 在运行时是静态原位；按整段行程判定是错的",
+  "fixture": "fixtures/07-matrix/moving-solid-sweep/game-config.json"
+}

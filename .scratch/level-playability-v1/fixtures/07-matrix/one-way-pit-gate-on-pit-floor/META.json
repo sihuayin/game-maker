@@ -1,0 +1,17 @@
+{
+  "caseId": "one-way-pit-gate-on-pit-floor",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "one-way-pit-pickup",
+  "evidence": [
+    [
+      "05",
+      "one-way-pit-gate-on-pit-floor"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/one-way-pit-gate-on-pit-floor/game-config.json"
+}

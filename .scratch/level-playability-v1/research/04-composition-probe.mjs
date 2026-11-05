@@ -9,6 +9,7 @@ import {
 } from "../../../packages/contracts/dist/index.js";
 
 const ROOT = path.resolve(import.meta.dirname, "../../..");
+const EXCLUDE_FIXTURES = path.join(ROOT, ".scratch/level-playability-v1/fixtures/07-matrix");
 const SKIP = new Set(["node_modules", ".git", "dist", ".vite", "coverage"]);
 const JSON_DIRS = ["out", "fixtures", ".scratch", "packages/demo/fixtures"];
 
@@ -17,7 +18,7 @@ function walk(dir, out) {
   try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
   for (const d of ents) {
     const p = path.join(dir, d.name);
-    if (d.isDirectory()) { if (!SKIP.has(d.name)) walk(p, out); }
+    if (d.isDirectory()) { if (!SKIP.has(d.name) && !p.startsWith(EXCLUDE_FIXTURES)) walk(p, out); }
     else if (d.isFile() && d.name.endsWith(".json")) out.push(p);
   }
 }

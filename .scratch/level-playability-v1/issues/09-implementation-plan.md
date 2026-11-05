@@ -1,8 +1,8 @@
 # 最小实施方案与契约候选
 
 Type: research
-Status: open
-Owner: —
+Status: resolved
+Owner: research subagent · 2026-11-05
 Blocked by: 01, 02, 03, 04, 05, 06, 07, 08
 Map: ../map.md
 
@@ -31,3 +31,42 @@ Map: ../map.md
 - 不修改生产代码；不实施判据。
 - 不把契约候选写成已批准；审批归 10。
 - 不扩大 Q5 的允许面；不引入 Runtime 修改。
+
+## Answer
+
+研究完成 2026-11-05。方案报告：[plan.md](../plan.md)（808 行，覆盖八个必交项）；未修改生产代码、未实施判据、未改 tracker。
+
+### 结论摘要
+
+1. **不需要新的持久化契约形状**。三态 `PlayabilityVerdict` 只活在 contracts 内部；`PROVEN_UNPLAYABLE` 映射为现有 `ConfigIssue[]`，另两态不产 issue。
+2. **单一入口 `auditPlayability(config, manifest, profile?)`**，内部组合空间 / 机制 / 完成性；`auditReachability` 保留为 QA 的单层空间入口，两者共用同一移动图核心。
+3. **生产接线三处**：`config-audit.ts` 的 `deterministic` 替换、`publish-gate.ts` 现场复验替换、`index.ts` 加法导出；compile 循环 / 汇合点 / CLI/MCP 发布闸自动覆盖；QA 仍 7 条；`assembleSite` 直调残余风险明写。
+4. **实施顺序**：LP-00 基础设施 → LP-01 03 移动图修正 → LP-02 03 空间判据 + `CHEST_BLOCKED` → LP-03 机制 A → LP-04 机制 B → LP-05 完成性 → LP-06 编译提示词 → LP-07 验收。A 必须在 03 walk/clearance 修复之后，且票 10 对 3 条历史真实缺陷做出迁移 / 例外裁定之后才可硬拒。
+5. **回退**：注册表 + `PLAYABILITY_DISABLED` profile 开关；每条判据可单独移除，不污染其它判据；每票一个 commit。
+6. **测试**：每条判据单测（正/负/合法边界）、07 的 39 例矩阵转生产测试、08 的冻结语料回归（96 配对 / 20 唯一；空间 0、完成性 0、机制 A 3 真实缺陷）、profile 缺口测试。
+
+### 契约候选（均未批准，交票 10）
+
+| 候选 | 内容 | 建议 |
+|---|---|---|
+| C1 | 加法导出 `auditPlayability` + `playabilityIssues` + 内部类型 | **批准**（Q5 审计纯函数；若 10 把任何加法导出视为形状变更，则按 C1 单列批准） |
+| C2 | 新增 `ConfigIssue.code` | **否 / 推迟**（闭集无消费者需要；未来另立审批） |
+| C3 | 持久化 `PlayabilityVerdict` / coverage | **否**（违反 framework §3.5） |
+| C4 | 新增 QA 判据（第 8 条） | **否**（framework §4.3 已裁定 QA 不变） |
+| C5 | `FixedRuntimeProfile` 成为生产入参 / CLI 参数 | **否**（Q5 排除；profile 是内部常量） |
+| C6 | 扩展 manifest 暴露逐帧 atlas 几何 | **否 / 未来 effort**（超出 Q5） |
+
+### 票 10 必须裁定
+
+1. 批准本方案与 LP-00…LP-07 实施 effort（分支 `p1/level-playability-v1`，每票一 commit）。
+2. C1 批准、C2–C6 不采用。
+3. 3 条历史真实缺陷：迁移还是保留例外（不设路径例外；如需迁移，另立票据，超出本图「不改历史」边界）。
+4. 批准 profile 假设 P1（标称 size + 资源 anchor）/ P2（`body` 语义）/ P3（chest range）/ P4（spawn 分离）；不批准则对应判据只能 `INSUFFICIENT_EVIDENCE`。
+5. 接受 `auditReachability` 与 QA `reachability` detail 的行为变化（仍 7 条判据），或要求 QA 行为冻结（代价是两套移动模型漂移）。
+6. R1：04 B 的 `no-safe-window` witness 是否作为第五种 witness，或折入 `blocked` 子字段。
+7. R21：07 矩阵的层级 `expectedVerdict` 与整关 aggregate 的口径（推荐 (a) 层级预期，整关另测）。
+8. 残余风险：`assembleSite` 直调不过闸、QA standalone 看不到机制 / 完成性 error。
+
+### 明确排除 V1
+
+Runtime 修改、新机制、移动平台支持、hazard / pickup / goal 的 `body` honor、二段跳、kill plane、世界边界碰撞、斜坡 / 非 AABB、逐帧 atlas 几何、设计层布局坐标、新 EntityKind / Motion。

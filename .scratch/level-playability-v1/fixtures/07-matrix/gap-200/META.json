@@ -1,0 +1,17 @@
+{
+  "caseId": "gap-200",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+  "failureLocation": "entity \"suitcase-2\"",
+  "legalPair": "gap-40",
+  "evidence": [
+    [
+      "03",
+      "gap-200"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/gap-200/game-config.json"
+}

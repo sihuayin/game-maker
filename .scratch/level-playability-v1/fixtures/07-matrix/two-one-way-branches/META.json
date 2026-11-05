@@ -1,0 +1,17 @@
+{
+  "caseId": "two-one-way-branches",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT",
+  "failureLocation": "entity \"gate\"",
+  "legalPair": "order-required-high-then-low",
+  "evidence": [
+    [
+      "05",
+      "two-one-way-branches"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/two-one-way-branches/game-config.json"
+}

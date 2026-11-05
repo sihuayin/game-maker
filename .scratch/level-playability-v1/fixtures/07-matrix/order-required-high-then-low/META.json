@@ -1,0 +1,17 @@
+{
+  "caseId": "order-required-high-then-low",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "two-one-way-branches",
+  "evidence": [
+    [
+      "05",
+      "order-required-high-then-low"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/order-required-high-then-low/game-config.json"
+}

@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "path": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/manifest.json",
+      "staticHazards": [
+        "hazard-spikes-1",
+        "hazard-spikes-2",
+        "hazard-current-1",
+        "hazard-spikes-3"
+      ],
+      "hopOnly": [
+        "entity \"pickup-water-4\"",
+        "entity \"goal-1\""
+      ],
+      "withWalk": [
+        "entity \"pickup-water-4\"",
+        "entity \"goal-1\""
+      ],
+      "gaps": []
+    },
+    {
+      "path": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/site/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/pack/v2/manifest.json",
+      "staticHazards": [
+        "spike-1"
+      ],
+      "hopOnly": [
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\""
+      ],
+      "withWalk": [
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\""
+      ],
+      "gaps": []
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/hazard-contact/config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/pack/v2/manifest.json",
+      "staticHazards": [
+        "hazard-1"
+      ],
+      "hopOnly": [
+        "entity \"goal\""
+      ],
+      "withWalk": [
+        "entity \"goal\""
+      ],
+      "gaps": []
+    },
+    {
+      "path": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "manifest": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/manifest.json",
+      "staticHazards": [
+        "hazard-1"
+      ],
+      "hopOnly": [
+        "entity \"pickup-3\"",
+        "entity \"chest-1\"",
+        "entity \"gate\""
+      ],
+      "withWalk": [
+        "entity \"pickup-3\"",
+        "entity \"chest-1\"",
+        "entity \"gate\""
+      ],
+      "gaps": []
+    }
+  ]
+}

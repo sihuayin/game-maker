@@ -1,0 +1,23 @@
+{
+  "paired": 20,
+  "configsWithMovingHazard": 16,
+  "naivePatrolSweepAddsError": 1,
+  "cases": [
+    {
+      "file": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/site/v1/game-config.json",
+      "base": [],
+      "naive": [
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\""
+      ],
+      "added": [
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\""
+      ]
+    }
+  ]
+}

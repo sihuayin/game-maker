@@ -1,0 +1,17 @@
+{
+  "caseId": "gate-midair-jumpthrough",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "goal-inside-luggage",
+  "evidence": [
+    [
+      "05",
+      "gate-midair-jumpthrough"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/gate-midair-jumpthrough/game-config.json"
+}

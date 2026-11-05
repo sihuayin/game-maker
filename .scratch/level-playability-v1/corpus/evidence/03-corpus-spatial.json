@@ -1,0 +1,253 @@
+{
+  "result": {
+    "totalConfigs": 152,
+    "uniqueConfigs": 21,
+    "paired": 20,
+    "unpaired": [
+      "packages/demo/fixtures/empty-world.json"
+    ],
+    "spawnEmbed": {
+      "boxOverlap": 11,
+      "footInside": 10
+    },
+    "embedded": {},
+    "chestErrors": {},
+    "diffs": {
+      ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      "out/__probe-timeout/last-train/game-configs/v1.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      "out/__probe-timeout/last-train/game-configs/v2.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      "out/last-train/site/v3/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/p0-02-second-demo-v2/runs/09-probe-all/avoid-danger/config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/p0-02-second-demo-v2/runs/09-probe-all/collect-pickup/config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/p0-02-second-demo-v2/runs/09-probe-all/open-chest/config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/playtest-v1/runs/2026-10-27-ticket-08/e2e-evidence/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/site/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/hazard-contact/config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      },
+      ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json": {
+        "current": 0,
+        "next": 0,
+        "new": [],
+        "fixed": []
+      }
+    },
+    "gaps": {},
+    "features": {
+      "movingSolids": 0,
+      "bodyIgnored": 0,
+      "chests": 6,
+      "targets": 92
+    }
+  },
+  "details": {
+    "newErrors": [],
+    "fixedErrors": [],
+    "spawn": [
+      {
+        "file": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": "out/__probe-timeout/last-train/game-configs/v1.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": "out/__probe-timeout/last-train/game-configs/v2.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": "out/last-train/site/v3/game-config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/avoid-danger/config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/collect-pickup/config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/open-chest/config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/site/v1/game-config.json",
+        "boxDepth": 108,
+        "footDepth": 0,
+        "anchorOffset": 0,
+        "burial": 0,
+        "footInside": false,
+        "lateralOnly": true
+      },
+      {
+        "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/hazard-contact/config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+        "boxDepth": 2,
+        "footDepth": 2,
+        "anchorOffset": 2.400000000000002,
+        "burial": -0.40000000000000213,
+        "footInside": true,
+        "lateralOnly": false
+      },
+      {
+        "file": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+        "boxDepth": 8,
+        "footDepth": 8,
+        "anchorOffset": 7.68,
+        "burial": 0.3200000000000003,
+        "footInside": true,
+        "lateralOnly": false
+      }
+    ],
+    "embedded": [],
+    "noSeed": [],
+    "chest": []
+  }
+}

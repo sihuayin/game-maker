@@ -1,0 +1,17 @@
+{
+  "caseId": "spawn-deep-terrain",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_SPAWN_IN_TERRAIN",
+  "failureLocation": "player.at",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "03",
+      "spawnDx"
+    ]
+  ],
+  "note": "窄口径依赖 P4 spawn 分离 profile；未写入 profile 时降为 INSUFFICIENT_EVIDENCE",
+  "fixture": "fixtures/07-matrix/spawn-deep-terrain/game-config.json"
+}

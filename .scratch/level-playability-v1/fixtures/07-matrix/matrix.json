@@ -1,0 +1,1098 @@
+{
+  "version": "level-playability-test-matrix/v1",
+  "generatedAt": "2026-11-05T03:50:15.582Z",
+  "nonProduction": true,
+  "baseline": "main @ fa17c14",
+  "cases": [
+    {
+      "caseId": "baseline-last-train",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": null,
+      "evidence": [
+        [
+          "03",
+          "baseline-last-train"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/baseline-last-train/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "baseline-last-train",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "gap-200",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+      "failureLocation": "entity \"suitcase-2\"",
+      "legalPair": "gap-40",
+      "evidence": [
+        [
+          "03",
+          "gap-200"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/gap-200/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"suitcase-1\"",
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "gap-200",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "gap-40",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "gap-200",
+      "evidence": [
+        [
+          "03",
+          "gap-40"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/gap-40/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "gap-40",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "wall-100",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+      "failureLocation": "entity \"signal\"",
+      "legalPair": "wall-40",
+      "evidence": [
+        [
+          "03",
+          "wall-100"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/wall-100/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "wall-100",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "wall-40",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "wall-100",
+      "evidence": [
+        [
+          "03",
+          "wall-40"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/wall-40/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "wall-40",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pickup-120",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+      "failureLocation": "entity \"suitcase-2\"",
+      "legalPair": "pickup-50",
+      "evidence": [
+        [
+          "03",
+          "pickup-120"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/pickup-120/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"suitcase-2\""
+      ],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "pickup-120",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pickup-50",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "pickup-120",
+      "evidence": [
+        [
+          "03",
+          "pickup-50"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/pickup-50/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "pickup-50",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "goal-inside-luggage",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_GATE_BLOCKED",
+      "failureLocation": "entity \"signal\"",
+      "legalPair": "gate-midair-jumpthrough",
+      "evidence": [
+        [
+          "03",
+          "goal-inside-luggage"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/goal-inside-luggage/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "goal-inside-luggage",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "gate-midair-jumpthrough",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "goal-inside-luggage",
+      "evidence": [
+        [
+          "05",
+          "gate-midair-jumpthrough"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/gate-midair-jumpthrough/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "gate-midair-jumpthrough",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "low-ceiling-walkable",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": null,
+      "evidence": [
+        [
+          "03",
+          "low-ceiling"
+        ]
+      ],
+      "note": "03 walk 边修复前是已知误报；修复后合法",
+      "fixture": "fixtures/07-matrix/low-ceiling-walkable/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"p\"",
+        "entity \"gate\""
+      ],
+      "currentAuditGameConfig": [
+        {
+          "severity": "warning",
+          "where": "entity \"ceiling\""
+        }
+      ],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "low-ceiling",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-in-pit",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_CHEST_UNREACHABLE",
+      "failureLocation": "entity \"chest\"",
+      "legalPair": "chest-range-rescues",
+      "evidence": [
+        [
+          "03",
+          "chest-in-pit"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-in-pit/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "chest-in-pit",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-range-rescues",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "chest-in-pit",
+      "evidence": [
+        [
+          "03",
+          "chest-range-rescues"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-range-rescues/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"gate\""
+      ],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "chest-range-rescues",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-inside-luggage-range0",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_CHEST_BLOCKED",
+      "failureLocation": "entity \"chest-in\"",
+      "legalPair": "chest-inside-luggage-range30",
+      "evidence": [
+        [
+          "03",
+          "chest-inside-luggage-range0"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-inside-luggage-range0/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "chest-inside-luggage-range0",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-inside-luggage-range30",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "chest-inside-luggage-range0",
+      "evidence": [
+        [
+          "03",
+          "chest-inside-luggage-range30"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-inside-luggage-range30/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "chest-inside-luggage-range30",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pickup-inside-luggage",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_BLOCKED",
+      "failureLocation": "entity \"p-inside\"",
+      "legalPair": "pickup-on-luggage",
+      "evidence": [
+        [
+          "03",
+          "pickup-inside-luggage"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/pickup-inside-luggage/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "pickup-inside-luggage",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pickup-on-luggage",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "pickup-inside-luggage",
+      "evidence": [
+        [
+          "03",
+          "pickup-on-luggage"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/pickup-on-luggage/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "pickup-on-luggage",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pickup-body-override-inside",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_BLOCKED",
+      "failureLocation": "entity \"p-body\"",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "03",
+          "pickup-body-override-inside"
+        ]
+      ],
+      "note": "运行时忽略 pickup 的 body；用声明 body 会漏报",
+      "fixture": "fixtures/07-matrix/pickup-body-override-inside/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "pickup-body-override-inside",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "moving-solid-sweep",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+      "failureLocation": "entity \"high-pickup\"",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "03",
+          "moving-solid-sweep"
+        ]
+      ],
+      "note": "solid + motion 在运行时是静态原位；按整段行程判定是错的",
+      "fixture": "fixtures/07-matrix/moving-solid-sweep/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "moving-solid-sweep",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "spawn-deep-terrain",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_SPAWN_IN_TERRAIN",
+      "failureLocation": "player.at",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "03",
+          "spawnDx"
+        ]
+      ],
+      "note": "窄口径依赖 P4 spawn 分离 profile；未写入 profile 时降为 INSUFFICIENT_EVIDENCE",
+      "fixture": "fixtures/07-matrix/spawn-deep-terrain/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "spawnDx",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "spawn-no-foothold",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedJudgmentId": null,
+      "failureLocation": "coverage.spatial",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "03",
+          "spawn-no-foothold"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/spawn-no-foothold/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "03",
+          "key": "spawn-no-foothold",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "spawn-in-solid",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "auditGameConfig.spawn-in-solid (existing)",
+      "failureLocation": "player.at",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "existing",
+          "auditGameConfig"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/spawn-in-solid/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [
+        {
+          "severity": "error",
+          "where": "player.at"
+        }
+      ],
+      "evidenceStatus": [
+        {
+          "src": "existing",
+          "key": "auditGameConfig",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "target-out-of-world",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "auditGameConfig.inWorld (existing)",
+      "failureLocation": "entity \"signal\"",
+      "legalPair": "target-at-edge",
+      "evidence": [
+        [
+          "existing",
+          "auditGameConfig"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/target-out-of-world/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"signal\""
+      ],
+      "currentAuditGameConfig": [
+        {
+          "severity": "error",
+          "where": "entity \"signal\""
+        }
+      ],
+      "evidenceStatus": [
+        {
+          "src": "existing",
+          "key": "auditGameConfig",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "target-at-edge",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "target-out-of-world",
+      "evidence": [
+        [
+          "existing",
+          "auditGameConfig"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/target-at-edge/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "existing",
+          "key": "auditGameConfig",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "static-hazard-seals-path",
+      "group": "mechanic",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+      "failureLocation": "entity \"suitcase-3\"",
+      "legalPair": "wide-patrol",
+      "evidence": [
+        [
+          "04-corpus",
+          "maskAddsError"
+        ]
+      ],
+      "note": "历史语料 4 个命中证明模型会响；本 fixture 是 09 的最小复现",
+      "fixture": "fixtures/07-matrix/static-hazard-seals-path/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "04-corpus",
+          "key": "maskAddsError",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "wide-patrol",
+      "group": "mechanic",
+      "nonProduction": true,
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedJudgmentId": null,
+      "failureLocation": "coverage.mechanic",
+      "legalPair": "static-hazard-seals-path",
+      "evidence": [
+        [
+          "04-patrol",
+          "naivePatrolSweepAddsError"
+        ]
+      ],
+      "note": "宽巡逻是合法设计；整段扫掠当实心会误报，V1 不注册巡逻判据",
+      "fixture": "fixtures/07-matrix/wide-patrol/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "04-patrol",
+          "key": "naivePatrolSweepAddsError",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "danger-full-wall",
+      "group": "mechanic",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_MECHANIC_PATH_NO_SAFE_WINDOW",
+      "failureLocation": "entity \"suitcase-3\"",
+      "legalPair": "danger-wide-idle",
+      "evidence": [
+        [
+          "04",
+          "dangerFull_crossingMs"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/danger-full-wall/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "04",
+          "key": "dangerFull_crossingMs",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "danger-wide-idle",
+      "group": "mechanic",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "danger-full-wall",
+      "evidence": [
+        [
+          "04",
+          "dangerWide_baseReach"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/danger-wide-idle/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "04",
+          "key": "dangerWide_baseReach",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pickup-in-static-hazard",
+      "group": "mechanic",
+      "nonProduction": true,
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedJudgmentId": null,
+      "failureLocation": "coverage.mechanic",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "04",
+          "pickupInStaticHazard_baseReach"
+        ]
+      ],
+      "note": "复位保留收集计数；同帧回调顺序不可证；不判错",
+      "fixture": "fixtures/07-matrix/pickup-in-static-hazard/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "04",
+          "key": "pickupInStaticHazard_baseReach",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "moving-platform",
+      "group": "mechanic",
+      "nonProduction": true,
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedJudgmentId": null,
+      "failureLocation": "coverage.mechanic",
+      "legalPair": "baseline-last-train",
+      "evidence": [
+        [
+          "04",
+          "movingSolid_staticOriginalReach"
+        ]
+      ],
+      "note": "moving-platform 未在 Runtime 实现；归 mechanic-coverage，不产 playability error",
+      "fixture": "fixtures/07-matrix/moving-platform/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "04",
+          "key": "movingSolid_staticOriginalReach",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "one-way-pit-pickup",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT",
+      "failureLocation": "entity \"gate\"",
+      "legalPair": "one-way-pit-gate-on-pit-floor",
+      "evidence": [
+        [
+          "05",
+          "one-way-pit-pickup"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/one-way-pit-pickup/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "one-way-pit-pickup",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "one-way-pit-gate-on-pit-floor",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "one-way-pit-pickup",
+      "evidence": [
+        [
+          "05",
+          "one-way-pit-gate-on-pit-floor"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/one-way-pit-gate-on-pit-floor/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "one-way-pit-gate-on-pit-floor",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "two-one-way-branches",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT",
+      "failureLocation": "entity \"gate\"",
+      "legalPair": "order-required-high-then-low",
+      "evidence": [
+        [
+          "05",
+          "two-one-way-branches"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/two-one-way-branches/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"gate\""
+      ],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "two-one-way-branches",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "order-required-high-then-low",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "two-one-way-branches",
+      "evidence": [
+        [
+          "05",
+          "order-required-high-then-low"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/order-required-high-then-low/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "order-required-high-then-low",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "two-pickups-one-arc",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": null,
+      "evidence": [
+        [
+          "05",
+          "two-pickups-one-arc"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/two-pickups-one-arc/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "two-pickups-one-arc",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-sealed-in-solid",
+      "group": "spatial",
+      "nonProduction": true,
+      "expectedVerdict": "PROVEN_UNPLAYABLE",
+      "expectedJudgmentId": "PLAYABILITY_SPATIAL_CHEST_BLOCKED",
+      "failureLocation": "entity \"sealed-chest\"",
+      "legalPair": "chest-behind-wall-with-range",
+      "evidence": [
+        [
+          "05",
+          "chest-sealed-in-solid"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-sealed-in-solid/game-config.json",
+      "parseOk": true,
+      "currentReachability": [
+        "entity \"gate\""
+      ],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "chest-sealed-in-solid",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-behind-wall-with-range",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": "chest-sealed-in-solid",
+      "evidence": [
+        [
+          "05",
+          "chest-behind-wall-with-range"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-behind-wall-with-range/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "chest-behind-wall-with-range",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-midair-jumpthrough",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": null,
+      "evidence": [
+        [
+          "05",
+          "chest-midair-jumpthrough"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-midair-jumpthrough/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "chest-midair-jumpthrough",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "pit-chest-with-reset-hazard",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": null,
+      "evidence": [
+        [
+          "05",
+          "pit-chest-with-reset-hazard"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/pit-chest-with-reset-hazard/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "pit-chest-with-reset-hazard",
+          "found": true
+        }
+      ]
+    },
+    {
+      "caseId": "chest-overlapping-hazard",
+      "group": "completion",
+      "nonProduction": true,
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
+      "expectedJudgmentId": null,
+      "failureLocation": null,
+      "legalPair": null,
+      "evidence": [
+        [
+          "05",
+          "chest-overlapping-hazard"
+        ]
+      ],
+      "note": null,
+      "fixture": "fixtures/07-matrix/chest-overlapping-hazard/game-config.json",
+      "parseOk": true,
+      "currentReachability": [],
+      "currentAuditGameConfig": [],
+      "evidenceStatus": [
+        {
+          "src": "05",
+          "key": "chest-overlapping-hazard",
+          "found": true
+        }
+      ]
+    }
+  ]
+}

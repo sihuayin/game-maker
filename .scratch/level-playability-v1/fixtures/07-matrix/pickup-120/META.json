@@ -1,0 +1,17 @@
+{
+  "caseId": "pickup-120",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+  "failureLocation": "entity \"suitcase-2\"",
+  "legalPair": "pickup-50",
+  "evidence": [
+    [
+      "03",
+      "pickup-120"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/pickup-120/game-config.json"
+}

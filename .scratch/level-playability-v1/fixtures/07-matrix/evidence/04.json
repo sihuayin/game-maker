@@ -1,0 +1,27 @@
+{
+  "fixture": "fixtures/game-configs/last-train.json",
+  "baseReach": [],
+  "staticHazard_asSolidReach": [],
+  "staticHazard_added": [],
+  "movingHazard_sweptSolid_naive": [],
+  "movingHazard_sweptSolid_added": [],
+  "dangerFull_idleMs": 300,
+  "dangerFull_crossingMs": 1067,
+  "dangerFull_baseReach": [],
+  "dangerFull_asSolidReach": [
+    "entity \"suitcase-3\"",
+    "entity \"signal\""
+  ],
+  "dangerWide_baseReach": [],
+  "dangerWide_asSolidReach": [
+    "entity \"suitcase-3\"",
+    "entity \"signal\""
+  ],
+  "pickupInStaticHazard_baseReach": [],
+  "pickupBehindStaticHazard_added": [],
+  "movingSolid_baseReach": [],
+  "movingSolid_staticOriginalReach": [],
+  "movingSolid_addedByStaticOriginal": [],
+  "playerSpeed": 90,
+  "playerWidth": 32
+}

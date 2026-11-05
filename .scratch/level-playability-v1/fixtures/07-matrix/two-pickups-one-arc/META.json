@@ -1,0 +1,17 @@
+{
+  "caseId": "two-pickups-one-arc",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": null,
+  "evidence": [
+    [
+      "05",
+      "two-pickups-one-arc"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/two-pickups-one-arc/game-config.json"
+}

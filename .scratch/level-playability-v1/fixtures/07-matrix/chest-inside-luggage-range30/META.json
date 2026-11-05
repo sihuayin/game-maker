@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-inside-luggage-range30",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "chest-inside-luggage-range0",
+  "evidence": [
+    [
+      "03",
+      "chest-inside-luggage-range30"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-inside-luggage-range30/game-config.json"
+}

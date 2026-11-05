@@ -1,0 +1,17 @@
+{
+  "caseId": "wall-100",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+  "failureLocation": "entity \"signal\"",
+  "legalPair": "wall-40",
+  "evidence": [
+    [
+      "03",
+      "wall-100"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/wall-100/game-config.json"
+}

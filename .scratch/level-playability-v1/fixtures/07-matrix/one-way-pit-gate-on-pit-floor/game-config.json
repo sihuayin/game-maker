@@ -1,0 +1,89 @@
+{
+  "format": "game-config/v1",
+  "world": {
+    "size": {
+      "w": 480,
+      "h": 270
+    }
+  },
+  "scene": {
+    "background": {
+      "asset": "bg-dusk-halt"
+    }
+  },
+  "player": {
+    "asset": "player-traveler",
+    "anims": {
+      "idle": "idle",
+      "run": "run",
+      "jump": "jump"
+    },
+    "at": {
+      "x": 40,
+      "y": 150
+    }
+  },
+  "terrain": [
+    {
+      "x": 0,
+      "y": 150,
+      "w": 300,
+      "h": 20
+    },
+    {
+      "x": 300,
+      "y": 250,
+      "w": 180,
+      "h": 20
+    }
+  ],
+  "entities": [
+    {
+      "id": "pit-pickup",
+      "kind": "pickup",
+      "at": {
+        "x": 320,
+        "y": 250
+      },
+      "asset": "pickup-suitcase"
+    },
+    {
+      "id": "gate",
+      "kind": "goal",
+      "at": {
+        "x": 460,
+        "y": 250
+      },
+      "asset": "signal-endlight",
+      "anim": "green"
+    }
+  ],
+  "hud": {
+    "panel": {
+      "asset": "hud-lost-slots",
+      "at": {
+        "x": 8,
+        "y": 262
+      },
+      "size": {
+        "w": 72,
+        "h": 32
+      }
+    },
+    "pip": {
+      "asset": "hud-pip",
+      "at": {
+        "x": 12,
+        "y": 250
+      },
+      "step": {
+        "x": 20,
+        "y": 0
+      }
+    }
+  },
+  "objective": {
+    "kind": "collect-then-reach",
+    "gate": "gate"
+  }
+}

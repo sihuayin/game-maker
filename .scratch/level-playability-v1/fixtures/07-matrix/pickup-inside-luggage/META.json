@@ -1,0 +1,17 @@
+{
+  "caseId": "pickup-inside-luggage",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_BLOCKED",
+  "failureLocation": "entity \"p-inside\"",
+  "legalPair": "pickup-on-luggage",
+  "evidence": [
+    [
+      "03",
+      "pickup-inside-luggage"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/pickup-inside-luggage/game-config.json"
+}
