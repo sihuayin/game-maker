@@ -1,8 +1,8 @@
 # LP-01 基础几何模型
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: amber · 2026-11-05
 Blocked by: 02
 Map: ../map.md
 
@@ -47,3 +47,46 @@ Map: ../map.md
 ### 通过标准
 
 - AC-02：AABB、Solid、Walk / Fall 测试通过；与 LP-00 语义一致；不引入未确认物理行为。
+
+## Answer
+
+**2026-11-05 完成（LP-01，AFK）。Commit `acb782d`。纯加法：新增 `playability/**` 与两个测试文件，未修改任何既有生产文件。**
+
+### 交付
+
+- `packages/contracts/src/playability/geometry.ts` —— 唯一 AABB 词汇：`overlapsStrict` / `overlapsInclusive` / `contains` / `touches` / `expandBox` / `boxFromFoot`。
+- `packages/contracts/src/playability/profile.ts` —— `FIXED_RUNTIME_PROFILE`、`runtimeEntityGeometry`、`runtimePlayerGeometry`、`chestInteractionBox`、`chestInteractable`。
+- `packages/contracts/src/playability/graph.ts` —— 共享移动图：`blocked` / `standable`、`walk` / `walk-off` / `fall`、按需 `hopTargets`、`reachableCells`。
+- `packages/contracts/src/playability/index.ts` —— 内部桶；**尚未**从 contracts 根导出（C1 在 LP-05 接线）。
+- 测试：`packages/contracts/tests/playability-geometry.test.ts`（10 例）、`playability-graph.test.ts`（9 例）。
+
+### 语义边界（LP-00 复核后）
+
+- solid / chest / danger 用 `body ?? size` + manifest anchor；pickup / hazard / goal 用图集帧几何，`coverage: "partial"`；玩家动画精灵 `coverage: "partial"`。
+- chest 交互盒四边外扩 `range`，与玩家 AABB **严格**相交，不要求落地。
+- solid `motion` 按**原始位置**静态处理（`FIXED_RUNTIME_PROFILE.solidMotion = "static-origin"`）。
+- 出生点只提供 `startCells()` 宽松接位，**不**编码「重叠会被推出」的假设。
+
+### `EntityDesc.box` 调用方清单（复核裁定第 4 项）
+
+| 调用方 | 用途 | 处置 |
+|---|---|---|
+| `packages/demo/src/world.ts:176-187` | 对全部 kind 用 `body ?? size` 计算 `e.box` | Runtime 纯层，**行为未改** |
+| `packages/demo/src/shell/scene.ts:150` | solid 消费 `e.box` 建静态体 | 只消费 body 系 kind，语义一致 |
+| `packages/demo/src/shell/scene.ts:180` | chest 交互盒基座 | 同上 |
+| `packages/demo/src/shell/scene.ts:189` | danger 打击盒 | 同上 |
+| `packages/demo/src/site.ts:139-140` | `pokeOut` 世界边界检查 | 不是碰撞；未改 |
+| `packages/demo/tests/world.test.ts:104,120-121` | 断言这些盒 | 未改 |
+
+**审计侧不存在 `EntityDesc.box` 的消费者**；LP-01 的审计几何只走 `profile.ts`，所以 pickup / hazard / goal 不会继承 `body`。没有为迁就审计修改 Runtime。
+
+### 证据
+
+- `pnpm exec vitest run packages/contracts/tests/playability-geometry.test.ts packages/contracts/tests/playability-graph.test.ts` → 2 文件 / 19 例通过，exit 0。
+- `pnpm exec vitest run packages/contracts/tests` → 42 文件 / 857 例通过，exit 0。
+- `pnpm typecheck` → exit 0。
+- `pnpm build` → exit 0。
+
+### 回退点
+
+纯加法：删除 `packages/contracts/src/playability/**` 与两个测试文件即可，无需迁移、无既有行为变化。

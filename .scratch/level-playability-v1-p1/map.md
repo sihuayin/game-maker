@@ -74,7 +74,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 
 1. [LP-00 Runtime 语义核验](issues/01-lp00-runtime-semantics.md)（research，AFK）— **resolved**
 2. [LP-00 复核：Runtime 语义证据是否充分](issues/02-lp00-review.md)（grilling，HITL，blocked by 01）— **resolved**
-3. [LP-01 基础几何模型](issues/03-lp01-geometry.md)（task，AFK，blocked by 02）— open
+3. [LP-01 基础几何模型](issues/03-lp01-geometry.md)（task，AFK，blocked by 02）— **resolved**
 4. [LP-02 空间可达性判据](issues/04-lp02-spatial.md)（task，AFK，blocked by 03）— open
 5. [LP-02 复核：空间判据可靠性与误报](issues/05-lp02-review.md)（grilling，HITL，blocked by 04）— open
 6. [LP-03 机制可通行性判据](issues/06-lp03-mechanic.md)（task，AFK，blocked by 05）— open
@@ -88,6 +88,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 
 - [LP-00 Runtime 语义核验](issues/01-lp00-runtime-semantics.md)：P1 带边界 `CONFIRMED`（solid/chest/danger/player 用 `body ?? size`；pickup/hazard/goal 物理体按图集帧，等价性由 pack acceptance 保证、schema 不强制）；P2 `CONFIRMED`（`body` 只对 solid/chest/danger 生效）；P3 `CONFIRMED`（chest 交互盒四边外扩 `range`）；P4 **`CONTRADICTED`**（Runtime 无 spawn 专用处理，深/静止重叠不分离）。证据见 [research/01-runtime-semantics.md](research/01-runtime-semantics.md)。
 - [LP-00 复核](issues/02-lp00-review.md)：**PASS WITH BOUNDARIES**。P4 降级（`SPAWN_IN_TERRAIN` 仅观察）；P1 有条件接受（acceptance 不确认 ⇒ `coverage.partial`）；P2/P3 确认并写入统一 Runtime geometry profile；`EntityDesc.box` 以 Runtime 为准；`hazard.body` 忽略。LP-01 携带五项强制约束。
+- [LP-01 基础几何模型](issues/03-lp01-geometry.md)：统一 Runtime geometry profile + 共享移动图落地（纯加法，未改既有审计/Runtime）；body 系 vs 帧系几何与 coverage 分离；walk / walk-off / fall / hop 边；19 例新测试、contracts 857 例全绿。`EntityDesc.box` 调用方已清点，审计不消费它。
 
 ## Not yet specified
 
