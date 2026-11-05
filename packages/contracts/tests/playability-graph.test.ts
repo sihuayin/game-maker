@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseGameConfig, playerMoveOf } from "../src/index.js";
 import type { GameConfig } from "../src/game-config.js";
 import {
-  buildMovementGraph, fallTarget, hopTargets, movementNeighbors, reachableCells,
+  buildMovementGraph, fallTarget, hopEdges, hopTargets, movementNeighbors, reachableCells,
 } from "../src/playability/graph.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -108,5 +108,16 @@ describe("§Hop（抛物线）", () => {
   it("同高相邻列也在跳跃可达集里（弧线不撞）", () => {
     const g = graphOf(CONFIG);
     expect(hopTargets(g, 300, 250, playerMoveOf(CONFIG))).toContainEqual({ x: 301, y: 250 });
+  });
+
+  it("hopEdges 与 hopTargets 同源；采样包含起点与终点（LP-02 的覆盖判定用它）", () => {
+    const g = graphOf(CONFIG);
+    const move = playerMoveOf(CONFIG);
+    const edges = hopEdges(g, 300, 250, move);
+    const edge = edges.find((e) => e.x === 301 && e.y === 250);
+    expect(edge).toBeDefined();
+    expect(edge!.samples[0]).toEqual({ x: 300, y: 250 });
+    expect(edge!.samples[edge!.samples.length - 1]).toEqual({ x: 301, y: 250 });
+    expect(hopTargets(g, 300, 250, move)).toEqual(edges.map((e) => ({ x: e.x, y: e.y })));
   });
 });

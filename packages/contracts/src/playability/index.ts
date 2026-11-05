@@ -1,4 +1,4 @@
-// 可玩性内部桶（LP-01）。
+// 可玩性内部桶（LP-01 / LP-02）。
 //
 // ⚠️ 这里**不**导出到 `packages/contracts/src/index.ts`：加法导出（C1）在 LP-05 才接线。
 //   在此之前，判据与测试直接从 `playability/*` 取。
@@ -8,3 +8,5 @@
 
 export * from "./profile.js";
 export * from "./graph.js";
+export * from "./verdict.js";
+export * from "./spatial.js";

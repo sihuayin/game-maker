@@ -191,43 +191,64 @@ export function movementNeighbors(graph: MovementGraph, x: number, y: number): M
   return out;
 }
 
-/**
- * 从落脚点跳出去能落到的落脚点（按需计算）。
- * ⚠️ 与 `auditReachability` 是同一条抛物线；两种写法会漂移，LP-02 接线时必须只留这一份。
- */
-export function hopTargets(graph: MovementGraph, x: number, y: number, move: MoveParams): Vec[] {
-  const apex = maxJumpHeight(move);
-  const maxDx = Math.ceil(jumpSpan(move, graph.height));
-  const out: Vec[] = [];
-  const v = move.jumpVelocity;
-  const gravity = move.gravity;
+/** 一次跳跃边：落点 + 整条抛物线上的**脚点采样**（LP-02 的覆盖判定要用采样）。 */
+export type HopEdge = { readonly x: number; readonly y: number; readonly samples: readonly Vec[] };
 
+/**
+ * 从落脚点 A 跳到落脚点 B 的**整条抛物线采样**；撞进实心体或根本够不着时返回 `null`。
+ *
+ * ⚠️ 全仓只有这一处算跳跃弧：`hopTargets` 与 LP-02 的覆盖判定都从它取采样。
+ *   各写一份必然漂移，而漂移的后果是「可达集说能到、覆盖判定说没碰到」。
+ */
+export function hopSamples(
+  graph: MovementGraph, ax: number, ay: number, bx: number, by: number, move: MoveParams,
+): Vec[] | null {
+  const apex = maxJumpHeight(move);
+  const dh = ay - by;                                  // 正 = 落点更高
+  if (dh > apex || dh < -graph.height) return null;
+  const disc = move.jumpVelocity * move.jumpVelocity - 2 * move.gravity * dh;
+  if (disc < 0) return null;
+  const t = (move.jumpVelocity + Math.sqrt(disc)) / move.gravity;
+  const dx = bx - ax;
+  if (Math.abs(dx) > move.speed * t) return null;
+
+  const n = Math.max(6, Math.min(120, Math.ceil(t * 60)));
+  const samples: Vec[] = [];
+  for (let i = 0; i <= n; i++) {
+    const f = i / n;
+    const tt = t * f;
+    const px = Math.round(ax + dx * f);
+    const py = Math.round(ay - (move.jumpVelocity * tt - (move.gravity * tt * tt) / 2));
+    // 出世界的采样点不参与判决，也不进覆盖集（与 `blocked` 栅格同域）。
+    if (px < 0 || px > graph.width || py < 0 || py > graph.height) continue;
+    if (graph.blocked[px * graph.stride + py] === 1) return null;
+    samples.push({ x: px, y: py });
+  }
+  return samples.length > 0 ? samples : null;
+}
+
+/** 从落脚点能跳到的所有落脚点（含整条弧的采样；按需计算，不预物化）。 */
+export function hopEdges(graph: MovementGraph, x: number, y: number, move: MoveParams): HopEdge[] {
+  const maxDx = Math.ceil(jumpSpan(move, graph.height));
+  const out: HopEdge[] = [];
   for (let dx = -maxDx; dx <= maxDx; dx++) {
     const bx = x + dx;
     if (bx < 0 || bx > graph.width) continue;
     for (const by of graph.columns[bx] ?? []) {
       if (bx === x && by === y) continue;
-      const dh = y - by;
-      if (dh > apex || dh < -graph.height) continue;
-      const disc = v * v - 2 * gravity * dh;
-      if (disc < 0) continue;
-      const t = (v + Math.sqrt(disc)) / gravity;
-      if (Math.abs(dx) > move.speed * t) continue;
-
-      const n = Math.max(6, Math.min(120, Math.ceil(t * 60)));
-      let clear = true;
-      for (let i = 0; i <= n; i++) {
-        const f = i / n;
-        const tt = t * f;
-        const px = Math.round(x + dx * f);
-        const py = Math.round(y - (v * tt - (gravity * tt * tt) / 2));
-        if (px < 0 || px > graph.width || py < 0 || py > graph.height) continue;
-        if (graph.blocked[px * graph.stride + py] === 1) { clear = false; break; }
-      }
-      if (clear) out.push({ x: bx, y: by });
+      const samples = hopSamples(graph, x, y, bx, by, move);
+      if (samples) out.push({ x: bx, y: by, samples });
     }
   }
   return out;
+}
+
+/**
+ * 从落脚点跳出去能落到的落脚点（按需计算）。
+ * ⚠️ 与 `auditReachability` 是同一条抛物线；两种写法会漂移，LP-02 接线时必须只留这一份。
+ */
+export function hopTargets(graph: MovementGraph, x: number, y: number, move: MoveParams): Vec[] {
+  return hopEdges(graph, x, y, move).map((edge) => ({ x: edge.x, y: edge.y }));
 }
 
 /** BFS 可达集（键 `"x,y"`）。`includeHop=false` 只走地面移动，给 LP-01 的测试与调试用。 */
