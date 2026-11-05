@@ -17,6 +17,7 @@ Map: ../map.md
 3. **Publish Gate**：现场复验改调 `auditPlayability` 的映射，不得绕过已有确定性失败。
 4. **C1 加法导出**：仅 `auditPlayability` / `playabilityIssues` + 内部类型；不改既有调用者或返回形状。
 5. **结果分档**：`INSUFFICIENT_EVIDENCE` / `NO_PROVEN_BLOCKER` 不产 `ConfigIssue`；severity 只由 verdict 派生。
+6. **coverage**：`coverage.partial` 只活在内部 verdict，不落 `qa-report.json` / `delivery` / config。
 
 ### 必须交付
 

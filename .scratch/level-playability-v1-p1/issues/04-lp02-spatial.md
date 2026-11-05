@@ -18,6 +18,12 @@ Map: ../map.md
 | `PLAYABILITY_SPATIAL_CHEST_UNREACHABLE` | chest 交互盒（`range` 外扩）无路径可达 |
 | `PLAYABILITY_SPATIAL_{PICKUP,CHEST,GATE}_BLOCKED` | 目标完全埋进实心体、无任何自由玩家重叠位置；`BLOCKED` 与 `UNREACHABLE` 同目标互斥，`BLOCKED` 优先 |
 
+### LP-00 证据约束（待 02 复核批准）
+
+- `SPAWN_IN_TERRAIN`：P4 为 `CONTRADICTED`（Runtime 无 spawn 专用处理，深 / 静止重叠不分离）；该判据是否上线由 [LP-00 复核](02-lp00-review.md) 裁定。裁定前先实现窄口径，但默认 `INSUFFICIENT_EVIDENCE`。
+- `CHEST_UNREACHABLE`：交互盒按四边外扩 `range` 建模（`scene.ts:315-325`），并与玩家 AABB 严格相交。
+- 依赖逐帧几何的严格重叠 / `*_BLOCKED`：无法确认 pack acceptance 时使用 `coverage.partial`，不得因此硬拒。
+
 ### 必须交付
 
 - 以出生点为起点的玩家空间可达图，复用 LP-01 模型与真实碰撞尺寸 / 锚点。

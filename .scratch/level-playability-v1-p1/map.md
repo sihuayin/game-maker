@@ -72,7 +72,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 
 ### 票流
 
-1. [LP-00 Runtime 语义核验](issues/01-lp00-runtime-semantics.md)（research，AFK）— open
+1. [LP-00 Runtime 语义核验](issues/01-lp00-runtime-semantics.md)（research，AFK）— **resolved**
 2. [LP-00 复核：Runtime 语义证据是否充分](issues/02-lp00-review.md)（grilling，HITL，blocked by 01）— open
 3. [LP-01 基础几何模型](issues/03-lp01-geometry.md)（task，AFK，blocked by 02）— open
 4. [LP-02 空间可达性判据](issues/04-lp02-spatial.md)（task，AFK，blocked by 03）— open
@@ -86,12 +86,10 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 
 ## Decisions so far
 
-<!-- 尚无已关闭票据；每关闭一票在此追加一行。 -->
+- [LP-00 Runtime 语义核验](issues/01-lp00-runtime-semantics.md)：P1 带边界 `CONFIRMED`（solid/chest/danger/player 用 `body ?? size`；pickup/hazard/goal 物理体按图集帧，等价性由 pack acceptance 保证、schema 不强制）；P2 `CONFIRMED`（`body` 只对 solid/chest/danger 生效）；P3 `CONFIRMED`（chest 交互盒四边外扩 `range`）；P4 **`CONTRADICTED`**（Runtime 无 spawn 专用处理，深/静止重叠不分离）。证据见 [research/01-runtime-semantics.md](research/01-runtime-semantics.md)。
 
 ## Not yet specified
 
-- **LP-01 移动图的精确边界**：walk / fall 边的净空、台阶高、锚点与碰撞盒近似方式，取决于 LP-00 的 P1 / P4 证据；LP-00 复核前无法精确切票。
-- **LP-00 证据不足时的范围收缩**：若 P1–P4 某项 `CONTRADICTED` / `INSUFFICIENT_EVIDENCE`，哪些判据不可上线、地图如何缩小，由 LP-00 复核票当场裁定。
 - **LP-05 接线点的最终确认**：`deterministic` 与 publish gate 的实际替换点需在 LP-01 / LP-02 落定后按真实代码复核，可能与 [plan.md](../level-playability-v1/plan.md) §1 有细节偏差。
 
 ## Out of scope
