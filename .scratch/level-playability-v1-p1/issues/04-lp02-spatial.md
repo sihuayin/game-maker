@@ -90,7 +90,7 @@ Map: ../map.md
 
 - 未接入 `deterministic` / Publish Gate / `auditReachability`（LP-05 接线）；未新增 CLI / MCP 参数；未新增持久化 schema；QA 仍 7 条。
 - 未改 Runtime / 历史语料 / 既有验收证据；零模型调用、零生图、零付费。
-- 已知 V1 限制：只建模「有落点的跳跃弧」；mid-air touch-only 若弧线不落到任何落脚点，仍可能被报 UNREACHABLE（待 LP-02 复核裁定是否需降级）。
+- mid-air touch-only：LP-02 复核裁定 Q3(a) 已补保守降级（commit `cbc93a8`，判据 `PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN`）；见 [05-lp02-review.md](05-lp02-review.md)。
 
 ### 回退点
 
