@@ -91,9 +91,9 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 3. [空间布局候选判据](issues/03-spatial-layout-judgments.md)（research，AFK）— resolved
 4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK）— resolved
 5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK）— resolved
-6. [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)（task，AFK）— open
+6. [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)（task，AFK）— resolved
 7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK）— open
-8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK，blocked by 06）— open
+8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK）— open
 9. [最小实施方案与契约候选](issues/09-implementation-plan.md)（research，AFK，blocked by 01–08）— open
 10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL，blocked by 09）— open
 
@@ -104,6 +104,7 @@ Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-
 - [空间布局候选判据](issues/03-spatial-layout-judgments.md)：新增三类确定性 error —— chest 不可取得、目标完全埋进实心体的 `BLOCKED`、出生点埋 terrain 的窄口径；另四项是对既有可达图的模型修正（真实重叠、走路/净空边、solid 静态、运行时几何）。语料 20 份唯一配对新增 **0**。报告见 [03-spatial-layout-judgments.md](research/03-spatial-layout-judgments.md)。
 - [机制组合候选判据](issues/04-mechanic-composition-judgments.md)：只有两条退化确定性判据 —— 非移动 hazard 作不可站立禁区封路、单个全高 danger 墙的安全窗口不足；巡逻 hazard / moving platform / 被包住的收集物 / 多危险物均 `INSUFFICIENT_EVIDENCE`。语料 4 个命中待 08 逐案裁定，裁定前不得硬拒。报告见 [04-mechanic-composition-judgments.md](research/04-mechanic-composition-judgments.md)。
 - [关卡完成性候选判据](issues/05-level-completion-judgments.md)：唯一新 completion id `PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT`（mask DP + 复位边，复用 03 的图与 gate 谓词）；不重复 03/04 的空间与机制根因；语料有效 gate 新增 **0**。报告见 [05-level-completion-judgments.md](research/05-level-completion-judgments.md)。
+- [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)：152 份横版 config（21 唯一）、171 份 manifest（90 v4 / 81 旧 schema）、49 设计 / 77 关；结构配对 146、审计可用 150 份 / 96 唯一对；冻结 `sha256:25e6c891…`。清单见 [corpus/inventory.md](corpus/inventory.md)。
 
 ## Not yet specified
 
