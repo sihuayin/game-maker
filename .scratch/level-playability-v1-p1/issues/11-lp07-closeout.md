@@ -10,6 +10,13 @@ Map: ../map.md
 
 汇总 LP-00～LP-06 的实现与证据，形成可审查、可复现、可回退的完整交付，并由用户裁定收口（PRD §4.8）。本票 HITL。
 
+## Context
+
+- LP-04 / LP-05 的实现与文档在本地，**未推送**；Draft PR #28 仍停在 LP-03。收口前需推送并更新 PR。
+- `pnpm test` 依赖 `vitest.config.ts` 的 20s 超时 + `dangerouslyIgnoreUnhandledErrors`（Vitest worker RPC 超时）；LP-07 必须复核是否可移除。
+- 整关 aggregate 采用用户 2026-11-06 裁定的三层 verdict 组合（19/16/4）；`coverage` 单独暴露。
+- 已知残余：`assembleSite` 直调不过闸；QA standalone 不看机制 / 完成性；3 条历史缺陷 + 1 probe 会被机制 A 硬拒。
+
 ### 必须交付
 
 1. 完整实现代码、全部自动化测试。
