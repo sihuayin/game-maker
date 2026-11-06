@@ -1,8 +1,8 @@
 # LP-06 历史语料与负例验收
 
 Type: task
-Status: open
-Owner: —
+Status: in progress
+Owner: amber · 2026-11-06
 Blocked by: 09
 Map: ../map.md
 
@@ -35,3 +35,10 @@ Map: ../map.md
 - AC-08：冻结语料与 39 例矩阵完成验收。
 - AC-09：不存在未解释的新增误阻断。
 - 最终措辞只能是「零不可解释误伤」，不是「新增 error = 0」；`NO_PROVEN_BLOCKER` 不写成「可玩」。
+
+## Interim（2026-11-06，等待裁定）
+
+- 冻结语料：96 唯一配对 / 20 唯一 config（31 唯一内容组合）；**3 条历史真实缺陷全部被机制 A 识别**，0 playability 误报，6 个 probe 夹具排除；6 份移动 hazard 的 level config 落 `INSUFFICIENT_EVIDENCE`。
+- 39 例矩阵：**案例级预期 19/16/4**；**实际 `auditPlayability` 组合 19/9/11**。7 个带合法宽巡逻 hazard 的空间边界（baseline / gap-40 / wall-40 / pickup-50 / chest-range30 / pickup-on-luggage / target-at-edge）被 LP-03 已批准的 `moving-hazard-phase` gap 拉成 `INSUFFICIENT`，不是新增误报、不是硬拒。
+- 证据：[06-corpus-acceptance.md](../evidence/06-corpus-acceptance.md)、`06-corpus-regression.json`、`06-matrix-acceptance.json`。
+- **待用户裁定 A/B/C**：接受实际 19/9/11 / 收紧巡逻 gap / 改矩阵预期为 19/9/11。未改判据、夹具或历史语料。

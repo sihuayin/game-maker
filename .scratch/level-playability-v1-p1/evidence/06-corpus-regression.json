@@ -1,0 +1,2700 @@
+{
+  "version": "level-playability-v1-p1/lp06-corpus-regression/v1",
+  "generatedAt": "2026-11-06T07:58:11.147Z",
+  "inventory": {
+    "version": "level-playability-corpus-inventory/v1",
+    "freeze": "sha256:25e6c891cbb01e456433e104862bc9f03c8404f92fec10acdc93700aca00983d",
+    "verified": true
+  },
+  "counts": {
+    "usableConfigs": 150,
+    "uniquePairs": 96,
+    "uniqueConfigs": 20,
+    "evaluatedPairs": 96,
+    "evaluatedConfigs": 20,
+    "uniqueContentPairs": 31
+  },
+  "pairVerdicts": {
+    "PROVEN_UNPLAYABLE": 36,
+    "INSUFFICIENT_EVIDENCE": 36,
+    "NO_PROVEN_BLOCKER": 24
+  },
+  "configVerdicts": {
+    "PROVEN_UNPLAYABLE": 8,
+    "INSUFFICIENT_EVIDENCE": 6
+  },
+  "playabilityConfigVerdicts": {
+    "INSUFFICIENT_EVIDENCE": 11,
+    "PROVEN_UNPLAYABLE": 3
+  },
+  "allConfigVerdicts": {
+    "PROVEN_UNPLAYABLE": 9,
+    "INSUFFICIENT_EVIDENCE": 9,
+    "NO_PROVEN_BLOCKER": 2
+  },
+  "historicalDefects": [
+    {
+      "contentHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+      "paths": [
+        ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json"
+      ],
+      "final": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        "entity \"pickup-water-4\"",
+        "entity \"goal-1\""
+      ]
+    },
+    {
+      "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+      "paths": [
+        ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/run/v1/game-config.json"
+      ],
+      "final": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\"",
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\""
+      ]
+    },
+    {
+      "contentHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+      "paths": [
+        ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json"
+      ],
+      "final": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        "entity \"pickup-3\"",
+        "entity \"chest-1\"",
+        "entity \"gate\""
+      ]
+    }
+  ],
+  "probeExcluded": [
+    {
+      "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+      "paths": [
+        "out/__probe-timeout/last-train/game-configs/v1.json"
+      ],
+      "final": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+      "paths": [
+        "out/__probe-timeout/last-train/game-configs/v2.json"
+      ],
+      "final": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "paths": [
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/site/v1/game-config.json"
+      ],
+      "final": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "paths": [
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/collect-pickup/config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/collect-pickup/config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/collect-pickup/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/collect-pickup/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/collect-pickup/config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/collect-pickup/config.json"
+      ],
+      "final": "NO_PROVEN_BLOCKER"
+    },
+    {
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "paths": [
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/open-chest/config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/open-chest/config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/open-chest/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/open-chest/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/open-chest/config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/open-chest/config.json"
+      ],
+      "final": "NO_PROVEN_BLOCKER"
+    },
+    {
+      "contentHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "paths": [
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/hazard-contact/config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/site/v1/game-config.json"
+      ],
+      "final": "PROVEN_UNPLAYABLE"
+    }
+  ],
+  "falsePositives": [],
+  "existingAuditConfigs": [
+    {
+      "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "paths": [
+        "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/negative-gate/config-gate-missing.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json"
+      ],
+      "existingAudit": [
+        "objective.gate"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+      "paths": [
+        ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json"
+      ],
+      "existingAudit": [
+        "entity \"chest-1\""
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "paths": [
+        ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket10-reject-old/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/game-config.json"
+      ],
+      "existingAudit": [
+        "entity \"chest-1\"",
+        "entity \"chest-2\""
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "paths": [
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        ".scratch/generic-playtest-v1/evidence/self-test-run/gate/config-gate-missing.json",
+        ".scratch/playtest-v1/runs/2026-10-27-self-test/gate/config-gate-missing.json",
+        ".scratch/playtest-v1/runs/2026-10-28-self-test/gate/config-gate-missing.json",
+        ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json"
+      ],
+      "existingAudit": [
+        "objective.gate"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "contentHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+      "paths": [
+        ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json"
+      ],
+      "existingAudit": [
+        "entity \"chest-1\""
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+    }
+  ],
+  "insufficient": [
+    {
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "paths": [
+        "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/site/v1/game-config.json",
+        ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json"
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "paths": [
+        "out/__probe/last-train/site/v1/game-config.json",
+        "out/drawlist-coveraged/site/v1/game-config.json",
+        "out/last-train/site/v1/game-config.json",
+        "out/last-train-gpt/site/v1/game-config.json",
+        "out/r6-drawlist/site/v1/game-config.json",
+        "out/r6-image/site/v1/game-config.json",
+        "fixtures/game-configs/last-train.json",
+        ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json"
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+      "paths": [
+        "out/last-train/game-configs/v1.json"
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+      "paths": [
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json"
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+      "paths": [
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json"
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+      "paths": [
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json"
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    }
+  ],
+  "configs": [
+    {
+      "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "paths": [
+        "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/negative-gate/config-gate-missing.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [
+        "objective.gate"
+      ],
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "gate-missing"
+            }
+          ]
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "gate-missing"
+            },
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "gate-missing"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "paths": [
+        "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/site/v1/game-config.json",
+        ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/site/v1/game-config.json",
+        ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "paths": [
+        "out/__probe/last-train/site/v1/game-config.json",
+        "out/drawlist-coveraged/site/v1/game-config.json",
+        "out/last-train/site/v1/game-config.json",
+        "out/last-train-gpt/site/v1/game-config.json",
+        "out/r6-drawlist/site/v1/game-config.json",
+        "out/r6-image/site/v1/game-config.json",
+        "fixtures/game-configs/last-train.json",
+        ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+      "paths": [
+        "out/__probe-timeout/last-train/game-configs/v1.json"
+      ],
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+      "paths": [
+        "out/__probe-timeout/last-train/game-configs/v2.json"
+      ],
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+      "paths": [
+        "out/last-train/game-configs/v1.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+      "paths": [
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+        ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+      "paths": [
+        ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [
+        "entity \"chest-1\""
+      ],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "paths": [
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/site/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "spawn-in-danger"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "paths": [
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/collect-pickup/config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/collect-pickup/config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/collect-pickup/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/collect-pickup/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/collect-pickup/config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/collect-pickup/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/collect-pickup/config.json"
+      ],
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "finals": [
+        "NO_PROVEN_BLOCKER"
+      ],
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {},
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "paths": [
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/open-chest/config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/open-chest/config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/open-chest/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/open-chest/config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/open-chest/config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/open-chest/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/open-chest/config.json"
+      ],
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "finals": [
+        "NO_PROVEN_BLOCKER"
+      ],
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {},
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "paths": [
+        ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket10-reject-old/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [
+        "entity \"chest-1\"",
+        "entity \"chest-2\""
+      ],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "paths": [
+        ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        ".scratch/generic-playtest-v1/evidence/self-test-run/gate/config-gate-missing.json",
+        ".scratch/playtest-v1/runs/2026-10-27-self-test/gate/config-gate-missing.json",
+        ".scratch/playtest-v1/runs/2026-10-28-self-test/gate/config-gate-missing.json",
+        ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [
+        "objective.gate"
+      ],
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "gate-missing"
+            }
+          ]
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "gate-missing"
+            },
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "gate-missing"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+      "paths": [
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+      "paths": [
+        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "finals": [
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+      "paths": [
+        ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json"
+      ],
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "PROVEN_UNPLAYABLE",
+      "existingAudit": [],
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"pickup-water-4\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal-1\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "target-inside-hazard": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "evidence": [
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"pickup-water-4\""
+            },
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"goal-1\""
+            }
+          ],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            },
+            {
+              "missing": "target-inside-hazard",
+              "target": "pickup-scrap-5"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "suppressed-by-spatial-or-mechanic"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+      "paths": [
+        ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/run/v1/game-config.json"
+      ],
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "PROVEN_UNPLAYABLE",
+      "existingAudit": [],
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-4\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-5\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-6\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"gate-1\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-4\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-5\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-6\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"gate-1\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "evidence": [
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"scrap-4\""
+            },
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"scrap-5\""
+            },
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"scrap-6\""
+            },
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"gate-1\""
+            }
+          ],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "suppressed-by-spatial-or-mechanic"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "paths": [
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/site/v1/game-config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-all/hazard-contact/config.json",
+        ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/site/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": true,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "PROVEN_UNPLAYABLE",
+      "existingAudit": [],
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal\""
+        }
+      ],
+      "gaps": {
+        "suppressed-by-spatial-or-mechanic": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "evidence": [
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"goal\""
+            }
+          ],
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "suppressed-by-spatial-or-mechanic"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+      "paths": [
+        ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json"
+      ],
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "existingAudit": [
+        "entity \"chest-1\""
+      ],
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "evidence": [],
+          "gaps": []
+        }
+      }
+    },
+    {
+      "contentHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+      "paths": [
+        ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json"
+      ],
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "finals": [
+        "PROVEN_UNPLAYABLE"
+      ],
+      "playabilityVerdict": "PROVEN_UNPLAYABLE",
+      "existingAudit": [
+        "entity \"chest-1\""
+      ],
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"pickup-3\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"chest-1\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"gate\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "evidence": [
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"pickup-3\""
+            },
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"chest-1\""
+            },
+            {
+              "id": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+              "target": "entity \"gate\""
+            }
+          ],
+          "gaps": [
+            {
+              "missing": "moving-hazard-phase"
+            }
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "evidence": [],
+          "gaps": [
+            {
+              "missing": "suppressed-by-spatial-or-mechanic"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "path": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+      "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/__probe/last-train/site/v1/game-config.json",
+      "manifest": "out/__probe/last-train/pack/v2/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/__probe-timeout/last-train/game-configs/v1.json",
+      "manifest": "out/__probe/empty/pack/v2/manifest.json",
+      "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/__probe-timeout/last-train/game-configs/v2.json",
+      "manifest": "out/__probe/empty/pack/v2/manifest.json",
+      "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/drawlist-coveraged/site/v1/game-config.json",
+      "manifest": "out/drawlist-coveraged/pack/v17/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/last-train/game-configs/v1.json",
+      "manifest": "out/last-train/pack/v17/manifest.json",
+      "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/last-train/site/v1/game-config.json",
+      "manifest": "out/last-train/pack/v17/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/last-train-gpt/site/v1/game-config.json",
+      "manifest": "out/last-train-gpt/pack/v1/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/r6-drawlist/site/v1/game-config.json",
+      "manifest": "out/r6-drawlist/pack/v2/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "out/r6-image/site/v1/game-config.json",
+      "manifest": "out/r6-image/pack/v2/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": "fixtures/game-configs/last-train.json",
+      "manifest": "fixtures/packs/last-train/v2/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+      "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      }
+    },
+    {
+      "path": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/collect-pickup/config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/open-chest/config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/collect-pickup/config.json",
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/open-chest/config.json",
+      "manifest": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v2/manifest.json",
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-final/work/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+      "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/site/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/pack/v2/manifest.json",
+      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/manifest.json",
+      "contentHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"pickup-water-4\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal-1\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "target-inside-hazard": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    },
+    {
+      "path": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1/manifest.json",
+      "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-4\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-5\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-6\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"gate-1\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    },
+    {
+      "path": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/pack/v2/manifest.json",
+      "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-4\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-5\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"scrap-6\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"gate-1\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      }
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/collect-pickup/config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/open-chest/config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/07-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/self-test-run/gate/config-gate-missing.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/site/v1/game-config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/site/v1/game-config.json",
+      "manifest": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      }
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/collect-pickup/config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/open-chest/config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      }
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/open-chest/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/collect-pickup/config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/open-chest/config.json",
+      "manifest": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-mechanic-probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
+      "historical": false,
+      "probe": true,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "spawn-in-danger": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/collect-pickup/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/pack/v2/manifest.json",
+      "contentHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "historical": false,
+      "probe": true,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal\""
+        }
+      ],
+      "gaps": {
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/open-chest/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/collect-pickup/config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:a99b65527318941b427b8bb9ad9d32f282e54ea661572c17b808c6181854ef49",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/hazard-contact/config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "historical": false,
+      "probe": true,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal\""
+        }
+      ],
+      "gaps": {
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/open-chest/config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/pack/v2/manifest.json",
+      "contentHash": "sha256:20cfb996fe5f59e3ad239ac7e4aec5f2a21ca85006a4d311a9ac91eb0e43647d",
+      "historical": false,
+      "probe": true,
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
+      "blockers": [],
+      "gaps": {}
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/assembled/hazard-contact/pack/v2/manifest.json",
+      "contentHash": "sha256:5f5f3e4c632703a572f11a80fc109736da33b70379b62224681c8166dbe916b5",
+      "historical": false,
+      "probe": true,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"goal\""
+        }
+      ],
+      "gaps": {
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket10-reject-old/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket10-reject-old/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/pack/v2/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/pack/v3/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/negative-gate/config-gate-missing.json",
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json",
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-27-self-test/gate/config-gate-missing.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/site/v1/game-config.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-28-self-test/gate/config-gate-missing.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/site/v1/game-config.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "gate-missing": 3,
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/site/v1/game-config.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json",
+      "manifest": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/pack/v7/manifest.json",
+      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+      "historical": false,
+      "probe": false,
+      "final": "INSUFFICIENT_EVIDENCE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/pack/v4/manifest.json",
+      "contentHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+      "historical": false,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "INSUFFICIENT_EVIDENCE",
+      "blockers": [],
+      "gaps": {
+        "moving-hazard-phase": 1
+      }
+    },
+    {
+      "path": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "manifest": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/manifest.json",
+      "contentHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+      "historical": true,
+      "probe": false,
+      "final": "PROVEN_UNPLAYABLE",
+      "global": "PROVEN_UNPLAYABLE",
+      "blockers": [
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"pickup-3\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"chest-1\""
+        },
+        {
+          "layer": "mechanic",
+          "judgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "target": "entity \"gate\""
+        }
+      ],
+      "gaps": {
+        "moving-hazard-phase": 1,
+        "suppressed-by-spatial-or-mechanic": 1
+      }
+    }
+  ]
+}
