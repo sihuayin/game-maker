@@ -13,7 +13,11 @@ Map: ../map.md
 ### 必须交付
 
 1. **冻结语料全量回归**：`sha256:25e6c891…` 的 96 唯一配对 / 20 唯一 config；逐判据新增结果。
-2. **39 例矩阵全部执行**：LP-03 复核时为 **18 `PROVEN_UNPLAYABLE` / 17 `NO_PROVEN_BLOCKER` / 4 `INSUFFICIENT_EVIDENCE`**；LP-04 完成性重判发现 **#39 `chest-overlapping-hazard` 由机制层 A 阻断 gate**，整关分布应为 **19 / 16 / 4**，LP-06 必须逐条确认后采用。逐条解释 #4（SUBJECT 修正）、#12（遗漏同关 gate）、#19（LP-00 复核覆盖 P4）、#28（只检查被包住的 pickup，同一 hazard 仍封死其后目标）；层内 verdict 与 `coverage` 必须同时断言。
+2. **39 例矩阵全部执行**：整关最终分布 **19 `PROVEN_UNPLAYABLE` / 16 `NO_PROVEN_BLOCKER` / 4 `INSUFFICIENT_EVIDENCE`**（用户 2026-11-06 裁定，批准 LP-04 的 19/16/4，不修改 #39）。逐条解释 #4（SUBJECT 修正）、#12（遗漏同关 gate）、#19（LP-00 复核覆盖 P4）、#28（只检查被包住的 pickup，同一 hazard 仍封死其后目标）、#39（机制层 A 阻断 gate，完成性抑制）。层内 verdict 与 `coverage` 必须同时断言。
+   - 保留 #39 原始合成夹具（64×48 hazard），不因统计口径修改夹具。
+   - 分别记录空间层、机制层、完成性层的 verdict；记录完成性抑制重复归因的原因。
+   - 明确区分「层内发现」与「整关最终归因」：`two-one-way-branches` 整关 PROVEN 归空间层；`chest-overlapping-hazard` 整关 PROVEN 归机制层。
+   - 保留研究 05 的「有效 gate no-walk = 0」结论；它与跨层归因不冲突。
 3. **真实缺陷识别**：机制 A 的 3 条历史真实缺陷必须被对应判据识别；不重发布旧 run/pack。
 4. **误报控制**：新增误报逐条根因分析；合法设计不得出现不可解释的误阻断。
 5. **证据不足案例**：不得被强行归类为不可玩。

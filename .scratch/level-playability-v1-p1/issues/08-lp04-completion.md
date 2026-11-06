@@ -73,7 +73,7 @@ Map: ../map.md
 1. **`two-one-way-branches`（#32）**：研究矩阵记完成性 `PROVEN`；生产层空间判据先证明 gate 不可达（x=180..200 的全高墙），完成性正确抑制。**整关 verdict 仍是 PROVEN，但归空间层**；完成性层是 `INSUFFICIENT_EVIDENCE` + 抑制 gap。
 2. **`chest-overlapping-hazard`（#39）**：研究矩阵记 `NO_PROVEN_BLOCKER`（只考虑 chest 与 hazard 重叠后可复位开箱）；但同一 64×48 hazard 也封死了 gate，机制层 A 报 `PLAYABILITY_MECHANIC_PATH_BLOCKED`。完成性抑制；**整关 verdict 变为 PROVEN，归机制层**。
 
-⇒ 39 例整关分布从 LP-03 复核的 **18/17/4** 变为 **19/16/4**（#39 由 NO_PROVEN → PROVEN）。这不是完成性判据的误报，而是跨层归因：完成性只报「收齐后到不了 gate」，不覆盖机制层的静态 hazard 封路。**需要用户 / LP-06 明确接受 19/16/4，或把 #39 的合成夹具修正为不阻断 gate 的 hazard。** 本票不改研究矩阵文件。
+⇒ 39 例整关分布从 LP-03 复核的 **18/17/4** 变为 **19/16/4**（#39 由 NO_PROVEN → PROVEN）。这不是完成性判据的误报，而是跨层归因：完成性只报「收齐后到不了 gate」，不覆盖机制层的静态 hazard 封路。**已由用户裁定接受 19/16/4，保留 #39 原始夹具、不改研究矩阵文件（见下）。**
 
 ### 边界
 
@@ -84,3 +84,12 @@ Map: ../map.md
 ### 回退点
 
 撤销 `d152630` 即可：新增 `completion.ts` 与测试 / 夹具 / scratch 证据；`reach.ts` 只新增可选 `full`；`verdict.ts` 只给 `no-path` 加可选字段；空间 / 机制行为不变（LP-02 / LP-03 全量测试仍绿）。
+
+### 用户裁定（2026-11-06）
+
+**批准 (a)：接受 19 / 16 / 4，不修改 #39 合成夹具。**
+
+- `two-one-way-branches`：整关 `PROVEN_UNPLAYABLE`，**归空间层**（gate 被 x=180..200 的全高墙阻断）；完成性层正确抑制，不重复计为完成性缺陷。
+- `chest-overlapping-hazard`：整关 `PROVEN_UNPLAYABLE`，**归机制层**（同一 64×48 hazard 封死 gate，A 报 `PATH_BLOCKED`）；完成性层正确抑制。这不是完成性误报。
+- 39 例整关最终分布：**19 PROVEN / 16 NO_PROVEN / 4 INSUFFICIENT**；相较 LP-03 复核的 18/17/4，仅 #39 从 NO_PROVEN 转为 PROVEN。
+- 原则：各层负责证明自己发现的阻断，整关 aggregate 汇总所有有效阻断；不为了维持某一层的原始统计而修改有效夹具或回退判据。
