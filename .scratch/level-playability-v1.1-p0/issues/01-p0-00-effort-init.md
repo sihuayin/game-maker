@@ -1,7 +1,7 @@
 # P0-00 Effort 初始化
 
 Type: task
-Status: claimed
+Status: resolved
 Owner: agent（AFK）· 2026-11-06
 Blocked by: —
 Map: ../map.md
@@ -31,3 +31,23 @@ Map: ../map.md
 ### 通过标准
 
 - 执行分支存在，`evidence/00-baseline.md` 完整，`git status` 只显示本 effort 新增文件。
+
+## Answer
+
+**2026-11-06 完成（agent，AFK）。** 只做分支、目录、基线、声明；未解析 Runtime 语义，未触碰产品代码，零付费。
+
+| 交付 | 结果 |
+|---|---|
+| 执行分支 | `p1/level-playability-v1.1-p0`，自图 tip `a82165cb10ee93a71ed3bb88e0c419faa6dcd8dc` 切出 |
+| 基线文档 | [`../evidence/00-baseline.md`](../evidence/00-baseline.md) |
+| 目录 | `evidence/`、`prototype/`、`cases/` 已建立；后两者以 `.gitkeep` 保留 |
+| PRD 校验 | `sha256:37bab0a85739b22069b22a6927df9d917d8fd78fa2c4d14fb4f6edac0628ad72`（与图 Baseline 一致） |
+| LP-00 基线 | `.scratch/level-playability-v1-p1/research/01-runtime-semantics.md` @ `8b6efbb` |
+| 前序图收口 | `.scratch/level-playability-v1-p1/map.md` @ `ae4fc75`（`Status: closed · 2026-11-06`） |
+| 站点输入校验 | `fixtures/packs/last-train/v2/manifest.json` `sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689` |
+| `git status --short` | 仅本 effort 目录内文件（见基线文档 §6） |
+
+- 本票工作提交：`e79aaf1fcb0049ec61da23bc2169dc64556a17e5` — `P0-00: effort init — execution branch, baseline, boundaries`
+- 回退点：`git reset --hard a82165c`（丢弃本票）或删除分支 `p1/level-playability-v1.1-p0`。
+- 零付费：未调用模型、未生图、未重建站点。
+- 下一票：[P0-01 移动 Hazard Runtime 增量语义核验](02-p0-01-moving-hazard-semantics.md)（blocked by 01）已解锁。

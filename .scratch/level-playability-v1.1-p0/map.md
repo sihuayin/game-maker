@@ -93,19 +93,19 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 
 ### 票流
 
-1. [P0-00 Effort 初始化](issues/01-p0-00-effort-init.md)（task，AFK）— open · **frontier**
-2. [P0-01 移动 Hazard Runtime 增量语义核验](issues/02-p0-01-moving-hazard-semantics.md)（research，AFK）— open · blocked by 01
+1. [P0-00 Effort 初始化](issues/01-p0-00-effort-init.md)（task，AFK）— **resolved**
+2. [P0-01 移动 Hazard Runtime 增量语义核验](issues/02-p0-01-moving-hazard-semantics.md)（research，AFK）— open · **frontier**
 3. [P0-01R 语义证据复核](issues/03-p0-01r-semantics-review.md)（grilling，HITL）— open · blocked by 02
 4. [P0-02 最小时序模型与独立原型](issues/04-p0-02-temporal-model-prototype.md)（prototype，HITL）— open · blocked by 03
 5. [P0-02R 模型健全性复核](issues/05-p0-02r-model-review.md)（grilling，HITL）— open · blocked by 04
-6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— open · blocked by 01
+6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— open · unblocked（frontier，位列 02 之后）
 7. [P0-03 A/B/C 三案例验证与真实 Runtime 对照](issues/07-p0-03-case-validation.md)（task，AFK）— open · blocked by 05, 06
 8. [P0-03R 案例证据复核](issues/08-p0-03r-evidence-review.md)（grilling，HITL）— open · blocked by 07
 9. [P0-04 结论包与 HITL 裁定](issues/09-p0-04-verdict.md)（grilling，HITL）— open · blocked by 08
 
 ## Decisions so far
 
-<!-- 尚无已关闭的票。开图裁定见 Notes；每张票的答案只写在票里，本图只放一行 gist + 链接。 -->
+- [P0-00 Effort 初始化](issues/01-p0-00-effort-init.md): 执行分支 `p1/level-playability-v1.1-p0` 自图 tip `a82165c` 切出；冻结输入与边界见 [`evidence/00-baseline.md`](evidence/00-baseline.md)。
 
 ## Not yet specified
 
