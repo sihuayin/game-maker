@@ -25,7 +25,7 @@ P4 为 `CONTRADICTED`、P1 带边界、P2/P3 为 `CONFIRMED`。复核必须逐�
 2. **P1 边界**：审计输入看不到图集 JSON；接受「依赖逐帧几何的严格判定在无法确认 pack acceptance 时用 `coverage.partial`」吗？
 3. **P2 / P3**：确认可作为确定性判据的基础；chest 交互盒四边外扩 `range` 是否写入 profile。
 4. **`EntityDesc.box` 分歧**：运行时对 pickup / hazard / goal 忽略 `body`，而 `EntityDesc.box` 对全部 kind 都算 `body`；确认审计必须以运行时几何为准。
-5. **hazard body**：源码证明 hazard body 被忽略；[plan.md](../level-playability-v1/plan.md) 的保守降级是策略选择而非语义缺口，是否保留该策略。
+5. **hazard body**：源码证明 hazard body 被忽略；[plan.md](../../level-playability-v1/plan.md) 的保守降级是策略选择而非语义缺口，是否保留该策略。
 
 ### 输出
 

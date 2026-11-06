@@ -32,7 +32,7 @@ Map: ../map.md
 
 ### 必须交付
 
-- 实现：按 [plan.md](../level-playability-v1/plan.md) §1 的修改面（`packages/contracts/src/playability/…`），纯函数优先。
+- 实现：按 [plan.md](../../level-playability-v1/plan.md) §1 的修改面（`packages/contracts/src/playability/…`），纯函数优先。
 - 统一 Runtime geometry profile：`collisionBox(entity)` 按 EntityKind 取 `body` 或图集帧几何；chest 交互盒四边外扩；profile 暴露几何来源与 coverage。
 - `EntityDesc.box` 调用方清单（`file:line`）与迁移结论。
 - 单测：AABB 相交 / 包含 / 边界接触；Solid 阻挡；Walk / Fall 可达与不可达；锚点与碰撞偏移；`body` 覆盖。
