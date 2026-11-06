@@ -207,8 +207,9 @@ export function movementNeighbors(graph: MovementGraph, x: number, y: number): M
     }
   }
 
-  const fy = nextStandableBelow(graph, x, y + 1);
-  if (fy !== null) push(x, fy, "fall");
+  // ⚠️ **不发 `fall` 边**：能站住的格子脚下就是实心体，竖直「穿过去」是非物理的；
+  //   真正的下落由 `walk-off`（迈出悬崖后的整段竖直下落）覆盖。这条过近似会让 base 反事实
+  //   通过不存在的路径显示可达，把空间不可达误归因给 hazard（LP-03 复核 Q5(b)）。
   return out;
 }
 
