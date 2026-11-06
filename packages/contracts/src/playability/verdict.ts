@@ -45,7 +45,15 @@ export type PlayabilityCoverage = {
  *   no-safe-window—— LP-03 B 的全高 danger 闭式下界（idle / active / required）。
  */
 export type PlayabilityWitness =
-  | { readonly kind: "no-path"; readonly reachableSet: string; readonly blockedAt?: string; readonly targetsReached?: readonly string[] }
+  | {
+      readonly kind: "no-path"; readonly reachableSet: string; readonly blockedAt?: string;
+      readonly targetsReached?: readonly string[];
+      /** LP-04 完成性：必需集合 / 能单独取得的目标 / gate 前缀 / 是否建模复位边。 */
+      readonly required?: readonly string[];
+      readonly collectableAlone?: readonly string[];
+      readonly gatePre?: boolean;
+      readonly usedResetEdges?: boolean;
+    }
   | {
       readonly kind: "blocked"; readonly rect: Aabb; readonly overlapFoot: Aabb;
       readonly solids: readonly string[];

@@ -82,7 +82,7 @@ export function assessReachability(
   graph: MovementGraph,
   move: MoveParams,
   targets: readonly ReachTarget[],
-  options: { readonly midAir?: boolean } = {},
+  options: { readonly midAir?: boolean; readonly full?: boolean } = {},
 ): ReachAssessment {
   const seeds = graph.startCells();
   const covered = new Set<number>();
@@ -113,7 +113,7 @@ export function assessReachability(
   // 出生点本身也可能正好碰到目标（不要求落位成功）。
   coverAt(Math.round(graph.player.foot.x), Math.round(graph.player.foot.y));
 
-  for (let head = 0; head < queue.length && covered.size < targets.length; head++) {
+  for (let head = 0; head < queue.length && (options.full === true || covered.size < targets.length); head++) {
     const cell = queue[head]!;
     for (const edge of movementNeighbors(graph, cell.x, cell.y)) {
       if (edge.kind !== "walk") {
