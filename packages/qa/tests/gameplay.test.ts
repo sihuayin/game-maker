@@ -138,7 +138,8 @@ describe("§可达性：**真的会响**", () => {
     expect(f.judgement).toBe("reachability");
     expect(f.target).toBe("game-config");
     expect(f.severity).toBe("error");
-    for (const id of ["suitcase-1", "suitcase-2", "suitcase-3", "signal"]) expect(f.detail).toContain(id);
+    // suitcase-1 悬在沟上方，只算 mid-air 触达（LP-02 复核 Q3(a)），QA 不再硬拒它。
+    for (const id of ["suitcase-2", "suitcase-3", "signal"]) expect(f.detail).toContain(id);
   });
 
   it("⚠️ **只有「够不到」才报 `error`** —— 这一条判据从不报「可达」", async () => {

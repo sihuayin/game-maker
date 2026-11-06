@@ -52,11 +52,13 @@ describe("§真夹具：这一关是通的", () => {
 });
 
 describe("§它**报**什么（不可达的那半边）", () => {
-  it("挖一条 200px 的沟 ⇒ 沟那边的一个都够不到（而**沟这边**的 `suitcase-1` 一起陪葬 —— 它也在沟外）", () => {
+  it("挖一条 200px 的沟 ⇒ 沟对面的够不到；沟上方的 suitcase-1 只算 mid-air 触达，不硬拒", () => {
     const bad = reach(withConfig((c) => {
       c.terrain = [{ x: 0, y: 250, w: 200, h: 20 }, { x: 400, y: 250, w: 1040, h: 20 }];
     }));
-    expect(who(bad).sort()).toEqual(['entity "signal"', 'entity "suitcase-1"', 'entity "suitcase-2"', 'entity "suitcase-3"'].sort());
+    // suitcase-1 在 x=300 的沟上方：跳出去能碰到，但落不到任何落脚点。
+    // LP-02 复核 Q3(a) 的 mid-air 保守降级让 QA 也继承它 —— 不判 UNREACHABLE。
+    expect(who(bad).sort()).toEqual(['entity "signal"', 'entity "suitcase-2"', 'entity "suitcase-3"'].sort());
     for (const i of bad) expect(i.severity).toBe("error");
     expect(bad[0]!.message).toMatch(/够不到/);
   });
@@ -103,12 +105,13 @@ describe("§它**不**报什么（宽松的那一侧 —— 误伤比漏报贵�
     }))).not.toEqual([]);
   });
 
-  it("⚠️ **一个身位之内就算够到** —— goal 埋在行李堆正中间（站不进去）也**不报**", () => {
-    // 这是**故意**宽的那一侧：判据只该在「怎么走都碰不到」时开口，
-    // 而「碰到」在物理上没有一个利落的定义（盒子的哪一部分算碰到？）
-    // ⇒ 宁可说可达。⚠️ 代价是「终点被埋进墙里」这一种坏设计**抓不到**（文件头二写着）。
+  it("goal 埋在行李堆正中间（站不进去）⇒ 严格重叠判 BLOCKED（LP-02 已翻面）", () => {
+    // 旧 `covers`「一个身位之内就算够到」是故意宽的那一侧；LP-01/02 换成严格 AABB 后，
+    // 完全埋在实心体里的目标必须报出来（03 §3.3 / 测试矩阵 #8）。
     const c = withConfig((cfg) => { cfg.entities.find((e) => e.id === "signal")!.at = { x: 500, y: 250 }; });
-    expect(reach(c)).toEqual([]);
+    const bad = reach(c);
+    expect(who(bad)).toEqual(['entity "signal"']);
+    expect(bad[0]!.message).toMatch(/完全落在实心体内/);
   });
 
   it("⚠️ 玩家资源解不到 ⇒ 也不报（那是**引用族**的事，本判据不重复说一遍）", () => {

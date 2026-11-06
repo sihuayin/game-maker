@@ -33,10 +33,12 @@
 import { playerMoveOf } from "../game-config.js";
 import type { GameConfig, Motion } from "../game-config.js";
 import type { AssetPackManifest } from "../assetpack.js";
+import type { MovementGraph } from "./graph.js";
 import type { Aabb, Vec } from "./geometry.js";
 import { boxFromFoot, overlapsInclusive, overlapsStrict } from "./geometry.js";
 import { buildMovementGraph, hopEdges, movementNeighbors } from "./graph.js";
 import { assessReachability } from "./reach.js";
+import type { ReachAssessment } from "./reach.js";
 import { FIXED_RUNTIME_PROFILE, runtimeEntityGeometry } from "./profile.js";
 import type { FixedRuntimeProfile } from "./profile.js";
 import { collectTargets } from "./targets.js";
@@ -57,6 +59,8 @@ export type CompletionResult = LayerResult & { readonly gaps: readonly Completio
 export type CompletionPrior = {
   readonly spatial?: SpatialResult;
   readonly mechanic?: MechanicResult;
+  /** LP-05：共享的 base 图 / 全量评估（必须 `full: true`），避免重复建图。 */
+  readonly base?: { readonly graph: MovementGraph; readonly assessment: ReachAssessment };
 };
 
 /** mask DP 的硬上限（研究语料最大 k=9；12 是批准上限）。 */
@@ -128,9 +132,9 @@ export function auditCompletion(
   }
 
   // ── 建全量可达图（不因「目标都覆盖了」提前停）──────────────────────────
-  const graph = buildMovementGraph(config, manifest, profile);
+  const graph = prior.base?.graph ?? buildMovementGraph(config, manifest, profile);
   if (!graph) { addGap("player-asset-missing"); return finish([], gaps, "partial", spatial, mechanic); }
-  const reach = assessReachability(graph, move, targets, { full: true });
+  const reach = prior.base?.assessment ?? assessReachability(graph, move, targets, { full: true });
   if (reach.seeds.length === 0) {
     addGap("spawn-no-foothold");
     return finish([], gaps, "partial", spatial, mechanic);

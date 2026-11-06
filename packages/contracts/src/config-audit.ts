@@ -12,16 +12,16 @@
 //   · `resampleable` —— 「模型错」那一族：下一发 config 可能写对，进 `modelHard` 重采样循环；
 //   · `deterministic` —— 在它之上再加两族**重抽 config 也改不了**的判据：
 //       · 「层盖不住世界」—— 由背景资源尺寸 + `world.size` 决定；
-//       · 「这一关通不通」（`auditReachability`，B-02）—— 由地形 / 布局决定，模型下一发
-//         可能写对，但**编译循环里不重采样**（它不属于「这一发写错」那一档，而是设计或清单层面的
-//         确定性缺陷）⇒ 与层覆盖同档：硬失败、不落盘。
+//       · 「这一关通不通 / 可玩性」（`auditPlayability`，LP-05）—— 由地形 / 布局 / 机制 /
+//         完成顺序决定，模型下一发可能写对，但**编译循环里不重采样**（它不属于「这一发写错」
+//         那一档，而是设计或清单层面的确定性缺陷）⇒ 与层覆盖同档：硬失败、不落盘。
 //     重抽 config 改不了 ⇒ 不重采样、不落盘。
 //   ⇒ `deterministic` **包含** `resampleable`（超集），调用方按需要取哪一档。
 // ⚠️ **顺序与今天的 `ops.ts` 逐条一致**，别重排：报文的次序是测试与使用者的定位线索。
 import { auditEntityIdentity, auditGameConfig, ENTITY_ASSET_KINDS, type ConfigIssue, type GameConfig } from "./game-config.js";
 import { auditLayerCoverage, backgroundLayerEntries } from "./layer-coverage.js";
 import { auditScreenSpace, DEFAULT_HUD_LINE_HEIGHT, gameHudScreenItems } from "./screen-space.js";
-import { auditReachability } from "./reachability.js";
+import { auditPlayability, playabilityIssues } from "./playability/api.js";
 import type { AssetKind, AssetPackManifest } from "./assetpack.js";
 import type { GameDesignSpec } from "./game-design.js";
 
@@ -50,7 +50,7 @@ export function auditConfigPipeline(
     ...resampleable,
     ...auditLayerCoverage(ctx.viewport, config.world.size,
       backgroundLayerEntries(config.scene.background.asset, config.world.size, ctx.manifest.assets)),
-    ...auditReachability(config, ctx.manifest),
+    ...playabilityIssues(auditPlayability(config, ctx.manifest)),
   ];
   return { resampleable, deterministic };
 }

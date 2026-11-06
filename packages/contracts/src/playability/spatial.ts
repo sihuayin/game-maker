@@ -48,6 +48,7 @@ import type { AssetPackManifest } from "../assetpack.js";
 import { buildMovementGraph } from "./graph.js";
 import type { MovementGraph } from "./graph.js";
 import { assessReachability, blockedBySolids } from "./reach.js";
+import type { ReachAssessment } from "./reach.js";
 import { TARGET_NOUN, collectTargets, formatRect } from "./targets.js";
 import type { TargetGap } from "./targets.js";
 import { FIXED_RUNTIME_PROFILE } from "./profile.js";
@@ -103,10 +104,11 @@ export function auditSpatial(
   config: GameConfig,
   manifest: AssetPackManifest,
   profile: FixedRuntimeProfile = FIXED_RUNTIME_PROFILE,
+  base?: { readonly graph: MovementGraph; readonly assessment: ReachAssessment },
 ): SpatialResult {
   const move = playerMoveOf(config);
 
-  const graph = buildMovementGraph(config, manifest, profile);
+  const graph = base?.graph ?? buildMovementGraph(config, manifest, profile);
   if (!graph) {
     const gaps: SpatialGap[] = [{ missing: "player-asset-missing" }];
     const evidence: PlayabilityEvidence[] = [];
@@ -144,7 +146,7 @@ export function auditSpatial(
   }
 
   // ── 可达 + 覆盖：共享底座（`reach.ts`）；覆盖 = 落脚点 / 下落段 / 跳跃弧采样 / mid-air 保护 ──
-  const assessment = assessReachability(graph, move, targets);
+  const assessment = base?.assessment ?? assessReachability(graph, move, targets);
   const { covered, seen, midAir } = assessment;
 
   // ── 每个没被覆盖的目标：BLOCKED（更强根因）→ mid-air 保守降级 → UNREACHABLE ──

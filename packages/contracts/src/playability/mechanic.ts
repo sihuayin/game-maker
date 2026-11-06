@@ -38,7 +38,9 @@ import type { AssetPackManifest } from "../assetpack.js";
 import type { Aabb } from "./geometry.js";
 import { boxFromFoot, overlapsInclusive, overlapsStrict } from "./geometry.js";
 import { buildMovementGraph } from "./graph.js";
+import type { MovementGraph } from "./graph.js";
 import { overlapFootRect, assessReachability } from "./reach.js";
+import type { ReachAssessment } from "./reach.js";
 import { FIXED_RUNTIME_PROFILE, runtimeEntityGeometry } from "./profile.js";
 import type { FixedRuntimeProfile } from "./profile.js";
 import { TARGET_NOUN, collectTargets } from "./targets.js";
@@ -73,6 +75,7 @@ export function auditMechanic(
   config: GameConfig,
   manifest: AssetPackManifest,
   profile: FixedRuntimeProfile = FIXED_RUNTIME_PROFILE,
+  baseShared?: { readonly graph: MovementGraph; readonly assessment: ReachAssessment },
 ): MechanicResult {
   const move = playerMoveOf(config);
   const { targets, gaps: targetGaps } = collectTargets(config, manifest, profile);
@@ -83,13 +86,13 @@ export function auditMechanic(
     mechanic = "partial";
   };
 
-  const baseGraph = buildMovementGraph(config, manifest, profile);
+  const baseGraph = baseShared?.graph ?? buildMovementGraph(config, manifest, profile);
   if (!baseGraph) {
     addGap("player-asset-missing");
     return finish([], gaps, "partial");
   }
   const graph = baseGraph;                     // 非空别名：闭包里 TS 不会跨函数边界收窄
-  const base = assessReachability(graph, move, targets);
+  const base = baseShared?.assessment ?? assessReachability(graph, move, targets);
   if (base.seeds.length === 0) {
     addGap("spawn-no-foothold");
     return finish([], gaps, "partial");

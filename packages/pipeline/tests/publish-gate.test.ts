@@ -151,7 +151,7 @@ describe("§拒绝：缺报告 / 身份不符 / error / incomplete", () => {
 //
 // ⚠️ 要补的洞：报告只钉 pack 身份 ⇒ 一份**绿报告属于 config A**，仍能给**不可达的 config B**
 //   放行。这里不是绑 config 身份，而是**现场重跑** `auditReachability`：当前 config 自己走不通 ⇒ 拒。
-describe("§P1 · publish-gate：不可达 config ⇒ 拒（绿报告也不能放行）", () => {
+describe("§P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行）", () => {
   const GOOD_CONFIG = path.join(ROOT, "fixtures/game-configs/last-train.json");
 
   /** 一份**不可达**的 config：满高的墙把世界切断（与 B-02 / QA 同一个现场）。 */
@@ -166,13 +166,13 @@ describe("§P1 · publish-gate：不可达 config ⇒ 拒（绿报告也不能�
     return p;
   }
 
-  it("显式报告分支：绿报告 + config B ⇒ `invalid`，文案是「这份 config 本身不可达」", () => {
+  it("显式报告分支：绿报告 + config B ⇒ `invalid`，文案是「这份 config 过不了可玩性判定」", () => {
     const d = tmp();
     const out = path.join(d, "out");
     const rp = writeReport(out, report());
     const e = errOf(() => assertPublishableQa({ packDir: PACK, configPath: unreachableConfig(d), qaReportPath: rp }));
     expect(e.kind).toBe("invalid");
-    expect(e.message).toMatch(/这份 config 本身不可达/);
+    expect(e.message).toMatch(/这份 config 过不了可玩性判定/);
     expect(e.message).toMatch(/够不到/);
     // ⚠️ 不是「报告不能证明属于这份 config」——报告身份没问题，问题是 config 自己走不通。
     expect(e.message).not.toMatch(/报告不能用于发布/);
@@ -184,7 +184,7 @@ describe("§P1 · publish-gate：不可达 config ⇒ 拒（绿报告也不能�
     writeReport(out, report());
     const e = errOf(() => assertPublishableQa({ packDir: PACK, configPath: unreachableConfig(d), outRoot: out }));
     expect(e.kind).toBe("invalid");
-    expect(e.message).toMatch(/这份 config 本身不可达/);
+    expect(e.message).toMatch(/这份 config 过不了可玩性判定/);
   });
 
   it("可达 config ⇒ 照常放行（不误拒手写 config）", () => {
