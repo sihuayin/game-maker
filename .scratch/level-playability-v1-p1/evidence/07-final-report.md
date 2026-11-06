@@ -64,7 +64,7 @@ chest-range30 / pickup-on-luggage / target-at-edge）。LP-03 已批准「巡逻
 | AC-07 Pipeline | **PASS** | `deterministic` + Publish Gate 接线；不可玩 config 退 4、站点不产；非阻断不改变流程 |
 | AC-08 历史回归 | **PASS** | 96 唯一配对 / 20 唯一 config + 39 例矩阵；双口径已由用户裁定 (A) |
 | AC-09 误报控制 | **PASS** | 0 playability 误报；3 条历史真实缺陷已知；7 个合法边界仅落 INSUFF |
-| AC-10 工程质量 | **PASS_WITH_KNOWN_LIMITATION** | 2550 例测试通过、build/typecheck exit 0；Vitest runner RPC workaround 仍在（§6） |
+| AC-10 工程质量 | **PASS_WITH_KNOWN_LIMITATION** | 2551 例测试通过、build/typecheck exit 0；Vitest runner RPC workaround 仍在（§6） |
 | AC-11 范围约束 | **PASS** | 无 Runtime / CLI / MCP / 依赖扩展；C1 加法导出；范围审计见 §5 |
 | AC-12 交付审查 | **PASS** | 正式 PR #28 + 本报告 + 回退说明；用户批准收口 |
 
@@ -172,8 +172,8 @@ PRD §6.1 原定分支为 `p1/level-playability-v1`。实施过程中经用户�
 
 - `pnpm build` → exit 0
 - `pnpm typecheck` → exit 0
-- `pnpm test` → **168 文件 / 2550 例通过，exit 0**
-- 契约测试：45 文件 / 963 例
+- `pnpm test` → **168 文件 / 2551 例通过，exit 0**
+- 契约测试：45 文件 / 964 例
 - 语料 / 矩阵脚本：`acceptance-corpus.mjs` / `acceptance-matrix.mjs` 均 exit 0
 
 ### 6.2 AC-10 已知限制（PASS_WITH_KNOWN_LIMITATION）

@@ -81,7 +81,7 @@ PRD §6.1 的分支名偏差（`p1/level-playability-v1`）经用户批准，记
 
 ### Q4：Vitest workaround
 
-保留为残余交接：Vitest 3.2.7；2550 例通过；长集成文件偶发
+保留为残余交接：Vitest 3.2.7；2551 例通过；长集成文件偶发
 `[vitest-worker]: Timeout calling onTaskUpdate`；当前 workaround 为 20s testTimeout +
 `dangerouslyIgnoreUnhandledErrors`。**这不是业务测试失败，也不表示 runner 问题已解决。**
 后续任务：LP-07 后移除 workaround，评估升级 Vitest 或拆分长集成测试文件。
