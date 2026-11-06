@@ -1,8 +1,8 @@
 # P0-00 Effort 初始化
 
 Type: task
-Status: open
-Owner:
+Status: claimed
+Owner: agent（AFK）· 2026-11-06
 Blocked by: —
 Map: ../map.md
 
