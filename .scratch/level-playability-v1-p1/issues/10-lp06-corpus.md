@@ -1,7 +1,7 @@
 # LP-06 历史语料与负例验收
 
 Type: task
-Status: in progress
+Status: resolved
 Owner: amber · 2026-11-06
 Blocked by: 09
 Map: ../map.md
@@ -42,3 +42,49 @@ Map: ../map.md
 - 39 例矩阵：**案例级预期 19/16/4**；**实际 `auditPlayability` 组合 19/9/11**。7 个带合法宽巡逻 hazard 的空间边界（baseline / gap-40 / wall-40 / pickup-50 / chest-range30 / pickup-on-luggage / target-at-edge）被 LP-03 已批准的 `moving-hazard-phase` gap 拉成 `INSUFFICIENT`，不是新增误报、不是硬拒。
 - 证据：[06-corpus-acceptance.md](../evidence/06-corpus-acceptance.md)、`06-corpus-regression.json`、`06-matrix-acceptance.json`。
 - **待用户裁定 A/B/C**：接受实际 19/9/11 / 收紧巡逻 gap / 改矩阵预期为 19/9/11。未改判据、夹具或历史语料。
+
+## Answer
+
+**2026-11-06 完成（LP-06，AFK）。证据 commit `203ad8a`；实现基线 `ca096cf`。用户裁定采用 (A)。**
+
+### 冻结语料
+
+- inventory `sha256:25e6c891…` 复算通过；**96 唯一配对 / 20 唯一 config / 31 唯一内容组合**。
+- 配对级：`PROVEN 36` / `INSUFFICIENT 36` / `NO_PROVEN 24`。
+- 唯一 config（排除 6 个 probe 夹具后 14 份）：
+  - **3 条历史真实缺陷**全部被机制 A 识别：`pickup-water-4`/`goal-1`、`scrap-4/5/6`/`gate-1`、`pickup-3`/`chest-1`/`gate`。
+  - **0 playability 误报**；6 个 probe 夹具排除。
+  - 6 份移动 hazard 的 level config 落 `INSUFFICIENT_EVIDENCE`（`moving-hazard-phase`），未硬拒。
+  - 5 份既有审计 error（2 gate 缺失 + 3 chest 引用）归引用族 / 自洽族，不计为 playability 新阻断。
+- 不重发布旧 run/pack；未修改任何历史语料。
+
+### 39 例矩阵
+
+- **层内 / 案例级预期：19 PROVEN / 16 NO_PROVEN / 4 INSUFFICIENT**。
+- **实际 `auditPlayability` 组合：19 PROVEN / 9 NO_PROVEN / 11 INSUFFICIENT**。
+- 差异：7 个带合法宽巡逻 `carriage` 的空间边界（baseline / gap-40 / wall-40 / pickup-50 / chest-range30 / pickup-on-luggage / target-at-edge）被 LP-03 已批准的 `moving-hazard-phase` gap 从 NO_PROVEN 拉成 INSUFF；不是新增误报、不是硬拒。
+- #32 整关 PROVEN 归空间层、#39 归机制层；完成性对两者正确抑制。
+- 逐条解释 #4 / #12 / #19 / #28 / #39 见报告 §2.3。
+- 有效 gate no-walk = 0（研究 05）保持。
+- 全部合法配对未被硬拒（无 PROVEN）。
+
+### 用户裁定（2026-11-06）
+
+采用 **(A)**：接受 **19 / 9 / 11** 为实际组合分布；**19 / 16 / 4** 保留为层内 / 案例级预期。不改判据、不改夹具、不改历史语料。
+
+### 命令与证据
+
+- `node .scratch/level-playability-v1-p1/acceptance-corpus.mjs` → exit 0；`evidence/06-corpus-regression.json`。
+- `node .scratch/level-playability-v1-p1/acceptance-matrix.mjs` → exit 0；`evidence/06-matrix-acceptance.json`。
+- 报告：`evidence/06-corpus-acceptance.md`。
+- `pnpm test` → 168 文件 / 2550 例，exit 0；`pnpm typecheck` / `pnpm build` exit 0（LP-05 基线）。
+
+### 残余
+
+- 6 份移动 hazard 的 level config 保持 `INSUFFICIENT_EVIDENCE`；16 份含巡逻 hazard 的语料口径不变（LP-03）。
+- 7 个合法空间边界在整关组合里是 INSUFF（覆盖缺口），不是不可玩；LP-07 报告必须两列并陈。
+- 测试 runner 的 20s / RPC workaround 仍在 `vitest.config.ts`，LP-07 复核。
+
+### 回退点
+
+证据 / 脚本 / 报告是纯只读新增；撤销 `203ad8a` 即可。判据与夹具未改。

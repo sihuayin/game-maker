@@ -14,7 +14,9 @@ Map: ../map.md
 
 - LP-04 / LP-05 的实现与文档在本地，**未推送**；Draft PR #28 仍停在 LP-03。收口前需推送并更新 PR。
 - `pnpm test` 依赖 `vitest.config.ts` 的 20s 超时 + `dangerouslyIgnoreUnhandledErrors`（Vitest worker RPC 超时）；LP-07 必须复核是否可移除。
-- 整关 aggregate 采用用户 2026-11-06 裁定的三层 verdict 组合（19/16/4）；`coverage` 单独暴露。
+- LP-06 已完成：96 配对 / 20 config；3 历史真实缺陷、0 playability 误报、6 probe 排除；合法 gate no-walk 0。
+- **矩阵双口径（用户裁定 A）**：层内 / 案例级预期 **19 / 16 / 4**；实际 `auditPlayability` 组合 **19 / 9 / 11**（7 个带合法宽巡逻 hazard 的空间边界是覆盖缺口，不是误报/硬拒）。LP-07 必须两列并陈，并保留 `NO_PROVEN_BLOCKER` ≠「可玩」。
+- 整关 aggregate 采用用户 2026-11-06 裁定的三层 verdict 组合；`coverage` 单独暴露。
 - 已知残余：`assembleSite` 直调不过闸；QA standalone 不看机制 / 完成性；3 条历史缺陷 + 1 probe 会被机制 A 硬拒。
 
 ### 必须交付
