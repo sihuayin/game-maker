@@ -37,17 +37,31 @@ export type PlayabilityCoverage = {
 };
 
 /**
- * `witness` 只用 framework §5.2 列的四种形状：
- *   no-path      —— 可达集摘要（`reachableSet`）+ 是否被某个位置挡死（`blockedAt`）；
- *   blocked      —— 目标盒 / 可重叠脚点矩形 / 参与封堵的实心体 id；
- *   coverage-gap —— 缺哪条语义（`missing`）；
- *   count        —— 完成性的 collected / required。
+ * `witness` 形状：
+ *   no-path       —— 可达集摘要（`reachableSet`）+ 是否被某个位置挡死（`blockedAt`）；
+ *   blocked       —— 目标盒 / 可重叠脚点矩形 / 参与封堵的实心体或 hazard id；
+ *   coverage-gap  —— 缺哪条语义（`missing`）；
+ *   count         —— 完成性的 collected / required；
+ *   no-safe-window—— LP-03 B 的全高 danger 闭式下界（idle / active / required）。
  */
 export type PlayabilityWitness =
   | { readonly kind: "no-path"; readonly reachableSet: string; readonly blockedAt?: string; readonly targetsReached?: readonly string[] }
-  | { readonly kind: "blocked"; readonly rect: Aabb; readonly overlapFoot: Aabb; readonly solids: readonly string[] }
+  | {
+      readonly kind: "blocked"; readonly rect: Aabb; readonly overlapFoot: Aabb;
+      readonly solids: readonly string[];
+      /** LP-03 A：封路的静止 hazard（`solids` 字段名沿用 framework 的 blocked 形状）。 */
+      readonly blockers?: readonly { readonly id: string; readonly rect: Aabb }[];
+    }
   | { readonly kind: "coverage-gap"; readonly missing: string }
-  | { readonly kind: "count"; readonly required: number; readonly collected: number };
+  | { readonly kind: "count"; readonly required: number; readonly collected: number }
+  /** LP-03 B：全高 danger 的安全窗口下界（闭式，可机检）。 */
+  | {
+      readonly kind: "no-safe-window"; readonly dangerId: string; readonly box: Aabb;
+      readonly idleMs: number; readonly activeMs: number; readonly requiredMs: number;
+      readonly speed: number; readonly playerWidth: number;
+      readonly side: "near->far"; readonly fullColumnCut: true;
+      readonly targetRegion: Aabb;
+    };
 
 export type PlayabilityEvidence = {
   /** 稳定判据 id（framework §5.1）。不改名；废弃走新 id。 */

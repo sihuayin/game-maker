@@ -42,16 +42,15 @@
 //     只要存在一条让玩家盒与目标盒严格相交的弧，就降级为 `INSUFFICIENT_EVIDENCE`，
 //     **不**判 UNREACHABLE，也**不**把它写进可达集。这是保护误拒绝，不是扩大可达性模型。
 
-import { jumpSpan, maxJumpHeight, playerMoveOf } from "../game-config.js";
+import { playerMoveOf } from "../game-config.js";
 import type { GameConfig } from "../game-config.js";
 import type { AssetPackManifest } from "../assetpack.js";
-import type { Aabb, Vec } from "./geometry.js";
-import { boxFromFoot, overlapsInclusive, overlapsStrict } from "./geometry.js";
-import {
-  buildMovementGraph, hopEdges, movementNeighbors,
-} from "./graph.js";
-import type { MovementGraph, MoveParams } from "./graph.js";
-import { FIXED_RUNTIME_PROFILE, chestInteractionBox, runtimeEntityGeometry } from "./profile.js";
+import { buildMovementGraph } from "./graph.js";
+import type { MovementGraph } from "./graph.js";
+import { assessReachability, blockedBySolids } from "./reach.js";
+import { TARGET_NOUN, collectTargets, formatRect } from "./targets.js";
+import type { TargetGap } from "./targets.js";
+import { FIXED_RUNTIME_PROFILE } from "./profile.js";
 import type { FixedRuntimeProfile } from "./profile.js";
 import type {
   CoverageState, LayerResult, PlayabilityCoverage, PlayabilityEvidence,
@@ -85,27 +84,13 @@ export const SPATIAL_NON_BLOCKING: ReadonlySet<string> = new Set<string>([
 ]);
 
 /** 建模不了 / 判不了的缺口；不产 issue，只把 coverage 与 verdict 拉向证据不足。 */
-export type SpatialGap = { readonly missing: string; readonly target?: string };
+export type SpatialGap = TargetGap;
 
 export type SpatialResult = LayerResult & { readonly gaps: readonly SpatialGap[] };
-
-type Subject = "PICKUP" | "CHEST" | "GATE";
-
-type SpatialTarget = {
-  readonly id: string;
-  readonly subject: Subject;
-  readonly rect: Aabb;
-  readonly assetId: string;
-};
 
 const coverageOf = (spatial: CoverageState): PlayabilityCoverage => ({
   spatial, mechanic: "not-checked", completion: "not-checked",
 });
-
-const outOfWorld = (rect: Aabb, width: number, height: number): boolean =>
-  rect.x < 0 || rect.y < 0 || rect.x + rect.w > width || rect.y + rect.h > height;
-
-const NOUN: Record<Subject, string> = { PICKUP: "拾取物", CHEST: "宝箱", GATE: "终点" };
 
 /**
  * 空间可达性判定。
@@ -119,7 +104,6 @@ export function auditSpatial(
   manifest: AssetPackManifest,
   profile: FixedRuntimeProfile = FIXED_RUNTIME_PROFILE,
 ): SpatialResult {
-  const { w: width, h: height } = config.world.size;
   const move = playerMoveOf(config);
 
   const graph = buildMovementGraph(config, manifest, profile);
@@ -134,43 +118,8 @@ export function auditSpatial(
 
   const coverage = graph.coverage;
   const evidence: PlayabilityEvidence[] = [];
-  const gaps: SpatialGap[] = [];
-  const targets: SpatialTarget[] = [];
-
-  // ── 靶子：运行时把**每一个** pickup / chest 都算进胜利计数，goal 只认 objective.gate ──
-  for (const entity of config.entities) {
-    if (entity.kind !== "pickup" && entity.kind !== "chest") continue;
-    const geometry = runtimeEntityGeometry(entity, manifest, profile);
-    if (!geometry) {
-      gaps.push({ missing: "target-asset-missing", target: entity.id });
-      continue;
-    }
-    const rect = entity.kind === "chest" ? chestInteractionBox(geometry, entity.range ?? 0) : geometry.box;
-    // ⚠️ 越界看**实体盒**，不看 chest 的交互盒：`range` 合法地可以把交互区伸到世界外
-    //   （运行时只要求玩家盒与交互盒相交）。越界仍归 `auditGameConfig.inWorld`，这里不重复报。
-    if (outOfWorld(geometry.box, width, height)) {
-      gaps.push({ missing: "target-out-of-world", target: entity.id });
-      continue;
-    }
-    targets.push({
-      id: entity.id, subject: entity.kind === "chest" ? "CHEST" : "PICKUP",
-      rect, assetId: entity.asset,
-    });
-  }
-
-  const gate = config.entities.find((e) => e.kind === "goal" && e.id === config.objective.gate);
-  if (!gate) {
-    gaps.push({ missing: "gate-missing" });
-  } else {
-    const geometry = runtimeEntityGeometry(gate, manifest, profile);
-    if (!geometry) {
-      gaps.push({ missing: "target-asset-missing", target: gate.id });
-    } else if (outOfWorld(geometry.box, width, height)) {
-      gaps.push({ missing: "target-out-of-world", target: gate.id });
-    } else {
-      targets.push({ id: gate.id, subject: "GATE", rect: geometry.box, assetId: gate.asset });
-    }
-  }
+  const { targets, gaps: targetGaps } = collectTargets(config, manifest, profile);
+  const gaps: SpatialGap[] = [...targetGaps];
 
   // ── 出生点诊断（窄口径；只观察，不阻断）────────────────────────────────
   const spawnDiagnostic = spawnInTerrain(config, graph);
@@ -194,73 +143,23 @@ export function auditSpatial(
     };
   }
 
-  // ── 可达 + 覆盖：一次 BFS，弧线与下落段都按脚点采样做严格 AABB 覆盖 ────────
-  const covered = new Set<number>();
-  const coverAt = (x: number, y: number): void => {
-    if (covered.size === targets.length) return;
-    const playerBox = boxFromFoot({ x, y }, graph.player.size);
-    for (const [i, target] of targets.entries())
-      if (!covered.has(i) && overlapsStrict(playerBox, target.rect)) covered.add(i);
-  };
-
-  const seen = new Set<string>();
-  const queue: Vec[] = [];
-  /** 走出悬崖的那一步：不落地弧线扫描的起点（`vy = 0`）。 */
-  const walkOffStarts: Vec[] = [];
-  const add = (x: number, y: number): void => {
-    const key = `${x},${y}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    queue.push({ x, y });
-    coverAt(x, y);
-  };
-
-  for (const seed of seeds) add(seed.x, seed.y);
-  // 出生点本身也可能正好碰到目标（不要求落位成功）。
-  coverAt(Math.round(graph.player.foot.x), Math.round(graph.player.foot.y));
-
-  for (let head = 0; head < queue.length && covered.size < targets.length; head++) {
-    const cell = queue[head]!;
-    for (const edge of movementNeighbors(graph, cell.x, cell.y)) {
-      if (edge.kind !== "walk") {
-        // 迈出悬崖那一步，以及整段竖直下落；中途碰到目标也算够到。
-        if (edge.x !== cell.x) {
-          coverAt(edge.x, cell.y);
-          if (edge.kind === "walk-off") walkOffStarts.push({ x: edge.x, y: cell.y });
-        }
-        for (let y = cell.y + 1; y <= edge.y; y++) coverAt(edge.x, y);
-      }
-      add(edge.x, edge.y);
-    }
-    for (const edge of hopEdges(graph, cell.x, cell.y, move)) {
-      for (const sample of edge.samples) coverAt(sample.x, sample.y);
-      add(edge.x, edge.y);
-    }
-  }
+  // ── 可达 + 覆盖：共享底座（`reach.ts`）；覆盖 = 落脚点 / 下落段 / 跳跃弧采样 / mid-air 保护 ──
+  const assessment = assessReachability(graph, move, targets);
+  const { covered, seen, midAir } = assessment;
 
   // ── 每个没被覆盖的目标：BLOCKED（更强根因）→ mid-air 保守降级 → UNREACHABLE ──
   const reachableSummary = `spawn-bfs/${seen.size}`;
   const reachedTargets = targets.filter((_, i) => covered.has(i)).map((t) => t.id);
 
-  const blockInfo = new Map<number, ReturnType<typeof blockedBySolids>>();
-  const midAirCandidates: number[] = [];
   for (const [i, target] of targets.entries()) {
     if (covered.has(i)) continue;
     const block = blockedBySolids(graph, target.rect);
-    blockInfo.set(i, block);
-    if (!block.blocked) midAirCandidates.push(i);
-  }
-  const midAir = midAirTouchableTargets(graph, queue, walkOffStarts, move, targets, midAirCandidates);
-
-  for (const [i, target] of targets.entries()) {
-    if (covered.has(i)) continue;
-    const block = blockInfo.get(i)!;
     if (block.blocked) {
       evidence.push({
         judgmentId: `PLAYABILITY_SPATIAL_${target.subject}_BLOCKED`,
         target: `entity "${target.id}"`,
-        detail: `这个${NOUN[target.subject]}的交互区完全落在实心体内：玩家盒在任何一个不撞墙的位置都无法与它相交` +
-          `（目标盒 ${fmtRect(target.rect)}；实心体 ${block.solids.join(", ") || "（未列出）"}）。`,
+        detail: `这个${TARGET_NOUN[target.subject]}的交互区完全落在实心体内：玩家盒在任何一个不撞墙的位置都无法与它相交` +
+          `（目标盒 ${formatRect(target.rect)}；实心体 ${block.solids.join(", ") || "（未列出）"}）。`,
         witness: { kind: "blocked", rect: target.rect, overlapFoot: block.overlapFoot, solids: block.solids },
         coverage: coverageOf(coverage),
         assetId: target.assetId,
@@ -275,7 +174,7 @@ export function auditSpatial(
       evidence.push({
         judgmentId: SPATIAL_JUDGMENTS.midAirUnproven,
         target: `entity "${target.id}"`,
-        detail: `没有证明可达，但也**不能**判不可达：存在一条不撞实心体、不要求落地的弧线，玩家盒能在空中与这个${NOUN[target.subject]}严格相交。` +
+        detail: `没有证明可达，但也**不能**判不可达：存在一条不撞实心体、不要求落地的弧线，玩家盒能在空中与这个${TARGET_NOUN[target.subject]}严格相交。` +
           "⚠️ 这条只是保守降级（mid-air touch-only 不在 V1 的确定性判定范围），不把该弧线写进可达集。",
         witness: { kind: "coverage-gap", missing: "mid-air-touch-only" },
         coverage: coverageOf(coverage),
@@ -289,7 +188,7 @@ export function auditSpatial(
     evidence.push({
       judgmentId: `PLAYABILITY_SPATIAL_${target.subject}_UNREACHABLE`,
       target: `entity "${target.id}"`,
-      detail: `够不到 —— 从出生点出发，用最宽的能力上界（walk / walk-off / fall / 真实抛物线跳跃）都碰不到这个${NOUN[target.subject]}。` +
+      detail: `够不到 —— 从出生点出发，用最宽的能力上界（walk / walk-off / fall / 真实抛物线跳跃）都碰不到这个${TARGET_NOUN[target.subject]}。` +
         "⚠️ 这条只证明「到不了」：没有哪一种设计意图能把「走不通」变成对的。要去的地方：地形 / 这一关的布局，不是再抽一次奖。",
       witness: { kind: "no-path", reachableSet: reachableSummary, blockedAt: target.id, targetsReached: reachedTargets },
       coverage: coverageOf(coverage),
@@ -305,116 +204,6 @@ export function auditSpatial(
     }),
     evidence, coverage, gaps,
   };
-}
-
-const fmtRect = (r: Aabb): string =>
-  `x=${r.x}, y=${r.y}, w=${r.w}, h=${r.h}`;
-
-/**
- * 目标的「可重叠脚点矩形」里有没有自由位置。
- *
- * 玩家盒以脚点 `(x, y)` 为中心、底边对齐 ⇒ 与目标盒严格相交的充要条件是
- * `x ∈ (T.x - pw/2, T.x + T.w + pw/2)`、`y ∈ (T.y, T.y + T.h + ph)`。
- * 整数格取开区间的整数部分；**不再外扩**（见文件头四）。
- */
-function blockedBySolids(
-  graph: MovementGraph, rect: Aabb,
-): { blocked: boolean; overlapFoot: Aabb; solids: string[] } {
-  const pw = graph.player.size.w;
-  const ph = graph.player.size.h;
-  const x0 = Math.max(0, Math.floor(rect.x - pw / 2) + 1);
-  const x1 = Math.min(graph.width, Math.ceil(rect.x + rect.w + pw / 2) - 1);
-  const y0 = Math.max(0, Math.floor(rect.y) + 1);
-  const y1 = Math.min(graph.height, Math.ceil(rect.y + rect.h + ph) - 1);
-  const overlapFoot: Aabb = {
-    x: x0, y: y0, w: Math.max(0, x1 - x0 + 1), h: Math.max(0, y1 - y0 + 1),
-  };
-  const solids = graph.solids.filter((s) => overlapsInclusive(s.box, rect)).map((s) => s.id);
-
-  if (x0 > x1 || y0 > y1) return { blocked: false, overlapFoot, solids };
-  for (let x = x0; x <= x1; x++)
-    for (let y = y0; y <= y1; y++)
-      if (graph.freeAt(x, y)) return { blocked: false, overlapFoot, solids };
-  return { blocked: true, overlapFoot, solids };
-}
-
-/**
- * 未覆盖目标是否存在**不落地弧线**的触达可能（LP-02 复核 Q3(a)）。
- *
- * 两类起点：
- *   jump —— 每个可达落脚点，`vy = jumpVelocity`；
- *   fall —— 每个 walk-off 悬崖点，`vy = 0`（走出边缘后可以水平漂移）。
- *
- * 对每个起点扫 `vx ∈ [-speed, speed]` 的弧线；弧线按 60Hz 采样、逐点查 `blocked`。
- * 只要某条不撞实心体的弧上，玩家盒与目标盒**严格相交**，就算「合理触达可能」。
- *
- * ⚠️ 这是**保守保护**，不是可达性证明：命中只用于把 UNREACHABLE 降级为
- *   `INSUFFICIENT_EVIDENCE`，绝不把该弧线写进可达集。
- */
-function midAirTouchableTargets(
-  graph: MovementGraph,
-  jumpStarts: readonly Vec[],
-  walkOffStarts: readonly Vec[],
-  move: MoveParams,
-  targets: readonly SpatialTarget[],
-  candidates: readonly number[],
-): Set<number> {
-  const hits = new Set<number>();
-  if (candidates.length === 0) return hits;
-
-  const pw = graph.player.size.w;
-  const ph = graph.player.size.h;
-  const apex = maxJumpHeight(move);
-  const maxDx = Math.ceil(jumpSpan(move, graph.height));
-  const bottom = graph.height + ph;   // 脚点超过它，玩家盒已完全离开世界
-
-  /** 粗筛：从 `from` 出发的弧线有没有可能碰到目标（边界放宽，宁可多扫）。 */
-  const couldReach = (from: Vec, idx: number): boolean => {
-    const target = targets[idx]!;
-    const left = target.rect.x - pw / 2;
-    const right = target.rect.x + target.rect.w + pw / 2;
-    if (right + maxDx < from.x || left - maxDx > from.x) return false;
-    if (target.rect.y > bottom) return false;
-    if (target.rect.y + target.rect.h + ph < from.y - apex - ph) return false;
-    return true;
-  };
-
-  const scan = (from: Vec, vy0: number, tEnd: number, idxs: readonly number[]): void => {
-    const steps = 32;
-    const n = Math.max(6, Math.min(240, Math.ceil(tEnd * 60)));
-    for (let s = 0; s <= steps; s++) {
-      const vx = -move.speed + (2 * move.speed * s) / steps;
-      for (let i = 1; i <= n; i++) {
-        const t = (tEnd * i) / n;
-        const px = Math.round(from.x + vx * t);
-        const py = Math.round(from.y - (vy0 * t - (move.gravity * t * t) / 2));
-        if (py > bottom) break;
-        // 世界外的采样点当自由空间（Runtime 没有世界边界碰撞）；世界内按 blocked 栅格。
-        if (px >= 0 && px <= graph.width && py >= 0 && py <= graph.height &&
-            graph.blocked[px * graph.stride + py] === 1) break;
-        const playerBox = boxFromFoot({ x: px, y: py }, graph.player.size);
-        for (const idx of idxs)
-          if (!hits.has(idx) && overlapsStrict(playerBox, targets[idx]!.rect)) hits.add(idx);
-        if (hits.size >= candidates.length) return;
-      }
-    }
-  };
-
-  for (const from of jumpStarts) {
-    const idxs = candidates.filter((idx) => !hits.has(idx) && couldReach(from, idx));
-    if (idxs.length === 0) continue;
-    const disc = move.jumpVelocity * move.jumpVelocity + 2 * move.gravity * Math.max(0, bottom - from.y);
-    const tEnd = (move.jumpVelocity + Math.sqrt(disc)) / move.gravity;
-    scan(from, move.jumpVelocity, tEnd, idxs);
-  }
-  for (const from of walkOffStarts) {
-    if (from.y >= bottom) continue;
-    const idxs = candidates.filter((idx) => !hits.has(idx) && couldReach(from, idx));
-    if (idxs.length === 0) continue;
-    const tEnd = Math.sqrt((2 * (bottom - from.y)) / move.gravity);
-    scan(from, 0, tEnd, idxs);
-  }
-  return hits;
 }
 
 /**

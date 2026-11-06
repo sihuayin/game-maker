@@ -46,8 +46,10 @@ export type MovementGraph = {
   readonly width: number;
   readonly height: number;
   readonly stride: number;
-  /** 脚点格是否被玩家盒子撞进实心体（严格相交，贴边不算）。 */
+  /** 脚点格是否被玩家盒子撞进**实心体**（严格相交，贴边不算）；只有它提供支撑。 */
   readonly blocked: Uint8Array;
+  /** 脚点格是否不可穿越：实心体 ∪ 可选禁区掩码（静止 hazard / danger 切面）。 */
+  readonly forbidden: Uint8Array;
   /** 脚点格自由，且脚点下方一点点就撞 —— 站得住。 */
   readonly standable: Uint8Array;
   /** 每一列的落脚点 y（升序）。 */
@@ -69,6 +71,14 @@ const sweptBox = (box: Aabb, entity: GameEntity): Aabb => {
     : { x: box.x, y: Math.min(box.y, box.y + d), w: box.w, h: box.h + Math.abs(d) };
 };
 
+export type MovementGraphOptions = {
+  /**
+   * 不可穿越、但**不提供支撑**的禁区（world 坐标矩形）。LP-03 的静止 hazard 掩码用它；
+   * 掩码按玩家宽高外扩，和 `blocked` 同一套脚点语义。
+   */
+  readonly forbiddenBoxes?: readonly Aabb[];
+};
+
 /**
  * 建图。玩家资源解不到返回 `null` —— 那是引用族的事，本层不重复报。
  */
@@ -76,6 +86,7 @@ export function buildMovementGraph(
   config: GameConfig,
   manifest: AssetPackManifest,
   profile: FixedRuntimeProfile = FIXED_RUNTIME_PROFILE,
+  options: MovementGraphOptions = {},
 ): MovementGraph | null {
   const player = runtimePlayerGeometry(config, manifest);
   if (!player) return null;
@@ -111,12 +122,22 @@ export function buildMovementGraph(
     for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) blocked[x * stride + y] = 1;
   }
 
-  // 站得住：这里自由，且再往下一点点就撞。⚠️ 世界的底不是地板。
+  // 禁区 = 实心体 ∪ 可选掩码；掩码**只拒绝穿越，不提供支撑**（hazard 顶不是地板）。
+  const forbidden = blocked.slice();
+  for (const box of options.forbiddenBoxes ?? []) {
+    const x0 = Math.max(0, Math.floor(box.x - halfW) + 1);
+    const x1 = Math.min(width, Math.ceil(box.x + box.w + halfW) - 1);
+    const y0 = Math.max(0, Math.floor(box.y) + 1);
+    const y1 = Math.min(height, Math.ceil(box.y + box.h + player.size.h) - 1);
+    for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) forbidden[x * stride + y] = 1;
+  }
+
+  // 站得住：这里自由，且再往下一点点就撞**实心体**。⚠️ 世界的底不是地板。
   const standable = new Uint8Array(blocked.length);
   for (let x = 0; x <= width; x++) {
     for (let y = 0; y <= height; y++) {
       const i = x * stride + y;
-      if (blocked[i] === 0 && y + 1 <= height && blocked[i + 1] === 1) standable[i] = 1;
+      if (forbidden[i] === 0 && y + 1 <= height && blocked[i + 1] === 1) standable[i] = 1;
     }
   }
 
@@ -128,11 +149,11 @@ export function buildMovementGraph(
   }
 
   const inBounds = (x: number, y: number): boolean => x >= 0 && x <= width && y >= 0 && y <= height;
-  const freeAt = (x: number, y: number): boolean => inBounds(x, y) && blocked[x * stride + y] === 0;
+  const freeAt = (x: number, y: number): boolean => inBounds(x, y) && forbidden[x * stride + y] === 0;
   const standableAt = (x: number, y: number): boolean => inBounds(x, y) && standable[x * stride + y] === 1;
 
   return {
-    width, height, stride, blocked, standable, columns, player, solids, coverage,
+    width, height, stride, blocked, forbidden, standable, columns, player, solids, coverage,
     freeAt, standableAt,
     startCells: () => {
       const out: Vec[] = [];
@@ -221,7 +242,7 @@ export function hopSamples(
     const py = Math.round(ay - (move.jumpVelocity * tt - (move.gravity * tt * tt) / 2));
     // 出世界的采样点不参与判决，也不进覆盖集（与 `blocked` 栅格同域）。
     if (px < 0 || px > graph.width || py < 0 || py > graph.height) continue;
-    if (graph.blocked[px * graph.stride + py] === 1) return null;
+    if (graph.forbidden[px * graph.stride + py] === 1) return null;
     samples.push({ x: px, y: py });
   }
   return samples.length > 0 ? samples : null;

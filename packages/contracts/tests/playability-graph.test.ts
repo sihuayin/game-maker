@@ -7,6 +7,7 @@ import type { GameConfig } from "../src/game-config.js";
 import {
   buildMovementGraph, fallTarget, hopEdges, hopTargets, movementNeighbors, reachableCells,
 } from "../src/playability/graph.js";
+import { FIXED_RUNTIME_PROFILE } from "../src/playability/profile.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const MANIFEST = (() => {
@@ -49,6 +50,16 @@ describe("§Solid 阻挡", () => {
     expect(g.freeAt(500, 250)).toBe(false);
     expect(g.standableAt(500, 250)).toBe(false);
     expect(movementNeighbors(g, 464, 250).some((e) => e.x === 465 && e.kind === "walk")).toBe(false);
+  });
+
+  it("禁区掩码（LP-03 静止 hazard）不可穿越，且**不提供支撑**：hazard 顶不是落脚点", () => {
+    const g = buildMovementGraph(CONFIG, MANIFEST, FIXED_RUNTIME_PROFILE, {
+      forbiddenBoxes: [{ x: 268, y: 202, w: 64, h: 48 }],
+    });
+    expect(g).not.toBeNull();
+    expect(g!.freeAt(300, 210)).toBe(false);       // 玩家盒撞进 hazard
+    expect(g!.standableAt(300, 202)).toBe(false);  // hazard 顶不是地板
+    expect(g!.blocked[300 * g!.stride + 210]).toBe(0);  // 支撑只看 solid，不看禁区
   });
 
   it("⚠️ moving solid 按**原始位置**静态处理：扫过但不在原位的格子不挡", () => {
