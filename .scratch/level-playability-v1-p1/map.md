@@ -77,7 +77,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 3. [LP-01 基础几何模型](issues/03-lp01-geometry.md)（task，AFK，blocked by 02）— **resolved**
 4. [LP-02 空间可达性判据](issues/04-lp02-spatial.md)（task，AFK，blocked by 03）— **resolved**
 5. [LP-02 复核：空间判据可靠性与误报](issues/05-lp02-review.md)（grilling，HITL，blocked by 04）— **resolved（有条件通过，条件已满足）**
-6. [LP-03 机制可通行性判据](issues/06-lp03-mechanic.md)（task，AFK，blocked by 05）— open
+6. [LP-03 机制可通行性判据](issues/06-lp03-mechanic.md)（task，AFK，blocked by 05）— **resolved**
 7. [LP-03 复核：机制判据语义一致性](issues/07-lp03-review.md)（grilling，HITL，blocked by 06）— open
 8. [LP-04 关卡完成性判据](issues/08-lp04-completion.md)（task，AFK，blocked by 07）— open
 9. [LP-05 Pipeline 集成](issues/09-lp05-pipeline.md)（task，AFK，blocked by 08）— open
@@ -91,6 +91,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 - [LP-01 基础几何模型](issues/03-lp01-geometry.md)：统一 Runtime geometry profile + 共享移动图落地（纯加法，未改既有审计/Runtime）；body 系 vs 帧系几何与 coverage 分离；walk / walk-off / fall / hop 边；19 例新测试、contracts 857 例全绿。`EntityDesc.box` 调用方已清点，审计不消费它。
 - [LP-02 空间可达性判据](issues/04-lp02-spatial.md)：`auditSpatial` 落地（三态 + coverage；BLOCKED 优先、UNREACHABLE 其次；chest range 四边外扩；pickup/goal 忽略 body；出生点只诊断不硬拒）。23 例空间矩阵转生产夹具；冻结语料 20 唯一 config：0 阻断、2 例 gate-missing 证据不足、18 例层内无阻断，对既有 reachability 新增/修复 0。研究矩阵三处修正（#19 降级、#4 subject、#12 gate 实际不可达）见票据 Answer。
 - [LP-02 复核](issues/05-lp02-review.md)：**有条件通过，条件已满足**。UNREACHABLE 必须以「搜索模型无遗漏」为前提；补 mid-air touch-only 保守降级（`cbc93a8`，`PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN`，只降级、不写可达集）。矩阵口径定为 **17 PROVEN / 17 NO_PROVEN / 5 INSUFFICIENT**；层内 verdict / coverage / 整关 aggregate 三者分离。空间 46 例、契约 904 例、全仓 2491 例、typecheck 0；20 唯一 config 回归 0 新增 / 0 修复。Draft PR [#28](https://github.com/sihuayin/game-maker/pull/28) 已创建。
+- [LP-03 机制可通行性判据](issues/06-lp03-mechanic.md)：`auditMechanic` 落地 —— A 静止 hazard 非支撑禁区 + 反事实；B 单全高 danger 的闭式安全窗口；巡逻 / moving-platform / 被包住目标 / 多 danger / 非全列 danger 一律 gap。共享 `reach.ts` / `targets.ts` 与 LP-02 同底座。25 例新测试；契约 930 例、全仓 2517 例、typecheck/build 全绿。20 唯一 config：4 个机制阻断（3 历史 + 1 probe）、14 证据不足、2 层内无阻断，与研究一致。矩阵 #28 `pickup-in-static-hazard` 生产层为 PROVEN（同一 hazard 封死其后目标），39 例分布需 LP-03 复核裁定为 **18/17/4**。未推送，等第三次强制复核。
 
 ## Not yet specified
 
