@@ -64,7 +64,7 @@ Map: ../map.md
 | AC-07 Pipeline | PASS | deterministic + Publish Gate |
 | AC-08 历史回归 | PASS | 39 例最终分布 19 / 16 / 4 |
 | AC-09 误报控制 | PASS | 修正后矩阵与逐条归因 |
-| AC-10 工程质量 | **PASS_WITH_KNOWN_LIMITATION** | 2550 例通过；Vitest runner RPC workaround 仍在 |
+| AC-10 工程质量 | **PASS_WITH_KNOWN_LIMITATION** | 2551 例通过；Vitest runner RPC workaround 仍在 |
 | AC-11 范围约束 | PASS | 范围审计无越界 |
 | AC-12 交付审查 | PASS | 正式 PR + 最终报告完成后成立 |
 
