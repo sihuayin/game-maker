@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-range-rescues",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "chest-in-pit",
+  "evidence": [
+    [
+      "03",
+      "chest-range-rescues"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-range-rescues/game-config.json"
+}

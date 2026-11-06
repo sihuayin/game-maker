@@ -35,36 +35,45 @@ const walledOff = () =>
   withConfig((c) => { c.terrain.push({ x: 300, y: 0, w: 100, h: c.world.size.h }); });
 
 describe("§B-02：`reachability` 的 error 进 `deterministic`，不进 `resampleable`", () => {
-  it("不可达 config：每条 reachability error 都在 deterministic 里", () => {
+  it("不可达 config：每个够不到的目标都在 deterministic 里", () => {
     const bad = walledOff();
     const rr = auditReachability(bad, MANIFEST);
     expect(rr.length).toBeGreaterThan(0);
     const p = pipe(bad);
     for (const i of rr) {
       expect(i.severity).toBe("error");
-      expect(p.deterministic).toContainEqual(i);
+      // LP-05：deterministic 用 auditPlayability 的映射；message 不再是 auditReachability 的旧文案，
+      // 但同一个 target 必须仍然被硬拒。
+      expect(p.deterministic.some((d) => d.severity === "error" && d.where === i.where)).toBe(true);
     }
   });
 
-  it("不可达 config：reachability error **一条都不进** resampleable（否则会被喂回下一发）", () => {
+  it("不可达 config：这些目标的 error **一条都不进** resampleable（否则会被喂回下一发）", () => {
     const bad = walledOff();
-    const key = (i: { where: string; message: string }) => `${i.where}|${i.message}`;
-    const rr = new Set(auditReachability(bad, MANIFEST).map(key));
+    const targets = new Set(auditReachability(bad, MANIFEST).map((i) => i.where));
     const p = pipe(bad);
-    expect(p.resampleable.filter((i) => rr.has(key(i)))).toEqual([]);
-    // ⚠️ 正反一起断：不是「resampleable 恰好为空」，而是「它没有因为可达性多出东西」。
+    expect(p.resampleable.filter((i) => i.severity === "error" && targets.has(i.where))).toEqual([]);
+    // ⚠️ 正反一起断：不是「resampleable 恰好为空」，而是「它没有因为可玩性多出东西」。
     expect(p.deterministic.length).toBeGreaterThan(p.resampleable.length);
   });
 
   it("可达的真夹具：reachability 不新增 error（deterministic 不含「够不到」）", () => {
     expect(auditReachability(CONFIG, MANIFEST)).toEqual([]);
     expect(pipe(CONFIG).deterministic.filter((i) => i.message.includes("够不到"))).toEqual([]);
-  });
+  }, 20000);
+
+  it("LP-05：机制层阻断（静止 hazard）也进 deterministic，不进 resampleable", () => {
+    const bad = withConfig((c) => { delete c.entities.find((e) => e.id === "carriage")!.motion; });
+    const p = pipe(bad);
+    const hard = p.deterministic.filter((i) => i.severity === "error" && /静止 hazard/.test(i.message));
+    expect(hard.some((i) => i.where === 'entity "signal"')).toBe(true);
+    expect(p.resampleable.some((i) => i.severity === "error" && /静止 hazard/.test(i.message))).toBe(false);
+  }, 20000);
 
   it("deterministic 仍是 resampleable 的超集（顺序与既有族不变）", () => {
     const p = pipe(CONFIG);
     expect(p.deterministic.slice(0, p.resampleable.length)).toEqual(p.resampleable);
-  });
+  }, 20000);
 });
 
 // ── D-03：`classifyConfigIssues` 的归因规则（保守兜底） ──────────────────────

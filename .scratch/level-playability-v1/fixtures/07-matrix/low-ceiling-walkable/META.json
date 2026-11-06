@@ -1,0 +1,17 @@
+{
+  "caseId": "low-ceiling-walkable",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": null,
+  "evidence": [
+    [
+      "03",
+      "low-ceiling"
+    ]
+  ],
+  "note": "03 walk 边修复前是已知误报；修复后合法",
+  "fixture": "fixtures/07-matrix/low-ceiling-walkable/game-config.json"
+}

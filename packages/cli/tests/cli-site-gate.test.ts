@@ -171,14 +171,14 @@ describe("§放行：干净包全绿 ⇒ 产站点；warning 不阻断", () => {
 //
 // ⚠️ 补的洞：绿报告属于 config A，仍能给不可达的 config B 放行。闸在这里**现场重跑**
 //   `auditReachability`：config B 自己走不通 ⇒ 退 4、站点不产。
-describe("§P1 · publish-gate：不可达 config ⇒ 拒（显式报告与 auto 查找两条）", () => {
+describe("§P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（显式报告与 auto 查找两条）", () => {
   it("显式 `--qa-report`：绿报告 + config B ⇒ 退 4、站点不产", async () => {
     const d = tmp("unreachable-explicit");
     const out = path.join(d, "out");
     const rp = writeReport(out, report());
     const { code, doc } = await site([PACK, "--config", unreachableConfig(d), "--shell", shellOf(d), "--out", out, "--qa-report", rp]);
     expect(code).toBe(EXIT.invalid);
-    expect(doc.error).toMatch(/这份 config 本身不可达/);
+    expect(doc.error).toMatch(/这份 config 过不了可玩性判定/);
     expect(doc.error).toMatch(/够不到/);
     expect(fs.existsSync(siteDir(out))).toBe(false);
   });
@@ -189,7 +189,7 @@ describe("§P1 · publish-gate：不可达 config ⇒ 拒（显式报告与 auto
     writeReport(out, report());
     const { code, doc } = await site([PACK, "--config", unreachableConfig(d), "--shell", shellOf(d), "--out", out]);
     expect(code).toBe(EXIT.invalid);
-    expect(doc.error).toMatch(/这份 config 本身不可达/);
+    expect(doc.error).toMatch(/这份 config 过不了可玩性判定/);
     expect(fs.existsSync(siteDir(out))).toBe(false);
   });
 });

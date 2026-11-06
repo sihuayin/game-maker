@@ -1,0 +1,17 @@
+{
+  "caseId": "pickup-in-static-hazard",
+  "group": "mechanic",
+  "nonProduction": true,
+  "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+  "expectedJudgmentId": null,
+  "failureLocation": "coverage.mechanic",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "04",
+      "pickupInStaticHazard_baseReach"
+    ]
+  ],
+  "note": "复位保留收集计数；同帧回调顺序不可证；不判错",
+  "fixture": "fixtures/07-matrix/pickup-in-static-hazard/game-config.json"
+}

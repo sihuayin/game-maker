@@ -1,0 +1,17 @@
+{
+  "caseId": "pickup-50",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "pickup-120",
+  "evidence": [
+    [
+      "03",
+      "pickup-50"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/pickup-50/game-config.json"
+}

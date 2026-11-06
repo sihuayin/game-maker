@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-overlapping-hazard",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": null,
+  "evidence": [
+    [
+      "05",
+      "chest-overlapping-hazard"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-overlapping-hazard/game-config.json"
+}

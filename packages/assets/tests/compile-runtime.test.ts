@@ -188,11 +188,13 @@ describe("⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落
   it("recipe-config-gap-v1 票 13：实体底边摆出界 ⇒ 确定性钳回世界内、照常出包", async () => {
     const d = tmp();
     const bad = structuredClone(GOOD);
-    (bad.entities as Record<string, unknown>[])[0]!.at = { x: 300, y: 290 };
+    // ⚠️ 用 solid（luggage）而不是 pickup：钳回世界底部会把盒子压进地面；
+    //   pickup 压进地面现在是 LP-02 的确定性 BLOCKED，而 solid 埋在地里不改可达性。
+    (bad.entities as Record<string, unknown>[])[3]!.at = { x: 500, y: 290 };
     const r = await run(d, bad);
     expect(r.data.ok).toBe(true);
     const written = JSON.parse(fs.readFileSync(fileOf(d), "utf8"));
-    expect(written.entities[0].at.y).toBeLessThan(290);
+    expect(written.entities[3].at.y).toBeLessThan(290);
   });
 
   it("entity-identity-v1 票 03：config 缺 sourceIntent（设计实体没被覆盖）→ 模型错、重采样、不落盘", async () => {

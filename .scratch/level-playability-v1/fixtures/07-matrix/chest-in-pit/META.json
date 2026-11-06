@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-in-pit",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_CHEST_UNREACHABLE",
+  "failureLocation": "entity \"chest\"",
+  "legalPair": "chest-range-rescues",
+  "evidence": [
+    [
+      "03",
+      "chest-in-pit"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-in-pit/game-config.json"
+}

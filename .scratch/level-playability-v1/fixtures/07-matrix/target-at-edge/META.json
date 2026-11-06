@@ -1,0 +1,17 @@
+{
+  "caseId": "target-at-edge",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "target-out-of-world",
+  "evidence": [
+    [
+      "existing",
+      "auditGameConfig"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/target-at-edge/game-config.json"
+}

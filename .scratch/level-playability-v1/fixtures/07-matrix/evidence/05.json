@@ -1,0 +1,646 @@
+{
+  "synthetic": [
+    {
+      "id": "baseline-last-train",
+      "expect": "completable",
+      "result": {
+        "id": "baseline-last-train",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 3,
+        "kChest": 0,
+        "declaredCollectables": 3,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 185463,
+        "gate": "signal",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "suitcase-1",
+            "kind": "pickup",
+            "ok": true
+          },
+          {
+            "id": "suitcase-2",
+            "kind": "pickup",
+            "ok": true
+          },
+          {
+            "id": "suitcase-3",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "one-way-pit-pickup",
+      "expect": "no-walk",
+      "result": {
+        "id": "one-way-pit-pickup",
+        "world": {
+          "w": 480,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 0,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 489,
+        "edgeCount": 57802,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "pit-pickup",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "gate-not-reachable-after-collection"
+        }
+      }
+    },
+    {
+      "id": "one-way-pit-chest",
+      "expect": "no-walk",
+      "result": {
+        "id": "one-way-pit-chest",
+        "world": {
+          "w": 480,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 489,
+        "edgeCount": 57802,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "pit-chest",
+            "kind": "chest",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "gate-not-reachable-after-collection"
+        }
+      }
+    },
+    {
+      "id": "chest-sealed-in-solid",
+      "expect": "unreachable",
+      "result": {
+        "id": "chest-sealed-in-solid",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 625,
+        "edgeCount": 78703,
+        "gate": "gate",
+        "gatePreCount": 0,
+        "spawnBits": 0,
+        "unreachable": [
+          {
+            "id": "sealed-chest",
+            "kind": "chest"
+          }
+        ],
+        "collectable": [
+          {
+            "id": "sealed-chest",
+            "kind": "chest",
+            "ok": false
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "no-order-visits-all"
+        }
+      }
+    },
+    {
+      "id": "chest-behind-wall-with-range",
+      "expect": "completable",
+      "result": {
+        "id": "chest-behind-wall-with-range",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 675,
+        "edgeCount": 85353,
+        "gate": "gate",
+        "gatePreCount": 181,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "behind-wall-chest",
+            "kind": "chest",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "chest-midair-jumpthrough",
+      "expect": "completable",
+      "result": {
+        "id": "chest-midair-jumpthrough",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 187231,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "air-chest",
+            "kind": "chest",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "two-one-way-branches",
+      "expect": "no-walk",
+      "result": {
+        "id": "two-one-way-branches",
+        "world": {
+          "w": 560,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 2,
+        "kChest": 0,
+        "declaredCollectables": 2,
+        "skippedTargets": 0,
+        "nodeCount": 307,
+        "edgeCount": 30184,
+        "gate": "gate",
+        "gatePreCount": 0,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "left-pickup",
+            "kind": "pickup",
+            "ok": true
+          },
+          {
+            "id": "right-pickup",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "no-order-visits-all"
+        }
+      }
+    },
+    {
+      "id": "two-pickups-one-arc",
+      "expect": "completable",
+      "result": {
+        "id": "two-pickups-one-arc",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 2,
+        "kChest": 0,
+        "declaredCollectables": 2,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 187231,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "arc-a",
+            "kind": "pickup",
+            "ok": true
+          },
+          {
+            "id": "arc-b",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "gate-sealed-in-solid",
+      "expect": "no-walk",
+      "result": {
+        "id": "gate-sealed-in-solid",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 0,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 625,
+        "edgeCount": 78703,
+        "gate": "gate",
+        "gatePreCount": 0,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "suitcase-1",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "gate-not-reachable-after-collection"
+        }
+      }
+    },
+    {
+      "id": "gate-midair-jumpthrough",
+      "expect": "completable",
+      "result": {
+        "id": "gate-midair-jumpthrough",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 0,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 187231,
+        "gate": "gate",
+        "gatePreCount": 181,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "suitcase-1",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "low-ceiling-walkable",
+      "expect": "completable(true-design)",
+      "result": {
+        "id": "low-ceiling-walkable",
+        "world": {
+          "w": 600,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 0,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 65,
+        "edgeCount": 0,
+        "gate": "gate",
+        "gatePreCount": 0,
+        "spawnBits": 0,
+        "unreachable": [
+          {
+            "id": "p",
+            "kind": "pickup"
+          }
+        ],
+        "collectable": [
+          {
+            "id": "p",
+            "kind": "pickup",
+            "ok": false
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "no-order-visits-all"
+        }
+      }
+    },
+    {
+      "id": "pickup-body-override-runtime-ignores",
+      "expect": "completable",
+      "result": {
+        "id": "pickup-body-override-runtime-ignores",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 0,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 187231,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "pickup-body-override",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "one-way-pit-gate-on-pit-floor",
+      "expect": "completable",
+      "result": {
+        "id": "one-way-pit-gate-on-pit-floor",
+        "world": {
+          "w": 480,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 0,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 493,
+        "edgeCount": 58837,
+        "gate": "gate",
+        "gatePreCount": 111,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "pit-pickup",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "order-required-high-then-low",
+      "expect": "completable",
+      "result": {
+        "id": "order-required-high-then-low",
+        "world": {
+          "w": 640,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 2,
+        "kChest": 0,
+        "declaredCollectables": 2,
+        "skippedTargets": 0,
+        "nodeCount": 632,
+        "edgeCount": 77106,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "high-pickup",
+            "kind": "pickup",
+            "ok": true
+          },
+          {
+            "id": "low-pickup",
+            "kind": "pickup",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "chest-inside-moving-solid-sweep",
+      "expect": "completable",
+      "result": {
+        "id": "chest-inside-moving-solid-sweep",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 185463,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [
+          {
+            "id": "chest-in-sweep",
+            "kind": "chest"
+          }
+        ],
+        "collectable": [
+          {
+            "id": "chest-in-sweep",
+            "kind": "chest",
+            "ok": false
+          }
+        ],
+        "dp": {
+          "status": "no-walk",
+          "reason": "no-order-visits-all"
+        }
+      }
+    },
+    {
+      "id": "pit-chest-with-reset-hazard",
+      "expect": "completable",
+      "result": {
+        "id": "pit-chest-with-reset-hazard",
+        "world": {
+          "w": 480,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 493,
+        "edgeCount": 58837,
+        "gate": "gate",
+        "gatePreCount": 192,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "pit-chest",
+            "kind": "chest",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    },
+    {
+      "id": "chest-overlapping-hazard",
+      "expect": "completable",
+      "result": {
+        "id": "chest-overlapping-hazard",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "player": {
+          "w": 32,
+          "h": 48
+        },
+        "k": 1,
+        "kChest": 1,
+        "declaredCollectables": 1,
+        "skippedTargets": 0,
+        "nodeCount": 1441,
+        "edgeCount": 187231,
+        "gate": "gate",
+        "gatePreCount": 131,
+        "spawnBits": 0,
+        "unreachable": [],
+        "collectable": [
+          {
+            "id": "chest-on-hazard",
+            "kind": "chest",
+            "ok": true
+          }
+        ],
+        "dp": {
+          "status": "completable"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-midair-jumpthrough",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": null,
+  "evidence": [
+    [
+      "05",
+      "chest-midair-jumpthrough"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-midair-jumpthrough/game-config.json"
+}

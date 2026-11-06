@@ -1,0 +1,128 @@
+# Level Playability V1：只读审计与判据规格
+
+Labels: wayfinder:map
+Tracker: local-markdown
+Effort: level-playability-v1
+Baseline: `main` @ `fa17c14`
+Status: closed · 2026-11-05 审批通过；实施另起 effort `p1/level-playability-v1`
+Predecessor: [Design-to-Config Residual B/D P1](../design-to-config-residual-bd-audit-v1-p1/map.md)（已收口）
+
+> **2026-11-04 开图。** 授权来源：[开图裁定](rulings-2026-11-04.md)（Q1–Q7 全部采纳推荐方案 A）。
+> 输入：[`docs/v7.7/配置.md`](../../docs/v7.7/配置.md) §13（建议下一优先级进入 Level Playability V1）。
+> 本图是**只读审计与规格设计**图：不在本图修改生产代码；实施另起 effort，沿用 B/D Audit → P1 的两段式治理。
+
+## Destination
+
+完成 Level Playability V1 的当前能力审计、确定性判据规格、历史语料重判、合成负例矩阵、最小实施方案与独立审批包；不修改生产代码，停在实施审批门前。
+
+交付至少包括：
+
+1. 当前源码能力与缺口审计；
+2. 「不可玩 / 证据不足 / 未发现确定性问题」的判定定义；
+3. 机制组合、空间布局、可通行性的原子判据；
+4. 每条判据的精确算法、输入、输出和失败定位；
+5. 历史语料重判结果；
+6. 合成负例测试矩阵；
+7. 最小实施方案、修改面、测试计划和回退策略；
+8. 独立实施 effort 的票据与审批问题。
+
+## Notes
+
+### 权威与输入
+
+- **PRD（只读冻结）**：[`docs/v7.7/配置.md`](../../docs/v7.7/配置.md)；§13 是本图的启动依据。
+- **开图裁定（冻结输入）**：[rulings-2026-11-04.md](rulings-2026-11-04.md)。Q1–Q7 全 A；逐字边界见该文件，本图不复述全文。
+- **领域词汇**：`CONTEXT.md` 是唯一权威；本图不新增同义词。可玩性术语已于 2026-11-04 写入 `CONTEXT.md`，定义见 [framework.md](framework.md) §0–§2。
+- **前序**：[Design-to-Config Residual B/D Audit](../design-to-config-residual-bd-audit-v1/map.md) · [P1 实施](../design-to-config-residual-bd-audit-v1-p1/map.md)（均已收口）。本图**不重开** B-03 / B-04 / B-05 / D-04 的既有裁定；只在前序边界内审计 **config 侧**可确定的判据。
+- **代码基线**：`main` @ `fa17c14`（PR #27 合并后）。
+
+### 执行边界（来自裁定）
+
+- **只读**：不修改生产代码；允许在 `.scratch/level-playability-v1/` 下写一次性分析脚本与夹具。
+- **不改 Runtime / 不新增机制**：不动 `packages/demo/**` 的行为；不新增 EntityKind / Motion / 机制 / 斜坡碰撞。
+- **契约形状变更单列审批**：允许提出审计纯函数与契约候选；任何 contracts schema/API 形状变化必须列必要性、替代方案、影响面、不做后果，等待独立审批。
+- **零付费**：不调用模型、不生图、不重建站点、不产生新付费 Demo；只用现有 fixture、历史语料和确定性测试。
+- **不改历史**：不修改 `run/**`、`pack/**`、`site/**`、`fixtures/**`、`.scratch/**` 中既有产物或验收证据。
+- **试玩边界**：`AGENT_LIMITATION` / `TIMEOUT` / `ENVIRONMENT_FAILURE` **不得**自动转成 `PROVEN_UNPLAYABLE`；试玩只作证据。
+- **停止线**：判据若只能依靠模型判断、主观难度评价或 Agent 试玩成功率，就不进入确定性 error，保留为观察项或 `INSUFFICIENT_EVIDENCE`。
+
+### 判定框架（裁定原文摘要）
+
+三层：
+
+| 层次 | 要回答的问题 | 示例 |
+|---|---|---|
+| 空间可达性 | 目标是否存在几何上的可达路径？ | 拾取物是否被地形完全隔断 |
+| 机制可通行性 | 路径在现有机制约束下是否实际可走？ | 巡逻危险区是否封死唯一通路 |
+| 关卡完成性 | 必须完成的目标是否能在关卡规则下完成？ | 必需物品是否可取得、终点是否可到达 |
+
+三态：
+
+- `PROVEN_UNPLAYABLE`：确定性证明不可玩。
+- `INSUFFICIENT_EVIDENCE`：当前算法无法证明可玩或不可玩。
+- `NO_PROVEN_BLOCKER`：没有发现确定性阻断。**不等于**保证玩家一定能通关。
+
+判据门槛：精确可算；能证明错误不是设计意图；只有可证明不可玩才进入确定性 error；难度、节奏、路线优劣、体验仍为观察项。
+
+### 证据分级
+
+沿用前序 effort 的 E1/E2/E3：
+
+- **E1**：源码/契约定位（`file:line`）。
+- **E2**：既有测试或新增的只读分析（测试名 + 断言）。
+- **E3**：零付费语料重判或合成夹具复现（命令、退出码、路径、计数）。
+
+### 02 审计基线（2026-11-04）
+
+- 现有可玩性判据只有 `auditReachability`（只报「够不到」）加 `auditGameConfig` 的台阶高 / 行程越界 **warning**；其余是引用、身份、HUD、背景、机制存在性。
+- 三态 `PROVEN_UNPLAYABLE` / `INSUFFICIENT_EVIDENCE` / `NO_PROVEN_BLOCKER` 全仓不存在；承载方式已由 [framework.md](framework.md) §3 定为内部 `PlayabilityVerdict`，不落持久化契约。
+- QA 实际是 7 条判据（`QA_JUDGEMENTS.length`），不是多处注释写的 6 条。
+- 历史语料不能直接重判：171 份 manifest 中 81 份不是 v4；152 份 config 中 21 份唯一、96 份配对；reachability 新增 error 0；0 moving solid / 0 非 hazard motion / 0 `body` 覆盖；53 个 chest 实例 / 5 份唯一 config。
+- 发布闸只重跑 `auditReachability`；新判据若不在该函数内，standalone `site` / `assemble_site` 不会执行。
+- 设计层 `levels[].layout` 是自由文本、无坐标；只能判 config 自身几何 + 运行时语义。
+- 低天花板 / 走路走廊有一个可复现的 reachability 误报（只建跳跃弧、不建走路边）。
+
+详见 [02-capability-gap-audit.md](research/02-capability-gap-audit.md)。
+
+### 票流
+
+1. [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)（grilling，HITL）— resolved
+2. [现有可玩性能力与缺口源码审计](issues/02-capability-gap-audit.md)（research，AFK）— resolved
+3. [空间布局候选判据](issues/03-spatial-layout-judgments.md)（research，AFK）— resolved
+4. [机制组合候选判据](issues/04-mechanic-composition-judgments.md)（research，AFK）— resolved
+5. [关卡完成性候选判据](issues/05-level-completion-judgments.md)（research，AFK）— resolved
+6. [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)（task，AFK）— resolved
+7. [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)（task，AFK）— resolved
+8. [历史语料重判](issues/08-corpus-rejudgment.md)（task，AFK）— resolved
+9. [最小实施方案与契约候选](issues/09-implementation-plan.md)（research，AFK）— resolved
+10. [审批包与独立实施交接](issues/10-approval-package.md)（grilling，HITL）— resolved
+
+## Decisions so far
+
+- [现有可玩性能力与缺口源码审计](issues/02-capability-gap-audit.md)：现有判据只有 `auditReachability` + 台阶/行程 warning；chest、收集后返回 gate、hazard/danger 时序、moving solid、低天花板误报均未覆盖；三态不存在；历史语料 96 配对 / 0 新 error。报告见 [02-capability-gap-audit.md](research/02-capability-gap-audit.md)。
+- [判定框架与输入/结果/集成边界裁定](issues/01-framework-and-boundaries.md)：输入只吃 config + manifest + `FixedRuntimeProfile`；内部 `PlayabilityVerdict` 三态不落持久化契约；`PROVEN_UNPLAYABLE` 进 `deterministic`；新入口 `auditPlayability` 替换 reachability 并接入发布闸；术语写入 `CONTEXT.md`。规格见 [framework.md](framework.md)。
+- [空间布局候选判据](issues/03-spatial-layout-judgments.md)：新增三类确定性 error —— chest 不可取得、目标完全埋进实心体的 `BLOCKED`、出生点埋 terrain 的窄口径；另四项是对既有可达图的模型修正（真实重叠、走路/净空边、solid 静态、运行时几何）。语料 20 份唯一配对新增 **0**。报告见 [03-spatial-layout-judgments.md](research/03-spatial-layout-judgments.md)。
+- [机制组合候选判据](issues/04-mechanic-composition-judgments.md)：只有两条退化确定性判据 —— 非移动 hazard 作不可站立禁区封路、单个全高 danger 墙的安全窗口不足；巡逻 hazard / moving platform / 被包住的收集物 / 多危险物均 `INSUFFICIENT_EVIDENCE`。语料 4 个命中待 08 逐案裁定，裁定前不得硬拒。报告见 [04-mechanic-composition-judgments.md](research/04-mechanic-composition-judgments.md)。
+- [关卡完成性候选判据](issues/05-level-completion-judgments.md)：唯一新 completion id `PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT`（mask DP + 复位边，复用 03 的图与 gate 谓词）；不重复 03/04 的空间与机制根因；语料有效 gate 新增 **0**。报告见 [05-level-completion-judgments.md](research/05-level-completion-judgments.md)。
+- [历史语料清单、去重与覆盖缺口](issues/06-corpus-inventory.md)：152 份横版 config（21 唯一）、171 份 manifest（90 v4 / 81 旧 schema）、49 设计 / 77 关；结构配对 146、审计可用 150 份 / 96 唯一对；冻结 `sha256:25e6c891…`。清单见 [corpus/inventory.md](corpus/inventory.md)。
+- [合成负例与合法边界矩阵](issues/07-negative-positive-matrix.md)：39 个非生产用例（17 证明不可玩 / 18 合法边界 / 4 证据不足）；巡逻 hazard、被机制包住的收集物、moving-platform 均落 `INSUFFICIENT_EVIDENCE`；矩阵与 fixtures 见 [test-matrix.md](test-matrix.md)、[fixtures/07-matrix](fixtures/07-matrix/)。
+- [历史语料重判](issues/08-corpus-rejudgment.md)：20 份唯一 config；空间新增 0；机制 A 4 命中（3 真实缺陷 + 1 probe 排除，0 误伤）；完成性有效 gate 新增 0；零误伤基线成立，但 3 条真实缺陷待 09/10 决定迁移或例外。报告见 [corpus/rejudgment.md](corpus/rejudgment.md)。
+- [最小实施方案与契约候选](issues/09-implementation-plan.md)：无需新增持久化契约；单一入口 `auditPlayability` + 三处生产接线；LP-00…LP-07 串行实施；C1 加法导出建议批准、C2–C6 不采用；A 待 10 裁定 3 条历史缺陷的迁移/例外。方案见 [plan.md](plan.md)。
+- [审批包与独立实施交接](issues/10-approval-package.md)：规格批准；仅批准 C1；P1–P4 进入规格但以 Runtime 证据为硬前提；3 条历史缺陷记录为已知真实缺陷、不设例外；QA 统一移动模型；LP-00…LP-07 串行授权，三个复核点；零付费；地图关闭。交接件见 [final-report.md](final-report.md)。
+
+## Not yet specified
+
+<!-- 图已关闭（2026-11-05）；无未决雾。实施移交 final-report.md 与 p1/level-playability-v1 effort。 -->
+
+## Out of scope
+
+- **生产代码实施**：任何 `packages/**` 的 contracts / pipeline / assets / demo / qa 修改；实施另起 effort。
+- **Runtime 修改**：新 EntityKind、Motion、机制、斜坡碰撞、外壳行为。
+- **契约形状变更**：未经单列审批的 contracts schema/API 变化。
+- **塔防 `td-config/v1`**：本轮只覆盖横版 `game-config/v1`。
+- **付费验证**：模型调用、生图、站点重建、新付费 Demo。
+- **把 Agent 试玩结果当判据**：`AGENT_LIMITATION` / `TIMEOUT` / `ENVIRONMENT_FAILURE` 不得转成不可玩。
+- **难度 / 节奏 / 路线优劣 / 体验评价**：保留为观察项，不进确定性 error。
+- **重开前序冻结裁定**：B-03 / B-04 / B-05 / D-04、`interactables` 同桶误归属、`decor` 无 kind 锁等；本图只在其边界内审计 config 侧可判定的部分。
+- **修改历史**：`run/**`、`pack/**`、`site/**`、`fixtures/**`、既有验收证据。
+- **多关卡索引、CLI/MCP 扩展、推送 `main`、合并 PR。**

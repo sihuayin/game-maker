@@ -1,0 +1,17 @@
+{
+  "caseId": "one-way-pit-pickup",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT",
+  "failureLocation": "entity \"gate\"",
+  "legalPair": "one-way-pit-gate-on-pit-floor",
+  "evidence": [
+    [
+      "05",
+      "one-way-pit-pickup"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/one-way-pit-pickup/game-config.json"
+}

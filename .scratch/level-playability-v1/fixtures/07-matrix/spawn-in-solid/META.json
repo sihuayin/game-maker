@@ -1,0 +1,17 @@
+{
+  "caseId": "spawn-in-solid",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "auditGameConfig.spawn-in-solid (existing)",
+  "failureLocation": "player.at",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "existing",
+      "auditGameConfig"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/spawn-in-solid/game-config.json"
+}

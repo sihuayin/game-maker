@@ -1,0 +1,17 @@
+{
+  "caseId": "static-hazard-seals-path",
+  "group": "mechanic",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+  "failureLocation": "entity \"suitcase-3\"",
+  "legalPair": "wide-patrol",
+  "evidence": [
+    [
+      "04-corpus",
+      "maskAddsError"
+    ]
+  ],
+  "note": "历史语料 4 个命中证明模型会响；本 fixture 是 09 的最小复现",
+  "fixture": "fixtures/07-matrix/static-hazard-seals-path/game-config.json"
+}

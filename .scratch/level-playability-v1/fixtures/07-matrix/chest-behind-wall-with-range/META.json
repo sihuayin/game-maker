@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-behind-wall-with-range",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "chest-sealed-in-solid",
+  "evidence": [
+    [
+      "05",
+      "chest-behind-wall-with-range"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-behind-wall-with-range/game-config.json"
+}

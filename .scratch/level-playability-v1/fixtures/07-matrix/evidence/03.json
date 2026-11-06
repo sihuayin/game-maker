@@ -1,0 +1,223 @@
+{
+  "scenarios": {
+    "baseline-last-train": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "gap-200": {
+      "current": [
+        "entity \"suitcase-1\"",
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "next": [
+        "entity \"suitcase-1\"",
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "gaps": []
+    },
+    "gap-40": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "wall-100": {
+      "current": [
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "next": [
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "gaps": []
+    },
+    "wall-40": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "pickup-120": {
+      "current": [
+        "entity \"suitcase-2\""
+      ],
+      "next": [
+        "entity \"suitcase-2\""
+      ],
+      "gaps": []
+    },
+    "pickup-50": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "goal-inside-luggage": {
+      "current": [],
+      "next": [
+        "entity \"signal\""
+      ],
+      "gaps": []
+    },
+    "low-ceiling": {
+      "current": [
+        "entity \"p\"",
+        "entity \"gate\""
+      ],
+      "next": [],
+      "gaps": []
+    },
+    "chest-in-pit": {
+      "current": [],
+      "next": [
+        "entity \"chest\""
+      ],
+      "gaps": []
+    },
+    "chest-range-rescues": {
+      "current": [
+        "entity \"gate\""
+      ],
+      "next": [
+        "entity \"gate\""
+      ],
+      "gaps": []
+    },
+    "moving-solid-sweep": {
+      "current": [],
+      "next": [
+        "entity \"high-pickup\""
+      ],
+      "gaps": []
+    },
+    "pickup-inside-luggage": {
+      "current": [],
+      "next": [
+        "entity \"p-inside\" (embedded)"
+      ],
+      "gaps": []
+    },
+    "pickup-on-luggage": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "pickup-body-override-inside": {
+      "current": [],
+      "next_runtimeGeometry": [
+        "entity \"p-body\""
+      ],
+      "next_declaredBody": [],
+      "note": "runtime 用帧尺寸（scene.ts:151-155），忽略 e.body；用 body 会漏报"
+    },
+    "chest-inside-luggage-range0": {
+      "current": [],
+      "next": [
+        "entity \"chest-in\" (embedded)"
+      ],
+      "gaps": []
+    },
+    "chest-inside-luggage-range30": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "spawn-in-terrain": {
+      "current": [],
+      "next": [],
+      "gaps": []
+    },
+    "spawn-no-foothold": {
+      "current": [],
+      "next": [
+        "entity \"suitcase-1\"",
+        "entity \"suitcase-2\"",
+        "entity \"suitcase-3\"",
+        "entity \"signal\""
+      ],
+      "gaps": [
+        "spawn-no-foothold"
+      ]
+    }
+  },
+  "spawnToleranceCases": {
+    "lastTrain": {
+      "depth": 2,
+      "tol": 4
+    },
+    "deeplyBuried": {
+      "depth": 7,
+      "tol": 4
+    }
+  },
+  "spawnDx": {
+    "shallow-anchor (last-train)": {
+      "foot": {
+        "x": 40,
+        "y": 252
+      },
+      "anchorOffset": 2.400000000000002,
+      "terrainHit": {
+        "x": 0,
+        "y": 250,
+        "w": 1440,
+        "h": 20
+      },
+      "depth": 2,
+      "burial": -0.40000000000000213,
+      "nearbyStand": true,
+      "error": false
+    },
+    "deep-flat (02 probe E: top 240, at 245)": {
+      "foot": {
+        "x": 40,
+        "y": 247
+      },
+      "anchorOffset": 2.400000000000002,
+      "terrainHit": {
+        "x": 0,
+        "y": 240,
+        "w": 1440,
+        "h": 30
+      },
+      "depth": 7,
+      "burial": 4.599999999999998,
+      "nearbyStand": true,
+      "error": false
+    },
+    "deep-buried (top 100, at 200)": {
+      "foot": {
+        "x": 40,
+        "y": 202
+      },
+      "anchorOffset": 2.400000000000002,
+      "terrainHit": {
+        "x": 0,
+        "y": 100,
+        "w": 600,
+        "h": 170
+      },
+      "depth": 102,
+      "burial": 99.6,
+      "nearbyStand": false,
+      "error": true
+    },
+    "lateral-wall (1920 corpus shape)": {
+      "foot": {
+        "x": 40,
+        "y": 250
+      },
+      "anchorOffset": 2.400000000000002,
+      "terrainHit": null,
+      "depth": 0,
+      "burial": -2.400000000000002,
+      "nearbyStand": false,
+      "error": false
+    }
+  }
+}

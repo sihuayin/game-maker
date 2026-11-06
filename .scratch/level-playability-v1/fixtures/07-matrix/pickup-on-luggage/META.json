@@ -1,0 +1,17 @@
+{
+  "caseId": "pickup-on-luggage",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "pickup-inside-luggage",
+  "evidence": [
+    [
+      "03",
+      "pickup-on-luggage"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/pickup-on-luggage/game-config.json"
+}

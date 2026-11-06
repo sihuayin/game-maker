@@ -1,0 +1,17 @@
+{
+  "caseId": "moving-platform",
+  "group": "mechanic",
+  "nonProduction": true,
+  "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+  "expectedJudgmentId": null,
+  "failureLocation": "coverage.mechanic",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "04",
+      "movingSolid_staticOriginalReach"
+    ]
+  ],
+  "note": "moving-platform 未在 Runtime 实现；归 mechanic-coverage，不产 playability error",
+  "fixture": "fixtures/07-matrix/moving-platform/game-config.json"
+}

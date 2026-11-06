@@ -1,0 +1,17 @@
+{
+  "caseId": "target-out-of-world",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "auditGameConfig.inWorld (existing)",
+  "failureLocation": "entity \"signal\"",
+  "legalPair": "target-at-edge",
+  "evidence": [
+    [
+      "existing",
+      "auditGameConfig"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/target-out-of-world/game-config.json"
+}

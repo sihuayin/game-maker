@@ -254,7 +254,13 @@
           "x": 240,
           "y": 230
         },
-        "asset": "e-drone"
+        "asset": "e-drone",
+        "motion": {
+          "kind": "cycle",
+          "axis": "x",
+          "distance": 80,
+          "periodMs": 2000
+        }
       },
       {
         "id": "e-goal",

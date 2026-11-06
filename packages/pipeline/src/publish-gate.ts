@@ -9,8 +9,8 @@
 //
 // ⚠️ **报告身份只钉 pack**（票 05 §8.4 的残余风险）：一份绿色 pack 报告仍不能**证明**
 //   它属于当前这份 config。P1 · publish-gate 的处理不是绑 config 身份，而是**现场重跑**
-//   配置敏感的那条判据（`auditReachability`，B-02 已把它放进 `deterministic`）：
-//   当前 config 自己不可达 ⇒ 拒。剩余洞是报告身份本身（另有交接，见 Q8）。
+//   配置敏感的那条判据（`auditPlayability`，LP-05 已把它放进 `deterministic`）：
+//   当前 config 自己过不了可玩性判定 ⇒ 拒。剩余洞是报告身份本身（另有交接，见 Q8）。
 //
 // ⚠️ **不在这里跑 `verifyPack`**（2026-10-22 裁定）：字节完整性归 P0-04 ——
 //   create / build 链在 QA 之前已经逐文件校验过；standalone `site` 不重算 checksum，
@@ -22,7 +22,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditReachability, CommandError, formatIssues, parseAssetPack, parseGameConfig, QA_JUDGEMENTS, QAReportSchema,
+  auditPlayability, CommandError, formatIssues, parseAssetPack, parseGameConfig, playabilityIssues, QA_JUDGEMENTS, QAReportSchema,
   qaVerdict, TD_CONFIG_FORMAT,
   type AssetPackManifest, type QAReport,
 } from "@game-maker/contracts";
@@ -123,9 +123,9 @@ function subjectProblem(report: QAReport, manifest: AssetPackManifest, checksum:
   return undefined;
 }
 
-/** 当前 config 自身的可达性（P1 · publish-gate）。返回 `undefined` = 通 / 跳过。
+/** 当前 config 自身的可玩性（P1 · publish-gate）。返回 `undefined` = 通 / 跳过。
  *
- *  ⚠️ 它回答的是「**这份 config 自己通不通**」，不是「报告属不属于这份 config」——
+ *  ⚠️ 它回答的是「**这份 config 自己过不过得了可玩性判定**」，不是「报告属不属于这份 config」——
  *    报告身份仍只钉 pack（`subjectProblem`）；这一项补的是「config A 的绿报告 + config B」那个洞。
  *  ⚠️ **解不开的 config 跳过**：schema 错由装配器报它自己的错，不在这里重复 Ownership。
  *  ⚠️ `configPath` 缺省 ⇒ 跳过（库调用 / 既有测试）；四个发布入口都传它（CLI build/site、
@@ -137,9 +137,9 @@ function configProblem(configPath: string | undefined, manifest: AssetPackManife
   try { raw = JSON.parse(fs.readFileSync(configPath, "utf8")); } catch { return undefined; }
   const parsed = parseGameConfig(raw);
   if (!parsed.ok) return undefined;
-  const hard = auditReachability(parsed.value, manifest).filter((i) => i.severity === "error");
+  const hard = playabilityIssues(auditPlayability(parsed.value, manifest)).filter((i) => i.severity === "error");
   if (hard.length === 0) return undefined;
-  return `**这份 config 本身不可达**（${hard.length} 条硬失败）：\n`
+  return `**这份 config 过不了可玩性判定**（${hard.length} 条硬失败）：\n`
     + hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n");
 }
 

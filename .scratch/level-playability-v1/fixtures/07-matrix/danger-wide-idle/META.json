@@ -1,0 +1,17 @@
+{
+  "caseId": "danger-wide-idle",
+  "group": "mechanic",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "danger-full-wall",
+  "evidence": [
+    [
+      "04",
+      "dangerWide_baseReach"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/danger-wide-idle/game-config.json"
+}

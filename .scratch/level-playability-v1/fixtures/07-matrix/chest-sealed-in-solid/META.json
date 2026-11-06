@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-sealed-in-solid",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_CHEST_BLOCKED",
+  "failureLocation": "entity \"sealed-chest\"",
+  "legalPair": "chest-behind-wall-with-range",
+  "evidence": [
+    [
+      "05",
+      "chest-sealed-in-solid"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-sealed-in-solid/game-config.json"
+}

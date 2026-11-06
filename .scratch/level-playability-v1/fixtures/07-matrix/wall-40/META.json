@@ -1,0 +1,17 @@
+{
+  "caseId": "wall-40",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": "wall-100",
+  "evidence": [
+    [
+      "03",
+      "wall-40"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/wall-40/game-config.json"
+}

@@ -1,0 +1,17 @@
+{
+  "caseId": "chest-inside-luggage-range0",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_CHEST_BLOCKED",
+  "failureLocation": "entity \"chest-in\"",
+  "legalPair": "chest-inside-luggage-range30",
+  "evidence": [
+    [
+      "03",
+      "chest-inside-luggage-range0"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/chest-inside-luggage-range0/game-config.json"
+}

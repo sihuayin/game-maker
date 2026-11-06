@@ -144,7 +144,7 @@ describe("§放行：六条全跑、无 error", () => {
 });
 
 // ── P1 · publish-gate：不可达 config 现场复验（B-02 的配套闸）───────────────
-describe("§P1 · publish-gate：不可达 config ⇒ 拒", () => {
+describe("§P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒", () => {
   it("绿报告 + config B ⇒ isError、退 4、站点不产", async () => {
     const d = tmp("unreachable");
     const out = path.join(d, "out");
@@ -152,7 +152,7 @@ describe("§P1 · publish-gate：不可达 config ⇒ 拒", () => {
     const r = await assembleSite({ packDir: PACK, configPath: unreachableConfig(d), shellPath: shellOf(d), outDir: out });
     expect(r.isError).toBe(true);
     expect(r._exitCode).toBe(4);
-    expect(r.content[0].text).toMatch(/这份 config 本身不可达/);
+    expect(r.content[0].text).toMatch(/这份 config 过不了可玩性判定/);
     expect(fs.existsSync(siteDir(out))).toBe(false);
   });
 });

@@ -1,0 +1,17 @@
+{
+  "caseId": "pickup-body-override-inside",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "PROVEN_UNPLAYABLE",
+  "expectedJudgmentId": "PLAYABILITY_SPATIAL_PICKUP_BLOCKED",
+  "failureLocation": "entity \"p-body\"",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "03",
+      "pickup-body-override-inside"
+    ]
+  ],
+  "note": "运行时忽略 pickup 的 body；用声明 body 会漏报",
+  "fixture": "fixtures/07-matrix/pickup-body-override-inside/game-config.json"
+}

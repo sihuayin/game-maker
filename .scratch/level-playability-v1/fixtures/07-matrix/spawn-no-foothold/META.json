@@ -1,0 +1,17 @@
+{
+  "caseId": "spawn-no-foothold",
+  "group": "spatial",
+  "nonProduction": true,
+  "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+  "expectedJudgmentId": null,
+  "failureLocation": "coverage.spatial",
+  "legalPair": "baseline-last-train",
+  "evidence": [
+    [
+      "03",
+      "spawn-no-foothold"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/spawn-no-foothold/game-config.json"
+}

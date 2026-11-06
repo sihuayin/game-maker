@@ -488,6 +488,30 @@ _Avoid_: 色板摘要、画面占比。
 ⚠️ R2 拆掉自动评分之后，**大部分**可算的量都落在观察这一侧 ——
 **不要把观察当成欠债**：要把一条观察升级成判据，得先说出「错了一定不是设计」的理由。
 
+**可玩性判定（Playability Judgement）**
+只用 [[Game Config]]、[[AssetPackManifest]] 与 [[FixedRuntimeProfile]] 做输入的**确定性证明系统**：回答「能否证明这一关不可玩」，不回答「这关好不好玩」。三个维度：[[空间可达性]] · [[机制可通行性]] · [[关卡完成性]]。
+_Avoid_: 可玩性评分、通过率、试玩结论。
+
+**空间可达性（Spatial Reachability）**
+仅凭关卡几何判断目标之间是否存在可达路径；不看危险物时序、不看收集顺序。
+_Avoid_: 用「可通行性」泛指本层。
+
+**机制可通行性（Mechanic-aware Traversability）**
+在**现有**机制约束下判断路径是否实际可走（巡逻危险物、定时危险区、实心体的真实运动语义）；不新增机制，不评价难度与操作技巧。
+_Avoid_: 难度、路线优劣。
+
+**关卡完成性（Level Completion）**
+在关卡规则下判断**必须完成的目标**能否在一次游玩中全部完成 —— 包括必要收集物与收集后回到终点；[[Playability Verdict]] 的 `NO_PROVEN_BLOCKER` 不保证能通关。
+_Avoid_: 通关率、关卡质量。
+
+**Playability Verdict（可玩性结论）**
+三态：`PROVEN_UNPLAYABLE`（有确定性证据证明不可玩）· `INSUFFICIENT_EVIDENCE`（当前判据无法证明可玩或不可玩）· `NO_PROVEN_BLOCKER`（已跑判据未发现确定性阻断）。⚠️ `NO_PROVEN_BLOCKER` **不等于** `PROVEN_PLAYABLE`；它必须同时携带 coverage，记录哪些维度没检查。
+_Avoid_: 与 [[InsufficientEvidence]] 混用；把空 error 数组当「已证明可玩」。
+
+**FixedRuntimeProfile（固定运行剖面）**
+判据依赖的一组**集中定义、可测试**的运行时假设：无二段跳、`solid` 静态碰撞、hazard 接触后复位、无 kill plane，viewport 与设计文本不作输入。运行时行为变化时必须重新评估判据，不得沿用过期假设。
+_Avoid_: 隐式假设、每个审计函数自带一套默认值。
+
 **结构性不可判（Structurally unverifiable）** —— ⚠️ **2026-10-25 新词**（visual-semantics-verification-v1 票 01）
 若设计契约缺少建立[[观察 / 判据|判据]]所需的语义字段或坐标关系，则相关维度属于**结构性不可判**：
 **不得**通过推断、布局伪影或放宽阈值把它转化为判据。它不是「暂时没实现」、也不是「将来加测试就能解决」，

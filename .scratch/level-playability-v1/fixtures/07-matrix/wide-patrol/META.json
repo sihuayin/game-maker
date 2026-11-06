@@ -1,0 +1,17 @@
+{
+  "caseId": "wide-patrol",
+  "group": "mechanic",
+  "nonProduction": true,
+  "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+  "expectedJudgmentId": null,
+  "failureLocation": "coverage.mechanic",
+  "legalPair": "static-hazard-seals-path",
+  "evidence": [
+    [
+      "04-patrol",
+      "naivePatrolSweepAddsError"
+    ]
+  ],
+  "note": "宽巡逻是合法设计；整段扫掠当实心会误报，V1 不注册巡逻判据",
+  "fixture": "fixtures/07-matrix/wide-patrol/game-config.json"
+}

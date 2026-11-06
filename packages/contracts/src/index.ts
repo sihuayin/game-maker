@@ -147,6 +147,7 @@ export * from "./td-config.js";
 //   它们本来就在 `game-config.ts` 里。⚠️ 它**不**被 `compile-runtime` / `site` 调用：
 //   要不要让那两处也硬失败是**另一张票**（票 17 对 `layer-coverage` 判过同款）。
 export * from "./reachability.js";
+export * from "./playability/api.js";
 
 // ── 屏幕空间：两种玩法共用的那条判据与各自的 HUD 项清单（票 03 · 09）────
 export * from "./screen-space.js";

@@ -1,0 +1,37 @@
+{
+  "paired": 20,
+  "configsWithStaticHazard": 9,
+  "maskAddsError": 4,
+  "cases": [
+    {
+      "file": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "errs": [
+        "entity \"pickup-water-4\"",
+        "entity \"goal-1\""
+      ]
+    },
+    {
+      "file": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-18a/wasteland-scavenger-assets/site/v1/game-config.json",
+      "errs": [
+        "entity \"scrap-4\"",
+        "entity \"scrap-5\"",
+        "entity \"scrap-6\"",
+        "entity \"gate-1\""
+      ]
+    },
+    {
+      "file": ".scratch/p0-02-second-demo-v2/runs/09-probe-hazard/hazard-contact/config.json",
+      "errs": [
+        "entity \"goal\""
+      ]
+    },
+    {
+      "file": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "errs": [
+        "entity \"pickup-3\"",
+        "entity \"chest-1\"",
+        "entity \"gate\""
+      ]
+    }
+  ]
+}

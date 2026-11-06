@@ -1,0 +1,17 @@
+{
+  "caseId": "pit-chest-with-reset-hazard",
+  "group": "completion",
+  "nonProduction": true,
+  "expectedVerdict": "NO_PROVEN_BLOCKER",
+  "expectedJudgmentId": null,
+  "failureLocation": null,
+  "legalPair": null,
+  "evidence": [
+    [
+      "05",
+      "pit-chest-with-reset-hazard"
+    ]
+  ],
+  "note": null,
+  "fixture": "fixtures/07-matrix/pit-chest-with-reset-hazard/game-config.json"
+}
