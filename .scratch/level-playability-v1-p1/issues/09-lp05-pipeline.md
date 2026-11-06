@@ -41,4 +41,5 @@ Map: ../map.md
 - **前置（LP-03 复核 Q5(b)）**：在把机制 A 接成 `deterministic` 硬拒之前，先修 `graph.ts` `movementNeighbors` 对 standable 格子发 `fall` 边的过近似（它可能让 A 的 base 反事实通过不存在的路径显示可达，把空间不可达误归因给 hazard），并重跑 LP-01/02/03 全量回归；该修复单独 commit。
 - LP-01 / LP-02 已落定：`auditReachability` **尚未**改（LP-02 是纯加法），`playability/` 内部桶已含 `verdict` / `spatial`，但**未**从 contracts 根导出。
 - 接线点按 [plan.md](../level-playability-v1/plan.md) §1：`config-audit.ts:53` 的 `deterministic` 替换、`publish-gate.ts:140` 现场复验替换、`index.ts` C1 加法导出。开票时按真实代码复核是否有细节偏差。
+- 完成性层 `auditCompletion` 已就绪（LP-04，`d152630`）；`auditPlayability` 组合三层时把已算好的 `spatial` / `mechanic` 结果作为 `prior` 传入，避免重复建图。
 - 层内 verdict 与整关 aggregate 分层（plan R21(a)）：`auditPlayability` 做整关聚合；`coverage.spatial` 在 LP-02 恒为 `partial`（玩家 / 帧几何不可见），整关 aggregate 因此多为 `INSUFFICIENT_EVIDENCE`，但**不得**掩盖 `PROVEN_UNPLAYABLE`。
