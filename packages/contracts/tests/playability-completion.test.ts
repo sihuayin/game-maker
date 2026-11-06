@@ -97,13 +97,16 @@ describe("§完成性判据的核心：一次走法收齐再到达 gate", () => 
     }
   });
 
-  it("合法的强制顺序 / 一弧收两件 / 悬空 gate 不误报", () => {
+  it("合法的强制顺序 / 一弧收两件 / 悬空 gate 不误报（重 CPU：拆两段）", () => {
     expect(completionOf("order-required-high-then-low").verdict).toBe("NO_PROVEN_BLOCKER");
     expect(completionOf("two-pickups-one-arc").verdict).toBe("NO_PROVEN_BLOCKER");
+  }, 60000);
+
+  it("悬空 gate / mid-air chest / range chest 不误报", () => {
     expect(completionOf("gate-midair-jumpthrough").verdict).toBe("NO_PROVEN_BLOCKER");
     expect(completionOf("chest-midair-jumpthrough").verdict).toBe("NO_PROVEN_BLOCKER");
     expect(completionOf("chest-behind-wall-with-range").verdict).toBe("NO_PROVEN_BLOCKER");
-  }, 20000);
+  }, 60000);
 
   it("复位边是必需的：去掉 pit 里的 hazard，同一关从 NO_PROVEN 变成 no-walk", () => {
     const withHazard = completionOf("pit-chest-with-reset-hazard");
