@@ -178,7 +178,7 @@ PRD §6.1 原定分支为 `p1/level-playability-v1`。实施过程中经用户�
 
 ### 6.2 AC-10 已知限制（PASS_WITH_KNOWN_LIMITATION）
 
-- Vitest 版本 **3.2.7`。
+- Vitest 版本 **3.2.7**。
 - 长集成测试文件偶发 `[vitest-worker]: Timeout calling onTaskUpdate`；这是 **runner 通信超时**，
   不是业务测试失败。
 - 当前 workaround：`vitest.config.ts` 的 **20s testTimeout** + **`dangerouslyIgnoreUnhandledErrors`**。
