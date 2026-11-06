@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1-p1
 Baseline: `wayfinder/level-playability-v1` @ `915aa42` + 本图提交（含 `docs/v7.8/可玩.md`）；生产代码基线 `main` @ `fa17c14`
-Status: open · 2026-11-05 开图
+Status: closed · 2026-11-06 收口
 Predecessor: [Level Playability V1：只读审计与判据规格](../level-playability-v1/map.md)（已关闭）
 
 > **2026-11-05 开图。** 授权来源：[`docs/v7.8/可玩.md`](../../docs/v7.8/可玩.md)（已批准 PRD）、
@@ -82,7 +82,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 8. [LP-04 关卡完成性判据](issues/08-lp04-completion.md)（task，AFK，blocked by 07）— **resolved**
 9. [LP-05 Pipeline 集成](issues/09-lp05-pipeline.md)（task，AFK，blocked by 08）— **resolved**
 10. [LP-06 历史语料与负例验收](issues/10-lp06-corpus.md)（task，AFK，blocked by 09）— **resolved**
-11. [LP-07 最终收口](issues/11-lp07-closeout.md)（grilling，HITL，blocked by 10）— open
+11. [LP-07 最终收口](issues/11-lp07-closeout.md)（grilling，HITL，blocked by 10）— **resolved**
 
 ## Decisions so far
 
@@ -91,6 +91,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 - [LP-01 基础几何模型](issues/03-lp01-geometry.md)：统一 Runtime geometry profile + 共享移动图落地（纯加法，未改既有审计/Runtime）；body 系 vs 帧系几何与 coverage 分离；walk / walk-off / fall / hop 边；19 例新测试、contracts 857 例全绿。`EntityDesc.box` 调用方已清点，审计不消费它。
 - [LP-02 空间可达性判据](issues/04-lp02-spatial.md)：`auditSpatial` 落地（三态 + coverage；BLOCKED 优先、UNREACHABLE 其次；chest range 四边外扩；pickup/goal 忽略 body；出生点只诊断不硬拒）。23 例空间矩阵转生产夹具；冻结语料 20 唯一 config：0 阻断、2 例 gate-missing 证据不足、18 例层内无阻断，对既有 reachability 新增/修复 0。研究矩阵三处修正（#19 降级、#4 subject、#12 gate 实际不可达）见票据 Answer。
 - [LP-02 复核](issues/05-lp02-review.md)：**有条件通过，条件已满足**。UNREACHABLE 必须以「搜索模型无遗漏」为前提；补 mid-air touch-only 保守降级（`cbc93a8`，`PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN`，只降级、不写可达集）。矩阵口径当时定为 **17/17/5**，后被 LP-03 复核修正为 **18/17/4**；层内 verdict / coverage / 整关 aggregate 三者分离。空间 46 例、契约 904 例、全仓 2491 例、typecheck 0；20 唯一 config 回归 0 新增 / 0 修复。Draft PR [#28](https://github.com/sihuayin/game-maker/pull/28) 已创建。LP-04 完成性重判后，#39 由机制层阻断；用户裁定整关分布为 **19/16/4**。
+- [LP-07 最终收口](issues/11-lp07-closeout.md)：用户裁定收口通过；AC-01～09/11 PASS，**AC-10 PASS_WITH_KNOWN_LIMITATION**（Vitest runner RPC workaround），AC-12 随正式 PR + 最终报告 PASS。分支沿用 `wayfinder/level-playability-v1`（PRD §6.1 偏差经批准）；PR #28 转正式；最终报告 `evidence/07-final-report.md`；地图关闭。不合并、不推 `main`。
 - [LP-06 历史语料与负例验收](issues/10-lp06-corpus.md)：96 唯一配对 / 20 唯一 config（31 内容组合）；3 条历史真实缺陷全部被机制 A 识别、0 playability 误报、6 probe 排除；6 份移动 hazard 落证据不足；合法 gate no-walk 0。矩阵双口径（用户裁定 A）：层内/案例级 **19/16/4**；实际 `auditPlayability` 组合 **19/9/11**（7 个合法空间边界因巡逻 hazard 覆盖缺口变 INSUFF，不是误报）。证据 `evidence/06-corpus-acceptance.md`，commit `203ad8a`。
 - [LP-05 Pipeline 集成](issues/09-lp05-pipeline.md)：`auditPlayability` / `playabilityIssues` 接入 `deterministic` 与发布闸；QA 仍 7 条，`auditReachability` 保留为单层入口并改走共享图。整关 aggregate 按用户裁定为三层 verdict 组合（19/16/4），coverage 单独暴露。前置修复 `ec078b1`（fall 边）；集成 `ca096cf`；契约 963 例、全仓 2550 例、typecheck/build 全绿。`vitest.config.ts` 的 20s / RPC workaround 留给 LP-07 复核。未推送。
 - [LP-04 关卡完成性判据](issues/08-lp04-completion.md)：`auditCompletion` 落地 —— `R[mask]` mask DP（k≤12）、复位边保留计数、gate 只算收齐后命中、空间/机制根因抑制。10 例矩阵转生产夹具；23 例新测试；契约 953 例、全仓 2540 例、typecheck/build 全绿。20 唯一 config：0 完成性阻断、14 层内无阻断、6 证据不足（2 gate-missing + 4 跨层抑制），kMax 9。两处归因修正：#32 归空间层、#39 归机制层，39 例整关分布经用户裁定为 **19/16/4**（#32 归空间层、#39 归机制层）。
@@ -99,7 +100,7 @@ LP-02 复核通过后开 Draft PR，LP-07 后转正式 PR；不合并、不推 `
 
 ## Not yet specified
 
-<!-- 暂无：LP-05 接线点已收敛到票据 09 的 Context。 -->
+<!-- 地图已关闭。残余交接见 LP-07 Answer / evidence/07-final-report.md §6。 -->
 
 ## Out of scope
 
