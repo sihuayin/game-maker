@@ -1,0 +1,351 @@
+{
+  "frames": {
+    "hazard-sweeping-carriage.sweep1": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "hazard-sweeping-carriage.sweep2": {
+      "frame": {
+        "x": 0,
+        "y": 48,
+        "w": 64,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "player-traveler.idle1": {
+      "frame": {
+        "x": 0,
+        "y": 96,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.idle2": {
+      "frame": {
+        "x": 32,
+        "y": 96,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.jump1": {
+      "frame": {
+        "x": 0,
+        "y": 144,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.jump2": {
+      "frame": {
+        "x": 32,
+        "y": 144,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.run1": {
+      "frame": {
+        "x": 0,
+        "y": 192,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.run2": {
+      "frame": {
+        "x": 32,
+        "y": 192,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.run3": {
+      "frame": {
+        "x": 0,
+        "y": 240,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "player-traveler.run4": {
+      "frame": {
+        "x": 32,
+        "y": 240,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.95
+      }
+    },
+    "signal-endlight.green1": {
+      "frame": {
+        "x": 0,
+        "y": 288,
+        "w": 16,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "signal-endlight.green2": {
+      "frame": {
+        "x": 16,
+        "y": 288,
+        "w": 16,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "signal-endlight.red1": {
+      "frame": {
+        "x": 32,
+        "y": 288,
+        "w": 16,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "signal-endlight.red2": {
+      "frame": {
+        "x": 48,
+        "y": 288,
+        "w": 16,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    }
+  },
+  "meta": {
+    "app": "game-maker",
+    "version": "1",
+    "image": "atlas.animations.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 64,
+      "h": 328
+    },
+    "scale": 1
+  }
+}

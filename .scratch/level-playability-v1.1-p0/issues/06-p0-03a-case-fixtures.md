@@ -1,8 +1,8 @@
 # P0-03a 合成案例与 scratch 站点
 
 Type: task
-Status: open
-Owner:
+Status: claimed
+Owner: agent（AFK）· 2026-11-07
 Blocked by: 01
 Map: ../map.md
 

@@ -1,0 +1,100 @@
+{
+  "stop": {
+    "reason": "reset-exhaustion",
+    "atStep": 260
+  },
+  "limits": {
+    "NO_PROGRESS_STEPS": 300,
+    "RESET_BUDGET": 5,
+    "WAIT_STEPS": 120,
+    "JUMP_VERIFY_STEPS": 3,
+    "JUMP_UNVERIFIED_BUDGET": 3,
+    "JUMP_FAILURE_BUDGET": 5
+  },
+  "progress": {
+    "maxX": 516.0000000000016,
+    "collected": 1,
+    "chests": 0,
+    "gate": false,
+    "won": false
+  },
+  "noProgressSteps": 221,
+  "resets": 5,
+  "waits": 0,
+  "jump": {
+    "failures": 0,
+    "unverified": 0,
+    "degraded": false,
+    "pending": null
+  },
+  "lastObservation": {
+    "x": 300,
+    "bottom": 250,
+    "onFloor": false,
+    "vy": 0,
+    "collected": 1,
+    "won": false
+  },
+  "notes": [
+    {
+      "step": 51,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 1
+      }
+    },
+    {
+      "step": 104,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 2
+      }
+    },
+    {
+      "step": 105,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 104
+      }
+    },
+    {
+      "step": 155,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 3
+      }
+    },
+    {
+      "step": 208,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 4
+      }
+    },
+    {
+      "step": 260,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 5
+      }
+    },
+    {
+      "step": 260,
+      "kind": "stop",
+      "detail": {
+        "reason": "reset-exhaustion",
+        "atStep": 260
+      }
+    }
+  ]
+}

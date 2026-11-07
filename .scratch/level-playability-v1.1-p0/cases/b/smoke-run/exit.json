@@ -1,0 +1,6 @@
+{
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1 --scenario-dir .scratch/level-playability-v1.1-p0/cases/b/scenario --out .scratch/level-playability-v1.1-p0/cases/b/smoke-run --repeat 2 --json",
+  "exitCode": 0,
+  "at": "2026-11-07T14:00:02.429Z",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/b/smoke-run"
+}
