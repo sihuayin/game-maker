@@ -107,3 +107,14 @@ Node 22 的 `node --test <dir>` 在本机把目录当模块解析，故使用精
 7. 一帧滞后：`lagMs=0` 安全、`lagMs=100` 碰撞（扫掠带覆盖）。
 8. 预算耗尽 ⇒ IE，绝不 `PROVEN_UNPLAYABLE`。
 9. 缺 `lagMs` ⇒ IE（拒绝精确帧假设）。
+
+## 算法冻结（2026-11-07 用户裁定）
+
+完整裁定见 [P0-02 的 Answer](../issues/04-p0-02-temporal-model-prototype.md)。锁定规则：
+
+1. **witness**：接受任意可执行安全路径；不修改 BFS 代价函数来迎合案例叙事；P0-03 的 A 案例单独构造「原地等待」真实 Runtime 场景。
+2. **`PROVEN_UNPLAYABLE`**：只允许「正宽度永久封锁门 + 显式 `verticalEvasionImpossible` 声明」。单点门、BFS 无解、预算耗尽、采样未发现安全窗口、不能排除垂直规避——一律 `INSUFFICIENT_EVIDENCE`。
+3. **`lagMs`**：P0-03 使用真实 trace 的观测最大帧间隔 + 明确余量；同时报告 `16.67ms` 与 `200ms` 两档敏感性；不得把观测最大帧间隔宣称为 Runtime 的绝对上界。
+4. **接口**：输入为单一 config 对象（`certainty` / `assumptions` / `options.lagMs`）；输出为三态 + 适用时的 `witness` / `proof` / `stats`。字段语义由 JSDoc 与测试覆盖；不得改变已有三态定义。
+
+算法找不到路 ≠ 游戏没有路。只有能证明永久封锁，才有资格判不可玩。

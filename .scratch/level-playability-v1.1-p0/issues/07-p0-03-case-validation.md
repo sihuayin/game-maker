@@ -21,6 +21,14 @@ Map: ../map.md
 - C：分析器明确落 `INSUFFICIENT_EVIDENCE`；不强制跑 Runtime。
 - 原始运行目录、命令、退出码、commit SHA。
 
+### P0-02 算法冻结对 P0-03 的要求（2026-11-07 用户裁定）
+
+- 记录真实 Runtime `trace` 的最大帧间隔。
+- 记录采用的安全余量及其理由。
+- 记录最终 `lagMs`。
+- 同时给出 `16.67ms` 与 `200ms` 两档 `lagMs` 的敏感性结果。
+- **不得**把观测最大帧间隔直接宣称为 Runtime 的绝对上界。
+
 ### 边界
 
 - 复用现有 playtest harness；若 trace 无法提供必要证据，停止并提交 P0-03R 裁定，不得新增观察字段。
