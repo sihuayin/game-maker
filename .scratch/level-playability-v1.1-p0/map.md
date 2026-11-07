@@ -98,8 +98,8 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 3. [P0-01R 语义证据复核](issues/03-p0-01r-semantics-review.md)（grilling，HITL）— **resolved**（通过，附硬约束）
 4. [P0-02 最小时序模型与独立原型](issues/04-p0-02-temporal-model-prototype.md)（prototype，HITL）— **resolved**（9/9 → 复核修正后 12/12；算法冻结）
 5. [P0-02R 模型健全性复核](issues/05-p0-02r-model-review.md)（grilling，HITL）— **resolved**（有条件通过）
-6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— open · **frontier**（已追加 E3 可复现交付条件）
-7. [P0-03 A/B/C 三案例验证与真实 Runtime 对照](issues/07-p0-03-case-validation.md)（task，AFK）— open · blocked by 06（已追加 hitbox / lag 审计条件）
+6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— **resolved**（A/B/C 夹具、站点、E3 复扫；结论见票）
+7. [P0-03 A/B/C 三案例验证与真实 Runtime 对照](issues/07-p0-03-case-validation.md)（task，AFK）— open · **frontier**（已追加 hitbox / lag 审计条件）
 8. [P0-03R 案例证据复核](issues/08-p0-03r-evidence-review.md)（grilling，HITL）— open · blocked by 07
 9. [P0-04 结论包与 HITL 裁定](issues/09-p0-04-verdict.md)（grilling，HITL）— open · blocked by 08
 
@@ -110,10 +110,10 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 - [P0-01R 语义证据复核](issues/03-p0-01r-semantics-review.md): 六项 CONFIRMED 全部采信；三条证据边界 + 时间/碰撞模型 + x 轴范围写成 P0-02 硬约束；E3 脚本可复现性交由 P0-03a 补齐（不阻断 P0-02）。裁定见 [`evidence/01r-ruling.md`](evidence/01r-ruling.md)。
 - [P0-02 最小时序模型与独立原型](issues/04-p0-02-temporal-model-prototype.md): 9/9 单测通过；安全结论只来自连续验证的 witness，不可玩只来自正宽度永久封锁门 + 垂直规避声明；`lagMs` 扫掠带、预算耗尽 ⇒ IE。算法冻结见 [`prototype/MODEL.md`](prototype/MODEL.md)。
 - [P0-02R 模型健全性复核](issues/05-p0-02r-model-review.md): 复核发现并修正封锁门的 lag 语义（并集 → 交集，不带 pad；B 门 `[30, 70]`；单点门 ⇒ IE），测试 12/12；**有条件通过**——P0-03 必须完成 hitbox 来源与 lag 敏感性审计，否则案例不得作为确定性结论证据。裁定见 [`evidence/02r-ruling.md`](evidence/02r-ruling.md)。
+- [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md): A/B 站点与 C 分析器输入就绪；E3 复扫逐项复现 P0-01 数字（无差异）；harness 冒烟证明 A/B 可取证（A won/no-reset，B reset-exhaustion，repeat 2 一致）。证据见 [`evidence/03a-sites.md`](evidence/03a-sites.md)。
 
 ## Not yet specified
 
-- **A/B 在现有 playtest harness 下能否完整取证**：尤其 B 的「始终封锁」必须由算法证明，试玩失败不算；依赖 P0-03a 的站点与场景构造结果。
 - **若结论为 GO / CONDITIONAL GO，正式集成的推荐范围与前置条件如何表述**：依赖 P0-03R 的三案例证据；本图只写推荐，不产出集成方案。
 
 ## Out of scope
