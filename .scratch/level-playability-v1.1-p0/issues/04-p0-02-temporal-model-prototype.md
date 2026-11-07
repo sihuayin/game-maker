@@ -26,6 +26,30 @@ Map: ../map.md
 4. 不改变现有三态语义；原型不接 Pipeline、不进生产包。
 5. 显式定义并报告状态空间上限与单次查询时限；超过上限的处置写进报告。
 
+### P0-01R 冻结的硬约束（2026-11-07 用户裁定）
+
+完整裁定见 [`../evidence/01r-ruling.md`](../evidence/01r-ruling.md) §4。本票验收必须逐条满足：
+
+**证据边界**
+
+1. 任何依赖**墙钟时间**的判据，一律 `INSUFFICIENT_EVIDENCE`。
+2. 任何依赖**精确帧时刻**命中或不命中的判据，一律 `INSUFFICIENT_EVIDENCE`。
+3. 非当前 pack 的**严格命中体几何不可确认**时，降级为 `partial / INSUFFICIENT_EVIDENCE`。
+
+**时间与碰撞模型**
+
+- 使用全局 game-time `T`，不得使用墙钟时间。
+- 明确区分 `hazard.periodMs`（往返运动整周期）与 `danger.periodMs`（idle / 安全窗口），不得混用。
+- Hazard 碰撞位姿**存在一帧滞后**；必须用**扫掠带与连续包络**保守覆盖。
+- Runtime **不存在 swept collision**，算法不得假设其存在。
+- **瞬时几何相交**不能单独作为安全或命中的证明。
+
+**方向与范围**
+
+- 主案例**仅支持 x 轴**移动 Hazard。
+- y 轴未经真实 Runtime witness，不得给出确定性判据。
+- **Moving Platform 不进入本阶段实现范围。**
+
 ### 交付
 
 - `prototype/` 下的 `.mjs` 模块 + `node:test` 单元测试；JSDoc 标注输入、输出、状态含义。

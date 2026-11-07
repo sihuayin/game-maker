@@ -25,6 +25,18 @@ Map: ../map.md
 - 使用现有 playtest harness 的场景 JSON（必要时用 `setup.kind = "mutate-hazard"`）；**不新增站点观察字段**。
 - C 案例只需分析器输入；不强制构造 Runtime 站点。
 
+### E3 可复现交付（P0-01R 裁定）
+
+P0-03a 建站时必须提供**可重复执行的只读扫描脚本**（落盘到本 effort 目录），并重新记录：
+
+- hazard 总数与 moving 数量；
+- frames 数量；
+- `badSize`、`badAnchor`；
+- 速度区间；
+- 扫描范围、输入基线 SHA 和脚本版本。
+
+新扫描结果与 [`../evidence/01-moving-hazard-semantics.md`](../evidence/01-moving-hazard-semantics.md) 的原数字不一致时，**必须解释差异**，不得静默覆盖旧报告。
+
 ### 边界
 
 - 不改 `fixtures/**`、`run/**`、`pack/**`、`site/**`；所有新产物写入本 effort 目录。
