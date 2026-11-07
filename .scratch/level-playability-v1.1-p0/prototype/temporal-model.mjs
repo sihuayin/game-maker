@@ -230,21 +230,28 @@ export function segmentCollides(seg, config, lagMs) {
 /**
  * 永久封锁门证明。
  *
- * 设 `C = [L, R]` 为 hazard 在**所有时刻**都覆盖的 x 区间（带 lag 扫掠带后的保守值）：
- *   L = max_T (P(T) - pad - anchorX*w)
- *   R = min_T (P(T) + pad + (1-anchorX)*w)
- * 若 `L <= R` 且玩家起点盒完全在 C 左侧、终点在 C 右侧（或反过来），则玩家从起点到
- * 终点必须让盒子跨过 C 中某点；而该点在任何时刻都被 hazard 覆盖 ⇒ 必然碰撞。
+ * ⚠️ 不可玩证明需要的是「所有可能位姿的**交集**」，不是并集。
+ * 设 hazard 在所有时刻的位置范围为 [minP, maxP]（一个周期内取到）；对任意可能的
+ * 检测位姿 P(T-δ)（δ ∈ [0, lagMs]），点 g 都被覆盖 ⇔
+ *   g >= P - anchorX*w 且 g <= P + (1-anchorX)*w  对所有 P ∈ [minP, maxP]
+ * ⇔ g ∈ [maxP - anchorX*w, minP + (1-anchorX)*w]。
+ * 该交集**不带 lag pad**：lag 的不确定性只会让可证明的门变窄，绝不会变宽。
+ * 安全 witness 用的是并集（扫掠带），两者方向相反，不可混用。
+ *
+ * 若 C = [L, R] 是正宽度（L < R），且玩家起点盒完全在 C 左侧、终点在 C 右侧
+ * （或反过来），则玩家从起点到终点必须让盒子跨过 C 中某点；而该点在任何时刻、
+ * 任何可能 lag 位姿下都被 hazard 覆盖 ⇒ 必然严格相交。
+ *
+ * 单点门（L == R）不构成证明：严格 AABB 下玩家可能在恰好相切的瞬间穿过。
  *
  * ⚠️ 该证明假设玩家**无法垂直规避**（跳过/绕下）。调用方必须显式声明
  * `assumptions.verticalEvasionImpossible === true`，否则本原型只返回
  * `INSUFFICIENT_EVIDENCE`，不得据此判不可玩。
  *
  * @param {object} config
- * @param {number} lagMs
- * @returns {{kind:string, gateLo:number, gateHi:number, minP:number, maxP:number, pad:number, lagMs:number}|null}
+ * @returns {{kind:string, gateLo:number, gateHi:number, minP:number, maxP:number}|null}
  */
-export function provePermanentGate(config, lagMs) {
+export function provePermanentGate(config) {
   const p = config.player;
   const h = config.hazard;
   if (!verticallyOverlaps(p, h)) return null;
@@ -252,9 +259,8 @@ export function provePermanentGate(config, lagMs) {
   if (!(h.periodMs > 0)) return null;
 
   const { minP, maxP } = hazardPositionRange(h, 0, h.periodMs);
-  const pad = hazardSpeed(h) * lagMs;
-  const L = maxP - pad - h.anchorX * h.width;
-  const R = minP + pad + (1 - h.anchorX) * h.width;
+  const L = maxP - h.anchorX * h.width;
+  const R = minP + (1 - h.anchorX) * h.width;
   // 必须是**正宽度**门：L == R 时玩家可以在「恰好相切」的瞬间穿过（严格 AABB 不算碰撞），
   // 该证明不成立，只返回 null（交由 IE）。
   if (!(L < R - EPS)) return null;
@@ -267,7 +273,7 @@ export function provePermanentGate(config, lagMs) {
   else if (g < s) holds = g + pw < L - EPS && s > R + EPS;
   if (!holds) return null;
 
-  return { kind: "permanent-gate", gateLo: L, gateHi: R, minP, maxP, pad, lagMs };
+  return { kind: "permanent-gate", gateLo: L, gateHi: R, minP, maxP };
 }
 
 /** 二分下界。 */
@@ -374,7 +380,7 @@ export function analyze(config) {
   if (pointCollides(config, p.startX, 0, lagMs)) return ie("start-in-collision");
 
   // ---- 不可玩证明（唯一合法来源） ----
-  const proof = provePermanentGate(config, lagMs);
+  const proof = provePermanentGate(config);
   if (proof) {
     if (config.assumptions?.verticalEvasionImpossible !== true) {
       return ie("unplayable-proof-requires-vertical-evasion-assumption", { proof });

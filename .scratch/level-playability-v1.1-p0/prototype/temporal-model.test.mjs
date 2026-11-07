@@ -8,6 +8,7 @@ import {
   analyze,
   hazardSpanAt,
   pointCollides,
+  provePermanentGate,
   segmentCollides,
   trianglePosition,
   verifyWitness,
@@ -71,7 +72,7 @@ test("B: a hazard permanently covering a gate proves PROVEN_UNPLAYABLE", () => {
       startX: 40,
       distance: 20,
       periodMs: 2000,
-      width: 20,
+      width: 60,
       height: 100,
       anchorX: 0.5,
       anchorY: 1,
@@ -91,7 +92,7 @@ test("B without the vertical-evasion assumption must not claim unplayable", () =
       startX: 40,
       distance: 20,
       periodMs: 2000,
-      width: 20,
+      width: 60,
       height: 100,
       anchorX: 0.5,
       anchorY: 1,
@@ -104,6 +105,32 @@ test("B without the vertical-evasion assumption must not claim unplayable", () =
   assert.equal(result.verdict, Verdict.INSUFFICIENT);
   assert.match(result.reason, /vertical-evasion/);
   assert.notEqual(result.verdict, Verdict.UNPLAYABLE);
+});
+
+test("single-point permanent coverage must not yield PROVEN_UNPLAYABLE", () => {
+  // width 20 / travel 20 -> bare intersection gate is the single point x=50.
+  const cfg = makeConfig({
+    hazard: {
+      startX: 40,
+      distance: 20,
+      periodMs: 2000,
+      width: 20,
+      height: 100,
+      anchorX: 0.5,
+      anchorY: 1,
+      y: 0,
+      axis: "x",
+    },
+  });
+  const result = analyze(cfg);
+  assert.notEqual(result.verdict, Verdict.UNPLAYABLE, "a single-point gate is not a proof");
+});
+
+test("y-axis hazard is INSUFFICIENT_EVIDENCE", () => {
+  const cfg = makeConfig({ hazard: { ...makeConfig().hazard, axis: "y" } });
+  const result = analyze(cfg);
+  assert.equal(result.verdict, Verdict.INSUFFICIENT);
+  assert.equal(result.reason, "y-axis-not-modelled");
 });
 
 test("C: uncertain phase or hitbox is INSUFFICIENT_EVIDENCE", () => {
@@ -185,4 +212,21 @@ test("a missing lag bound is INSUFFICIENT_EVIDENCE (no exact-frame assumptions)"
   const result = analyze(cfg);
   assert.equal(result.verdict, Verdict.INSUFFICIENT);
   assert.equal(result.reason, "lag-bound-unspecified");
+});
+
+test("permanent gate uses the intersection (no lag pad) and requires positive width", () => {
+  const base = makeConfig();
+  const wide = provePermanentGate({
+    ...base,
+    hazard: { ...base.hazard, startX: 40, distance: 20, width: 60 },
+  });
+  assert.ok(wide, "width 60 / travel 20 must yield a positive-width gate");
+  assert.equal(wide.gateLo, 30);
+  assert.equal(wide.gateHi, 70);
+
+  const singlePoint = provePermanentGate({
+    ...base,
+    hazard: { ...base.hazard, startX: 40, distance: 20, width: 20 },
+  });
+  assert.equal(singlePoint, null, "width 20 / travel 20 leaves only a single point");
 });

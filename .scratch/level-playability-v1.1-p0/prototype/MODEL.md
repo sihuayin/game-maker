@@ -61,7 +61,10 @@ Node 22 的 `node --test <dir>` 在本机把目录当模块解析，故使用精
 
 - 检测位姿为 `P(t - δ)`，`δ ∈ [0, lagMs]`；`lagMs` 必须由调用方给出。
 - 由于三角波是 `hazardSpeed`-Lipschitz，`P(t-δ) ∈ [P(t)-pad, P(t)+pad]`，`pad = hazardSpeed * lagMs`。
-- 所有碰撞判定使用扩大后的扫掠带；这是**保守过近似**（可能多判危险，不会少判）。
+- **安全 witness（并集）**：所有碰撞判定使用扩大后的扫掠带；这是保守过近似（可能多判危险，不会少判）。
+- **不可玩证明（交集）**：永久封锁门使用所有可能位姿的**交集**，**不带 pad**：
+  `g` 对每个 `P ∈ [minP, maxP]` 都被覆盖 ⇔ `g ∈ [maxP - anchorX*w, minP + (1-anchorX)*w]`。
+  lag 的不确定性只会让可证明的门**变窄**，绝不会变宽。两者方向相反，不可混用。
 - `lagMs` 缺省 / 非法 ⇒ `INSUFFICIENT_EVIDENCE`（拒绝精确帧时刻假设）。
 
 ## 证明义务
@@ -69,17 +72,22 @@ Node 22 的 `node --test <dir>` 在本机把目录当模块解析，故使用精
 | 结论 | 允许的来源 | 不允许的来源 |
 |---|---|---|
 | `NO_PROVEN_BLOCKER` | BFS witness，且每个线段通过连续区间判定 | 采样点无碰撞；未经验证的候选路径 |
-| `PROVEN_UNPLAYABLE` | **永久封锁门**：存在正宽度区间 `[L,R]`，hazard 在所有时刻覆盖它，且起点盒在其左、终点在其右（或反向） | 搜索超时 / 状态耗尽 / 找不到 witness |
+| `PROVEN_UNPLAYABLE` | **永久封锁门**：存在正宽度区间 `[L,R]`，hazard 在所有时刻、所有可能 lag 位姿下覆盖它，且起点盒在其左、终点在其右（或反向） | 搜索超时 / 状态耗尽 / 找不到 witness / 单点门 |
 | `INSUFFICIENT_EVIDENCE` | 未知输入、非 x 轴、不确定相位 / 命中体、缺 lagMs、预算耗尽、无 witness | — |
 
 永久封锁门（`provePermanentGate`）：
 
-- `L = max_T P(T) - pad - anchorX*width`
-- `R = min_T P(T) + pad + (1-anchorX)*width`
+- `L = max_T P(T) - anchorX*width`
+- `R = min_T P(T) + (1-anchorX)*width`
+- **不带 lag pad**：这是所有可能位姿的**交集**（保证覆盖），不是并集（扫掠带）。
 - 要求 `L < R`（**正宽度**；`L == R` 时玩家可能在恰好相切的瞬间穿过，严格 AABB 下该证明不成立）。
 - 起点盒 `[startX, startX+width]` 完全在 `L` 左侧、终点 `goalX` 在 `R` 右侧（或反向）。
-- 玩家从起点到终点必须让盒子跨过 `(L,R)`；该区间每时每刻都被 hazard 覆盖 ⇒ 必然严格相交。
+- 玩家从起点到终点必须让盒子跨过 `(L,R)`；该区间每时每刻、每个可能 lag 位姿下都被 hazard 覆盖 ⇒ 必然严格相交。
 - 仅当调用方显式声明 `assumptions.verticalEvasionImpossible === true` 时才允许返回 `PROVEN_UNPLAYABLE`；否则返回 IE。
+
+> **复核修正（2026-11-07）**：初版误用 lag 并集（`pad`）计算门，会把保证覆盖区间**加宽**；
+> 例：width 20 / travel 20 时真实交集退化为单点 `x=50`，初版却报出 `[49.6, 50.4]`。
+> 已改为交集且不带 pad；B 案例夹具改为 width 60 / travel 20，门 `[30, 70]`。
 
 ## 状态空间与时限
 
@@ -96,24 +104,27 @@ Node 22 的 `node --test <dir>` 在本机把目录当模块解析，故使用精
 - `periodMs` 是 hazard 的**往返整周期**；不使用 `danger.periodMs` 的 idle 窗口语义。
 - 精确帧时刻、墙钟相位不作为判据；所有时间都是 game-time `T`。
 
-## 测试清单（`temporal-model.test.mjs`，9 项全绿）
+## 测试清单（`temporal-model.test.mjs`，12 项全绿）
 
 1. Q1 周期语义：`t=0` 在 start、`P/2` 在 start+distance、`P` 回到 start。
 2. A 型：等待后通过，witness 含静止段且逐段连续验证通过。
-3. B 型：永久封锁门 ⇒ `PROVEN_UNPLAYABLE`。
+3. B 型：正宽度永久封锁门 ⇒ `PROVEN_UNPLAYABLE`（width 60 / travel 20，门 `[30,70]`）。
 4. B 型缺少垂直规避声明 ⇒ IE，不得判不可玩。
-5. C 型：相位 / 命中体不确定 ⇒ IE。
-6. 采样陷阱：端点安全、区间内碰撞被连续判定抓到，分析器不返回安全。
-7. 一帧滞后：`lagMs=0` 安全、`lagMs=100` 碰撞（扫掠带覆盖）。
-8. 预算耗尽 ⇒ IE，绝不 `PROVEN_UNPLAYABLE`。
-9. 缺 `lagMs` ⇒ IE（拒绝精确帧假设）。
+5. 单点门（width 20 / travel 20）⇒ 不得 `PROVEN_UNPLAYABLE`。
+6. y 轴 hazard ⇒ IE。
+7. C 型：相位 / 命中体不确定 ⇒ IE。
+8. 采样陷阱：端点安全、区间内碰撞被连续判定抓到，分析器不返回安全。
+9. 一帧滞后：`lagMs=0` 安全、`lagMs=100` 碰撞（扫掠带覆盖）。
+10. 预算耗尽 ⇒ IE，绝不 `PROVEN_UNPLAYABLE`。
+11. 缺 `lagMs` ⇒ IE（拒绝精确帧假设）。
+12. 永久封锁门直接用交集（无 pad）计算：width 60 / travel 20 ⇒ `[30,70]`；width 20 / travel 20 ⇒ null。
 
 ## 算法冻结（2026-11-07 用户裁定）
 
 完整裁定见 [P0-02 的 Answer](../issues/04-p0-02-temporal-model-prototype.md)。锁定规则：
 
 1. **witness**：接受任意可执行安全路径；不修改 BFS 代价函数来迎合案例叙事；P0-03 的 A 案例单独构造「原地等待」真实 Runtime 场景。
-2. **`PROVEN_UNPLAYABLE`**：只允许「正宽度永久封锁门 + 显式 `verticalEvasionImpossible` 声明」。单点门、BFS 无解、预算耗尽、采样未发现安全窗口、不能排除垂直规避——一律 `INSUFFICIENT_EVIDENCE`。
+2. **`PROVEN_UNPLAYABLE`**：只允许「正宽度永久封锁门（所有可能位姿的交集，不带 lag pad）+ 显式 `verticalEvasionImpossible` 声明」。单点门、BFS 无解、预算耗尽、采样未发现安全窗口、不能排除垂直规避——一律 `INSUFFICIENT_EVIDENCE`。
 3. **`lagMs`**：P0-03 使用真实 trace 的观测最大帧间隔 + 明确余量；同时报告 `16.67ms` 与 `200ms` 两档敏感性；不得把观测最大帧间隔宣称为 Runtime 的绝对上界。
 4. **接口**：输入为单一 config 对象（`certainty` / `assumptions` / `options.lagMs`）；输出为三态 + 适用时的 `witness` / `proof` / `stats`。字段语义由 JSDoc 与测试覆盖；不得改变已有三态定义。
 
