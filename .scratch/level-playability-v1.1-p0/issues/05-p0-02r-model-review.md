@@ -1,8 +1,8 @@
 # P0-02R 模型健全性复核
 
 Type: grilling
-Status: open
-Owner:
+Status: resolved
+Owner: amber（HITL 复核）· 2026-11-07
 Blocked by: 04
 Map: ../map.md
 
@@ -33,3 +33,45 @@ Map: ../map.md
 ### 通过标准
 
 - 用户明确批准；未通过时 P0-03 保持 blocked。
+
+## Answer
+
+**2026-11-07 完成（用户 HITL 裁定）：有条件通过。**
+
+- 裁定记录：[`../evidence/02r-ruling.md`](../evidence/02r-ruling.md)
+- 本票裁定与条件提交：`fe34312ff22cbd4a802f6438696e8a0f2f8d1ffa` — `P0-02R: ruling record + hitbox/lag audit conditions`
+- 复核对象：P0-02 原型 @ `f60f486` / `703c62a`；健全性修正 @ `eb30032`
+- 复核人：amber
+
+### 复核发现
+
+初版永久封锁门误用 lag **并集**（`pad`）计算保证覆盖区间，会加宽门，属不健全证明。反例：width 20 / travel 20 的真实交集退化为单点 `x=50`，初版却报出 `[49.6, 50.4]`。
+
+**修正**：门取所有可能位姿的**交集**、不带 pad、要求正宽度；B 夹具改为 width 60 / travel 20，门 `[30, 70]`；原 `[49.6, 50.4]` 作废；新增单点门、y 轴、门公式回归测试，测试 **9 → 12**，全部通过。
+
+### 12 项清单结论
+
+1. 玩家上界 / Hazard 占用：通过（修正后）
+2. 采样陷阱：通过
+3. 等待 / 走 / 跳 / 落：通过（范围边界；跳/落不建模，UNPLAYABLE 依赖垂直规避声明）
+4. 状态空间与时限：通过
+5. 与生产隔离：通过（生产路径无 diff）
+6. 「未观察到碰撞 = 安全」：通过
+7. 扫掠带覆盖 lag：通过（安全侧并集；不可玩侧交集）
+8. 连续包络保守：通过
+9. 墙钟 / 精确帧：通过
+10. y 轴 / 非当前 pack：通过（有条件）
+11. 超时误判不可玩：通过
+12. UNPLAYABLE 唯一来源：通过（修正后）
+
+### 用户裁定
+
+| 问题 | 裁定 |
+|---|---|
+| Q1 封锁门修正 | **接受**：交集、不带 lag pad、严格正宽度；新 B 夹具 width 60 / travel 20，门 `[30, 70]`；原 `[49.6, 50.4]` 作废 |
+| Q2 P0-02R | **有条件通过**：允许进入 P0-03，但必须满足 hitbox 来源审计与 lag 敏感性审计；未满足的案例不得作为确定性结论的验收证据 |
+| Q3 Hitbox 来源 | **(a)**：保持 `certainty.hitbox = "known" \| "unverifiable"`，不新增字段；`known` 是调用方声明，accepted pack 来源是 P0-03 的外部证据责任 |
+
+- 条件已写入 [P0-03 A/B/C 三案例验证与真实 Runtime 对照](07-p0-03-case-validation.md) 与 [P0-03R 案例证据复核](08-p0-03r-evidence-review.md)。
+- 本票不产生产品代码 commit；原型修正提交为 `eb30032`。
+- 下一票：[P0-03a 合成案例与 scratch 站点](06-p0-03a-case-fixtures.md)（task，AFK）为 frontier；P0-03 在 P0-03a 完成后解锁。
