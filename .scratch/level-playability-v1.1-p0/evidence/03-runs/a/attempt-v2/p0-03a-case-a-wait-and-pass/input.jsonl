@@ -1,0 +1,7 @@
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":0,"seq":0,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":427,"seq":1,"source":"reach_goal"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":3165,"seq":2,"source":"reach_goal"}
+{"type":"keyDown","key":" ","code":"Space","t":3166,"seq":3,"source":"reach_goal"}
+{"type":"keyUp","key":" ","code":"Space","t":3218,"seq":4,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":3790,"seq":5,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":3792,"seq":6,"source":"cleanup"}

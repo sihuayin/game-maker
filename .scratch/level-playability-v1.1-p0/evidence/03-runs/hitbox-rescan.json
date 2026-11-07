@@ -1,0 +1,397 @@
+{
+  "script": "tools/e3-rescan.mjs",
+  "scriptVersion": "p0-03a-e3-rescan/1",
+  "at": "2026-11-07T14:38:49.037Z",
+  "command": "node .scratch/level-playability-v1.1-p0/tools/e3-rescan.mjs --out .scratch/level-playability-v1.1-p0/evidence/03a-e3-rescan.json --json",
+  "node": "v22.23.2",
+  "repoHead": "be234df82c84728216907cc3a02f2318d16a79d4",
+  "readOnly": true,
+  "corpus": {
+    "scope": {
+      "inventory": ".scratch/level-playability-v1/corpus/inventory.json",
+      "inventorySha256": "sha256:ba1d051a401ac70f45be5a705e2c478961ffc3fc0a6c9feb4cde09365df5f74f",
+      "inventoryBaseline": "main @ fa17c14",
+      "inventoryGeneratedAt": "2026-11-05T03:07:53.694Z",
+      "roots": [
+        "out",
+        "fixtures",
+        ".scratch",
+        "packages/demo/fixtures"
+      ],
+      "filter": "parseOk ∧ format=game-config/v1 ∧ unique by contentHash",
+      "skipped": {
+        "notParseOk": 0,
+        "notHorizontal": 0,
+        "unreadable": 0
+      }
+    },
+    "results": {
+      "configs": 21,
+      "hazards": 31,
+      "withMotion": 19,
+      "withBody": 0,
+      "anims": 18,
+      "movingHazardAssets": 19,
+      "framesChecked": 121,
+      "badSize": 0,
+      "badAnchor": 0,
+      "missingAtlas": 0,
+      "missingFrame": 0,
+      "missingAsset": 0,
+      "speedMin": 0.02667,
+      "speedMax": 0.13846,
+      "motionAxes": {
+        "x": 19
+      },
+      "anchorsByMotion": {
+        "0.5,1": 17,
+        "0.5,0.95": 1,
+        "0.5,0.85": 1
+      },
+      "hazardsByKind": {
+        "hazard": 31
+      }
+    },
+    "assets": [
+      {
+        "config": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        "id": "enemy-patrol",
+        "asset": "wasteland-enemy",
+        "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+        "manifestSha256": "sha256:e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326",
+        "atlas": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+        "frames": 15
+      },
+      {
+        "config": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        "id": "enemy-patrol",
+        "asset": "wasteland-enemy",
+        "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+        "manifestSha256": "sha256:e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326",
+        "atlas": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+        "frames": 15
+      },
+      {
+        "config": "out/__probe/last-train/site/v1/game-config.json",
+        "id": "carriage",
+        "asset": "hazard-sweeping-carriage",
+        "manifest": "out/__probe/last-train/pack/v2/manifest.json",
+        "manifestSha256": "sha256:b3d9fa29f3503bd8941ec346767c7dfdc79be3b5801ce6144146bf7eb1c353b2",
+        "atlas": "out/__probe/last-train/pack/v2/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "frames": 2
+      },
+      {
+        "config": "out/__probe-timeout/last-train/game-configs/v1.json",
+        "id": "mover",
+        "asset": "hazard-sweeping-carriage",
+        "manifest": "out/__probe/empty/pack/v2/manifest.json",
+        "manifestSha256": "sha256:b3d9fa29f3503bd8941ec346767c7dfdc79be3b5801ce6144146bf7eb1c353b2",
+        "atlas": "out/__probe/empty/pack/v2/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "frames": 2
+      },
+      {
+        "config": "out/__probe-timeout/last-train/game-configs/v2.json",
+        "id": "sweeper",
+        "asset": "hazard-sweeping-carriage",
+        "manifest": "out/__probe/empty/pack/v2/manifest.json",
+        "manifestSha256": "sha256:b3d9fa29f3503bd8941ec346767c7dfdc79be3b5801ce6144146bf7eb1c353b2",
+        "atlas": "out/__probe/empty/pack/v2/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "frames": 2
+      },
+      {
+        "config": "out/last-train/game-configs/v1.json",
+        "id": "sweeping-carriage",
+        "asset": "hazard-sweeping-carriage",
+        "manifest": "out/last-train/pack/v17/manifest.json",
+        "manifestSha256": "sha256:a17be8d0811638f7b9e89b29735e9930cc1637826411338402a9ef82b2c84a6a",
+        "atlas": "out/last-train/pack/v17/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "frames": 2
+      },
+      {
+        "config": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+        "id": "enemy-patrol",
+        "asset": "wasteland-enemy",
+        "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+        "manifestSha256": "sha256:387347aa8a9c8a5c832d08f1c95617952f0a07308db128c4e5c86386676b1ee4",
+        "atlas": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+        "frames": 15
+      },
+      {
+        "config": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "id": "enemy-1",
+        "asset": "enemy-wasteland",
+        "manifest": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "manifestSha256": "sha256:5ccc72d6ff35b2aeda0ada3e2b513365d62fb51f2343010a931ba50b161e7282",
+        "atlas": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:d096a9557046f2ea2ce89b1a1ceb6fa6381b8f864aed9cc7a0081e12b4c2d019",
+        "frames": 4
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "id": "patroller-1",
+        "asset": "wasteland-patroller",
+        "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "manifestSha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "atlas": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd",
+        "frames": 6
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "id": "patroller-2",
+        "asset": "wasteland-patroller",
+        "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "manifestSha256": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+        "atlas": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd",
+        "frames": 6
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        "id": "enemy-patrol",
+        "asset": "wasteland-enemy",
+        "manifest": ".scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v2/manifest.json",
+        "manifestSha256": "sha256:410d20180117e2b0a643e63e63b3c30503ad5efbba42e740f13110e3e7a1837d",
+        "atlas": ".scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v2/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+        "frames": 15
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "id": "enemy-1",
+        "asset": "entity-wasteland-enemy",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+        "manifestSha256": "sha256:a7c11fdeaaebd629255bbc0bbd3f14891ed84eb161e5025a46a69dafc4e859f7",
+        "atlas": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:7e8e219c54058c28dcf5a0c8d6040419378a2ccda47df8b038e4c7a431d831fa",
+        "frames": 6
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "id": "enemy-2",
+        "asset": "entity-wasteland-enemy",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+        "manifestSha256": "sha256:a7c11fdeaaebd629255bbc0bbd3f14891ed84eb161e5025a46a69dafc4e859f7",
+        "atlas": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:7e8e219c54058c28dcf5a0c8d6040419378a2ccda47df8b038e4c7a431d831fa",
+        "frames": 6
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "id": "enemy-1",
+        "asset": "entity-enemy",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "manifestSha256": "sha256:66caebde149254623fa587dc1d58e1942a2aebdfb01b727bcbf5409f3b895d4d",
+        "atlas": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:8593daf5ec0b9ef6c098e086213df1d6c3b9f5e715e494a5149b44417d33ab4b",
+        "frames": 4
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "id": "enemy-2",
+        "asset": "entity-enemy",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "manifestSha256": "sha256:66caebde149254623fa587dc1d58e1942a2aebdfb01b727bcbf5409f3b895d4d",
+        "atlas": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:8593daf5ec0b9ef6c098e086213df1d6c3b9f5e715e494a5149b44417d33ab4b",
+        "frames": 4
+      },
+      {
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+        "id": "enemy-patrol-1",
+        "asset": "enemy-patroller",
+        "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/manifest.json",
+        "manifestSha256": "sha256:7a6be8a996a997788369cb08b346bc9ab71b72da8970e26364d85c1eca6571c7",
+        "atlas": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:aaf65b0746d753fe0d810ab5d727644d6394541fa8064e9346f19cdff4e2f2d7",
+        "frames": 6
+      },
+      {
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        "id": "enemy-1",
+        "asset": "enemy-wasteland",
+        "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1/manifest.json",
+        "manifestSha256": "sha256:d9b7a652ef56d6a29eeca6b4db5c65d6582c8904e143ae13bbc1d93b4ac6d69c",
+        "atlas": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:7f45ed03b4e243a3bdbabf39236c90a879fecb42369954aff8ee246617641908",
+        "frames": 4
+      },
+      {
+        "config": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+        "id": "enemy-1",
+        "asset": "enemy-scavenger",
+        "manifest": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/pack/v4/manifest.json",
+        "manifestSha256": "sha256:aa090167a3ce1ee1714cb3f1c5e55a1651be77f80780ab3590edd79808ffbede",
+        "atlas": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/pack/v4/delivery/atlas.sprites.json",
+        "atlasSha256": "sha256:a2a427376a31e692f13afcabc9b05bd0cce4a2cdcba814dec44da284906f6cb4",
+        "frames": 1
+      },
+      {
+        "config": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+        "id": "enemy-1",
+        "asset": "enemy-wasteland",
+        "manifest": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/manifest.json",
+        "manifestSha256": "sha256:24a0013c103e12168eea874c678f130d6b56c7444c4528e97b0ee736429dae3d",
+        "atlas": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/delivery/atlas.animations.json",
+        "atlasSha256": "sha256:53ab3941f3b9f6df7acf3b7d0e07216722cf6ed1816c531c40d413b622d52bcc",
+        "frames": 6
+      }
+    ],
+    "issues": []
+  },
+  "caseHitboxProvenance": [
+    {
+      "case": "a",
+      "hazardId": "case-a-hazard",
+      "asset": "prop-luggage-pile",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 120,
+        "periodMs": 4000
+      },
+      "config": ".scratch/level-playability-v1.1-p0/cases/a/game-config.json",
+      "configSha256": "sha256:afba7a5265c4765c19abc119c9e6b229d9b84860517e5f07e1472790fd6565de",
+      "siteDir": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1",
+      "packManifest": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/pack/v2/manifest.json",
+      "packManifestSha256": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "size": {
+        "w": 40,
+        "h": 40
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlas": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/pack/v2/delivery/atlas.sprites.json",
+      "atlasSha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+      "frames": [
+        {
+          "name": "prop-luggage-pile",
+          "sourceSize": {
+            "w": 40,
+            "h": 40
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "sizeOk": true,
+          "anchorOk": true
+        }
+      ],
+      "framesMatchManifest": true,
+      "issues": []
+    },
+    {
+      "case": "b",
+      "hazardId": "case-b-hazard",
+      "asset": "hazard-sweeping-carriage",
+      "motion": {
+        "kind": "cycle",
+        "axis": "x",
+        "distance": 20,
+        "periodMs": 2000
+      },
+      "config": ".scratch/level-playability-v1.1-p0/cases/b/game-config.json",
+      "configSha256": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe",
+      "siteDir": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1",
+      "packManifest": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/pack/v2/manifest.json",
+      "packManifestSha256": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "size": {
+        "w": 64,
+        "h": 48
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "atlas": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/pack/v2/delivery/atlas.animations.json",
+      "atlasSha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+      "frames": [
+        {
+          "name": "hazard-sweeping-carriage.sweep1",
+          "sourceSize": {
+            "w": 64,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "sizeOk": true,
+          "anchorOk": true
+        },
+        {
+          "name": "hazard-sweeping-carriage.sweep2",
+          "sourceSize": {
+            "w": 64,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "sizeOk": true,
+          "anchorOk": true
+        }
+      ],
+      "framesMatchManifest": true,
+      "issues": []
+    }
+  ],
+  "comparison": {
+    "expected": {
+      "configs": 21,
+      "hazards": 31,
+      "withMotion": 19,
+      "withBody": 0,
+      "anims": 18,
+      "movingHazardAssets": 19,
+      "framesChecked": 121,
+      "badSize": 0,
+      "badAnchor": 0,
+      "missingAtlas": 0,
+      "missingFrame": 0,
+      "speedMin": 0.02667,
+      "speedMax": 0.13846,
+      "source": "evidence/01-moving-hazard-semantics.md §0.2 命令 5/6/7"
+    },
+    "observed": {
+      "configs": 21,
+      "hazards": 31,
+      "withMotion": 19,
+      "withBody": 0,
+      "anims": 18,
+      "movingHazardAssets": 19,
+      "framesChecked": 121,
+      "badSize": 0,
+      "badAnchor": 0,
+      "missingAtlas": 0,
+      "missingFrame": 0,
+      "missingAsset": 0,
+      "speedMin": 0.02667,
+      "speedMax": 0.13846,
+      "motionAxes": {
+        "x": 19
+      },
+      "anchorsByMotion": {
+        "0.5,1": 17,
+        "0.5,0.95": 1,
+        "0.5,0.85": 1
+      },
+      "hazardsByKind": {
+        "hazard": 31
+      }
+    },
+    "discrepancies": [],
+    "matches": true
+  }
+}

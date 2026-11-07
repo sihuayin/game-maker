@@ -1,0 +1,678 @@
+{
+  "a": {
+    "attempt-v1": {
+      "traceEntries": 102,
+      "tStart": 0,
+      "tEnd": 3810,
+      "maxGapMs": 94,
+      "p95GapMs": 40,
+      "medianGapMs": 38,
+      "gapsOver100": 0,
+      "maxX": 665.3333333333319,
+      "minX": 500,
+      "hazardX": {
+        "min": 600.9059999998569,
+        "max": 719.8817999985696
+      },
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 1,
+        "jump": 1,
+        "win": 1
+      },
+      "winTimes": [
+        3807
+      ],
+      "jumpTimes": [
+        3276
+      ],
+      "resets": [],
+      "final": {
+        "t": 3810,
+        "x": 665.3333333333319,
+        "y": 219.85,
+        "bottom": 222.25,
+        "left": 649.3333333333319,
+        "right": 681.3333333333319,
+        "vx": 0,
+        "vy": 225,
+        "onFloor": false,
+        "blockedRight": false,
+        "touchingRight": true,
+        "collected": 1,
+        "won": true,
+        "pickups": [
+          {
+            "x": 530,
+            "y": 250,
+            "active": false
+          }
+        ],
+        "hazards": [
+          {
+            "x": 612.1284000014305,
+            "y": 250
+          }
+        ],
+        "chests": [],
+        "dangers": [],
+        "gate": {
+          "x": 670,
+          "y": 250
+        },
+        "scrollX": 425.3333333333319
+      },
+      "strategy": {
+        "stop": null,
+        "limits": {
+          "NO_PROGRESS_STEPS": 300,
+          "RESET_BUDGET": 5,
+          "WAIT_STEPS": 120,
+          "JUMP_VERIFY_STEPS": 3,
+          "JUMP_UNVERIFIED_BUDGET": 3,
+          "JUMP_FAILURE_BUDGET": 5
+        },
+        "progress": {
+          "maxX": 662.6666666666653,
+          "collected": 1,
+          "chests": 0,
+          "gate": false,
+          "won": true
+        },
+        "noProgressSteps": 0,
+        "resets": 0,
+        "waits": 0,
+        "jump": {
+          "failures": 0,
+          "unverified": 0,
+          "degraded": false,
+          "pending": null
+        },
+        "lastObservation": {
+          "x": 665.3333333333319,
+          "bottom": 222.25,
+          "onFloor": false,
+          "vy": 225,
+          "collected": 1,
+          "won": true
+        },
+        "notes": [
+          {
+            "step": 87,
+            "kind": "jump-verified",
+            "detail": {
+              "atStep": 86
+            }
+          }
+        ]
+      },
+      "siteIntegrity": {
+        "before": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "after": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "unchanged": true
+      }
+    },
+    "attempt-v2": {
+      "traceEntries": 102,
+      "tStart": 0,
+      "tEnd": 3793,
+      "maxGapMs": 92,
+      "p95GapMs": 39,
+      "medianGapMs": 37,
+      "gapsOver100": 0,
+      "maxX": 665.3333333333319,
+      "minX": 500,
+      "hazardX": {
+        "min": 600.9181999997139,
+        "max": 719.9890000028613
+      },
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 1,
+        "jump": 1,
+        "win": 1
+      },
+      "winTimes": [
+        3790
+      ],
+      "jumpTimes": [
+        3256
+      ],
+      "resets": [],
+      "final": {
+        "t": 3793,
+        "x": 665.3333333333319,
+        "y": 219.85,
+        "bottom": 222.25,
+        "left": 649.3333333333319,
+        "right": 681.3333333333319,
+        "vx": 160,
+        "vy": 225,
+        "onFloor": false,
+        "blockedRight": false,
+        "touchingRight": true,
+        "collected": 1,
+        "won": true,
+        "pickups": [
+          {
+            "x": 530,
+            "y": 250,
+            "active": false
+          }
+        ],
+        "hazards": [
+          {
+            "x": 613.0002000028614,
+            "y": 250
+          }
+        ],
+        "chests": [],
+        "dangers": [],
+        "gate": {
+          "x": 670,
+          "y": 250
+        },
+        "scrollX": 425.3333333333319
+      },
+      "strategy": {
+        "stop": null,
+        "limits": {
+          "NO_PROGRESS_STEPS": 300,
+          "RESET_BUDGET": 5,
+          "WAIT_STEPS": 120,
+          "JUMP_VERIFY_STEPS": 3,
+          "JUMP_UNVERIFIED_BUDGET": 3,
+          "JUMP_FAILURE_BUDGET": 5
+        },
+        "progress": {
+          "maxX": 662.6666666666653,
+          "collected": 1,
+          "chests": 0,
+          "gate": false,
+          "won": true
+        },
+        "noProgressSteps": 0,
+        "resets": 0,
+        "waits": 0,
+        "jump": {
+          "failures": 0,
+          "unverified": 0,
+          "degraded": false,
+          "pending": null
+        },
+        "lastObservation": {
+          "x": 665.3333333333319,
+          "bottom": 222.25,
+          "onFloor": false,
+          "vy": 225,
+          "collected": 1,
+          "won": true
+        },
+        "notes": [
+          {
+            "step": 87,
+            "kind": "jump-verified",
+            "detail": {
+              "atStep": 86
+            }
+          }
+        ]
+      },
+      "siteIntegrity": {
+        "before": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "after": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "unchanged": true
+      }
+    }
+  },
+  "b": {
+    "attempt-v1": {
+      "traceEntries": 264,
+      "tStart": 0,
+      "tEnd": 9998,
+      "maxGapMs": 93,
+      "p95GapMs": 39,
+      "medianGapMs": 38,
+      "gapsOver100": 0,
+      "maxX": 518.6666666666683,
+      "minX": 300,
+      "hazardX": {
+        "min": 560.0310666671436,
+        "max": 579.9905333338102
+      },
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 1,
+        "reset": 5,
+        "jump": 3,
+        "land": 3
+      },
+      "winTimes": [],
+      "jumpTimes": [
+        3853,
+        5964,
+        8096
+      ],
+      "resets": [
+        {
+          "t": 1736,
+          "fromX": 518.6666666666683,
+          "toX": 300
+        },
+        {
+          "t": 3853,
+          "fromX": 516.0000000000016,
+          "toX": 300
+        },
+        {
+          "t": 5871,
+          "fromX": 516.0000000000016,
+          "toX": 300
+        },
+        {
+          "t": 8008,
+          "fromX": 513.3333333333348,
+          "toX": 300
+        },
+        {
+          "t": 9996,
+          "fromX": 513.3333333333348,
+          "toX": 300
+        }
+      ],
+      "final": {
+        "t": 9998,
+        "x": 300,
+        "y": 247.6,
+        "bottom": 250,
+        "left": 284,
+        "right": 316,
+        "vx": 0,
+        "vy": 0,
+        "onFloor": true,
+        "blockedRight": false,
+        "touchingRight": false,
+        "collected": 1,
+        "won": false,
+        "pickups": [
+          {
+            "x": 350,
+            "y": 250,
+            "active": false
+          }
+        ],
+        "hazards": [
+          {
+            "x": 560.3690666671438,
+            "y": 250
+          }
+        ],
+        "chests": [],
+        "dangers": [],
+        "gate": {
+          "x": 700,
+          "y": 250
+        },
+        "scrollX": 60
+      },
+      "strategy": {
+        "stop": {
+          "reason": "reset-exhaustion",
+          "atStep": 263
+        },
+        "limits": {
+          "NO_PROGRESS_STEPS": 300,
+          "RESET_BUDGET": 5,
+          "WAIT_STEPS": 120,
+          "JUMP_VERIFY_STEPS": 3,
+          "JUMP_UNVERIFIED_BUDGET": 3,
+          "JUMP_FAILURE_BUDGET": 5
+        },
+        "progress": {
+          "maxX": 518.6666666666683,
+          "collected": 1,
+          "chests": 0,
+          "gate": false,
+          "won": false
+        },
+        "noProgressSteps": 224,
+        "resets": 5,
+        "waits": 0,
+        "jump": {
+          "failures": 0,
+          "unverified": 0,
+          "degraded": false,
+          "pending": null
+        },
+        "lastObservation": {
+          "x": 300,
+          "bottom": 250,
+          "onFloor": true,
+          "vy": 0,
+          "collected": 1,
+          "won": false
+        },
+        "notes": [
+          {
+            "step": 48,
+            "kind": "reset",
+            "detail": {
+              "fromX": 518.6666666666683,
+              "toX": 300,
+              "count": 1
+            }
+          },
+          {
+            "step": 104,
+            "kind": "reset",
+            "detail": {
+              "fromX": 516.0000000000016,
+              "toX": 300,
+              "count": 2
+            }
+          },
+          {
+            "step": 157,
+            "kind": "reset",
+            "detail": {
+              "fromX": 516.0000000000016,
+              "toX": 300,
+              "count": 3
+            }
+          },
+          {
+            "step": 158,
+            "kind": "jump-verified",
+            "detail": {
+              "atStep": 157
+            }
+          },
+          {
+            "step": 212,
+            "kind": "reset",
+            "detail": {
+              "fromX": 513.3333333333348,
+              "toX": 300,
+              "count": 4
+            }
+          },
+          {
+            "step": 213,
+            "kind": "jump-verified",
+            "detail": {
+              "atStep": 212
+            }
+          },
+          {
+            "step": 263,
+            "kind": "reset",
+            "detail": {
+              "fromX": 513.3333333333348,
+              "toX": 300,
+              "count": 5
+            }
+          },
+          {
+            "step": 263,
+            "kind": "stop",
+            "detail": {
+              "reason": "reset-exhaustion",
+              "atStep": 263
+            }
+          }
+        ]
+      },
+      "siteIntegrity": {
+        "before": {
+          "index.html": "sha256:f0018e9981fbb24c661591a39de10ee261439f3bf0e79efc783fab4f66d41f53",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe"
+        },
+        "after": {
+          "index.html": "sha256:f0018e9981fbb24c661591a39de10ee261439f3bf0e79efc783fab4f66d41f53",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe"
+        },
+        "unchanged": true
+      }
+    },
+    "attempt-v2": {
+      "traceEntries": 260,
+      "tStart": 0,
+      "tEnd": 9857,
+      "maxGapMs": 93,
+      "p95GapMs": 40,
+      "medianGapMs": 38,
+      "gapsOver100": 0,
+      "maxX": 516.0000000000016,
+      "minX": 300,
+      "hazardX": {
+        "min": 560.1207999995231,
+        "max": 579.8782000004768
+      },
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 1,
+        "reset": 5,
+        "jump": 3,
+        "land": 3
+      },
+      "winTimes": [],
+      "jumpTimes": [
+        3958,
+        5975,
+        8079
+      ],
+      "resets": [
+        {
+          "t": 1864,
+          "fromX": 516.0000000000016,
+          "toX": 300
+        },
+        {
+          "t": 3865,
+          "fromX": 516.0000000000016,
+          "toX": 300
+        },
+        {
+          "t": 5975,
+          "fromX": 513.3333333333348,
+          "toX": 300
+        },
+        {
+          "t": 7986,
+          "fromX": 513.3333333333348,
+          "toX": 300
+        },
+        {
+          "t": 9855,
+          "fromX": 516.0000000000016,
+          "toX": 300
+        }
+      ],
+      "final": {
+        "t": 9857,
+        "x": 300,
+        "y": 247.6,
+        "bottom": 250,
+        "left": 284,
+        "right": 316,
+        "vx": 0,
+        "vy": 0,
+        "onFloor": true,
+        "blockedRight": false,
+        "touchingRight": false,
+        "collected": 1,
+        "won": false,
+        "pickups": [
+          {
+            "x": 350,
+            "y": 250,
+            "active": false
+          }
+        ],
+        "hazards": [
+          {
+            "x": 563.2160000004769,
+            "y": 250
+          }
+        ],
+        "chests": [],
+        "dangers": [],
+        "gate": {
+          "x": 700,
+          "y": 250
+        },
+        "scrollX": 60
+      },
+      "strategy": {
+        "stop": {
+          "reason": "reset-exhaustion",
+          "atStep": 259
+        },
+        "limits": {
+          "NO_PROGRESS_STEPS": 300,
+          "RESET_BUDGET": 5,
+          "WAIT_STEPS": 120,
+          "JUMP_VERIFY_STEPS": 3,
+          "JUMP_UNVERIFIED_BUDGET": 3,
+          "JUMP_FAILURE_BUDGET": 5
+        },
+        "progress": {
+          "maxX": 516.0000000000016,
+          "collected": 1,
+          "chests": 0,
+          "gate": false,
+          "won": false
+        },
+        "noProgressSteps": 220,
+        "resets": 5,
+        "waits": 0,
+        "jump": {
+          "failures": 0,
+          "unverified": 0,
+          "degraded": false,
+          "pending": null
+        },
+        "lastObservation": {
+          "x": 300,
+          "bottom": 250,
+          "onFloor": true,
+          "vy": 0,
+          "collected": 1,
+          "won": false
+        },
+        "notes": [
+          {
+            "step": 51,
+            "kind": "reset",
+            "detail": {
+              "fromX": 516.0000000000016,
+              "toX": 300,
+              "count": 1
+            }
+          },
+          {
+            "step": 104,
+            "kind": "reset",
+            "detail": {
+              "fromX": 516.0000000000016,
+              "toX": 300,
+              "count": 2
+            }
+          },
+          {
+            "step": 105,
+            "kind": "jump-verified",
+            "detail": {
+              "atStep": 104
+            }
+          },
+          {
+            "step": 158,
+            "kind": "reset",
+            "detail": {
+              "fromX": 513.3333333333348,
+              "toX": 300,
+              "count": 3
+            }
+          },
+          {
+            "step": 211,
+            "kind": "reset",
+            "detail": {
+              "fromX": 513.3333333333348,
+              "toX": 300,
+              "count": 4
+            }
+          },
+          {
+            "step": 212,
+            "kind": "jump-verified",
+            "detail": {
+              "atStep": 211
+            }
+          },
+          {
+            "step": 259,
+            "kind": "reset",
+            "detail": {
+              "fromX": 516.0000000000016,
+              "toX": 300,
+              "count": 5
+            }
+          },
+          {
+            "step": 259,
+            "kind": "stop",
+            "detail": {
+              "reason": "reset-exhaustion",
+              "atStep": 259
+            }
+          }
+        ]
+      },
+      "siteIntegrity": {
+        "before": {
+          "index.html": "sha256:f0018e9981fbb24c661591a39de10ee261439f3bf0e79efc783fab4f66d41f53",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe"
+        },
+        "after": {
+          "index.html": "sha256:f0018e9981fbb24c661591a39de10ee261439f3bf0e79efc783fab4f66d41f53",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe"
+        },
+        "unchanged": true
+      }
+    }
+  }
+}

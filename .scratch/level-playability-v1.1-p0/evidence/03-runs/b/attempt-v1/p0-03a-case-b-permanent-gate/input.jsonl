@@ -1,0 +1,15 @@
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":1,"seq":0,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":1359,"seq":1,"source":"reach_goal"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":1736,"seq":2,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":3089,"seq":3,"source":"reach_goal"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":3853,"seq":4,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":5193,"seq":5,"source":"reach_goal"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":5872,"seq":6,"source":"reach_goal"}
+{"type":"keyDown","key":" ","code":"Space","t":5875,"seq":7,"source":"reach_goal"}
+{"type":"keyUp","key":" ","code":"Space","t":5927,"seq":8,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":7215,"seq":9,"source":"reach_goal"}
+{"type":"keyDown","key":"ArrowRight","code":"ArrowRight","t":8008,"seq":10,"source":"reach_goal"}
+{"type":"keyDown","key":" ","code":"Space","t":8008,"seq":11,"source":"reach_goal"}
+{"type":"keyUp","key":" ","code":"Space","t":8059,"seq":12,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":9349,"seq":13,"source":"reach_goal"}
+{"type":"keyUp","key":"ArrowRight","code":"ArrowRight","t":9997,"seq":14,"source":"cleanup"}

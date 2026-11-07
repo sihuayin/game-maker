@@ -1,0 +1,155 @@
+{
+  "reportVersion": "playtest-report/v1",
+  "identity": {
+    "scenarioFormatVersion": "playtest-scenario/v1",
+    "siteVersion": 1,
+    "packId": "last-train",
+    "packVersion": 2,
+    "packChecksum": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+    "configChecksum": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe",
+    "shellVersion": "2",
+    "harnessVersion": "playtest-harness/v2",
+    "rulesVersion": "playtest-rules/v2"
+  },
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1 --scenario-dir .scratch/level-playability-v1.1-p0/cases/b/scenario --out .scratch/level-playability-v1.1-p0/evidence/03-runs/b --repeat 2 --json",
+  "exitCode": 0,
+  "startedAt": "2026-11-07T14:36:19.632Z",
+  "finishedAt": "2026-11-07T14:36:30.522Z",
+  "execution": "executed",
+  "scenarios": [
+    {
+      "scenarioId": "p0-03a-case-b-permanent-gate",
+      "scenarioVersion": 1,
+      "required": true,
+      "harnessCondition": "none",
+      "expectedOutcome": "AGENT_LIMITATION",
+      "baselineEligible": false,
+      "execution": "executed",
+      "terminationReached": false,
+      "assertions": [
+        {
+          "id": "pickup-collected",
+          "kind": "state",
+          "requires": [
+            "collected"
+          ],
+          "result": "pass",
+          "observed": 1,
+          "expect": {
+            "kind": "state",
+            "path": "collected",
+            "op": "gte",
+            "value": 1
+          },
+          "withinMs": 30000,
+          "evidence": []
+        },
+        {
+          "id": "reset-observed",
+          "kind": "event",
+          "requires": [
+            "reset"
+          ],
+          "result": "pass",
+          "observed": 5,
+          "expect": {
+            "kind": "event",
+            "type": "reset",
+            "op": "gte",
+            "value": 1
+          },
+          "withinMs": 30000,
+          "evidence": []
+        }
+      ],
+      "assertionAggregate": "pass",
+      "endState": {
+        "collected": 1,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 0,
+        "playerX": 300
+      },
+      "initialState": {
+        "collected": 0,
+        "won": false,
+        "hits": 0,
+        "chestsOpened": 0,
+        "activePickups": 1,
+        "playerX": 300
+      },
+      "actions": [
+        {
+          "kind": "reach_goal",
+          "outcome": "timeout",
+          "durationMs": 9854,
+          "steps": 259
+        }
+      ],
+      "stop": {
+        "reason": "reset-exhaustion",
+        "atStep": 259
+      },
+      "comparableEvents": [
+        "pickup",
+        "win",
+        "reset"
+      ],
+      "eventCounts": {
+        "scene-ready": 1,
+        "spawn": 1,
+        "pickup": 1,
+        "win": 0,
+        "chest-open": 0,
+        "danger-hit": 0,
+        "danger-erupt": 0,
+        "land": 3,
+        "jump": 3,
+        "reset": 5,
+        "runtime-error": 0
+      },
+      "evidence": [
+        "playtest-events",
+        "playtest-trace",
+        "playtest-input",
+        "playtest-console",
+        "playtest-exceptions"
+      ],
+      "durationMs": 10230,
+      "steps": 260
+    }
+  ],
+  "runtime": {
+    "pollIntervalMs": 50,
+    "stepDelayMs": 35,
+    "scenarioTimeoutMs": 30000,
+    "viewport": {
+      "w": 1000,
+      "h": 600
+    },
+    "deviceScaleFactor": 1,
+    "chromeFlags": [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-background-timer-throttling",
+      "--disable-renderer-backgrounding",
+      "--disable-backgrounding-occluded-windows",
+      "--hide-scrollbars",
+      "--window-size=1000,600"
+    ]
+  },
+  "evidence": [
+    "playtest-events",
+    "playtest-trace",
+    "playtest-input",
+    "playtest-console",
+    "playtest-exceptions",
+    "playtest-chrome"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "repeat": 2,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "p0-03a-case-a-wait-and-pass",
+      "runs": 2,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "p0-03a-case-a-wait-and-pass",
+          "outcome": null,
+          "stopReason": null,
+          "assertions": [
+            {
+              "id": "won",
+              "result": "pass"
+            },
+            {
+              "id": "pickup-collected",
+              "result": "pass"
+            },
+            {
+              "id": "no-reset",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 1,
+            "won": true,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 1,
+            "win": 1,
+            "reset": 0
+          }
+        },
+        {
+          "scenarioId": "p0-03a-case-a-wait-and-pass",
+          "outcome": null,
+          "stopReason": null,
+          "assertions": [
+            {
+              "id": "won",
+              "result": "pass"
+            },
+            {
+              "id": "pickup-collected",
+              "result": "pass"
+            },
+            {
+              "id": "no-reset",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 1,
+            "won": true,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 1,
+            "win": 1,
+            "reset": 0
+          }
+        }
+      ]
+    }
+  ]
+}
