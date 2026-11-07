@@ -1,8 +1,8 @@
 # P0-02 最小时序模型与独立原型
 
 Type: prototype
-Status: open
-Owner:
+Status: resolved
+Owner: agent + amber（HITL prototype）· 2026-11-07
 Blocked by: 03
 Map: ../map.md
 
@@ -67,3 +67,72 @@ Map: ../map.md
 
 - 不处理 moving platform、多 hazard、多 danger、复杂目标组合。
 - 模拟器只服务算法回归，不宣称与真实 Runtime 等价。
+
+## Answer
+
+**2026-11-07 完成（prototype，HITL；用户 Q1–Q4 全部采纳推荐方案）。** 原型已交付并通过 9 项单测；算法规则冻结并纳入 P0-03 验证要求。
+
+### 产物
+
+- [`../prototype/temporal-model.mjs`](../prototype/temporal-model.mjs) —— 三角波、连续区间碰撞、lag 扫掠带、BFS witness、永久封锁门证明
+- [`../prototype/temporal-model.test.mjs`](../prototype/temporal-model.test.mjs) —— 9 项 `node:test`
+- [`../prototype/MODEL.md`](../prototype/MODEL.md) —— 状态表示、等待边、时间展开、证明义务、已知边界、算法冻结
+
+### 命令与退出码
+
+```bash
+node --test .scratch/level-playability-v1.1-p0/prototype/temporal-model.test.mjs
+# EXIT=0；# tests 9 / # pass 9 / # fail 0
+```
+
+> `node --test <dir>` 在本机 Node 22 把目录当模块解析；使用精确文件路径（票面允许「等价精确路径」）。
+
+### 结果
+
+| 案例 | Verdict | 证据 |
+|---|---|---|
+| A 等待后通过 | `NO_PROVEN_BLOCKER` | 66 段 witness，31 段静止等待；`verifyWitness = null`；`statesVisited=2771`、`edgesChecked=13672`、`elapsedMs=7` |
+| B 始终封锁 | `PROVEN_UNPLAYABLE` | `permanent-gate`：`[49.6, 50.4]`（lagMs=20 扫掠带）；无需搜索 |
+| C 相位 / 碰撞边界不确定 | `INSUFFICIENT_EVIDENCE` | `phase-uncertain` / `hitbox-uncertain` |
+| 采样陷阱 | 不返回安全 | 端点无碰撞、区间内碰撞被连续判定抓到 |
+| 一帧滞后 | 不返回安全（lag 下） | `lagMs=0` 安全、`lagMs=100` 碰撞 |
+| 预算耗尽 | `INSUFFICIENT_EVIDENCE` | `search-budget-exhausted`，绝不 `PROVEN_UNPLAYABLE` |
+
+### 状态空间（A 案例）
+
+`xPositions=99`、`phaseSteps=200`、`dtMs=10`、`maxStepPx=5`、`statesEnqueued=2832`、`statesVisited=2771`、`edgesChecked=13672`、`elapsedMs=7`、`budgetExceeded=false`。
+B 由证明直接给出，`statesVisited=0`；C 在输入门直接返回。
+
+### 算法冻结（用户 2026-11-07 裁定）
+
+| 问题 | 裁定 | 锁定规则 |
+|---|---|---|
+| Q1 witness 形态 | **(a)** | 接受任意可执行安全路径；不改 BFS 代价函数；P0-03 的 A 案例单独构造原地等待场景 |
+| Q2 不可玩证明 | **冻结** | 只有「正宽度永久封锁门 + 显式垂直规避声明」可判 `PROVEN_UNPLAYABLE`；单点门、BFS 无解、预算耗尽、采样无窗口、不能排除垂直规避 ⇒ 一律 `INSUFFICIENT_EVIDENCE` |
+| Q3 `lagMs` | **(c) + (d)** | P0-03 记录真实 trace 最大帧间隔、采用的安全余量及理由、最终 `lagMs`；另报 `16.67ms` 与 `200ms` 敏感性；不得把观测最大帧间隔宣称为绝对上界 |
+| Q4 接口 | **是** | 沿用单一 config + `certainty` / `assumptions` / `options.lagMs`；输出三态 + `witness` / `proof` / `stats`；字段语义由 JSDoc 与测试覆盖；不改三态定义 |
+
+- Q3/Q4 要求已写入 [P0-03 A/B/C 三案例验证与真实 Runtime 对照](07-p0-03-case-validation.md)；Q2 已追加到 [P0-02R 模型健全性复核](05-p0-02r-model-review.md) 第 12 条。
+- 本票不授权提前进入 P0-03，也不授权 Pipeline 集成。
+
+### 提交与回退
+
+- 原型提交：`f60f486` —— `P0-02: minimal temporal model prototype + tests (awaiting HITL reaction)`
+- 算法冻结 + P0-03 要求：`703c62a` —— `P0-02: freeze algorithm rules and P0-03 lag requirements`
+- 回退点：`git reset --hard 417f67b`（丢弃本票全部产物）；或 revert 上述提交。
+
+### 单测清单
+
+1. `periodMs` 往返整周期语义（`t=0` / `P/2` / `P`）
+2. A 型：等待后通过，witness 含静止段并逐段连续验证
+3. B 型：正宽度永久封锁门 ⇒ `PROVEN_UNPLAYABLE`
+4. B 型缺少垂直规避声明 ⇒ IE，不得判不可玩
+5. C 型：相位 / 命中体不确定 ⇒ IE
+6. 采样陷阱：区间内碰撞被连续判定抓到，分析器不返回安全
+7. 一帧滞后：`lagMs=0` 安全、`lagMs=100` 碰撞
+8. 预算耗尽 ⇒ IE，绝不 `PROVEN_UNPLAYABLE`
+9. 缺 `lagMs` ⇒ IE（拒绝精确帧假设）
+
+### 下一票
+
+[P0-02R 模型健全性复核](05-p0-02r-model-review.md)（grilling，HITL）已解锁。通过前 P0-03 保持 blocked。

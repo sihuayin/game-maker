@@ -96,9 +96,9 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 1. [P0-00 Effort 初始化](issues/01-p0-00-effort-init.md)（task，AFK）— **resolved**
 2. [P0-01 移动 Hazard Runtime 增量语义核验](issues/02-p0-01-moving-hazard-semantics.md)（research，AFK）— **resolved**
 3. [P0-01R 语义证据复核](issues/03-p0-01r-semantics-review.md)（grilling，HITL）— **resolved**（通过，附硬约束）
-4. [P0-02 最小时序模型与独立原型](issues/04-p0-02-temporal-model-prototype.md)（prototype，HITL）— open · **frontier**
-5. [P0-02R 模型健全性复核](issues/05-p0-02r-model-review.md)（grilling，HITL）— open · blocked by 04
-6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— open · unblocked（frontier，位列 04 之后；已追加 E3 可复现交付条件）
+4. [P0-02 最小时序模型与独立原型](issues/04-p0-02-temporal-model-prototype.md)（prototype，HITL）— **resolved**（9/9 测试通过；算法冻结）
+5. [P0-02R 模型健全性复核](issues/05-p0-02r-model-review.md)（grilling，HITL）— open · **frontier**
+6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— open · unblocked（frontier，位列 05 之后；已追加 E3 可复现交付条件）
 7. [P0-03 A/B/C 三案例验证与真实 Runtime 对照](issues/07-p0-03-case-validation.md)（task，AFK）— open · blocked by 05, 06
 8. [P0-03R 案例证据复核](issues/08-p0-03r-evidence-review.md)（grilling，HITL）— open · blocked by 07
 9. [P0-04 结论包与 HITL 裁定](issues/09-p0-04-verdict.md)（grilling，HITL）— open · blocked by 08
@@ -108,6 +108,7 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 - [P0-00 Effort 初始化](issues/01-p0-00-effort-init.md): 执行分支 `p1/level-playability-v1.1-p0` 自图 tip `a82165c` 切出；冻结输入与边界见 [`evidence/00-baseline.md`](evidence/00-baseline.md)。
 - [P0-01 移动 Hazard Runtime 增量语义核验](issues/02-p0-01-moving-hazard-semantics.md): 三角波轨迹、`periodMs` = 往返整周期、全局 game-time `T`、一帧碰撞滞后、命中体取图集帧而非 `entity.body`；完整证据与 8 项未确认事项见 [`evidence/01-moving-hazard-semantics.md`](evidence/01-moving-hazard-semantics.md)。
 - [P0-01R 语义证据复核](issues/03-p0-01r-semantics-review.md): 六项 CONFIRMED 全部采信；三条证据边界 + 时间/碰撞模型 + x 轴范围写成 P0-02 硬约束；E3 脚本可复现性交由 P0-03a 补齐（不阻断 P0-02）。裁定见 [`evidence/01r-ruling.md`](evidence/01r-ruling.md)。
+- [P0-02 最小时序模型与独立原型](issues/04-p0-02-temporal-model-prototype.md): 9/9 单测通过；安全结论只来自连续验证的 witness，不可玩只来自正宽度永久封锁门 + 垂直规避声明；`lagMs` 扫掠带、预算耗尽 ⇒ IE。算法冻结见 [`prototype/MODEL.md`](prototype/MODEL.md)。
 
 ## Not yet specified
 
