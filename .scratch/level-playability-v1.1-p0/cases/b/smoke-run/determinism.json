@@ -1,0 +1,67 @@
+{
+  "repeat": 2,
+  "same": true,
+  "comparisons": [
+    {
+      "scenarioId": "p0-03a-case-b-permanent-gate",
+      "runs": 2,
+      "same": true,
+      "projections": [
+        {
+          "scenarioId": "p0-03a-case-b-permanent-gate",
+          "outcome": null,
+          "stopReason": "reset-exhaustion",
+          "assertions": [
+            {
+              "id": "pickup-collected",
+              "result": "pass"
+            },
+            {
+              "id": "reset-observed",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 1,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 1,
+            "win": 0,
+            "reset": 5
+          }
+        },
+        {
+          "scenarioId": "p0-03a-case-b-permanent-gate",
+          "outcome": null,
+          "stopReason": "reset-exhaustion",
+          "assertions": [
+            {
+              "id": "pickup-collected",
+              "result": "pass"
+            },
+            {
+              "id": "reset-observed",
+              "result": "pass"
+            }
+          ],
+          "endState": {
+            "collected": 1,
+            "won": false,
+            "hits": 0,
+            "chestsOpened": 0,
+            "activePickups": 0
+          },
+          "eventCounts": {
+            "pickup": 1,
+            "win": 0,
+            "reset": 5
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "formatVersion": "playtest-scenario/v1",
+  "id": "p0-03a-case-a-wait-and-pass",
+  "version": 1,
+  "required": true,
+  "expectedOutcome": "SUCCESS",
+  "baselineEligible": false,
+  "target": { "siteVersion": 1 },
+  "harnessCondition": "none",
+  "setup": { "kind": "mutate-hazard", "index": 0, "distance": 120, "periodMs": 4000 },
+  "actions": [{ "kind": "reach_goal" }],
+  "assertions": [
+    {
+      "id": "won",
+      "kind": "state",
+      "requires": ["won"],
+      "expect": { "kind": "state", "path": "won", "op": "eq", "value": true },
+      "withinMs": 30000,
+      "onInsufficient": "unknown"
+    },
+    {
+      "id": "pickup-collected",
+      "kind": "state",
+      "requires": ["collected"],
+      "expect": { "kind": "state", "path": "collected", "op": "gte", "value": 1 },
+      "withinMs": 30000,
+      "onInsufficient": "unknown"
+    },
+    {
+      "id": "no-reset",
+      "kind": "event",
+      "requires": ["reset"],
+      "expect": { "kind": "event", "type": "reset", "op": "eq", "value": 0 },
+      "withinMs": 30000,
+      "onInsufficient": "unknown"
+    }
+  ],
+  "termination": { "kind": "won" },
+  "timeoutMs": 30000,
+  "pollIntervalMs": 50,
+  "stepDelayMs": 35,
+  "comparableEvents": ["pickup", "win", "reset"]
+}

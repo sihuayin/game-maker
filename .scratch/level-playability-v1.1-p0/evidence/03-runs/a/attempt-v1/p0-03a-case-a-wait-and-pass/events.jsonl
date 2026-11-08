@@ -1,0 +1,5 @@
+{"v":1,"seq":0,"t":0,"frame":null,"type":"scene-ready","actor":null,"params":{"x":500,"y":247.6,"onFloor":true},"source":"poll"}
+{"v":1,"seq":1,"t":0,"frame":null,"type":"spawn","actor":null,"params":{"inferred":true,"x":500,"y":247.6,"onFloor":true},"source":"poll"}
+{"v":1,"seq":2,"t":90,"frame":null,"type":"pickup","actor":"pickup[0]","params":{"count":1,"indexes":[0],"collected":1,"ambiguous":false},"source":"poll"}
+{"v":1,"seq":3,"t":3276,"frame":null,"type":"jump","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":4,"t":3807,"frame":null,"type":"win","actor":null,"params":{"collected":1},"source":"poll"}

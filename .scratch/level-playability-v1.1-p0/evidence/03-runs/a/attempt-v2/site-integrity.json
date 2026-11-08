@@ -1,0 +1,15 @@
+{
+  "before": {
+    "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+    "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+    "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+    "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+  },
+  "after": {
+    "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+    "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+    "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+    "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+  },
+  "unchanged": true
+}

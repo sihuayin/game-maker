@@ -1,0 +1,44 @@
+{
+  "stop": null,
+  "limits": {
+    "NO_PROGRESS_STEPS": 300,
+    "RESET_BUDGET": 5,
+    "WAIT_STEPS": 120,
+    "JUMP_VERIFY_STEPS": 3,
+    "JUMP_UNVERIFIED_BUDGET": 3,
+    "JUMP_FAILURE_BUDGET": 5
+  },
+  "progress": {
+    "maxX": 662.6666666666653,
+    "collected": 1,
+    "chests": 0,
+    "gate": false,
+    "won": true
+  },
+  "noProgressSteps": 0,
+  "resets": 0,
+  "waits": 0,
+  "jump": {
+    "failures": 0,
+    "unverified": 0,
+    "degraded": false,
+    "pending": null
+  },
+  "lastObservation": {
+    "x": 665.3333333333319,
+    "bottom": 222.25,
+    "onFloor": false,
+    "vy": 225,
+    "collected": 1,
+    "won": true
+  },
+  "notes": [
+    {
+      "step": 87,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 86
+      }
+    }
+  ]
+}

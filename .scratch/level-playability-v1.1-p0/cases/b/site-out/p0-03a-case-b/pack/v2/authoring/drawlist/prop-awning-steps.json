@@ -1,0 +1,276 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "prop-awning-steps",
+  "frame": "prop-awning-steps",
+  "viewBox": [
+    0,
+    0,
+    56,
+    32
+  ],
+  "expectedSize": [
+    56,
+    32
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 2,
+      "y": 26,
+      "w": 52,
+      "h": 6
+    },
+    {
+      "op": "dither",
+      "x": 2,
+      "y": 26,
+      "w": 52,
+      "h": 6,
+      "colors": [
+        "palette:2",
+        "palette:0"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 2,
+      "y": 30,
+      "w": 52,
+      "h": 2
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 6,
+      "y": 22,
+      "w": 44,
+      "h": 4
+    },
+    {
+      "op": "dither",
+      "x": 6,
+      "y": 22,
+      "w": 44,
+      "h": 4,
+      "colors": [
+        "palette:6",
+        "palette:3"
+      ],
+      "ratio": 0.25,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 10,
+      "y": 18,
+      "w": 36,
+      "h": 4
+    },
+    {
+      "op": "dither",
+      "x": 10,
+      "y": 18,
+      "w": 36,
+      "h": 4,
+      "colors": [
+        "palette:6",
+        "palette:3"
+      ],
+      "ratio": 0.25,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 14,
+      "y": 14,
+      "w": 28,
+      "h": 4
+    },
+    {
+      "op": "dither",
+      "x": 14,
+      "y": 14,
+      "w": 28,
+      "h": 4,
+      "colors": [
+        "palette:7",
+        "palette:3"
+      ],
+      "ratio": 0.25,
+      "pattern": "checker"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 18,
+      "y": 10,
+      "w": 20,
+      "h": 4
+    },
+    {
+      "op": "dither",
+      "x": 18,
+      "y": 10,
+      "w": 20,
+      "h": 4,
+      "colors": [
+        "palette:7",
+        "palette:3"
+      ],
+      "ratio": 0.25,
+      "pattern": "checker"
+    },
+    {
+      "op": "poly",
+      "fill": "palette:3",
+      "points": [
+        [
+          6,
+          22
+        ],
+        [
+          10,
+          18
+        ],
+        [
+          10,
+          22
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:3",
+      "points": [
+        [
+          46,
+          18
+        ],
+        [
+          50,
+          22
+        ],
+        [
+          46,
+          22
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:3",
+      "points": [
+        [
+          10,
+          18
+        ],
+        [
+          14,
+          14
+        ],
+        [
+          14,
+          18
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:4",
+      "points": [
+        [
+          14,
+          14
+        ],
+        [
+          18,
+          10
+        ],
+        [
+          18,
+          14
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:4",
+      "points": [
+        [
+          38,
+          10
+        ],
+        [
+          42,
+          14
+        ],
+        [
+          38,
+          14
+        ]
+      ]
+    },
+    {
+      "op": "rect",
+      "fill": "palette:5",
+      "x": 18,
+      "y": 10,
+      "w": 20,
+      "h": 2
+    },
+    {
+      "op": "dither",
+      "x": 18,
+      "y": 10,
+      "w": 20,
+      "h": 2,
+      "colors": [
+        "palette:5",
+        "palette:4"
+      ],
+      "ratio": 0.4,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:4",
+      "x": 18,
+      "y": 12,
+      "w": 20,
+      "h": 1
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 14,
+      "y1": 14,
+      "x2": 14,
+      "y2": 22
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 38,
+      "y1": 14,
+      "x2": 38,
+      "y2": 22
+    },
+    {
+      "op": "line",
+      "stroke": "palette:3",
+      "strokeWidth": 1,
+      "x1": 14,
+      "y1": 14,
+      "x2": 38,
+      "y2": 14
+    }
+  ]
+}

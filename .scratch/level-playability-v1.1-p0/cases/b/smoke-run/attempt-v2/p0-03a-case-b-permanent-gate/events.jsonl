@@ -1,0 +1,16 @@
+{"v":1,"seq":0,"t":0,"frame":null,"type":"scene-ready","actor":null,"params":{"x":300,"y":247.6,"onFloor":true},"source":"poll"}
+{"v":1,"seq":1,"t":0,"frame":null,"type":"spawn","actor":null,"params":{"inferred":true,"x":300,"y":247.6,"onFloor":true},"source":"poll"}
+{"v":1,"seq":2,"t":194,"frame":null,"type":"pickup","actor":"pickup[0]","params":{"count":1,"indexes":[0],"collected":1,"ambiguous":false},"source":"poll"}
+{"v":1,"seq":3,"t":285,"frame":null,"type":"jump","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":4,"t":473,"frame":null,"type":"land","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":5,"t":1714,"frame":null,"type":"reset","actor":null,"params":{"fromX":518.6666666666683,"toX":300},"source":"poll"}
+{"v":1,"seq":6,"t":3719,"frame":null,"type":"reset","actor":null,"params":{"fromX":518.6666666666683,"toX":300},"source":"poll"}
+{"v":1,"seq":7,"t":3812,"frame":null,"type":"jump","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":8,"t":4040,"frame":null,"type":"land","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":9,"t":5965,"frame":null,"type":"jump","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":10,"t":5965,"frame":null,"type":"reset","actor":null,"params":{"fromX":513.3333333333348,"toX":300},"source":"poll"}
+{"v":1,"seq":11,"t":6005,"frame":null,"type":"land","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":12,"t":7844,"frame":null,"type":"reset","actor":null,"params":{"fromX":516.0000000000016,"toX":300},"source":"poll"}
+{"v":1,"seq":13,"t":7938,"frame":null,"type":"jump","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":14,"t":8130,"frame":null,"type":"land","actor":null,"params":{"inferred":true},"source":"poll"}
+{"v":1,"seq":15,"t":9843,"frame":null,"type":"reset","actor":null,"params":{"fromX":516.0000000000016,"toX":300},"source":"poll"}

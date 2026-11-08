@@ -1,0 +1,316 @@
+{
+  "script": "tools/p0-03-analysis.mjs",
+  "scriptVersion": "p0-03-analysis/1",
+  "at": "2026-11-07T14:38:35.632Z",
+  "command": "node .scratch/level-playability-v1.1-p0/tools/p0-03-analysis.mjs --out .scratch/level-playability-v1.1-p0/evidence/03-analyzer-results.json --json",
+  "node": "v22.23.2",
+  "finalLagMs": 200,
+  "bands": [
+    16.67,
+    200
+  ],
+  "inputs": {
+    "a": {
+      "file": "cases/a/analyzer-input-lag200ms.json",
+      "sha256": "sha256:97e13cbe789eb9e3b02f79574a4ff2855fc4ec9240daa6d6e33f33401ffd29f8"
+    },
+    "b": {
+      "file": "cases/b/analyzer-input-lag200ms.json",
+      "sha256": "sha256:922f7d34afbdfba4f4dcf3721801fb1e9f0f9716f43d2b8381e5ce31d5131b01"
+    },
+    "c1": {
+      "file": "cases/c/analyzer-phase-unknown.json",
+      "sha256": "sha256:2cb5aee06c3676d603a3c5ce843dab4c6f6b05936ffcecb93b6460444a4c916e"
+    },
+    "c2": {
+      "file": "cases/c/analyzer-hitbox-unverifiable.json",
+      "sha256": "sha256:5824788def680489e07983dc86791b7e43644f2607de25d5fd28d0a0db797908"
+    }
+  },
+  "rows": [
+    {
+      "case": "A",
+      "file": "cases/a/analyzer-input-lag200ms.json",
+      "lagMs": 16.67,
+      "verdict": "NO_PROVEN_BLOCKER",
+      "reason": "witness-found",
+      "proof": null,
+      "witness": {
+        "departAt": 0,
+        "arriveAt": 1280,
+        "segments": 64,
+        "movingSegments": 64
+      },
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 4224,
+        "statesVisited": 4096,
+        "edgesChecked": 12288,
+        "elapsedMs": 19,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "A",
+      "file": "cases/a/analyzer-input-lag200ms.json",
+      "lagMs": 200,
+      "verdict": "NO_PROVEN_BLOCKER",
+      "reason": "witness-found",
+      "proof": null,
+      "witness": {
+        "departAt": 0,
+        "arriveAt": 1280,
+        "segments": 64,
+        "movingSegments": 64
+      },
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 4224,
+        "statesVisited": 4096,
+        "edgesChecked": 12288,
+        "elapsedMs": 7,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "B",
+      "file": "cases/b/analyzer-input-lag200ms.json",
+      "lagMs": 16.67,
+      "verdict": "PROVEN_UNPLAYABLE",
+      "reason": "permanent-gate",
+      "proof": {
+        "kind": "permanent-gate",
+        "gateLo": 548,
+        "gateHi": 592,
+        "minP": 560,
+        "maxP": 580
+      },
+      "witness": null,
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "B",
+      "file": "cases/b/analyzer-input-lag200ms.json",
+      "lagMs": 200,
+      "verdict": "PROVEN_UNPLAYABLE",
+      "reason": "permanent-gate",
+      "proof": {
+        "kind": "permanent-gate",
+        "gateLo": 548,
+        "gateHi": 592,
+        "minP": 560,
+        "maxP": 580
+      },
+      "witness": null,
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "C1",
+      "file": "cases/c/analyzer-phase-unknown.json",
+      "lagMs": 16.67,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "phase-uncertain",
+      "proof": null,
+      "witness": null,
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "C1",
+      "file": "cases/c/analyzer-phase-unknown.json",
+      "lagMs": 200,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "phase-uncertain",
+      "proof": null,
+      "witness": null,
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "C2",
+      "file": "cases/c/analyzer-hitbox-unverifiable.json",
+      "lagMs": 16.67,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "hitbox-uncertain",
+      "proof": null,
+      "witness": null,
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "case": "C2",
+      "file": "cases/c/analyzer-hitbox-unverifiable.json",
+      "lagMs": 200,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "hitbox-uncertain",
+      "proof": null,
+      "witness": null,
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    }
+  ],
+  "aSafeWindow": [
+    {
+      "lagMs": 16.67,
+      "padPx": 1.0002,
+      "thresholdPx": 665.0002,
+      "windowMs": [
+        1083.336666666666,
+        2916.663333333334
+      ],
+      "durationMs": 1833.326666666668,
+      "playerRightAtGoal": 644,
+      "constructed": {
+        "waitLeft": 544.9998,
+        "witness": {
+          "segments": [
+            {
+              "t0": 0,
+              "t1": 1083.336666666666,
+              "x0": 544.9998,
+              "x1": 544.9998
+            },
+            {
+              "t0": 1083.336666666666,
+              "t1": 1502.0879166666655,
+              "x0": 544.9998,
+              "x1": 612
+            }
+          ],
+          "departAt": 1083.336666666666,
+          "arriveAt": 1502.0879166666655,
+          "elapsedMs": 0
+        },
+        "verify": null
+      }
+    },
+    {
+      "lagMs": 200,
+      "padPx": 12,
+      "thresholdPx": 676,
+      "windowMs": [
+        1266.6666666666667,
+        2733.333333333333
+      ],
+      "durationMs": 1466.6666666666663,
+      "playerRightAtGoal": 644,
+      "constructed": {
+        "waitLeft": 534,
+        "witness": {
+          "segments": [
+            {
+              "t0": 0,
+              "t1": 1266.6666666666667,
+              "x0": 534,
+              "x1": 534
+            },
+            {
+              "t0": 1266.6666666666667,
+              "t1": 1754.1666666666667,
+              "x0": 534,
+              "x1": 612
+            }
+          ],
+          "departAt": 1266.6666666666667,
+          "arriveAt": 1754.1666666666667,
+          "elapsedMs": 0
+        },
+        "verify": null
+      }
+    }
+  ]
+}

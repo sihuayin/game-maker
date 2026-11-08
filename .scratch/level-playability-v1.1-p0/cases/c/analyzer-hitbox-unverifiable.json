@@ -1,0 +1,12 @@
+{
+  "case": "C2",
+  "source": "cases/b/game-config.json (animated carriage geometry) with accepted-pack provenance withheld",
+  "world": { "xMin": 0, "xMax": 1408 },
+  "player": { "startX": 484, "goalX": 640, "width": 32, "height": 48, "y": 204.4, "maxSpeed": 0.16 },
+  "hazard": { "startX": 600, "distance": 120, "periodMs": 4000, "width": 64, "height": 48,
+    "anchorX": 0.5, "anchorY": 1, "y": 202, "axis": "x" },
+  "certainty": { "phase": "known", "hitbox": "unverifiable" },
+  "assumptions": { "verticalEvasionImpossible": true },
+  "options": { "lagMs": 200, "phaseSteps": 200, "xStep": 2,
+    "limits": { "maxStates": 200000, "timeBudgetMs": 5000 } }
+}

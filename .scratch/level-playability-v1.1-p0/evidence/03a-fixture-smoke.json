@@ -1,0 +1,176 @@
+{
+  "script": "tools/analyze-cases.mjs",
+  "scriptVersion": "p0-03a-analyze-cases/1",
+  "at": "2026-11-07T13:59:00.556Z",
+  "command": "node .scratch/level-playability-v1.1-p0/tools/analyze-cases.mjs --out .scratch/level-playability-v1.1-p0/evidence/03a-fixture-smoke.json --json",
+  "node": "v22.23.2",
+  "note": "夹具自检，不是 P0-03 的案例判断；最终 lagMs 由 P0-03 的 trace 决定",
+  "rows": [
+    {
+      "file": ".scratch/level-playability-v1.1-p0/cases/a/analyzer-input-lag16.67ms.json",
+      "fileSha256": "sha256:29ef9750137307a42332e51ecde7480e4c3b20665bcc498f9c1cfba6674cdbd4",
+      "case": "A",
+      "lagMs": 16.67,
+      "verdict": "NO_PROVEN_BLOCKER",
+      "reason": "witness-found",
+      "witness": {
+        "departAt": 0,
+        "arriveAt": 1280,
+        "segments": 64,
+        "movingSegments": 64,
+        "verify": null
+      },
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 4224,
+        "statesVisited": 4096,
+        "edgesChecked": 12288,
+        "elapsedMs": 6,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "file": ".scratch/level-playability-v1.1-p0/cases/a/analyzer-input-lag200ms.json",
+      "fileSha256": "sha256:97e13cbe789eb9e3b02f79574a4ff2855fc4ec9240daa6d6e33f33401ffd29f8",
+      "case": "A",
+      "lagMs": 200,
+      "verdict": "NO_PROVEN_BLOCKER",
+      "reason": "witness-found",
+      "witness": {
+        "departAt": 0,
+        "arriveAt": 1280,
+        "segments": 64,
+        "movingSegments": 64,
+        "verify": null
+      },
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 4224,
+        "statesVisited": 4096,
+        "edgesChecked": 12288,
+        "elapsedMs": 2,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "file": ".scratch/level-playability-v1.1-p0/cases/b/analyzer-input-lag16.67ms.json",
+      "fileSha256": "sha256:74e993a673bbf59713303f5eb66473644da8734f69a7dacf6157d118e7275765",
+      "case": "B",
+      "lagMs": 16.67,
+      "verdict": "PROVEN_UNPLAYABLE",
+      "reason": "permanent-gate",
+      "proof": {
+        "kind": "permanent-gate",
+        "gateLo": 548,
+        "gateHi": 592,
+        "minP": 560,
+        "maxP": 580
+      },
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "file": ".scratch/level-playability-v1.1-p0/cases/b/analyzer-input-lag200ms.json",
+      "fileSha256": "sha256:922f7d34afbdfba4f4dcf3721801fb1e9f0f9716f43d2b8381e5ce31d5131b01",
+      "case": "B",
+      "lagMs": 200,
+      "verdict": "PROVEN_UNPLAYABLE",
+      "reason": "permanent-gate",
+      "proof": {
+        "kind": "permanent-gate",
+        "gateLo": 548,
+        "gateHi": 592,
+        "minP": 560,
+        "maxP": 580
+      },
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "file": ".scratch/level-playability-v1.1-p0/cases/c/analyzer-hitbox-unverifiable.json",
+      "fileSha256": "sha256:5824788def680489e07983dc86791b7e43644f2607de25d5fd28d0a0db797908",
+      "case": "C2",
+      "lagMs": 200,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "hitbox-uncertain",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    },
+    {
+      "file": ".scratch/level-playability-v1.1-p0/cases/c/analyzer-phase-unknown.json",
+      "fileSha256": "sha256:2cb5aee06c3676d603a3c5ce843dab4c6f6b05936ffcecb93b6460444a4c916e",
+      "case": "C1",
+      "lagMs": 200,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "phase-uncertain",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      }
+    }
+  ]
+}

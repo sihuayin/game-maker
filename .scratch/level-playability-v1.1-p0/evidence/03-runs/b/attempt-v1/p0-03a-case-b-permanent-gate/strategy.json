@@ -1,0 +1,107 @@
+{
+  "stop": {
+    "reason": "reset-exhaustion",
+    "atStep": 263
+  },
+  "limits": {
+    "NO_PROGRESS_STEPS": 300,
+    "RESET_BUDGET": 5,
+    "WAIT_STEPS": 120,
+    "JUMP_VERIFY_STEPS": 3,
+    "JUMP_UNVERIFIED_BUDGET": 3,
+    "JUMP_FAILURE_BUDGET": 5
+  },
+  "progress": {
+    "maxX": 518.6666666666683,
+    "collected": 1,
+    "chests": 0,
+    "gate": false,
+    "won": false
+  },
+  "noProgressSteps": 224,
+  "resets": 5,
+  "waits": 0,
+  "jump": {
+    "failures": 0,
+    "unverified": 0,
+    "degraded": false,
+    "pending": null
+  },
+  "lastObservation": {
+    "x": 300,
+    "bottom": 250,
+    "onFloor": true,
+    "vy": 0,
+    "collected": 1,
+    "won": false
+  },
+  "notes": [
+    {
+      "step": 48,
+      "kind": "reset",
+      "detail": {
+        "fromX": 518.6666666666683,
+        "toX": 300,
+        "count": 1
+      }
+    },
+    {
+      "step": 104,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 2
+      }
+    },
+    {
+      "step": 157,
+      "kind": "reset",
+      "detail": {
+        "fromX": 516.0000000000016,
+        "toX": 300,
+        "count": 3
+      }
+    },
+    {
+      "step": 158,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 157
+      }
+    },
+    {
+      "step": 212,
+      "kind": "reset",
+      "detail": {
+        "fromX": 513.3333333333348,
+        "toX": 300,
+        "count": 4
+      }
+    },
+    {
+      "step": 213,
+      "kind": "jump-verified",
+      "detail": {
+        "atStep": 212
+      }
+    },
+    {
+      "step": 263,
+      "kind": "reset",
+      "detail": {
+        "fromX": 513.3333333333348,
+        "toX": 300,
+        "count": 5
+      }
+    },
+    {
+      "step": 263,
+      "kind": "stop",
+      "detail": {
+        "reason": "reset-exhaustion",
+        "atStep": 263
+      }
+    }
+  ]
+}

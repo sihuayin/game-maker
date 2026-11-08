@@ -1,0 +1,121 @@
+{
+  "startedAt": "2026-11-07T13:59:28.820Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1 --scenario-dir .scratch/level-playability-v1.1-p0/cases/a/scenario --out .scratch/level-playability-v1.1-p0/cases/a/smoke-run --repeat 2 --json",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/pack/v2",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/scenario",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/smoke-run",
+  "repeat": 2,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "last-train",
+    "packVersion": 2,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/smoke-run/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "p0-03a-case-a-wait-and-pass",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": true,
+          "steps": 102
+        }
+      ],
+      "siteUnchanged": true
+    },
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/smoke-run/attempt-v2",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "p0-03a-case-a-wait-and-pass",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": true,
+          "steps": 101
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 2,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "p0-03a-case-a-wait-and-pass",
+        "runs": 2,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "p0-03a-case-a-wait-and-pass",
+            "outcome": null,
+            "stopReason": null,
+            "assertions": [
+              {
+                "id": "won",
+                "result": "pass"
+              },
+              {
+                "id": "pickup-collected",
+                "result": "pass"
+              },
+              {
+                "id": "no-reset",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 1,
+              "reset": 0
+            }
+          },
+          {
+            "scenarioId": "p0-03a-case-a-wait-and-pass",
+            "outcome": null,
+            "stopReason": null,
+            "assertions": [
+              {
+                "id": "won",
+                "result": "pass"
+              },
+              {
+                "id": "pickup-collected",
+                "result": "pass"
+              },
+              {
+                "id": "no-reset",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 1,
+              "reset": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

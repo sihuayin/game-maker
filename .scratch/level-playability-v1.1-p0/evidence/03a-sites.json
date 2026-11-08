@@ -1,0 +1,125 @@
+{
+  "script": "tools/build-cases.mjs",
+  "scriptVersion": "p0-03a-build-cases/1",
+  "at": "2026-11-07T13:58:12.758Z",
+  "command": "node .scratch/level-playability-v1.1-p0/tools/build-cases.mjs --force --json",
+  "exitCode": 0,
+  "toolchain": {
+    "node": "v22.23.2",
+    "demoDist": {
+      "path": "packages/demo/dist/index.js",
+      "sha256": "sha256:5ab06341df67601edacef6f3ec670c9daf6c1590815ec396b14366ec3d795cd0"
+    },
+    "shellJs": {
+      "path": "packages/demo/dist/shell.js",
+      "sha256": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a"
+    },
+    "pack": {
+      "path": "fixtures/packs/last-train/v2",
+      "manifestSha256": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "treeSha256": "sha256:29673385086a9701f7d6b7209a7c1bba37a3dad4efb307a3afa9f607bf2c5478"
+    }
+  },
+  "fixtureIntegrity": {
+    "before": {
+      "manifest": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "tree": "sha256:29673385086a9701f7d6b7209a7c1bba37a3dad4efb307a3afa9f607bf2c5478"
+    },
+    "after": {
+      "manifest": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "tree": "sha256:29673385086a9701f7d6b7209a7c1bba37a3dad4efb307a3afa9f607bf2c5478"
+    },
+    "unchanged": true,
+    "gitStatusFixtures": ""
+  },
+  "cases": [
+    {
+      "case": "a",
+      "config": ".scratch/level-playability-v1.1-p0/cases/a/game-config.json",
+      "configSha256": "sha256:afba7a5265c4765c19abc119c9e6b229d9b84860517e5f07e1472790fd6565de",
+      "outRoot": ".scratch/level-playability-v1.1-p0/cases/a/site-out",
+      "gameId": "p0-03a-case-a",
+      "siteDir": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1",
+      "packDir": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/pack/v2",
+      "siteVersion": 1,
+      "shellVersion": "2",
+      "packVersion": "v2",
+      "entry": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1/index.html",
+      "serveRoot": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a",
+      "warnings": [],
+      "siteJson": {
+        "shell": "2",
+        "pack": "v2",
+        "config": "game-config.json"
+      },
+      "files": [
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1/game-config.json",
+          "sha256": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8",
+          "bytes": 1582
+        },
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1/index.html",
+          "sha256": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "bytes": 272
+        },
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1/shell.js",
+          "sha256": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "bytes": 1638292
+        },
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1/site.json",
+          "sha256": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "bytes": 67
+        }
+      ],
+      "siteTreeSha256": "sha256:2b1cb4d88a859c1e62e8b01d708a7ad466d69297e07a8eda2a630ccdbacd17f0",
+      "packTreeSha256": "sha256:29673385086a9701f7d6b7209a7c1bba37a3dad4efb307a3afa9f607bf2c5478"
+    },
+    {
+      "case": "b",
+      "config": ".scratch/level-playability-v1.1-p0/cases/b/game-config.json",
+      "configSha256": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe",
+      "outRoot": ".scratch/level-playability-v1.1-p0/cases/b/site-out",
+      "gameId": "p0-03a-case-b",
+      "siteDir": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1",
+      "packDir": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/pack/v2",
+      "siteVersion": 1,
+      "shellVersion": "2",
+      "packVersion": "v2",
+      "entry": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1/index.html",
+      "serveRoot": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b",
+      "warnings": [],
+      "siteJson": {
+        "shell": "2",
+        "pack": "v2",
+        "config": "game-config.json"
+      },
+      "files": [
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1/game-config.json",
+          "sha256": "sha256:b3c8d8ada4f694004eff2c48880db877656762740a21801cb4dfcce11de1f0fe",
+          "bytes": 1630
+        },
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1/index.html",
+          "sha256": "sha256:f0018e9981fbb24c661591a39de10ee261439f3bf0e79efc783fab4f66d41f53",
+          "bytes": 272
+        },
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1/shell.js",
+          "sha256": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "bytes": 1638292
+        },
+        {
+          "path": ".scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1/site.json",
+          "sha256": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "bytes": 67
+        }
+      ],
+      "siteTreeSha256": "sha256:4bd3e497cc921d5f6cce9106dee6a42633b7780a67c24c33a1633312db764575",
+      "packTreeSha256": "sha256:29673385086a9701f7d6b7209a7c1bba37a3dad4efb307a3afa9f607bf2c5478"
+    }
+  ]
+}

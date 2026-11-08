@@ -1,0 +1,113 @@
+{
+  "startedAt": "2026-11-07T14:36:08.374Z",
+  "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1 --scenario-dir .scratch/level-playability-v1.1-p0/cases/b/scenario --out .scratch/level-playability-v1.1-p0/evidence/03-runs/b --repeat 2 --json",
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/b/site-out/p0-03a-case-b/pack/v2",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/b/scenario",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/evidence/03-runs/b",
+  "repeat": 2,
+  "identity": {
+    "siteVersion": 1,
+    "packId": "last-train",
+    "packVersion": 2,
+    "shellVersion": "2"
+  },
+  "rejections": [],
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/evidence/03-runs/b/attempt-v1",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "p0-03a-case-b-permanent-gate",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": false,
+          "steps": 264
+        }
+      ],
+      "siteUnchanged": true
+    },
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/evidence/03-runs/b/attempt-v2",
+      "execution": "executed",
+      "scenarios": [
+        {
+          "scenarioId": "p0-03a-case-b-permanent-gate",
+          "execution": "executed",
+          "assertionAggregate": "pass",
+          "terminationReached": false,
+          "steps": 260
+        }
+      ],
+      "siteUnchanged": true
+    }
+  ],
+  "determinism": {
+    "repeat": 2,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "p0-03a-case-b-permanent-gate",
+        "runs": 2,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "p0-03a-case-b-permanent-gate",
+            "outcome": null,
+            "stopReason": "reset-exhaustion",
+            "assertions": [
+              {
+                "id": "pickup-collected",
+                "result": "pass"
+              },
+              {
+                "id": "reset-observed",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 0,
+              "reset": 5
+            }
+          },
+          {
+            "scenarioId": "p0-03a-case-b-permanent-gate",
+            "outcome": null,
+            "stopReason": "reset-exhaustion",
+            "assertions": [
+              {
+                "id": "pickup-collected",
+                "result": "pass"
+              },
+              {
+                "id": "reset-observed",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 0,
+              "reset": 5
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

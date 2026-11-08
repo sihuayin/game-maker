@@ -1,0 +1,457 @@
+{
+  "siteDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1",
+  "packDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/pack/v2",
+  "scenarioDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/cases/a/scenario",
+  "outDir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/evidence/03-runs/a",
+  "repeat": 2,
+  "rejections": [],
+  "determinism": {
+    "repeat": 2,
+    "same": true,
+    "comparisons": [
+      {
+        "scenarioId": "p0-03a-case-a-wait-and-pass",
+        "runs": 2,
+        "same": true,
+        "projections": [
+          {
+            "scenarioId": "p0-03a-case-a-wait-and-pass",
+            "outcome": null,
+            "stopReason": null,
+            "assertions": [
+              {
+                "id": "won",
+                "result": "pass"
+              },
+              {
+                "id": "pickup-collected",
+                "result": "pass"
+              },
+              {
+                "id": "no-reset",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 1,
+              "reset": 0
+            }
+          },
+          {
+            "scenarioId": "p0-03a-case-a-wait-and-pass",
+            "outcome": null,
+            "stopReason": null,
+            "assertions": [
+              {
+                "id": "won",
+                "result": "pass"
+              },
+              {
+                "id": "pickup-collected",
+                "result": "pass"
+              },
+              {
+                "id": "no-reset",
+                "result": "pass"
+              }
+            ],
+            "endState": {
+              "collected": 1,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0
+            },
+            "eventCounts": {
+              "pickup": 1,
+              "win": 1,
+              "reset": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "attempts": [
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/evidence/03-runs/a/attempt-v1",
+      "report": {
+        "reportVersion": "playtest-report/v1",
+        "identity": {
+          "scenarioFormatVersion": "playtest-scenario/v1",
+          "siteVersion": 1,
+          "packId": "last-train",
+          "packVersion": 2,
+          "packChecksum": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+          "configChecksum": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8",
+          "shellVersion": "2",
+          "harnessVersion": "playtest-harness/v2",
+          "rulesVersion": "playtest-rules/v2"
+        },
+        "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1 --scenario-dir .scratch/level-playability-v1.1-p0/cases/a/scenario --out .scratch/level-playability-v1.1-p0/evidence/03-runs/a --repeat 2 --json",
+        "exitCode": 0,
+        "startedAt": "2026-11-07T14:35:56.788Z",
+        "finishedAt": "2026-11-07T14:36:02.332Z",
+        "execution": "executed",
+        "scenarios": [
+          {
+            "scenarioId": "p0-03a-case-a-wait-and-pass",
+            "scenarioVersion": 1,
+            "required": true,
+            "harnessCondition": "none",
+            "expectedOutcome": "SUCCESS",
+            "baselineEligible": false,
+            "execution": "executed",
+            "terminationReached": true,
+            "assertions": [
+              {
+                "id": "won",
+                "kind": "state",
+                "requires": [
+                  "won"
+                ],
+                "result": "pass",
+                "observed": true,
+                "expect": {
+                  "kind": "state",
+                  "path": "won",
+                  "op": "eq",
+                  "value": true
+                },
+                "withinMs": 30000,
+                "evidence": []
+              },
+              {
+                "id": "pickup-collected",
+                "kind": "state",
+                "requires": [
+                  "collected"
+                ],
+                "result": "pass",
+                "observed": 1,
+                "expect": {
+                  "kind": "state",
+                  "path": "collected",
+                  "op": "gte",
+                  "value": 1
+                },
+                "withinMs": 30000,
+                "evidence": []
+              },
+              {
+                "id": "no-reset",
+                "kind": "event",
+                "requires": [
+                  "reset"
+                ],
+                "result": "pass",
+                "observed": 0,
+                "expect": {
+                  "kind": "event",
+                  "type": "reset",
+                  "op": "eq",
+                  "value": 0
+                },
+                "withinMs": 30000,
+                "evidence": []
+              }
+            ],
+            "assertionAggregate": "pass",
+            "endState": {
+              "collected": 1,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0,
+              "playerX": 665.3333333333319
+            },
+            "initialState": {
+              "collected": 0,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 1,
+              "playerX": 500
+            },
+            "actions": [
+              {
+                "kind": "reach_goal",
+                "outcome": "completed",
+                "durationMs": 3807,
+                "steps": 101
+              }
+            ],
+            "comparableEvents": [
+              "pickup",
+              "win",
+              "reset"
+            ],
+            "eventCounts": {
+              "scene-ready": 1,
+              "spawn": 1,
+              "pickup": 1,
+              "win": 1,
+              "chest-open": 0,
+              "danger-hit": 0,
+              "danger-erupt": 0,
+              "land": 0,
+              "jump": 1,
+              "reset": 0,
+              "runtime-error": 0
+            },
+            "evidence": [
+              "playtest-events",
+              "playtest-trace",
+              "playtest-input",
+              "playtest-console",
+              "playtest-exceptions"
+            ],
+            "durationMs": 4195,
+            "steps": 102
+          }
+        ],
+        "runtime": {
+          "pollIntervalMs": 50,
+          "stepDelayMs": 35,
+          "scenarioTimeoutMs": 30000,
+          "viewport": {
+            "w": 1000,
+            "h": 600
+          },
+          "deviceScaleFactor": 1,
+          "chromeFlags": [
+            "--headless=new",
+            "--disable-gpu",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--disable-background-networking",
+            "--disable-background-timer-throttling",
+            "--disable-renderer-backgrounding",
+            "--disable-backgrounding-occluded-windows",
+            "--hide-scrollbars",
+            "--window-size=1000,600"
+          ]
+        },
+        "evidence": [
+          "playtest-events",
+          "playtest-trace",
+          "playtest-input",
+          "playtest-console",
+          "playtest-exceptions",
+          "playtest-chrome"
+        ]
+      },
+      "integrity": {
+        "before": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "after": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "unchanged": true
+      }
+    },
+    {
+      "dir": "/Volumes/shy/some-projects/game-maker/.scratch/level-playability-v1.1-p0/evidence/03-runs/a/attempt-v2",
+      "report": {
+        "reportVersion": "playtest-report/v1",
+        "identity": {
+          "scenarioFormatVersion": "playtest-scenario/v1",
+          "siteVersion": 1,
+          "packId": "last-train",
+          "packVersion": 2,
+          "packChecksum": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+          "configChecksum": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8",
+          "shellVersion": "2",
+          "harnessVersion": "playtest-harness/v2",
+          "rulesVersion": "playtest-rules/v2"
+        },
+        "command": "node /Volumes/shy/some-projects/game-maker/packages/demo/probe/playtest/playtest.mjs --site .scratch/level-playability-v1.1-p0/cases/a/site-out/p0-03a-case-a/site/v1 --scenario-dir .scratch/level-playability-v1.1-p0/cases/a/scenario --out .scratch/level-playability-v1.1-p0/evidence/03-runs/a --repeat 2 --json",
+        "exitCode": 0,
+        "startedAt": "2026-11-07T14:36:02.467Z",
+        "finishedAt": "2026-11-07T14:36:07.399Z",
+        "execution": "executed",
+        "scenarios": [
+          {
+            "scenarioId": "p0-03a-case-a-wait-and-pass",
+            "scenarioVersion": 1,
+            "required": true,
+            "harnessCondition": "none",
+            "expectedOutcome": "SUCCESS",
+            "baselineEligible": false,
+            "execution": "executed",
+            "terminationReached": true,
+            "assertions": [
+              {
+                "id": "won",
+                "kind": "state",
+                "requires": [
+                  "won"
+                ],
+                "result": "pass",
+                "observed": true,
+                "expect": {
+                  "kind": "state",
+                  "path": "won",
+                  "op": "eq",
+                  "value": true
+                },
+                "withinMs": 30000,
+                "evidence": []
+              },
+              {
+                "id": "pickup-collected",
+                "kind": "state",
+                "requires": [
+                  "collected"
+                ],
+                "result": "pass",
+                "observed": 1,
+                "expect": {
+                  "kind": "state",
+                  "path": "collected",
+                  "op": "gte",
+                  "value": 1
+                },
+                "withinMs": 30000,
+                "evidence": []
+              },
+              {
+                "id": "no-reset",
+                "kind": "event",
+                "requires": [
+                  "reset"
+                ],
+                "result": "pass",
+                "observed": 0,
+                "expect": {
+                  "kind": "event",
+                  "type": "reset",
+                  "op": "eq",
+                  "value": 0
+                },
+                "withinMs": 30000,
+                "evidence": []
+              }
+            ],
+            "assertionAggregate": "pass",
+            "endState": {
+              "collected": 1,
+              "won": true,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 0,
+              "playerX": 665.3333333333319
+            },
+            "initialState": {
+              "collected": 0,
+              "won": false,
+              "hits": 0,
+              "chestsOpened": 0,
+              "activePickups": 1,
+              "playerX": 500
+            },
+            "actions": [
+              {
+                "kind": "reach_goal",
+                "outcome": "completed",
+                "durationMs": 3792,
+                "steps": 101
+              }
+            ],
+            "comparableEvents": [
+              "pickup",
+              "win",
+              "reset"
+            ],
+            "eventCounts": {
+              "scene-ready": 1,
+              "spawn": 1,
+              "pickup": 1,
+              "win": 1,
+              "chest-open": 0,
+              "danger-hit": 0,
+              "danger-erupt": 0,
+              "land": 0,
+              "jump": 1,
+              "reset": 0,
+              "runtime-error": 0
+            },
+            "evidence": [
+              "playtest-events",
+              "playtest-trace",
+              "playtest-input",
+              "playtest-console",
+              "playtest-exceptions"
+            ],
+            "durationMs": 4175,
+            "steps": 102
+          }
+        ],
+        "runtime": {
+          "pollIntervalMs": 50,
+          "stepDelayMs": 35,
+          "scenarioTimeoutMs": 30000,
+          "viewport": {
+            "w": 1000,
+            "h": 600
+          },
+          "deviceScaleFactor": 1,
+          "chromeFlags": [
+            "--headless=new",
+            "--disable-gpu",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--disable-background-networking",
+            "--disable-background-timer-throttling",
+            "--disable-renderer-backgrounding",
+            "--disable-backgrounding-occluded-windows",
+            "--hide-scrollbars",
+            "--window-size=1000,600"
+          ]
+        },
+        "evidence": [
+          "playtest-events",
+          "playtest-trace",
+          "playtest-input",
+          "playtest-console",
+          "playtest-exceptions",
+          "playtest-chrome"
+        ]
+      },
+      "integrity": {
+        "before": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "after": {
+          "index.html": "sha256:b707924f9a039da5387cc925783ea401afa461221088391366a45c26881cdace",
+          "shell.js": "sha256:d5e552d50b897f517ff068ce1ca3e00a94b7118d57419b944ebd52bfff7e322a",
+          "site.json": "sha256:2b90151ebc43705720b05e43fc8f348c06dace0d0ead6ba319cd4ca5bbcaba21",
+          "game-config.json": "sha256:7a878f7a204408b4a12fb29165b4ad9d060380e55eb69fa9e46721d9c15c2ac8"
+        },
+        "unchanged": true
+      }
+    }
+  ]
+}
