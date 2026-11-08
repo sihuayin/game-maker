@@ -4,12 +4,14 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1.1-p0
 Baseline: `wayfinder/level-playability-v1` @ `34db62b20a8fdc5dbe9bd25a05b20cfa67296040`；PRD `docs/v7.8/可玩1.md` @ `sha256:37bab0a85739b22069b22a6927df9d917d8fd78fa2c4d14fb4f6edac0628ad72`
-Status: open · 2026-11-06 开图
+Status: closed · 2026-11-08 收口
 Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已收口）
 
 > **2026-11-06 开图。** 授权来源：[`docs/v7.8/可玩1.md`](../../docs/v7.8/可玩1.md)（Level Playability V1.1 — P0）。
 > 本图按 Notes「执行覆盖」**承载执行**：不是只做决策，而是实际完成 P0-01～P0-03 的研究、原型、测试与三案例对照，产出结论包。
 > 终点由最后一张 HITL 票裁定；裁定前不得关图，也不得启动正式集成。
+>
+> **2026-11-08 收口。** 用户最终裁定 **GO — 技术可行性得到支持**（Q1(a) / Q2(a)）；本图关闭；后续集成必须另开 effort 并单独授权。
 
 ## Destination
 
@@ -101,7 +103,7 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 6. [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md)（task，AFK）— **resolved**（A/B/C 夹具、站点、E3 复扫；结论见票）
 7. [P0-03 A/B/C 三案例验证与真实 Runtime 对照](issues/07-p0-03-case-validation.md)（task，AFK）— **resolved**（A/B Runtime 对照 + lag / hitbox 审计）
 8. [P0-03R 案例证据复核](issues/08-p0-03r-evidence-review.md)（grilling，HITL）— **resolved**（证据充分，附 A 机制表述限制）
-9. [P0-04 结论包与 HITL 裁定](issues/09-p0-04-verdict.md)（grilling，HITL）— open · **frontier**
+9. [P0-04 结论包与 HITL 裁定](issues/09-p0-04-verdict.md)（grilling，HITL）— **resolved**（GO — 技术可行性；见[结论包](evidence/04-final-report.md)）
 
 ## Decisions so far
 
@@ -113,6 +115,7 @@ Predecessor: [Level Playability V1 P1](../level-playability-v1-p1/map.md)（已�
 - [P0-03a 合成案例与 scratch 站点](issues/06-p0-03a-case-fixtures.md): A/B 站点与 C 分析器输入就绪；E3 复扫逐项复现 P0-01 数字（无差异）；harness 冒烟证明 A/B 可取证（A won/no-reset，B reset-exhaustion，repeat 2 一致）。证据见 [`evidence/03a-sites.md`](evidence/03a-sites.md)。
 - [P0-03 A/B/C 三案例验证与真实 Runtime 对照](issues/07-p0-03-case-validation.md): A/B 真实 Runtime `--repeat 2` 与算法判断一致（A 安全通过/0 复位；B 永久封锁门 `[548,592]`，试玩仅旁证）；C 落 IE。最终 `lagMs=200ms`（trace 观测最大 94ms + 余量 106ms，锚定 Phaser `delta≤200ms`）；hitbox 可追溯到 accepted pack。报告见 [`evidence/03-case-comparison.md`](evidence/03-case-comparison.md)。
 - [P0-03R 案例证据复核](issues/08-p0-03r-evidence-review.md): 用户裁定**证据充分**——A 双侧支持但机制不等价（算法水平等待 vs Runtime 跳跃）；B 证明成立、Runtime 仅旁证；C 正确落 IE；最终 `lagMs=200ms`（94ms 仅观测值）；hitbox / fixture 审计通过。P0-03 收口，P0-04 解阻。裁定见 [`evidence/03r-ruling.md`](evidence/03r-ruling.md)。
+- [P0-04 结论包与 HITL 裁定](issues/09-p0-04-verdict.md): 用户裁定 **GO — 技术可行性得到支持**（Q1(a) 技术可行性口径 / Q2(a) 能力证明 + 结果层旁证）；六问答案、推荐范围、7 项前置条件与残余风险见 [`evidence/04-final-report.md`](evidence/04-final-report.md)；A 案仅结果层旁证、未验证机制等价；集成须另开 effort 并单独授权。
 
 ## Not yet specified
 
