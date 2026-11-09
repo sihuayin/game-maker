@@ -1,7 +1,7 @@
 # I00-10 垂直规避证明（G-04）
 
 Type: grilling
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 01
 Map: ../map.md
