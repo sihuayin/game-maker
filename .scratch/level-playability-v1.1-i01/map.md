@@ -149,6 +149,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 索引：每张已关闭票一行，够判断相关性即可；细节永远在票里。 -->
 
+- [I01-06 测试矩阵与证据要求](issues/06-i01-06-test-matrix.md): 唯一新测试文件 `playability-temporal-input.test.ts`，既有测试零改动、夹具零新增；65 条矩阵覆盖失败码、`1e-9` 容差、累积去重、TOCTOU 同字节、brand 伪造（配 PU/NB 阳性对照）、lag 矩阵、scope 与架构扫描；负向须重绑 `files[]` 才触达目标失败码；读取器无独立单元测试、接线只能结构证明，两条残余限制进 R1。
 - [I01-05 三处生产调用方接线与回归影响](issues/05-i01-05-call-site-wiring.md): 三处均可接线且越界清单为空；`runTemporalAudit` 必须同步、绝不抛；适用才读盘、每次编排读一次，重采样循环内不接（结果丢弃、无法影响重试）；汇合点与发布闸丢弃结果，时序 IE 不产 issue、不改 Verdict、不阻断；无新增参数或返回字段。
 - [I01-04 双档 lag 编排与 stub 降级](issues/04-i01-04-lag-orchestration.md): 结果区分 `applicable`；只要存在移动 Hazard 即适用，Y 轴 / 多 Hazard 保守 IE；两档只比 `verdict`，不同 ⇒ IE + `lag-disagreement`；非法 lag ⇒ IE + `lag-invalid`；常量唯一住 contracts；编排器在 `assets/ops.ts`；生产用显式 stub，替身只在测试；三处调用方接线后丢弃结果。
 - [I01-03 逐帧几何判据与负例矩阵](issues/03-i01-03-frame-geometry-predicate.md): 每帧须存在、`sourceSize == asset.size`、`anchor` 在 `1e-9` 内一致、`rotated/trimmed === false`；schema 优先，缺失默认按 `false`；失败闭集扩到 10 个；`files[]` 按路径去重；全量累积去重排序；`last-train/v2` 零不符。
@@ -159,7 +160,6 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 在**目标之内**、但还无法精确表述的问题。能写成一张票就写成票，不要预先切片。 -->
 
-- 证据产物模板：`01-file-plan.md` / `06-test-matrix.md` 的最小格式。
 - 授权包对 scratch 证据的归档方式（引用 vs 复制）。
 
 ## Out of scope
