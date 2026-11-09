@@ -1,7 +1,7 @@
 # I00-R2 文件白名单与授权边界 [HARD BLOCK]
 
 Type: grilling
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 11
 Map: ../map.md
