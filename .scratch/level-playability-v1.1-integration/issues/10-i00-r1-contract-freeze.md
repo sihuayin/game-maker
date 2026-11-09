@@ -1,7 +1,7 @@
 # I00-R1 输入输出契约冻结 [HARD BLOCK]
 
 Type: grilling
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 09
 Map: ../map.md

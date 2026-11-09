@@ -139,6 +139,7 @@ I00-R1 输入输出契约冻结（grilling · HITL）[HARD BLOCK]
 - [I00-06 性能取证与预算](issues/07-i00-06-performance-budget.md): 语料 21 configs / 19 moving；N=200、xStep=2 下状态容量 p50 137,800 / max 177,800，有效搜索 p50 32ms / max 43ms；全搜索最坏 569k states / 1.71M edges / 215ms（W=5760）。P0 的 4096/12288 只是首条 witness 路径，约为全搜索的 1/33。建议默认 `maxStates=500_000` / `timeBudgetMs=2_000`（硬上限 1M / 10s），写在机制层模块常量；超限逐层降级、不允许部分 witness。**附带缺陷**：固定 `phaseSteps=200` 在默认 90px/s 下 19/19 语料全部 `maxStepPx < xStep`，BFS 退化为只能等待 ⇒ 契约必须校验或推导 N。证据见 [`evidence/06-performance.md`](evidence/06-performance.md)。
 - [I00-05 连续时间边界与数值容差](issues/06-i00-05-continuous-tolerance.md): 相切沿用 `overlapsStrict`（并须补 Phaser overlap 的直接证据）；门宽不设语义阈值，只设 `R-L > ε`；容差为单一具名常量 `ε = max(1e-9, 1e-9·世界跨度)`；网格/步长不公开可调，契约冻结导出规则且必须保证 `maxSpeed·periodMs/N ≥ xStep`，否则 IE；稳定性 (d) 为每次运行硬门槛、(a)(b)(c) 为 I-02 验收性质；几何语义与 `overlapsStrict` 同义、实现可解析求交。
 - [I00-10 垂直规避证明（G-04）](issues/08-i00-10-vertical-evasion-proof.md): **主证明用 V1 图割**（恒覆盖门区作 forbidden region，起点终点不连通 ⇒ 无垂直规避），满高门作快速路径；hop 只作可达性上近似、不消费时间维度；硬门槛是参与判定的几何必须全 `checked`；门区按玩家几何外扩、不带 lag pad；证明不了即 IE，`PROVEN_UNPLAYABLE` 仅在「门区恒覆盖 + 全几何 checked + 图割不连通」三条同时成立时给出。
+- [I00-07 七项硬门槛验证矩阵](issues/09-i00-07-hard-gate-matrix.md): G-01 / G-02 / G-06 为 **BLOCKED**（数据通道缺失、聚合无法表达 partial 约束），G-03 / G-04 **NEEDS-RULING**，G-05 / G-07 **SATISFIABLE**。硬结论：全局 `partial ⇒ IE` 不可行，约束必须按维度设计；G-01 不成立则 G-04 不成立 ⇒ `PROVEN_UNPLAYABLE` 不可达。矩阵见 [`evidence/07-gate-matrix.md`](evidence/07-gate-matrix.md)。
 
 ## Not yet specified
 
