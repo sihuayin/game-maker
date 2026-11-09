@@ -1,8 +1,8 @@
 # I01-04 双档 lag 编排与 stub 降级
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: 02
 Map: ../map.md
 Class: I-01 / DECISION
@@ -38,3 +38,18 @@ Class: I-01 / DECISION
 - 两档比较需要一个公共诊断字段才能被观察；
 - stub 需要改变 `coverage` 或顶层聚合；
 - 需要模块级默认值或第二入口。
+
+## Answer
+
+决策记录：[`evidence/04-lag-orchestration.md`](../evidence/04-lag-orchestration.md)。
+
+- **Q1–Q8 全部 A**，并按修正把「生产 stub」与「测试替身」分开。
+- **结果类型**：`{ applicable: false } | { applicable: true, verdict, degradation?: "lag-invalid" | "lag-disagreement" }`。
+- **适用性**：只要存在带 `motion` 的 `hazard` 就为 `true`；Y 轴与多移动 Hazard 保守 IE，不判为不适用。
+- **两档比较**：只比 `verdict`；不同 ⇒ IE + `lag-disagreement`。
+- **非法 lag**：`undefined` / 非 number / `NaN` / `±Infinity` / 负数 ⇒ IE + `lag-invalid`；`0` 合法。顺序为先校验 lag，再判适用性。
+- **常量**：`TEMPORAL_LAG_MS = 16.67`、`TEMPORAL_LAG_BASELINE_MS = 200`，唯一住在 contracts `temporal.ts`；不复用 `FRAME_MARGIN_MS`。
+- **编排器**：`assets/ops.ts` 的 `runTemporalAudit`，读一次可信输入、调两次入口、`resolveTwoLagResults` 后返回。
+- **stub 边界**：生产显式使用 `stubTemporalAnalyzer`（`@internal` 导出）；其它 analyzer 只允许出现在 contracts 测试；架构测试限制生产调用者与生产 stub。
+- **消费局限**：三处调用方接线后丢弃结果，消费留到 I-03；若 I01-05 发现必须新增公共字段 ⇒ 停止重裁。
+- 不改变静态 Verdict、发布门禁、`coverage.temporal`、持久化或 CLI/MCP。
