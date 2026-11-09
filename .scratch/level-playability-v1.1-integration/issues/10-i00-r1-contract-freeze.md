@@ -5,7 +5,7 @@ Status: claimed
 Owner: 用户裁定（部分）· 2026-11-09
 Blocked by: 09
 Map: ../map.md
-State: BLOCKED（B1 / B2 未关闭，不得签署）
+State: READY-TO-SIGN（B1 / B2 已关闭，待用户确认签署）
 Class: I-00 / DECISION
 
 ## Question
@@ -77,3 +77,14 @@ Class: I-00 / DECISION
 - 未授权任何生产修改。
 - 未授权 I-01 执行。
 - B1 / B2 关闭后，Q1–Q6 合并为 R1 最终裁定，**不再新增 HITL 票**。
+
+---
+
+## 阻断项关闭（2026-11-09）
+
+- **B1 已关闭**：[`evidence/b1-grid-sampling.md`](../evidence/b1-grid-sampling.md)。结论：`≥` 方向成立（`N ≤ floor(maxSpeed·periodMs/xStep)`），它是**能力约束**——违反只产生 IE，不产生错误结论；不存在 `v_hazard·dt ≤ xStep` 的安全性约束（解析求交负责可靠性）。
+- **B2 已关闭**：[`evidence/b2-vertical-evasion-boundary.md`](../evidence/b2-vertical-evasion-boundary.md)。G-04 的六条证明义务、门区构造、降级与禁止条文已成文；新增「hop 采样加倍不变性」作为 PU 的硬性验证义务。
+
+**契约草案**：[`evidence/r1-contract.md`](../evidence/r1-contract.md)（待签署）。
+
+`State: READY-TO-SIGN` —— B1/B2 的实质结论与用户预设不同（方向未反），签署前需用户确认。
