@@ -1,8 +1,8 @@
 # I01-06 测试矩阵与证据要求
 
 Type: task
-Status: open
-Owner: —
+Status: claimed
+Owner: amber
 Blocked by: 03, 04, 05
 Map: ../map.md
 Class: I-01 / DELIVERABLE
