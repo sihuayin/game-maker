@@ -1,7 +1,7 @@
 # I00-07 七项硬门槛验证矩阵
 
 Type: task
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 02, 03, 04, 05, 06, 07, 08
 Map: ../map.md
