@@ -1,8 +1,8 @@
 # I01-01 精确文件清单与依赖方向
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: —
 Map: ../map.md
 Class: I-01 / DELIVERABLE
@@ -38,3 +38,15 @@ Class: I-01 / DELIVERABLE
 - 依赖方向无环；
 - 公共面无第 5 项加法；
 - 越界清单为空，或明确写出停止结论并移交 I01-07 / I01-R1。
+
+## Answer
+
+计划：[`evidence/01-file-plan.md`](../evidence/01-file-plan.md)。
+
+- **最小改动面**：contracts 2 个新文件（`temporal-input.ts` 纯验证 + brand、`temporal.ts` 入口 + stub + 两档比较）+ `api.ts` 只加导出；assets `ops.ts` 唯一读盘层；pipeline `create-game.ts` / `publish-gate.ts` 接线；新测试 1 个。
+- **不需要改** `config-audit.ts`、`mechanic.ts`、`verdict.ts`、`playability/index.ts`、`contracts/src/index.ts`。三处调用方直接调 `runTemporalAudit`，不经过 `ConfigAuditContext`。
+- **公开路径约束**：`contracts/src/index.ts` 不在白名单，且只导出 `playability/api.js` ⇒ 新符号必须经 `api.ts` 转出；这让 I-00 计划的 `auditPlayability` 签名改动**完全不必要**。
+- **公共面**：新导出替代 R2 第 1 项，不是第 5 项；R2 第 2–4 项在 I-01 不使用（留给 I-03）。assets 包新增两个导出，必须进 I01-07 审计。
+- **依赖方向**：`pipeline → assets → contracts`，无环；contracts 源码禁止 `node:fs` / `node:crypto`，由新测试内的架构断言守护。
+- **既有测试**：零改动（旧入口签名不变，`ConfigAuditContext` 不变）。
+- **越界清单**：空。条件性停止已列出：contracts 引入 Node 内置模块、改 `index.ts`、第 5 项公共面、改既有测试、新依赖或 `fixtures/packs/**`。

@@ -149,7 +149,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 索引：每张已关闭票一行，够判断相关性即可；细节永远在票里。 -->
 
-_（尚无已关闭票。）_
+- [I01-01 精确文件清单与依赖方向](issues/01-i01-01-file-plan.md): 最小改动面 = contracts 2 新 + `api.ts` 只加导出、assets `ops.ts` 唯一读盘层、pipeline 2 处接线；`config-audit.ts` / `mechanic.ts` / `verdict.ts` / `index.ts` 全不改；新导出**替代** R2 第 1 项而非第 5 项；既有测试零改动；越界清单为空。
 
 ## Not yet specified
 
