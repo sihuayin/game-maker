@@ -1,7 +1,7 @@
 # B2 G-04 垂直规避证明的契约边界
 
 Type: task
-Status: claimed
+Status: resolved
 Owner: agent（AFK）· 2026-11-09
 Blocked by: —
 Blocks: 10（R1 签署）
@@ -32,3 +32,17 @@ Class: I-00 / DELIVERABLE
 ## Answer
 
 （待补）
+
+## Answer
+
+条文草案：[`evidence/b2-vertical-evasion-boundary.md`](../evidence/b2-vertical-evasion-boundary.md)。可直接并入 `docs/v7.8/移动-I00.md`。
+
+**要点**
+
+- 图的边界：只含 `walk` / `walk-off` / `fall` / `hop` 四种边（`graph.ts:183-272`）；不含精确跳跃时序、空中变向、爬墙、状态转换、世界边界碰撞。
+- 门区：`[L,R] × hazard y 区间`，交集、不带 lag pad、正宽度 `R−L > ε`；按玩家盒子外扩后经 `forbiddenBoxes` 注入（`graph.ts:79,127-132`）。
+- 证明义务六条：门区恒覆盖 / 全几何 `checked` / 含 hop 边图上不连通 / **hop 采样加倍不变性** / 模型外规避已排除 / 两档 lag 一致。
+- **新增残差风险**：`hopSamples` 的 `Math.round`（`graph.ts:241-247`）可能误拒合法 hop ⇒ 低估玩家能力 ⇒ 假 PU。因此把「采样加倍后连通性不变」列为硬性验证义务。
+- 禁止：调用方布尔标记、hop 时间维度、以复杂度为由跳过、把「图割不连通」当不证自明、几何未 `checked` 时输出 PU。
+- 负例 10 条（N1–N10）全部进 I-04。
+- **G-01 不成立 ⇒ G-04 不成立**，因此 I-01 必须先于 I-02 的 PU 证明部分。
