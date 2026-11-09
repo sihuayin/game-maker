@@ -1,0 +1,202 @@
+{
+  "generatedAt": "2026-11-09T05:49:33.295Z",
+  "node": "v22.23.2",
+  "tests": {
+    "T1": {
+      "question": "采样点 t=0 与 t=1000 均安全，Hazard 在中途穿过玩家：连续判定是否捕获？",
+      "hazardSpeedPxPerMs": 2,
+      "hazardTravelPerDtPx": 2000,
+      "xStep": 2,
+      "endpointsSafe": true,
+      "collisionCaught": true,
+      "collisionAt": {
+        "t": 476,
+        "x": 1000,
+        "hazardLeft": 992,
+        "hazardRight": 1012
+      }
+    },
+    "T2": {
+      "question": "采样粗细是否影响「中途穿越」的捕获？",
+      "rows": [
+        {
+          "N": 2,
+          "dtMs": 1000,
+          "segment": [
+            0,
+            1000
+          ],
+          "containsCollisionInstant": true,
+          "hazardTravelPerDtPx": 2000,
+          "collisionCaught": true
+        },
+        {
+          "N": 4,
+          "dtMs": 500,
+          "segment": [
+            0,
+            500
+          ],
+          "containsCollisionInstant": true,
+          "hazardTravelPerDtPx": 1000,
+          "collisionCaught": true
+        },
+        {
+          "N": 8,
+          "dtMs": 250,
+          "segment": [
+            250,
+            500
+          ],
+          "containsCollisionInstant": true,
+          "hazardTravelPerDtPx": 500,
+          "collisionCaught": true
+        },
+        {
+          "N": 16,
+          "dtMs": 125,
+          "segment": [
+            375,
+            500
+          ],
+          "containsCollisionInstant": true,
+          "hazardTravelPerDtPx": 250,
+          "collisionCaught": true
+        }
+      ]
+    },
+    "T3": {
+      "question": "maxStepPx < xStep 时搜索是否退化？",
+      "rows": [
+        {
+          "maxSpeed": 0.02,
+          "maxStepPx": 0.2,
+          "xStep": 2,
+          "movePossible": false,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "statesVisited": 200,
+          "edgesChecked": 200
+        },
+        {
+          "maxSpeed": 0.05,
+          "maxStepPx": 0.5,
+          "xStep": 2,
+          "movePossible": false,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "statesVisited": 200,
+          "edgesChecked": 200
+        },
+        {
+          "maxSpeed": 0.1,
+          "maxStepPx": 1,
+          "xStep": 2,
+          "movePossible": false,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "statesVisited": 200,
+          "edgesChecked": 200
+        },
+        {
+          "maxSpeed": 0.15,
+          "maxStepPx": 1.5,
+          "xStep": 2,
+          "movePossible": false,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "statesVisited": 200,
+          "edgesChecked": 200
+        },
+        {
+          "maxSpeed": 0.2,
+          "maxStepPx": 2,
+          "xStep": 2,
+          "movePossible": true,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "statesVisited": 2469,
+          "edgesChecked": 7353
+        },
+        {
+          "maxSpeed": 0.5,
+          "maxStepPx": 5,
+          "xStep": 2,
+          "movePossible": true,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "statesVisited": 2703,
+          "edgesChecked": 13338
+        }
+      ]
+    },
+    "T4": {
+      "question": "N 超过 maxSpeed*periodMs/xStep 后是否退化？",
+      "rows": [
+        {
+          "N": 90,
+          "maxStepPx": 2.2222,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "statesVisited": 1720,
+          "edgesChecked": 5120
+        },
+        {
+          "N": 99,
+          "maxStepPx": 2.0202,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "statesVisited": 1720,
+          "edgesChecked": 5120
+        },
+        {
+          "N": 100,
+          "maxStepPx": 2,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "statesVisited": 1720,
+          "edgesChecked": 5120
+        },
+        {
+          "N": 101,
+          "maxStepPx": 1.9802,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "statesVisited": 101,
+          "edgesChecked": 101
+        },
+        {
+          "N": 110,
+          "maxStepPx": 1.8182,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "statesVisited": 110,
+          "edgesChecked": 110
+        }
+      ]
+    },
+    "T5": {
+      "question": "P0 A 型案例在不同 N 下结论是否稳定？",
+      "rows": [
+        {
+          "N": 2,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "witness": true
+        },
+        {
+          "N": 50,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "witness": true
+        },
+        {
+          "N": 200,
+          "verdict": "NO_PROVEN_BLOCKER",
+          "reason": "witness-found",
+          "witness": true
+        }
+      ]
+    }
+  }
+}

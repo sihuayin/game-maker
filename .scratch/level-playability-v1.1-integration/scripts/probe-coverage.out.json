@@ -1,0 +1,1354 @@
+{
+  "aggregateLayer_partial_empty": "NO_PROVEN_BLOCKER",
+  "cases": [
+    {
+      "doc": "matrix",
+      "caseId": "baseline-last-train",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "gap-200",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_MIDAIR_TOUCH_UNPROVEN",
+          "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+          "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+          "PLAYABILITY_SPATIAL_GATE_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": [
+            "mid-air-touch-only"
+          ]
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "gap-40",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "wall-100",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+          "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE",
+          "PLAYABILITY_SPATIAL_GATE_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "wall-40",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "pickup-120",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "pickup-50",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "goal-inside-luggage",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_GATE_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "low-ceiling-walkable",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "chest-in-pit",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_CHEST_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "chest-range-rescues",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_GATE_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "chest-inside-luggage-range0",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_CHEST_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "chest-inside-luggage-range30",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "pickup-inside-luggage",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_PICKUP_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "pickup-on-luggage",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "pickup-body-override-inside",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_PICKUP_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "moving-solid-sweep",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_PICKUP_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-platform-unsupported"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "spawn-deep-terrain",
+      "fixtureExpected": "INSUFFICIENT_EVIDENCE",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_SPAWN_IN_TERRAIN"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "spawn-no-foothold"
+          ]
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "spawn-no-foothold"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "spawn-no-foothold"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "spawn-no-foothold",
+      "fixtureExpected": "INSUFFICIENT_EVIDENCE",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_SPAWN_NO_FOOTHOLD"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "spawn-no-foothold"
+          ]
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "spawn-no-foothold"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "spawn-no-foothold"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "spawn-in-solid",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "target-out-of-world",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "target-out-of-world"
+          ]
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "target-out-of-world",
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "target-out-of-world"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "target-at-edge",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "matrix",
+      "caseId": "chest-sealed-in-solid",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_CHEST_BLOCKED",
+          "PLAYABILITY_SPATIAL_GATE_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "mechanic",
+      "caseId": "static-hazard-seals-path",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "PLAYABILITY_MECHANIC_PATH_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "mechanic",
+      "caseId": "wide-patrol",
+      "fixtureExpected": "INSUFFICIENT_EVIDENCE",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-hazard-phase"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "mechanic",
+      "caseId": "danger-full-wall",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_MECHANIC_PATH_NO_SAFE_WINDOW",
+          "PLAYABILITY_MECHANIC_PATH_NO_SAFE_WINDOW"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "mechanic",
+      "caseId": "danger-wide-idle",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "mechanic",
+      "caseId": "pickup-in-static-hazard",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_MECHANIC_PATH_BLOCKED",
+          "PLAYABILITY_MECHANIC_PATH_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": [
+            "target-inside-hazard"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "mechanic",
+      "caseId": "moving-platform",
+      "fixtureExpected": "INSUFFICIENT_EVIDENCE",
+      "top": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "moving-platform-unsupported"
+          ]
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "gate-midair-jumpthrough",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "one-way-pit-pickup",
+      "fixtureExpected": "PROVEN_UNPLAYABLE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": [
+          "PLAYABILITY_COMPLETION_GATE_NOT_REACHABLE_AFTER_COLLECT"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "one-way-pit-gate-on-pit-floor",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "two-one-way-branches",
+      "fixtureExpected": "INSUFFICIENT_EVIDENCE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_SPATIAL_GATE_UNREACHABLE"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "order-required-high-then-low",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "two-pickups-one-arc",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "chest-behind-wall-with-range",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "chest-midair-jumpthrough",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "checked",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "pit-chest-with-reset-hazard",
+      "fixtureExpected": "NO_PROVEN_BLOCKER",
+      "top": {
+        "verdict": "NO_PROVEN_BLOCKER",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "checked"
+        },
+        "evidence": []
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "completion": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
+          "gaps": []
+        }
+      }
+    },
+    {
+      "doc": "completion",
+      "caseId": "chest-overlapping-hazard",
+      "fixtureExpected": "INSUFFICIENT_EVIDENCE",
+      "top": {
+        "verdict": "PROVEN_UNPLAYABLE",
+        "coverage": {
+          "spatial": "partial",
+          "mechanic": "partial",
+          "completion": "partial"
+        },
+        "evidence": [
+          "PLAYABILITY_MECHANIC_PATH_BLOCKED"
+        ]
+      },
+      "layers": {
+        "spatial": {
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "partial",
+          "gaps": []
+        },
+        "mechanic": {
+          "verdict": "PROVEN_UNPLAYABLE",
+          "coverage": "partial",
+          "gaps": [
+            "target-inside-hazard"
+          ]
+        },
+        "completion": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "coverage": "partial",
+          "gaps": [
+            "suppressed-by-spatial-or-mechanic"
+          ]
+        }
+      }
+    }
+  ]
+}

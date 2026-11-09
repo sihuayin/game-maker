@@ -1,0 +1,337 @@
+{
+  "script": ".scratch/level-playability-v1.1-integration/scripts/perf-probe.mjs",
+  "scriptVersion": "i00-06-perf-probe/1",
+  "scriptSha256": "sha256:4485333e81ee8a0e9b3f55eff300c13c5de23af0a8dde7af17fed75e0538938b",
+  "command": "node --expose-gc .scratch/level-playability-v1.1-integration/scripts/perf-probe.mjs --out .scratch/level-playability-v1.1-integration/evidence/06-perf",
+  "node": "v22.23.2",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "cores": 10,
+  "totalMemMiB": 16384,
+  "loadavg": [
+    2.24,
+    1.96,
+    1.59
+  ],
+  "repoHead": "330d6dc3919d9f7fa9de05baff9668a4a1177133",
+  "branch": "wayfinder/level-playability-v1.1-integration",
+  "readOnly": true,
+  "exposeGc": true,
+  "at": "2026-11-09T04:14:40.510Z",
+  "durationMs": 3678.6,
+  "model": {
+    "path": ".scratch/level-playability-v1.1-p0/prototype/temporal-model.mjs",
+    "sha256": "sha256:01788b03db2bef13de5f9951368760f9cc79ba07effb8680d98c6ee270206d4d"
+  },
+  "inventory": {
+    "path": ".scratch/level-playability-v1/corpus/inventory.json",
+    "sha256": "sha256:ba1d051a401ac70f45be5a705e2c478961ffc3fc0a6c9feb4cde09365df5f74f"
+  },
+  "p0Inputs": {
+    "safeA": {
+      "path": ".scratch/level-playability-v1.1-p0/cases/a/analyzer-input-lag16.67ms.json",
+      "sha256": "sha256:29ef9750137307a42332e51ecde7480e4c3b20665bcc498f9c1cfba6674cdbd4"
+    },
+    "gateB": {
+      "path": ".scratch/level-playability-v1.1-p0/cases/b/analyzer-input-lag16.67ms.json",
+      "sha256": "sha256:74e993a673bbf59713303f5eb66473644da8734f69a7dacf6157d118e7275765"
+    }
+  },
+  "checks": [
+    {
+      "id": "corpus-counts-match-p0",
+      "pass": true,
+      "observed": {
+        "uniqueConfigs": 21,
+        "hazardsTotal": 31,
+        "configsWithMotion": 16,
+        "movingHazards": 19,
+        "nonXAxisMoving": 0
+      },
+      "expected": {
+        "uniqueConfigs": 21,
+        "movingHazards": 19
+      }
+    },
+    {
+      "id": "state-capacity-is-product",
+      "pass": true,
+      "note": "xPositions 由独立复刻的网格公式重算一致；stateCapacity = xPositions × phaseSteps。"
+    },
+    {
+      "id": "edge-formula-within-5pct",
+      "pass": true,
+      "observed": [
+        {
+          "label": "width/640",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.996,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.12
+        },
+        {
+          "label": "width/1440",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.05
+        },
+        {
+          "label": "width/2880",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.02
+        },
+        {
+          "label": "width/5760",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 3,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.01
+        },
+        {
+          "label": "distance/20",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.02
+        },
+        {
+          "label": "distance/40",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.02
+        },
+        {
+          "label": "distance/80",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.02
+        },
+        {
+          "label": "distance/160",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.02
+        },
+        {
+          "label": "period/4000",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.05
+        },
+        {
+          "label": "period/8000",
+          "maxStepPx": 6.4,
+          "xStep": 2,
+          "observedEdgesPerState": 6.991,
+          "predictedEdgesPerState": 7,
+          "errorPct": -0.13
+        },
+        {
+          "label": "period/16000",
+          "maxStepPx": 12.8,
+          "xStep": 2,
+          "observedEdgesPerState": 12.969,
+          "predictedEdgesPerState": 13,
+          "errorPct": -0.24
+        },
+        {
+          "label": "period/32000",
+          "maxStepPx": 25.6,
+          "xStep": 2,
+          "observedEdgesPerState": 24.886,
+          "predictedEdgesPerState": 25,
+          "errorPct": -0.46
+        },
+        {
+          "label": "phase/50",
+          "maxStepPx": 25.6,
+          "xStep": 2,
+          "observedEdgesPerState": 24.886,
+          "predictedEdgesPerState": 25,
+          "errorPct": -0.46
+        },
+        {
+          "label": "phase/100",
+          "maxStepPx": 12.8,
+          "xStep": 2,
+          "observedEdgesPerState": 12.969,
+          "predictedEdgesPerState": 13,
+          "errorPct": -0.24
+        },
+        {
+          "label": "phase/200",
+          "maxStepPx": 6.4,
+          "xStep": 2,
+          "observedEdgesPerState": 6.991,
+          "predictedEdgesPerState": 7,
+          "errorPct": -0.13
+        },
+        {
+          "label": "phase/400",
+          "maxStepPx": 3.2,
+          "xStep": 2,
+          "observedEdgesPerState": 2.999,
+          "predictedEdgesPerState": 3,
+          "errorPct": -0.05
+        }
+      ],
+      "note": "edgesChecked/statesVisited 与 2·floor(maxStepPx/xStep)+1 的误差均在 5% 内。"
+    },
+    {
+      "id": "p0-n200-valid-at-160pxs",
+      "pass": true,
+      "observed": {
+        "valid": 19,
+        "total": 19
+      }
+    },
+    {
+      "id": "resolution-rule-covers-corpus",
+      "pass": true,
+      "observed": {
+        "n": 38,
+        "min": 36855,
+        "p50": 111618,
+        "p90": 198432,
+        "max": 220480,
+        "mean": 123533.553,
+        "sd": 55875.988
+      },
+      "note": "在 resolution rule 允许的最大 phaseSteps 下，语料状态上限仍落在建议的 maxStates=500k 内。"
+    },
+    {
+      "id": "visited-within-capacity",
+      "pass": true
+    },
+    {
+      "id": "repeat-verdict-and-counts-stable",
+      "pass": true,
+      "observed": [
+        {
+          "label": "repeat/safeA",
+          "verdicts": [
+            "NO_PROVEN_BLOCKER"
+          ],
+          "visited": [
+            4096
+          ],
+          "edges": [
+            12288
+          ]
+        },
+        {
+          "label": "repeat/exhaust-w1440",
+          "verdicts": [
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "visited": [
+            137090
+          ],
+          "edges": [
+            411070
+          ]
+        },
+        {
+          "label": "repeat/exhaust-w2880",
+          "verdicts": [
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "visited": [
+            281090
+          ],
+          "edges": [
+            843070
+          ]
+        }
+      ]
+    },
+    {
+      "id": "budget-never-proves-unplayable",
+      "pass": true,
+      "note": "非门输入在 timeBudget=0/1ms、maxStates=0/1 下只能 SAFE 或 IE，绝不 PROVEN_UNPLAYABLE。"
+    },
+    {
+      "id": "gate-proof-independent-of-budget",
+      "pass": true,
+      "note": "永久封锁门在 timeBudget=0/1ms、maxStates=0/1 下仍是 PROVEN_UNPLAYABLE（证明在搜索之前）。"
+    },
+    {
+      "id": "safe-flips-to-ie-under-tiny-budget",
+      "pass": true
+    },
+    {
+      "id": "exhaustion-remains-ie",
+      "pass": true
+    },
+    {
+      "id": "wall-clock-only-budget-or-reporting",
+      "pass": true,
+      "hits": [
+        {
+          "line": 320,
+          "api": "Date.now",
+          "fn": "reconstruct",
+          "text": "return { segments, departAt, arriveAt, elapsedMs: Date.now() - startedAt };"
+        },
+        {
+          "line": 329,
+          "api": "Date.now",
+          "fn": "analyze",
+          "text": "const startedAt = Date.now();"
+        },
+        {
+          "line": 355,
+          "api": "Date.now",
+          "fn": "analyze",
+          "text": "stats.elapsedMs = Date.now() - startedAt;"
+        },
+        {
+          "line": 388,
+          "api": "Date.now",
+          "fn": "analyze",
+          "text": "stats.elapsedMs = Date.now() - startedAt;"
+        },
+        {
+          "line": 412,
+          "api": "Date.now",
+          "fn": "analyze",
+          "text": "stats.elapsedMs = Date.now() - startedAt;"
+        },
+        {
+          "line": 431,
+          "api": "Date.now",
+          "fn": "analyze",
+          "text": "if ((stats.statesVisited & 1023) === 0 && Date.now() - startedAt > limits.timeBudgetMs) {"
+        },
+        {
+          "line": 449,
+          "api": "Date.now",
+          "fn": "analyze",
+          "text": "stats.elapsedMs = Date.now() - startedAt;"
+        }
+      ]
+    },
+    {
+      "id": "runtime-under-180s",
+      "pass": true,
+      "observedMs": 3678.6
+    }
+  ]
+}

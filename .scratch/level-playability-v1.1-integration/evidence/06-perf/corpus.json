@@ -1,0 +1,3561 @@
+{
+  "script": ".scratch/level-playability-v1.1-integration/scripts/perf-probe.mjs",
+  "scriptVersion": "i00-06-perf-probe/1",
+  "scriptSha256": "sha256:4485333e81ee8a0e9b3f55eff300c13c5de23af0a8dde7af17fed75e0538938b",
+  "command": "node --expose-gc .scratch/level-playability-v1.1-integration/scripts/perf-probe.mjs --out .scratch/level-playability-v1.1-integration/evidence/06-perf",
+  "node": "v22.23.2",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "cores": 10,
+  "totalMemMiB": 16384,
+  "loadavg": [
+    2.24,
+    1.96,
+    1.59
+  ],
+  "repoHead": "330d6dc3919d9f7fa9de05baff9668a4a1177133",
+  "branch": "wayfinder/level-playability-v1.1-integration",
+  "readOnly": true,
+  "exposeGc": true,
+  "at": "2026-11-09T04:14:40.511Z",
+  "corpus": {
+    "scope": {
+      "inventory": ".scratch/level-playability-v1/corpus/inventory.json",
+      "inventorySha256": "sha256:ba1d051a401ac70f45be5a705e2c478961ffc3fc0a6c9feb4cde09365df5f74f",
+      "inventoryBaseline": "main @ fa17c14",
+      "roots": [
+        "out",
+        "fixtures",
+        ".scratch",
+        "packages/demo/fixtures"
+      ],
+      "filter": "parseOk ∧ format=game-config/v1 ∧ unique by contentHash",
+      "skipped": {
+        "notParseOk": 0,
+        "notGameConfig": 0,
+        "unreadable": 0
+      }
+    },
+    "counts": {
+      "uniqueConfigs": 21,
+      "hazardsTotal": 31,
+      "configsWithMotion": 16,
+      "movingHazards": 19,
+      "nonXAxisMoving": 0
+    },
+    "distributions": {
+      "worldWidth": {
+        "n": 19,
+        "min": 640,
+        "p50": 1440,
+        "p90": 1440,
+        "max": 1920,
+        "mean": 1296.842,
+        "sd": 365.225
+      },
+      "distance": {
+        "n": 19,
+        "min": 40,
+        "p50": 120,
+        "p90": 180,
+        "max": 200,
+        "mean": 113.684,
+        "sd": 51.662
+      },
+      "periodMs": {
+        "n": 19,
+        "min": 2500,
+        "p50": 3000,
+        "p90": 3680,
+        "max": 4000,
+        "mean": 3205.263,
+        "sd": 420.943
+      },
+      "hazardSpeedPxPerMs": {
+        "n": 19,
+        "min": 0.027,
+        "p50": 0.069,
+        "p90": 0.101,
+        "max": 0.138,
+        "mean": 0.07,
+        "sd": 0.031
+      },
+      "canonicalXPositions": {
+        "n": 19,
+        "min": 273,
+        "p50": 689,
+        "p90": 697,
+        "max": 889,
+        "mean": 611.947,
+        "sd": 185.563
+      },
+      "canonicalStateCapacity": {
+        "n": 19,
+        "min": 54600,
+        "p50": 137800,
+        "p90": 139400,
+        "max": 177800,
+        "mean": 122389.474,
+        "sd": 37112.53
+      },
+      "resolutionValidStateCapacity": {
+        "n": 38,
+        "min": 36855,
+        "p50": 111618,
+        "p90": 198432,
+        "max": 220480,
+        "mean": 123533.553,
+        "sd": 55875.988
+      }
+    },
+    "resolution": {
+      "rule": "phaseSteps ≤ maxSpeed · periodMs / xStep（否则 maxStepPx < xStep，玩家无法移动）",
+      "fixedN200ValidAtP0Speed": 19,
+      "fixedN200ValidAtConfigSpeed": 0,
+      "total": 19
+    },
+    "rows": [
+      {
+        "config": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+        "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+        "visualWidth": 640,
+        "playerAsset": "scavenger-actor",
+        "playerGeometry": {
+          "w": 48,
+          "h": 64,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 600,
+        "goalX": 520,
+        "hazardId": "enemy-patrol",
+        "hazardAsset": "wasteland-enemy",
+        "hazardGeometry": {
+          "w": 48,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 480,
+        "distance": 40,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.026667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 273,
+          "stateCapacity": 54600,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 36855,
+            "0.16": 65520
+          }
+        }
+      },
+      {
+        "config": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+        "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+        "visualWidth": 640,
+        "playerAsset": "scavenger-actor",
+        "playerGeometry": {
+          "w": 48,
+          "h": 64,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 600,
+        "goalX": 520,
+        "hazardId": "enemy-patrol",
+        "hazardAsset": "wasteland-enemy",
+        "hazardGeometry": {
+          "w": 48,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 480,
+        "distance": 40,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.026667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 273,
+          "stateCapacity": 54600,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 36855,
+            "0.16": 65520
+          }
+        }
+      },
+      {
+        "config": "out/__probe/last-train/site/v1/game-config.json",
+        "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+        "manifest": "out/__probe/last-train/pack/v2/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-traveler",
+        "playerGeometry": {
+          "w": 32,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 0.95
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1400,
+        "goalX": 1360,
+        "hazardId": "carriage",
+        "hazardAsset": "hazard-sweeping-carriage",
+        "hazardGeometry": {
+          "w": 64,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 800,
+        "distance": 200,
+        "periodMs": 4000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.1,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.8,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 180,
+            "0.16": 320
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 124020,
+            "0.16": 220480
+          }
+        }
+      },
+      {
+        "config": "out/__probe-timeout/last-train/game-configs/v1.json",
+        "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+        "manifest": "out/__probe/empty/pack/v2/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-traveler",
+        "playerGeometry": {
+          "w": 32,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 0.95
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1380,
+        "goalX": 1340,
+        "hazardId": "mover",
+        "hazardAsset": "hazard-sweeping-carriage",
+        "hazardGeometry": {
+          "w": 64,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 900,
+        "distance": 160,
+        "periodMs": 4000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.08,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.8,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 180,
+            "0.16": 320
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 124020,
+            "0.16": 220480
+          }
+        }
+      },
+      {
+        "config": "out/__probe-timeout/last-train/game-configs/v2.json",
+        "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+        "manifest": "out/__probe/empty/pack/v2/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-traveler",
+        "playerGeometry": {
+          "w": 32,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 0.95
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1400,
+        "goalX": 1360,
+        "hazardId": "sweeper",
+        "hazardAsset": "hazard-sweeping-carriage",
+        "hazardGeometry": {
+          "w": 64,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 760,
+        "distance": 160,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.106667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 93015,
+            "0.16": 165360
+          }
+        }
+      },
+      {
+        "config": "out/last-train/game-configs/v1.json",
+        "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+        "manifest": "out/last-train/pack/v17/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-traveler",
+        "playerGeometry": {
+          "w": 32,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 0.95
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1400,
+        "goalX": 1360,
+        "hazardId": "sweeping-carriage",
+        "hazardAsset": "hazard-sweeping-carriage",
+        "hazardGeometry": {
+          "w": 64,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 1080,
+        "distance": 180,
+        "periodMs": 2600,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.138462,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.17,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 117,
+            "0.16": 208
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 80613,
+            "0.16": 143312
+          }
+        }
+      },
+      {
+        "config": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+        "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
+        "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+        "visualWidth": 640,
+        "playerAsset": "scavenger-actor",
+        "playerGeometry": {
+          "w": 48,
+          "h": 64,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 560,
+        "goalAtX": 600,
+        "goalX": 520,
+        "hazardId": "enemy-patrol",
+        "hazardAsset": "wasteland-enemy",
+        "hazardGeometry": {
+          "w": 48,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 480,
+        "distance": 40,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.026667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 273,
+          "stateCapacity": 54600,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 36855,
+            "0.16": 65520
+          }
+        }
+      },
+      {
+        "config": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+        "manifest": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "scavenger-hero",
+        "playerGeometry": {
+          "w": 32,
+          "h": 40,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1400,
+        "goalX": 1354,
+        "hazardId": "enemy-1",
+        "hazardAsset": "enemy-wasteland",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 36,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 1150,
+        "distance": 180,
+        "periodMs": 3600,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.1,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.62,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 162,
+            "0.16": 288
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 111618,
+            "0.16": 198432
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+        "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "scavenger-hero",
+        "playerGeometry": {
+          "w": 24,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1380,
+        "goalX": 1356,
+        "hazardId": "patroller-1",
+        "hazardAsset": "wasteland-patroller",
+        "hazardGeometry": {
+          "w": 24,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 340,
+        "distance": 100,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.066667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 697,
+          "stateCapacity": 139400,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 94095,
+            "0.16": 167280
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+        "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "scavenger-hero",
+        "playerGeometry": {
+          "w": 24,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1380,
+        "goalX": 1356,
+        "hazardId": "patroller-2",
+        "hazardAsset": "wasteland-patroller",
+        "hazardGeometry": {
+          "w": 24,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 720,
+        "distance": 120,
+        "periodMs": 3500,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.068571,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 697,
+          "stateCapacity": 139400,
+          "maxStepPx": 1.575,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 157,
+            "0.16": 280
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 109429,
+            "0.16": 195160
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+        "manifest": ".scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v2/manifest.json",
+        "visualWidth": 640,
+        "playerAsset": "scavenger-actor",
+        "playerGeometry": {
+          "w": 48,
+          "h": 64,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 600,
+        "goalX": 520,
+        "hazardId": "enemy-patrol",
+        "hazardAsset": "wasteland-enemy",
+        "hazardGeometry": {
+          "w": 48,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 480,
+        "distance": 40,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.026667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 273,
+          "stateCapacity": 54600,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 36855,
+            "0.16": 65520
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-scavenger",
+        "playerGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1380,
+        "goalX": 1348,
+        "hazardId": "enemy-1",
+        "hazardAsset": "entity-wasteland-enemy",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 380,
+        "distance": 100,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.066667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 93015,
+            "0.16": 165360
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-scavenger",
+        "playerGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1380,
+        "goalX": 1348,
+        "hazardId": "enemy-2",
+        "hazardAsset": "entity-wasteland-enemy",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 880,
+        "distance": 120,
+        "periodMs": 3500,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.068571,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.575,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 157,
+            "0.16": 280
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 108173,
+            "0.16": 192920
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "scavenger-hero",
+        "playerGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 50,
+        "goalAtX": 1380,
+        "goalX": 1348,
+        "hazardId": "enemy-1",
+        "hazardAsset": "entity-enemy",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 600,
+        "distance": 120,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.08,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 93015,
+            "0.16": 165360
+          }
+        }
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+        "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "scavenger-hero",
+        "playerGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 50,
+        "goalAtX": 1380,
+        "goalX": 1348,
+        "hazardId": "enemy-2",
+        "hazardAsset": "entity-enemy",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 1050,
+        "distance": 100,
+        "periodMs": 2500,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.08,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.125,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 112,
+            "0.16": 200
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 77168,
+            "0.16": 137800
+          }
+        }
+      },
+      {
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+        "contentHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+        "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "player-scavenger",
+        "playerGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1390,
+        "goalX": 1350,
+        "hazardId": "enemy-patrol-1",
+        "hazardAsset": "enemy-patroller",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 32,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 960,
+        "distance": 120,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.08,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 93015,
+            "0.16": 165360
+          }
+        }
+      },
+      {
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+        "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1/manifest.json",
+        "visualWidth": 1920,
+        "playerAsset": "player-scavenger",
+        "playerGeometry": {
+          "w": 72,
+          "h": 108,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 830,
+        "goalX": 742,
+        "hazardId": "enemy-1",
+        "hazardAsset": "enemy-wasteland",
+        "hazardGeometry": {
+          "w": 80,
+          "h": 88,
+          "anchorX": 0.5,
+          "anchorY": 1
+        },
+        "hazardAtX": 620,
+        "distance": 60,
+        "periodMs": 3000,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.04,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 889,
+          "stateCapacity": 177800,
+          "maxStepPx": 1.35,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 135,
+            "0.16": 240
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 120015,
+            "0.16": 213360
+          }
+        }
+      },
+      {
+        "config": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+        "manifest": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/pack/v4/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "hero",
+        "playerGeometry": {
+          "w": 32,
+          "h": 48,
+          "anchorX": 0.5,
+          "anchorY": 0.95
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1390,
+        "goalX": 1338,
+        "hazardId": "enemy-1",
+        "hazardAsset": "enemy-scavenger",
+        "hazardGeometry": {
+          "w": 32,
+          "h": 40,
+          "anchorX": 0.5,
+          "anchorY": 0.95
+        },
+        "hazardAtX": 760,
+        "distance": 160,
+        "periodMs": 3600,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.088889,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 689,
+          "stateCapacity": 137800,
+          "maxStepPx": 1.62,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 162,
+            "0.16": 288
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 111618,
+            "0.16": 198432
+          }
+        }
+      },
+      {
+        "config": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+        "contentHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+        "manifest": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/manifest.json",
+        "visualWidth": 1440,
+        "playerAsset": "scavenger",
+        "playerGeometry": {
+          "w": 48,
+          "h": 64,
+          "anchorX": 0.5,
+          "anchorY": 0.88
+        },
+        "playerConfigSpeedPxPerMs": 0.09,
+        "startX": 40,
+        "goalAtX": 1400,
+        "goalX": 1336,
+        "hazardId": "enemy-1",
+        "hazardAsset": "enemy-wasteland",
+        "hazardGeometry": {
+          "w": 56,
+          "h": 64,
+          "anchorX": 0.5,
+          "anchorY": 0.85
+        },
+        "hazardAtX": 960,
+        "distance": 120,
+        "periodMs": 3600,
+        "axis": "x",
+        "kind": "cycle",
+        "hazardSpeedPxPerMs": 0.066667,
+        "canonical": {
+          "xStep": 2,
+          "phaseSteps": 200,
+          "maxSpeedBands": [
+            0.09,
+            0.16
+          ],
+          "xPositions": 673,
+          "stateCapacity": 134600,
+          "maxStepPx": 1.62,
+          "resolutionMaxPhaseStepsBySpeed": {
+            "0.09": 162,
+            "0.16": 288
+          },
+          "resolutionCapacityBySpeed": {
+            "0.09": 109026,
+            "0.16": 193824
+          }
+        }
+      }
+    ]
+  },
+  "runs": [
+    {
+      "label": "corpus/out/__p03-smoke/negative-gate/config-gate-missing.json#enemy-patrol/speed=0.09",
+      "corpusConfig": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+      "hazardId": "enemy-patrol",
+      "maxSpeed": 0.09,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 592
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 520,
+          "width": 48,
+          "height": 64,
+          "y": 186,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 480,
+          "distance": 40,
+          "periodMs": 3000,
+          "width": 48,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 640,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.026667,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.232,
+      "heapDeltaKiB": 26
+    },
+    {
+      "label": "corpus/out/__p03-smoke/negative-gate/config-gate-missing.json#enemy-patrol/speed=0.16",
+      "corpusConfig": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+      "hazardId": "enemy-patrol",
+      "maxSpeed": 0.16,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 592
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 520,
+          "width": 48,
+          "height": 64,
+          "y": 186,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 480,
+          "distance": 40,
+          "periodMs": 3000,
+          "width": 48,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 640,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.026667,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.049,
+      "heapDeltaKiB": 11.5
+    },
+    {
+      "label": "corpus/out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json#enemy-patrol/speed=0.09",
+      "corpusConfig": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "hazardId": "enemy-patrol",
+      "maxSpeed": 0.09,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 592
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 520,
+          "width": 48,
+          "height": 64,
+          "y": 186,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 480,
+          "distance": 40,
+          "periodMs": 3000,
+          "width": 48,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 640,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.026667,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.049,
+      "heapDeltaKiB": 11.6
+    },
+    {
+      "label": "corpus/out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json#enemy-patrol/speed=0.16",
+      "corpusConfig": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "hazardId": "enemy-patrol",
+      "maxSpeed": 0.16,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 592
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 520,
+          "width": 48,
+          "height": 64,
+          "y": 186,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 480,
+          "distance": 40,
+          "periodMs": 3000,
+          "width": 48,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 640,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.026667,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.056,
+      "heapDeltaKiB": 11.6
+    },
+    {
+      "label": "corpus/out/__probe/last-train/site/v1/game-config.json#carriage/speed=0.09",
+      "corpusConfig": "out/__probe/last-train/site/v1/game-config.json",
+      "hazardId": "carriage",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1360,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 800,
+          "distance": 200,
+          "periodMs": 4000,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 1.7999999999999998,
+          "hazardSpeedPxPerMs": 0.1,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 1.7999999999999998,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.602,
+      "heapDeltaKiB": 572.6
+    },
+    {
+      "label": "corpus/out/__probe/last-train/site/v1/game-config.json#carriage/speed=0.16",
+      "corpusConfig": "out/__probe/last-train/site/v1/game-config.json",
+      "hazardId": "carriage",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1360,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 800,
+          "distance": 200,
+          "periodMs": 4000,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 3.2,
+          "hazardSpeedPxPerMs": 0.1,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 83600,
+        "statesVisited": 83600,
+        "edgesChecked": 250600,
+        "elapsedMs": 35,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 34.72,
+      "heapDeltaKiB": 11053.8
+    },
+    {
+      "label": "corpus/out/__probe-timeout/last-train/game-configs/v1.json#mover/speed=0.09",
+      "corpusConfig": "out/__probe-timeout/last-train/game-configs/v1.json",
+      "hazardId": "mover",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1340,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 900,
+          "distance": 160,
+          "periodMs": 4000,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 1.7999999999999998,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 1.7999999999999998,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.116,
+      "heapDeltaKiB": 364.1
+    },
+    {
+      "label": "corpus/out/__probe-timeout/last-train/game-configs/v1.json#mover/speed=0.16",
+      "corpusConfig": "out/__probe-timeout/last-train/game-configs/v1.json",
+      "hazardId": "mover",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1340,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 900,
+          "distance": 160,
+          "periodMs": 4000,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 3.2,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 91560,
+        "statesVisited": 91560,
+        "edgesChecked": 274480,
+        "elapsedMs": 35,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 35.24,
+      "heapDeltaKiB": 23511.5
+    },
+    {
+      "label": "corpus/out/__probe-timeout/last-train/game-configs/v2.json#sweeper/speed=0.09",
+      "corpusConfig": "out/__probe-timeout/last-train/game-configs/v2.json",
+      "hazardId": "sweeper",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1360,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 760,
+          "distance": 160,
+          "periodMs": 3000,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "hazardSpeedPxPerMs": 0.106667,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 1.3499999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 1,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.094,
+      "heapDeltaKiB": 304
+    },
+    {
+      "label": "corpus/out/__probe-timeout/last-train/game-configs/v2.json#sweeper/speed=0.16",
+      "corpusConfig": "out/__probe-timeout/last-train/game-configs/v2.json",
+      "hazardId": "sweeper",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1360,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 760,
+          "distance": 160,
+          "periodMs": 3000,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "hazardSpeedPxPerMs": 0.106667,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 2.4,
+        "statesEnqueued": 77520,
+        "statesVisited": 77520,
+        "edgesChecked": 232360,
+        "elapsedMs": 28,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 27.166,
+      "heapDeltaKiB": 20369.6
+    },
+    {
+      "label": "corpus/out/last-train/game-configs/v1.json#sweeping-carriage/speed=0.09",
+      "corpusConfig": "out/last-train/game-configs/v1.json",
+      "hazardId": "sweeping-carriage",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1360,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 1080,
+          "distance": 180,
+          "periodMs": 2600,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 13,
+          "maxStepPx": 1.17,
+          "hazardSpeedPxPerMs": 0.138462,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 13,
+        "maxStepPx": 1.17,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.094,
+      "heapDeltaKiB": 303.7
+    },
+    {
+      "label": "corpus/out/last-train/game-configs/v1.json#sweeping-carriage/speed=0.16",
+      "corpusConfig": "out/last-train/game-configs/v1.json",
+      "hazardId": "sweeping-carriage",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1360,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 1080,
+          "distance": 180,
+          "periodMs": 2600,
+          "width": 64,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 13,
+          "maxStepPx": 2.08,
+          "hazardSpeedPxPerMs": 0.138462,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 13,
+        "maxStepPx": 2.08,
+        "statesEnqueued": 110470,
+        "statesVisited": 110470,
+        "edgesChecked": 331210,
+        "elapsedMs": 39,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 39.412,
+      "heapDeltaKiB": 19635.6
+    },
+    {
+      "label": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json#enemy-patrol",
+      "skipped": "no-goal-or-goal-not-ahead"
+    },
+    {
+      "label": "corpus/.scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.09",
+      "corpusConfig": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1354,
+          "width": 32,
+          "height": 40,
+          "y": 210,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 1150,
+          "distance": 180,
+          "periodMs": 3600,
+          "width": 32,
+          "height": 36,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 214,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 1.6199999999999999,
+          "hazardSpeedPxPerMs": 0.1,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 18,
+        "maxStepPx": 1.6199999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.085,
+      "heapDeltaKiB": 302.8
+    },
+    {
+      "label": "corpus/.scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.16",
+      "corpusConfig": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1354,
+          "width": 32,
+          "height": 40,
+          "y": 210,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 1150,
+          "distance": 180,
+          "periodMs": 3600,
+          "width": 32,
+          "height": 36,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 214,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 2.88,
+          "hazardSpeedPxPerMs": 0.1,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 18,
+        "maxStepPx": 2.88,
+        "statesEnqueued": 119130,
+        "statesVisited": 119130,
+        "edgesChecked": 357190,
+        "elapsedMs": 43,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 42.231,
+      "heapDeltaKiB": 18200.6
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-1/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "patroller-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1416
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1356,
+          "width": 24,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 340,
+          "distance": 100,
+          "periodMs": 3000,
+          "width": 24,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "hazardSpeedPxPerMs": 0.066667,
+          "stateCapacity": 139400
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 697,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 1.3499999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.119,
+      "heapDeltaKiB": 308.4
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-1/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "patroller-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1416
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1356,
+          "width": 24,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 340,
+          "distance": 100,
+          "periodMs": 3000,
+          "width": 24,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "hazardSpeedPxPerMs": 0.066667,
+          "stateCapacity": 139400
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 697,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 2.4,
+        "statesEnqueued": 35350,
+        "statesVisited": 35350,
+        "edgesChecked": 105850,
+        "elapsedMs": 12,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 12.258,
+      "heapDeltaKiB": 7203.6
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-2/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "patroller-2",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1416
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1356,
+          "width": 24,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 720,
+          "distance": 120,
+          "periodMs": 3500,
+          "width": 24,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 1.575,
+          "hazardSpeedPxPerMs": 0.068571,
+          "stateCapacity": 139400
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 697,
+        "phaseSteps": 200,
+        "dtMs": 17.5,
+        "maxStepPx": 1.575,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.239,
+      "heapDeltaKiB": 531.3
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-2/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "patroller-2",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1416
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1356,
+          "width": 24,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 720,
+          "distance": 120,
+          "periodMs": 3500,
+          "width": 24,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 2.8000000000000003,
+          "hazardSpeedPxPerMs": 0.068571,
+          "stateCapacity": 139400
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 697,
+        "phaseSteps": 200,
+        "dtMs": 17.5,
+        "maxStepPx": 2.8000000000000003,
+        "statesEnqueued": 74400,
+        "statesVisited": 74400,
+        "edgesChecked": 223000,
+        "elapsedMs": 29,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 29.417,
+      "heapDeltaKiB": 19097.2
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json#enemy-patrol/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+      "hazardId": "enemy-patrol",
+      "maxSpeed": 0.09,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 592
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 520,
+          "width": 48,
+          "height": 64,
+          "y": 186,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 480,
+          "distance": 40,
+          "periodMs": 3000,
+          "width": 48,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 640,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.026667,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.048,
+      "heapDeltaKiB": 4
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json#enemy-patrol/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+      "hazardId": "enemy-patrol",
+      "maxSpeed": 0.16,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 592
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 520,
+          "width": 48,
+          "height": 64,
+          "y": 186,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 480,
+          "distance": 40,
+          "periodMs": 3000,
+          "width": 48,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 202,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 640,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.026667,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.01,
+      "heapDeltaKiB": 4.5
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 380,
+          "distance": 100,
+          "periodMs": 3000,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "hazardSpeedPxPerMs": 0.066667,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 1.3499999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.117,
+      "heapDeltaKiB": 377.6
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 380,
+          "distance": 100,
+          "periodMs": 3000,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "hazardSpeedPxPerMs": 0.066667,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 2.4,
+        "statesEnqueued": 38150,
+        "statesVisited": 38150,
+        "edgesChecked": 114250,
+        "elapsedMs": 18,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 17.583,
+      "heapDeltaKiB": 10972.7
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-2/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-2",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 880,
+          "distance": 120,
+          "periodMs": 3500,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 1.575,
+          "hazardSpeedPxPerMs": 0.068571,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 17.5,
+        "maxStepPx": 1.575,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.113,
+      "heapDeltaKiB": 351.8
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-2/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-2",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 880,
+          "distance": 120,
+          "periodMs": 3500,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 2.8000000000000003,
+          "hazardSpeedPxPerMs": 0.068571,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 17.5,
+        "maxStepPx": 2.8000000000000003,
+        "statesEnqueued": 89200,
+        "statesVisited": 89200,
+        "edgesChecked": 267400,
+        "elapsedMs": 31,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 31.512,
+      "heapDeltaKiB": 21434.9
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 50,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 600,
+          "distance": 120,
+          "periodMs": 3000,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 1.3499999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.089,
+      "heapDeltaKiB": 351.6
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 50,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 600,
+          "distance": 120,
+          "periodMs": 3000,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 2.4,
+        "statesEnqueued": 61160,
+        "statesVisited": 61160,
+        "edgesChecked": 183280,
+        "elapsedMs": 21,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 21.256,
+      "heapDeltaKiB": 12349.7
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-2/speed=0.09",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "enemy-2",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 50,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 1050,
+          "distance": 100,
+          "periodMs": 2500,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 12.5,
+          "maxStepPx": 1.125,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 12.5,
+        "maxStepPx": 1.125,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.102,
+      "heapDeltaKiB": 351.6
+    },
+    {
+      "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-2/speed=0.16",
+      "corpusConfig": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "hazardId": "enemy-2",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 50,
+          "goalX": 1348,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 1050,
+          "distance": 100,
+          "periodMs": 2500,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 12.5,
+          "maxStepPx": 2,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 12.5,
+        "maxStepPx": 2,
+        "statesEnqueued": 105150,
+        "statesVisited": 105150,
+        "edgesChecked": 315250,
+        "elapsedMs": 37,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 36.928,
+      "heapDeltaKiB": 15292.9
+    },
+    {
+      "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json#enemy-patrol-1/speed=0.09",
+      "corpusConfig": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "hazardId": "enemy-patrol-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1350,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 960,
+          "distance": 120,
+          "periodMs": 3000,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 1.3499999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.069,
+      "heapDeltaKiB": 320
+    },
+    {
+      "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json#enemy-patrol-1/speed=0.16",
+      "corpusConfig": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "hazardId": "enemy-patrol-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1350,
+          "width": 32,
+          "height": 32,
+          "y": 218,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 960,
+          "distance": 120,
+          "periodMs": 3000,
+          "width": 32,
+          "height": 32,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 218,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "hazardSpeedPxPerMs": 0.08,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 15,
+        "maxStepPx": 2.4,
+        "statesEnqueued": 97160,
+        "statesVisited": 97160,
+        "edgesChecked": 291280,
+        "elapsedMs": 33,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 33.585,
+      "heapDeltaKiB": 13846.7
+    },
+    {
+      "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.09",
+      "corpusConfig": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.09,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1848
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 742,
+          "width": 72,
+          "height": 108,
+          "y": 142,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 620,
+          "distance": 60,
+          "periodMs": 3000,
+          "width": 80,
+          "height": 88,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 162,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1920,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.04,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.032,
+      "heapDeltaKiB": 1.6
+    },
+    {
+      "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.16",
+      "corpusConfig": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.16,
+      "gridMovable": null,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1848
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 742,
+          "width": 72,
+          "height": 108,
+          "y": 142,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 620,
+          "distance": 60,
+          "periodMs": 3000,
+          "width": 80,
+          "height": 88,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 162,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1920,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "hazardSpeedPxPerMs": 0.04,
+          "stateCapacity": 0
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+      "stats": {
+        "xPositions": 0,
+        "phaseSteps": 0,
+        "dtMs": 0,
+        "maxStepPx": 0,
+        "statesEnqueued": 0,
+        "statesVisited": 0,
+        "edgesChecked": 0,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.038,
+      "heapDeltaKiB": 2.6
+    },
+    {
+      "label": "corpus/.scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.09",
+      "corpusConfig": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1338,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 760,
+          "distance": 160,
+          "periodMs": 3600,
+          "width": 32,
+          "height": 40,
+          "anchorX": 0.5,
+          "anchorY": 0.95,
+          "y": 212,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 1.6199999999999999,
+          "hazardSpeedPxPerMs": 0.088889,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 18,
+        "maxStepPx": 1.6199999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.111,
+      "heapDeltaKiB": 345.5
+    },
+    {
+      "label": "corpus/.scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.16",
+      "corpusConfig": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1408
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1338,
+          "width": 32,
+          "height": 48,
+          "y": 204.4,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 760,
+          "distance": 160,
+          "periodMs": 3600,
+          "width": 32,
+          "height": 40,
+          "anchorX": 0.5,
+          "anchorY": 0.95,
+          "y": 212,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 2.88,
+          "hazardSpeedPxPerMs": 0.088889,
+          "stateCapacity": 137800
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 689,
+        "phaseSteps": 200,
+        "dtMs": 18,
+        "maxStepPx": 2.88,
+        "statesEnqueued": 79160,
+        "statesVisited": 79160,
+        "edgesChecked": 237280,
+        "elapsedMs": 30,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 29.599,
+      "heapDeltaKiB": 11552.1
+    },
+    {
+      "label": "corpus/.scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json#enemy-1/speed=0.09",
+      "corpusConfig": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.09,
+      "gridMovable": false,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1392
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1336,
+          "width": 48,
+          "height": 64,
+          "y": 193.68,
+          "maxSpeed": 0.09
+        },
+        "hazard": {
+          "startX": 960,
+          "distance": 120,
+          "periodMs": 3600,
+          "width": 56,
+          "height": 64,
+          "anchorX": 0.5,
+          "anchorY": 0.85,
+          "y": 195.6,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 1.6199999999999999,
+          "hazardSpeedPxPerMs": 0.066667,
+          "stateCapacity": 134600
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 673,
+        "phaseSteps": 200,
+        "dtMs": 18,
+        "maxStepPx": 1.6199999999999999,
+        "statesEnqueued": 200,
+        "statesVisited": 200,
+        "edgesChecked": 200,
+        "elapsedMs": 0,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 0.103,
+      "heapDeltaKiB": 344.7
+    },
+    {
+      "label": "corpus/.scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json#enemy-1/speed=0.16",
+      "corpusConfig": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "hazardId": "enemy-1",
+      "maxSpeed": 0.16,
+      "gridMovable": true,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1392
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1336,
+          "width": 48,
+          "height": 64,
+          "y": 193.68,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 960,
+          "distance": 120,
+          "periodMs": 3600,
+          "width": 56,
+          "height": 64,
+          "anchorX": 0.5,
+          "anchorY": 0.85,
+          "y": 195.6,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          }
+        },
+        "derived": {
+          "worldVisualWidth": 1440,
+          "xStep": 2,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 2.88,
+          "hazardSpeedPxPerMs": 0.066667,
+          "stateCapacity": 134600
+        }
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 673,
+        "phaseSteps": 200,
+        "dtMs": 18,
+        "maxStepPx": 2.88,
+        "statesEnqueued": 94400,
+        "statesVisited": 94400,
+        "edgesChecked": 283000,
+        "elapsedMs": 37,
+        "limits": {
+          "maxStates": 200000,
+          "timeBudgetMs": 5000
+        },
+        "budgetExceeded": false
+      },
+      "wallMs": 37.483,
+      "heapDeltaKiB": 18900.7
+    }
+  ]
+}
