@@ -2,9 +2,10 @@
 
 Type: grilling
 Status: claimed
-Owner: —
+Owner: 用户裁定（部分）· 2026-11-09
 Blocked by: 09
 Map: ../map.md
+State: BLOCKED（B1 / B2 未关闭，不得签署）
 Class: I-00 / DECISION
 
 ## Question
@@ -28,3 +29,51 @@ Class: I-00 / DECISION
 
 - PRD 三态语义与 G-01～G-07 不得放宽。
 - 若某项裁定要求修改 PRD，先走 HITL 修改权威输入并重算哈希。
+
+## Answer（部分裁定 — 未签署）
+
+用户 2026-11-09 裁定：**Q1、Q2、Q3、Q4、Q6 通过；Q5 有条件通过（运动模型冻结，网格不等式待证）。R1 保持 BLOCKED，不签署通过。**
+
+### 已接受
+
+**Q1 — G-01 采用 (a) 审计时读取 Atlas JSON。** 冻结要求：
+
+1. 审计前执行 `verifyPack`。
+2. 从已验证的 Manifest 取得 Atlas 记录与 SHA-256。
+3. 对**实际读取的 Atlas 字节**校验 SHA-256 与 Manifest 一致。
+4. 用**这份已校验的字节**解析，逐帧比对 `sourceSize`、`anchor` 等几何字段。
+5. 读取、哈希校验、几何比对必须使用**同一份字节**——禁止「先 verifyPack，再重新读一个可能被替换的文件」。**TOCTOU 裂缝必须关闭。**
+6. 缺失帧、缺失 anchor、尺寸不一致、哈希不一致、验收后文件被改写 ⇒ `INSUFFICIENT_EVIDENCE`。
+
+不采用 acceptance 报告作为唯一证据；不扩展 Manifest 契约。
+
+**Q2 — G-02 采用 (iii)。** 核心 API 的 `lagMs` **必填、无隐式默认**；`auditConfigPipeline` 用单一具名常量提供 200ms；两档为 16.67ms / 200ms；**两档结论不一致 ⇒ `INSUFFICIENT_EVIDENCE`**。核心 API 每次只接受一个 `lagMs`，两档由上层编排分别调用并比较——核心 API 内部不得藏第二个默认值。证据记录两档输入与各自结果。不得复用 `mechanic.ts:62` 的 `FRAME_MARGIN_MS`。
+
+**Q3 — G-06 采用 (c) 新增内存内 `coverage.temporal`。** `coverage.spatial` 行为一字不改，不得因它恒为 partial 而使 9 个既有案例回归。移动 Hazard 的机制判定必须检查 `coverage.temporal`：未完成可信证据检查 ⇒ 机制层 IE；完成才允许进入时序判定。`temporal = checked` 只表示所需输入与模型检查完成，**不代表已证明可通行**。**新增优先级规则**：时序层证据不足不得被顶层聚合成 `NO_PROVEN_BLOCKER`——须有覆盖 `api.ts:87-92` 顶层聚合路径的明确测试。不新增持久化 verdict、不新增 `ConfigIssue.code`。
+
+**Q4 — 证据结构做内存内加法。** 新增可选字段 `model` / `lag` / `degradation` / `limits`；不改 `ConfigIssue`、不加 `code`、不新增持久化 schema、不引入落盘证据链。冻结文档与未来能力声明必须写明：「可审计」指测试、冻结契约、scratch 原始证据与审计过程可复核，**不是生产运行结果可持久化追溯**。
+
+**Q5 — 运动模型部分冻结。** 单 X 轴、三角波、`periodMs` 为往返整周期、`t=0` 在 `at`、相位当自由变量、唯一未定量为 `T_arr`、U9 存在时允许覆盖完整相位、`lagMs` 与相位正交。**网格不等式方向不冻结**（见 B1）。
+
+**Q5 补充 — PRD FR-07 映射（精确版）**：相位可作为自由变量分析；只有当 `T_arr` 无法确定**且不存在经过验证的可达安全等待格 U9** 时，才因相位不确定降级为 IE。U9 成立必须证明它**在当前模型下可达、可等待、且等待过程本身安全**——不能因为地图上有一个空格就认定 U9 成立。
+
+**Q6 — 三态形式化通过，附 G-04 限定。**
+
+| 结果 | 必要条件 |
+| --- | --- |
+| `PROVEN_UNPLAYABLE` | 门区恒覆盖 + 所有参与判定的几何 `checked` + 图割证明不连通 + 已排除当前支持模型内的合法规避路径 |
+| `NO_PROVEN_BLOCKER` | 连续时间验证过的安全 witness + 两档 lag 结论一致 |
+| `INSUFFICIENT_EVIDENCE` | 其余所有情况 |
+
+禁止规则：BFS 无解 / 预算耗尽 / 采样未撞 ≠ PU；NB ≠ 可玩保证；任一必要几何证据未 `checked` 不得输出确定性结论。
+
+### 阻塞项（R1 未签署的原因）
+
+- **B1 网格采样不等式的方向**：`maxSpeed · periodMs / N ≥ xStep` 与直觉相反，必须用反例与推导确认后才能冻结。见 [B1](15-b1-grid-sampling-inequality.md)。
+- **B2 G-04 的证明边界**：必须把「受支持模型内的图割不连通」与「模型外垂直规避无法排除时降级 IE」写成正式契约条文，且不接受调用方布尔标记。见 [B2](16-b2-vertical-evasion-contract.md)。
+
+### 授权状态
+
+- 未授权任何生产修改。
+- 未授权 I-01 执行。
+- B1 / B2 关闭后，Q1–Q6 合并为 R1 最终裁定，**不再新增 HITL 票**。
