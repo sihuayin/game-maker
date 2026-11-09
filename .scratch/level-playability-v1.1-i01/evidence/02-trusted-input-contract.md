@@ -15,7 +15,7 @@
 - **一次调用验整包**：按 `atlases[].meta` 路径去重；每份 JSON 的 SHA 来自 `files[]`；哈希与 `AtlasJson.safeParse` 消费**同一份 bytes**。
 - **brand**：模块私有 `unique symbol`，唯一生产者是 `verifyTemporalInput`，不导出铸造工厂；运行时守卫拒绝普通对象。
 - **digest 注入**：`(bytes: Uint8Array) => string`，返回完整 `sha256:<hex>`；生产只允许 `assets/src/ops.ts` 提供真实实现。
-- **失败分类**：闭集 code + 显式 `verified` 表；查不到 = 未验证，不回落默认值；不新增 `ConfigIssue.code`。
+- **失败分类**：闭集 code + 显式 `verified` 表；查不到 = 未验证，不回落默认值；不新增 `ConfigIssue.code`。闭集由 [I01-03](03-frame-geometry-predicate.md) 扩到 **10** 个（新增 rotated / trimmed unsupported）。
 - **入口**：`auditPlayabilityTemporal` 只接受 branded 值；没有 geometry / hitbox / body / 尺寸 / 垂直规避参数。
 - **Q8**：`verifyTemporalInput` 经 `api.ts` 导出并标 `@internal`；生产调用者由架构测试限制为 `assets/src/ops.ts`。**`@internal` 不是包级访问控制**。
 
@@ -43,7 +43,9 @@ type TemporalInputFailureCode =
   | "frame-source-size-mismatch"
   | "frame-anchor-missing"
   | "frame-anchor-mismatch"
-  | "asset-unverified";
+  | "asset-unverified"
+  | "frame-rotated-unsupported"
+  | "frame-trimmed-unsupported";
 
 type TemporalInputFailure = {
   readonly code: TemporalInputFailureCode;

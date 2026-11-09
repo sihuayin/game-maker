@@ -52,7 +52,7 @@ Class: I-01 / DECISION
 - **一次调用验整包**：按 `atlases[].meta` 去重；SHA 来自 `files[]`；digest 与 `AtlasJson.safeParse` 消费同一份 bytes。
 - **brand**：模块私有 `unique symbol`；唯一生产者是 `verifyTemporalInput`；不导出铸造工厂；运行时守卫拒绝普通对象。
 - **digest**：`(bytes: Uint8Array) => string`，完整 `sha256:<hex>`；生产只允许 `assets/src/ops.ts`。
-- **失败码**：8 个闭集 code + 显式 `verified` 表；不新增 `ConfigIssue.code`。
+- **失败码**：8 个闭集 code + 显式 `verified` 表；不新增 `ConfigIssue.code`。后由 [I01-03](03-i01-03-frame-geometry-predicate.md) 扩到 **10** 个（新增 rotated / trimmed unsupported）。
 - **入口**：`auditPlayabilityTemporal` 只认 branded 输入，无 geometry / hitbox / body / 尺寸 / 垂直规避参数。
 - **Q8**：`verifyTemporalInput` 经 `api.ts` 导出并标 `@internal`；架构测试把生产调用者限制为 `assets/src/ops.ts`。**`@internal` 不是包级访问控制**。
 - 真实语料：`last-train/v2` 在严格判据下零不符；`counter-siege` 无 manifest，不是有效证据。

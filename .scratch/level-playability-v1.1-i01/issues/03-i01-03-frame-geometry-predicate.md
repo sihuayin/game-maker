@@ -1,8 +1,8 @@
 # I01-03 逐帧几何判据与负例矩阵
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: —
 Map: ../map.md
 Class: I-01 / DECISION
@@ -33,3 +33,17 @@ Class: I-01 / DECISION
 
 - 现有语料中合法的多帧资源会因 Q12=A 被系统性误判，且无法在不改 I-00 契约的前提下区分；
 - 需要修改 `assetpack.ts` / `atlas-json.ts` 等白名单外文件。
+
+## Answer
+
+判据与负例矩阵：[`evidence/03-frame-geometry-predicate.md`](../evidence/03-frame-geometry-predicate.md)。
+
+- **Q1–Q8 全部 A**。
+- 每帧判据：帧存在；`sourceSize` 精确等于 `asset.size`；`anchor` 存在且在 `1e-9` 容差内等于 `asset.anchor`（`ANCHOR_EQUAL_EPSILON`，不复用门宽 `ε`）；`rotated === false`；`trimmed === false`。
+- **schema 优先**：任何 schema 拒绝 ⇒ `atlas-json-invalid`；帧级 code 只处理结构合法输入。`rotated` / `trimmed` 缺失按冻结默认 `false` 通过；只有显式 `true` 才报 unsupported。
+- **失败闭集 10 个**：新增 `frame-rotated-unsupported`、`frame-trimmed-unsupported`。
+- **文件绑定**：`files[]` 按路径去重；相同 checksum 合并，冲突报 `atlas-checksum-mismatch`，缺失报 `atlas-file-missing`；JSON 的 digest 只认 `files[]`，`AtlasEntry.checksum` 是 PNG。
+- **身份**：键为 `(assetId, frameName)`；跨资产同名帧分别验证；幽灵帧与 atlas 帧计数不纳入本票。
+- **累积**：全量、按 `(code, atlasPath, assetId, frameName)` 去重并稳定排序；失败结果不含可消费几何。
+- 真实语料：`last-train/v2` 9 资产 / 14 帧全部通过；player anchor 固定 `{0.5, 0.95}`。
+- 不修改 `atlas-json.ts` / `assetpack.ts` / `acceptance.ts` / 既有测试；不构成实施授权。

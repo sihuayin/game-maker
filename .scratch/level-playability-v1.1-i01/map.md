@@ -149,6 +149,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 索引：每张已关闭票一行，够判断相关性即可；细节永远在票里。 -->
 
+- [I01-03 逐帧几何判据与负例矩阵](issues/03-i01-03-frame-geometry-predicate.md): 每帧须存在、`sourceSize == asset.size`、`anchor` 在 `1e-9` 内一致、`rotated/trimmed === false`；schema 优先，缺失默认按 `false`；失败闭集扩到 10 个；`files[]` 按路径去重；全量累积去重排序；`last-train/v2` 零不符。
 - [I01-02 可信输入契约与 brand 机制](issues/02-i01-02-trusted-input-contract.md): 全有或全无的判别联合；范围 = player + 配置引用的 hazard/pickup/goal；一次调用验整包、SHA 来自 `files[]`、同字节解析；模块私有 Symbol brand；digest 注入且生产只允许 `ops.ts`；闭集失败码 + 显式 verified 表；入口无几何/规避参数；`verifyTemporalInput` 经 `api.ts` 标 `@internal`，调用者由架构测试限制。
 - [I01-01 精确文件清单与依赖方向](issues/01-i01-01-file-plan.md): 最小改动面 = contracts 2 新 + `api.ts` 只加导出、assets `ops.ts` 唯一读盘层、pipeline 2 处接线；`config-audit.ts` / `mechanic.ts` / `verdict.ts` / `index.ts` 全不改；新导出**替代** R2 第 1 项而非第 5 项；既有测试零改动；越界清单为空。
 
@@ -160,7 +161,6 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 - stub 在 I-02 的替换接口稳定性：I-01 的编排契约必须允许 I-02 换算法而不改入口。
 - `compileRuntime` 两处调用是否共享一次 Atlas 读取，避免重采样循环里重复读盘。
 - `publish-gate` 在时序 IE 下的行为与文案：Q8=B 下不改变 Verdict，但是否需要可见的观察记录。
-- 多帧资源 `sourceSize` 不一致时的判据：manifest `size` 只取第 0 帧。
 - 授权包对 scratch 证据的归档方式（引用 vs 复制）。
 
 ## Out of scope
