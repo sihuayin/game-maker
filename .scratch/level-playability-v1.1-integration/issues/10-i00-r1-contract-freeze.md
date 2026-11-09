@@ -1,11 +1,11 @@
 # I00-R1 输入输出契约冻结 [HARD BLOCK]
 
 Type: grilling
-Status: claimed
-Owner: 用户裁定（部分）· 2026-11-09
+Status: resolved
+Owner: 用户裁定 · 2026-11-09
 Blocked by: 09
 Map: ../map.md
-State: READY-TO-SIGN（B1 / B2 已关闭，待用户确认签署）
+State: SIGNED（2026-11-09）
 Class: I-00 / DECISION
 
 ## Question
@@ -88,3 +88,15 @@ Class: I-00 / DECISION
 **契约草案**：[`evidence/r1-contract.md`](../evidence/r1-contract.md)（待签署）。
 
 `State: READY-TO-SIGN` —— B1/B2 的实质结论与用户预设不同（方向未反），签署前需用户确认。
+
+---
+
+## 签署（2026-11-09）
+
+用户确认：**接受 B1 结论，签署 R1**。
+
+- B1 结论接受：`maxSpeed · periodMs / N ≥ xStep` 为**能力约束**（违反只产生 IE）；不引入 `v_hazard · dt ≤ xStep`。
+- 契约以 [`evidence/r1-contract.md`](../evidence/r1-contract.md) 为准，经 R3 并入 `docs/v7.8/移动-I00.md`。
+- 本签署**不等于**实施授权；公共面改动仍需 I00-R2 白名单裁定与独立实施授权。
+
+`State: SIGNED`。

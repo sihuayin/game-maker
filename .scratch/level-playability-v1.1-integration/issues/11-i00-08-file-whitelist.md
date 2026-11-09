@@ -1,7 +1,7 @@
 # I00-08 文件影响分析与白名单提案
 
 Type: task
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 10
 Map: ../map.md

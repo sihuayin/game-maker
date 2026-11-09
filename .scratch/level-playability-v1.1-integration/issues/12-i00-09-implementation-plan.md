@@ -1,7 +1,7 @@
 # I00-09 I-01～I-05 实施计划骨架
 
 Type: task
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 10
 Map: ../map.md
