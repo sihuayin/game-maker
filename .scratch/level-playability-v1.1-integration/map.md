@@ -145,6 +145,7 @@ I00-R1 输入输出契约冻结（grilling · HITL）[HARD BLOCK]
 - [I00-R1 输入输出契约冻结](issues/10-i00-r1-contract-freeze.md): 用户签署（2026-11-09）。G-01 采用审计时读 Atlas 并校验同一份字节的 SHA-256（TOCTOU 关闭）；`lagMs` 核心必填、编排层两档、不一致即 IE；新增内存内 `coverage.temporal`，`coverage.spatial` 一字不改；证据做加法；网格 `N ≤ floor(maxSpeed·periodMs/xStep)`；PU 六条件含 hop 加倍不变性。契约见 [`evidence/r1-contract.md`](evidence/r1-contract.md)。
 - [I00-08 文件影响分析与白名单提案](issues/11-i00-08-file-whitelist.md): 最小改动面 = contracts 4 既有 + 2 新文件、pipeline 2、assets 1；**CLI/MCP 无新参数**；公共面 4 项改动全部待 R2；**发布行为变化**（含移动 hazard 的关卡可能从放行变为拒绝）需 R2 显式批准。见 [`evidence/08-file-impact.md`](evidence/08-file-impact.md)。
 - [I00-09 I-01～I-05 实施计划骨架](issues/12-i00-09-implementation-plan.md): 五阶段与门槛落位、估算 15–21 会话；回归 = 既有 vitest + LP-06/07 scratch 复跑（不转 vitest，列为已知限制）；真实案例需覆盖 NB/PU/IE 各一，新 fixture 需 R2 单独批准。全部 `PLANNED`。见 [`evidence/09-implementation-plan.md`](evidence/09-implementation-plan.md)。
+- [I00-R2 文件白名单与授权边界](issues/13-i00-r2-whitelist-authorization.md): 用户签署（2026-11-09）。白名单照单批准、三个待裁定项不预先批准；公共面 4 项加法获批，CLI/MCP/`ConfigIssue.code`/持久化/新依赖不批；执行**分阶段放行**、每阶段独立 PR、I-01 先行；回归门槛为既有 vitest + LP-06/07 复跑且不得删改断言；越界即回 R2；**批准发布行为变化**，但 I-04 必须证明 19 个既有移动 hazard 关卡无误拒。
 - [B2 G-04 垂直规避证明的契约边界](issues/16-b2-vertical-evasion-contract.md): 图边集仅 walk/walk-off/fall/hop；门区交集不带 pad、按玩家几何外扩后经 `forbiddenBoxes` 注入；PU 六条义务含**hop 采样加倍不变性**（`hopSamples` 取整可能误拒合法 hop ⇒ 假 PU）；G-01 不成立则 G-04 不成立。条文见 [`evidence/b2-vertical-evasion-boundary.md`](evidence/b2-vertical-evasion-boundary.md)。
 
 ## Not yet specified

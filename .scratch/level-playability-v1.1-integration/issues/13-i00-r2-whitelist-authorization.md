@@ -1,8 +1,8 @@
 # I00-R2 文件白名单与授权边界 [HARD BLOCK]
 
 Type: grilling
-Status: claimed
-Owner: —
+Status: resolved
+Owner: 用户裁定 · 2026-11-09
 Blocked by: 11
 Map: ../map.md
 Class: I-00 / DECISION
@@ -26,3 +26,41 @@ Class: I-00 / DECISION
 ### 产出
 
 裁定记录 + 白名单表（并入 `docs/v7.8/移动-I00.md`）。
+
+## Answer
+
+用户 2026-11-09 裁定：**Q1–Q6 全部采纳推荐，签署 R2。**
+
+### Q1 白名单
+
+- **照单批准** [`evidence/08-file-impact.md`](../evidence/08-file-impact.md) §4 的「允许」清单。
+- **照单确认**「明确禁止」清单。
+- 三个「需单独裁定」项（`profile.ts`、`graph.ts` 参数化 hop 采样、`fixtures/packs/**`）**不预先批准**，需要时单独提。
+
+### Q2 公共面
+
+- 批准 4 项加法：`auditPlayability` 第三参数、`ConfigAuditContext` 可选字段、`coverage.temporal`、`PlayabilityEvidence` 可选字段。
+- 不批：CLI 参数、MCP 工具、`ConfigIssue.code`、持久化 schema、新依赖。
+
+### Q3 授权形态
+
+- R2 一次批准白名单，**执行分阶段放行**：每阶段独立 PR，上一阶段证据通过后才开下一阶段。
+- **I-01 单独先行**（G-01 不成立则 G-04 不成立）。
+
+### Q4 回归门槛
+
+- 既有 vitest 全绿 + LP-06/07 scratch 语料复跑一致。
+- LP-06/07 不转 vitest，作为已知限制写入冻结文档。
+- **任何既有断言被删除或放宽 ⇒ 直接阻断。**
+
+### Q5 越界判定
+
+- 发现必须改白名单外文件 ⇒ **停止并回到 R2**，不得就地扩大范围。
+- R2 通过不代表白名单内改动自动获批；每个阶段的 PR 仍需独立审查。
+
+### Q6 发布行为变化
+
+- **批准**：含移动 hazard 的关卡在时序判定得出 `PROVEN_UNPLAYABLE` 时会被 `build` / `site` / `publish-gate` 拒绝。
+- **硬条件**：I-04 必须证明 19 个既有移动 hazard 关卡**无一被误拒**；任何假阳即回滚该关卡类别的启用。
+
+`State: SIGNED（2026-11-09）`。

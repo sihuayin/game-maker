@@ -1,7 +1,7 @@
 # I00-R3 I-00 最终收口 [HARD BLOCK]
 
 Type: grilling
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 13, 12
 Map: ../map.md
