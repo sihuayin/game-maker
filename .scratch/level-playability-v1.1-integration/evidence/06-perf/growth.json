@@ -1,0 +1,1488 @@
+{
+  "script": ".scratch/level-playability-v1.1-integration/scripts/perf-probe.mjs",
+  "scriptVersion": "i00-06-perf-probe/1",
+  "scriptSha256": "sha256:4485333e81ee8a0e9b3f55eff300c13c5de23af0a8dde7af17fed75e0538938b",
+  "command": "node --expose-gc .scratch/level-playability-v1.1-integration/scripts/perf-probe.mjs --out .scratch/level-playability-v1.1-integration/evidence/06-perf",
+  "node": "v22.23.2",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "cores": 10,
+  "totalMemMiB": 16384,
+  "loadavg": [
+    2.24,
+    1.96,
+    1.59
+  ],
+  "repoHead": "330d6dc3919d9f7fa9de05baff9668a4a1177133",
+  "branch": "wayfinder/level-playability-v1.1-integration",
+  "readOnly": true,
+  "exposeGc": true,
+  "at": "2026-11-09T04:14:40.511Z",
+  "growth": {
+    "note": "合成用例：goal 被 hazard 永久覆盖但落在门内（provePermanentGate 返回 null），故 BFS 耗尽可达状态后返回 INSUFFICIENT_EVIDENCE / no-witness-found。",
+    "model": {
+      "stateCapacity": "xPositions × phaseSteps；xPositions = floor((world.xMax - world.xMin - player.width) / xStep) + 1（另加 start/goal 特殊点）",
+      "dt": "periodMs / phaseSteps",
+      "maxStepPx": "maxSpeed × dt = maxSpeed × periodMs / phaseSteps",
+      "edgesPerState": "2·floor(maxStepPx / xStep) + 1（内部格；边界更少）",
+      "totalEdges": "≈ xPositions × phaseSteps × (2·floor(maxSpeed·periodMs / (phaseSteps·xStep)) + 1)",
+      "resolutionRule": "必须 maxSpeed·periodMs / phaseSteps ≥ xStep，否则 player 无法移动，BFS 退化为“只能等待”"
+    },
+    "formula": [
+      {
+        "label": "width/640",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.996,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.12
+      },
+      {
+        "label": "width/1440",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.05
+      },
+      {
+        "label": "width/2880",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.02
+      },
+      {
+        "label": "width/5760",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 3,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.01
+      },
+      {
+        "label": "distance/20",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.02
+      },
+      {
+        "label": "distance/40",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.02
+      },
+      {
+        "label": "distance/80",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.02
+      },
+      {
+        "label": "distance/160",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.02
+      },
+      {
+        "label": "period/4000",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.05
+      },
+      {
+        "label": "period/8000",
+        "maxStepPx": 6.4,
+        "xStep": 2,
+        "observedEdgesPerState": 6.991,
+        "predictedEdgesPerState": 7,
+        "errorPct": -0.13
+      },
+      {
+        "label": "period/16000",
+        "maxStepPx": 12.8,
+        "xStep": 2,
+        "observedEdgesPerState": 12.969,
+        "predictedEdgesPerState": 13,
+        "errorPct": -0.24
+      },
+      {
+        "label": "period/32000",
+        "maxStepPx": 25.6,
+        "xStep": 2,
+        "observedEdgesPerState": 24.886,
+        "predictedEdgesPerState": 25,
+        "errorPct": -0.46
+      },
+      {
+        "label": "phase/50",
+        "maxStepPx": 25.6,
+        "xStep": 2,
+        "observedEdgesPerState": 24.886,
+        "predictedEdgesPerState": 25,
+        "errorPct": -0.46
+      },
+      {
+        "label": "phase/100",
+        "maxStepPx": 12.8,
+        "xStep": 2,
+        "observedEdgesPerState": 12.969,
+        "predictedEdgesPerState": 13,
+        "errorPct": -0.24
+      },
+      {
+        "label": "phase/200",
+        "maxStepPx": 6.4,
+        "xStep": 2,
+        "observedEdgesPerState": 6.991,
+        "predictedEdgesPerState": 7,
+        "errorPct": -0.13
+      },
+      {
+        "label": "phase/400",
+        "maxStepPx": 3.2,
+        "xStep": 2,
+        "observedEdgesPerState": 2.999,
+        "predictedEdgesPerState": 3,
+        "errorPct": -0.05
+      }
+    ],
+    "edgeFormulaWithin5Pct": true,
+    "sweeps": {
+      "width": [
+        {
+          "label": "width/640",
+          "axis": "width",
+          "x": 640,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 620
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 600,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 600,
+              "distance": 20,
+              "periodMs": 4000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 640,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.01,
+              "stateCapacity": 60200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 301,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 57090,
+            "statesVisited": 57090,
+            "edgesChecked": 171070,
+            "elapsedMs": 21,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 21.566,
+          "heapDeltaKiB": 12111.4
+        },
+        {
+          "label": "width/1440",
+          "axis": "width",
+          "x": 1440,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 4000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.01,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 137090,
+            "statesVisited": 137090,
+            "edgesChecked": 411070,
+            "elapsedMs": 53,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 52.415,
+          "heapDeltaKiB": 26948.5
+        },
+        {
+          "label": "width/2880",
+          "axis": "width",
+          "x": 2880,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 2860
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 2840,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 2840,
+              "distance": 20,
+              "periodMs": 4000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 2880,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.01,
+              "stateCapacity": 284200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 1421,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 281090,
+            "statesVisited": 281090,
+            "edgesChecked": 843070,
+            "elapsedMs": 100,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 100.66,
+          "heapDeltaKiB": 37700.6
+        },
+        {
+          "label": "width/5760",
+          "axis": "width",
+          "x": 5760,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 5740
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 5720,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 5720,
+              "distance": 20,
+              "periodMs": 4000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 5760,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.01,
+              "stateCapacity": 572200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 2861,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 569090,
+            "statesVisited": 569090,
+            "edgesChecked": 1707070,
+            "elapsedMs": 215,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 214.497,
+          "heapDeltaKiB": 62894.3
+        }
+      ],
+      "distance": [
+        {
+          "label": "distance/20",
+          "axis": "distance",
+          "x": 20,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 2860
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 2840,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 2840,
+              "distance": 20,
+              "periodMs": 4000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 2880,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.01,
+              "stateCapacity": 284200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 1421,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 281090,
+            "statesVisited": 281090,
+            "edgesChecked": 843070,
+            "elapsedMs": 105,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 105.104,
+          "heapDeltaKiB": 38498.4
+        },
+        {
+          "label": "distance/40",
+          "axis": "distance",
+          "x": 40,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 2860
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 2840,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 2840,
+              "distance": 40,
+              "periodMs": 4000,
+              "width": 80,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 2880,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.02,
+              "stateCapacity": 284200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 1421,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 280080,
+            "statesVisited": 280080,
+            "edgesChecked": 840040,
+            "elapsedMs": 101,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 100.907,
+          "heapDeltaKiB": 34257.6
+        },
+        {
+          "label": "distance/80",
+          "axis": "distance",
+          "x": 80,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 2860
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 2840,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 2840,
+              "distance": 80,
+              "periodMs": 4000,
+              "width": 160,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 2880,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.04,
+              "stateCapacity": 284200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 1421,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 278040,
+            "statesVisited": 278040,
+            "edgesChecked": 833920,
+            "elapsedMs": 101,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 101.34,
+          "heapDeltaKiB": 42957.1
+        },
+        {
+          "label": "distance/160",
+          "axis": "distance",
+          "x": 160,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 2860
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 2840,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 2840,
+              "distance": 160,
+              "periodMs": 4000,
+              "width": 320,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 2880,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.08,
+              "stateCapacity": 284200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 1421,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 273960,
+            "statesVisited": 273960,
+            "edgesChecked": 821680,
+            "elapsedMs": 98,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 98.251,
+          "heapDeltaKiB": 28991.1
+        }
+      ],
+      "period": [
+        {
+          "label": "period/2000",
+          "axis": "period",
+          "x": 2000,
+          "gridMovable": false,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 2000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 10,
+              "maxStepPx": 1.6,
+              "hazardSpeedPxPerMs": 0.02,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 10,
+            "maxStepPx": 1.6,
+            "statesEnqueued": 200,
+            "statesVisited": 200,
+            "edgesChecked": 200,
+            "elapsedMs": 0,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 0.057,
+          "heapDeltaKiB": 319.1
+        },
+        {
+          "label": "period/4000",
+          "axis": "period",
+          "x": 4000,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 4000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.01,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 137090,
+            "statesVisited": 137090,
+            "edgesChecked": 411070,
+            "elapsedMs": 48,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 48.514,
+          "heapDeltaKiB": 13987.6
+        },
+        {
+          "label": "period/8000",
+          "axis": "period",
+          "x": 8000,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 8000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 40,
+              "maxStepPx": 6.4,
+              "hazardSpeedPxPerMs": 0.005,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 40,
+            "maxStepPx": 6.4,
+            "statesEnqueued": 137090,
+            "statesVisited": 137090,
+            "edgesChecked": 958430,
+            "elapsedMs": 100,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 99.696,
+          "heapDeltaKiB": 22147.2
+        },
+        {
+          "label": "period/16000",
+          "axis": "period",
+          "x": 16000,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 16000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 80,
+              "maxStepPx": 12.8,
+              "hazardSpeedPxPerMs": 0.0025,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 80,
+            "maxStepPx": 12.8,
+            "statesEnqueued": 137090,
+            "statesVisited": 137090,
+            "edgesChecked": 1777970,
+            "elapsedMs": 177,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 176.921,
+          "heapDeltaKiB": 15508.6
+        },
+        {
+          "label": "period/32000",
+          "axis": "period",
+          "x": 32000,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 32000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 160,
+              "maxStepPx": 25.6,
+              "hazardSpeedPxPerMs": 0.00125,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 160,
+            "maxStepPx": 25.6,
+            "statesEnqueued": 137090,
+            "statesVisited": 137090,
+            "edgesChecked": 3411631,
+            "elapsedMs": 306,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 305.426,
+          "heapDeltaKiB": 23441.7
+        }
+      ],
+      "phase": [
+        {
+          "label": "phase/50",
+          "axis": "phase",
+          "x": 50,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 8000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 50,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 50,
+              "dtMs": 160,
+              "maxStepPx": 25.6,
+              "hazardSpeedPxPerMs": 0.005,
+              "stateCapacity": 35050
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 50,
+            "dtMs": 160,
+            "maxStepPx": 25.6,
+            "statesEnqueued": 34270,
+            "statesVisited": 34270,
+            "edgesChecked": 852845,
+            "elapsedMs": 77,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 77.281,
+          "heapDeltaKiB": 6736.9
+        },
+        {
+          "label": "phase/100",
+          "axis": "phase",
+          "x": 100,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 8000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 100,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 100,
+              "dtMs": 80,
+              "maxStepPx": 12.8,
+              "hazardSpeedPxPerMs": 0.005,
+              "stateCapacity": 70100
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 100,
+            "dtMs": 80,
+            "maxStepPx": 12.8,
+            "statesEnqueued": 68540,
+            "statesVisited": 68540,
+            "edgesChecked": 888920,
+            "elapsedMs": 90,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 89.66,
+          "heapDeltaKiB": 7787
+        },
+        {
+          "label": "phase/200",
+          "axis": "phase",
+          "x": 200,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 8000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 200,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 200,
+              "dtMs": 40,
+              "maxStepPx": 6.4,
+              "hazardSpeedPxPerMs": 0.005,
+              "stateCapacity": 140200
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 200,
+            "dtMs": 40,
+            "maxStepPx": 6.4,
+            "statesEnqueued": 137090,
+            "statesVisited": 137090,
+            "edgesChecked": 958430,
+            "elapsedMs": 101,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 101.135,
+          "heapDeltaKiB": 22431.4
+        },
+        {
+          "label": "phase/400",
+          "axis": "phase",
+          "x": 400,
+          "gridMovable": true,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 8000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 400,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 400,
+              "dtMs": 20,
+              "maxStepPx": 3.2,
+              "hazardSpeedPxPerMs": 0.005,
+              "stateCapacity": 280400
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 400,
+            "dtMs": 20,
+            "maxStepPx": 3.2,
+            "statesEnqueued": 274190,
+            "statesVisited": 274190,
+            "edgesChecked": 822170,
+            "elapsedMs": 98,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 97.89,
+          "heapDeltaKiB": 29118.2
+        },
+        {
+          "label": "phase/800",
+          "axis": "phase",
+          "x": 800,
+          "gridMovable": false,
+          "input": {
+            "world": {
+              "xMin": 0,
+              "xMax": 1420
+            },
+            "player": {
+              "startX": 40,
+              "goalX": 1400,
+              "width": 20,
+              "height": 48,
+              "y": 200,
+              "maxSpeed": 0.16
+            },
+            "hazard": {
+              "startX": 1400,
+              "distance": 20,
+              "periodMs": 8000,
+              "width": 40,
+              "height": 48,
+              "anchorX": 0.5,
+              "anchorY": 1,
+              "y": 200,
+              "axis": "x"
+            },
+            "options": {
+              "lagMs": 16.67,
+              "phaseSteps": 800,
+              "xStep": 2,
+              "limits": {
+                "maxStates": 1500000,
+                "timeBudgetMs": 60000
+              }
+            },
+            "derived": {
+              "worldVisualWidth": 1440,
+              "xStep": 2,
+              "phaseSteps": 800,
+              "dtMs": 10,
+              "maxStepPx": 1.6,
+              "hazardSpeedPxPerMs": 0.005,
+              "stateCapacity": 560800
+            }
+          },
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reason": "no-witness-found",
+          "stats": {
+            "xPositions": 701,
+            "phaseSteps": 800,
+            "dtMs": 10,
+            "maxStepPx": 1.6,
+            "statesEnqueued": 800,
+            "statesVisited": 800,
+            "edgesChecked": 800,
+            "elapsedMs": 0,
+            "limits": {
+              "maxStates": 1500000,
+              "timeBudgetMs": 60000
+            },
+            "budgetExceeded": false
+          },
+          "wallMs": 0.15,
+          "heapDeltaKiB": 1060
+        }
+      ]
+    },
+    "fits": {
+      "width": {
+        "elapsedMsVsX": {
+          "n": 4,
+          "slope": 0.037554744640605285,
+          "intercept": -3.3622156368221567,
+          "r2": 0.9989222639434918
+        },
+        "stateCapacityVsX": {
+          "n": 4,
+          "slope": 100,
+          "intercept": -3800,
+          "r2": 1
+        },
+        "edgesCheckedVsX": {
+          "n": 4,
+          "slope": 300,
+          "intercept": -20930,
+          "r2": 1
+        },
+        "excludedDegenerate": []
+      },
+      "distance": {
+        "elapsedMsVsX": {
+          "n": 4,
+          "slope": -0.03951565217391275,
+          "intercept": 104.36417391304344,
+          "r2": 0.7518946564934279
+        },
+        "stateCapacityVsX": {
+          "n": 4,
+          "slope": 0,
+          "intercept": 284200,
+          "r2": 1
+        },
+        "edgesCheckedVsX": {
+          "n": 4,
+          "slope": -152.85652173913044,
+          "intercept": 846141.7391304348,
+          "r2": 0.9999983689540303
+        },
+        "excludedDegenerate": []
+      },
+      "period": {
+        "elapsedMsVsX": {
+          "n": 4,
+          "slope": 0.008994863043478261,
+          "intercept": 22.71630434782608,
+          "r2": 0.9930367549953129
+        },
+        "stateCapacityVsX": {
+          "n": 4,
+          "slope": 0,
+          "intercept": 140200,
+          "r2": 1
+        },
+        "edgesCheckedVsX": {
+          "n": 4,
+          "slope": 105.53242826086957,
+          "intercept": 56788.82608695654,
+          "r2": 0.9981577157441702
+        },
+        "excludedDegenerate": [
+          "period/2000"
+        ]
+      },
+      "phase": {
+        "elapsedMsVsX": {
+          "n": 4,
+          "slope": 0.05000939130434787,
+          "intercept": 82.11473913043477,
+          "r2": 0.5298903103929936
+        },
+        "stateCapacityVsX": {
+          "n": 4,
+          "slope": 701,
+          "intercept": 0,
+          "r2": 1
+        },
+        "edgesCheckedVsX": {
+          "n": 4,
+          "slope": -116.24608695652174,
+          "intercept": 902387.3913043478,
+          "r2": 0.09419503925817574
+        },
+        "excludedDegenerate": [
+          "phase/800"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,74 @@
+I00-06 performance probe · v22.23.2 · Apple M4 · 10 cores
+duration=3678.6ms · out=.scratch/level-playability-v1.1-integration/evidence/06-perf
+
+corpus: 21 configs / 31 hazards / 19 moving (16 configs with motion)
+  worldWidth   {"n":19,"min":640,"p50":1440,"p90":1440,"max":1920,"mean":1296.842,"sd":365.225}
+  distance     {"n":19,"min":40,"p50":120,"p90":180,"max":200,"mean":113.684,"sd":51.662}
+  periodMs     {"n":19,"min":2500,"p50":3000,"p90":3680,"max":4000,"mean":3205.263,"sd":420.943}
+  hazardSpeed  {"n":19,"min":0.027,"p50":0.069,"p90":0.101,"max":0.138,"mean":0.07,"sd":0.031}
+  xPositions@200x2 {"n":19,"min":273,"p50":689,"p90":697,"max":889,"mean":611.947,"sd":185.563}
+  stateCap@200x2   {"n":19,"min":54600,"p50":137800,"p90":139400,"max":177800,"mean":122389.474,"sd":37112.53}
+  resolutionCap    {"n":38,"min":36855,"p50":111618,"p90":198432,"max":220480,"mean":123533.553,"sd":55875.988} (N <= maxSpeed*period/xStep)
+  fixedN200 valid: p0speed=19/19 configSpeed=0/19
+  runs: effective=14 degenerate(maxStepPx<xStep)=14 gate-early-exit=8
+  effective elapsedMs  {"n":14,"min":12,"p50":32,"p90":38.4,"max":43,"mean":30.571,"sd":8.582}
+  effective wallMs     {"n":14,"min":12.258,"p50":32.549,"p90":38.833,"max":42.231,"mean":30.599,"sd":8.575}
+  all-run elapsedMs    {"n":36,"min":0,"p50":0,"p90":36,"max":43,"mean":11.917,"sd":15.974}
+  all-run wallMs       {"n":36,"min":0.01,"p50":0.118,"p90":36.084,"max":42.231,"mean":11.971,"sd":15.952}
+  reasons {"unplayable-proof-requires-vertical-evasion-assumption":8,"no-witness-found":28}
+
+growth (synthetic full-exhaustion):
+  [width]
+    width/640                          INSUFFICIENT_EVIDENCE  no-witness-found           vis=  57090 edge=  171070 elapsed=   21ms wall=  21.566ms
+    width/1440                         INSUFFICIENT_EVIDENCE  no-witness-found           vis= 137090 edge=  411070 elapsed=   53ms wall=  52.415ms
+    width/2880                         INSUFFICIENT_EVIDENCE  no-witness-found           vis= 281090 edge=  843070 elapsed=  100ms wall=  100.66ms
+    width/5760                         INSUFFICIENT_EVIDENCE  no-witness-found           vis= 569090 edge= 1707070 elapsed=  215ms wall= 214.497ms
+    fit elapsed≈{"n":4,"slope":0.037554744640605285,"intercept":-3.3622156368221567,"r2":0.9989222639434918}
+  [distance]
+    distance/20                        INSUFFICIENT_EVIDENCE  no-witness-found           vis= 281090 edge=  843070 elapsed=  105ms wall= 105.104ms
+    distance/40                        INSUFFICIENT_EVIDENCE  no-witness-found           vis= 280080 edge=  840040 elapsed=  101ms wall= 100.907ms
+    distance/80                        INSUFFICIENT_EVIDENCE  no-witness-found           vis= 278040 edge=  833920 elapsed=  101ms wall=  101.34ms
+    distance/160                       INSUFFICIENT_EVIDENCE  no-witness-found           vis= 273960 edge=  821680 elapsed=   98ms wall=  98.251ms
+    fit elapsed≈{"n":4,"slope":-0.03951565217391275,"intercept":104.36417391304344,"r2":0.7518946564934279}
+  [period]
+    period/2000                        INSUFFICIENT_EVIDENCE  no-witness-found           vis=    200 edge=     200 elapsed=    0ms wall=   0.057ms
+    period/4000                        INSUFFICIENT_EVIDENCE  no-witness-found           vis= 137090 edge=  411070 elapsed=   48ms wall=  48.514ms
+    period/8000                        INSUFFICIENT_EVIDENCE  no-witness-found           vis= 137090 edge=  958430 elapsed=  100ms wall=  99.696ms
+    period/16000                       INSUFFICIENT_EVIDENCE  no-witness-found           vis= 137090 edge= 1777970 elapsed=  177ms wall= 176.921ms
+    period/32000                       INSUFFICIENT_EVIDENCE  no-witness-found           vis= 137090 edge= 3411631 elapsed=  306ms wall= 305.426ms
+    fit elapsed≈{"n":4,"slope":0.008994863043478261,"intercept":22.71630434782608,"r2":0.9930367549953129}
+  [phase]
+    phase/50                           INSUFFICIENT_EVIDENCE  no-witness-found           vis=  34270 edge=  852845 elapsed=   77ms wall=  77.281ms
+    phase/100                          INSUFFICIENT_EVIDENCE  no-witness-found           vis=  68540 edge=  888920 elapsed=   90ms wall=   89.66ms
+    phase/200                          INSUFFICIENT_EVIDENCE  no-witness-found           vis= 137090 edge=  958430 elapsed=  101ms wall= 101.135ms
+    phase/400                          INSUFFICIENT_EVIDENCE  no-witness-found           vis= 274190 edge=  822170 elapsed=   98ms wall=   97.89ms
+    phase/800                          INSUFFICIENT_EVIDENCE  no-witness-found           vis=    800 edge=     800 elapsed=    0ms wall=    0.15ms
+    fit elapsed≈{"n":4,"slope":0.05000939130434787,"intercept":82.11473913043477,"r2":0.5298903103929936}
+
+repeats:
+  repeat/safeA             elapsed all=[4,3,2,2,2,2,3] warm={"n":6,"min":2,"p50":2,"p90":3,"max":3,"mean":2.333,"sd":0.516} verdicts=["NO_PROVEN_BLOCKER"] visited=[4096]
+  repeat/exhaust-w1440     elapsed all=[50,49,48,50,48,48,48] warm={"n":6,"min":48,"p50":48,"p90":49.5,"max":50,"mean":48.5,"sd":0.837} verdicts=["INSUFFICIENT_EVIDENCE"] visited=[137090]
+  repeat/exhaust-w2880     elapsed all=[102,101,101,102,104,100,102] warm={"n":6,"min":100,"p50":101.5,"p90":103,"max":104,"mean":101.667,"sd":1.366} verdicts=["INSUFFICIENT_EVIDENCE"] visited=[281090]
+
+budget boundary:
+  safeA/timeBudget=0                 time=    0 states= 200000 → INSUFFICIENT_EVIDENCE  search-budget-exhausted
+  safeA/timeBudget=1                 time=    1 states= 200000 → INSUFFICIENT_EVIDENCE  search-budget-exhausted
+  safeA/timeBudget=2                 time=    2 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=5                 time=    5 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=10                time=   10 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=25                time=   25 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=100               time=  100 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=250               time=  250 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=1000              time= 1000 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  safeA/timeBudget=5000              time= 5000 states= 200000 → NO_PROVEN_BLOCKER      witness-found
+  gateB/timeBudget=0                 time=    0 states= 200000 → PROVEN_UNPLAYABLE      permanent-gate
+  gateB/timeBudget=1                 time=    1 states= 200000 → PROVEN_UNPLAYABLE      permanent-gate
+  gateB/timeBudget=1000              time= 1000 states= 200000 → PROVEN_UNPLAYABLE      permanent-gate
+  exhaust/timeBudget=1               time=    1 states=1500000 → INSUFFICIENT_EVIDENCE  search-budget-exhausted
+  exhaust/timeBudget=1000            time= 1000 states=1500000 → INSUFFICIENT_EVIDENCE  no-witness-found
+  exhaust/timeBudget=60000           time=60000 states=1500000 → INSUFFICIENT_EVIDENCE  no-witness-found
+
+per-edge cost µs: {"n":46,"min":0.09,"p50":0.126,"p90":0.573,"max":3.01,"mean":0.311,"sd":0.465}
+peak state run: 569090 visited (3978ms game-time), heapΔ=62894.3KiB, 214.497ms
+
+checks: 13/13 pass

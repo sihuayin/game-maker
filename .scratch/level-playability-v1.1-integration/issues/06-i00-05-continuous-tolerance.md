@@ -1,7 +1,7 @@
 # I00-05 连续时间边界与数值容差
 
 Type: grilling
-Status: open
+Status: claimed
 Owner: —
 Blocked by: 01
 Map: ../map.md
