@@ -117,6 +117,7 @@ I00-R1 输入输出契约冻结（grilling · HITL）[HARD BLOCK]
             I00-R3 I-00 最终收口（grilling · HITL）[HARD BLOCK]
 ```
 
+- **R1 状态（2026-11-09）**：用户部分裁定 Q1–Q4、Q6 通过、Q5 有条件通过；R1 一度 `BLOCKED`，由 [B1](issues/15-b1-grid-sampling-inequality.md) 与 [B2](issues/16-b2-vertical-evasion-contract.md) 阻断。两项均已关闭，R1 现为 `READY-TO-SIGN`。
 - `I00-10` 是对用户 2026-11-09 骨架的补充：G-04（垂直规避必须由可信几何 + 受支持的玩家运动模型证明，不得采信调用方布尔标记）在骨架里没有独立落点，而它决定 `PROVEN_UNPLAYABLE` 能否落地。它不是门槛矩阵的一行，是一个必须先裁的范围问题。
 - 其余问题用 grilling 票直接裁定；若 grilling 发现会改变三张 R 票的核心结论，回到对应 R 票，不绕过硬阻断。
 - **R2 通过只表示白名单与边界已经清楚，不代表白名单内的生产修改自动获批。** 未来执行仍需独立实施授权。
@@ -140,6 +141,8 @@ I00-R1 输入输出契约冻结（grilling · HITL）[HARD BLOCK]
 - [I00-05 连续时间边界与数值容差](issues/06-i00-05-continuous-tolerance.md): 相切沿用 `overlapsStrict`（并须补 Phaser overlap 的直接证据）；门宽不设语义阈值，只设 `R-L > ε`；容差为单一具名常量 `ε = max(1e-9, 1e-9·世界跨度)`；网格/步长不公开可调，契约冻结导出规则且必须保证 `maxSpeed·periodMs/N ≥ xStep`，否则 IE；稳定性 (d) 为每次运行硬门槛、(a)(b)(c) 为 I-02 验收性质；几何语义与 `overlapsStrict` 同义、实现可解析求交。
 - [I00-10 垂直规避证明（G-04）](issues/08-i00-10-vertical-evasion-proof.md): **主证明用 V1 图割**（恒覆盖门区作 forbidden region，起点终点不连通 ⇒ 无垂直规避），满高门作快速路径；hop 只作可达性上近似、不消费时间维度；硬门槛是参与判定的几何必须全 `checked`；门区按玩家几何外扩、不带 lag pad；证明不了即 IE，`PROVEN_UNPLAYABLE` 仅在「门区恒覆盖 + 全几何 checked + 图割不连通」三条同时成立时给出。
 - [I00-07 七项硬门槛验证矩阵](issues/09-i00-07-hard-gate-matrix.md): G-01 / G-02 / G-06 为 **BLOCKED**（数据通道缺失、聚合无法表达 partial 约束），G-03 / G-04 **NEEDS-RULING**，G-05 / G-07 **SATISFIABLE**。硬结论：全局 `partial ⇒ IE` 不可行，约束必须按维度设计；G-01 不成立则 G-04 不成立 ⇒ `PROVEN_UNPLAYABLE` 不可达。矩阵见 [`evidence/07-gate-matrix.md`](evidence/07-gate-matrix.md)。
+- [B1 网格采样不等式的方向证明](issues/15-b1-grid-sampling-inequality.md): 方向未反——可靠性不依赖 `dt`/`xStep`（解析求交；N=2/4/8/16 下 hazard 每 dt 位移达 250–2000px 仍全部捕获）；`maxSpeed·periodMs/N ≥ xStep` 是**能力约束**，N=100 正常、N=101 立即退化为只能等待；违反只产生 IE。不设 `v_hazard·dt ≤ xStep`。证据见 [`evidence/b1-grid-sampling.md`](evidence/b1-grid-sampling.md)。
+- [B2 G-04 垂直规避证明的契约边界](issues/16-b2-vertical-evasion-contract.md): 图边集仅 walk/walk-off/fall/hop；门区交集不带 pad、按玩家几何外扩后经 `forbiddenBoxes` 注入；PU 六条义务含**hop 采样加倍不变性**（`hopSamples` 取整可能误拒合法 hop ⇒ 假 PU）；G-01 不成立则 G-04 不成立。条文见 [`evidence/b2-vertical-evasion-boundary.md`](evidence/b2-vertical-evasion-boundary.md)。
 
 ## Not yet specified
 
