@@ -1,7 +1,7 @@
 # I00-08 文件影响分析与白名单提案
 
 Type: task
-Status: claimed
+Status: resolved
 Owner: —
 Blocked by: 10
 Map: ../map.md
@@ -22,3 +22,14 @@ Class: I-00 / DELIVERABLE
 ### 产出
 
 `evidence/08-file-impact.md`。**不修改任何代码。**
+
+## Answer
+
+影响分析与白名单草案：[`evidence/08-file-impact.md`](../evidence/08-file-impact.md)。
+
+- 最小改动面：contracts **4 个既有文件 + 2 个新文件**，pipeline 2 个，assets 1 个。
+- **CLI / MCP 不需要新增参数**：`lagMs` 由 pipeline 层具名常量提供，`packDir` 在四个发布入口本已存在。
+- 公共面改动 4 项：`auditPlayability` 签名、`ConfigAuditContext`、`coverage.temporal`、`PlayabilityEvidence` 可选字段——全部需 R2 授权。
+- **发布行为变化**：含移动 hazard 的关卡从「不产 issue」可能变为「被拒」；这是功能目的，但需 R2 显式批准，且 I-04 必须证明 19 个既有移动 hazard 关卡无误拒。
+- 明确禁止：`packages/demo/**`、`packages/cli/**`、`packages/mcp/**`、`game-config.ts`、`assetpack.ts`、既有测试断言、任何新依赖。
+- 需单独裁定：`profile.ts`、`graph.ts`（若需参数化 hop 采样）、`fixtures/packs/**`。

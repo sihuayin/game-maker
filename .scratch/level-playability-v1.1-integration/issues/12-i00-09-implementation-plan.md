@@ -1,7 +1,7 @@
 # I00-09 I-01～I-05 实施计划骨架
 
 Type: task
-Status: claimed
+Status: resolved
 Owner: —
 Blocked by: 10
 Map: ../map.md
@@ -28,3 +28,13 @@ Class: I-01～I-05 / PLAN
 ### 产出
 
 `evidence/09-implementation-plan.md`。**不写任何实现代码，不标任何条目为已完成。**
+
+## Answer
+
+实施计划骨架：[`evidence/09-implementation-plan.md`](../evidence/09-implementation-plan.md)。全部条目状态 `PLANNED`，不构成执行授权。
+
+- 五阶段与门槛落位：I-01（G-01/02/03 输入侧）→ I-02（G-03/04/05 核心）→ I-03（G-01 传递 / G-06 语义）→ I-04（全部负例 + V1 回归）→ I-05（G-07 Pipeline 收口）。
+- **Q1 回归覆盖**：既有 vitest 全绿 + LP-06/07 scratch 复跑；**不**把 LP-06/07 转 vitest（会扩大 effort），该缺口写进已知限制。
+- **Q2 真实案例**：现有 19 个移动 hazard config 需筛选，I-05 至少覆盖 NB / PU / IE 各一例；不足时新建 fixture 需 R2 单独批准。
+- 偏离：无 CLI/MCP 新参数；结果不落盘；Runtime 只读；发布行为变化需 R2 批准。
+- 估算：I-01 3–4、I-02 5–7、I-03 2–3、I-04 3–4、I-05 2–3 会话（仅估算）。
