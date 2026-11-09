@@ -4,12 +4,14 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1.1-integration
 Baseline: `docs/v7.8/移动.md` @ `sha256:3598cc19889b10a9fabf3a4f6f28ae7cee43a22355b639d8d61298e6d459cea9`；权威输入提交 `bd1389f`
-Status: open · 2026-11-09 开图
+Status: closed · 2026-11-09 收口
 Predecessor: [Level Playability V1.1 P0](../level-playability-v1.1-p0/map.md)（已收口；裁定 GO — 技术可行性）
 
 > **2026-11-09 开图。** 授权来源：[`docs/v7.8/移动.md`](../../docs/v7.8/移动.md)（Level Playability V1.1 — 单移动 Hazard 正式集成需求文档）。
 > PRD §9.1 把当前阶段限死在规划：需求分析、契约提案、架构与文件影响分析、测试矩阵设计、验收方案、独立实施计划编制。§9.2 规定 Runtime / Pipeline / contracts / CLI / MCP / 新依赖的任何改动都必须另提白名单并**重新授权**。
 > 因此本图的终点是**可授权的 I-00 冻结包**，不是集成本身，也不是「已证明方案都能在现有代码结构下实现」。
+>
+> **2026-11-09 收口。** 冻结包已发布为 [`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)；R1 / R2 / R3 三张硬阻断票全部签署。**收口不等于实施授权**：I-01～I-05 仍需分阶段独立授权。
 
 ## Destination
 
@@ -117,7 +119,7 @@ I00-R1 输入输出契约冻结（grilling · HITL）[HARD BLOCK]
             I00-R3 I-00 最终收口（grilling · HITL）[HARD BLOCK]
 ```
 
-- **R1 状态（2026-11-09）**：用户部分裁定 Q1–Q4、Q6 通过、Q5 有条件通过；R1 一度 `BLOCKED`，由 [B1](issues/15-b1-grid-sampling-inequality.md) 与 [B2](issues/16-b2-vertical-evasion-contract.md) 阻断。两项均已关闭，R1 现为 `READY-TO-SIGN`。
+- **R1 状态（2026-11-09）**：用户部分裁定 Q1–Q4、Q6 通过、Q5 有条件通过；R1 一度 `BLOCKED`，由 [B1](issues/15-b1-grid-sampling-inequality.md) 与 [B2](issues/16-b2-vertical-evasion-contract.md) 阻断。两项均已关闭，R1 已签署（`SIGNED`），契约见 [`evidence/r1-contract.md`](evidence/r1-contract.md)。
 - `I00-10` 是对用户 2026-11-09 骨架的补充：G-04（垂直规避必须由可信几何 + 受支持的玩家运动模型证明，不得采信调用方布尔标记）在骨架里没有独立落点，而它决定 `PROVEN_UNPLAYABLE` 能否落地。它不是门槛矩阵的一行，是一个必须先裁的范围问题。
 - 其余问题用 grilling 票直接裁定；若 grilling 发现会改变三张 R 票的核心结论，回到对应 R 票，不绕过硬阻断。
 - **R2 通过只表示白名单与边界已经清楚，不代表白名单内的生产修改自动获批。** 未来执行仍需独立实施授权。
@@ -148,15 +150,10 @@ I00-R1 输入输出契约冻结（grilling · HITL）[HARD BLOCK]
 - [I00-R2 文件白名单与授权边界](issues/13-i00-r2-whitelist-authorization.md): 用户签署（2026-11-09）。白名单照单批准、三个待裁定项不预先批准；公共面 4 项加法获批，CLI/MCP/`ConfigIssue.code`/持久化/新依赖不批；执行**分阶段放行**、每阶段独立 PR、I-01 先行；回归门槛为既有 vitest + LP-06/07 复跑且不得删改断言；越界即回 R2；**批准发布行为变化**，但 I-04 必须证明 19 个既有移动 hazard 关卡无误拒。
 - [B2 G-04 垂直规避证明的契约边界](issues/16-b2-vertical-evasion-contract.md): 图边集仅 walk/walk-off/fall/hop；门区交集不带 pad、按玩家几何外扩后经 `forbiddenBoxes` 注入；PU 六条义务含**hop 采样加倍不变性**（`hopSamples` 取整可能误拒合法 hop ⇒ 假 PU）；G-01 不成立则 G-04 不成立。条文见 [`evidence/b2-vertical-evasion-boundary.md`](evidence/b2-vertical-evasion-boundary.md)。
 
+- [I00-R3 I-00 最终收口](issues/14-i00-r3-final-freeze.md): 六项核对全部通过；冻结包发布为 [`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)（245 行，九节契约 + 门槛方案 + 白名单 + 性能预算 + 非目标 / 停止 / 退出条件 + 实施计划 + 风险）；用户签署「完成」。**契约冻结 ≠ 实施授权。**
 ## Not yet specified
 
-<!-- 以下雾区的形状取决于尚未裁定的票；前沿推进后再毕业为票。 -->
-
-- **若 G-01 无法在不改公共契约的前提下满足，集成范围缩到哪**（是否限定单 pack / 单 fixture 来源、是否要求调用方提供已验收包清单）。取决于 [I00-02 AssetPack 几何证据来源](issues/03-i00-02-asset-geometry-provenance.md)。
-- **若 `lagMs` 必须扩展公共 API，是否需要拆出一个独立的前置 effort**。取决于 [I00-04 lagMs 来源与传递路径](issues/05-i00-04-lagms-source.md)。
-- **现有语料里实际含移动 hazard 的关卡有多少**，决定集成收益与回归面；可作为取证顺带产出，但可能反过来影响范围裁定。
-- **`coverage` 契约是否需要顺带修正**：PRD 禁止回退既有语义，而当前 `partial` 不参与顶层聚合。修正可能同时影响 V1 既有行为。取决于 [I00-01 现有审计语义与 coverage 缺口](issues/02-i00-01-audit-semantics-coverage.md)。
-- **G-04 若判定必须建模跳跃 / 下落，是否直接超出 PRD 非目标** ⇒ 那时只剩「缩范围」或「停」。取决于 [I00-10 垂直规避证明](issues/08-i00-10-vertical-evasion-proof.md)。
+<!-- 无。地图已收口；所有雾区均已毕业为票并关闭，或被判出局。 -->
 
 ## Out of scope
 

@@ -1,7 +1,7 @@
 # I00-R3 I-00 最终收口 [HARD BLOCK]
 
 Type: grilling
-Status: claimed
+Status: resolved
 Owner: —
 Blocked by: 13, 12
 Map: ../map.md
@@ -55,3 +55,12 @@ Class: I-00 / DECISION
 3. 地图 `Status: closed`，全部 16 张票结论索引进 Decisions so far，`Not yet specified` 清空。
 
 **不进行的动作**：不启动 I-01，不修改任何生产代码。
+
+## Answer
+
+**用户 2026-11-09 签署 R3：结论「完成」。**
+
+- 冻结文档：[`docs/v7.8/移动-I00.md`](../../../docs/v7.8/移动-I00.md)（状态改为「已冻结（2026-11-09）」）。
+- 六项收口核对全部通过（见上）。
+- 地图关闭；16 张票结论已全部索引进 `map.md` 的 Decisions so far；`Not yet specified` 清空。
+- **未授权**：I-01～I-05 的执行。契约冻结 ≠ 实施授权；每个阶段仍需独立 PR 与阶段复核。
