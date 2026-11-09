@@ -22,7 +22,8 @@ Class: I-01 / EVIDENCE
 3. **IE 下的行为**：Q8=B 下 IE 不产 `ConfigIssue`。写出三处调用方在时序 IE 时具体发生什么（继续 / 不阻断），并证明这与今天的行为一致。
 4. **公共面检查**：接线是否必须新增返回字段、参数或类型。若是 ⇒ 标记 `STOP`，不要顺手加。
 5. **回归影响**：列出受影响的既有测试与语料（`playability-*`、`config-audit.test.ts`、`publish-gate.test.ts`、LP-06 / LP-07 scratch 语料），并给出每项的预期不变性。
-6. **可行性结论**：三处是否都能在 I-00 白名单内完成接线。
+6. **范围收集**：从 `GameConfig` 推导 `assetIds`（player + 引用的 hazard / pickup / goal）的纯函数放在哪、三处如何共享同一份实现，避免各写一遍。
+7. **可行性结论**：三处是否都能在 I-00 白名单内完成接线。
 
 ### 产出
 

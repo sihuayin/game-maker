@@ -19,11 +19,8 @@ Class: I-01 / DECISION
    - `anchor` 必须存在；
    - `anchor.x == asset.anchor.x` 且 `anchor.y == asset.anchor.y`（精确相等还是有容差？I-00 只给了 `ε` 用于门宽，不用于几何相等）。
    任一不满足 ⇒ 该资产不可信 ⇒ 时序入口返回 `INSUFFICIENT_EVIDENCE`。
-2. **验证范围**：哪些资产必须进入验证集合？
-   - 仅参与时序判定的移动 Hazard；
-   - 还是所有 `collisionSource === "frame"` 的实体（hazard / pickup / goal / player）。
-   必须给出理由，并说明未纳入验证的 frame 源实体如何保持今天的覆盖口径。
-3. **checksum 绑定**：Atlas JSON 字节绑定到 `files[]` 中 `atlases[].meta` 那一条；`AtlasEntry.checksum` 是 PNG 的 sha256，**不得**拿来校验 JSON。多张 atlas 共用同一 JSON / 同一 PNG 时如何处理。
+2. **验证范围（已由 [I01-02](02-i01-02-trusted-input-contract.md) 裁定）**：`config.player.asset` + 配置引用的 `hazard` / `pickup` / `goal` 资产；排除 background / UI / decor / 未引用资产。本票不再重开范围，只把范围落成可执行的帧清单。
+3. **checksum 绑定（已由 [I01-02](02-i01-02-trusted-input-contract.md) 裁定）**：JSON 字节绑定 `files[]` 中 `atlases[].meta` 那一条；`AtlasEntry.checksum` 是 PNG 的 sha256，**不得**拿来校验 JSON。本票只需写清多张 atlas 共用同一 JSON 时的去重与失败口径。
 4. **多帧尺寸不一致**：manifest `size` 只取第 0 帧（`pack.ts:1216-1218`）。若第 1..n 帧 `sourceSize` 与 `asset.size` 不同，按 Q12=A 一律 IE；确认这是否会误伤合法包（用现有语料取证）。
 5. **边界**：缺帧、幽灵帧、重复帧名、帧名跨资产重复、`meta` 路径逃逸（`../`）、JSON 顶层多余字段。
 6. **负例矩阵**：至少覆盖需求 §2.3 的六类，每条写清输入、期望结果、证据落点。

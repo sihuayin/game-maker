@@ -1,8 +1,8 @@
 # I01-02 可信输入契约与 brand 机制
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: 01
 Map: ../map.md
 Class: I-01 / DECISION
@@ -42,3 +42,18 @@ Class: I-01 / DECISION
 - 需要 contracts 引入 Node 内置模块；
 - 需要新增第 5 项公共面加法；
 - 需要改既有测试文件。
+
+## Answer
+
+决策记录：[`evidence/02-trusted-input-contract.md`](../evidence/02-trusted-input-contract.md)。
+
+- **Q1–Q8 全部 A**。验证范围 = `config.player.asset` + 配置引用的 `hazard` / `pickup` / `goal` 资产；background / UI / decor / 未引用资产排除。
+- **全有或全无**：判别联合；不可信时不返回部分几何。
+- **一次调用验整包**：按 `atlases[].meta` 去重；SHA 来自 `files[]`；digest 与 `AtlasJson.safeParse` 消费同一份 bytes。
+- **brand**：模块私有 `unique symbol`；唯一生产者是 `verifyTemporalInput`；不导出铸造工厂；运行时守卫拒绝普通对象。
+- **digest**：`(bytes: Uint8Array) => string`，完整 `sha256:<hex>`；生产只允许 `assets/src/ops.ts`。
+- **失败码**：8 个闭集 code + 显式 `verified` 表；不新增 `ConfigIssue.code`。
+- **入口**：`auditPlayabilityTemporal` 只认 branded 输入，无 geometry / hitbox / body / 尺寸 / 垂直规避参数。
+- **Q8**：`verifyTemporalInput` 经 `api.ts` 导出并标 `@internal`；架构测试把生产调用者限制为 `assets/src/ops.ts`。**`@internal` 不是包级访问控制**。
+- 真实语料：`last-train/v2` 在严格判据下零不符；`counter-siege` 无 manifest，不是有效证据。
+- 本票只收口技术决策；不构成 I-01 实施授权。
