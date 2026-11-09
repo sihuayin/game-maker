@@ -1,8 +1,8 @@
 # I01-05 三处生产调用方接线与回归影响
 
 Type: research
-Status: open
-Owner: —
+Status: claimed
+Owner: amber
 Blocked by: 02, 04
 Map: ../map.md
 Class: I-01 / EVIDENCE
