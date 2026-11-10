@@ -135,7 +135,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
                                     └─ I01-R1 I-01 执行包冻结与授权（grilling · HITL）[HARD BLOCK]
 ```
 
-- **frontier**：`I01-01` 与 `I01-03` 可并行开工；其余等待前置。
+- **frontier**：`I01-R1`（唯一未关闭票；HITL，需用户签署）。
 - `I01-05` 是 research 票，可由子代理执行，但必须等 `I01-02` / `I01-04` 收口。
 - `I01-R1` 签署后，本图收口；实施是图外的独立 PR。
 
@@ -149,6 +149,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 索引：每张已关闭票一行，够判断相关性即可；细节永远在票里。 -->
 
+- [I01-07 白名单与 R2 一致性审计](issues/07-i01-07-whitelist-audit.md): 7 个文件全部在白名单内（3 新 + 4 改），无 `D`、无测试改动、无新依赖 / lockfile / fixtures；公共面无第 5 项类别——R2 第 2–4 项不用，第 1 项由新入口替代；`stubTemporalAnalyzer` / `temporalScope` 为边界导出，R1 必须逐符号签署，若被判定第 5 项则 `STOP → I-00 R2`；map 的 5 项偏离 + `:1284` 收敛全部允许；无硬越界。
 - [I01-06 测试矩阵与证据要求](issues/06-i01-06-test-matrix.md): 唯一新测试文件 `playability-temporal-input.test.ts`，既有测试零改动、夹具零新增；65 条矩阵覆盖失败码、`1e-9` 容差、累积去重、TOCTOU 同字节、brand 伪造（配 PU/NB 阳性对照）、lag 矩阵、scope 与架构扫描；负向须重绑 `files[]` 才触达目标失败码；读取器无独立单元测试、接线只能结构证明，两条残余限制进 R1。
 - [I01-05 三处生产调用方接线与回归影响](issues/05-i01-05-call-site-wiring.md): 三处均可接线且越界清单为空；`runTemporalAudit` 必须同步、绝不抛；适用才读盘、每次编排读一次，重采样循环内不接（结果丢弃、无法影响重试）；汇合点与发布闸丢弃结果，时序 IE 不产 issue、不改 Verdict、不阻断；无新增参数或返回字段。
 - [I01-04 双档 lag 编排与 stub 降级](issues/04-i01-04-lag-orchestration.md): 结果区分 `applicable`；只要存在移动 Hazard 即适用，Y 轴 / 多 Hazard 保守 IE；两档只比 `verdict`，不同 ⇒ IE + `lag-disagreement`；非法 lag ⇒ IE + `lag-invalid`；常量唯一住 contracts；编排器在 `assets/ops.ts`；生产用显式 stub，替身只在测试；三处调用方接线后丢弃结果。

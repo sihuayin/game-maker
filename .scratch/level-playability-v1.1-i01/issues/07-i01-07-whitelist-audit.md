@@ -1,7 +1,7 @@
 # I01-07 白名单与 R2 一致性审计
 
 Type: task
-Status: claimed
+Status: resolved
 Owner: amber
 Blocked by: 01, 05, 06
 Map: ../map.md
@@ -29,3 +29,15 @@ Class: I-01 / EVIDENCE
 - 审计表无未分类项；
 - 越界清单为空，或明确停止；
 - 审计结论可直接作为授权票的附件。
+
+## Answer
+
+审计记录：[`evidence/07-scope-audit.md`](../evidence/07-scope-audit.md)。
+
+- **逐文件：7 个文件全部落在 I-00 §11 白名单内，越界清单为空。** 预期实施 diff = **3 个新增**（`temporal.ts`、`temporal-input.ts`、`playability-temporal-input.test.ts`）+ **4 个修改**（`api.ts`、`assets/ops.ts`、`create-game.ts`、`publish-gate.ts`）；无 `D`、无 `package.json` / `pnpm-lock.yaml`、无 `fixtures/**`、无 `docs/v7.8/**`、无 demo / cli / mcp。
+- **既有测试零改动、零删除、零放宽**。唯一新增测试是 `playability-temporal-input.test.ts`；`publish-gate.test.ts` 按 I01-06 裁定不新增用例（`:193` 已穿过新接线）。
+- **公共面没有第 5 项功能类别**：R2 第 2–4 项一项不用；第 1 项（`auditPlayability` 第三参数）由新时序入口**替代**，`auditPlayability` 签名一字不改。无新 `ConfigIssue.code`、持久化字段、CLI / MCP 参数或新依赖。
+- **边界项（必须 R1 逐符号签署，不是越界）**：`stubTemporalAnalyzer`、`temporalScope` 是新模块内部导出，不在 I01-01 的逐项枚举里；判定属「第 1 项替代集合」。若签署人或 R2 授权人认为任何新符号都算第 5 项 ⇒ 本包不得签署，`STOP → I-00 R2`。
+- **偏离审计**：map 的 5 项显式偏离全部落在白名单；另登记 I01-05 的 `compileRuntime` 只接 `:1284`（不接 `:1247`），以及 I01-06 的发布闸测试不加法。`profile.ts` / `graph.ts` / `fixtures/packs/**` 三项「需单独裁定」全部未触发。
+- **无硬越界，无需回 I-00 R2。** R1 必须显式列明 4 条边界：第 1 项替代形态、`stubTemporalAnalyzer` / `temporalScope` 导出、`:1284` 收敛、读取器无独立单元测试 + 接线只能结构证明。
+- 本票只产出审计证据；不构成 I-01 实施授权。
