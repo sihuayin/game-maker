@@ -5,13 +5,15 @@ Tracker: local-markdown
 Effort: level-playability-v1.1-i01
 Baseline: `main` @ `29ea1d1`
 Authority: [`docs/v7.8/移动-I01-需求.md`](../../docs/v7.8/移动-I01-需求.md) @ `sha256:05c6c72aaaa2201cb33c8de42eb38809251ab97a1cf06450daee7d9e7416a113`（2847 bytes，2026-11-09 冻结，只读）
-Status: open · 2026-11-09 开图
+Status: closed · 2026-11-10 收口（I-01 执行包已签署）
 Predecessor: [Level Playability V1.1 Integration](../level-playability-v1.1-integration/map.md)（已收口；I-00 冻结包已发布）
 
 > **2026-11-09 开图。** 用户以 I-01 需求文档发起本图，并逐轮裁定终点、架构、入口、降级与判据。
 > 按裁定，本图只产出**可独立签署的 I-01 执行包**；不实施生产代码，不进入独立 PR。
 > I-00 冻结包（[`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)）与 **R2 授权边界**仍是上位约束。
-> **本图不构成 I-01 实施授权。**
+> **开图时不构成 I-01 实施授权。** 2026-11-10 由 [I01-R1](issues/08-i01-r1-authorization.md) 单独签署后，本图收口。
+
+> **2026-11-10 收口。** I-01 执行包已由用户逐项签署：[`evidence/r1-i01-authorization.md`](evidence/r1-i01-authorization.md)。签署只授权 I-01 实施（7 文件、独立 PR、零付费、不启动 I-02 / I-03）；I-02 / I-03 仍需另行授权。
 
 ## Destination
 
@@ -135,7 +137,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
                                     └─ I01-R1 I-01 执行包冻结与授权（grilling · HITL）[HARD BLOCK]
 ```
 
-- **frontier**：`I01-R1`（唯一未关闭票；HITL，需用户签署）。
+- **frontier**：无。I01-R1 已签署，本图收口。
 - `I01-05` 是 research 票，可由子代理执行，但必须等 `I01-02` / `I01-04` 收口。
 - `I01-R1` 签署后，本图收口；实施是图外的独立 PR。
 
@@ -149,6 +151,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 索引：每张已关闭票一行，够判断相关性即可；细节永远在票里。 -->
 
+- [I01-R1 I-01 执行包冻结与授权](issues/08-i01-r1-authorization.md): 用户签署（2026-11-10）。授权 I-01 实施：7 文件、独立 PR、零付费、Runtime / CLI / MCP 只读、不启动 I-02 / I-03；`stubTemporalAnalyzer` / `temporalScope` 接受为 R2 第 1 项替代集合；读取器无独立单元测试与接线仅结构证明两条限制原文收录；`compileRuntime` 只接 `:1284`；证据链接引用。
 - [I01-07 白名单与 R2 一致性审计](issues/07-i01-07-whitelist-audit.md): 7 个文件全部在白名单内（3 新 + 4 改），无 `D`、无测试改动、无新依赖 / lockfile / fixtures；公共面无第 5 项类别——R2 第 2–4 项不用，第 1 项由新入口替代；`stubTemporalAnalyzer` / `temporalScope` 为边界导出，R1 必须逐符号签署，若被判定第 5 项则 `STOP → I-00 R2`；map 的 5 项偏离 + `:1284` 收敛全部允许；无硬越界。
 - [I01-06 测试矩阵与证据要求](issues/06-i01-06-test-matrix.md): 唯一新测试文件 `playability-temporal-input.test.ts`，既有测试零改动、夹具零新增；65 条矩阵覆盖失败码、`1e-9` 容差、累积去重、TOCTOU 同字节、brand 伪造（配 PU/NB 阳性对照）、lag 矩阵、scope 与架构扫描；负向须重绑 `files[]` 才触达目标失败码；读取器无独立单元测试、接线只能结构证明，两条残余限制进 R1。
 - [I01-05 三处生产调用方接线与回归影响](issues/05-i01-05-call-site-wiring.md): 三处均可接线且越界清单为空；`runTemporalAudit` 必须同步、绝不抛；适用才读盘、每次编排读一次，重采样循环内不接（结果丢弃、无法影响重试）；汇合点与发布闸丢弃结果，时序 IE 不产 issue、不改 Verdict、不阻断；无新增参数或返回字段。
@@ -161,7 +164,7 @@ I01-01 精确文件清单与依赖方向（task · AFK）
 
 <!-- 在**目标之内**、但还无法精确表述的问题。能写成一张票就写成票，不要预先切片。 -->
 
-- 授权包对 scratch 证据的归档方式（引用 vs 复制）。
+<!-- 无。地图已收口；所有雾区均已毕业为票并关闭，或被判出局。 -->
 
 ## Out of scope
 

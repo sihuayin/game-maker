@@ -1,8 +1,8 @@
 # I01-R1 I-01 执行包冻结与授权
 
 Type: grilling
-Status: claimed
-Owner: amber
+Status: resolved
+Owner: 用户裁定 · 2026-11-10
 Blocked by: 02, 03, 04, 05, 06, 07
 Map: ../map.md
 Class: I-01 / HARD BLOCK
@@ -37,3 +37,14 @@ Class: I-01 / HARD BLOCK
 ### 产出
 
 `../evidence/r1-i01-authorization.md` + 用户签署记录。**不修改任何生产文件。**
+
+## Answer
+
+用户签署（2026-11-10）。执行包：[`evidence/r1-i01-authorization.md`](../evidence/r1-i01-authorization.md)。
+
+- **Q1 整体授权：签署。** 按执行包 §1～§10 授权 I-01 实施；仅限 7 个文件、独立 PR、零付费、Runtime / CLI / MCP 只读、不启动 I-02 / I-03。
+- **Q2 边界导出：接受为 R2 第 1 项替代集合。** `stubTemporalAnalyzer` / `temporalScope` 由执行包逐符号签署，不视为第 5 项，不回 I-00 R2。
+- **Q3 残余限制：接受并原文写入。** 生产读取器无独立单元测试；三处接线丢弃结果、只能结构证明「已消费」。
+- **Q4 执行形态：全部接受。** `compileRuntime` 只接 `:1284`；独立 PR；分支 `p1/level-playability-v1.1-i01` 自 `main@29ea1d1`。
+- **Q5 证据归档：链接引用。** 执行包正文自包含签署所需的判定与清单；细节证据不复制。
+- 签署只授权 I-01；I-02 / I-03 仍需另行授权。实施完成后必须提交测试、回归、范围审计证据，复核通过后才申请 I-02 授权。
