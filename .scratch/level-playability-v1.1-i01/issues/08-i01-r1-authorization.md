@@ -1,8 +1,8 @@
 # I01-R1 I-01 执行包冻结与授权
 
 Type: grilling
-Status: open
-Owner: —
+Status: claimed
+Owner: amber
 Blocked by: 02, 03, 04, 05, 06, 07
 Map: ../map.md
 Class: I-01 / HARD BLOCK
