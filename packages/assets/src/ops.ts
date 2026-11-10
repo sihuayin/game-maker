@@ -9,9 +9,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditConfigPipeline, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE, entityBox, FALLBACK_ANCHOR,
-  formatIssues, GameDesignSpecSchema,
-  jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
+  auditConfigPipeline, auditPlayabilityTemporal, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE,
+  entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
+  resolveTwoLagResults, stubTemporalAnalyzer, TEMPORAL_LAG_BASELINE_MS, TEMPORAL_LAG_MS, temporalScope,
+  verifyTemporalInput, type TemporalAuditResult,
   parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, PLATFORMER_V1,
   DESIGN_BUCKET_ASSET_KINDS,
   PLAYER_ACTION_NAMES,
@@ -981,6 +982,68 @@ function resourceBrief(manifest: AssetPackManifest): string {
   return lines.join("\n");
 }
 
+// ── I-01：可信 Atlas 输入（唯一读盘层）──────────────────────────────────────────
+//
+// ⚠️ **这是全仓唯一读 atlas JSON 字节并算真实 SHA-256 的地方**。contracts 只收
+//   `bytes` 做比对与解析（浏览器兼容）；这里是 Node 侧薄壳。
+// ⚠️ `readTrustedAtlasInput` **模块私有**：不导出，减少公共面。`runTemporalAudit`
+//   是三处生产调用方唯一入口，**同步**且**绝不抛** —— 它不得改变既有退出码。
+// ⚠️ 结果按 I01-04 Q8=A **丢弃**：I-01 只接通链路，消费留到 I-03。
+
+const atlasDigest = (bytes: Uint8Array): string =>
+  "sha256:" + createHash("sha256").update(bytes).digest("hex");
+
+/** 读一次相关 atlas 字节，交给 contracts 纯验证。读取失败 ⇒ 省略该路径，由验证报缺失。 */
+function readTrustedAtlasInput(
+  packDir: string,
+  manifest: AssetPackManifest,
+  assetIds: readonly string[],
+): ReturnType<typeof verifyTemporalInput> {
+  const paths = new Set<string>();
+  for (const id of assetIds) {
+    const asset = manifest.assets.find((a) => a.id === id);
+    if (asset === undefined) continue;
+    const atlas = manifest.atlases.find((a) => a.id === asset.atlasId);
+    if (atlas !== undefined) paths.add(atlas.meta);
+  }
+  const atlases: { path: string; bytes: Uint8Array }[] = [];
+  for (const meta of [...paths].sort((a, b) => a.localeCompare(b))) {
+    try {
+      atlases.push({ path: meta, bytes: fs.readFileSync(path.join(packDir, meta)) });
+    } catch {
+      // 缺文件 / 权限 / 坏路径都收敛为「没有提供字节」；verify 报 atlas-file-missing。
+    }
+  }
+  return verifyTemporalInput({ manifest, assetIds, atlases, digest: atlasDigest });
+}
+
+/**
+ * 读一次可信输入 → 两档各调一次入口 → 比较 → 返回。
+ *
+ * ⚠️ **同步**：`assertPublishableQa` 是同步 API，改成 `async` 会破坏公共签名。
+ * ⚠️ **绝不抛**：任何未知异常收敛为最保守的 IE；I-01 接线不得改变既有退出码。
+ * ⚠️ **适用才读盘**：没有移动 Hazard 时不产生任何文件 I/O。
+ */
+export function runTemporalAudit(args: {
+  config: GameConfig;
+  manifest: AssetPackManifest;
+  packDir: string;
+}): TemporalAuditResult {
+  try {
+    const scope = temporalScope(args.config);
+    if (!scope.applicable) return { applicable: false };
+    const trusted = readTrustedAtlasInput(args.packDir, args.manifest, scope.assetIds);
+    if (!trusted.ok) return { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
+    const at = (lagMs: number): TemporalAuditResult =>
+      auditPlayabilityTemporal(args.config, args.manifest, {
+        lagMs, trustedInput: trusted.value, analyze: stubTemporalAnalyzer,
+      });
+    return resolveTwoLagResults(at(TEMPORAL_LAG_MS), at(TEMPORAL_LAG_BASELINE_MS));
+  } catch {
+    return { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
+  }
+}
+
 export type CompileRuntimeOptions = {
   /** `run/v<N>/game-design.json` —— 理解层的收尾产物（票 10）。 */
   designPath: string;
@@ -1293,6 +1356,11 @@ ${SKELETON_SHAPE_NOTE}
       "\n⚠️ 这是**确定性失败** —— 重抽 config 改不了，也不落盘。" +
       "按上面每一条的提示改布局 / 配置或资源清单，不是再抽一次 config。",
       ledgerCarrying(call.record()));
+
+  // ── I-01：可信时序输入接线（只接通、不消费；Q8=A）────────────────────────────
+  //   ⚠️ 放在**确定性硬校验通过之后、落盘之前**：重采样循环内不接（结果丢弃、无法影响
+  //   重试，逐发读取只会重复 I/O）。最终会落盘的那一份才是唯一有意义的一份。
+  runTemporalAudit({ config, manifest, packDir: opts.packDir });
 
   const dir = path.join(opts.outRoot, manifest.id, "game-configs");
   fs.mkdirSync(dir, { recursive: true });

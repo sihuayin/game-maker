@@ -122,3 +122,17 @@ export { FIXED_RUNTIME_PROFILE } from "./profile.js";
 export type {
   PlayabilityCoverage, PlayabilityEvidence, PlayabilityVerdictState,
 } from "./verdict.js";
+
+// ── I-01：可信时序输入与双档编排（@internal）────────────────────────────────
+//
+// ⚠️ `@internal` **不是包级访问控制**：这些符号经 `api.ts` 转出后对包外可见。
+//   真正限制生产调用者的是架构测试与代码评审（生产只允许 `assets/src/ops.ts`）。
+// ⚠️ `isTrustedAtlasInput` 与失败码类型**不转出**：它们只在 contracts 内部/测试使用，
+//   把公共面压到最小。
+export {
+  auditPlayabilityTemporal, resolveTwoLagResults, stubTemporalAnalyzer, temporalScope,
+  TEMPORAL_LAG_BASELINE_MS, TEMPORAL_LAG_MS,
+} from "./temporal.js";
+export type { TemporalAnalyzer, TemporalAuditResult } from "./temporal.js";
+export { verifyTemporalInput } from "./temporal-input.js";
+export type { TrustedAtlasInput } from "./temporal-input.js";

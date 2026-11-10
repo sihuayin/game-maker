@@ -25,7 +25,7 @@ import {
 } from "@game-maker/contracts";
 import { analyzeReference } from "@game-maker/vision";
 import { analyzeIntent, compileCharacterDna, compileDesign } from "@game-maker/game-design";
-import { DEFAULT_VIEWPORT, compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, encodePNG, inspectPack, nextPackVersion, packAssets, planAssets, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
+import { DEFAULT_VIEWPORT, compileRuntime, decodePNG, designCoverageGate, emptyPaletteProblem, encodePNG, inspectPack, nextPackVersion, packAssets, planAssets, runTemporalAudit, verifyPack, type ImageTransport, type InspectData } from "@game-maker/assets";
 // ⚠️ **合成器是这一层的默认值**（票 20 的 Q3）：`packages/qa` 的白名单只有 `contracts`，
 //   而两个壳**不许**依赖它（`check-deps.mjs` 的 `ALLOWED`）⇒ 够得着它的**只有本包**，
 //   而本包与 `qa` 那条边从票 07 起就画在图里了（今天它第一次被用上）。
@@ -641,6 +641,10 @@ export async function runBuild(input: BuildInput): Promise<BuildResult> {
       pipelineIssues.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n") +
       "\n⚠️ 这一关不重采样、不落盘 —— 改配置、布局或清单，不是再去抽一次 config。");
 
+  // ── I-01：可信时序输入接线（两条路径共用；只接通、不消费）──────────────────────
+  //   ⚠️ `reuseConfig` 与 `compileRuntime` 都经过这里；同一位置、同一顺序。
+  //   ⚠️ 结果按 I01-04 Q8=A 丢弃；时序 IE 不产 issue、不改 Verdict、不阻断。
+  runTemporalAudit({ config: config.value, manifest: manifest.value, packDir });
 
   // ── QA：**默认跑**（票 20 的 Q3），而它的硬失败**阻断**（R3 · 票 20 的 Q4）──────────
   let qa: QAReport | undefined;
