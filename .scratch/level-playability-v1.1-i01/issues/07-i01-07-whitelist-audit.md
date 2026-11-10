@@ -1,8 +1,8 @@
 # I01-07 白名单与 R2 一致性审计
 
 Type: task
-Status: open
-Owner: —
+Status: claimed
+Owner: amber
 Blocked by: 01, 05, 06
 Map: ../map.md
 Class: I-01 / EVIDENCE
