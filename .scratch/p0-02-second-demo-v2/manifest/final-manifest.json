@@ -2,7 +2,7 @@
   "format": "delivery-evidence-manifest/v1",
   "generatedAt": "2026-10-30T04:54:52.120Z",
   "generatedBy": "p0-02-second-demo-v2 stage A closure",
-  "note": "阶段 A 冻结清单：v3 playtest 写回 + 覆盖报告 + 旧 fa04 视觉记录（历史身份绑定，不重新审核）",
+  "note": "P0-04-07 negative C tampered manifest (do not merge)",
   "subject": {
     "packId": "wasteland-scavenger-recipe",
     "packVersion": 1,
