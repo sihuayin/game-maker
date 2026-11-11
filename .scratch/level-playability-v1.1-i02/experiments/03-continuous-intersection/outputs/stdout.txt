@@ -1,0 +1,3 @@
+{"checks":123,"passed":123,"failed":0}
+determinism.inProcess = true
+measurementSha256 = ab0d04c6ed1fd32c0e0ad8f884f7858ba87006df3d64a31825a9a9fb9b2beee8

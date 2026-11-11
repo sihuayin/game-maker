@@ -1,0 +1,2976 @@
+{
+  "meta": {
+    "ticket": "I02-05",
+    "effort": "level-playability-v1.1-i02",
+    "note": "P0 proxy, not the I-02 implementation; scratch-only, not production acceptance",
+    "node": "v22.23.2",
+    "model": {
+      "path": ".scratch/level-playability-v1.1-p0/prototype/temporal-model.mjs",
+      "sha256": "sha256:01788b03db2bef13de5f9951368760f9cc79ba07effb8680d98c6ee270206d4d"
+    },
+    "inventory": {
+      "path": ".scratch/level-playability-v1/corpus/inventory.json",
+      "sha256": "sha256:ba1d051a401ac70f45be5a705e2c478961ffc3fc0a6c9feb4cde09365df5f74f"
+    },
+    "inputsSha256": "bd4333e10d289980f0438c6bb7bf970304d88868a4a9b8ff4fc767918dd9a6e3",
+    "readOnly": true
+  },
+  "environment": {
+    "node": "v22.23.2",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M4",
+    "cores": 10,
+    "totalMemMiB": 16384,
+    "loadavg": [
+      1.47,
+      1.99,
+      1.75
+    ],
+    "repoHead": "a3b8a54e36a292d0dc8dbd5f5839ec35964a3858",
+    "branch": "wayfinder/level-playability-v1.1-i02",
+    "exposeGc": true
+  },
+  "summary": {
+    "checks": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "failures": [],
+  "corpus": {
+    "scope": {
+      "inventory": ".scratch/level-playability-v1/corpus/inventory.json",
+      "inventorySha256": "sha256:ba1d051a401ac70f45be5a705e2c478961ffc3fc0a6c9feb4cde09365df5f74f",
+      "filter": "parseOk ∧ format=game-config/v1 ∧ unique by contentHash",
+      "skipped": {
+        "notParseOk": 0,
+        "notGameConfig": 0,
+        "unreadable": 0
+      }
+    },
+    "counts": {
+      "uniqueConfigs": 21,
+      "hazardsTotal": 31,
+      "configsWithMotion": 16,
+      "movingHazards": 19,
+      "nonXAxisMoving": 0
+    },
+    "capacityDist": {
+      "n": 19,
+      "min": 54600,
+      "p50": 137800,
+      "p90": 139400,
+      "max": 177800,
+      "mean": 122389.474,
+      "sd": 37112.53
+    },
+    "skipped": [
+      {
+        "config": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+        "hazardId": "enemy-patrol",
+        "reason": "no-goal-or-goal-not-ahead"
+      }
+    ],
+    "runs": 36,
+    "valid": 14,
+    "degenerate": 22,
+    "rows": [
+      {
+        "label": "corpus/out/__p03-smoke/negative-gate/config-gate-missing.json#enemy-patrol/speed=0.09",
+        "kind": "corpus",
+        "config": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+        "configSha256": "sha256:ffda50a379a0dd612940d3413b9686087503eecb5ea6320519e778469e0274ec",
+        "hazardId": "enemy-patrol",
+        "speed": 0.09,
+        "canonicalCapacity": 54600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.23,
+        "heapDeltaKiB": 26.1,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 592
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 520,
+            "width": 48,
+            "height": 64,
+            "y": 186,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 480,
+            "distance": 40,
+            "periodMs": 3000,
+            "width": 48,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__p03-smoke/negative-gate/config-gate-missing.json#enemy-patrol/speed=0.16",
+        "kind": "corpus",
+        "config": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
+        "configSha256": "sha256:ffda50a379a0dd612940d3413b9686087503eecb5ea6320519e778469e0274ec",
+        "hazardId": "enemy-patrol",
+        "speed": 0.16,
+        "canonicalCapacity": 54600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.056,
+        "heapDeltaKiB": 11.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 592
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 520,
+            "width": 48,
+            "height": 64,
+            "y": 186,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 480,
+            "distance": 40,
+            "periodMs": 3000,
+            "width": 48,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json#enemy-patrol/speed=0.09",
+        "kind": "corpus",
+        "config": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+        "configSha256": "sha256:78fe11d72ac0f15c05031fa131a48951292b9dcb2dd69747b2bce26c5b1de42e",
+        "hazardId": "enemy-patrol",
+        "speed": 0.09,
+        "canonicalCapacity": 54600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.047,
+        "heapDeltaKiB": 11.8,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 592
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 520,
+            "width": 48,
+            "height": 64,
+            "y": 186,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 480,
+            "distance": 40,
+            "periodMs": 3000,
+            "width": 48,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json#enemy-patrol/speed=0.16",
+        "kind": "corpus",
+        "config": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
+        "configSha256": "sha256:78fe11d72ac0f15c05031fa131a48951292b9dcb2dd69747b2bce26c5b1de42e",
+        "hazardId": "enemy-patrol",
+        "speed": 0.16,
+        "canonicalCapacity": 54600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.033,
+        "heapDeltaKiB": 11.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 592
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 520,
+            "width": 48,
+            "height": 64,
+            "y": 186,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 480,
+            "distance": 40,
+            "periodMs": 3000,
+            "width": 48,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__probe/last-train/site/v1/game-config.json#carriage/speed=0.09",
+        "kind": "corpus",
+        "config": "out/__probe/last-train/site/v1/game-config.json",
+        "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+        "configSha256": "sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+        "hazardId": "carriage",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 1.7999999999999998,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 1,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.655,
+        "heapDeltaKiB": 572.9,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1360,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 800,
+            "distance": 200,
+            "periodMs": 4000,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__probe/last-train/site/v1/game-config.json#carriage/speed=0.16",
+        "kind": "corpus",
+        "config": "out/__probe/last-train/site/v1/game-config.json",
+        "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
+        "configSha256": "sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+        "hazardId": "carriage",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 3.2,
+          "statesEnqueued": 83600,
+          "statesVisited": 83600,
+          "edgesChecked": 250600,
+          "elapsedMs": 34,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 34.633,
+        "heapDeltaKiB": 13255,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1360,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 800,
+            "distance": 200,
+            "periodMs": 4000,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__probe-timeout/last-train/game-configs/v1.json#mover/speed=0.09",
+        "kind": "corpus",
+        "config": "out/__probe-timeout/last-train/game-configs/v1.json",
+        "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+        "configSha256": "sha256:74b75606ce930d25e475aaf84efd1cd5b8fc1a6c3eaad75658c3af3fffd91df7",
+        "hazardId": "mover",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 1.7999999999999998,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 1,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.153,
+        "heapDeltaKiB": 364.1,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1340,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 900,
+            "distance": 160,
+            "periodMs": 4000,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__probe-timeout/last-train/game-configs/v1.json#mover/speed=0.16",
+        "kind": "corpus",
+        "config": "out/__probe-timeout/last-train/game-configs/v1.json",
+        "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
+        "configSha256": "sha256:74b75606ce930d25e475aaf84efd1cd5b8fc1a6c3eaad75658c3af3fffd91df7",
+        "hazardId": "mover",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 20,
+          "maxStepPx": 3.2,
+          "statesEnqueued": 91560,
+          "statesVisited": 91560,
+          "edgesChecked": 274480,
+          "elapsedMs": 35,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 35.545,
+        "heapDeltaKiB": 23528.2,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1340,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 900,
+            "distance": 160,
+            "periodMs": 4000,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__probe-timeout/last-train/game-configs/v2.json#sweeper/speed=0.09",
+        "kind": "corpus",
+        "config": "out/__probe-timeout/last-train/game-configs/v2.json",
+        "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+        "configSha256": "sha256:886393fe70c3506692962a975781757679407b5c1fc9123f03c8c697c77cb420",
+        "hazardId": "sweeper",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.162,
+        "heapDeltaKiB": 309.8,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1360,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 760,
+            "distance": 160,
+            "periodMs": 3000,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/__probe-timeout/last-train/game-configs/v2.json#sweeper/speed=0.16",
+        "kind": "corpus",
+        "config": "out/__probe-timeout/last-train/game-configs/v2.json",
+        "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
+        "configSha256": "sha256:886393fe70c3506692962a975781757679407b5c1fc9123f03c8c697c77cb420",
+        "hazardId": "sweeper",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "statesEnqueued": 77520,
+          "statesVisited": 77520,
+          "edgesChecked": 232360,
+          "elapsedMs": 27,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 27.187,
+        "heapDeltaKiB": 20454.5,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1360,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 760,
+            "distance": 160,
+            "periodMs": 3000,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/last-train/game-configs/v1.json#sweeping-carriage/speed=0.09",
+        "kind": "corpus",
+        "config": "out/last-train/game-configs/v1.json",
+        "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+        "configSha256": "sha256:d1415d119b25991b36dd72f70e766f09af971c083b7db1fed23d4ad7356a961e",
+        "hazardId": "sweeping-carriage",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 13,
+          "maxStepPx": 1.17,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.093,
+        "heapDeltaKiB": 303.7,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1360,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 1080,
+            "distance": 180,
+            "periodMs": 2600,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/out/last-train/game-configs/v1.json#sweeping-carriage/speed=0.16",
+        "kind": "corpus",
+        "config": "out/last-train/game-configs/v1.json",
+        "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
+        "configSha256": "sha256:d1415d119b25991b36dd72f70e766f09af971c083b7db1fed23d4ad7356a961e",
+        "hazardId": "sweeping-carriage",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 13,
+          "maxStepPx": 2.08,
+          "statesEnqueued": 110470,
+          "statesVisited": 110470,
+          "edgesChecked": 331210,
+          "elapsedMs": 38,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 38.117,
+        "heapDeltaKiB": 19760.3,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1360,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 1080,
+            "distance": 180,
+            "periodMs": 2600,
+            "width": 64,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+        "configSha256": "sha256:bb144bbf3718a61b4a51791f37f70b569a4b0715d398e17b5f540c0626c92b63",
+        "hazardId": "enemy-1",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 1.6199999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.075,
+        "heapDeltaKiB": 302.8,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1354,
+            "width": 32,
+            "height": 40,
+            "y": 210,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 1150,
+            "distance": 180,
+            "periodMs": 3600,
+            "width": 32,
+            "height": 36,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 214,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:01b557f4d56726ffc858f5b96e0e8c06713ab69f5fc81ce0109653595d1b6d93",
+        "configSha256": "sha256:bb144bbf3718a61b4a51791f37f70b569a4b0715d398e17b5f540c0626c92b63",
+        "hazardId": "enemy-1",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 2.88,
+          "statesEnqueued": 119130,
+          "statesVisited": 119130,
+          "edgesChecked": 357190,
+          "elapsedMs": 42,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 42.299,
+        "heapDeltaKiB": 18171.9,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1354,
+            "width": 32,
+            "height": 40,
+            "y": 210,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 1150,
+            "distance": 180,
+            "periodMs": 3600,
+            "width": 32,
+            "height": 36,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 214,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+        "configSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "hazardId": "patroller-1",
+        "speed": 0.09,
+        "canonicalCapacity": 139400,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 697,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 139400,
+        "wallMs": 0.074,
+        "heapDeltaKiB": 303.3,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1416
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1356,
+            "width": 24,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 340,
+            "distance": 100,
+            "periodMs": 3000,
+            "width": 24,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+        "configSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "hazardId": "patroller-1",
+        "speed": 0.16,
+        "canonicalCapacity": 139400,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 697,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "statesEnqueued": 35350,
+          "statesVisited": 35350,
+          "edgesChecked": 105850,
+          "elapsedMs": 13,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 139400,
+        "wallMs": 12.202,
+        "heapDeltaKiB": 7196.8,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1416
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1356,
+            "width": 24,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 340,
+            "distance": 100,
+            "periodMs": 3000,
+            "width": 24,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-2/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+        "configSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "hazardId": "patroller-2",
+        "speed": 0.09,
+        "canonicalCapacity": 139400,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 697,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 1.575,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 139400,
+        "wallMs": 0.22,
+        "heapDeltaKiB": 531.3,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1416
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1356,
+            "width": 24,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 720,
+            "distance": 120,
+            "periodMs": 3500,
+            "width": 24,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json#patroller-2/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
+        "configSha256": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+        "hazardId": "patroller-2",
+        "speed": 0.16,
+        "canonicalCapacity": 139400,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 697,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 2.8000000000000003,
+          "statesEnqueued": 74400,
+          "statesVisited": 74400,
+          "edgesChecked": 223000,
+          "elapsedMs": 29,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 139400,
+        "wallMs": 29.617,
+        "heapDeltaKiB": 19165.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1416
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1356,
+            "width": 24,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 720,
+            "distance": 120,
+            "periodMs": 3500,
+            "width": 24,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json#enemy-patrol/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+        "configSha256": "sha256:29b4ac87a141487a1fca717229a4c98cd60925c6ce40be2ec83128686b01d323",
+        "hazardId": "enemy-patrol",
+        "speed": 0.09,
+        "canonicalCapacity": 54600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.059,
+        "heapDeltaKiB": 4,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 592
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 520,
+            "width": 48,
+            "height": 64,
+            "y": 186,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 480,
+            "distance": 40,
+            "periodMs": 3000,
+            "width": 48,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json#enemy-patrol/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
+        "configSha256": "sha256:29b4ac87a141487a1fca717229a4c98cd60925c6ce40be2ec83128686b01d323",
+        "hazardId": "enemy-patrol",
+        "speed": 0.16,
+        "canonicalCapacity": 54600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 1,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.022,
+        "heapDeltaKiB": 4.4,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 592
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 520,
+            "width": 48,
+            "height": 64,
+            "y": 186,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 480,
+            "distance": 40,
+            "periodMs": 3000,
+            "width": 48,
+            "height": 48,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 202,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+        "configSha256": "sha256:20f64bc82570659f97342c2b521db51451589936ee1b8b83239263f6282a4c1e",
+        "hazardId": "enemy-1",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 1,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.123,
+        "heapDeltaKiB": 377.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 380,
+            "distance": 100,
+            "periodMs": 3000,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+        "configSha256": "sha256:20f64bc82570659f97342c2b521db51451589936ee1b8b83239263f6282a4c1e",
+        "hazardId": "enemy-1",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "statesEnqueued": 38150,
+          "statesVisited": 38150,
+          "edgesChecked": 114250,
+          "elapsedMs": 18,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 18.077,
+        "heapDeltaKiB": 11047.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 380,
+            "distance": 100,
+            "periodMs": 3000,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-2/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+        "configSha256": "sha256:20f64bc82570659f97342c2b521db51451589936ee1b8b83239263f6282a4c1e",
+        "hazardId": "enemy-2",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 1.575,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.096,
+        "heapDeltaKiB": 351.8,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 880,
+            "distance": 120,
+            "periodMs": 3500,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json#enemy-2/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
+        "configSha256": "sha256:20f64bc82570659f97342c2b521db51451589936ee1b8b83239263f6282a4c1e",
+        "hazardId": "enemy-2",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 17.5,
+          "maxStepPx": 2.8000000000000003,
+          "statesEnqueued": 89200,
+          "statesVisited": 89200,
+          "edgesChecked": 267400,
+          "elapsedMs": 32,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 31.746,
+        "heapDeltaKiB": 21508.8,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 880,
+            "distance": 120,
+            "periodMs": 3500,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+        "configSha256": "sha256:9fda5917353bbd16bdc19353b4f82a71c2b604523de56476ded184958773144d",
+        "hazardId": "enemy-1",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.098,
+        "heapDeltaKiB": 351.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 50,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 600,
+            "distance": 120,
+            "periodMs": 3000,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+        "configSha256": "sha256:9fda5917353bbd16bdc19353b4f82a71c2b604523de56476ded184958773144d",
+        "hazardId": "enemy-1",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "statesEnqueued": 61160,
+          "statesVisited": 61160,
+          "edgesChecked": 183280,
+          "elapsedMs": 21,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 21.412,
+        "heapDeltaKiB": 12409.7,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 50,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 600,
+            "distance": 120,
+            "periodMs": 3000,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-2/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+        "configSha256": "sha256:9fda5917353bbd16bdc19353b4f82a71c2b604523de56476ded184958773144d",
+        "hazardId": "enemy-2",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 12.5,
+          "maxStepPx": 1.125,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.089,
+        "heapDeltaKiB": 351.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 50,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 1050,
+            "distance": 100,
+            "periodMs": 2500,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json#enemy-2/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
+        "configSha256": "sha256:9fda5917353bbd16bdc19353b4f82a71c2b604523de56476ded184958773144d",
+        "hazardId": "enemy-2",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 12.5,
+          "maxStepPx": 2,
+          "statesEnqueued": 105150,
+          "statesVisited": 105150,
+          "edgesChecked": 315250,
+          "elapsedMs": 38,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 37.362,
+        "heapDeltaKiB": 15374.7,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 50,
+            "goalX": 1348,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 1050,
+            "distance": 100,
+            "periodMs": 2500,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json#enemy-patrol-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+        "contentHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+        "configSha256": "sha256:bae4a7ed5b24fda4a18f50d44feb2e20d1136d2ed78caacfe5fbdd03e5cebdd1",
+        "hazardId": "enemy-patrol-1",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 1.3499999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.07,
+        "heapDeltaKiB": 320,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1350,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 960,
+            "distance": 120,
+            "periodMs": 3000,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json#enemy-patrol-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+        "contentHash": "sha256:cb3e030865bbc5b3f3389fe6669c94ec9496258782bb7869b2be989e2777a8ad",
+        "configSha256": "sha256:bae4a7ed5b24fda4a18f50d44feb2e20d1136d2ed78caacfe5fbdd03e5cebdd1",
+        "hazardId": "enemy-patrol-1",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 15,
+          "maxStepPx": 2.4,
+          "statesEnqueued": 97160,
+          "statesVisited": 97160,
+          "edgesChecked": 291280,
+          "elapsedMs": 34,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 33.854,
+        "heapDeltaKiB": 14070.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1350,
+            "width": 32,
+            "height": 32,
+            "y": 218,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 960,
+            "distance": 120,
+            "periodMs": 3000,
+            "width": 32,
+            "height": 32,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 218,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+        "configSha256": "sha256:3c7629b1b8041123fce5dbaa1f84fd7082ec4f41edf8967dac579c6b5dc735b2",
+        "hazardId": "enemy-1",
+        "speed": 0.09,
+        "canonicalCapacity": 177800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.032,
+        "heapDeltaKiB": 1.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1848
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 742,
+            "width": 72,
+            "height": 108,
+            "y": 142,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 620,
+            "distance": 60,
+            "periodMs": 3000,
+            "width": 80,
+            "height": 88,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 162,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:43b3370d329505ad55d2b23cf515061d3d99c400446ba71d80aeb48b86eec878",
+        "configSha256": "sha256:3c7629b1b8041123fce5dbaa1f84fd7082ec4f41edf8967dac579c6b5dc735b2",
+        "hazardId": "enemy-1",
+        "speed": 0.16,
+        "canonicalCapacity": 177800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "unplayable-proof-requires-vertical-evasion-assumption",
+        "stats": {
+          "xPositions": 0,
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "maxStepPx": 0,
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 0,
+        "wallMs": 0.031,
+        "heapDeltaKiB": 2.6,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1848
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 742,
+            "width": 72,
+            "height": 108,
+            "y": 142,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 620,
+            "distance": 60,
+            "periodMs": 3000,
+            "width": 80,
+            "height": 88,
+            "anchorX": 0.5,
+            "anchorY": 1,
+            "y": 162,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+        "configSha256": "sha256:94a32745584e56cead1ebb82c98152010266c9374520ccf4e284939f3073d06b",
+        "hazardId": "enemy-1",
+        "speed": 0.09,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 1.6199999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 0.136,
+        "heapDeltaKiB": 345.5,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1338,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 760,
+            "distance": 160,
+            "periodMs": 3600,
+            "width": 32,
+            "height": 40,
+            "anchorX": 0.5,
+            "anchorY": 0.95,
+            "y": 212,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json#enemy-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+        "contentHash": "sha256:0c99c4b31a9b983bef7e19c5840b20a909cd4c3bb22a4f8b72b116346d774755",
+        "configSha256": "sha256:94a32745584e56cead1ebb82c98152010266c9374520ccf4e284939f3073d06b",
+        "hazardId": "enemy-1",
+        "speed": 0.16,
+        "canonicalCapacity": 137800,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 689,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 2.88,
+          "statesEnqueued": 79160,
+          "statesVisited": 79160,
+          "edgesChecked": 237280,
+          "elapsedMs": 31,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 137800,
+        "wallMs": 31.103,
+        "heapDeltaKiB": 11626.3,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1408
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1338,
+            "width": 32,
+            "height": 48,
+            "y": 204.4,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 760,
+            "distance": 160,
+            "periodMs": 3600,
+            "width": 32,
+            "height": 40,
+            "anchorX": 0.5,
+            "anchorY": 0.95,
+            "y": 212,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json#enemy-1/speed=0.09",
+        "kind": "corpus",
+        "config": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+        "contentHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+        "configSha256": "sha256:7f53bfc8a2e52391ef48365570e8c87acfb4ddf0dbae7e621b00e53ba13d4f7f",
+        "hazardId": "enemy-1",
+        "speed": 0.09,
+        "canonicalCapacity": 134600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 673,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 1.6199999999999999,
+          "statesEnqueued": 200,
+          "statesVisited": 200,
+          "edgesChecked": 200,
+          "elapsedMs": 0,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 134600,
+        "wallMs": 0.114,
+        "heapDeltaKiB": 344.7,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1392
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1336,
+            "width": 48,
+            "height": 64,
+            "y": 193.68,
+            "maxSpeed": 0.09
+          },
+          "hazard": {
+            "startX": 960,
+            "distance": 120,
+            "periodMs": 3600,
+            "width": 56,
+            "height": 64,
+            "anchorX": 0.5,
+            "anchorY": 0.85,
+            "y": 195.6,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      },
+      {
+        "label": "corpus/.scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json#enemy-1/speed=0.16",
+        "kind": "corpus",
+        "config": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+        "contentHash": "sha256:782680136a38edccd465bad3b3c7d0b87bd9e5afe87d6215648f70c4edab2559",
+        "configSha256": "sha256:7f53bfc8a2e52391ef48365570e8c87acfb4ddf0dbae7e621b00e53ba13d4f7f",
+        "hazardId": "enemy-1",
+        "speed": 0.16,
+        "canonicalCapacity": 134600,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reason": "no-witness-found",
+        "stats": {
+          "xPositions": 673,
+          "phaseSteps": 200,
+          "dtMs": 18,
+          "maxStepPx": 2.88,
+          "statesEnqueued": 94400,
+          "statesVisited": 94400,
+          "edgesChecked": 283000,
+          "elapsedMs": 38,
+          "limits": {
+            "maxStates": 200000,
+            "timeBudgetMs": 5000
+          },
+          "budgetExceeded": false
+        },
+        "stateCapacity": 134600,
+        "wallMs": 38.009,
+        "heapDeltaKiB": 18994.5,
+        "input": {
+          "world": {
+            "xMin": 0,
+            "xMax": 1392
+          },
+          "player": {
+            "startX": 40,
+            "goalX": 1336,
+            "width": 48,
+            "height": 64,
+            "y": 193.68,
+            "maxSpeed": 0.16
+          },
+          "hazard": {
+            "startX": 960,
+            "distance": 120,
+            "periodMs": 3600,
+            "width": 56,
+            "height": 64,
+            "anchorX": 0.5,
+            "anchorY": 0.85,
+            "y": 195.6,
+            "axis": "x"
+          },
+          "options": {
+            "lagMs": 16.67,
+            "phaseSteps": 200,
+            "xStep": 2,
+            "limits": {
+              "maxStates": 200000,
+              "timeBudgetMs": 5000
+            }
+          }
+        }
+      }
+    ]
+  },
+  "distributions": {
+    "wallMs": {
+      "n": 14,
+      "min": 12.202,
+      "p50": 32.8,
+      "p90": 38.085,
+      "max": 42.299,
+      "mean": 30.797,
+      "sd": 8.497
+    },
+    "statesVisited": {
+      "n": 14,
+      "min": 35350,
+      "p50": 86400,
+      "p90": 108874,
+      "max": 119130,
+      "mean": 82600.714,
+      "sd": 24602.492
+    },
+    "edgesChecked": {
+      "n": 14,
+      "min": 105850,
+      "p50": 259000,
+      "p90": 326422,
+      "max": 357190,
+      "mean": 247602.143,
+      "sd": 73807.477
+    },
+    "stateCapacity": {
+      "n": 14,
+      "min": 134600,
+      "p50": 137800,
+      "p90": 138920,
+      "max": 139400,
+      "mean": 137800,
+      "sd": 1086.986
+    }
+  },
+  "synthetic": [
+    {
+      "label": "synthetic/E1440",
+      "kind": "synthetic",
+      "id": "E1440",
+      "visualWidth": 1440,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 701,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 137090,
+        "statesVisited": 137090,
+        "edgesChecked": 411070,
+        "elapsedMs": 51,
+        "limits": {
+          "maxStates": 1500000,
+          "timeBudgetMs": 60000
+        },
+        "budgetExceeded": false
+      },
+      "stateCapacity": 140200,
+      "wallMs": 50.652,
+      "heapDeltaKiB": 14382.9,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 1420
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 1400,
+          "width": 20,
+          "height": 48,
+          "y": 200,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 1400,
+          "distance": 20,
+          "periodMs": 4000,
+          "width": 40,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 200,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 1500000,
+            "timeBudgetMs": 60000
+          }
+        }
+      }
+    },
+    {
+      "label": "synthetic/E5760",
+      "kind": "synthetic",
+      "id": "E5760",
+      "visualWidth": 5760,
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "no-witness-found",
+      "stats": {
+        "xPositions": 2861,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 569090,
+        "statesVisited": 569090,
+        "edgesChecked": 1707070,
+        "elapsedMs": 217,
+        "limits": {
+          "maxStates": 1500000,
+          "timeBudgetMs": 60000
+        },
+        "budgetExceeded": false
+      },
+      "stateCapacity": 572200,
+      "wallMs": 216.701,
+      "heapDeltaKiB": 48714.6,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 5740
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 5720,
+          "width": 20,
+          "height": 48,
+          "y": 200,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 5720,
+          "distance": 20,
+          "periodMs": 4000,
+          "width": 40,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 200,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 1500000,
+            "timeBudgetMs": 60000
+          }
+        }
+      }
+    }
+  ],
+  "boundary": [
+    {
+      "label": "boundary/state500k",
+      "kind": "boundary",
+      "id": "state500k",
+      "limits": {
+        "maxStates": 500000,
+        "timeBudgetMs": 60000
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "search-budget-exhausted",
+      "stats": {
+        "xPositions": 2861,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 500001,
+        "statesVisited": 499801,
+        "edgesChecked": 1499203,
+        "elapsedMs": 187,
+        "limits": {
+          "maxStates": 500000,
+          "timeBudgetMs": 60000
+        },
+        "budgetExceeded": true
+      },
+      "stateCapacity": 572200,
+      "wallMs": 186.624,
+      "heapDeltaKiB": 57095.7,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 5740
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 5720,
+          "width": 20,
+          "height": 48,
+          "y": 200,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 5720,
+          "distance": 20,
+          "periodMs": 4000,
+          "width": 40,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 200,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 500000,
+            "timeBudgetMs": 60000
+          }
+        }
+      }
+    },
+    {
+      "label": "boundary/wall5ms",
+      "kind": "boundary",
+      "id": "wall5ms",
+      "limits": {
+        "maxStates": 1500000,
+        "timeBudgetMs": 5
+      },
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reason": "search-budget-exhausted",
+      "stats": {
+        "xPositions": 2861,
+        "phaseSteps": 200,
+        "dtMs": 20,
+        "maxStepPx": 3.2,
+        "statesEnqueued": 10386,
+        "statesVisited": 10240,
+        "edgesChecked": 30611,
+        "elapsedMs": 6,
+        "limits": {
+          "maxStates": 1500000,
+          "timeBudgetMs": 5
+        },
+        "budgetExceeded": true
+      },
+      "stateCapacity": 572200,
+      "wallMs": 5.743,
+      "heapDeltaKiB": 6390.8,
+      "input": {
+        "world": {
+          "xMin": 0,
+          "xMax": 5740
+        },
+        "player": {
+          "startX": 40,
+          "goalX": 5720,
+          "width": 20,
+          "height": 48,
+          "y": 200,
+          "maxSpeed": 0.16
+        },
+        "hazard": {
+          "startX": 5720,
+          "distance": 20,
+          "periodMs": 4000,
+          "width": 40,
+          "height": 48,
+          "anchorX": 0.5,
+          "anchorY": 1,
+          "y": 200,
+          "axis": "x"
+        },
+        "options": {
+          "lagMs": 16.67,
+          "phaseSteps": 200,
+          "xStep": 2,
+          "limits": {
+            "maxStates": 1500000,
+            "timeBudgetMs": 5
+          }
+        }
+      }
+    }
+  ],
+  "repeats": [
+    {
+      "target": "E1440",
+      "count": 5,
+      "wallMs": [
+        50.172,
+        53.104,
+        49.094,
+        48.567,
+        48.374
+      ],
+      "wallDist": {
+        "n": 5,
+        "min": 48.374,
+        "p50": 49.094,
+        "p90": 51.931,
+        "max": 53.104,
+        "mean": 49.862,
+        "sd": 1.942
+      },
+      "elapsedMs": [
+        50,
+        53,
+        50,
+        48,
+        49
+      ],
+      "visitedUnique": [
+        137090
+      ],
+      "edgesUnique": [
+        411070
+      ],
+      "verdicts": [
+        "INSUFFICIENT_EVIDENCE/no-witness-found"
+      ],
+      "stateCountsStable": true
+    },
+    {
+      "target": "E5760",
+      "count": 5,
+      "wallMs": [
+        216.164,
+        214.925,
+        214.125,
+        214.854,
+        214.611
+      ],
+      "wallDist": {
+        "n": 5,
+        "min": 214.125,
+        "p50": 214.854,
+        "p90": 215.668,
+        "max": 216.164,
+        "mean": 214.936,
+        "sd": 0.755
+      },
+      "elapsedMs": [
+        216,
+        214,
+        214,
+        215,
+        215
+      ],
+      "visitedUnique": [
+        569090
+      ],
+      "edgesUnique": [
+        1707070
+      ],
+      "verdicts": [
+        "INSUFFICIENT_EVIDENCE/no-witness-found"
+      ],
+      "stateCountsStable": true
+    }
+  ],
+  "graphCapacity": {
+    "built": 11,
+    "failed": 5,
+    "dist": {
+      "n": 11,
+      "min": 128000,
+      "p50": 288200,
+      "p90": 288200,
+      "max": 384200,
+      "mean": 237981.818,
+      "sd": 91754.78
+    },
+    "rows": [
+      {
+        "config": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+        "world": {
+          "w": 640,
+          "h": 270
+        },
+        "standable": 640,
+        "stateCapacity200": 128000
+      },
+      {
+        "config": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+        "world": {
+          "w": 640,
+          "h": 270
+        },
+        "standable": 640,
+        "stateCapacity200": 128000
+      },
+      {
+        "config": "out/__probe/last-train/site/v1/game-config.json",
+        "error": "parse-manifest"
+      },
+      {
+        "config": "out/__probe-timeout/last-train/game-configs/v1.json",
+        "error": "parse-manifest"
+      },
+      {
+        "config": "out/__probe-timeout/last-train/game-configs/v2.json",
+        "error": "parse-manifest"
+      },
+      {
+        "config": "out/last-train/game-configs/v1.json",
+        "error": "parse-manifest"
+      },
+      {
+        "config": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+        "world": {
+          "w": 640,
+          "h": 270
+        },
+        "standable": 640,
+        "stateCapacity200": 128000
+      },
+      {
+        "config": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "standable": 1441,
+        "stateCapacity200": 288200
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "standable": 1441,
+        "stateCapacity200": 288200
+      },
+      {
+        "config": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+        "world": {
+          "w": 640,
+          "h": 270
+        },
+        "standable": 640,
+        "stateCapacity200": 128000
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "standable": 1441,
+        "stateCapacity200": 288200
+      },
+      {
+        "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "standable": 1403,
+        "stateCapacity200": 280600
+      },
+      {
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+        "error": "parse-manifest"
+      },
+      {
+        "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+        "world": {
+          "w": 1920,
+          "h": 270
+        },
+        "standable": 1921,
+        "stateCapacity200": 384200
+      },
+      {
+        "config": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "standable": 1441,
+        "stateCapacity200": 288200
+      },
+      {
+        "config": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+        "world": {
+          "w": 1440,
+          "h": 270
+        },
+        "standable": 1441,
+        "stateCapacity200": 288200
+      }
+    ]
+  },
+  "comparison": {
+    "recommended": {
+      "maxStates": 500000,
+      "timeBudgetMs": 2000
+    },
+    "hard": {
+      "maxStates": 1000000,
+      "timeBudgetMs": 10000
+    },
+    "corpusCapacity": {
+      "p50": 137800,
+      "max": 177800,
+      "headroomVsRecommended": 2.81
+    },
+    "syntheticCapacity": {
+      "E1440": {
+        "capacity": 140200,
+        "fitsRecommended": true,
+        "fitsHard": true,
+        "ratioVsRecommended": 0.28
+      },
+      "E5760": {
+        "capacity": 572200,
+        "fitsRecommended": false,
+        "fitsHard": true,
+        "ratioVsRecommended": 1.14
+      }
+    },
+    "elapsed": {
+      "corpusAndSyntheticMaxMs": 216.701,
+      "fitsRecommended": true,
+      "fitsHard": true,
+      "headroomVsRecommended": 9.23
+    },
+    "graphCapacity200": {
+      "p50": 288200,
+      "max": 384200,
+      "fitsRecommended": true,
+      "fitsHard": true,
+      "ratioVsRecommended": 0.77
+    },
+    "findings": {
+      "corpusFitsRecommendedStates": true,
+      "corpusFitsHardStates": true,
+      "synthetic5760ExceedsRecommendedStates": true,
+      "synthetic5760FitsHardStates": true,
+      "graphProxyMaxExceedsRecommendedStates": false,
+      "elapsedFitsRecommended": true
+    }
+  },
+  "wallClock": {
+    "runs": [
+      {
+        "visited": 8192,
+        "wallMs": 5.896,
+        "budgetExceeded": true
+      },
+      {
+        "visited": 7168,
+        "wallMs": 5.551,
+        "budgetExceeded": true
+      },
+      {
+        "visited": 12288,
+        "wallMs": 6.082,
+        "budgetExceeded": true
+      },
+      {
+        "visited": 7168,
+        "wallMs": 5.677,
+        "budgetExceeded": true
+      },
+      {
+        "visited": 14336,
+        "wallMs": 5.707,
+        "budgetExceeded": true
+      }
+    ],
+    "visitedDist": {
+      "n": 5,
+      "min": 7168,
+      "p50": 8192,
+      "p90": 13516.8,
+      "max": 14336,
+      "mean": 9830.4,
+      "sd": 3286.386
+    },
+    "visitedUnique": 4,
+    "note": "墙钟超时的 visited 随机器/负载变化；状态预算超时的 visited 稳定。"
+  },
+  "determinism": {
+    "stateSignatureSha256": "1e2e2dd8a27d734335a34419eddad25c4572a6bf04d9b8d28238f6d966c5704d",
+    "excluded": "wall5ms (wall-clock driven)"
+  }
+}
