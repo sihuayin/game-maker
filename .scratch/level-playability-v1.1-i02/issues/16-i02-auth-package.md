@@ -59,3 +59,18 @@ I02-AUDIT。
 ## 上游裁定（D5，2026-11-11）
 
 原样引用 [I02-D5](11-i02-d5-budget-determinism.md)：确定性承诺措辞、预算表、降级顺序、双档「不完整 vs 不一致」、发布门分层。`maxCutsPerBranch` 标 `DEFERRED`，以 [I02-D5B](21-i02-d5b-cut-budget-benchmark.md) 为前置；不得签署 U1–U2 的完整预算验收。
+
+## 上游裁定（D6 / D7，2026-11-11）
+
+授权包必须完成三项对齐：
+
+1. **文件白名单**：D6 的 I-02 白名单 + D7 增补的 `packages/contracts/tests/playability-temporal-fixtures.ts`（`TEST_ONLY`，单独列出，不并入 `playability-temporal*.test.ts` 通配）。
+2. **测试语义**：D7 的六文件布局、A–J 语义断言、双档 lag、预算 / 确定性、性能证据、LP-06/07 回归口径与 AC-01～AC-13 映射。
+3. **内部字段**：D9 必须为 A–J 每条语义断言提供字段落点；AUTH 逐条核对，对不上就回 D9，不得弱化 D7。
+
+另需在授权包中写明：
+
+- `now` 注入是内部测试专用，只用于 wall-clock abort，不构成公共接口；
+- `graph.ts` 仍受独立增量审批约束；
+- `ops.ts` stub 与 T-57 / T-58 / T-61 保持不变；
+- `PUBLIC_NB` / `PUBLIC_PU` 在 I-03 前均为 `BLOCKED`。

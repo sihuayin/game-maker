@@ -171,6 +171,7 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 - [I02-D5 预算、确定性与降级裁定](issues/11-i02-d5-budget-determinism.md): 工作预算是唯一语义预算，墙钟只 abort-only、不计入确定性签名；U9/W 共用 NB 预算，U2/U4 独立、每档 lag 独立；`500k/2s` 默认、`1M/10s` 硬；新增 `maxCutsPerBranch`（数值待 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md)）；`N=min(N_max, floor(maxStates/xPositions))`、`stateCapacity` 是完整空间上界、`phaseGridCapped` 是诊断；检查点改为 1024 work units；双档「不完整」与「不一致」分开；发布门不覆盖内部结果；确定性要求所有策略遍历顺序固定。**U1–U2 完整预算验收待 D5B。**
 
 - [I02-D6 文件白名单增量与模块布局裁定](issues/12-i02-d6-whitelist-layout.md): I-02 按单元拆六个内部模块（`temporal-{result,budget,motion,witness,gate,evasion}.ts`）+ `temporal.ts` 编排，依赖单向无环；新文件逐一点名、未列名即 STOP；`graph.ts` 仅 `HopSampling` 尾参进白名单但须独立增量审批，未批 U4 `BLOCKED`；`profile.ts` 禁止修改（只读 import 不受限）；I-02 不接生产，`ops.ts` 与 T-57/T-58/T-61 原样；新模块不转出公共 barrel；测试只增、内存夹具优先、不新增 pack。
+- [I02-D7 测试矩阵与证据口径裁定](issues/13-i02-d7-test-matrix.md): 六个 `playability-temporal*.test.ts`（五单元 + A–J 矩阵）+ `TEST_ONLY` 的 `playability-temporal-fixtures.ts`（D6 白名单增量）；A–J 断言内部证明结果而非公共 Verdict，字段落点由 D9 绑定，AUTH 逐条核对；确定性 = 进程内重复 + 剔除 `wallClockMs` 的稳定序列化（跨进程签名只进基准）；预算上下文可注入 `budget` / `now`，`now` 仅测试专用；性能是证据不是 vitest 墙钟门禁（`scripts/bench-temporal.mjs` + 语料 SHA）；LP-06/07 只在 U5 与最终审计复跑，差异即 STOP；AC-01～AC-13 分派到 U1–U5 与 R1–R4/AUDIT。
 
 ## Not yet specified
 

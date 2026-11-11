@@ -59,3 +59,10 @@ I02-AUTH。
 - `temporal-result.ts` 不得导入 `temporal.ts`；任何循环依赖视为架构验收失败。
 - 结果类型不转出公共 barrel（不进 `playability/index.ts` / `contracts/src/index.ts` / package exports）；内部符号加 `@internal`。
 - I-02 不接生产：内部结果由 I-02 专项测试直接消费，不复用/修改生产 `TemporalAnalyzer` 签名，不改 `ops.ts`、T-57/T-58。
+
+## 上游裁定（D7，2026-11-11）
+
+- D7 的 A–J 语义断言表（[I02-D7](13-i02-d7-test-matrix.md) §2）需要 D9 为**每一条**提供明确字段落点。
+- 强制对齐规则：D9 必须能表达 D7 的语义断言；若不能，回 D9 修订，不得在 AUTH 中弱化 D7；不得以字段名的实现便利性改变预期结论。
+- 内部 NB 证书成立 ≠ 公共 `NO_PROVEN_BLOCKER`；内部 PU 证据成立 ≠ 公共 `PROVEN_UNPLAYABLE`；`publicCapability` 在 I-03 前保持 `BLOCKED`。
+- A–J 的具体字段名**不由 D7 冻结**，由本票冻结；AUTH 负责逐条核对两边映射。

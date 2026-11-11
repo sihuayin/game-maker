@@ -178,6 +178,7 @@ temporal-motion.ts
 | `packages/contracts/src/playability/temporal-gate.ts` | 新增 U3 门区证明模块 |
 | `packages/contracts/src/playability/temporal-evasion.ts` | 新增 U4 垂直规避图割模块 |
 | `packages/contracts/tests/playability-temporal*.test.ts` | 只新增测试，不修改既有测试文件 |
+| `packages/contracts/tests/playability-temporal-fixtures.ts` | **TEST_ONLY**：内存构造器 / 断言 / 边界辅助；不得含产品逻辑、不得被 `src/**` 引用、不得注册测试或读写文件系统；需 AUTH 单列 |
 | `packages/contracts/src/playability/graph.ts` | 仅 `HopSampling` 可选尾参；**独立增量审批通过后方可修改** |
 
 按单元归属：
@@ -236,3 +237,14 @@ temporal-motion.ts
 - 需要改动 T-57 / T-58 / T-61 或任何既有断言；
 - 需要新增公共导出或公共 Contract 字段；
 - 出现循环依赖或 `temporal.ts` 被新模块 import。
+
+## 增补（D7，2026-11-11）
+
+按 [I02-D7 测试矩阵与证据口径裁定](13-i02-d7-test-matrix.md) 做一次**显式白名单增量**；D6 其余边界与停止条件不变：
+
+1. 新增允许文件 `packages/contracts/tests/playability-temporal-fixtures.ts`，标记 `TEST_ONLY`。允许内容仅限：`GameConfig` / manifest 内存构造器、公共测试断言辅助、边界值与反例构造辅助。
+2. 禁止：产品算法或生产逻辑；被 `src/**` 引用；注册测试或产生测试副作用；文件系统读写；新增 pack fixture。
+3. 该 helper **不是** `playability-temporal*.test.ts` 通配的一部分，必须由 AUTH 显式列入白名单增量，并在 diff 审计中单独检查。
+4. 六个测试文件（`playability-temporal-{motion,budget,witness,gate,evasion}.test.ts` 与 `playability-temporal.test.ts`）确认落在既有通配内，不需要额外授权。
+5. 时间注入 `now` 是**内部测试专用**，只用于 wall-clock abort；不构成公共接口，不进入公共签名 / Contract / 配置 / barrel export（边界见 D7 §6.1）。
+6. U1 仍是唯一已授权实施单元；本增补不改变 U2–U5 状态。
