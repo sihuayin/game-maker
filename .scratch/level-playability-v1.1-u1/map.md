@@ -110,6 +110,7 @@ U1-00 初始化与基线
 - [U1-01 内部结果类型与预算骨架](issues/02-u1-01-types-budget.md): D9 纯类型全集 + 预算常量 / 解析 / 计数器落地；`BudgetProfile` 类型依 DAG 留在 result，`maxEdges` 解析时派生；非法预算 / 溢出即 IE；架构断言 65/65、全量 2616 绿。
 - [U1-02 运动原语与连续时间求交](issues/03-u1-02-motion.md): 三角波 / 不取整 AABB / ε / 单侧 lagPad + 解析连续求交落地；折返点切段、`c1 === 0` 精确分支、切点真实重叠才合并、`cut-budget` 前置守卫；T-55…T-65 65/65、全量 2616 绿。
 - [U1-03 `temporal.ts` 类型、签名辅助与导入](issues/04-u1-03-temporal-wiring.md): 内部入口类型 + FNV-1a 确定性签名落地；签名排除 `wallClockMs` / `detail` / `budgetProfile`，键序无关；`analyzeTemporalInternal` 仍未实现；架构断言 65/65、全量 2616 绿。
+- [U1-04 测试矩阵与 TEST_ONLY 夹具](issues/05-u1-04-tests.md): 35 条运动 / 几何 / ε / 连续求交 + 23 条预算 / 确定性测试落地；6 处 P0 差异、采样陷阱、折返点相切全覆盖；无 JSON / fs 夹具；定向 58 tests、全量 172 files / 2674 tests 绿。
 
 ## Not yet specified
 
