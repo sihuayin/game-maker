@@ -21,6 +21,7 @@ import type { AssetPackManifest } from "../assetpack.js";
 import type { GameConfig } from "../game-config.js";
 import type { PlayabilityVerdictState } from "./verdict.js";
 import { isTrustedAtlasInput, type TrustedAtlasInput } from "./temporal-input.js";
+import type { InternalBudget, TemporalInternalResult } from "./temporal-result.js";
 
 /** 逐帧延迟（约 60Hz）。I01-04：唯一具名常量，不复用 mechanic.ts 的帧余量常量。 */
 export const TEMPORAL_LAG_MS = 16.67;
@@ -112,4 +113,80 @@ export function resolveTwoLagResults(a: TemporalAuditResult, b: TemporalAuditRes
   }
   if (a.verdict === b.verdict) return { applicable: true, verdict: a.verdict };
   return { applicable: true, verdict: "INSUFFICIENT_EVIDENCE", degradation: "lag-disagreement" };
+}
+
+// ── I-02：内部入口词汇与确定性签名（U1，@internal）────────────────────────────
+//
+// ⚠️ 这些符号**不**进 `playability/index.ts` / `contracts/src/index.ts`：`api.ts` 只按
+//   名字转出 I-01 的公共编排，不转出内部入口。`testHooks` 不是生产参数。
+//
+// ⚠️ `analyzeTemporalInternal` **不在 U1 实现**：本票只建立入口类型与签名辅助，
+//   不新增任何分析结果、不接生产 Verdict。U1 的 `certificate` 恒为 `{ kind: "none" }`。
+
+/** @internal I-02 内部入口输入；`start / goal / corridor` 由 `GameConfig` + profile 派生。 */
+export type TemporalInternalInput = {
+  readonly config: GameConfig;
+  readonly manifest: AssetPackManifest;
+  readonly lagMs: number;
+  readonly trustedInput: TrustedAtlasInput;
+  /**
+   * @internal 仅用于 I-02 专项测试。
+   * `budget` 不得高于硬上限；`now` 只参与 wall-clock abort，不参与相位 / 移动 /
+   * 碰撞 / Witness / 策略选择。
+   */
+  readonly testHooks?: {
+    readonly budget?: InternalBudget;
+    readonly now?: () => number;
+  };
+};
+
+/** @internal I-02 内部分析器类型；具体实现不在 U1。 */
+export type TemporalInternalAnalyzer =
+  (input: TemporalInternalInput) => TemporalInternalResult;
+
+/** 规范化 JSON：对象键排序、数组保留语义顺序；不引入 `Map` / `Set` / class。 */
+const stableStringify = (value: unknown): string =>
+  JSON.stringify(value, (_key, val) => {
+    if (val === null || typeof val !== "object" || Array.isArray(val)) return val;
+    const record = val as Record<string, unknown>;
+    const sorted: Record<string, unknown> = {};
+    for (const key of Object.keys(record).sort()) sorted[key] = record[key];
+    return sorted;
+  });
+
+/** FNV-1a 32-bit（UTF-16 code units），输出 8 位十六进制串。 */
+const fnv1a32 = (text: string): string => {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0");
+};
+
+/**
+ * @internal 确定性指纹（FNV-1a 32-bit）。
+ *
+ * 覆盖：`grid`、`work` 计数、`internalResult`、`certificate`、`diagnostics` 原因码、
+ * `stats.budget` 状态。排除：`stats.timing.wallClockMs`、`diagnostics.detail`、
+ * 时间戳与 `testHooks`。
+ *
+ * ⚠️ 32-bit 只是**指纹**，不是无碰撞证明。确定性测试必须同时比较签名与剔除
+ * `wallClockMs` / `detail` 后的规范化完整序列化；不得仅凭签名相等判定结果相同。
+ */
+export function determinismSignature(result: TemporalInternalResult): string {
+  return fnv1a32(stableStringify({
+    internalResult: result.internalResult,
+    certificate: result.certificate,
+    grid: result.stats.grid,
+    work: result.stats.work,
+    budget: {
+      budgetStatus: result.stats.budget.budgetStatus,
+      budgetKind: result.stats.budget.budgetKind,
+    },
+    diagnostics: {
+      degradationReason: result.diagnostics.degradationReason,
+      secondaryReasons: result.diagnostics.secondaryReasons,
+    },
+  }));
 }
