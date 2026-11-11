@@ -4,12 +4,14 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1.1-i02
 Baseline: `docs/v7.8/移动-200.md` @ `sha256:14a3816d8d5975765e3a9301c5f06612ab03f6f14130ca4ca865550ec165b7d5`；权威输入提交 `a3b8a54`
-Status: open · 2026-11-10 开图
+Status: closed · 2026-11-11 收口（首次签署仅 U1）
 Predecessor: [Level Playability V1.1 Integration](../level-playability-v1.1-integration/map.md)（I-00 冻结包已签署并收口）
 
 > **2026-11-10 开图。** 授权来源：[`docs/v7.8/移动-200.md`](../../docs/v7.8/移动-200.md)（I-02 需求文档：单移动 Hazard 连续时间判定核心）。
 > I-02 需求 §12 明确：该文档**不构成实施授权**；正式启动前应另行提交 I-02 实施授权包。§12 的最终建议是「先批准 I-02-01 的算法设计与测试夹具准备；在连续时间求交语义和数值稳定性得到独立复核前，不授权完整 I-02 实施」。
 > 因此本图的终点是**可签署、可审计、分阶段放行的 I-02 授权包**，不是 I-02 算法实现，也不是 I-03 生产接入。
+>
+> **2026-11-11 收口。** 授权包已由 `amber` 签署（首次仅 U1）；U2/U3/U5 `PLANNED`、U4 `BLOCKED`、`PUBLIC_NB/PU` `BLOCKED`；后续实现是独立 effort，不得从本图推导授权。
 
 ## Destination
 
@@ -141,7 +143,7 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 
 - 图与票：`wayfinder/level-playability-v1.1-i02`（本分支）。
 - 产物：`.scratch/level-playability-v1.1-i02/{map.md,issues/,scripts/,evidence/,experiments/,reports/}`。
-- 最终授权包：`docs/v7.8/移动-I02.md`（由 [I02-AUTH](issues/16-i02-auth-package.md) 于 2026-11-11 产出草稿；**签署前不构成实施授权**，待 AUDIT → SIGN）。
+- 最终授权包：`docs/v7.8/移动-I02.md`（由 [I02-AUTH](issues/16-i02-auth-package.md) 于 2026-11-11 产出；AUDIT `SIGN-READY`；`amber` 于 2026-11-11 签署，**首次仅放行 U1**）。
 - 不复活或改写 I-00 / P0 的 effort 目录；引用可以，重开结论不行。
 
 ## Decisions so far
@@ -174,13 +176,17 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 - [I02-D7 测试矩阵与证据口径裁定](issues/13-i02-d7-test-matrix.md): 六个 `playability-temporal*.test.ts`（五单元 + A–J 矩阵）+ `TEST_ONLY` 的 `playability-temporal-fixtures.ts`（D6 白名单增量）；A–J 断言内部证明结果而非公共 Verdict，字段落点由 D9 绑定，AUTH 逐条核对；确定性 = 进程内重复 + 剔除 `wallClockMs` 的稳定序列化（跨进程签名只进基准）；预算上下文可注入 `budget` / `now`，`now` 仅测试专用；性能是证据不是 vitest 墙钟门禁（`scripts/bench-temporal.mjs` + 语料 SHA）；LP-06/07 只在 U5 与最终审计复跑，差异即 STOP；AC-01～AC-13 分派到 U1–U5 与 R1–R4/AUDIT。
 - [I02-D5B 累计 cut 预算基准](issues/21-i02-d5b-cut-budget-benchmark.md): 代理实测 1.165 亿次 check：cutPoints 99.94% 为 0、max 1；累计 segments 推荐限值 max `1,263,594`、硬限值 max `2,057,148`。`maxCutsPerBranch` 按解析段数计，默认 `5,000,000` / 硬 `10,000,000`；`maxCutsPerCheck` 1M 不变。Witness 路径型 1,380 转移 / 276KB；策略表上界 500k→100MB、1M→200MB，故 `1M 转移 + 64MiB` 只对紧凑记录自洽，D9 须在 W1/W2/W3 中冻结形状。证据见 [`evidence/07-cut-budget.md`](evidence/07-cut-budget.md)。
 - [I02-D9 内部分析结果与诊断契约裁定](issues/15-i02-d9-internal-result-contract.md): 分层结果 `internalResult`（`nb-candidate` / `pu-candidate` / `insufficient-evidence`）+ `certificate` 判别联合（`witness` / `permanent-gate` / `none`，均带 `COMPLETE`/`INCOMPLETE`）；`pu-candidate` 仅表示模型内门 + 图割 + hop 完整，PU 条件 2/5 仍 `BLOCKED`，`publicCapability` 恒 `BLOCKED`；Witness 用 W1 紧凑记录（`1M` 转移 / `64 MiB`，以实际序列化字节判定）；Stats 分组并同时暴露 `cutPointsTotal` / `segmentsTotal`；原因码闭集；内部入口在 `temporal.ts`，`testHooks` 不进公共面；确定性签名 FNV-1a 32-bit 只作指纹，测试同时比较完整规范化序列化；I-03 负责公共转换。
-- [I02-AUTH 授权包编写](issues/16-i02-auth-package.md): 草稿 [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（15 节，约 1,010 行）：七项 §12 内容、冲突登记 A-01～A-05 / B-01～B-17、U1–U5 定义与台账、R1–R4 复核、测试矩阵 / AC 映射、风险 / 证据 / 签署表；首次签署只放行 U1，U4 `BLOCKED`，`PUBLIC_NB/PU` `BLOCKED`；草稿未签署，待 AUDIT → SIGN。
+- [I02-AUTH 授权包编写](issues/16-i02-auth-package.md): 草稿 [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（15 节，约 1,020 行）：七项 §12 内容、冲突登记 A-01～A-05 / B-01～B-17、U1–U5 定义与台账、R1–R4 复核、测试矩阵 / AC 映射、风险 / 证据 / 签署表；首次签署只放行 U1，U4 `BLOCKED`，`PUBLIC_NB/PU` `BLOCKED`；草稿未签署；AUDIT 已判 `SIGN-READY`（仅 U1），待 SIGN。
+- [I02-AUDIT 范围与证据审计](issues/17-i02-audit.md): 报告 [`reports/02-auth-audit.md`](reports/02-auth-audit.md)；结论 **`SIGN-READY`（仅首次签署 U1）**，无阻断项。范围 / 证据 / 完整性 / D8 专项全部 PASS；F1/F2（白名单显式禁止 `temporal-input.ts` 与新增 JSON fixture）、F3（行数口径）、F4（05/06 输出 SHA 为快照、按语义复现）已修；F5 自审限制与 F6 条件（B-02 `OPEN`、B-11 `PARTIAL`、B-03/04/13 归 I-03、U4 `BLOCKED`、`PUBLIC_*` `BLOCKED`）已记录。授权包 SHA `afb1fbe9…`。
+- [I02-SIGN 授权包签署](issues/18-i02-sign.md): `amber` 于 2026-11-11 签署 [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)，**首次签署仅放行 U1**；U2/U3/U5 `PLANNED`、U4 `BLOCKED`、`PUBLIC_NB/PU` `BLOCKED`。签署依据审计版本 SHA `afb1fbe9…`；签署后文档 SHA `797cd6fc…`。地图收口；后续实现为独立 effort。
 
 ## Not yet specified
 
 <!-- 雾：知道方向、还不足以写成票的问题。前沿推进后再毕业。 -->
 
 - **非整数出生点的支持形态。** D3 冻结「脚点 x 非整数 ⇒ IE `spawn-not-on-lattice`」；若 19 关语料显示非整数出生点普遍存在，需要单独 HITL 裁定如何支持精确非整数起点（不得静默吸附），并判断对 I-02 可用范围的影响。
+
+> **收口交接**：该残余风险已写入授权包 §13；不在本图继续裁定。本图无剩余可动票。
 
 ## Out of scope
 

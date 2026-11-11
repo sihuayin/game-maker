@@ -98,7 +98,7 @@ I02-AUDIT。
 
 ## Answer
 
-**AFK task 已完成。** 产出授权包草稿 [`docs/v7.8/移动-I02.md`](../../../docs/v7.8/移动-I02.md)（约 1,010 行，15 节）。
+**AFK task 已完成。** 产出授权包草稿 [`docs/v7.8/移动-I02.md`](../../../docs/v7.8/移动-I02.md)（约 1,020 行，15 节）。
 
 **修改产品目录：否**（未触碰 `packages/**`、Runtime、CLI、MCP、公共 Contract、I-00 / I-02 原文；只新增 docs 授权包、更新本票与地图 / 下游票尾）。
 
