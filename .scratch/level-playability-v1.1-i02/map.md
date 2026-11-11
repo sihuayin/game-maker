@@ -135,7 +135,7 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 - **I02-D10 是 D1 的显式后续**：D1 只裁定证书的充分性与量化方向，不裁定 U9 / Winning Set 的可执行判据；D3 / D4 / D9 都依赖 D10。
 - **I02-D6 已裁定 `graph.ts` 的审批形态**：hop 参数化进入 I-02 白名单，但需独立于 I-00 R2 的增量书面审批；未批 U4 保持 `BLOCKED`。详见 [I02-D6](issues/12-i02-d6-whitelist-layout.md)。
 - **I02-D4 已裁定生产 PU 不授权**：`movementModelClosure = "not-proven-air-control"`（`scene.ts:89` 空中水平控制）与几何 `partial` 是两项独立阻塞；I02-03 / I02-04 只做模型条件性内部计算，不得发布 `PROVEN_UNPLAYABLE`。PU 六条件第 2、5 条 `BLOCKED`，第 6 条为构造性 lag 无关。
-- **I02-D5 的累计 cut 预算未冻结**：`maxCutsPerBranch` 由 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md) 基准确定；在此之前 U2 不得声称完整确定性工作预算，D9/AUTH 不得签署 U1–U2 完整预算验收。
+- **I02-D5B 已冻结累计 cut 预算**：`maxCutsPerBranch` 按解析段数计，默认 `5,000,000`、硬 `10,000,000`；witness 体积上限取决于 D9 的记录形状（W1/W2/W3）。详见 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md)。
 
 ### 分支与产物
 
@@ -168,10 +168,12 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 
 - [I02-D8 复核门槛、单元依赖与增量授权裁定](issues/14-i02-d8-review-gates.md): 实施单元 U1–U5（连续求交 / Witness / 永久门 / 图割 / 预算集成）；强制复核 R1(U1)→R2(U2)→R3(U3)→R4(U4)，U5 由完成报告 + AC-08～AC-13 验收；首次签署只授权 U1，后续单元须独立增量签署；预算接口是 U1 前置、不是独立单元；U4 依赖 `graph.ts` 独立审批，未批则 `BLOCKED`，scratch 分析不构成 U4 授权；单元授权 ≠ 公共能力授权，`PUBLIC_NB`/`PUBLIC_PU` 仍由 I-03 准入；任何假 PU 是严重证明健全性失败。
 
-- [I02-D5 预算、确定性与降级裁定](issues/11-i02-d5-budget-determinism.md): 工作预算是唯一语义预算，墙钟只 abort-only、不计入确定性签名；U9/W 共用 NB 预算，U2/U4 独立、每档 lag 独立；`500k/2s` 默认、`1M/10s` 硬；新增 `maxCutsPerBranch`（数值待 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md)）；`N=min(N_max, floor(maxStates/xPositions))`、`stateCapacity` 是完整空间上界、`phaseGridCapped` 是诊断；检查点改为 1024 work units；双档「不完整」与「不一致」分开；发布门不覆盖内部结果；确定性要求所有策略遍历顺序固定。**U1–U2 完整预算验收待 D5B。**
+- [I02-D5 预算、确定性与降级裁定](issues/11-i02-d5-budget-determinism.md): 工作预算是唯一语义预算，墙钟只 abort-only、不计入确定性签名；U9/W 共用 NB 预算，U2/U4 独立、每档 lag 独立；`500k/2s` 默认、`1M/10s` 硬；新增 `maxCutsPerBranch`（数值由 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md) 冻结：默认 5M / 硬 10M segments）；`N=min(N_max, floor(maxStates/xPositions))`、`stateCapacity` 是完整空间上界、`phaseGridCapped` 是诊断；检查点改为 1024 work units；双档「不完整」与「不一致」分开；发布门不覆盖内部结果；确定性要求所有策略遍历顺序固定。**U1–U2 完整预算验收已由 D5B 补齐。**
 
 - [I02-D6 文件白名单增量与模块布局裁定](issues/12-i02-d6-whitelist-layout.md): I-02 按单元拆六个内部模块（`temporal-{result,budget,motion,witness,gate,evasion}.ts`）+ `temporal.ts` 编排，依赖单向无环；新文件逐一点名、未列名即 STOP；`graph.ts` 仅 `HopSampling` 尾参进白名单但须独立增量审批，未批 U4 `BLOCKED`；`profile.ts` 禁止修改（只读 import 不受限）；I-02 不接生产，`ops.ts` 与 T-57/T-58/T-61 原样；新模块不转出公共 barrel；测试只增、内存夹具优先、不新增 pack。
 - [I02-D7 测试矩阵与证据口径裁定](issues/13-i02-d7-test-matrix.md): 六个 `playability-temporal*.test.ts`（五单元 + A–J 矩阵）+ `TEST_ONLY` 的 `playability-temporal-fixtures.ts`（D6 白名单增量）；A–J 断言内部证明结果而非公共 Verdict，字段落点由 D9 绑定，AUTH 逐条核对；确定性 = 进程内重复 + 剔除 `wallClockMs` 的稳定序列化（跨进程签名只进基准）；预算上下文可注入 `budget` / `now`，`now` 仅测试专用；性能是证据不是 vitest 墙钟门禁（`scripts/bench-temporal.mjs` + 语料 SHA）；LP-06/07 只在 U5 与最终审计复跑，差异即 STOP；AC-01～AC-13 分派到 U1–U5 与 R1–R4/AUDIT。
+- [I02-D5B 累计 cut 预算基准](issues/21-i02-d5b-cut-budget-benchmark.md): 代理实测 1.165 亿次 check：cutPoints 99.94% 为 0、max 1；累计 segments 推荐限值 max `1,263,594`、硬限值 max `2,057,148`。`maxCutsPerBranch` 按解析段数计，默认 `5,000,000` / 硬 `10,000,000`；`maxCutsPerCheck` 1M 不变。Witness 路径型 1,380 转移 / 276KB；策略表上界 500k→100MB、1M→200MB，故 `1M 转移 + 64MiB` 只对紧凑记录自洽，D9 须在 W1/W2/W3 中冻结形状。证据见 [`evidence/07-cut-budget.md`](evidence/07-cut-budget.md)。
+- [I02-D9 内部分析结果与诊断契约裁定](issues/15-i02-d9-internal-result-contract.md): 分层结果 `internalResult`（`nb-candidate` / `pu-candidate` / `insufficient-evidence`）+ `certificate` 判别联合（`witness` / `permanent-gate` / `none`，均带 `COMPLETE`/`INCOMPLETE`）；`pu-candidate` 仅表示模型内门 + 图割 + hop 完整，PU 条件 2/5 仍 `BLOCKED`，`publicCapability` 恒 `BLOCKED`；Witness 用 W1 紧凑记录（`1M` 转移 / `64 MiB`，以实际序列化字节判定）；Stats 分组并同时暴露 `cutPointsTotal` / `segmentsTotal`；原因码闭集；内部入口在 `temporal.ts`，`testHooks` 不进公共面；确定性签名 FNV-1a 32-bit 只作指纹，测试同时比较完整规范化序列化；I-03 负责公共转换。
 
 ## Not yet specified
 

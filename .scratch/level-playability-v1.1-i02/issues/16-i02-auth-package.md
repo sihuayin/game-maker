@@ -74,3 +74,24 @@ I02-AUDIT。
 - `graph.ts` 仍受独立增量审批约束；
 - `ops.ts` stub 与 T-57 / T-58 / T-61 保持不变；
 - `PUBLIC_NB` / `PUBLIC_PU` 在 I-03 前均为 `BLOCKED`。
+
+## 上游裁定（D5B，2026-11-11）
+
+授权包必须记录 D5B 冻结的预算终值（证据：[`evidence/07-cut-budget.md`](../evidence/07-cut-budget.md)）：
+
+- `maxCutsPerBranch` = **5,000,000** 默认 / **10,000,000** 硬，计量单位 **解析段数**（`cutPoints + 1`）；`maxCutsPerCheck` = 1,000,000（cutPoints）。
+- 在预算章节明确 D5 §3.1 的 `cuts` = segments；若拒绝该澄清，记录 fallback `1,000,000` / `4,000,000` 并注明其不具约束力、真实工作由 `maxEdges` 约束。
+- Witness 体积终值按 D9 冻结的记录形状记录：W1 `1,000,000 / 64 MiB`（推荐）、W2 `250,000 / 64 MiB`、W3 `1,000,000 / 256 MiB`（不推荐）。
+- 累计 cut 预算不得先于状态 / edge 预算触发；U9 与 W 共用 NB 预算，不另设计数器。
+
+## 上游裁定（D9，2026-11-11）
+
+授权包必须写入 [I02-D9](15-i02-d9-internal-result-contract.md) 的内部结果契约，并完成对齐：
+
+1. **A–J ↔ 字段**：逐条核对 D7 §2 的语义断言与 D9 §9 的字段落点；对不上回 D9，不得弱化 D7。
+2. **候选语义**：`pu-candidate` 只表示模型内门区 + 图割 + hop 证明完整，**不是**公共 PU；`geometry-checked` 与 `model-out-excluded` 仍为 `BLOCKED`；`publicCapability` 恒为 `BLOCKED`，`publicResult` 恒为 `null`。
+3. **Witness**：W1 紧凑记录；`1M / 64 MiB`；容量以实际确定性序列化字节数为准；不完整证明保留 `certificate.status = "INCOMPLETE"`。
+4. **原因码**：D9 §5 的闭集；新增原因必须改 D9/AUTH。
+5. **确定性**：FNV-1a 32-bit 只是指纹；测试与基准必须同时保留规范化完整序列化。
+6. **测试钩子**：`testHooks`（`budget` / `now`）不进公共导出面；AUTH 必须要求公共导出扫描与白名单审计。
+7. **I-03 边界**：I-03 负责 `coverage.temporal`、`PlayabilityEvidence` 的 `model/lag/degradation/limits` 与公共发布门禁；I-02 不接生产。

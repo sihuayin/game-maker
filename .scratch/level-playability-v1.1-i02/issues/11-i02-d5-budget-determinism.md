@@ -309,3 +309,29 @@ scratch 基准只能证明预算配置有实测依据，不能表述为生产验
 - 墙钟 abort 不在确定性承诺范围内；它是 IE-only 的环境中止。
 - `phaseGridCapped` 是诊断，不是降级；粗化相位必须配合整格残差验证。
 - 本票不产生任何生产验收声明；`NO_PROVEN_BLOCKER` 仍不等于可玩。
+
+## 增补（D5B，2026-11-11）
+
+[I02-D5B 累计 cut 预算基准](21-i02-d5b-cut-budget-benchmark.md) 已用 scratch 代理完成实测（证据：[`evidence/07-cut-budget.md`](../evidence/07-cut-budget.md)）。本增补冻结 §3 中标记为待定 / 暂定的值：
+
+| 预算 | 默认 | 硬上限 | 计量单位 |
+| --- | ---: | ---: | --- |
+| `maxCutsPerBranch` | **5,000,000** | **10,000,000** | **解析段数**（`cutPoints + 1`） |
+| `maxCutsPerCheck` | 1,000,000 | 1,000,000 | cutPoints（维持 §3 的 DoS 守卫） |
+| `maxWitnessTransitions` | 1,000,000 | 1,000,000 | 转移数（**条件：D9 冻结紧凑记录**） |
+| `maxWitnessBytes` | 64 MiB | 64 MiB | 序列化字节（**条件：D9 冻结紧凑记录**） |
+
+- **计量单位澄清**：`maxCutsPerBranch` 按解析段数计，不按内部折返点数。实测 cutPoints 最大 3,955（按点数计永不触发），segments 最大 1,263,594（推荐限值）/ 2,057,148（硬限值）。
+- **fallback**：若 AUTH 坚持 cutPoints 语义，`maxCutsPerBranch` = 1,000,000 / 硬 4,000,000，并注明该预算不具约束力、真实工作由 `maxEdges` 约束。
+- **Witness 条件**：1M 转移与 64 MiB 只对紧凑记录（实测 35 B/转移）自洽；全记录（200 B/转移）下 1M 转移约需 200 MB。D9 必须在 W1（紧凑 1M/64MiB，推荐）、W2（全记录 250k/64MiB）、W3（全记录 1M/256MiB，不推荐）中冻结其一，AUTH 按选择记录终值。
+- **不抢占**：累计 cut 预算不得先于状态 / edge 预算触发，否则降级原因会从 `state-budget` / `edge-budget` 变成 `cut-budget`。
+- U9 等待成本实测为 1,440 segments（N=480），与 W 共用 NB 预算，不另设计数器。
+
+## 确认（D9，2026-11-11）
+
+[I02-D9](15-i02-d9-internal-result-contract.md) 已冻结内部结果契约，确认本票的预算口径：
+
+- Witness 采用 **W1 紧凑记录**：`maxWitnessTransitions = 1,000,000`、`maxWitnessBytes = 64 MiB`；容量以最终确定性序列化的**实际 UTF-8 字节数**为准，任一超限 ⇒ IE `witness-volume`。
+- `maxCutsPerBranch` 按 `segmentsTotal` 计（默认 5,000,000 / 硬 10,000,000）；内部结果同时暴露 `cutPointsTotal` 与 `segmentsTotal`。
+- `stats.budget` 暴露 `budgetProfile` / `budgetStatus` / `budgetKind`；`wallClockMs` 在 `stats.timing`，不进确定性签名。
+- `phaseGridCapped` 是诊断；`stateCapacity` 是理论容量，不冒充实际访问量。

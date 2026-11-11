@@ -290,3 +290,19 @@ packages/contracts/tests/playability-temporal-fixtures.ts
 - `graph.ts` 仍受独立增量审批约束。
 - `ops.ts` stub、T-57 / T-58 / T-61 保持不变。
 - `PUBLIC_NB`、`PUBLIC_PU` 继续 `BLOCKED`。
+
+## 上游裁定（D5B，2026-11-11）
+
+- `maxCutsPerBranch` 的测试值：**5,000,000** 默认 / **10,000,000** 硬，按解析段数计（AUTH 确认后生效）；`maxCutsPerCheck` = 1,000,000（cutPoints）。
+- Witness 体积测试值取决于 D9 冻结的记录形状：W1 `1,000,000 / 64 MiB`（推荐）、W2 `250,000 / 64 MiB`、W3 `1,000,000 / 256 MiB`。
+- 预算测试必须断言 IE `cut-budget-exhausted` / `witness-volume` 使用上述终值；在 AUTH 记录终值前，U2 不得声称完整预算验收。
+- 证据：[`evidence/07-cut-budget.md`](../evidence/07-cut-budget.md)。
+
+## 上游裁定（D9，2026-11-11）
+
+- A–J 的字段落点已由 [I02-D9](15-i02-d9-internal-result-contract.md) §9 冻结；测试必须断言 D9 §9 的字段组合，不得只断言 `internalResult`。
+- 特别是 **B**：必须同时断言 `internalResult = "pu-candidate"`、`certificate.kind = "permanent-gate"`、`certificate.status = "COMPLETE"`、`puConditions["geometry-checked"].status = "BLOCKED"`、`puConditions["model-out-excluded"].status = "BLOCKED"`、`publicCapability = "BLOCKED"`。
+- E/F/G 允许保留 `certificate.status = "INCOMPLETE"` 的部分证据；不得把不完整证明压扁成 `none`，也不得升级为 `nb-candidate` / `pu-candidate`。
+- Witness 体积测试以最终确定性序列化的 UTF-8 字节数为准；`1M` 转移或 `64 MiB` 任一超限 ⇒ IE `witness-volume`。
+- 确定性测试必须同时比较 `stats.determinismSignature` 与剔除 `wallClockMs` / `detail` 后的规范化完整序列化。
+- 原因码使用 D9 §5 的闭集；新增原因必须回 D9/AUTH。
