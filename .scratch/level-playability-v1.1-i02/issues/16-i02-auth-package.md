@@ -1,8 +1,8 @@
 # I02-AUTH 授权包编写
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: amber
 Blocked by: 07, 08, 09, 10, 11, 12, 13, 14, 15, 21
 Map: ../map.md
 Class: I-02 / DELIVERABLE
@@ -95,3 +95,56 @@ I02-AUDIT。
 5. **确定性**：FNV-1a 32-bit 只是指纹；测试与基准必须同时保留规范化完整序列化。
 6. **测试钩子**：`testHooks`（`budget` / `now`）不进公共导出面；AUTH 必须要求公共导出扫描与白名单审计。
 7. **I-03 边界**：I-03 负责 `coverage.temporal`、`PlayabilityEvidence` 的 `model/lag/degradation/limits` 与公共发布门禁；I-02 不接生产。
+
+## Answer
+
+**AFK task 已完成。** 产出授权包草稿 [`docs/v7.8/移动-I02.md`](../../../docs/v7.8/移动-I02.md)（约 1,010 行，15 节）。
+
+**修改产品目录：否**（未触碰 `packages/**`、Runtime、CLI、MCP、公共 Contract、I-00 / I-02 原文；只新增 docs 授权包、更新本票与地图 / 下游票尾）。
+
+> 草稿**未签署，不构成实施授权**。首次签署只放行 U1；U4 在 `graph.ts` 独立审批前保持 `BLOCKED`；`PUBLIC_NB` / `PUBLIC_PU` 均为 `BLOCKED`。
+
+### 1. 覆盖 AUTH 票的十项要求
+
+| 要求 | 授权包章节 |
+| --- | --- |
+| 能力声明与边界（沿用 I-00 §1） | §1 |
+| 文件白名单与允许修改的模块 | §5（六模块 DAG + 允许 / 禁止 / TEST_ONLY helper / `graph.ts` 独立审批） |
+| I02-01～I02-05 提交拆分 | §7（U1–U5、每单元分支 / PR、`graph.ts` 单独 PR） |
+| AABB、ε、三角波、图割正式数学语义 | §3（3.1–3.8） |
+| 默认预算与硬上限终值 | §4 |
+| 测试命令、性能基准、停止条件 | §8、§12 |
+| 公共接口 / 依赖 / Runtime 审批边界 | §11 |
+| R1 / R2 通过条件（并扩到 R3/R4） | §9 |
+| I-00 / I-02 冲突登记表 | §10（A-01～A-05、B-01～B-17，逐条裁定票与状态） |
+| 五个单元定义与授权状态 | §7.1 / §7.3（U1 `AUTHORIZED`；U2/U3/U5 `PLANNED`；U4 `BLOCKED`） |
+| I02-03 / I02-04 依赖、顺序、授权条件 | §7.1（U3 → R3 → U4；`graph.ts` 审批） |
+| 执行边界 | §11、§15 |
+| 风险与未确认项 | §13 |
+| 证据索引 | §14（完整 SHA + 复现命令） |
+| 签署表 | §15（含审计记录占位） |
+
+### 2. 冻结进授权包的关键值
+
+- 白名单：`temporal.ts` + `temporal-{result,budget,motion,witness,gate,evasion}.ts`；`TEST_ONLY` 的 `playability-temporal-fixtures.ts`；六个测试文件；`graph.ts` 仅 `HopSampling` 尾参且需独立审批。
+- 预算：`500k/2s` 默认、`1M/10s` 硬；`maxCutsPerCheck=1M`（cutPoints）；`maxCutsPerBranch=5M/10M`（**segments**）；`maxWitnessTransitions=1M`、`maxWitnessBytes=64MiB`（W1 紧凑记录）。
+- 内部状态：`nb-candidate` / `pu-candidate` / `insufficient-evidence`；`modelConditional=true`；`publicCapability="BLOCKED"`；`publicResult=null`；`certificate` 带 `COMPLETE/INCOMPLETE`。
+- PU：条件 2/5 `BLOCKED`；`pu-candidate` 仅是模型内证书；公共 PU 不授权。
+- 测试：A–J 语义、D3 §11 十三条、D4 N1/N2、D10 全相位覆盖、双档 lag、预算 / 确定性、LP-06/07 回归、AC-01～AC-13 映射。
+- 复核：R1(U1) → R2(U2) → R3(U3) → R4(U4)；U5 由完成报告 + AC-08～AC-13 验收。
+
+### 3. 审计前必须注意的未闭合项
+
+授权包 §10/§13 明确保留：
+
+- **B-02**：几何 `coverage` 仍 `partial`，PU 条件 2 `BLOCKED`；公共 PU 不授权。
+- **B-03 / B-04 / B-13**：`coverage.temporal`、机制层 gap、I-03 接线均 `DEFERRED TO I-03`。
+- **B-11**：`temporal-input.ts` 不在白名单，既有 `localeCompare` 作为 I-01 已知限制；I-02 自有排序必须用 locale-independent 比较器。
+- **U4**：`graph.ts` 独立审批未通过前 `BLOCKED`。
+- **LP-06/07**：无 vitest，仅 U5 / AUTH 前 scratch 复跑。
+- **Runtime hitbox equality**：未证；I-02 不声称已证。
+
+### 4. 下游
+
+- **I02-AUDIT**：按授权包 §15.4 的范围与证据审计表核对；审计只决定是否达到可签署，不替用户签署。
+- **I02-SIGN**：首次签署只放行 U1；其余单元与公共能力保持 `PLANNED` / `BLOCKED`。

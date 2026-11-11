@@ -141,7 +141,7 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 
 - 图与票：`wayfinder/level-playability-v1.1-i02`（本分支）。
 - 产物：`.scratch/level-playability-v1.1-i02/{map.md,issues/,scripts/,evidence/,experiments/,reports/}`。
-- 最终授权包：`docs/v7.8/移动-I02.md`（由 [I02-AUTH](issues/16-i02-auth-package.md) 产出，签署前不构成实施授权）。
+- 最终授权包：`docs/v7.8/移动-I02.md`（由 [I02-AUTH](issues/16-i02-auth-package.md) 于 2026-11-11 产出草稿；**签署前不构成实施授权**，待 AUDIT → SIGN）。
 - 不复活或改写 I-00 / P0 的 effort 目录；引用可以，重开结论不行。
 
 ## Decisions so far
@@ -174,6 +174,7 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 - [I02-D7 测试矩阵与证据口径裁定](issues/13-i02-d7-test-matrix.md): 六个 `playability-temporal*.test.ts`（五单元 + A–J 矩阵）+ `TEST_ONLY` 的 `playability-temporal-fixtures.ts`（D6 白名单增量）；A–J 断言内部证明结果而非公共 Verdict，字段落点由 D9 绑定，AUTH 逐条核对；确定性 = 进程内重复 + 剔除 `wallClockMs` 的稳定序列化（跨进程签名只进基准）；预算上下文可注入 `budget` / `now`，`now` 仅测试专用；性能是证据不是 vitest 墙钟门禁（`scripts/bench-temporal.mjs` + 语料 SHA）；LP-06/07 只在 U5 与最终审计复跑，差异即 STOP；AC-01～AC-13 分派到 U1–U5 与 R1–R4/AUDIT。
 - [I02-D5B 累计 cut 预算基准](issues/21-i02-d5b-cut-budget-benchmark.md): 代理实测 1.165 亿次 check：cutPoints 99.94% 为 0、max 1；累计 segments 推荐限值 max `1,263,594`、硬限值 max `2,057,148`。`maxCutsPerBranch` 按解析段数计，默认 `5,000,000` / 硬 `10,000,000`；`maxCutsPerCheck` 1M 不变。Witness 路径型 1,380 转移 / 276KB；策略表上界 500k→100MB、1M→200MB，故 `1M 转移 + 64MiB` 只对紧凑记录自洽，D9 须在 W1/W2/W3 中冻结形状。证据见 [`evidence/07-cut-budget.md`](evidence/07-cut-budget.md)。
 - [I02-D9 内部分析结果与诊断契约裁定](issues/15-i02-d9-internal-result-contract.md): 分层结果 `internalResult`（`nb-candidate` / `pu-candidate` / `insufficient-evidence`）+ `certificate` 判别联合（`witness` / `permanent-gate` / `none`，均带 `COMPLETE`/`INCOMPLETE`）；`pu-candidate` 仅表示模型内门 + 图割 + hop 完整，PU 条件 2/5 仍 `BLOCKED`，`publicCapability` 恒 `BLOCKED`；Witness 用 W1 紧凑记录（`1M` 转移 / `64 MiB`，以实际序列化字节判定）；Stats 分组并同时暴露 `cutPointsTotal` / `segmentsTotal`；原因码闭集；内部入口在 `temporal.ts`，`testHooks` 不进公共面；确定性签名 FNV-1a 32-bit 只作指纹，测试同时比较完整规范化序列化；I-03 负责公共转换。
+- [I02-AUTH 授权包编写](issues/16-i02-auth-package.md): 草稿 [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（15 节，约 1,010 行）：七项 §12 内容、冲突登记 A-01～A-05 / B-01～B-17、U1–U5 定义与台账、R1–R4 复核、测试矩阵 / AC 映射、风险 / 证据 / 签署表；首次签署只放行 U1，U4 `BLOCKED`，`PUBLIC_NB/PU` `BLOCKED`；草稿未签署，待 AUDIT → SIGN。
 
 ## Not yet specified
 
