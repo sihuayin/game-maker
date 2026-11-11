@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Owner: —
+Owner: claude (wayfinder session 2026-11-11)
 Blocked by: 02, 03
 Map: ../map.md
 Class: U1 / IMPLEMENTATION
