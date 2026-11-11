@@ -108,6 +108,7 @@ U1-00 初始化与基线
 
 - [U1-00 初始化、基线与白名单确认](issues/01-u1-00-init.md): BASE `ed02339`（i02 head），建图提交仅 scratch；授权包 `797cd6fc…` 复算一致，仅放行 U1；白名单七文件与 §5.2 逐文件一致（`temporal.ts` 已有 115 行，其余六个待建）；基线 `pnpm build` / `typecheck` / `test` 全 exit 0（170 files / 2616 tests，2 条已知 Vitest RPC flake）；T-57/58/61/62/64 全 PASS；产品目录零改动。证据 [`evidence/00-baseline.md`](evidence/00-baseline.md)。
 - [U1-01 内部结果类型与预算骨架](issues/02-u1-01-types-budget.md): D9 纯类型全集 + 预算常量 / 解析 / 计数器落地；`BudgetProfile` 类型依 DAG 留在 result，`maxEdges` 解析时派生；非法预算 / 溢出即 IE；架构断言 65/65、全量 2616 绿。
+- [U1-02 运动原语与连续时间求交](issues/03-u1-02-motion.md): 三角波 / 不取整 AABB / ε / 单侧 lagPad + 解析连续求交落地；折返点切段、`c1 === 0` 精确分支、切点真实重叠才合并、`cut-budget` 前置守卫；T-55…T-65 65/65、全量 2616 绿。
 
 ## Not yet specified
 
