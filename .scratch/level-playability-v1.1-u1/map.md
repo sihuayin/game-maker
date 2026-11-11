@@ -106,6 +106,8 @@ U1-00 初始化与基线
 
 <!-- 索引：每张已关闭票一行；细节在票里。 -->
 
+- [U1-00 初始化、基线与白名单确认](issues/01-u1-00-init.md): BASE `ed02339`（i02 head），建图提交仅 scratch；授权包 `797cd6fc…` 复算一致，仅放行 U1；白名单七文件与 §5.2 逐文件一致（`temporal.ts` 已有 115 行，其余六个待建）；基线 `pnpm build` / `typecheck` / `test` 全 exit 0（170 files / 2616 tests，2 条已知 Vitest RPC flake）；T-57/58/61/62/64 全 PASS；产品目录零改动。证据 [`evidence/00-baseline.md`](evidence/00-baseline.md)。
+
 ## Not yet specified
 
 <!-- 无已知雾区。路线已清楚；任何新增文件 / 扩权需求 = STOP + HITL，不在此处自行毕业。 -->
