@@ -52,3 +52,10 @@ I02-AUTH。
 ## 上游裁定（D5，2026-11-11）
 
 字段集按 [I02-D5](11-i02-d5-budget-determinism.md) §9.1：含 `statesEnqueued` / `statesVisited` 分列、`cutsTotal`、`workUnitsSinceLastCheckpoint`、`budgetKind` 枚举、`internalResult` / `modelConditional` / `publicCapability` / `publicResult` 分层；`wallClockMs` 不进入 `determinismSignature`。`maxCutsPerBranch` 在 D5B 完成前保持 `DEFERRED`。
+
+## 上游裁定（D6，2026-11-11）
+
+- 内部结果类型落在新增 `packages/contracts/src/playability/temporal-result.ts`：**纯类型模块**，不依赖任何 I-02 模块，不得反向导入 budget / motion / witness / gate / evasion。
+- `temporal-result.ts` 不得导入 `temporal.ts`；任何循环依赖视为架构验收失败。
+- 结果类型不转出公共 barrel（不进 `playability/index.ts` / `contracts/src/index.ts` / package exports）；内部符号加 `@internal`。
+- I-02 不接生产：内部结果由 I-02 专项测试直接消费，不复用/修改生产 `TemporalAnalyzer` 签名，不改 `ops.ts`、T-57/T-58。

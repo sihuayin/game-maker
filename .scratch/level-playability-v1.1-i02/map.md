@@ -133,7 +133,7 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 - **I02-03 与 I02-04 的先后不在建图时预设**：两票都只挂在证据族之后，先后与授权条件由 [I02-D8](issues/14-i02-d8-review-gates.md) 裁定。
 - **I02-D1 是本图的拱心石**：相位全称/存在语义直接决定 Witness 与永久封锁证明的量化方向；D1 已于 2026-11-10 裁定（`∀φ0` + per-phase 策略；`NB ⇔ U9 ∨ ∀φ0 W`）。
 - **I02-D10 是 D1 的显式后续**：D1 只裁定证书的充分性与量化方向，不裁定 U9 / Winning Set 的可执行判据；D3 / D4 / D9 都依赖 D10。
-- **I02-D6 可能触发 I-00 R2 之外的增量授权**：`graph.ts` 的 hop 参数化仍在 I-00「需单独裁定」名单；若 D4 判定必须改 `graph.ts`，授权包必须写清额外的审批形态，不能把它当作白名单内改动。
+- **I02-D6 已裁定 `graph.ts` 的审批形态**：hop 参数化进入 I-02 白名单，但需独立于 I-00 R2 的增量书面审批；未批 U4 保持 `BLOCKED`。详见 [I02-D6](issues/12-i02-d6-whitelist-layout.md)。
 - **I02-D4 已裁定生产 PU 不授权**：`movementModelClosure = "not-proven-air-control"`（`scene.ts:89` 空中水平控制）与几何 `partial` 是两项独立阻塞；I02-03 / I02-04 只做模型条件性内部计算，不得发布 `PROVEN_UNPLAYABLE`。PU 六条件第 2、5 条 `BLOCKED`，第 6 条为构造性 lag 无关。
 - **I02-D5 的累计 cut 预算未冻结**：`maxCutsPerBranch` 由 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md) 基准确定；在此之前 U2 不得声称完整确定性工作预算，D9/AUTH 不得签署 U1–U2 完整预算验收。
 
@@ -170,12 +170,12 @@ I02-D3 + I02-D4 ─────────→ I02-D8 复核门槛、单元依�
 
 - [I02-D5 预算、确定性与降级裁定](issues/11-i02-d5-budget-determinism.md): 工作预算是唯一语义预算，墙钟只 abort-only、不计入确定性签名；U9/W 共用 NB 预算，U2/U4 独立、每档 lag 独立；`500k/2s` 默认、`1M/10s` 硬；新增 `maxCutsPerBranch`（数值待 [I02-D5B](issues/21-i02-d5b-cut-budget-benchmark.md)）；`N=min(N_max, floor(maxStates/xPositions))`、`stateCapacity` 是完整空间上界、`phaseGridCapped` 是诊断；检查点改为 1024 work units；双档「不完整」与「不一致」分开；发布门不覆盖内部结果；确定性要求所有策略遍历顺序固定。**U1–U2 完整预算验收待 D5B。**
 
+- [I02-D6 文件白名单增量与模块布局裁定](issues/12-i02-d6-whitelist-layout.md): I-02 按单元拆六个内部模块（`temporal-{result,budget,motion,witness,gate,evasion}.ts`）+ `temporal.ts` 编排，依赖单向无环；新文件逐一点名、未列名即 STOP；`graph.ts` 仅 `HopSampling` 尾参进白名单但须独立增量审批，未批 U4 `BLOCKED`；`profile.ts` 禁止修改（只读 import 不受限）；I-02 不接生产，`ops.ts` 与 T-57/T-58/T-61 原样；新模块不转出公共 barrel；测试只增、内存夹具优先、不新增 pack。
+
 ## Not yet specified
 
 <!-- 雾：知道方向、还不足以写成票的问题。前沿推进后再毕业。 -->
 
-- **是否需要新 fixture pack。** I-00 将 `fixtures/packs/**` 列为「需单独裁定」；I-02 测试优先用内存夹具，若必须加 pack，审批路径未定。
-- **I-02 内部结果能否在不改 `TemporalAnalyzer` 签名的前提下承载 proof / stats / diagnostics。** D9 会给出结论；若不能，I-03 之前的接口边界需重新设计。
 - **非整数出生点的支持形态。** D3 冻结「脚点 x 非整数 ⇒ IE `spawn-not-on-lattice`」；若 19 关语料显示非整数出生点普遍存在，需要单独 HITL 裁定如何支持精确非整数起点（不得静默吸附），并判断对 I-02 可用范围的影响。
 
 ## Out of scope

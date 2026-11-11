@@ -40,3 +40,11 @@ I02-AUTH。
 ## 上游裁定（D5，2026-11-11）
 
 测试矩阵必须覆盖：工作预算触顶、墙钟 abort、`phaseGridCapped`、非法预算 / 派生上界溢出、双档「不完整」与「不一致」分开、确定性复跑（关闭墙钟）、累计 cut、Witness 体积。基准证据按 [I02-D5](11-i02-d5-budget-determinism.md) §9.2 记录；`maxCutsPerBranch` 由 [I02-D5B](21-i02-d5b-cut-budget-benchmark.md) 提供。
+
+## 上游裁定（D6，2026-11-11）
+
+- 测试文件：新增 `packages/contracts/tests/playability-temporal*.test.ts`，**只新增**；可拆成 `playability-temporal-motion.test.ts` / `-witness.test.ts` 等，便于 R1–R4 逐单元定位；不得修改 `playability-temporal-input.test.ts`（含 T-55～T-65 与 I-01 矩阵）。
+- 夹具内存优先；需真包时只读复用 `fixtures/packs/last-train/v2`；不新增 `fixtures/packs/**`（需单独 HITL）。
+- 三角波 cross-check 可在测试中用 `node:fs` 只读 `packages/demo/src/hazard.ts` 文本。
+- I-02 不接生产：测试直接调用内部 analyzer，`ops.ts` / T-57 / T-58 / T-61 原样。
+- 新模块须避开文本扫描陷阱：不得出现 `analyze:` 属性标签（T-58）、不得调用 `auditPlayabilityTemporal(`（T-57）、不得出现 `Symbol(`（T-64）、不得导出 `TEMPORAL_LAG_*` 同名常量（T-62）。
