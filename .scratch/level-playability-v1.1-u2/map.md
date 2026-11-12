@@ -4,7 +4,7 @@ Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1.1-u2
 Authority: [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md) @ `sha256:797cd6fc7b299e22b6e90b9ef8a9567376ea3a914d70f8b6f1fc0f9a6ecedc56`（已签署；首次签署仅放行 U1）
-Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权 U2 及其复核门」· 范围**仅 U2 实施 + R2 复核门**（依据 R1 PASS 2026-11-12）
+Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权 U2 及其复核门」· 范围**仅 U2 实施 + R2 复核门**（依据 R1 PASS 2026-11-12）；记录落点 `.scratch/level-playability-v1.1-i02/reports/03-u2-incremental-authorization.md`（U2-00 创建）
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `23a2027`（已含签署 U1）
 Branch: `wayfinder/level-playability-v1.1-u2`
 PR target: `wayfinder/level-playability-v1.1-i02`
@@ -44,7 +44,7 @@ Status: open · 2026-11-12 开图
 - 不授权：修改 `temporal.ts`（U2 不实现 `analyzeTemporalInternal`，测试直接调用 witness 模块）、修改 `temporal-budget.ts` / `temporal-result.ts`、U3–U5、`graph.ts` 尾参、Pipeline / Runtime / CLI / MCP / 公共 Contract / 新依赖 / JSON fixtures / `fixtures/packs/**`。
 - 预算如需扩 `BudgetProfile` 或 D9 闭集 ⇒ STOP + HITL。
 - 推送 / 合并 / i02 → main 不在本图授权内；需要另行明确指令。
-- 授权台账的规范记录（`docs/v7.8/移动-I02.md` §15）走**单独 docs PR**；本图 Header 已记录用户指令，U2-00 负责准备该 diff。
+- 增量签署记录写入 `.scratch/level-playability-v1.1-i02/reports/03-u2-incremental-authorization.md`；**不改已签署授权包**，`docs/v7.8/移动-I02.md` 的 SHA `797cd6fc…` 必须保持不变。
 
 ### 冻结语义（引用）
 
@@ -124,5 +124,5 @@ U2-00 初始化与授权台账
 - **公共 Contract / Runtime / CLI / MCP / Pipeline / 持久化 / 新依赖。**
 - **`graph.ts` 尾参、`profile.ts`、`temporal-input.ts`、`ops.ts`、`packages/demo/**`。**
 - **推送、合并、i02 → main**（另行明确指令）。
-- **修改已签署授权包**（U2 授权台账记录除外，且走单独 docs PR）。
+- **修改已签署授权包 / I-00 / I-02 原文**（增量授权只写独立记录，不改原包）。
 - **把 U2 完成写成公共 NB / PU 能力。**
