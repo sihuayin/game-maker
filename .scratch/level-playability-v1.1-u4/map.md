@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-u3` @ `1405c3f`（含 U3 实现、R3 与 U3-SIGN；**U3 尚未并入 i02**）
 Branch: `wayfinder/level-playability-v1.1-u4`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-12 开图 · **U4 实施 `BLOCKED`（待 U4-01 `graph.ts` 独立审批）**
+Status: open · 2026-11-12 · U4-00 完成；**U4 实施 `BLOCKED`（待 U4-01 `graph.ts` 独立审批）**
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**用户 2026-11-12 授权的 U4（I02-04：垂直规避图割）；不进入 U5，不改 `reach.ts`，不接生产，不发布公共 Verdict。
 >
@@ -152,7 +152,7 @@ U4-00 初始化与授权台账
 
 ## Decisions so far
 
-<!-- 关票后在此追加一行：名称链接 + 一句结论摘要 -->
+- [U4-00 初始化、授权台账与基线](issues/01-u4-00-init.md): 基线全绿（build/typecheck 0；174 files / 2795 tests）；增量授权 05 就绪，仅 U4 实施 + R4 + `graph.ts` 审批前置；U4 执行门仍 `BLOCKED`；R4 协议已冻结。
 
 ## Not yet specified
 
