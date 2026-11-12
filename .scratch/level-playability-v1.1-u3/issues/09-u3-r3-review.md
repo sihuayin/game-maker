@@ -1,8 +1,8 @@
 # U3-R3 独立复核
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: independent reviewer subagent (fresh context) / driven by claude, 2026-11-12
 Blocked by: 08
 Map: ../map.md
 Class: U3 / REVIEW
@@ -48,3 +48,29 @@ R3 报告完整；所有 R3 项均有结论；命令有退出码；证据有 has
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。R3 结论：PASS。** 报告：[`.scratch/level-playability-v1.1-i02/reports/R3-review.md`](../../level-playability-v1.1-i02/reports/R3-review.md)。
+
+复核由**未参与 U3 实现的 fresh-context 复核子代理**执行，独立签署于报告 §8；驱动会话未代填其判断。
+
+| 项 | 结论 |
+| --- | --- |
+| R3-01 门区闭式 | **PASS** |
+| R3-02 全相位覆盖 | **PASS** |
+| R3-03 侧规则 | **PASS** |
+| R3-04 `forbiddenInjection` | **PASS** |
+| R3-05 D4 §11 反例 1–4 / 6 / 13 | **PASS** |
+| R3-06 输出边界 | **PASS** |
+| R3-07 范围 | **PASS** |
+| R3-08 独立验证（≥2 反例 + 1 边界值） | **PASS** |
+
+- 无 `FAIL`、无 `NOT_RUN`。
+- 命令（复核人现场重跑）：`pnpm build` / `pnpm typecheck` / gate 定向 48 / input 定向 65 / `pnpm test` 174 files · 2795 tests，**退出码均 0**；2 条 vitest worker RPC 超时属工具层，非断言失败。
+- diff `c0d6981..d479816` 产品路径仅两个新增文件；`temporal.ts` / `graph.ts` / `reach.ts` / `docs/` / `fixtures/` 零 diff；无新依赖 / 锁文件 / JSON fixture / barrel 导出；`temporal-gate.ts` 不 import `temporal.ts`。
+- 文件 hash 与授权包 SHA-256 均现场复算匹配。
+
+**下游**：U3-SIGN（用户签署 R3）已 unblocked，**只能由用户 `amber` 完成**；本会话不代签。R3 PASS **不**授权 U4 / U5、`PUBLIC_NB` / `PUBLIC_PU`、I-03 接线、推送 / 建 PR / 合并。
+
+**隔离说明**：复核人未读取 `07-implementation.md`、`07-draft-pr.md`、`map.md` 及本票外的 U3 票；驱动会话（本会话）在派出复核人前已加载地图与 U3-07 票面，故未自行担任复核人，R3 结论全部来自复核子代理的独立工作。
