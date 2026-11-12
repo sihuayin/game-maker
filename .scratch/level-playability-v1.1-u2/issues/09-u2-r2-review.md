@@ -110,7 +110,7 @@ Class: U2 / REVIEW
 
 **R2 重审结论：PASS —— 首次 FAIL 的 S2 / U9 项已解决；U2 可提交 U2-SIGN，R2 PASS 不替代用户签署。**
 
-Status: resolved
+**2026-11-12 重审完成。**
 
 - 报告（新文件，未覆盖首次报告）：`.scratch/level-playability-v1.1-i02/reports/R2-review-rerun.md`
 - 首次报告：`.scratch/level-playability-v1.1-i02/reports/R2-review.md`（FAIL，保留）

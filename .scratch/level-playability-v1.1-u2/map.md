@@ -62,14 +62,15 @@ Status: open · 2026-11-12 开图
 - U2-07 准备 Draft PR 描述与证据，但**不推送、不创建 PR**。
 - 不自动合并；R2 通过 + 用户签署后才讨论 PR 后续。
 
-### R2 FAIL 与修复路径（2026-11-12）
+### R2 FAIL、修复与重审（2026-11-12）
 
 首次 R2 **FAIL**：S2 的 `lagPad` 在 `lagMs` 窗口跨折返点 `m·P/2` 时按当前段方向单侧加宽，不是精确 `∃δ` 的保守覆盖；官方 `16.67ms` 可复现反例见 `.scratch/level-playability-v1.1-i02/reports/R2-review.md` §4.3。
 
 - **U2-08**：S2 / 残差等待 / U9 停留的 pad 保守化，并补跨折返点回归；
 - **U2-09**：修复后回归、白名单审计、实现报告与 R2 重审输入；
 - 之后由**新的独立会话**重审 U2-R2；首次 FAIL 报告保留，不得覆盖。
-- U2 仍未完成；U2-SIGN 继续被 U2-R2 阻塞。
+- **2026-11-12 重审 PASS**：首次 S2 / U9 FAIL 均已解决；报告 `.scratch/level-playability-v1.1-i02/reports/R2-review-rerun.md`，首次 FAIL `R2-review.md` 保留。
+- U2 仍未完成；**U2-SIGN 已 unblocked**，等待用户签署。R2 PASS 不等于 U3 授权。
 
 ### 冻结的扫描约束
 
@@ -137,6 +138,7 @@ U2-00 初始化与授权台账
 - 2026-11-12 · **U2-08 S2 lagPad 保守化 + 跨折返点回归** — `resolved`；S2 / 残差等待 / U9 停留三处 pad 收敛到内部 `conservativeLagPad` + `lagPaddedHazardBox`，改为**左右对称** `|slope|·lagMs`（删除按单调段方向单侧加宽）；R2 §4.3 官方 `16.67ms` 反例由 `verified:true` → `failure:"hazard"`；新增 5 条 `[R2-FIX]` 回归（16.67ms / 200ms / W/U9 move 边 / 残差整格 / W phase 39）+ 1 条既有 S2 测试更新为对称语义；build / typecheck exit 0，定向 73 + 65 = 138/138，`pnpm test` 173 files / 2747 tests exit 0（仅已知 runner RPC 超时）；diff 仅 2 个白名单文件 → [票](issues/11-u2-08-s2-lagpad-fix.md)。U2-09 unblocked。
 
 - 2026-11-12 · **U2-09 修复后回归 / 审计 / R2 输入** — `resolved`；build / typecheck exit 0；U2 定向 73 + 65 = **138/138**（另 `[R2-FIX]` 过滤 5/5、input verbose 65/65）；`pnpm test` 两次均 **173 files / 2747 tests passed, exit 0**（每次 5 条已知 vitest worker `onTaskUpdate` RPC 超时，非断言失败）；R2 §4.3 `16.67ms` 反例由测试 + 独立复算确认为 `verified:false` / `failure:"hazard"`；diff 产品路径仍只 3 白名单文件、`docs/` 零 diff、授权包 SHA 不变；T-55/57/58/61/62/64 全 PASS；R2 重审输入包 → [报告](reports/08-fix-implementation.md) · [票](issues/12-u2-09-fix-audit.md)。R2 重审（新独立会话）unblocked；首次 FAIL 报告保留，重审结论写入 `R2-review-rerun.md`。
+- [U2-R2 独立复核](issues/09-u2-r2-review.md): 首次 **FAIL**（S2 lagPad 单侧 pad 非保守）→ U2-08 对称 pad 修复 → U2-09 重审计 → 独立重审 **PASS**；首次 S2 / U9 FAIL 已解决；报告 `R2-review-rerun.md`（首次 `R2-review.md` 保留）；U2-SIGN unblocked，R2 PASS 不等于 U3 授权。
 
 ## Not yet specified
 
