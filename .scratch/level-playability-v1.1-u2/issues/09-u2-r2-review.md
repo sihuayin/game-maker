@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Owner: —
+Owner: independent reviewer subagent (rerun) · 2026-11-12
 Blocked by: 11, 12
 Map: ../map.md
 Class: U2 / REVIEW
