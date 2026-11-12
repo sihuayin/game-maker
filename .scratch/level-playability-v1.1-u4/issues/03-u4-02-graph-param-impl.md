@@ -1,8 +1,8 @@
 # U4-02 graph.ts HopSampling 尾参实现与默认行为回归
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-02 session 2026-11-12)
 Blocked by: 02
 Map: ../map.md
 Class: U4 / IMPLEMENTATION
@@ -48,3 +48,24 @@ Class: U4 / IMPLEMENTATION
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。** 已按 U4-01 批准的提案在独立分支 `wayfinder/level-playability-v1.1-u4-graph-hop`（base `c0d6981`）实现并本地验证；**未推送、未建 PR、未合并**。
+
+| 项 | 结果 |
+| --- | --- |
+| 本地 commit | `13b4e3b`（`U4-02: graph.ts HopSampling tail param and default regression`） |
+| 改动面 | `graph.ts`（`HopSampling` 可选尾参 + 默认回落）+ 新建 `playability-temporal-evasion.test.ts`（5 条默认等价断言） |
+| `graph.ts` hash | 前 `def3fa71…445e55b` → 后 `85346d6f…e0228b0` |
+| 未改 | 跳跃公式、既有采样语义、`reach.ts`、`reachableCells`、其他导出 / 调用语义、既有测试 |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| `playability-graph.test.ts` | 退出码 **0**；**11 / 11 passed** |
+| `playability-temporal-evasion.test.ts` | 退出码 **0**；**5 / 5 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed** |
+| `pnpm test` | 退出码 **0**；**174 / 174 files，2752 / 2752 tests passed**（分支未含 U3 的 48 条 gate 测试） |
+| 白名单外改动 | **无** |
+
+证据：[`../evidence/02-graph-param.md`](../evidence/02-graph-param.md)（原始输出 `02-*.log`，本地保留不入库）。
+
+**下游**：U4-03（独立 PR 推送与合并门）已 **unblocked**，但**必须等待用户明确指令**才会推送 / 建 PR / 合并。**U4 执行门仍 `BLOCKED`。** 本票未启动 U4-03。
