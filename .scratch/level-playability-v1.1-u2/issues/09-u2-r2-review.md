@@ -2,8 +2,8 @@
 
 Type: task
 Status: open
-Owner: independent reviewer subagent · 2026-11-12
-Blocked by: 08
+Owner: —
+Blocked by: 11, 12
 Map: ../map.md
 Class: U2 / REVIEW
 
@@ -99,3 +99,9 @@ Class: U2 / REVIEW
 > 按授权包 §9.2 与票 09 的失败处理，R2 不通过 ⇒ U2 不得标记完成；R2 PASS 也不能替代
 > 用户签署，何况本次为 FAIL。票保持 `open`，等待实施会话修复后重新复核。
 
+### 首次 R2 结果与重审条件（协调会话记录，2026-11-12）
+
+- 首次 R2：**FAIL**（S2 `lagPad` 在 lag 窗口跨折返点时非保守；报告 `.scratch/level-playability-v1.1-i02/reports/R2-review.md`，复核人 `independent reviewer subagent, fresh context`）。
+- 修复：U2-08；修复后审计：U2-09。
+- 本票保持 open，Owner 重置为 `—`；由**新的独立会话**在 U2-08 / U2-09 完成后 claim 并重审。
+- 首次 FAIL 报告保留，不得覆盖；重审结论另写，不得改写首次报告。

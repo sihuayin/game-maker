@@ -56,11 +56,20 @@ Status: open · 2026-11-12 开图
 ### 执行形态
 
 - 一票一 commit：`U2-0x: …`；每张实现票一个独立会话。
-- 依赖：U2-00 → U2-01 → U2-02 → U2-03 → U2-04 → U2-05 → U2-06 → U2-07 → U2-R2 → U2-SIGN。
+- 依赖：U2-00 → U2-01 → U2-02 → U2-03 → U2-04 → U2-05 → U2-06 → U2-07 → U2-R2（首次 FAIL）→ U2-08 修复 → U2-09 重审计 → U2-R2 重审（新独立会话）→ U2-SIGN。
 - U2-04（U9）复用 U2-03（W）的搜索，故排在 W 之后。
 - R2 复核会话必须与实现会话隔离；不得读作者总结 / PASS 结论 / 调试笔记。
 - U2-07 准备 Draft PR 描述与证据，但**不推送、不创建 PR**。
 - 不自动合并；R2 通过 + 用户签署后才讨论 PR 后续。
+
+### R2 FAIL 与修复路径（2026-11-12）
+
+首次 R2 **FAIL**：S2 的 `lagPad` 在 `lagMs` 窗口跨折返点 `m·P/2` 时按当前段方向单侧加宽，不是精确 `∃δ` 的保守覆盖；官方 `16.67ms` 可复现反例见 `.scratch/level-playability-v1.1-i02/reports/R2-review.md` §4.3。
+
+- **U2-08**：S2 / 残差等待 / U9 停留的 pad 保守化，并补跨折返点回归；
+- **U2-09**：修复后回归、白名单审计、实现报告与 R2 重审输入；
+- 之后由**新的独立会话**重审 U2-R2；首次 FAIL 报告保留，不得覆盖。
+- U2 仍未完成；U2-SIGN 继续被 U2-R2 阻塞。
 
 ### 冻结的扫描约束
 
@@ -103,8 +112,11 @@ U2-00 初始化与授权台账
                       └─ U2-05 Witness 编码、体积与确定性
                            └─ U2-06 测试矩阵与 D3 §11 反例
                                 └─ U2-07 回归 / 白名单审计 / 实现报告
-                                     └─ U2-R2 独立复核（独立会话）
-                                          └─ U2-SIGN 用户签署
+                                     └─ U2-R2 独立复核（首次 FAIL：S2 lagPad）
+                                          └─ U2-08 S2 lagPad 保守化 + 跨折返点回归
+                                               └─ U2-09 修复后回归 / 审计 / R2 输入
+                                                    └─ U2-R2 重审（新独立会话）
+                                                         └─ U2-SIGN 用户签署
 ```
 
 ## Decisions so far
@@ -121,7 +133,7 @@ U2-00 初始化与授权台账
 - 2026-11-12 · **U2-05 Witness 编码、体积与确定性** — `resolved`；`temporal-witness.ts` 只增 `encodeWitness`（`+662 / −2`，删除行只来自模块头注释）：W 从 N 个 spawn 相位沿 rank 严格递减后继到 Goal，去重转移进 `verifications`；U9 接近段 `∀k` + 规范相位格 N 个单格 stay wait + 出口 `∃j` 全进策略表，残差等待由 `phaseCoverage` 承载，termination 用有限 trace；`volume.bytes` = Witness 去掉 `volume` 的规范化 JSON 的 UTF-8 长度，超 `1M` / `64 MiB` ⇒ `witness-volume` 且无部分 witness；双档一次一档、跨档复用 U9 停留记录 ⇒ `model-out`；build / typecheck / input 65/65 / temporal 123/123 全绿，真实夹具 W 479,983 转移 / 32.5MB、U9 10,336 转移，探针全过 → [票](issues/06-u2-05-witness-encoding.md)。U2-06 unblocked。
 
 - 2026-11-12 · **U2-06 测试矩阵与 D3 §11 反例** — `resolved`；新增 `playability-temporal-witness.test.ts`（68 tests：网格 / 走廊 / spawn / 到达 / S1–S4 / 残差等待 / U9 / W / Witness / 双档 lag / 预算 / 确定性）与 `playability-temporal-fixtures.ts` 的**内存世界**夹具（raw object → `parseGameConfig` / `parseAssetPack`，无文件系统 / 无 JSON fixture）；D3 §11 十三条逐条覆盖且必须失败 / IE；build / typecheck / 定向 68/68 / input 65/65 全绿，`pnpm test` 173 files / 2742 tests exit 0（2 条已知 runner RPC 超时）；已知限制：S1 对真实走廊冗余、`maxCutsPerCheck` 只能由 U1 原语耗尽 → [票](issues/07-u2-06-tests.md)。U2-07 unblocked。
-- 2026-11-12 · **U2-07 回归 / 白名单审计 / 实现报告** — `resolved`；`pnpm build` / `pnpm typecheck` exit 0；U2 定向 68 + 65 = **133/133**；`pnpm test` 子会话两次 + 协调会话独立重跑均 **173 files / 2742 tests passed, exit 0**（最后一次 123.74s；0 测试超时 / 0 断言失败；仅 2 条已知 runner RPC unhandled error）；diff 产品路径**只有 U2 白名单 3 文件**，无新依赖 / JSON fixture / barrel / 公共导出；T-55 / T-57 / T-58 / T-61 / T-62 / T-64 全 PASS，`temporal-witness.ts` 不 import `temporal.ts`；报告与 R2 输入包 → [报告](reports/07-implementation.md) · [票](issues/08-u2-07-audit.md)。U2-R2 unblocked（需独立会话；本票未启动）。
+- 2026-11-12 · **U2-07 回归 / 白名单审计 / 实现报告** — `resolved`；`pnpm build` / `pnpm typecheck` exit 0；U2 定向 68 + 65 = **133/133**；`pnpm test` 子会话两次 + 协调会话独立重跑均 **173 files / 2742 tests passed, exit 0**（最后一次 123.74s；0 测试超时 / 0 断言失败；仅 2 条已知 runner RPC unhandled error）；diff 产品路径**只有 U2 白名单 3 文件**，无新依赖 / JSON fixture / barrel / 公共导出；T-55 / T-57 / T-58 / T-61 / T-62 / T-64 全 PASS，`temporal-witness.ts` 不 import `temporal.ts`；报告与 R2 输入包 → [报告](reports/07-implementation.md) · [票](issues/08-u2-07-audit.md)。U2-R2 已复核但 **FAIL**（S2 lagPad 非保守）；由 U2-08 / U2-09 修复与重审计后重审。
 
 
 ## Not yet specified
