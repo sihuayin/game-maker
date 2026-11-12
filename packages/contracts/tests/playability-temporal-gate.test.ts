@@ -485,6 +485,112 @@ describe("U3-05 forbiddenInjection", () => {
   });
 });
 
+describe("U3-06 D4 §11 反例（R3 范围：1–4、6、13）", () => {
+  const gateWorld = () => {
+    const { config, manifest } = witnessWorld({ hazardW: 20, hazardH: 20 });
+    return {
+      build: (forbiddenBoxes: readonly Aabb[]) =>
+        buildMovementGraph(config, manifest, undefined, { forbiddenBoxes }),
+    };
+  };
+
+  it("反例 1：门宽用 pad 或扫掠并集 ⇒ 必须只取闭式 w−d 核心", () => {
+    const gate = gateOf();
+    const sweptLeft = 50 - 0.5 * 20; // at − anchorX·w
+    const sweptWidth = 20 + 10; // w + d
+    const pad = ((2 * 10) / 200) * 16.67; // Witness 方向的假设 pad
+    expect(gate.width).toBe(10);
+    expect(gate.width).not.toBe(sweptWidth);
+    expect(gate.L).toBeGreaterThan(sweptLeft);
+    expect(gate.width).not.toBe(10 + 2 * pad);
+    expect(gate.L).not.toBe(50 - pad);
+  });
+
+  it("反例 2：只取上升段或按相位格采样 ⇒ 不能声称全周期", () => {
+    const coverage = resultOf().periodCoverage;
+    if (coverage === null) throw new Error("expected coverage");
+    expect(coverage.intervals).toHaveLength(2); // 上升段 + 下降段
+    expect(coverage.intervals[1]).toEqual([100, 200]);
+    const total = coverage.intervals.reduce((sum, [start, end]) => sum + (end - start), 0);
+    expect(total).toBe(coverage.periodMs);
+  });
+
+  it("反例 3：把整段扫掠区注入 forbiddenBoxes ⇒ 必须拒绝", () => {
+    const { build } = gateWorld();
+    const sweptRect: Aabb = { x: 40, y: 20, w: 30, h: 20 };
+    const result = computePermanentGate({
+      ...input(),
+      buildGraph: (forbiddenBoxes) => build(forbiddenBoxes.map(() => sweptRect)),
+    });
+    expect(result.gateStatus).toBe("INCOMPLETE");
+    expect(result.reason).toBe("geometry-untrusted");
+    expect(result.forbiddenInjection).toBeNull();
+  });
+
+  it("反例 4：手工预扩张门、再经 forbiddenBoxes 扩张 ⇒ 必须拒绝", () => {
+    const { build } = gateWorld();
+    const result = computePermanentGate({
+      ...input(),
+      buildGraph: (forbiddenBoxes) =>
+        build(forbiddenBoxes.map((box) => ({ x: box.x - 1, y: box.y, w: box.w + 2, h: box.h + 20 }))),
+    });
+    expect(result.gateStatus).toBe("INCOMPLETE");
+    expect(result.reason).toBe("geometry-untrusted");
+  });
+
+  it("反例 6：同侧 / 目标跨门 / 起点不在严格一侧 ⇒ 必须拒绝", () => {
+    const cases: readonly Partial<PermanentGateInput>[] = [
+      { goalRect: aabb(2, 20, 6, 20) }, // 同侧
+      { goalRect: aabb(45, 20, 20, 20) }, // 目标跨门
+      { spawnBox: boxFromFoot({ x: 51, y: 40 }, { w: 2, h: 20 }) }, // 起点跨门
+      { spawnBox: aabb(48.5, 20, 2, 20) }, // 起点右缘略超 L
+    ];
+    for (const overrides of cases) {
+      const result = resultOf(overrides);
+      expect(result.gateStatus).toBe("INCOMPLETE");
+      expect(result.reason).toBe("no-permanent-gate");
+      expect(result.sideRule).toBeNull();
+      expect(result.forbiddenInjection).toBeNull();
+    }
+  });
+
+  it("反例 13：把 Witness 的 lag pad 用到门区 ⇒ 门区不带 pad", () => {
+    const gate = gateOf();
+    const pad = ((2 * 10) / 200) * 16.67;
+    expect(gate.L).toBe(50);
+    expect(gate.R).toBe(60);
+    expect(gate.width).toBe(10);
+    expect(gate.L).not.toBe(50 - pad);
+    expect(gate.R).not.toBe(60 + pad);
+    expect(gateSource()).not.toContain("lagPad");
+  });
+
+  it("ε 不进碰撞谓词：同一门宽在不同 ε 下几何不变", () => {
+    const small = gateOf();
+    const scaled = gateOf({
+      ...withMotion({ distance: 100 }, { size: { w: 110, h: 20 } }),
+      goalRect: aabb(110, 20, 6, 20),
+    });
+    expect(scaled.epsilon).toBeGreaterThan(small.epsilon);
+    expect(scaled.width).toBe(small.width);
+    expect(scaled.L).toBe(95); // 50 + 100 − 0.5·110
+    expect(scaled.R).toBe(105); // 50 + 0.5·110
+    expect(gateSource()).not.toContain("overlapsStrict");
+  });
+
+  it("确定性与公共面：无随机 / 时间依赖、无新依赖、无 barrel 导出", () => {
+    const source = gateSource();
+    expect(source).not.toMatch(/Math\.random|Date\.now|performance\.now/);
+    expect(JSON.stringify(resultOf())).toBe(JSON.stringify(resultOf()));
+    for (const barrel of [
+      "packages/contracts/src/playability/index.ts",
+      "packages/contracts/src/index.ts",
+    ]) {
+      expect(fs.readFileSync(path.join(ROOT, barrel), "utf8"), barrel).not.toContain("temporal-gate");
+    }
+  });
+});
+
 describe("U3 依赖与公共面边界", () => {
   it("temporal-gate.ts 不 import temporal.ts / temporal-witness.ts", () => {
     const source = gateSource();

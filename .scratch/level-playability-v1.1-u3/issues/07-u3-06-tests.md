@@ -1,8 +1,8 @@
 # U3-06 测试矩阵与 D4 反例
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-06 session 2026-11-12)
 Blocked by: 06
 Map: ../map.md
 Class: U3 / IMPLEMENTATION
@@ -46,4 +46,22 @@ Class: U3 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 门区测试矩阵收束为 48 条，D4 §11 的 R3 范围反例（1–4、6、13）全部有断言；产品代码本票零改动。
+
+| 项 | 结果 |
+| --- | --- |
+| 测试文件 | `packages/contracts/tests/playability-temporal-gate.test.ts`（48 条） |
+| D4 §11 反例 | 1（pad / 扫掠并集门宽）、2（采样 / 只取上升段）、3（整段扫掠区注入）、4（预扩张再注入）、6（同侧 / 跨门 / 起点不严格在一侧）、13（Witness lag pad）均被拒绝或与闭式不符 |
+| ε | 仅作门宽阈值；同一门宽在不同 ε 下 `L/R/width` 不变；模块不使用 `overlapsStrict` |
+| 确定性与公共面 | 重复运行序列化相等；无 `Math.random` / `Date.now` / `performance.now`；无新依赖；无 barrel 导出 |
+| 架构断言 | T-55 / T-62 / T-64 保持 ✓；不 import `temporal.ts` / `temporal-witness.ts` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 gate 测试 | 退出码 **0**；**48 / 48 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed** |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+注：首轮有 1 条新用例失败（ε 对比用例未同步移动目标，判侧按设计拒绝）；修的是测试而非产品代码。
+
+证据：[`../evidence/06-tests.md`](../evidence/06-tests.md)。
+
+**下游**：U3-07（回归 / 白名单审计 / 实现报告）已 **unblocked**。本票未启动 U3-07。

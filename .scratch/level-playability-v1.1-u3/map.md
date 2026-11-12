@@ -132,6 +132,7 @@ U3-00 初始化与授权台账
 - [U3-03 全周期覆盖](issues/04-u3-03-period-coverage.md): `periodCoverage` 由闭式极值 `at` / `at+d` 生成，记录 `[[0,P/2],[P/2,P]]`（不合并）；模块无采样循环，非法周期 ⇒ `geometry-untrusted`。
 - [U3-04 判侧规则](issues/05-u3-04-side-rule.md): 精确 spawn 盒 + `goalRegion = inflate(goalRect, 0.5)`，两方向闭式判侧；同侧 / 跨门 / 无法判侧 ⇒ `no-permanent-gate`。
 - [U3-05 forbiddenInjection](issues/06-u3-05-forbidden-injection.md): 原始 `gateRect` 经 `buildGraph` 注入一次，`expandedRect` 记录；同源 / 掩码 / `standable` 逐项校验，预扩张与不同源 ⇒ `geometry-untrusted`。输入契约新增 `buildGraph` 回调（需 R3 关注）。
+- [U3-06 测试矩阵与 D4 反例](issues/07-u3-06-tests.md): gate 测试收束为 48 条；D4 §11 的 1–4、6、13 全部有断言，产品代码零改动。
 
 ## Not yet specified
 
