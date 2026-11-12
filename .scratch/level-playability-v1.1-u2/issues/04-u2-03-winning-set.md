@@ -32,7 +32,7 @@ Class: U2 / IMPLEMENTATION
 
 ## Answer
 
-Status: resolved（2026-11-12）。产品路径只改 `packages/contracts/src/playability/temporal-witness.ts`（只增 275 行）；未新增测试 / fixture / 公共 barrel 导出 / 依赖，未改 `temporal-result.ts` 的 D9 闭集。
+**2026-11-12 完成。**产品路径只改 `packages/contracts/src/playability/temporal-witness.ts`（只增 275 行）；未新增测试 / fixture / 公共 barrel 导出 / 依赖，未改 `temporal-result.ts` 的 D9 闭集。
 
 ### 实现摘要
 
