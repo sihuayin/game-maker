@@ -111,6 +111,8 @@ U2-00 初始化与授权台账
 
 <!-- 索引：每张已关闭票一行；细节在票里。 -->
 
+- 2026-11-12 · **U2-00 初始化 / 授权台账 / 基线** — `resolved`；授权包 SHA `797cd6fc…` 不变；基线全绿（`pnpm test` 172 files / 2674 tests，2 条已知 RPC 超时）；产品目录零改动 → [票](issues/01-u2-00-init.md) · [证据](evidence/00-baseline.md)。U2-01 unblocked。
+
 ## Not yet specified
 
 <!-- 路线由已签署授权包 D3 / D10 / §3.5 / §9.2 冻结；无已知雾区。任何新增文件 / 扩权需求 = STOP + HITL，不在此处自行毕业。 -->
