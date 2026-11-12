@@ -1,7 +1,7 @@
 # U2-R2 独立复核
 
 Type: task
-Status: open
+Status: resolved
 Owner: independent reviewer subagent (rerun) · 2026-11-12
 Blocked by: 11, 12
 Map: ../map.md
@@ -105,3 +105,56 @@ Class: U2 / REVIEW
 - 修复：U2-08；修复后审计：U2-09。
 - 本票保持 open，Owner 重置为 `—`；由**新的独立会话**在 U2-08 / U2-09 完成后 claim 并重审。
 - 首次 FAIL 报告保留，不得覆盖；重审结论另写，不得改写首次报告。
+
+## Re-review Answer
+
+**R2 重审结论：PASS —— 首次 FAIL 的 S2 / U9 项已解决；U2 可提交 U2-SIGN，R2 PASS 不替代用户签署。**
+
+Status: resolved
+
+- 报告（新文件，未覆盖首次报告）：`.scratch/level-playability-v1.1-i02/reports/R2-review-rerun.md`
+- 首次报告：`.scratch/level-playability-v1.1-i02/reports/R2-review.md`（FAIL，保留）
+- 复核人：**independent reviewer subagent (rerun), fresh context**；日期 **2026-11-12**
+- 授权包 SHA-256 现场复算匹配 `797cd6fc7b299e22b6e90b9ef8a9567376ea3a914d70f8b6f1fc0f9a6ecedc56`；
+  U2 全量 `23a2027..1fe09ef` 产品路径只含 3 个白名单文件；`1fe09ef..HEAD -- packages/ docs/` 为空。
+- 修复段 `f743c61..1fe09ef`：源码 +55/−44（真改产品逻辑，不是只改测试），测试 +117/−2
+  （新增 5 条跨折返点回归，未削弱原有断言）。
+
+### 首次 FAIL 是否解决
+
+| 首次 FAIL | 状态 | 独立证据 |
+| --- | --- | --- |
+| S2 `lagPad` 单侧加宽（首次报告 §4） | **已解决** | S2 / 残差等待 / U9 停留三处共用同一对称 pad helper；用首次报告原始参数（`at=(0,40)`、`anchor=(0,1)`、`lag=16.67`）独立复现：`verified:false` / `failure:"hazard"`；精确 `∃δ`（`u=211.6`，Hazard 盒 `[5.8,15.8]` vs 玩家 `[14,16]`）仍成立 |
+| U9 接近 / 出口继承 S2 | **已解决** | 接近 / 出口 / 停留共享同一 `verifyTransition` / `verifyU9Stay`；跨折返点 `move` 边判 `hazard`；反例场景 U9 `failed / residual-wait`，不再出证 |
+
+### 逐项结果（授权包 §9.2）
+
+| §9.2 项 | 判定 |
+| --- | --- |
+| Witness 模型 | PASS |
+| S1–S4 | **PASS（S2 已修复）** |
+| 残差等待 | PASS |
+| U9 | **PASS（继承项已修复）** |
+| 完整性 | PASS |
+| Witness 形状 | PASS |
+| 双档 | PASS（附 W 编码未绑定 lag 的残留风险） |
+| 反例 | PASS（D3 §11 13/13） |
+| 范围与模型条件 | PASS |
+| 未提前实现 U3/U4/U5 | PASS |
+| T-55/57/58/61/62/64 | PASS |
+
+### 命令重跑
+
+- `pnpm build` exit 0；`pnpm typecheck` exit 0。
+- witness `73 passed (73)`；input `65 passed (65)`；T-55/57/58/61/62/64 定向
+  `6 passed | 59 skipped (65)`。
+- `pnpm test` 两次均 exit 0：`173 passed` / `2747 passed`；两次分别为 4 / 5 条
+  `[vitest-worker]: Timeout calling "onTaskUpdate"` 工具层 RPC 超时（非断言失败，未作为 PASS 依据）。
+- 独立探针：S2 373 条 verified / **0 假验证**；残差等待 335 / **0**；U9 停留 215 / **0**；
+  W 最小不动点闭包 / rank / 全 N 格核查通过；Witness 编码不变量通过；U9 跨档 `model-out`。
+
+### 未运行 / 风险
+
+- 未运行真实 19 关语料 / 性能分布（R2 不要求）；未读取作者实现 / 修复报告 / 地图 / 其它票（硬约束）。
+- 残留风险：W 编码未绑定 hazard / lag 来源（实测 0ms 结果用 200ms 请求仍编码成功）；
+  全量测试工具层 RPC 超时；D9 原因码映射偏宽。均不构成 §9.2 FAIL。
