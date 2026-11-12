@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Owner: —
+Owner: amber（用户签署）· 2026-11-12
 Blocked by: 09
 Map: ../map.md
 Class: U2 / SIGN
