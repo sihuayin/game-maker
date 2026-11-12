@@ -1,7 +1,7 @@
 # U2-07 回归、白名单审计与实现报告
 
 Type: task
-Status: resolved
+Status: open
 Owner: claude (U2-07 audit session 2026-11-12)
 Blocked by: 07
 Map: ../map.md
@@ -84,3 +84,7 @@ Class: U2 / AUDIT
 ### 下游
 
 U2-R2 已 unblocked（独立会话、独立复核），**本票未启动 R2**。R2 PASS 不等于 U3 授权，也不等于 U2 签署。
+
+### 重开记录（2026-11-12）
+
+用户要求：**全量重跑通过后再关票**。票暂时重开，等待协调会话独立重跑 `pnpm test`；通过后恢复 `resolved`，未通过则保持 open 并记录失败项。
