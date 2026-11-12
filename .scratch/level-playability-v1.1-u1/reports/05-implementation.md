@@ -15,11 +15,11 @@
 
 | 命令 | 退出码 | 计数 / 备注 | 日志 |
 | --- | ---: | --- | --- |
-| `pnpm build` | 0 | `tsc -b` + 各包 bundle 完成 | [`evidence/05-build.log`](../evidence/05-build.log) |
-| `pnpm typecheck` | 0 | 10 个 workspace 包全部 Done | [`evidence/05-typecheck.log`](../evidence/05-typecheck.log) |
-| `pnpm exec vitest run packages/contracts/tests/playability-temporal-motion.test.ts packages/contracts/tests/playability-temporal-budget.test.ts` | 0 | **2 files / 58 tests passed** | [`evidence/05-vitest-u1.log`](../evidence/05-vitest-u1.log) |
-| `pnpm exec vitest run packages/contracts/tests/playability-temporal-input.test.ts --reporter=verbose` | 0 | **1 file / 65 tests passed**（含 T-55～T-65） | [`evidence/05-architecture.log`](../evidence/05-architecture.log) |
-| `pnpm test` | 0 | **172 files / 2674 tests passed**；2 条已知 `[vitest-worker]: Timeout calling "onTaskUpdate"`（与 U1-00 基线同型，非产品失败） | [`evidence/05-test.log`](../evidence/05-test.log) |
+| `pnpm build` | 0 | `tsc -b` + 各包 bundle 完成 | `evidence/05-build.log` |
+| `pnpm typecheck` | 0 | 10 个 workspace 包全部 Done | `evidence/05-typecheck.log` |
+| `pnpm exec vitest run packages/contracts/tests/playability-temporal-motion.test.ts packages/contracts/tests/playability-temporal-budget.test.ts` | 0 | **2 files / 58 tests passed** | `evidence/05-vitest-u1.log` |
+| `pnpm exec vitest run packages/contracts/tests/playability-temporal-input.test.ts --reporter=verbose` | 0 | **1 file / 65 tests passed**（含 T-55～T-65） | `evidence/05-architecture.log` |
+| `pnpm test` | 0 | **172 files / 2674 tests passed**；2 条已知 `[vitest-worker]: Timeout calling "onTaskUpdate"`（与 U1-00 基线同型，非产品失败） | `evidence/05-test.log` |
 
 基线（U1-00）：170 files / 2616 tests。U1-04 新增 2 个测试文件 / 58 条测试，全量计数与增量一致。
 
@@ -54,7 +54,7 @@
 - `fixtures/**`、`packages/demo/**`、`packages/assets/**`、`packages/pipeline/**`、`packages/cli/**`、`packages/mcp/**`、`packages/contracts/tests/fixtures/**` 零改动。
 - `graph.ts` / `profile.ts` / `temporal-input.ts` / `playability/index.ts` / `contracts/src/index.ts` / `api.ts` 零改动。
 
-审计原始输出：[`evidence/05-diff-audit.log`](../evidence/05-diff-audit.log)。
+审计原始输出：`evidence/05-diff-audit.log`。
 
 ## 3. 白名单核对
 
