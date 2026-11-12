@@ -7,7 +7,7 @@ Authority: [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md) @ `sha256:
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `ed02339`
 Branch: `wayfinder/level-playability-v1.1-u1`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-11 开图
+Status: closed · 2026-11-12（R1 PASS + 用户签署；U1 收口，U2 未授权）
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U1；不进入 U2，不接生产，不发布公共 Verdict。
 >
@@ -113,6 +113,7 @@ U1-00 初始化与基线
 - [U1-04 测试矩阵与 TEST_ONLY 夹具](issues/05-u1-04-tests.md): 35 条运动 / 几何 / ε / 连续求交 + 23 条预算 / 确定性测试落地；6 处 P0 差异、采样陷阱、折返点相切全覆盖；无 JSON / fs 夹具；定向 58 tests、全量 172 files / 2674 tests 绿。
 - [U1-05 回归、白名单 / diff 审计与实现报告](issues/06-u1-05-regression-audit.md): 全量 172 files / 2674 tests、定向 58 tests 全绿；7 文件产品改动严格在白名单内、`temporal.ts` 纯增；无新依赖 / 公共导出 / fixture；报告与 R1 输入包见 [`reports/05-implementation.md`](reports/05-implementation.md)。
 - [U1-R1 独立复核](issues/07-u1-r1-review.md): 未参与编写的独立复核子代理逐项 **PASS 7/7**（无 FAIL / NOT_RUN）；build / typecheck / 定向 58 / 架构 65 / 全量 172 files·2674 tests 全绿；diff 仅 7 个白名单文件；正式报告 `.scratch/level-playability-v1.1-i02/reports/R1-review.md`，签署栏留空待 U1-SIGN。
+- [U1-SIGN 用户签署 R1](issues/08-u1-sign.md): `amber` 于 2026-11-12 签署 U1（范围 U1 / I-02 R1，R1 PASS 7/7）；地图收口，U1 完成；**签署不等于 U2 授权**，未推送 / 未建 PR / 未启动 U2。
 
 ## Not yet specified
 

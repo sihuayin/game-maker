@@ -1,7 +1,7 @@
 # U1-SIGN 用户签署 R1
 
 Type: grilling
-Status: open
+Status: resolved
 Owner: amber（用户签署）· 2026-11-12
 Blocked by: 07
 Map: ../map.md
@@ -31,3 +31,14 @@ Class: U1 / SIGN
 ### 下游
 
 无（U1 收口）。U2 实现是独立 effort / 独立授权。
+
+## Answer
+
+**2026-11-12 用户签署 U1。签署人 `amber`。**
+
+- 签署范围：**U1 / I-02 R1**。
+- 结论：R1 PASS（§9.1 七项全 PASS，无 FAIL / NOT_RUN），**U1 完成**。
+- 依据：`.scratch/level-playability-v1.1-i02/reports/R1-review.md`；签署栏已填入 §9。
+- 地图收口：`Status: closed`；`Decisions so far` 补 U1-SIGN 条目。
+- **签署不等于 U2 授权**：U2 仍需独立复核 + 单独的增量签署。
+- 未推送、未创建 PR、未合并；未启动 U2。

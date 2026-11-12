@@ -217,10 +217,10 @@ sig wallClock/detail excluded -> true；cutPoints/grid/reason/budget covered -> 
 
 ---
 
-## 9. 用户签署栏（由 U1-SIGN 填写，保持留空）
+## 9. 用户签署栏（已由 U1-SIGN 填写）
 
 | 签署人 | 范围 | 结论 | 日期 | 备注 |
 | --- | --- | --- | --- | --- |
-|  | U1 / I-02 R1 |  |  |  |
+| amber | U1 / I-02 R1 | 签署 U1 完成（R1 PASS 7/7） | 2026-11-12 | 签署不等于 U2 授权 |
 
 > R1 PASS 只表示独立复核通过，不表示 U1 已完成，也不替代 U1-SIGN 用户签署。
