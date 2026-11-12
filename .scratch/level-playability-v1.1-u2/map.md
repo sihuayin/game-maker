@@ -112,6 +112,7 @@ U2-00 初始化与授权台账
 <!-- 索引：每张已关闭票一行；细节在票里。 -->
 
 - 2026-11-12 · **U2-00 初始化 / 授权台账 / 基线** — `resolved`；授权包 SHA `797cd6fc…` 不变；基线全绿（`pnpm test` 172 files / 2674 tests，2 条已知 RPC 超时）；产品目录零改动 → [票](issues/01-u2-00-init.md) · [证据](evidence/00-baseline.md)。U2-01 unblocked。
+- 2026-11-12 · **U2-01 状态格 / 静态走廊 / 精确 spawn / 到达** — `resolved`；新增 `temporal-witness.ts`（唯一产品改动）：`xStep=1`、`N`/`N_max`/容量/`phaseGridCapped`、`standable-run` 走廊（合法范围裁剪）、`boxFromFoot` 精确 spawn、取整 Goal Rect 内缩 0.5px 到达；失败只用 D9 闭集原因码（`spawn-not-standable` 记为 `gap`，不扩闭集）；build / typecheck / input 65/65 全绿 → [票](issues/02-u2-01-grid-corridor-spawn.md)。U2-02 unblocked。
 
 ## Not yet specified
 
