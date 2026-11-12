@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `23a2027`（已含签署 U1）
 Branch: `wayfinder/level-playability-v1.1-u2`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-12 开图
+Status: closed · 2026-11-12（R2 PASS + 用户签署；U2 收口，U3 未授权）
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U2（I02-02：安全通过 Witness）；不进入 U3–U5，不接生产，不发布公共 Verdict。
 >
@@ -70,7 +70,7 @@ Status: open · 2026-11-12 开图
 - **U2-09**：修复后回归、白名单审计、实现报告与 R2 重审输入；
 - 之后由**新的独立会话**重审 U2-R2；首次 FAIL 报告保留，不得覆盖。
 - **2026-11-12 重审 PASS**：首次 S2 / U9 FAIL 均已解决；报告 `.scratch/level-playability-v1.1-i02/reports/R2-review-rerun.md`，首次 FAIL `R2-review.md` 保留。
-- U2 仍未完成；**U2-SIGN 已 unblocked**，等待用户签署。R2 PASS 不等于 U3 授权。
+- **2026-11-12 用户 `amber` 签署 U2**（范围 U2 / I-02 R2）；地图收口。R2 PASS 与签署均不等于 U3 授权。
 
 ### 冻结的扫描约束
 
@@ -139,6 +139,7 @@ U2-00 初始化与授权台账
 
 - 2026-11-12 · **U2-09 修复后回归 / 审计 / R2 输入** — `resolved`；build / typecheck exit 0；U2 定向 73 + 65 = **138/138**（另 `[R2-FIX]` 过滤 5/5、input verbose 65/65）；`pnpm test` 两次均 **173 files / 2747 tests passed, exit 0**（每次 5 条已知 vitest worker `onTaskUpdate` RPC 超时，非断言失败）；R2 §4.3 `16.67ms` 反例由测试 + 独立复算确认为 `verified:false` / `failure:"hazard"`；diff 产品路径仍只 3 白名单文件、`docs/` 零 diff、授权包 SHA 不变；T-55/57/58/61/62/64 全 PASS；R2 重审输入包 → [报告](reports/08-fix-implementation.md) · [票](issues/12-u2-09-fix-audit.md)。R2 重审（新独立会话）unblocked；首次 FAIL 报告保留，重审结论写入 `R2-review-rerun.md`。
 - [U2-R2 独立复核](issues/09-u2-r2-review.md): 首次 **FAIL**（S2 lagPad 单侧 pad 非保守）→ U2-08 对称 pad 修复 → U2-09 重审计 → 独立重审 **PASS**；首次 S2 / U9 FAIL 已解决；报告 `R2-review-rerun.md`（首次 `R2-review.md` 保留）；U2-SIGN unblocked，R2 PASS 不等于 U3 授权。
+- [U2-SIGN 用户签署 R2](issues/10-u2-sign.md): `amber` 于 2026-11-12 签署 U2（范围 U2 / I-02 R2，R2 重审 PASS）；地图收口，U2 完成；**签署不等于 U3 授权**，未推送 / 未建 PR / 未启动 U3。
 
 ## Not yet specified
 

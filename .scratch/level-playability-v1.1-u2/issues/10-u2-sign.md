@@ -1,7 +1,7 @@
 # U2-SIGN 用户签署 R2
 
 Type: grilling
-Status: open
+Status: resolved
 Owner: amber（用户签署）· 2026-11-12
 Blocked by: 09
 Map: ../map.md
@@ -31,3 +31,15 @@ Class: U2 / SIGN
 ### 下游
 
 无（U2 收口）。U3 实现是独立 effort / 独立授权。
+
+## Answer
+
+**2026-11-12 用户签署 U2。签署人 `amber`。**
+
+- 签署范围：**U2 / I-02 R2**。
+- 结论：R2 重审 **PASS**（§9.2 九类全 PASS，无 FAIL / NOT_RUN），**U2 完成**。
+- 依据：`.scratch/level-playability-v1.1-i02/reports/R2-review-rerun.md`；签署栏已填入 §7。
+- 首次 R2 FAIL 报告 `R2-review.md` 保留；S2 / U9 两项已由 U2-08 修复、U2-09 重审计与独立重审解决。
+- 地图收口：`Status: closed`。
+- **签署不等于 U3 授权**：U3 仍需 R2 PASS + 单独的增量签署。
+- 未推送、未创建 PR、未合并；未启动 U3。
