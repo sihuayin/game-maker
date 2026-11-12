@@ -1,7 +1,7 @@
 # U2-07 回归、白名单审计与实现报告
 
 Type: task
-Status: open
+Status: resolved
 Owner: claude (U2-07 audit session 2026-11-12)
 Blocked by: 07
 Map: ../map.md
@@ -88,3 +88,14 @@ U2-R2 已 unblocked（独立会话、独立复核），**本票未启动 R2**。
 ### 重开记录（2026-11-12）
 
 用户要求：**全量重跑通过后再关票**。票暂时重开，等待协调会话独立重跑 `pnpm test`；通过后恢复 `resolved`，未通过则保持 open 并记录失败项。
+
+### 全量重跑确认（2026-11-12，协调会话）
+
+- 命令：`pnpm test`
+- 退出码：**0**
+- 计数：**173 files / 2742 tests passed**，Duration **123.74s**
+- 测试超时：**0**；断言失败：**0**
+- 仅 2 条已知 `[vitest-worker]: Timeout calling "onTaskUpdate"` runner RPC unhandled error（不影响退出码）
+- 原始日志：`evidence/07-test-rerun-confirm.log`（本地，`*.log` 被 `.gitignore` 忽略）
+
+重跑通过 ⇒ 恢复 `Status: resolved`。
