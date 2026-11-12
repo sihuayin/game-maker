@@ -116,6 +116,7 @@ U2-00 初始化与授权台账
 - 2026-11-12 · **U2-02 wait / move、S1–S4 与预算计数** — `resolved`；`temporal-witness.ts` 只增：`(footX,k)` 转移（wait / move、`|Δx| ≤ maxStep`、整周期偏移）、S1 扫掠并集连续静态检查、S2 折返点切段 + 分段方向 `lagPad` 的保守加宽盒逐段 `intersectContinuous`、S3 单相位格、S4 链式连续、残差等待整格覆盖（`symbolic / conservative-over-cell`）、`createWitnessWorkBudget`（分列 `statesEnqueued` / `statesVisited` / `edgesChecked`，按 `segmentsTotal` 执行 `maxCutsPerBranch`，墙钟仅 abort）；build / typecheck / input 65/65 全绿 → [票](issues/03-u2-02-wait-move.md)。U2-03 unblocked。
 
 - 2026-11-12 · **U2-03 全相位 Winning Set 与终止性** — `resolved`；`temporal-witness.ts` 只增 `searchWinningSet`（最小不动点 `μX.(Goal ∪ Pre∃(X))`、反向 BFS、Goal rank 0、策略 rank 严格递减）；`N` 个半开相位格先整格残差等待、再检查 `(spawn.footX,(k+1) mod N) ∈ W`；`complete / failed / insufficient`，失败用 D9 `no-witness-found`、耗尽用实际预算原因码，均只导 IE；复用 U9+W 共用 `WitnessWorkBudget`；build / typecheck / input 65/65 全绿 → [票](issues/04-u2-03-winning-set.md)。U2-04 unblocked。
+- 2026-11-12 · **U2-04 U9 安全等待格证书** — `resolved`；`temporal-witness.ts` 只增 `searchU9WaitingCell` / `verifyU9Stay` / `isValidWaitingCell`，并把 U2-03 反向 BFS 抽为内部 `solveWinningCore`（目标集可泛化为任意 x 列，旧 API / 语义不变）；U9 四项（standable 走廊格、接近段 `∀k` 残差等待 + `W_{→s}` 严格递减 rank、`[T_arr,T_arr+P]` 只在折返点切段 + 方向 `lagPad` 的解析停留检查、出口 `∃j` 最小 rank 相位）；`coverage.temporal` / 玩家几何作为显式前置，失败用 D9 `geometry-untrusted`；U9 + W 共用同一 `WitnessWorkBudget`；build / typecheck / input 65/65 全绿，探针 26/26 → [票](issues/05-u2-04-u9.md)。U2-05 unblocked。
 
 ## Not yet specified
 
