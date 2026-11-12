@@ -120,6 +120,8 @@ U2-00 初始化与授权台账
 
 - 2026-11-12 · **U2-05 Witness 编码、体积与确定性** — `resolved`；`temporal-witness.ts` 只增 `encodeWitness`（`+662 / −2`，删除行只来自模块头注释）：W 从 N 个 spawn 相位沿 rank 严格递减后继到 Goal，去重转移进 `verifications`；U9 接近段 `∀k` + 规范相位格 N 个单格 stay wait + 出口 `∃j` 全进策略表，残差等待由 `phaseCoverage` 承载，termination 用有限 trace；`volume.bytes` = Witness 去掉 `volume` 的规范化 JSON 的 UTF-8 长度，超 `1M` / `64 MiB` ⇒ `witness-volume` 且无部分 witness；双档一次一档、跨档复用 U9 停留记录 ⇒ `model-out`；build / typecheck / input 65/65 / temporal 123/123 全绿，真实夹具 W 479,983 转移 / 32.5MB、U9 10,336 转移，探针全过 → [票](issues/06-u2-05-witness-encoding.md)。U2-06 unblocked。
 
+- 2026-11-12 · **U2-06 测试矩阵与 D3 §11 反例** — `resolved`；新增 `playability-temporal-witness.test.ts`（68 tests：网格 / 走廊 / spawn / 到达 / S1–S4 / 残差等待 / U9 / W / Witness / 双档 lag / 预算 / 确定性）与 `playability-temporal-fixtures.ts` 的**内存世界**夹具（raw object → `parseGameConfig` / `parseAssetPack`，无文件系统 / 无 JSON fixture）；D3 §11 十三条逐条覆盖且必须失败 / IE；build / typecheck / 定向 68/68 / input 65/65 全绿，`pnpm test` 173 files / 2742 tests exit 0（2 条已知 runner RPC 超时）；已知限制：S1 对真实走廊冗余、`maxCutsPerCheck` 只能由 U1 原语耗尽 → [票](issues/07-u2-06-tests.md)。U2-07 unblocked。
+
 ## Not yet specified
 
 <!-- 路线由已签署授权包 D3 / D10 / §3.5 / §9.2 冻结；无已知雾区。任何新增文件 / 扩权需求 = STOP + HITL，不在此处自行毕业。 -->
