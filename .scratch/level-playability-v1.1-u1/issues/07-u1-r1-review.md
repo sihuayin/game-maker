@@ -71,5 +71,3 @@ Class: U1 / REVIEW
 - **Diff scope**：仅 7 个 U1 白名单产品文件（`temporal.ts` 纯增）与 `.scratch/level-playability-v1.1-u1/**`；无新依赖、无 JSON fixture、无公共导出、无生产接线、未提前执行 `maxCutsPerBranch` / Witness 体积 / 相位网格搜索。
 - **未覆盖项**：`analyzeTemporalInternal` 按 U1 范围未实现；A–J 矩阵属 U2+；墙钟 `>=` 边界约定、`maxEdges: 0` 覆盖等观察见报告 §7（均不构成 R1 FAIL）。
 - **复核人**：independent reviewer subagent, fresh context · 2026-11-12
-
-Status: resolved
