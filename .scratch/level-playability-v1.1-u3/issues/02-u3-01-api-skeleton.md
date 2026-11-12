@@ -1,8 +1,8 @@
 # U3-01 门区模块 API 骨架与输入契约
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-01 session 2026-11-12)
 Blocked by: 01
 Map: ../map.md
 Class: U3 / IMPLEMENTATION
@@ -51,4 +51,22 @@ Class: U3 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 门区半部 API 骨架与输入契约就位；未实现任何门区语义。
+
+| 项 | 结果 |
+| --- | --- |
+| 新增（白名单内） | `packages/contracts/src/playability/temporal-gate.ts`、`packages/contracts/tests/playability-temporal-gate.test.ts` |
+| 入口 | `computePermanentGate(input: PermanentGateInput): PermanentGateHalf`（`@internal`） |
+| 输入 | `motion` / `hazard` / `playerSize` / `spawnBox` / `goalRect` / 只读 `graph`；不解析 `GameConfig` |
+| 输出 | `gate` / `periodCoverage` / `sideRule` / `forbiddenInjection` 取自 D9 `PermanentGateProof` 索引类型；`gateStatus: ProofStatus`；`reason: DegradationReason \| null` |
+| 骨架行为 | 恒 `INCOMPLETE` + `no-permanent-gate`，四个半部 `null`；原因闭集只用 `no-permanent-gate` / `geometry-untrusted` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 gate 测试 | 退出码 **0**；**11 / 11 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed**；T-55 / T-57 / T-58 / T-61 / T-62 / T-64 保持 ✓ |
+| 依赖边界 | 只 import `./geometry.js` / `./graph.js` / `./temporal-motion.js` / `./temporal-result.js`；不 import `temporal.ts` / `temporal-witness.ts` |
+| 公共面 | 不进任何 barrel；导出符号全标 `@internal` |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+证据：[`../evidence/01-api-skeleton.md`](../evidence/01-api-skeleton.md)（原始输出 `../evidence/01-{build,typecheck,gate,temporal-input}.log`，`*.log` 不入库）。
+
+**下游**：U3-02（门区几何与闭式公式）已 **unblocked**。本票未启动 U3-02。

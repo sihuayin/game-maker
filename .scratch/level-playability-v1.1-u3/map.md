@@ -127,6 +127,7 @@ U3-00 初始化与授权台账
 ## Decisions so far
 
 - [U3-00 初始化、授权台账与基线](issues/01-u3-00-init.md): 基线全绿（build/typecheck 0，全量 2747 tests passed）；增量授权记录 04 就绪，仅 U3 + R3；R3 协议已冻结（报告 `R3-review.md`、会话隔离、逐项 PASS/FAIL/NOT_RUN）。
+- [U3-01 门区模块 API 骨架与输入契约](issues/02-u3-01-api-skeleton.md): `computePermanentGate` 契约冻结（输入为已派生显式几何，输出取 D9 索引类型）；骨架恒 `INCOMPLETE` + `no-permanent-gate`，原因闭集两项，无 barrel 导出。
 
 ## Not yet specified
 
