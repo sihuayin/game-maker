@@ -112,6 +112,7 @@ U1-00 初始化与基线
 - [U1-03 `temporal.ts` 类型、签名辅助与导入](issues/04-u1-03-temporal-wiring.md): 内部入口类型 + FNV-1a 确定性签名落地；签名排除 `wallClockMs` / `detail` / `budgetProfile`，键序无关；`analyzeTemporalInternal` 仍未实现；架构断言 65/65、全量 2616 绿。
 - [U1-04 测试矩阵与 TEST_ONLY 夹具](issues/05-u1-04-tests.md): 35 条运动 / 几何 / ε / 连续求交 + 23 条预算 / 确定性测试落地；6 处 P0 差异、采样陷阱、折返点相切全覆盖；无 JSON / fs 夹具；定向 58 tests、全量 172 files / 2674 tests 绿。
 - [U1-05 回归、白名单 / diff 审计与实现报告](issues/06-u1-05-regression-audit.md): 全量 172 files / 2674 tests、定向 58 tests 全绿；7 文件产品改动严格在白名单内、`temporal.ts` 纯增；无新依赖 / 公共导出 / fixture；报告与 R1 输入包见 [`reports/05-implementation.md`](reports/05-implementation.md)。
+- [U1-R1 独立复核](issues/07-u1-r1-review.md): 未参与编写的独立复核子代理逐项 **PASS 7/7**（无 FAIL / NOT_RUN）；build / typecheck / 定向 58 / 架构 65 / 全量 172 files·2674 tests 全绿；diff 仅 7 个白名单文件；正式报告 `.scratch/level-playability-v1.1-i02/reports/R1-review.md`，签署栏留空待 U1-SIGN。
 
 ## Not yet specified
 
