@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-u3` @ `1405c3f`（含 U3 实现、R3 与 U3-SIGN；**U3 尚未并入 i02**）
 Branch: `wayfinder/level-playability-v1.1-u4`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-12 · U4-02 完成（未推送）；**U4 实施 `BLOCKED`（待 U4-03 合并门）**
+Status: open · 2026-11-12 · U4-03 已推送并建 [PR #37](https://github.com/sihuayin/game-maker/pull/37)（CI pending）；**U4 实施 `BLOCKED`（待合并）**
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**用户 2026-11-12 授权的 U4（I02-04：垂直规避图割）；不进入 U5，不改 `reach.ts`，不接生产，不发布公共 Verdict。
 >

@@ -1,8 +1,8 @@
 # U4-03 graph.ts 尾参独立 PR 推送与合并门
 
 Type: task
-Status: open
-Owner: —
+Status: in-progress
+Owner: claude (U4-03 session 2026-11-12) / merge pending user confirmation
 Blocked by: 03
 Map: ../map.md
 Class: U4 / APPROVAL (HITL)
