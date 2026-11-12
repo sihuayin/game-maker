@@ -31,10 +31,12 @@
 //
 //   `gate.epsilon` 是 I-00 §6.4 的**单一具名常量**
 //   （`temporal-motion.ts` 的 `epsilon(xMin, xMax)`），只用于门宽 / 显式区间阈值，
-//   **不进入**碰撞谓词。
+//   **不进入**碰撞谓词。x 域取 Hazard 锚点的全周期行程 `[at.x, at.x + distance]`：
+//   它是本层唯一独立的长度标尺（用门宽自身作标尺会让 `width > ε` 退化为恒真）。
 // ─────────────────────────────────────────────────────────────────────────────
 import type { Aabb, Size } from "./geometry.js";
 import type { MovementGraph } from "./graph.js";
+import { epsilon } from "./temporal-motion.js";
 import type { HazardBoxSpec, TriangleMotion } from "./temporal-motion.js";
 import type { DegradationReason, PermanentGateProof, ProofStatus } from "./temporal-result.js";
 
@@ -92,25 +94,98 @@ export type PermanentGateInput = {
   readonly graph: MovementGraph;
 };
 
+// ── 失败构造 ────────────────────────────────────────────────────────────────
+
+/** @internal 门区几何判定结果；失败原因只取 D9 闭集的 U3 两项。 */
+type GateGeometryCheck =
+  | { readonly ok: true; readonly gate: GateGeometry }
+  | { readonly ok: false; readonly reason: DegradationReason };
+
+const incomplete = (reason: DegradationReason): PermanentGateHalf => ({
+  gate: null,
+  periodCoverage: null,
+  sideRule: null,
+  forbiddenInjection: null,
+  gateStatus: "INCOMPLETE",
+  reason,
+});
+
+// ── 门区闭式（D4 §1.1） ─────────────────────────────────────────────────────
+
+/**
+ * @internal
+ * 门区闭式几何与有效性判定。
+ *
+ * ```text
+ * L = at + d − anchorX·w
+ * R = at + (1 − anchorX)·w
+ * width = w − d
+ * ```
+ *
+ * 有效条件：`width > ε`；Hazard 盒 y 区间与玩家盒 y 区间**严格重叠**。
+ * 门区**不加** Witness 的 lag pad、不用整段扫掠区、不预扩张（D4 §1.4）。
+ * 非法周期 / 非有限数值 / 非法几何 ⇒ `geometry-untrusted`，不静默修复；
+ * 门宽或 y 区间不成立 ⇒ `no-permanent-gate`。
+ */
+const gateGeometryOf = (input: PermanentGateInput): GateGeometryCheck => {
+  const { motion, hazard, playerSize, spawnBox } = input;
+  const numeric = [
+    motion.at.x, motion.at.y, motion.distance, motion.periodMs,
+    hazard.size.w, hazard.size.h, hazard.anchor.x, hazard.anchor.y,
+    playerSize.w, playerSize.h, spawnBox.x, spawnBox.y, spawnBox.w, spawnBox.h,
+  ];
+  if (numeric.some((value) => !Number.isFinite(value))) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  if (!(motion.periodMs > 0) || motion.distance < 0) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  if (!(hazard.size.w > 0) || !(hazard.size.h > 0) || !(playerSize.w > 0) || !(playerSize.h > 0)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  if (hazard.anchor.x < 0 || hazard.anchor.x > 1 || hazard.anchor.y < 0 || hazard.anchor.y > 1) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  if (!(spawnBox.w > 0) || !(spawnBox.h > 0)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+
+  const width = hazard.size.w - motion.distance;
+  const threshold = epsilon(motion.at.x, motion.at.x + motion.distance);
+  if (!(width > threshold)) return { ok: false, reason: "no-permanent-gate" };
+
+  const hazY = motion.at.y - hazard.anchor.y * hazard.size.h;
+  const hazH = hazard.size.h;
+  // 严格重叠：贴边不算（Hazard 与玩家盒仅在边界接触时不可能挡住玩家）。
+  if (!(hazY < spawnBox.y + spawnBox.h && spawnBox.y < hazY + hazH)) {
+    return { ok: false, reason: "no-permanent-gate" };
+  }
+
+  const L = motion.at.x + motion.distance - hazard.anchor.x * hazard.size.w;
+  const R = motion.at.x + (1 - hazard.anchor.x) * hazard.size.w;
+  return { ok: true, gate: { L, R, width, y: hazY, height: hazH, epsilon: threshold } };
+};
+
 // ── 入口 ────────────────────────────────────────────────────────────────────
 
 /**
  * @internal
  * U3 门区半部的入口。
  *
- * U3-01 只建立 API 契约与输入边界：始终返回 `INCOMPLETE` + `no-permanent-gate`，
- * 不计算任何门区半部。几何闭式（U3-02）、全周期覆盖（U3-03）、判侧（U3-04）与
- * `forbiddenInjection`（U3-05）由后续票逐段填充；在填满之前，**不得**返回
- * `COMPLETE`，也不得以「部分结果」冒充证明。
+ * U3-02 只填 `gate`；`periodCoverage`（U3-03）、`sideRule`（U3-04）与
+ * `forbiddenInjection`（U3-05）仍为 `null`。门区几何有效时 `gateStatus` 为
+ * `COMPLETE`，但这只是**门区半部**完成，不代表完整 `PermanentGateProof` ——
+ * `graphCut` / hop / 模型闭合归 U4 / U5，**不得**在本模块伪造。
  */
 export const computePermanentGate = (input: PermanentGateInput): PermanentGateHalf => {
-  void input;
+  const geometry = gateGeometryOf(input);
+  if (!geometry.ok) return incomplete(geometry.reason);
   return {
-    gate: null,
+    gate: geometry.gate,
     periodCoverage: null,
     sideRule: null,
     forbiddenInjection: null,
-    gateStatus: "INCOMPLETE",
-    reason: "no-permanent-gate",
+    gateStatus: "COMPLETE",
+    reason: null,
   };
 };

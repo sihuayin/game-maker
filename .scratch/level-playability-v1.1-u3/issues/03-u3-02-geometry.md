@@ -1,8 +1,8 @@
 # U3-02 门区几何与闭式公式
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-02 session 2026-11-12)
 Blocked by: 02
 Map: ../map.md
 Class: U3 / IMPLEMENTATION
@@ -49,4 +49,21 @@ Class: U3 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 门区闭式几何与有效性判定就位；周期覆盖 / 判侧 / 注入仍未实现。
+
+| 项 | 结果 |
+| --- | --- |
+| 闭式 | `L = at + d − anchorX·w`、`R = at + (1 − anchorX)·w`、`width = w − d`、`y = at.y − anchorY·h`、`height = h` |
+| 有效条件 | `width > ε` 且 Hazard y 区间与玩家盒 y 区间**严格重叠**（相切不算） |
+| ε 域 | `[at.x, at.x + d]`（锚点全周期行程）；不用门宽自身作标尺，否则阈值恒真 |
+| 失败分类 | 非有限 / 非法周期 / 非法几何 ⇒ `geometry-untrusted`；`width ≤ ε` / y 不相交 ⇒ `no-permanent-gate` |
+| 无 pad | 门区取恒覆盖核心，不等于扫掠区，不带宽高 pad、不预扩张 |
+| 有效输出 | `gate` + `gateStatus: "COMPLETE"`；其余半部 `null` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 gate 测试 | 退出码 **0**；**17 / 17 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed**；架构断言保持 ✓ |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+证据：[`../evidence/02-geometry.md`](../evidence/02-geometry.md)。
+
+**下游**：U3-03（全周期覆盖）已 **unblocked**。本票未启动 U3-03。
