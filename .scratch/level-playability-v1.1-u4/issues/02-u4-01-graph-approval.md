@@ -1,8 +1,8 @@
 # U4-01 graph.ts HopSampling 独立增量审批
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-01 session 2026-11-12) + amber (approval 2026-11-12)
 Blocked by: 01
 Map: ../map.md
 Class: U4 / APPROVAL (HITL)
@@ -44,3 +44,21 @@ Class: U4 / APPROVAL (HITL)
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。用户 `amber` 于 2026-11-12 书面批准** `graph.ts` 的 `HopSampling` 可选尾参提案（**命名导出**），未修改任何产品代码。
+
+| 项 | 结果 |
+| --- | --- |
+| 审批记录 | [`.scratch/level-playability-v1.1-i02/reports/06-u4-graph-approval.md`](../../level-playability-v1.1-i02/reports/06-u4-graph-approval.md) |
+| 审批对象 | `graph.ts` @ `sha256:def3fa71…445e55b` |
+| 提案正文 | [`../evidence/01-graph-approval-proposal.diff`](../evidence/01-graph-approval-proposal.diff) @ `sha256:3213ecfe…444c62f` |
+| 批准范围 | 仅 `hopSamples` / `hopEdges` / `hopTargets` 可选尾参 `HopSampling = { hz?, maxSamples? }`；默认 `{60, 120}`；不改跳跃公式 / `reach.ts` / `reachableCells` / 既有测试 |
+| 公共面 | 知悉 `HopSampling` 会经 `playability/index.ts` 的 `export *` 可见；包根 `src/index.ts` 不导出该 barrel，**不新增包根公共导出** |
+| 回归计划 | U4-02 在 `playability-temporal-evasion.test.ts` 落默认等价与稳定序列化断言 |
+| 产品目录 | **零改动**（本票只出审批包） |
+
+**审批独立性**：本审批独立于 I-00 R2，不以白名单推定。
+
+**下游**：U4-02（尾参实现与默认行为回归，独立分支）已 **unblocked**。**U4 执行门仍 `BLOCKED`，直到 U4-03 合并该独立 PR。** 本票未启动 U4-02。
