@@ -122,6 +122,8 @@ U2-00 初始化与授权台账
 
 - 2026-11-12 · **U2-06 测试矩阵与 D3 §11 反例** — `resolved`；新增 `playability-temporal-witness.test.ts`（68 tests：网格 / 走廊 / spawn / 到达 / S1–S4 / 残差等待 / U9 / W / Witness / 双档 lag / 预算 / 确定性）与 `playability-temporal-fixtures.ts` 的**内存世界**夹具（raw object → `parseGameConfig` / `parseAssetPack`，无文件系统 / 无 JSON fixture）；D3 §11 十三条逐条覆盖且必须失败 / IE；build / typecheck / 定向 68/68 / input 65/65 全绿，`pnpm test` 173 files / 2742 tests exit 0（2 条已知 runner RPC 超时）；已知限制：S1 对真实走廊冗余、`maxCutsPerCheck` 只能由 U1 原语耗尽 → [票](issues/07-u2-06-tests.md)。U2-07 unblocked。
 
+- 2026-11-12 · **U2-07 回归 / 白名单审计 / 实现报告** — `resolved`；`pnpm build` / `pnpm typecheck` exit 0；U2 定向 68 + 65 = **133/133**；`pnpm test` 两次均 **173 files / 2742 tests passed, exit 0**（0 测试超时、0 断言失败；每次仅 2 条已知 runner RPC unhandled error）；diff 产品路径**只有 U2 白名单 3 文件**，无新依赖 / JSON fixture / barrel / 公共导出；T-55 / T-57 / T-58 / T-61 / T-62 / T-64 全 PASS，`temporal-witness.ts` 不 import `temporal.ts`；报告与 R2 输入包 → [报告](reports/07-implementation.md) · [票](issues/08-u2-07-audit.md)。U2-R2 unblocked（需独立会话；本票未启动）。
+
 ## Not yet specified
 
 <!-- 路线由已签署授权包 D3 / D10 / §3.5 / §9.2 冻结；无已知雾区。任何新增文件 / 扩权需求 = STOP + HITL，不在此处自行毕业。 -->
