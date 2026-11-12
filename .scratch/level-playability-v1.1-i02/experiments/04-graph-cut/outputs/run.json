@@ -1,0 +1,308 @@
+{
+  "meta": {
+    "ticket": "I02-04",
+    "effort": "level-playability-v1.1-i02",
+    "note": "scratch-only; product code read-only; not production acceptance",
+    "node": "v22.23.2",
+    "inputsSha256": "6937b847ac576c11f8bffcbfec76b4d6c7dabfa505a12df2c9f2d1434dd969da",
+    "sources": {
+      "packages/contracts/src/playability/graph.ts": "def3fa7132b9142e5f9441f1b5b6f5b6e4d8ef97096bd0db0b2c5b620445e55b",
+      "packages/contracts/src/playability/reach.ts": "5329904c8c6e16031208825e3e5e11c184a9cc8b63dcf08db1827a5f5544efb2",
+      "packages/contracts/dist/playability/graph.js": "4e754550c604874a9b2acb1380e12d1e97f8ab2a574d6263c99d9d604172be80",
+      "packages/contracts/src/game-config.ts": "1015a9d49b3b1bcba483ea5c07d0357007bc12d6a986770b80a31ba6f55e2e79",
+      "fixtures/game-configs/last-train.json": "d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+      "fixtures/packs/last-train/v2/manifest.json": "145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689"
+    }
+  },
+  "determinism": {
+    "inProcess": true,
+    "measurementSha256": "e966581677c1490c3cf7b578f60cb32db9b1c2a6b7595d6b89d909c15f422124"
+  },
+  "summary": {
+    "checks": 35,
+    "passed": 35,
+    "failed": 0
+  },
+  "failures": [],
+  "measurements": {
+    "player": {
+      "w": 32,
+      "h": 48,
+      "foot": {
+        "x": 40,
+        "y": 252.4
+      }
+    },
+    "baseline": {
+      "product": 1441,
+      "scratch60": 1441,
+      "scratch120": 1441,
+      "goal": true
+    },
+    "semantics": {
+      "gateRect": {
+        "x0": 685,
+        "x1": 755,
+        "y0": 211,
+        "y1": 270
+      },
+      "freeAt": false,
+      "standableAtTop": false,
+      "hopReject": true,
+      "walkNeighbors": [
+        "683,250,walk"
+      ]
+    },
+    "outOfWorld": {
+      "outsideSamples": 17,
+      "edgeAccepted": true,
+      "counterfactualReject": true
+    },
+    "N1": {
+      "flatGoal60": false,
+      "platformGoal60": true,
+      "platformGoal120": true,
+      "platformCells60": 1441,
+      "platformStandable650_210": true
+    },
+    "N2": {
+      "flatGoal60": false,
+      "pitGoal60": true,
+      "pitGoal120": true,
+      "pitCells60": 1441,
+      "pitStandable700_260": true
+    },
+    "N7a": {
+      "edge60": false,
+      "edge120": true,
+      "goal60": true,
+      "goal120": true,
+      "crossing60": {
+        "n": 22,
+        "left": 631,
+        "right": 775
+      },
+      "crossing120": {
+        "n": 21,
+        "left": 631,
+        "right": 775
+      }
+    },
+    "N7b": {
+      "goal60": true,
+      "goal120": false,
+      "right60": 161,
+      "right120": 0,
+      "crossing60": {
+        "n": 4,
+        "left": 599,
+        "right": 168
+      },
+      "crossing120": {
+        "n": 0,
+        "left": 599,
+        "right": 168
+      }
+    },
+    "sweepEdge": {
+      "seed": 987654321,
+      "trials": 100000,
+      "forward": 95,
+      "reverse": 4,
+      "examples": [
+        {
+          "ax": 635,
+          "ay": 250,
+          "bx": 683,
+          "by": 246,
+          "box": {
+            "x": 661.5676567554474,
+            "y": 227.13863445003517,
+            "w": 2.216148709412664,
+            "h": 0.9624634445644915
+          },
+          "rect": {
+            "x0": 646,
+            "x1": 679,
+            "y0": 228,
+            "y1": 270
+          },
+          "hit60": false,
+          "hit120": true
+        },
+        {
+          "ax": 626,
+          "ay": 250,
+          "bx": 672,
+          "by": 219,
+          "box": {
+            "x": 653.405826639384,
+            "y": 216.5016642708797,
+            "w": 2.4286899524740875,
+            "h": 8.337819496635348
+          },
+          "rect": {
+            "x0": 638,
+            "x1": 671,
+            "y0": 217,
+            "y1": 270
+          },
+          "hit60": false,
+          "hit120": true
+        },
+        {
+          "ax": 620,
+          "ay": 250,
+          "bx": 673,
+          "by": 231,
+          "box": {
+            "x": 648.3549982234836,
+            "y": 208.91717590694316,
+            "w": 0.9347084774635732,
+            "h": 6.622179909143597
+          },
+          "rect": {
+            "x0": 633,
+            "x1": 665,
+            "y0": 209,
+            "y1": 263
+          },
+          "hit60": true,
+          "hit120": false
+        },
+        {
+          "ax": 639,
+          "ay": 250,
+          "bx": 688,
+          "by": 235,
+          "box": {
+            "x": 663.6522711887956,
+            "y": 215.05846888874657,
+            "w": 1.635244810488075,
+            "h": 4.08793860534206
+          },
+          "rect": {
+            "x0": 648,
+            "x1": 681,
+            "y0": 216,
+            "y1": 267
+          },
+          "hit60": false,
+          "hit120": true
+        }
+      ]
+    },
+    "sweepGraphSameHeight": {
+      "seed": 55555,
+      "varied": false,
+      "forward": 5,
+      "reverse": 0,
+      "both": 3936,
+      "total": 4000,
+      "none": 59,
+      "examples": [
+        {
+          "wl": 565,
+          "gap": 61,
+          "yR": 250,
+          "box": {
+            "x": 564.1055040913634,
+            "y": 235.95464323996566,
+            "w": 5.780237067490816,
+            "h": 2.0705766258761287
+          },
+          "cross60": true,
+          "cross120": false,
+          "n60": 1,
+          "n120": 0
+        },
+        {
+          "wl": 589,
+          "gap": 62,
+          "yR": 250,
+          "box": {
+            "x": 651.5742937782779,
+            "y": 241.42213476239704,
+            "w": 0.8647585101425648,
+            "h": 18.91834296565503
+          },
+          "cross60": true,
+          "cross120": false,
+          "n60": 1,
+          "n120": 0
+        },
+        {
+          "wl": 586,
+          "gap": 59,
+          "yR": 250,
+          "box": {
+            "x": 643.8947270205244,
+            "y": 226.31575627834536,
+            "w": 0.9254157477989793,
+            "h": 10.546709776856005
+          },
+          "cross60": true,
+          "cross120": false,
+          "n60": 1,
+          "n120": 0
+        }
+      ]
+    },
+    "sweepGraphVariedHeight": {
+      "seed": 777777,
+      "varied": true,
+      "forward": 32,
+      "reverse": 0,
+      "both": 3136,
+      "total": 4000,
+      "none": 832,
+      "examples": [
+        {
+          "wl": 573,
+          "gap": 25,
+          "yR": 230,
+          "box": {
+            "x": 579.9081086211372,
+            "y": 205.3022397402674,
+            "w": 2.877036737743765,
+            "h": 16.974335925653577
+          },
+          "cross60": true,
+          "cross120": false,
+          "n60": 1,
+          "n120": 0
+        },
+        {
+          "wl": 572,
+          "gap": 38,
+          "yR": 230,
+          "box": {
+            "x": 567.8996717585251,
+            "y": 208.77116191084497,
+            "w": 5.907204845920205,
+            "h": 12.208543888293207
+          },
+          "cross60": true,
+          "cross120": false,
+          "n60": 2,
+          "n120": 0
+        },
+        {
+          "wl": 579,
+          "gap": 41,
+          "yR": 220,
+          "box": {
+            "x": 618.5979861633386,
+            "y": 206.004954285454,
+            "w": 3.893321321811527,
+            "h": 7.298653896898031
+          },
+          "cross60": true,
+          "cross120": false,
+          "n60": 2,
+          "n120": 0
+        }
+      ]
+    }
+  }
+}

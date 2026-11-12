@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "effort": "level-playability-v1.1-i02",
+    "ticket": "I02-D5B",
+    "note": "scratch-only; D3/D10-shaped proxy, not the I-02 implementation. Cuts = interior turnaround points; segments = cuts + 1 analytic pieces.",
+    "inventory": ".scratch/level-playability-v1/corpus/inventory.json",
+    "inventorySha256": "sha256:ba1d051a401ac70f45be5a705e2c478961ffc3fc0a6c9feb4cde09365df5f74f",
+    "equation": {
+      "xStep": 1,
+      "N_max": "floor(maxSpeed * periodMs / xStep)",
+      "N": "min(N_max, floor(maxStates / xPositions))",
+      "dtMs": "periodMs / N",
+      "maxStepPx": "maxSpeed * dtMs"
+    }
+  },
+  "lagsMs": [
+    16.67,
+    200
+  ],
+  "corpus": {
+    "limits": {
+      "recommended": {
+        "maxStates": 500000,
+        "timeBudgetMs": 60000
+      },
+      "hard": {
+        "maxStates": 1000000,
+        "timeBudgetMs": 60000
+      }
+    },
+    "speedBands": [
+      "config",
+      0.16
+    ]
+  },
+  "synthetic": [
+    {
+      "id": "E1440",
+      "visualWidth": 1440,
+      "distance": 20,
+      "periodMs": 4000,
+      "maxSpeed": 0.16,
+      "playerWidth": 20,
+      "playerHeight": 48,
+      "limits": {
+        "maxStates": 1500000,
+        "timeBudgetMs": 60000
+      }
+    },
+    {
+      "id": "E5760",
+      "visualWidth": 5760,
+      "distance": 20,
+      "periodMs": 4000,
+      "maxSpeed": 0.16,
+      "playerWidth": 20,
+      "playerHeight": 48,
+      "limits": {
+        "maxStates": 1500000,
+        "timeBudgetMs": 60000
+      }
+    }
+  ],
+  "candidateCuts": [
+    500000,
+    1000000,
+    2000000,
+    5000000,
+    10000000,
+    20000000
+  ]
+}

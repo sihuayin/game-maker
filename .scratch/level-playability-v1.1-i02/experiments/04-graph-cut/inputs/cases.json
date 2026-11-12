@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "effort": "level-playability-v1.1-i02",
+    "ticket": "I02-04",
+    "note": "scratch-only; product code read-only via packages/contracts/dist",
+    "fixtures": {
+      "config": "fixtures/game-configs/last-train.json",
+      "manifest": "fixtures/packs/last-train/v2/manifest.json"
+    }
+  },
+  "baseline": {
+    "world": {
+      "w": 1440,
+      "h": 270
+    },
+    "terrain": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 1440,
+        "h": 20
+      }
+    ],
+    "forbiddenBoxes": [],
+    "startCell": {
+      "x": 40,
+      "y": 250
+    },
+    "goalCell": {
+      "x": 1000,
+      "y": 250
+    },
+    "note": "真夹具平地图：产品 BFS 与 scratch 60Hz 必须一致"
+  },
+  "N1": {
+    "note": "门上方有可站立平台 ⇒ 可绕过；平坦地形则应不可达",
+    "gate": {
+      "x": 700,
+      "y": 210,
+      "w": 40,
+      "h": 60
+    },
+    "world": {
+      "w": 1440,
+      "h": 270
+    },
+    "flat": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 1440,
+        "h": 20
+      }
+    ],
+    "withPlatform": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 660,
+        "h": 20
+      },
+      {
+        "x": 650,
+        "y": 210,
+        "w": 100,
+        "h": 8
+      },
+      {
+        "x": 780,
+        "y": 250,
+        "w": 660,
+        "h": 20
+      }
+    ],
+    "goalCell": {
+      "x": 1000,
+      "y": 250
+    },
+    "expectFlatGoal": false,
+    "expectPlatformGoal": true
+  },
+  "N2": {
+    "note": "门下可下坑绕行 ⇒ 可达；平坦地形则应不可达",
+    "gate": {
+      "x": 700,
+      "y": 170,
+      "w": 40,
+      "h": 42
+    },
+    "world": {
+      "w": 1440,
+      "h": 270
+    },
+    "flat": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 1440,
+        "h": 20
+      }
+    ],
+    "withPit": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 660,
+        "h": 20
+      },
+      {
+        "x": 660,
+        "y": 260,
+        "w": 120,
+        "h": 10
+      },
+      {
+        "x": 780,
+        "y": 250,
+        "w": 660,
+        "h": 20
+      }
+    ],
+    "goalCell": {
+      "x": 1000,
+      "y": 250
+    },
+    "expectFlatGoal": false,
+    "expectPitGoal": true
+  },
+  "N7a": {
+    "note": "边级反向翻转：60Hz 拒绝该 hop，120Hz 接受；但图级仍连通（冗余弧）",
+    "world": {
+      "w": 1440,
+      "h": 270
+    },
+    "terrain": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 620,
+        "h": 20
+      },
+      {
+        "x": 667,
+        "y": 231,
+        "w": 773,
+        "h": 19
+      }
+    ],
+    "forbiddenBoxes": [
+      {
+        "x": 648.3549982234836,
+        "y": 208.91717590694316,
+        "w": 0.9347084774635732,
+        "h": 6.622179909143597
+      }
+    ],
+    "edge": {
+      "ax": 620,
+      "ay": 250,
+      "bx": 673,
+      "by": 231
+    },
+    "goalCell": {
+      "x": 700,
+      "y": 231
+    },
+    "expectEdge60": false,
+    "expectEdge120": true,
+    "expectGoal60": true,
+    "expectGoal120": true
+  },
+  "N7b": {
+    "note": "图级正向翻转：60Hz 连通，120Hz 断连（短窗口被更密采样抓到）",
+    "world": {
+      "w": 800,
+      "h": 270
+    },
+    "terrain": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 600,
+        "h": 20
+      },
+      {
+        "x": 640,
+        "y": 250,
+        "w": 160,
+        "h": 20
+      }
+    ],
+    "forbiddenBoxes": [
+      {
+        "x": 614.4544526282698,
+        "y": 205.17369720852003,
+        "w": 1.9474802613258362,
+        "h": 6.032897406956181
+      }
+    ],
+    "goalCell": {
+      "x": 700,
+      "y": 250
+    },
+    "expectGoal60": true,
+    "expectGoal120": false,
+    "expectRight60Min": 1,
+    "expectRight120": 0
+  },
+  "semantics": {
+    "world": {
+      "w": 1440,
+      "h": 270
+    },
+    "terrain": [
+      {
+        "x": 0,
+        "y": 250,
+        "w": 1440,
+        "h": 20
+      }
+    ],
+    "gate": {
+      "x": 700,
+      "y": 210,
+      "w": 40,
+      "h": 60
+    },
+    "gateRect": {
+      "x0": 685,
+      "x1": 755,
+      "y0": 211,
+      "y1": 270
+    },
+    "gateProbe": {
+      "x": 700,
+      "y": 250
+    },
+    "gateTopProbe": {
+      "x": 700,
+      "y": 210
+    },
+    "approach": {
+      "x": 684,
+      "y": 250
+    },
+    "hopReject": {
+      "ax": 690,
+      "ay": 250,
+      "bx": 750,
+      "by": 250
+    },
+    "smallWorld": {
+      "world": {
+        "w": 200,
+        "h": 120
+      },
+      "terrain": [
+        {
+          "x": 0,
+          "y": 50,
+          "w": 200,
+          "h": 70
+        }
+      ],
+      "edge": {
+        "ax": 50,
+        "ay": 50,
+        "bx": 80,
+        "by": 50
+      }
+    }
+  },
+  "sweeps": {
+    "edge": {
+      "seed": 987654321,
+      "trials": 100000
+    },
+    "graphSameHeight": {
+      "seed": 55555,
+      "trials": 4000
+    },
+    "graphVariedHeight": {
+      "seed": 777777,
+      "trials": 4000
+    }
+  }
+}

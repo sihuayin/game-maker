@@ -1,0 +1,578 @@
+{
+  "meta": {
+    "ticket": "I02-03",
+    "effort": "level-playability-v1.1-i02",
+    "note": "scratch-only feasibility experiment; not production acceptance",
+    "node": "v22.23.2",
+    "inputsSha256": "e1e922ba538d3cdbfb3f8bf839ea6410f55299620c832380cbe7c96e588c9910",
+    "p0ModelSha256": "01788b03db2bef13de5f9951368760f9cc79ba07effb8680d98c6ee270206d4d",
+    "coreSha256": "ca1bb2ee299c46ac2cdd7f454d83998de992c1330e9667308a1573b284310ef6"
+  },
+  "determinism": {
+    "inProcess": true,
+    "measurementSha256": "ab0d04c6ed1fd32c0e0ad8f884f7858ba87006df3d64a31825a9a9fb9b2beee8"
+  },
+  "summary": {
+    "checks": 123,
+    "passed": 123,
+    "failed": 0
+  },
+  "failures": [],
+  "measurements": {
+    "predicate": [
+      {
+        "id": "P1",
+        "got": true,
+        "expect": true
+      },
+      {
+        "id": "P2",
+        "got": false,
+        "expect": false
+      },
+      {
+        "id": "P3",
+        "got": false,
+        "expect": false
+      },
+      {
+        "id": "P4",
+        "got": false,
+        "expect": false
+      },
+      {
+        "id": "P5",
+        "got": false,
+        "expect": false
+      },
+      {
+        "id": "P6",
+        "got": true,
+        "expect": true
+      },
+      {
+        "id": "P7",
+        "got": false,
+        "expect": false
+      },
+      {
+        "id": "P8",
+        "got": true,
+        "expect": true
+      }
+    ],
+    "wave": {
+      "positions": [
+        {
+          "t": 0,
+          "got": 10,
+          "expect": 10
+        },
+        {
+          "t": 500,
+          "got": 60,
+          "expect": 60
+        },
+        {
+          "t": 1000,
+          "got": 110,
+          "expect": 110
+        },
+        {
+          "t": 1500,
+          "got": 60,
+          "expect": 60
+        },
+        {
+          "t": 2000,
+          "got": 10,
+          "expect": 10
+        },
+        {
+          "t": 2500,
+          "got": 60,
+          "expect": 60
+        },
+        {
+          "t": -500,
+          "got": 60,
+          "expect": 60
+        },
+        {
+          "t": -1000,
+          "got": 110,
+          "expect": 110
+        },
+        {
+          "t": -2000,
+          "got": 10,
+          "expect": 10
+        }
+      ],
+      "symmetry": [
+        {
+          "t": 137,
+          "pAtT": 23.700000000000003,
+          "pAtNegT": 23.700000000000003
+        },
+        {
+          "t": 450,
+          "pAtT": 55,
+          "pAtNegT": 54.99999999999999
+        },
+        {
+          "t": 1999,
+          "pAtT": 10.099999999999989,
+          "pAtNegT": 10.1
+        }
+      ],
+      "continuity": [
+        {
+          "t": 999.999999,
+          "got": 109.99999990000002,
+          "expect": 109.9999999
+        },
+        {
+          "t": 1000.000001,
+          "got": 109.99999990000002,
+          "expect": 109.9999999
+        }
+      ],
+      "speed": 0.1,
+      "stationary": [
+        {
+          "t": 0,
+          "got": 42,
+          "expect": 42
+        },
+        {
+          "t": 12345,
+          "got": 42,
+          "expect": 42
+        },
+        {
+          "t": -7,
+          "got": 42,
+          "expect": 42
+        }
+      ]
+    },
+    "segments": [
+      {
+        "id": "S1",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            0,
+            140
+          ],
+          [
+            1860,
+            2000
+          ]
+        ],
+        "note": "静止玩家在路径中，整个周期的两次穿越"
+      },
+      {
+        "id": "S2",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            0,
+            240
+          ],
+          [
+            1760,
+            2000
+          ]
+        ],
+        "note": "t=0 相切，随后立刻重叠：碰撞从 0 开始"
+      },
+      {
+        "id": "S3",
+        "ok": true,
+        "hit": false,
+        "intervals": [],
+        "note": "仅在折返点相切（峰值）⇒ 不碰撞"
+      },
+      {
+        "id": "S4",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            950,
+            1050
+          ]
+        ],
+        "note": "碰撞区间跨折返点，必须在切段后合并成一段"
+      },
+      {
+        "id": "S5",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            2950,
+            3050
+          ]
+        ],
+        "note": "周期平移不变性：S4 平移 +2000ms"
+      },
+      {
+        "id": "S6",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            -1050,
+            -950
+          ]
+        ],
+        "note": "负时间：S4 关于 t=0 的镜像（三角波偶函数）"
+      },
+      {
+        "id": "S7",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            0,
+            1000
+          ]
+        ],
+        "note": "玩家与 hazard 同速同向、完全嵌入 ⇒ 整段碰撞"
+      },
+      {
+        "id": "S8",
+        "ok": true,
+        "hit": false,
+        "intervals": [],
+        "note": "同速同向、始终相切 ⇒ 不碰撞（c1=0 的严格分支）"
+      },
+      {
+        "id": "S9",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            499.9999999999502,
+            500.0000000001502
+          ]
+        ],
+        "note": "极短碰撞窗口：双方宽 1e-11，窗口 2e-10 ms"
+      },
+      {
+        "id": "S10",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            0,
+            999.9999990000026
+          ],
+          [
+            1000.0000000050251,
+            1120.603015080402
+          ]
+        ],
+        "note": "极短安全窗口（≈1.005e-6 ms），夹在两段碰撞之间，跨折返点",
+        "gap": 0.0000010050224545921083
+      },
+      {
+        "id": "S11",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            1000,
+            1100
+          ]
+        ],
+        "note": "近零相对速度（1e-10 px/ms）下的持续性微量重叠"
+      },
+      {
+        "id": "S12",
+        "ok": true,
+        "hit": true,
+        "intervals": [
+          [
+            0,
+            100
+          ]
+        ],
+        "note": "竖直重叠 5e-10 仍应判碰撞（严格语义无 EPS 收缩）"
+      },
+      {
+        "id": "S13",
+        "predicate": false,
+        "expect": false,
+        "note": "极短通道：玩家宽 4，通道净宽 4+1e-6 ⇒ 通过不撞"
+      }
+    ],
+    "errors": [
+      {
+        "id": "E1",
+        "ok": false,
+        "error": "hazard.at-not-finite",
+        "expect": "hazard.at-not-finite"
+      },
+      {
+        "id": "E2",
+        "ok": false,
+        "error": "hazard.periodMs-not-finite",
+        "expect": "hazard.periodMs-not-finite"
+      },
+      {
+        "id": "E3",
+        "ok": false,
+        "error": "segment.x1-not-finite",
+        "expect": "segment.x1-not-finite"
+      },
+      {
+        "id": "E4",
+        "ok": false,
+        "error": "opts.lagMs-not-finite",
+        "expect": "opts.lagMs-not-finite"
+      },
+      {
+        "id": "E5",
+        "ok": false,
+        "error": "hazard.periodMs-not-finite",
+        "expect": "hazard.periodMs-not-finite"
+      }
+    ],
+    "sampling": [
+      {
+        "id": "D1",
+        "hit": true,
+        "intervals": [
+          [
+            22.5,
+            27.5
+          ],
+          [
+            72.5,
+            77.5
+          ]
+        ],
+        "note": "端点/粗采样全部安全，区间内碰撞（22.5,27.5）",
+        "scans": [
+          {
+            "samples": 2,
+            "hits": 0
+          },
+          {
+            "samples": 6,
+            "hits": 0
+          },
+          {
+            "samples": 11,
+            "hits": 0
+          }
+        ]
+      },
+      {
+        "id": "D2",
+        "hit": true,
+        "intervals": [
+          [
+            499.99999999995,
+            500.00000000015
+          ]
+        ],
+        "note": "极短碰撞窗口（2e-10 ms）下，16.67ms 帧采样在 2s 跨度内全数漏检",
+        "scans": [
+          {
+            "samples": 120,
+            "hits": 0,
+            "note": "16.67ms"
+          }
+        ]
+      }
+    ],
+    "epsilon": {
+      "worlds": [
+        {
+          "span": 2000,
+          "got": 0.0000020000000000000003,
+          "expect": 0.000002
+        },
+        {
+          "span": 200,
+          "got": 2.0000000000000002e-7,
+          "expect": 2e-7
+        },
+        {
+          "span": 1,
+          "got": 1e-9,
+          "expect": 1e-9
+        },
+        {
+          "span": 1000000000,
+          "got": 1,
+          "expect": 1
+        }
+      ],
+      "gates": [
+        {
+          "id": "G1",
+          "L": 99.9999995,
+          "R": 100.0000005,
+          "width": 9.999999974752427e-7,
+          "expectWidth": 0.000001
+        },
+        {
+          "id": "G2",
+          "L": 99.9999985,
+          "R": 100.0000015,
+          "width": 0.000002999999992425728,
+          "expectWidth": 0.000003
+        }
+      ],
+      "verdicts": [
+        {
+          "worldWidth": 2000,
+          "gateWidth": 0.000001,
+          "eps": 0.0000020000000000000003,
+          "valid": false,
+          "expectValid": false
+        },
+        {
+          "worldWidth": 2000,
+          "gateWidth": 0.000003,
+          "eps": 0.0000020000000000000003,
+          "valid": true,
+          "expectValid": true
+        },
+        {
+          "worldWidth": 200,
+          "gateWidth": 0.000001,
+          "eps": 2.0000000000000002e-7,
+          "valid": true,
+          "expectValid": true
+        },
+        {
+          "worldWidth": 1,
+          "gateWidth": 1e-12,
+          "eps": 1e-9,
+          "valid": false,
+          "expectValid": false
+        }
+      ]
+    },
+    "p0Probes": [
+      {
+        "id": "X1",
+        "note": "极短碰撞窗口：精确找得到，P0 的 hi−lo>1e-9 阈值看不到",
+        "mineHit": true,
+        "p0Hit": false,
+        "expectMineHit": true,
+        "expectP0Hit": false
+      },
+      {
+        "id": "X2",
+        "note": "竖直重叠 5e-10：精确为真，P0 的 −EPS/+EPS 判据为假",
+        "mineHit": true,
+        "p0Hit": false,
+        "expectMineHit": true,
+        "expectP0Hit": false
+      },
+      {
+        "id": "X3",
+        "note": "近零相对速度 + 微量重叠：P0 的 |c1|<1e-9 绝对钳位把整段判安全",
+        "mineHit": true,
+        "p0Hit": false,
+        "expectMineHit": true,
+        "expectP0Hit": false
+      },
+      {
+        "id": "X4",
+        "note": "同一点位姿的两种表达：dt>0 用区间分支判撞，dt=0 用 pointCollides 判不撞（P0 内部分支不一致）",
+        "p0IntervalHit": true,
+        "expectIntervalHit": true,
+        "p0PointHit": false,
+        "expectPointHit": false,
+        "minePointHit": true
+      },
+      {
+        "id": "X5",
+        "note": "lag pad：P0 的对称 pad 在谷底把从未出现过的左侧位置算进来（保守超集）",
+        "padHit": true,
+        "p0PadHit": true,
+        "exactNoLagHit": false,
+        "reachableHit": false,
+        "reachableSpan": {
+          "left": 40,
+          "right": 70,
+          "minP": 50,
+          "maxP": 60.00000000000001
+        },
+        "expectPadHit": true,
+        "expectReachableHit": false
+      }
+    ],
+    "nearCritical": [
+      {
+        "yOffset": 0,
+        "overlapY": 0,
+        "mineHit": false,
+        "p0Hit": false,
+        "kind": "both-miss",
+        "expect": "both-miss"
+      },
+      {
+        "yOffset": -1e-12,
+        "overlapY": 1e-12,
+        "mineHit": true,
+        "p0Hit": false,
+        "kind": "exact-only",
+        "expect": "exact-only"
+      },
+      {
+        "yOffset": -5e-10,
+        "overlapY": 5e-10,
+        "mineHit": true,
+        "p0Hit": false,
+        "kind": "exact-only",
+        "expect": "exact-only"
+      },
+      {
+        "yOffset": -1e-9,
+        "overlapY": 1e-9,
+        "mineHit": true,
+        "p0Hit": false,
+        "kind": "exact-only",
+        "expect": "exact-only"
+      },
+      {
+        "yOffset": -0.000001,
+        "overlapY": 0.000001,
+        "mineHit": true,
+        "p0Hit": true,
+        "kind": "both-hit",
+        "expect": "both-hit"
+      },
+      {
+        "yOffset": -0.001,
+        "overlapY": 0.001,
+        "mineHit": true,
+        "p0Hit": true,
+        "kind": "both-hit",
+        "expect": "both-hit"
+      }
+    ],
+    "random": {
+      "seed": 1337,
+      "cases": 2000,
+      "bothHit": 392,
+      "bothMiss": 1608,
+      "mineOnly": 0,
+      "p0Only": 0,
+      "p0EmulationMismatch": 0,
+      "divergenceExamples": []
+    }
+  }
+}

@@ -512,6 +512,98 @@ _Avoid_: 与 [[InsufficientEvidence]] 混用；把空 error 数组当「已证�
 判据依赖的一组**集中定义、可测试**的运行时假设：无二段跳、`solid` 静态碰撞、hazard 接触后复位、无 kill plane，viewport 与设计文本不作输入。运行时行为变化时必须重新评估判据，不得沿用过期假设。
 _Avoid_: 隐式假设、每个审计函数自带一套默认值。
 
+**Initial Phase（初始相位 `φ0`）**
+玩家出生时 Hazard 在运动周期上的位置。`Motion` 只定义运动零点（`t=0` 在 `at`），不定义 `φ0`；`φ0` 未知，时序判定必须对全部合法 `φ0` 成立。
+_Avoid_: 把「相位自由」读成「配置里有相位字段」。
+
+**Observed Phase（观测相位 `φ(t)`）**
+game-time `t` 时 Hazard 在周期上的位置；检测 / 观测有滞后，观测到的是区间而不是精确相位。
+_Avoid_: 用墙钟或帧号当相位。
+
+**Hazard Max Rate（hazard 最大速率）**
+`2·distance/periodMs`，单位 `px/ms`；由 [[Motion]] 派生，不是配置字段。三角波在上升段/下降段分别取 `+v_max` / `−v_max`，折返点处速度未定义。
+_Avoid_: 把速度当 `Motion` 的输入字段；把折返点速度定义成 0 或某一侧连续。
+
+**Hazard Box（hazard 碰撞盒）**
+由 `Entity.at` 与 manifest `size/anchor` 派生的 Hazard AABB；忽略 `Entity.body`；Hazard 不是 solid，不提供支撑。连续时间核心使用未取整的锚点位置，空间层使用 `entityBox` 的取整盒。
+_Avoid_: 用 hazard 顶面当可站立面；把取整盒与未取整盒当成同一几何。
+
+**Model-out（模型外）**
+存在移动 Hazard，但其运动或组合形状超出 I-02 支持模型（Y 轴、多移动 Hazard、Moving Platform、Danger 联合、非 `cycle`、状态转换等）；结果为 IE。与“没有移动 Hazard 的 `applicable:false`”严格区分。
+_Avoid_: 把模型外当作“不适用”；静默近似成单 Hazard。
+
+**Frame-trusted Geometry（帧信任几何）**
+I-01 验证声明帧的 `sourceSize/anchor` 与 manifest 一致，且不存在 `rotated`/`trimmed`；它只证明 Atlas 元数据一致性，**不证明 Runtime hitbox**，公共 `coverage` 仍为 `partial`。
+_Avoid_: 把帧元数据一致当成运行时碰撞几何已验证；据此把 `partial` 改写成 `checked`。
+
+**Safe Waiting Cell（安全等待格，U9）**
+同一水平行走可达、可站立、可安全停留一个完整周期、且停留后存在安全出口的脚点格。接近必须对**每个合法初始相位**成立；出口只需在**某个可选相位**成立（等待格解耦了抵达相位与通过相位）。它是相位对齐的 canonical 充分证书，不是 `NO_PROVEN_BLOCKER` 的必要条件；另一条充分证书是 [[全相位 Winning Set]]（2026-11-11 I02-D10 裁定）。
+_Avoid_: 把「地图上有一个空格」当成 U9 成立；把「大部分时间安全」当成等待安全；用跳跃 / 下落路径充当接近段。
+
+**全相位 Winning Set（`W`）**
+在（玩家水平位置 × Hazard 相位）状态空间上，从**每个合法初始相位**出发都存在一条有限、连续时间安全、最终抵达目标的策略的状态集合。它是 `NO_PROVEN_BLOCKER` 的独立充分证书，与 [[Safe Waiting Cell]] 并列；必须覆盖全部相位，不能用有限采样冒充（最小不动点，不是最大安全不变集）。
+_Avoid_: 把「搜到若干成功轨迹」当成全相位证明；只证明每条边安全而不证明策略终止。
+
+**Safe Pass Witness（安全通过 Witness）**
+从真实出生状态出发、由等待与同脚点 y 的水平移动段组成、每段都经连续时间安全验证、带终止性证明并最终抵达目标区域的路径族；必须对每个初始相位格成立。它不是「找到一条成功轨迹」，也不是「部分路径 + 预算耗尽」。
+_Avoid_: 把未验证候选、有限采样轨迹或策略表本身当成 Witness；把「策略表 + 验证记录」当成不需要终止性证明。
+
+**Static Corridor（静态走廊）**
+出生脚点 y 上基础移动图的 `standable` 水平连通段；它只提供可站立格点的拓扑与 x 域，不证明格点之间的连续移动安全——每条水平移动段仍须单独做静态连续碰撞检查。
+_Avoid_: 把 `standable` 格点连通当成整段可走；用世界宽度代替连通段。
+
+**Residual Wait（残差等待）**
+出生相位落在某个相位格内时，玩家先在出生点原位等待到该格末端的那一段；因具体 `φ0` 未知，只能对整个相位格的 Hazard 位姿范围做保守验证。
+_Avoid_: 把残差等待的整格覆盖说成已逐一验证每个具体 `φ0`；只检查格端点。
+
+**Arrival Predicate（到达谓词）**
+未取整玩家盒与四边各内缩 0.5px 的取整目标矩形严格相交；用于吸收取整盒与真实盒之间 ≤0.5px/边的差异，是保守的模型内到达定义，不声称与 Runtime 目标判定逐位相等。
+_Avoid_: 直接用取整目标矩形判到达；用中心点或脚点代替玩家盒。
+
+**Permanent Gate（永久封锁门）**
+单个周期移动 Hazard 在**整个往返周期内恒覆盖**的正宽度 x 核心；门矩形的 y 范围 = Hazard 盒 y 范围。它是静态 forbidden 区域的来源，不是整段扫掠区，也不能用 Witness 方向的 lag pad 放大。
+_Avoid_: 把 Hazard 扫过的整段区域当门；给门加 Witness 的 union pad；用某个幸运相位的覆盖当全周期覆盖。
+
+**Model-conditional Result（模型条件性结果）**
+在声明的几何与运动模型内成立、但未被 Runtime 几何证据确认的分析结果；只能作为内部证据，不得发布为正式 [[Playability Verdict]]。
+_Avoid_: 把模型内「未找到路径」写成「玩家不存在路径」；把内部计算成功当作 PU 授权。
+
+**Movement Model Closure（移动模型闭合）**
+证明分析所用移动原语（walk / walk-off / hop 等）覆盖 Runtime 全部合法移动，或其可达集是 Runtime 可达集的超集；未闭合时任何「不可达」结论都不成立。
+_Avoid_: 用常速跳跃弧采样代替完整移动模型；把采样未命中当作不存在路径。
+
+**Lag-invariant by Construction（构造性 lag 无关）**
+PU 的门区与静态 forbidden 图不消费 `lagMs`，因此两档 lag 的 PU 分支在定义上相同；该性质**不**适用于 Witness，Witness 仍须按 lag 独立生成与验证。
+_Avoid_: 把 PU 的 lag 无关推广到 Witness；跨档复用 Witness 证据。
+
+**Implementation Unit（实现单元 U1–U5）**
+I-02 的五个实施单元：U1 连续时间求交、U2 安全通过 Witness、U3 永久封锁证明、U4 垂直规避图割、U5 预算/确定性/集成。用 U1–U5 指代实施单元，避免与 effort 票号或需求条款 I02-0x 混淆。
+_Avoid_: 用 I02-01～I02-05 同时指 effort 票与实施单元；把 effort 票的完成当成实施单元的授权。
+
+**Review Gate（复核门 R1–R4）**
+实施单元之间的强制独立复核点：R1(U1)、R2(U2)、R3(U3)、R4(U4)。每道门逐项 PASS/FAIL，复核人未参与该单元编写并自行重跑证据；通过只解除下一单元的**增量授权申请**资格，不自动授权。
+_Avoid_: 把「测试全绿」当复核通过；把 R4 通过当成公共 NB/PU 能力授权。
+
+**Authorization Ledger（授权台账）**
+授权包内逐单元记录 `AUTHORIZED` / `PLANNED` / `BLOCKED`、前置复核门、增量签署与证据链接的表；能力状态（`PUBLIC_NB` / `PUBLIC_PU`）单独记录，不与单元状态混用。
+_Avoid_: 把 `PLANNED` 读成隐含授权；把单元 `AUTHORIZED` 读成公共 Verdict 能力已获准。
+
+**Work Budget（工作预算）**
+确定性的语义预算：状态、边、切段、Witness 体积；只有它决定分析结果。工作预算内完成的运行才纳入确定性承诺。
+_Avoid_: 把墙钟当语义预算；把 `statesEnqueued` 与 `statesVisited` 合并成一个模糊计数。
+
+**Wall-clock Abort（墙钟中止）**
+环境相关的 abort-only 安全网；触发时只能降级为 `INSUFFICIENT_EVIDENCE`，不属于确定性承诺范围，也不得改变证明方向。
+_Avoid_: 把墙钟超时与状态预算耗尽混为一个原因；把墙钟字段写进确定性签名。
+
+**Phase Grid Cap（相位格容量上限）**
+`N = min(N_max, floor(maxStates / xPositions))`；相位分辨率受状态预算约束时的显式上限。它是诊断，不是降级；粗化必须配合整格残差验证。
+_Avoid_: 把 `phaseGridCapped` 当降级 Verdict；静默降低 `xStep` 或截断 N。
+
+**Cut Budget（累计切段预算）**
+U2 每档 lag 的累计连续求交切段上限；每次 check 同时受单次上限与剩余累计上限约束。未冻结时不得声称完整确定性工作预算。
+_Avoid_: 只用 `maxCutsPerCheck` 当完整 cut 预算；把累计 cut 计数混入 state / edge 计数。
+
 **结构性不可判（Structurally unverifiable）** —— ⚠️ **2026-10-25 新词**（visual-semantics-verification-v1 票 01）
 若设计契约缺少建立[[观察 / 判据|判据]]所需的语义字段或坐标关系，则相关维度属于**结构性不可判**：
 **不得**通过推断、布局伪影或放宽阈值把它转化为判据。它不是「暂时没实现」、也不是「将来加测试就能解决」，
