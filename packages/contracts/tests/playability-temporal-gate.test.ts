@@ -9,7 +9,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { boxFromFoot } from "../src/playability/geometry.js";
+import { boxFromFoot, expandBox } from "../src/playability/geometry.js";
+import type { Aabb } from "../src/playability/geometry.js";
 import { buildMovementGraph } from "../src/playability/graph.js";
 import { trianglePosition } from "../src/playability/temporal-motion.js";
 import {
@@ -31,6 +32,7 @@ const input = (overrides: Partial<PermanentGateInput> = {}): PermanentGateInput 
   const graph = buildMovementGraph(config, manifest);
   if (graph === null) throw new Error("fixture graph must build");
   return {
+    buildGraph: (forbiddenBoxes) => buildMovementGraph(config, manifest, undefined, { forbiddenBoxes }),
     motion: { at: { x: 50, y: 40 }, distance: 10, periodMs: 200 },
     hazard: { size: { w: 20, h: 20 }, anchor: { x: 0.5, y: 1 } },
     playerSize: { w: 2, h: 20 },
@@ -76,14 +78,14 @@ describe("U3-01 门区半部 API 契约", () => {
     ]);
   });
 
-  it("有效几何返回 COMPLETE，填 gate / periodCoverage / sideRule，不生成 U4 字段", () => {
+  it("有效几何返回 COMPLETE，四段半部全填，不生成 U4 字段", () => {
     const result = resultOf();
     expect(result.gateStatus).toBe("COMPLETE");
     expect(result.reason).toBeNull();
     expect(result.gate).not.toBeNull();
     expect(result.periodCoverage).not.toBeNull();
     expect(result.sideRule).not.toBeNull();
-    expect(result.forbiddenInjection).toBeNull();
+    expect(result.forbiddenInjection).not.toBeNull();
     const keys = Object.keys(result);
     for (const forbidden of ["graphCut", "hopDoubling", "hopSamplingCoverage", "movementModelClosure"]) {
       expect(keys).not.toContain(forbidden);
@@ -106,6 +108,7 @@ describe("U3-01 门区半部 API 契约", () => {
       expect(result.gate).toBeNull();
       expect(result.periodCoverage).toBeNull();
       expect(result.sideRule).toBeNull();
+      expect(result.forbiddenInjection).toBeNull();
     }
   });
 
@@ -118,7 +121,7 @@ describe("U3-01 门区半部 API 契约", () => {
     expect(gate).toEqual(result.gate);
     expect(period).toEqual(result.periodCoverage);
     expect(side).toEqual(result.sideRule);
-    expect(injection).toBeNull();
+    expect(injection).toEqual(result.forbiddenInjection);
   });
 
   it("相同输入重复运行结果规范化相等（无随机 / 时间依赖）", () => {
@@ -356,6 +359,132 @@ describe("U3-04 判侧规则", () => {
   });
 });
 
+describe("U3-05 forbiddenInjection", () => {
+  const world = (options: Parameters<typeof witnessWorld>[0] = { hazardW: 20, hazardH: 20 }) => {
+    const { config, manifest } = witnessWorld(options);
+    return {
+      config,
+      manifest,
+      build: (forbiddenBoxes: readonly Aabb[]) =>
+        buildMovementGraph(config, manifest, undefined, { forbiddenBoxes }),
+    };
+  };
+
+  it("原始 gateRect 原样注入，记录 source = forbiddenBoxes", () => {
+    const result = resultOf();
+    const injection = result.forbiddenInjection;
+    if (injection === null) throw new Error("expected injection");
+    expect(injection.source).toBe("forbiddenBoxes");
+    expect(injection.gateRect).toEqual({ x: 50, y: 20, w: 10, h: 20 });
+  });
+
+  it("expandedRect 只扩张一次（按玩家半宽 / 全高）", () => {
+    const injection = resultOf().forbiddenInjection;
+    if (injection === null) throw new Error("expected injection");
+    expect(injection.expandedRect).toEqual({
+      x: 49, // gate.x − playerHalfW
+      y: 20, // 脚点在盒底边，y 不下移
+      w: 12, // gate.w + playerW
+      h: 40, // gate.h + playerH
+    });
+  });
+
+  it("建图入口先收到基线 []、再收到原始 gateRect（不预扩张）", () => {
+    const { build } = world();
+    const seen: (readonly Aabb[])[] = [];
+    const result = computePermanentGate({
+      ...input(),
+      buildGraph: (forbiddenBoxes) => {
+        seen.push(forbiddenBoxes);
+        return build(forbiddenBoxes);
+      },
+    });
+    expect(result.gateStatus).toBe("COMPLETE");
+    expect(seen).toHaveLength(2);
+    expect(seen[0]).toEqual([]);
+    expect(seen[1]).toEqual([{ x: 50, y: 20, w: 10, h: 20 }]);
+  });
+
+  it("禁区不可穿越，且不写入 blocked", () => {
+    const { build } = world();
+    const base = build([]);
+    const injection = resultOf().forbiddenInjection;
+    if (base === null || injection === null) throw new Error("expected graph and injection");
+    const injected = build([injection.gateRect]);
+    if (injected === null) throw new Error("expected injected graph");
+
+    // 脚点 (55, 39) 的玩家盒在门区内：基线可走，注入后不可穿越。
+    expect(base.freeAt(55, 39)).toBe(true);
+    expect(injected.freeAt(55, 39)).toBe(false);
+
+    // blocked 是实心体掩码：注入只改 forbidden，不得改 blocked。
+    expect(Array.from(injected.blocked)).toEqual(Array.from(base.blocked));
+  });
+
+  it("门顶不是地板：注入不产生任何新站位", () => {
+    const { build } = world();
+    const base = build([]);
+    const injection = resultOf().forbiddenInjection;
+    if (base === null || injection === null) throw new Error("expected graph and injection");
+    const injected = build([injection.gateRect]);
+    if (injected === null) throw new Error("expected injected graph");
+
+    for (let index = 0; index < injected.standable.length; index++) {
+      if (injected.standable[index] === 1) expect(base.standable[index], `cell ${index}`).toBe(1);
+    }
+    // 门顶所在脚点格（y = gate.y + height = 40）不是地板。
+    expect(injected.standableAt(55, 40)).toBe(false);
+  });
+
+  it("门悬空时，门顶格不是可站立面（standable 只看 blocked）", () => {
+    const floating = world();
+    const result = computePermanentGate({
+      ...input({ motion: { at: { x: 50, y: 30 }, distance: 10, periodMs: 200 } }),
+      buildGraph: floating.build,
+    });
+    const injection = result.forbiddenInjection;
+    if (injection === null) throw new Error("expected injection");
+    const base = floating.build([]);
+    const injected = floating.build([injection.gateRect]);
+    if (base === null || injected === null) throw new Error("expected graph");
+
+    expect(injection.gateRect).toEqual({ x: 50, y: 10, w: 10, h: 20 });
+    // 门顶（脚点 y = 30）在基线里也不是站位；注入后更不可能变成站位。
+    expect(base.standableAt(55, 30)).toBe(false);
+    expect(injected.standableAt(55, 30)).toBe(false);
+  });
+
+  it("预扩张 / 重复扩张 ⇒ 不得产生 COMPLETE", () => {
+    const { build } = world();
+    const preExpanded = (forbiddenBoxes: readonly Aabb[]): ReturnType<typeof build> =>
+      build(forbiddenBoxes.map((box) => expandBox(box, 20)));
+    const result = computePermanentGate({ ...input(), buildGraph: preExpanded });
+    expect(result.gateStatus).toBe("INCOMPLETE");
+    expect(result.reason).toBe("geometry-untrusted");
+    expect(result.forbiddenInjection).toBeNull();
+  });
+
+  it("图与空间层不同源 ⇒ geometry-untrusted", () => {
+    const otherWorld = witnessWorld({ hazardW: 20, hazardH: 20, worldW: 120 });
+    const otherGraph = buildMovementGraph(otherWorld.config, otherWorld.manifest);
+    if (otherGraph === null) throw new Error("expected other graph");
+    const mismatchedGraph = resultOf({ graph: otherGraph });
+    expect(mismatchedGraph.gateStatus).toBe("INCOMPLETE");
+    expect(mismatchedGraph.reason).toBe("geometry-untrusted");
+
+    const mismatchedPlayer = resultOf({ playerSize: { w: 4, h: 20 } });
+    expect(mismatchedPlayer.gateStatus).toBe("INCOMPLETE");
+    expect(mismatchedPlayer.reason).toBe("geometry-untrusted");
+
+    const mismatchedBuilder = resultOf({
+      buildGraph: (forbiddenBoxes) =>
+        buildMovementGraph(otherWorld.config, otherWorld.manifest, undefined, { forbiddenBoxes }),
+    });
+    expect(mismatchedBuilder.gateStatus).toBe("INCOMPLETE");
+    expect(mismatchedBuilder.reason).toBe("geometry-untrusted");
+  });
+});
+
 describe("U3 依赖与公共面边界", () => {
   it("temporal-gate.ts 不 import temporal.ts / temporal-witness.ts", () => {
     const source = gateSource();
@@ -392,9 +521,29 @@ describe("U3 依赖与公共面边界", () => {
     expect(source).not.toMatch(/analyze\s*:/);
   });
 
-  it("门区模块不含采样循环（全周期结果只能来自闭式）", () => {
+  it("不做图割：无 assessReachability、无 graphCut 字段", () => {
     const source = gateSource();
-    expect(source).not.toMatch(/\b(?:for|while)\s*\(/);
+    expect(source).not.toMatch(/\bassessReachability\s*\(/);
+    expect(source).not.toMatch(/graphCut\s*:/);
+  });
+
+  it("全周期覆盖函数内不含采样循环（complete 只能来自闭式）", () => {
+    const source = gateSource();
+    const start = source.indexOf("const periodCoverageOf = (");
+    if (start < 0) throw new Error("missing periodCoverageOf");
+    const open = source.indexOf("{", start);
+    let depth = 0;
+    let end = -1;
+    for (let index = open; index < source.length; index++) {
+      const char = source[index];
+      if (char === "{") depth++;
+      else if (char === "}") {
+        depth--;
+        if (depth === 0) { end = index; break; }
+      }
+    }
+    expect(end).toBeGreaterThan(open);
+    expect(source.slice(start, end + 1)).not.toMatch(/\b(?:for|while)\s*\(/);
   });
 
   it("导出符号全部标 @internal", () => {

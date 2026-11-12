@@ -1,8 +1,8 @@
 # U3-05 forbiddenInjection
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-05 session 2026-11-12)
 Blocked by: 05
 Map: ../map.md
 Class: U3 / IMPLEMENTATION
@@ -47,4 +47,28 @@ Class: U3 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** `forbiddenInjection` 落地；门区半部四段齐备，未做图割。
+
+| 项 | 结果 |
+| --- | --- |
+| 注入 | 原始 `gateRect` 原样交给 `buildGraph([gateRect])`；扩张只由 `graph.ts` 一次完成，不预扩张、不重复扩张 |
+| 记录 | `{ gateRect, expandedRect, source: "forbiddenBoxes" }` |
+| `expandedRect` | `{ x: gate.x − playerW/2, y: gate.y, w: gate.w + playerW, h: gate.h + playerH }` |
+| 同源校验 | 基线图 vs 传入 `graph` 全等（含 `blocked` / `solids` / `player` / `coverage`）；玩家几何一致 |
+| 注入校验 | 注入图静态底座与基线全等（`blocked` 不变）；`forbidden` 恰为展开公式结果；`standable` 按「自由且下邻 `blocked`」重算 |
+| 语义 | 不可穿越、不提供支撑、门顶不是地板（`standable` 只看 `blocked`） |
+| 反例 | 预扩张 / 重复扩张、图不同源、玩家几何不同源、建图入口不同源 ⇒ `geometry-untrusted` |
+| 图割 | 未调用 `assessReachability`、无 `graphCut` 字段 |
+
+**输入契约扩展（需 R3 关注）**：`PermanentGateInput` 新增 `buildGraph(forbiddenBoxes) => MovementGraph | null`。原因是 U3-05 要求以原始 `gateRect` 调用 `buildMovementGraph`，而 U3-01 的输入不含 `GameConfig` / `AssetPackManifest`，地图又禁止本模块解析 `GameConfig`；该回调由调用方闭包持有 config/manifest/profile，本模块不新增模块依赖。同源性由 `buildGraph([])` 重跑基线图逐项校验。
+
+| 项 | 结果 |
+| --- | --- |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 gate 测试 | 退出码 **0**；**40 / 40 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed** |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+证据：[`../evidence/05-forbidden-injection.md`](../evidence/05-forbidden-injection.md)。
+
+**下游**：U3-06（测试矩阵与 D4 反例）已 **unblocked**。本票未启动 U3-06。

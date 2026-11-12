@@ -91,8 +91,16 @@ export type PermanentGateInput = {
   readonly spawnBox: Aabb;
   /** 配置派生的目标矩形（未外扩）。 */
   readonly goalRect: Aabb;
-  /** 只读 graph 句柄；本模块不建图、不修改 graph。 */
+  /** 只读 graph 句柄（基线图，不带 `forbiddenBoxes`）；本模块不修改它。 */
   readonly graph: MovementGraph;
+  /**
+   * 建图入口。调用方持有 `config` / `manifest` / `profile`，本模块**不解析**
+   * `GameConfig`；实现必须是
+   * `buildMovementGraph(config, manifest, profile, { forbiddenBoxes })`
+   * 且与 `graph` 同源。本模块用 `buildGraph([])` 重跑基线图校验同源，
+   * 再以**原始** `gateRect` 注入一次（扩张只由 `graph.ts` 完成）。
+   */
+  readonly buildGraph: (forbiddenBoxes: readonly Aabb[]) => MovementGraph | null;
 };
 
 // ── 失败构造 ────────────────────────────────────────────────────────────────
@@ -216,6 +224,114 @@ const sideRuleOf = (input: PermanentGateInput, gate: GateGeometry): GateSideChec
   return { ok: false, reason: "no-permanent-gate" };
 };
 
+// ── forbidden 注入（D4 §3） ─────────────────────────────────────────────────
+
+/** @internal 逐元素相等（`Uint8Array` 掩码比较）。 */
+const sameNumbers = (a: ArrayLike<number>, b: ArrayLike<number>): boolean => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+};
+
+/** @internal 静态底座相等：世界、玩家、solids、coverage 与 `blocked`。 */
+const sameStatics = (a: MovementGraph, b: MovementGraph): boolean =>
+  a.width === b.width &&
+  a.height === b.height &&
+  a.stride === b.stride &&
+  a.coverage === b.coverage &&
+  sameNumbers(a.blocked, b.blocked) &&
+  JSON.stringify(a.solids) === JSON.stringify(b.solids) &&
+  JSON.stringify(a.player) === JSON.stringify(b.player);
+
+/** @internal 同一份基线图：静态底座 + `forbidden` + `standable` 全等。 */
+const sameGraph = (a: MovementGraph, b: MovementGraph): boolean =>
+  sameStatics(a, b) && sameNumbers(a.forbidden, b.forbidden) && sameNumbers(a.standable, b.standable);
+
+/**
+ * @internal `graph.ts` 的禁区脚点格范围（与 `buildMovementGraph` 的展开公式一致）。
+ *
+ * 只用于**校验**注入结果，不用于注入本身：扩张必须由 `graph.ts` 完成。
+ */
+const forbiddenCellRange = (
+  box: Aabb,
+  player: Size,
+  graph: MovementGraph,
+): { readonly x0: number; readonly x1: number; readonly y0: number; readonly y1: number } => {
+  const halfW = player.w / 2;
+  return {
+    x0: Math.max(0, Math.floor(box.x - halfW) + 1),
+    x1: Math.min(graph.width, Math.ceil(box.x + box.w + halfW) - 1),
+    y0: Math.max(0, Math.floor(box.y) + 1),
+    y1: Math.min(graph.height, Math.ceil(box.y + box.h + player.h) - 1),
+  };
+};
+
+/** @internal forbidden 注入判定结果。 */
+type GateInjectionCheck =
+  | { readonly ok: true; readonly injection: GateForbiddenInjection }
+  | { readonly ok: false; readonly reason: DegradationReason };
+
+/**
+ * @internal
+ * `forbiddenBoxes` 注入与记录。
+ *
+ * - 把**原始** `gateRect`（`[L, R] × [y, y + height]`）原样交给建图入口；
+ *   扩张只由 `graph.ts` 完成一次 —— 不预扩张、不重复扩张。
+ * - 不写入 `blocked`：禁区只拒绝穿越，不提供支撑；门顶不是地板
+ *   （`standable` 只看 `blocked`）。
+ * - 基线图、注入图与传入的 `graph` 必须同源（同一份 solids / 玩家几何 / profile），
+ *   否则 `geometry-untrusted`。
+ * - 本模块只记录注入，**不**做图割、不调用 `assessReachability`、不产出 `graphCut`。
+ */
+const forbiddenInjectionOf = (
+  input: PermanentGateInput,
+  gate: GateGeometry,
+): GateInjectionCheck => {
+  const gateRect: Aabb = { x: gate.L, y: gate.y, w: gate.width, h: gate.height };
+  const base = input.buildGraph([]);
+  if (base === null || !sameGraph(base, input.graph)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  if (base.player.size.w !== input.playerSize.w || base.player.size.h !== input.playerSize.h) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+
+  const injected = input.buildGraph([gateRect]);
+  if (injected === null || !sameStatics(injected, base)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+
+  const { x0, x1, y0, y1 } = forbiddenCellRange(gateRect, input.playerSize, base);
+  const expectedForbidden = base.forbidden.slice();
+  for (let x = x0; x <= x1; x++) {
+    for (let y = y0; y <= y1; y++) expectedForbidden[x * base.stride + y] = 1;
+  }
+  if (!sameNumbers(expectedForbidden, injected.forbidden)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+
+  const expectedStandable = new Uint8Array(base.blocked.length);
+  for (let x = 0; x <= base.width; x++) {
+    for (let y = 0; y <= base.height; y++) {
+      const index = x * base.stride + y;
+      if (expectedForbidden[index] === 0 && y + 1 <= base.height && base.blocked[index + 1] === 1) {
+        expectedStandable[index] = 1;
+      }
+    }
+  }
+  if (!sameNumbers(expectedStandable, injected.standable)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+
+  const expandedRect: Aabb = {
+    x: gateRect.x - input.playerSize.w / 2,
+    y: gateRect.y,
+    w: gateRect.w + input.playerSize.w,
+    h: gateRect.h + input.playerSize.h,
+  };
+  return { ok: true, injection: { gateRect, expandedRect, source: "forbiddenBoxes" } };
+};
+
 // ── 入口 ────────────────────────────────────────────────────────────────────
 
 // ── 全周期覆盖（D4 §1.2–§1.3） ──────────────────────────────────────────────
@@ -264,10 +380,10 @@ const periodCoverageOf = (motion: TriangleMotion): GateCoverageCheck => {
  * @internal
  * U3 门区半部的入口。
  *
- * U3-04 填 `gate`、`periodCoverage` 与 `sideRule`；`forbiddenInjection`
- * （U3-05）仍为 `null`。三者全部成立时 `gateStatus` 为 `COMPLETE`，但这只是
- * **门区半部**完成，不代表完整 `PermanentGateProof` —— `graphCut` / hop /
- * 模型闭合归 U4 / U5，**不得**在本模块伪造。
+ * 填 `gate`（U3-02）、`periodCoverage`（U3-03）、`sideRule`（U3-04）与
+ * `forbiddenInjection`（U3-05）。四者全部成立时 `gateStatus` 为 `COMPLETE`，
+ * 但这只是**门区半部**完成，不代表完整 `PermanentGateProof` —— `graphCut` /
+ * hop / 模型闭合归 U4 / U5，**不得**在本模块伪造。
  *
  * `INCOMPLETE` 一律不携带半部结果（宁可整段为 `null`，也不留下可被误读为
  * 「部分证明」的几何）。
@@ -279,11 +395,13 @@ export const computePermanentGate = (input: PermanentGateInput): PermanentGateHa
   if (!coverage.ok) return incomplete(coverage.reason);
   const side = sideRuleOf(input, geometry.gate);
   if (!side.ok) return incomplete(side.reason);
+  const injection = forbiddenInjectionOf(input, geometry.gate);
+  if (!injection.ok) return incomplete(injection.reason);
   return {
     gate: geometry.gate,
     periodCoverage: coverage.coverage,
     sideRule: side.sideRule,
-    forbiddenInjection: null,
+    forbiddenInjection: injection.injection,
     gateStatus: "COMPLETE",
     reason: null,
   };
