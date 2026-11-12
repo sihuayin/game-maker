@@ -1,7 +1,7 @@
 # U1-R1 独立复核
 
 Type: task
-Status: open
+Status: resolved
 Owner: independent reviewer subagent · 2026-11-12
 Blocked by: 06
 Map: ../map.md
@@ -54,3 +54,22 @@ Class: U1 / REVIEW
 ### 验收
 
 报告完整、可复核；未修改任何产品文件。
+
+## Answer
+
+- **结论：PASS**（R1 通过；§9.1 七项全部 PASS，无 FAIL / NOT_RUN）
+- **报告**：`.scratch/level-playability-v1.1-i02/reports/R1-review.md`
+- **逐项结果**：
+  - 运动模型 PASS
+  - AABB 语义 PASS
+  - 连续求交 PASS
+  - ε PASS
+  - 数值稳定性 PASS
+  - 反例 PASS（I02-03 §8 六处 P0 差异、采样替代、折返点相切、负时间、同速、非有限值）
+  - 范围与确定性 PASS
+- **命令与退出码**：`pnpm build` 0；`pnpm typecheck` 0；U1 定向 vitest 58/58（0）；`playability-temporal-input.test.ts` 65/65（0，T-57/58/61/62/64 全 ✓）；`pnpm test` 172 文件 / 2674 测试全通过（0；2 条 vitest-worker `onTaskUpdate` RPC 超时，无测试失败，原始证据同样存在）。
+- **Diff scope**：仅 7 个 U1 白名单产品文件（`temporal.ts` 纯增）与 `.scratch/level-playability-v1.1-u1/**`；无新依赖、无 JSON fixture、无公共导出、无生产接线、未提前执行 `maxCutsPerBranch` / Witness 体积 / 相位网格搜索。
+- **未覆盖项**：`analyzeTemporalInternal` 按 U1 范围未实现；A–J 矩阵属 U2+；墙钟 `>=` 边界约定、`maxEdges: 0` 覆盖等观察见报告 §7（均不构成 R1 FAIL）。
+- **复核人**：independent reviewer subagent, fresh context · 2026-11-12
+
+Status: resolved
