@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Owner: —
+Owner: claude (U2-06 session 2026-11-12)
 Blocked by: 06
 Map: ../map.md
 Class: U2 / TESTS
