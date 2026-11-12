@@ -76,13 +76,13 @@ describe("U3-01 门区半部 API 契约", () => {
     ]);
   });
 
-  it("有效几何返回 COMPLETE，填 gate 与 periodCoverage，不生成 U4 字段", () => {
+  it("有效几何返回 COMPLETE，填 gate / periodCoverage / sideRule，不生成 U4 字段", () => {
     const result = resultOf();
     expect(result.gateStatus).toBe("COMPLETE");
     expect(result.reason).toBeNull();
     expect(result.gate).not.toBeNull();
     expect(result.periodCoverage).not.toBeNull();
-    expect(result.sideRule).toBeNull();
+    expect(result.sideRule).not.toBeNull();
     expect(result.forbiddenInjection).toBeNull();
     const keys = Object.keys(result);
     for (const forbidden of ["graphCut", "hopDoubling", "hopSamplingCoverage", "movementModelClosure"]) {
@@ -105,6 +105,7 @@ describe("U3-01 门区半部 API 契约", () => {
       expect(U3_REASONS).toContain(result.reason);
       expect(result.gate).toBeNull();
       expect(result.periodCoverage).toBeNull();
+      expect(result.sideRule).toBeNull();
     }
   });
 
@@ -116,7 +117,8 @@ describe("U3-01 门区半部 API 契约", () => {
     const injection: PermanentGateProof["forbiddenInjection"] | null = result.forbiddenInjection;
     expect(gate).toEqual(result.gate);
     expect(period).toEqual(result.periodCoverage);
-    expect([side, injection]).toEqual([null, null]);
+    expect(side).toEqual(result.sideRule);
+    expect(injection).toBeNull();
   });
 
   it("相同输入重复运行结果规范化相等（无随机 / 时间依赖）", () => {
@@ -259,6 +261,101 @@ describe("U3-03 全周期覆盖", () => {
   });
 });
 
+describe("U3-04 判侧规则", () => {
+  it("左→右：spawnRight ≤ L 且 goalRegion.x ≥ R", () => {
+    const result = resultOf();
+    const side = result.sideRule;
+    if (side === null) throw new Error("expected side rule");
+    expect(side.direction).toBe("left->right");
+    expect(side.spawnBox).toEqual(input().spawnBox);
+    expect(side.goalRegion).toEqual({ x: 86.5, y: 19.5, w: 7, h: 21 });
+  });
+
+  it("右→左：spawnBox.x ≥ R 且 goalRegion 右缘 ≤ L", () => {
+    const result = resultOf({
+      spawnBox: boxFromFoot({ x: 95, y: 40 }, { w: 2, h: 20 }),
+      goalRect: aabb(2, 20, 6, 20),
+    });
+    const side = result.sideRule;
+    if (side === null) throw new Error("expected side rule");
+    expect(side.direction).toBe("right->left");
+    expect(side.goalRegion).toEqual({ x: 1.5, y: 19.5, w: 7, h: 21 });
+  });
+
+  it("goalRegion 四边各外扩 0.5px，spawnBox 保持精确盒（不外扩）", () => {
+    const goalRect = aabb(87, 20, 6, 20);
+    const spawnBox = input().spawnBox;
+    const side = resultOf({ goalRect, spawnBox }).sideRule;
+    if (side === null) throw new Error("expected side rule");
+    expect(side.goalRegion).toEqual({ x: 86.5, y: 19.5, w: 7, h: 21 });
+    expect(side.spawnBox).toEqual(spawnBox);
+    expect(side.goalRegion).not.toEqual(goalRect);
+  });
+
+  it("同侧 / 目标跨门 / 起点跨门 ⇒ INCOMPLETE + no-permanent-gate", () => {
+    const cases: readonly Partial<PermanentGateInput>[] = [
+      { goalRect: aabb(2, 20, 6, 20) }, // 起点与目标同侧
+      { goalRect: aabb(45, 20, 20, 20) }, // 目标跨门
+      { spawnBox: boxFromFoot({ x: 51, y: 40 }, { w: 2, h: 20 }) }, // 起点跨门
+    ];
+    for (const overrides of cases) {
+      const result = resultOf(overrides);
+      expect(result.gateStatus).toBe("INCOMPLETE");
+      expect(result.reason).toBe("no-permanent-gate");
+      expect(result.sideRule).toBeNull();
+    }
+  });
+
+  it("边界相切按 ≤ / ≥ 闭合成立（左→右 / 右→左各一例）", () => {
+    const leftToRight = resultOf({
+      spawnBox: aabb(48, 20, 2, 20), // spawnRight = 50 = L
+      goalRect: aabb(60.5, 20, 6, 20), // goalRegion.x = 60 = R
+    });
+    expect(leftToRight.gateStatus).toBe("COMPLETE");
+    expect(leftToRight.sideRule?.direction).toBe("left->right");
+
+    const rightToLeft = resultOf({
+      spawnBox: aabb(60, 20, 2, 20), // spawnBox.x = 60 = R
+      goalRect: aabb(43.5, 20, 6, 20), // goalRegion 右缘 = 50 = L
+    });
+    expect(rightToLeft.gateStatus).toBe("COMPLETE");
+    expect(rightToLeft.sideRule?.direction).toBe("right->left");
+  });
+
+  it("不得直接用未外扩 Goal Rect：外扩后才成立的分离不算判侧", () => {
+    // 未外扩时 x = 60 = R 成立，外扩后 goalRegion.x = 59.5 < R ⇒ 必须 INCOMPLETE。
+    const leftToRight = resultOf({ goalRect: aabb(60, 20, 6, 20) });
+    expect(leftToRight.gateStatus).toBe("INCOMPLETE");
+    expect(leftToRight.reason).toBe("no-permanent-gate");
+
+    // 未外扩时右缘 = 50 = L 成立，外扩后 50.5 > L ⇒ 必须 INCOMPLETE。
+    const rightToLeft = resultOf({ goalRect: aabb(44, 20, 6, 20) });
+    expect(rightToLeft.gateStatus).toBe("INCOMPLETE");
+    expect(rightToLeft.reason).toBe("no-permanent-gate");
+  });
+
+  it("spawn 用精确盒，不做 0.5px 外扩", () => {
+    // spawnRight = 50.5 略超 L = 50；若对 spawn 做外扩/内缩就会被误判为分离。
+    const result = resultOf({ spawnBox: aabb(48.5, 20, 2, 20) });
+    expect(result.gateStatus).toBe("INCOMPLETE");
+    expect(result.reason).toBe("no-permanent-gate");
+  });
+
+  it("非法 goalRect ⇒ geometry-untrusted", () => {
+    for (const goalRect of [
+      aabb(87, 20, 0, 20),
+      aabb(87, 20, 6, 0),
+      aabb(Number.NaN, 20, 6, 20),
+      aabb(87, 20, Number.POSITIVE_INFINITY, 20),
+    ]) {
+      const result = resultOf({ goalRect });
+      expect(result.gateStatus).toBe("INCOMPLETE");
+      expect(result.reason).toBe("geometry-untrusted");
+      expect(result.sideRule).toBeNull();
+    }
+  });
+});
+
 describe("U3 依赖与公共面边界", () => {
   it("temporal-gate.ts 不 import temporal.ts / temporal-witness.ts", () => {
     const source = gateSource();
@@ -308,7 +405,7 @@ describe("U3 依赖与公共面边界", () => {
       .map(({ line, index }) => ({ name: line.split(/\s+/)[2], index }));
     expect(exported.length).toBeGreaterThan(0);
     for (const { name, index } of exported) {
-      const window = lines.slice(Math.max(0, index - 8), index).join("\n");
+      const window = lines.slice(Math.max(0, index - 20), index).join("\n");
       expect(window, name).toContain("@internal");
     }
   });

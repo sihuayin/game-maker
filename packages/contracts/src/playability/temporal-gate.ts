@@ -34,6 +34,7 @@
 //   **不进入**碰撞谓词。x 域取 Hazard 锚点的全周期行程 `[at.x, at.x + distance]`：
 //   它是本层唯一独立的长度标尺（用门宽自身作标尺会让 `width > ε` 退化为恒真）。
 // ─────────────────────────────────────────────────────────────────────────────
+import { expandBox } from "./geometry.js";
 import type { Aabb, Size } from "./geometry.js";
 import type { MovementGraph } from "./graph.js";
 import { epsilon } from "./temporal-motion.js";
@@ -166,6 +167,55 @@ const gateGeometryOf = (input: PermanentGateInput): GateGeometryCheck => {
   return { ok: true, gate: { L, R, width, y: hazY, height: hazH, epsilon: threshold } };
 };
 
+// ── 判侧规则（D4 §2） ───────────────────────────────────────────────────────
+
+/** @internal PU 目标区域四边外扩 [px]（D4 §2；与 D3 的 NB 内缩方向相反）。 */
+const GOAL_INFLATION = 0.5;
+
+/** @internal 判侧判定结果。 */
+type GateSideCheck =
+  | { readonly ok: true; readonly sideRule: GateSideRule }
+  | { readonly ok: false; readonly reason: DegradationReason };
+
+/**
+ * @internal
+ * 判侧：证明起点与目标被门区**分离**。
+ *
+ * ```text
+ * goalRegion = inflate(goalRect, 0.5)
+ * 左→右：spawnBox.x + spawnBox.w ≤ L ∧ goalRegion.x ≥ R
+ * 右→左：spawnBox.x ≥ R            ∧ goalRegion.x + goalRegion.w ≤ L
+ * ```
+ *
+ * - spawn 用 D3 的**精确盒**，不外扩；**不得**用 `startCells()` 的宽松多起点。
+ * - `goalRegion` 四边外扩 `0.5px`：PU 是「到不了」的过近似，方向与 NB 的到达内缩
+ *   相反，**不得**复用 witness 的到达判断。
+ * - 同侧 / 目标跨门 / 起点不在严格一侧 / 无法判侧 ⇒ `no-permanent-gate`；
+ *   绝不输出可升级的门区结论。
+ */
+const sideRuleOf = (input: PermanentGateInput, gate: GateGeometry): GateSideCheck => {
+  const { spawnBox, goalRect } = input;
+  const goalValues = [goalRect.x, goalRect.y, goalRect.w, goalRect.h];
+  if (goalValues.some((value) => !Number.isFinite(value))) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  if (!(goalRect.w > 0) || !(goalRect.h > 0)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+
+  const goalRegion = expandBox(goalRect, GOAL_INFLATION);
+  const spawnRight = spawnBox.x + spawnBox.w;
+  const goalRight = goalRegion.x + goalRegion.w;
+
+  if (spawnRight <= gate.L && goalRegion.x >= gate.R) {
+    return { ok: true, sideRule: { direction: "left->right", spawnBox, goalRegion } };
+  }
+  if (spawnBox.x >= gate.R && goalRight <= gate.L) {
+    return { ok: true, sideRule: { direction: "right->left", spawnBox, goalRegion } };
+  }
+  return { ok: false, reason: "no-permanent-gate" };
+};
+
 // ── 入口 ────────────────────────────────────────────────────────────────────
 
 // ── 全周期覆盖（D4 §1.2–§1.3） ──────────────────────────────────────────────
@@ -214,20 +264,25 @@ const periodCoverageOf = (motion: TriangleMotion): GateCoverageCheck => {
  * @internal
  * U3 门区半部的入口。
  *
- * U3-03 填 `gate` 与 `periodCoverage`；`sideRule`（U3-04）与
- * `forbiddenInjection`（U3-05）仍为 `null`。门区几何有效时 `gateStatus` 为
- * `COMPLETE`，但这只是**门区半部**完成，不代表完整 `PermanentGateProof` ——
- * `graphCut` / hop / 模型闭合归 U4 / U5，**不得**在本模块伪造。
+ * U3-04 填 `gate`、`periodCoverage` 与 `sideRule`；`forbiddenInjection`
+ * （U3-05）仍为 `null`。三者全部成立时 `gateStatus` 为 `COMPLETE`，但这只是
+ * **门区半部**完成，不代表完整 `PermanentGateProof` —— `graphCut` / hop /
+ * 模型闭合归 U4 / U5，**不得**在本模块伪造。
+ *
+ * `INCOMPLETE` 一律不携带半部结果（宁可整段为 `null`，也不留下可被误读为
+ * 「部分证明」的几何）。
  */
 export const computePermanentGate = (input: PermanentGateInput): PermanentGateHalf => {
   const geometry = gateGeometryOf(input);
   if (!geometry.ok) return incomplete(geometry.reason);
   const coverage = periodCoverageOf(input.motion);
   if (!coverage.ok) return incomplete(coverage.reason);
+  const side = sideRuleOf(input, geometry.gate);
+  if (!side.ok) return incomplete(side.reason);
   return {
     gate: geometry.gate,
     periodCoverage: coverage.coverage,
-    sideRule: null,
+    sideRule: side.sideRule,
     forbiddenInjection: null,
     gateStatus: "COMPLETE",
     reason: null,

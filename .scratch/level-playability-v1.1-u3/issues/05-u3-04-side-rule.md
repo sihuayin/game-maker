@@ -1,8 +1,8 @@
 # U3-04 判侧规则
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-04 session 2026-11-12)
 Blocked by: 04
 Map: ../map.md
 Class: U3 / IMPLEMENTATION
@@ -44,4 +44,21 @@ Class: U3 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 判侧规则落地；`forbiddenInjection` 仍未实现。
+
+| 项 | 结果 |
+| --- | --- |
+| 目标过近似 | `goalRegion = expandBox(goalRect, 0.5)`（四边各 +0.5px） |
+| spawn | 精确盒，不外扩 / 不内缩 / 不取整；不使用 `startCells()` |
+| 左→右 / 右→左 | `spawnRight ≤ L ∧ goalRegion.x ≥ R` / `spawnBox.x ≥ R ∧ goalRegion.right ≤ L` |
+| 失败 | 同侧 / 目标跨门 / 起点跨门 / 无法判侧 ⇒ `INCOMPLETE` + `no-permanent-gate`，`sideRule: null` |
+| 非法目标 | 非有限 / 非正宽高 ⇒ `geometry-untrusted` |
+| 方向语义 | 目标外扩（PU 过近似），与 NB 内缩相反；未复用 witness 到达判断 |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 gate 测试 | 退出码 **0**；**31 / 31 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed** |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+证据：[`../evidence/04-side-rule.md`](../evidence/04-side-rule.md)。
+
+**下游**：U3-05（forbiddenInjection）已 **unblocked**。本票未启动 U3-05。

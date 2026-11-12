@@ -130,6 +130,7 @@ U3-00 初始化与授权台账
 - [U3-01 门区模块 API 骨架与输入契约](issues/02-u3-01-api-skeleton.md): `computePermanentGate` 契约冻结（输入为已派生显式几何，输出取 D9 索引类型）；骨架恒 `INCOMPLETE` + `no-permanent-gate`，原因闭集两项，无 barrel 导出。
 - [U3-02 门区几何与闭式公式](issues/03-u3-02-geometry.md): 门区闭式 `L/R/width` 与 y 严格重叠判定落地；ε 取锚点行程 `[at, at+d]`；失败分 `geometry-untrusted` / `no-permanent-gate`，门区无 pad。
 - [U3-03 全周期覆盖](issues/04-u3-03-period-coverage.md): `periodCoverage` 由闭式极值 `at` / `at+d` 生成，记录 `[[0,P/2],[P/2,P]]`（不合并）；模块无采样循环，非法周期 ⇒ `geometry-untrusted`。
+- [U3-04 判侧规则](issues/05-u3-04-side-rule.md): 精确 spawn 盒 + `goalRegion = inflate(goalRect, 0.5)`，两方向闭式判侧；同侧 / 跨门 / 无法判侧 ⇒ `no-permanent-gate`。
 
 ## Not yet specified
 
