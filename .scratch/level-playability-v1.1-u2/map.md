@@ -118,6 +118,8 @@ U2-00 初始化与授权台账
 - 2026-11-12 · **U2-03 全相位 Winning Set 与终止性** — `resolved`；`temporal-witness.ts` 只增 `searchWinningSet`（最小不动点 `μX.(Goal ∪ Pre∃(X))`、反向 BFS、Goal rank 0、策略 rank 严格递减）；`N` 个半开相位格先整格残差等待、再检查 `(spawn.footX,(k+1) mod N) ∈ W`；`complete / failed / insufficient`，失败用 D9 `no-witness-found`、耗尽用实际预算原因码，均只导 IE；复用 U9+W 共用 `WitnessWorkBudget`；build / typecheck / input 65/65 全绿 → [票](issues/04-u2-03-winning-set.md)。U2-04 unblocked。
 - 2026-11-12 · **U2-04 U9 安全等待格证书** — `resolved`；`temporal-witness.ts` 只增 `searchU9WaitingCell` / `verifyU9Stay` / `isValidWaitingCell`，并把 U2-03 反向 BFS 抽为内部 `solveWinningCore`（目标集可泛化为任意 x 列，旧 API / 语义不变）；U9 四项（standable 走廊格、接近段 `∀k` 残差等待 + `W_{→s}` 严格递减 rank、`[T_arr,T_arr+P]` 只在折返点切段 + 方向 `lagPad` 的解析停留检查、出口 `∃j` 最小 rank 相位）；`coverage.temporal` / 玩家几何作为显式前置，失败用 D9 `geometry-untrusted`；U9 + W 共用同一 `WitnessWorkBudget`；build / typecheck / input 65/65 全绿，探针 26/26 → [票](issues/05-u2-04-u9.md)。U2-05 unblocked。
 
+- 2026-11-12 · **U2-05 Witness 编码、体积与确定性** — `resolved`；`temporal-witness.ts` 只增 `encodeWitness`（`+662 / −2`，删除行只来自模块头注释）：W 从 N 个 spawn 相位沿 rank 严格递减后继到 Goal，去重转移进 `verifications`；U9 接近段 `∀k` + 规范相位格 N 个单格 stay wait + 出口 `∃j` 全进策略表，残差等待由 `phaseCoverage` 承载，termination 用有限 trace；`volume.bytes` = Witness 去掉 `volume` 的规范化 JSON 的 UTF-8 长度，超 `1M` / `64 MiB` ⇒ `witness-volume` 且无部分 witness；双档一次一档、跨档复用 U9 停留记录 ⇒ `model-out`；build / typecheck / input 65/65 / temporal 123/123 全绿，真实夹具 W 479,983 转移 / 32.5MB、U9 10,336 转移，探针全过 → [票](issues/06-u2-05-witness-encoding.md)。U2-06 unblocked。
+
 ## Not yet specified
 
 <!-- 路线由已签署授权包 D3 / D10 / §3.5 / §9.2 冻结；无已知雾区。任何新增文件 / 扩权需求 = STOP + HITL，不在此处自行毕业。 -->
