@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Owner: —
+Owner: claude (U2-07 audit session 2026-11-12)
 Blocked by: 07
 Map: ../map.md
 Class: U2 / AUDIT
