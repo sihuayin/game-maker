@@ -9,7 +9,7 @@
 import { describe, expect, it } from "vitest";
 import { boxFromFoot, overlapsStrict } from "../src/playability/geometry.js";
 import { buildMovementGraph } from "../src/playability/graph.js";
-import { intersectContinuous, triangleMaxRate } from "../src/playability/temporal-motion.js";
+import { hazardBoxAt, intersectContinuous, triangleMaxRate } from "../src/playability/temporal-motion.js";
 import type { BudgetProfile } from "../src/playability/temporal-result.js";
 import {
   createWitnessWorkBudget,
@@ -426,7 +426,7 @@ describe("U2 S1–S4 转移验证", () => {
     expect(coarser.failure).toBe("hazard");
   });
 
-  it("[I02-02][AC-04][S2] lagPad 按单调段方向加宽：上升段右扩、下降段左扩", () => {
+  it("[I02-02][AC-04][S2] lagPad 两侧对称加宽：上升 / 下降段也向反方向扩", () => {
     const space = spaceOf();
     const rising = customHazard({ atX: 47, distance: 10, periodMs: 200 });
     // t=50 时锚点 x=52、盒 [50,54]；玩家 [54,56] 只相切。
@@ -434,6 +434,12 @@ describe("U2 S1–S4 转移验证", () => {
     const risingPadded = transition(space, rising, { footX: 55, k: 0 }, { footX: 55, k: 1 }, 20);
     expect(risingPadded.verified).toBe(false);
     expect(risingPadded.failure).toBe("hazard");
+    // 对称语义：上升段的 pad 也必须向左扩（旧实现只向右扩，会漏）。
+    // t=0 时锚点 x=47、盒 [45,49]；玩家 [43,45] 只相切，pad 20（=2px）后正宽度重叠。
+    expect(transition(space, rising, { footX: 44, k: 0 }, { footX: 44, k: 1 }, 0).verified).toBe(true);
+    const risingPaddedLeft = transition(space, rising, { footX: 44, k: 0 }, { footX: 44, k: 1 }, 20);
+    expect(risingPaddedLeft.verified).toBe(false);
+    expect(risingPaddedLeft.failure).toBe("hazard");
 
     const falling = customHazard({ atX: 57, distance: 10, periodMs: 200 });
     // t=150 时锚点 x=62、盒 [60,64]；玩家 [58,60] 只相切。
@@ -441,6 +447,13 @@ describe("U2 S1–S4 转移验证", () => {
     const fallingPadded = transition(space, falling, { footX: 59, k: 2 }, { footX: 59, k: 3 }, 20);
     expect(fallingPadded.verified).toBe(false);
     expect(fallingPadded.failure).toBe("hazard");
+    // 对称语义：下降段的 pad 也必须向右扩（旧实现只向左扩，会漏）。
+    // cell k=2 = [100,150]；t=100 时锚点 x=67、盒 [65,69]，玩家 [70,72] 分离 1px；
+    // 之后盒向左移动，单侧（向左）pad 永远碰不到玩家；对称 pad 2px ⇒ 右缘 71 重叠。
+    expect(transition(space, falling, { footX: 71, k: 2 }, { footX: 71, k: 3 }, 0).verified).toBe(true);
+    const fallingPaddedRight = transition(space, falling, { footX: 71, k: 2 }, { footX: 71, k: 3 }, 20);
+    expect(fallingPaddedRight.verified).toBe(false);
+    expect(fallingPaddedRight.failure).toBe("hazard");
   });
 
   it("[I02-02][AC-03][S2] 折返点切段：跨折返点的相位格被切成 2 段", () => {
@@ -454,6 +467,76 @@ describe("U2 S1–S4 转移验证", () => {
       expect(check.t0).toBe(witnessPhaseCellBounds(space.grid, k).t0);
       expect(check.t1).toBe(witnessPhaseCellBounds(space.grid, k).t1);
     }
+  });
+
+  it("[I02-02][R2-FIX][AC-03][S2] 官方 16.67ms 反例：lag 窗口跨折返点必须判 hazard", () => {
+    // R2-review §4.3：N=40、dt=5ms，cell 39=[195,200] 位于下降段末端，lag 窗口
+    // 跨过 t=200 的谷底后 Hazard 回到上升段另一侧。单侧（向左）pad 看不见该位姿。
+    const options: WitnessWorldOptions = {
+      hazardX: 5, hazardDistance: 50, hazardPeriodMs: 200, hazardW: 10, hazardH: 12,
+      spawnX: 15, playerSpeed: 200,
+    };
+    const space = spaceOf(options);
+    const hazard = witnessHazard(options);
+    expect(space.grid.phaseSteps).toBe(40);
+    expect(space.grid.dtMs).toBe(5);
+
+    const check = transition(space, hazard, { footX: 15, k: 39 }, { footX: 15, k: 0 }, 16.67);
+    expect(check.t0).toBe(195);
+    expect(check.t1).toBe(200);
+    expect(check.verified).toBe(false);
+    expect(check.failure).toBe("hazard");
+
+    // 精确 ∃δ 见证：玩家盒 [14,16]×[20,40]；t=195、δ=16.6 ⇒ u=211.6，
+    // p(211.6)=10.8、Hazard 盒 [5.8,15.8] 与玩家正宽度重叠。
+    const playerBox = witnessPlayerBox(space, 15);
+    expect(overlapsStrict(playerBox, hazardBoxAt(hazard.motion, hazard.box, 200))).toBe(false);
+    expect(overlapsStrict(playerBox, hazardBoxAt(hazard.motion, hazard.box, 211.6))).toBe(true);
+  });
+
+  it("[I02-02][R2-FIX][AC-03][S2] lagMs=200 跨折返点变体（N=3、k=2、footX=45）", () => {
+    // R2-review §4.3 的 200ms 变体：cell 2=[133.33,200] 在下降段，pad=0.5×200=100px。
+    const options: WitnessWorldOptions = {
+      hazardX: 0, hazardDistance: 50, hazardPeriodMs: 200, hazardW: 10, hazardH: 12,
+      spawnX: 5, playerSpeed: 20,
+    };
+    const space = spaceOf(options, budget({ maxStates: 300 }));
+    const hazard = witnessHazard(options);
+    expect(space.grid.phaseSteps).toBe(3);
+    expect(space.grid.dtMs).toBeCloseTo(200 / 3, 12);
+
+    const check = transition(space, hazard, { footX: 45, k: 2 }, { footX: 45, k: 0 }, 200);
+    expect(check.verified).toBe(false);
+    expect(check.failure).toBe("hazard");
+
+    // 名义下降段右缘最大 38.33 < 玩家左缘 44；t=200、δ=100（≤200）时 p=50，
+    // Hazard 盒 [45,55] 与玩家盒 [44,46] 正宽度重叠。
+    const playerBox = witnessPlayerBox(space, 45);
+    expect(overlapsStrict(playerBox, hazardBoxAt(hazard.motion, hazard.box, 200))).toBe(false);
+    expect(overlapsStrict(playerBox, hazardBoxAt(hazard.motion, hazard.box, 300))).toBe(true);
+  });
+
+  it("[I02-02][R2-FIX][AC-03][W/U9] 跨折返点的 move 转移（W_{→s} / W_{→goal} 同型）", () => {
+    // searchWinningSet / searchU9WaitingCell 的每条边都经 verifyTransition；
+    // 这里直接验证一条跨折返点的 move 边，覆盖 wait 之外的另一半转移原语。
+    const options: WitnessWorldOptions = {
+      hazardX: 5, hazardDistance: 50, hazardPeriodMs: 200, hazardW: 10, hazardH: 12,
+      spawnX: 15, playerSpeed: 200,
+    };
+    const space = spaceOf(options);
+    const hazard = witnessHazard(options);
+
+    const crossing = transition(space, hazard, { footX: 14, k: 39 }, { footX: 15, k: 0 }, 16.67);
+    expect(crossing.kind).toBe("move");
+    expect(crossing.verified).toBe(false);
+    expect(crossing.failure).toBe("hazard");
+
+    // 对照：同一条 move 在远离谷底的 cell 19（t∈[95,100]）仍安全，
+    // 说明失败来自 lag 窗口跨折返点，而不是 move / 静态检查本身。
+    const control = transition(space, hazard, { footX: 14, k: 19 }, { footX: 15, k: 20 }, 16.67);
+    expect(control.kind).toBe("move");
+    expect(control.verified).toBe(true);
+    expect(control.failure).toBeNull();
   });
 
   it("[I02-02][AC-03][S3] 相位 / 时间：跨格、回退相位、越界 k、非整数 cycle ⇒ phase", () => {
@@ -551,6 +634,23 @@ describe("U2 残差等待（整格保守覆盖）", () => {
     const check = verifyResidualWait({ space, hazard, lagMs: 0, cell: 1, budget: workBudget() });
     expect(check.verified).toBe(true);
     expect(check.segments).toBe(2);
+  });
+
+  it("[I02-02][R2-FIX][AC-04][residual] lag 跨折返点：整格覆盖必须看见折返后的位姿", () => {
+    // 与 S2 使用同一个对称 pad：cell 39 名义右缘 12.5 < spawn 左缘 14，
+    // 但 lag=16.67 跨过 t=200 后 p=10.8、盒 [5.8,15.8] 与 spawn 正宽度重叠。
+    const options: WitnessWorldOptions = {
+      hazardX: 5, hazardDistance: 50, hazardPeriodMs: 200, hazardW: 10, hazardH: 12,
+      spawnX: 15, playerSpeed: 200,
+    };
+    const space = spaceOf(options);
+    const hazard = witnessHazard(options);
+
+    const nominal = verifyResidualWait({ space, hazard, lagMs: 0, cell: 39, budget: workBudget() });
+    expect(nominal.verified).toBe(true);
+    const padded = verifyResidualWait({ space, hazard, lagMs: 16.67, cell: 39, budget: workBudget() });
+    expect(padded.verified).toBe(false);
+    expect(padded.failure).toBe("hazard");
   });
 
   it("[I02-02][AC-04][residual] 相切不算撞、正宽度才算撞（无最小安全窗口）", () => {
@@ -655,6 +755,21 @@ describe("U2 全相位 Winning Set", () => {
     expect(result.phaseCoverage.coveredPhases.length).toBeLessThan(space.grid.phaseSteps);
     expect(result.phaseCoverage.uncoveredPhases.length).toBeGreaterThan(0);
     expect(result.phases.some((phase) => !phase.residualWait.verified)).toBe(true);
+  });
+
+  it("[I02-02][R2-FIX][AC-03][W] 跨折返点的残差等待使 cell 39 不再被覆盖", () => {
+    // W 的每个相位格先做整格残差等待；修复前 cell 39（下降段末端）被假覆盖，
+    // 修复后必须因跨折返点的 ∃δ 位姿而失败。
+    const options: WitnessWorldOptions = {
+      hazardX: 5, hazardDistance: 50, hazardPeriodMs: 200, hazardW: 10, hazardH: 12,
+      spawnX: 15, playerSpeed: 200,
+    };
+    const space = spaceOf(options);
+    const hazard = witnessHazard(options);
+    const result = runW(space, hazard, 16.67);
+    expect(result.status).toBe("failed");
+    expect(result.phaseCoverage.uncoveredPhases).toContain(39);
+    expect(nth(result.phases, 39).residualWait.verified).toBe(false);
   });
 });
 

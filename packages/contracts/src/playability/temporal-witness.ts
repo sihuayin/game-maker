@@ -354,15 +354,16 @@ export function resolveWitnessSpace(input: WitnessSpaceInput): WitnessSpaceResul
 //   失败原因只在本模块的 `TransitionFailureKind` 里，不新增 D9 原因码。
 //   S1 用玩家盒 x 的**线性扫掠区间**与 `graph.solids` 做 `overlapsStrict`：
 //   扫掠并集的正宽度重叠 ⇒ 存在正时长的严格重叠（不能只查端点 `standable`）。
-//   S2 先按折返点 `m·P/2` 切段，再**逐段**按该单调段方向取 `lagPad`，构造保守
-//   加宽盒后调用 `intersectContinuous`；不得用单一 pad 跨折返点。
+//   S2 先按折返点 `m·P/2` 切段，再**逐段**取保守 `lagPad = |slope|·lagMs`，把
+//   Hazard 盒**两侧对称**加宽后调用 `intersectContinuous`；不得用单一 pad 跨折返点，
+//   也不得只按当前单调段方向单侧加宽（窗口跨折返点时会漏掉另一侧的可达位姿）。
 //   S3/S4 的结构义务（一个相位格、`k+1 mod N`、`t1 = t0 + dt`）在
 //   `verifyTransition` 内检查；链式连接用 `verifyTransitionChain`。
 //
 // 三、残差等待（D3 §5）
 //
 //   每个相位格 `C_k` 的残差等待从 `φ0 ∈ C_k` 到 `(k+1)·dt`：本模块对**整个格**
-//   的 Hazard 位姿范围（跨折返点切段 + 该段方向 pad 的并集扫掠盒）与 spawn 玩家盒
+//   的 Hazard 位姿范围（跨折返点切段 + 对称 pad 的并集扫掠盒）与 spawn 玩家盒
 //   做严格相交。`symbolic: true` / `residualWait: "conservative-over-cell"` 表明
 //   这是格覆盖，不是逐个 `φ0` 的采样。
 //
@@ -615,6 +616,35 @@ const isFiniteHazard = (hazard: WitnessHazard, lagMs: number): boolean =>
   Number.isFinite(hazard.box.size.h) && hazard.box.size.h >= 0 &&
   Number.isFinite(hazard.box.anchor.x) && Number.isFinite(hazard.box.anchor.y);
 
+// ── 保守 lag pad（三处共用：S2 / 残差等待 / U9 停留） ────────────────────────
+//
+// 语义是精确 `∃δ`：玩家在 `t` 时刻，Hazard 实际可达位姿是 `p(t+δ)`，δ ∈ [0, lag]。
+// 三角波速度有界 ⇒ `|p(t+δ) − p(t)| ≤ |slope|·lag`；该界与方向无关。当窗口跨过
+// 折返点 `m·P/2` 时，Hazard 会回到当前单调段的**另一侧**，所以单侧 pad 不是
+// `∃δ` 的超集（R2 §4 反例）。三处一律用对称 pad：两侧各扩 `pad`，宽 `w + 2·pad`。
+// I02-03 §8.1 已证对称 pad 是精确 `∃δ` 的保守超集。
+
+/** @internal 保守 pad 量 `= |slope| × lagMs`（静止 Hazard 的 slope = 0 ⇒ pad = 0）。 */
+const conservativeLagPad = (slope: number, lagMs: number): number => Math.abs(slope) * lagMs;
+
+/**
+ * @internal 对称 pad 后的 Hazard 盒：`[p − ax·w − pad, p + (1−ax)·w + pad]`。
+ * 锚点按新宽度折算 `(ax·w + pad) / (w + 2·pad)`，其余字段不变。
+ */
+const lagPaddedHazardBox = (hazard: WitnessHazard, pad: number): HazardBoxSpec => {
+  const w = hazard.box.size.w;
+  const paddedWidth = w + 2 * pad;
+  return {
+    size: { w: paddedWidth, h: hazard.box.size.h },
+    anchor: {
+      x: paddedWidth === 0
+        ? hazard.box.anchor.x
+        : (hazard.box.anchor.x * w + pad) / paddedWidth,
+      y: hazard.box.anchor.y,
+    },
+  };
+};
+
 // ── 转移验证 ────────────────────────────────────────────────────────────────
 
 /** @internal 单条转移的验证输入。 */
@@ -740,7 +770,7 @@ export function verifyTransition(input: TransitionCheckInput): TransitionCheck {
     if (overlapsStrict(swept, solid.box)) return fail("static");
   }
 
-  // S2：按折返点切段；每段内 Hazard 单调，pad 方向取该段运动方向。
+  // S2：按折返点切段；每段内 Hazard 单调，pad 两侧对称取 `|slope|·lagMs`。
   if (!isFiniteHazard(hazard, lagMs)) return fail("model-out");
   let cutPoints = 0;
   let segments = 0;
@@ -752,22 +782,13 @@ export function verifyTransition(input: TransitionCheckInput): TransitionCheck {
     const slope = pieceSlope(hazard.motion, a, b);
     if (slope === null) return fail("model-out", cutPoints, segments);
 
-    // lagPad = hazardSpeed × lagMs；方向取该单调段。上升段向右加宽，下降段向左加宽。
-    const pad = Math.abs(slope) * lagMs;
-    const w = hazard.box.size.w;
-    const paddedWidth = w + pad;
-    const anchorX = pad === 0 || paddedWidth === 0
-      ? hazard.box.anchor.x
-      : slope > 0
-        ? (hazard.box.anchor.x * w) / paddedWidth
-        : (hazard.box.anchor.x * w + pad) / paddedWidth;
+    // lagPad = hazardSpeed × lagMs，**两侧对称**扩：窗口跨折返点时 Hazard 可能回到
+    // 本段另一侧，单侧 pad 会漏掉这些 `∃δ` 可达位姿（R2 §4）。
+    const padded = lagPaddedHazardBox(hazard, conservativeLagPad(slope, lagMs));
     const playerBoxAtA: Aabb = { ...p0, x: p0.x + playerSpeedX * (a - t0) };
     const check = intersectContinuous({
       motion: hazard.motion,
-      hazard: {
-        size: { w: paddedWidth, h: hazard.box.size.h },
-        anchor: { x: anchorX, y: hazard.box.anchor.y },
-      },
+      hazard: padded,
       playerBox: playerBoxAtA,
       playerSpeedX,
       t0: a,
@@ -863,7 +884,7 @@ export type ResidualWaitCheck = {
  * @internal 保守验证 `C_k` 的残差等待（D3 §5）。
  *
  * `φ0` 遍历整个格；残差等待覆盖的 Hazard 位姿范围就是 `C_k` 上的位姿范围。
- * 本函数按折返点切段，对每段取「并集扫掠盒 + 该段方向 `lagPad`」，再与 spawn
+ * 本函数按折返点切段，对每段取「并集扫掠盒 + 两侧对称 `lagPad`」，再与 spawn
  * 玩家盒做 `overlapsStrict`。任一碰撞 ⇒ 该相位格失败；**不得只查格端点**。
  *
  * 残差等待是 `wait`，spawn 盒由 U2-01 保证不压 solid，因此这里不重复 S1。
@@ -902,7 +923,6 @@ export function verifyResidualWait(input: ResidualWaitInput): ResidualWaitCheck 
   if (!Number.isFinite(t0) || !Number.isFinite(t1) || !(t1 > t0)) return fail("phase");
 
   const spawnBox = space.spawn.box;
-  const w = hazard.box.size.w;
   const h = hazard.box.size.h;
   const hazardY = hazard.motion.at.y - hazard.box.anchor.y * h;
   const yOverlaps = hazardY < spawnBox.y + spawnBox.h && spawnBox.y < hazardY + h;
@@ -916,23 +936,25 @@ export function verifyResidualWait(input: ResidualWaitInput): ResidualWaitCheck 
     const slope = pieceSlope(hazard.motion, a, b);
     if (slope === null) return fail("model-out", segments);
 
-    const pad = Math.abs(slope) * lagMs;
+    // 与 S2 同一个对称 pad、同一个 helper：本段的扫掠范围两侧都扩 `pad`。
+    const pad = conservativeLagPad(slope, lagMs);
+    const padded = lagPaddedHazardBox(hazard, pad);
+    const leftOffset = hazard.box.anchor.x * hazard.box.size.w + pad;
     const start = trianglePosition(hazard.motion, a);
     const end = trianglePosition(hazard.motion, b);
-    const anchorLo = Math.min(start, end);
-    const anchorHi = Math.max(start, end);
-    // 上升段向右 pad，下降段向左 pad；slope = 0 时 pad = 0。
-    const anchorMin = slope > 0 ? anchorLo : anchorLo - pad;
-    const anchorMax = slope > 0 ? anchorHi + pad : anchorHi;
+    const leftAtStart = start - leftOffset;
+    const leftAtEnd = end - leftOffset;
+    const anchorMin = Math.min(leftAtStart, leftAtEnd);
+    const anchorMax = Math.max(leftAtStart, leftAtEnd);
 
     segments += 1;
     const signal = input.budget.chargeWork(1);
     if (signal.stopped) return fail("budget", segments, signal);
     if (!yOverlaps) continue;
     const sweptHazard: Aabb = {
-      x: anchorMin - hazard.box.anchor.x * w,
+      x: anchorMin,
       y: hazardY,
-      w: anchorMax - anchorMin + w,
+      w: anchorMax - anchorMin + padded.size.w,
       h,
     };
     if (overlapsStrict(spawnBox, sweptHazard)) return fail("hazard", segments);
@@ -1317,7 +1339,7 @@ export function searchWinningSet(input: WinningSetSearchInput): WinningSetResult
 //   ② 接近段 `∀k ∈ Z_N`：spawn 在 `C_k` 的残差等待整格保守安全，且对齐后的
 //      `(spawn, (k+1) mod N) ∈ W_{→s}`，策略 rank 严格递减；
 //   ③ 停留段：`s` 在 `[T_arr, T_arr + P]` 全周期无碰撞——只在 Hazard 折返点
-//      `m·P/2` 切段，每段用该段方向的 `lagPad = hazardSpeed × lagMs` 做解析
+//      `m·P/2` 切段，每段用两侧对称的 `lagPad = hazardSpeed × lagMs` 做解析
 //      连续求交；不按 `dt` 采样，不设最小安全窗口；
 //   ④ 出口段 `∃j ∈ Z_N`：`(s, j) ∈ W_{→goal}`，策略 rank 严格递减。
 //
@@ -1374,7 +1396,7 @@ export type U9StaySegmentCheck = {
   readonly direction: "rising" | "falling" | "static";
   /** 该子段的 Hazard 速度 [px/ms]（三角波每段恒定）。 */
   readonly slope: number;
-  /** 该子段方向的 pad `= |slope| × lagMs`。 */
+  /** 该子段的对称 pad 量 `= |slope| × lagMs`（两侧各扩同样多）。 */
   readonly lagPad: number;
   readonly cutPoints: number;
   /** `intersectContinuous` 的解析段数（`cutPoints + 1`）。 */
@@ -1526,7 +1548,7 @@ export const isValidWaitingCell = (space: WitnessSpace, footX: number): boolean 
  *
  * - 只在折返点 `m·P/2` 切段：每段内 Hazard 位姿线性，用 `intersectContinuous`
  *   解析求交，**不按 `dt` 采样**；
- * - 每段按该段运动方向取 `lagPad = |slope| × lagMs`；速度恒定 ⇒ 全程同一 pad；
+ * - 每段取对称 `lagPad = |slope| × lagMs`（两侧各扩）；速度恒定 ⇒ 全程同一 pad；
  * - `overlapsStrict`，不带 ε；任一正宽度碰撞 ⇒ 不成立；相切 / 零测度不算撞；
  * - `s` 是 `standable` 脚点 ⇒ 玩家盒不压 solid（与残差等待同一论证），不重复 S1。
  */
@@ -1560,8 +1582,6 @@ export function verifyU9Stay(input: U9StayInput): U9StayCheck {
   if (!Number.isFinite(t1) || !(t1 > t0)) return empty("phase");
 
   const playerBox = witnessPlayerBox(space, footX);
-  const w = hazard.box.size.w;
-  const h = hazard.box.size.h;
   const boundaries = monotoneBoundaries(periodMs, t0, t1);
   const turnarounds = boundaries.slice(1, -1);
   const segments: U9StaySegmentCheck[] = [];
@@ -1577,20 +1597,11 @@ export function verifyU9Stay(input: U9StayInput): U9StayCheck {
       failure = "model-out";
       break;
     }
-    // 与该段运动方向一致的保守 pad：上升段向右加宽，下降段向左加宽，静止段 pad = 0。
-    const pad = Math.abs(slope) * lagMs;
-    const paddedWidth = w + pad;
-    const anchorX = pad === 0 || paddedWidth === 0
-      ? hazard.box.anchor.x
-      : slope > 0
-        ? (hazard.box.anchor.x * w) / paddedWidth
-        : (hazard.box.anchor.x * w + pad) / paddedWidth;
+    // 与 S2 同一个对称 pad、同一个 helper：窗口跨折返点时两侧都必须被覆盖。
+    const pad = conservativeLagPad(slope, lagMs);
     const check = intersectContinuous({
       motion: hazard.motion,
-      hazard: {
-        size: { w: paddedWidth, h },
-        anchor: { x: anchorX, y: hazard.box.anchor.y },
-      },
+      hazard: lagPaddedHazardBox(hazard, pad),
       playerBox,
       playerSpeedX: 0,
       t0: a,
