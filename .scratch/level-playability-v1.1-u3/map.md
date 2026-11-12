@@ -133,6 +133,7 @@ U3-00 初始化与授权台账
 - [U3-04 判侧规则](issues/05-u3-04-side-rule.md): 精确 spawn 盒 + `goalRegion = inflate(goalRect, 0.5)`，两方向闭式判侧；同侧 / 跨门 / 无法判侧 ⇒ `no-permanent-gate`。
 - [U3-05 forbiddenInjection](issues/06-u3-05-forbidden-injection.md): 原始 `gateRect` 经 `buildGraph` 注入一次，`expandedRect` 记录；同源 / 掩码 / `standable` 逐项校验，预扩张与不同源 ⇒ `geometry-untrusted`。输入契约新增 `buildGraph` 回调（需 R3 关注）。
 - [U3-06 测试矩阵与 D4 反例](issues/07-u3-06-tests.md): gate 测试收束为 48 条；D4 §11 的 1–4、6、13 全部有断言，产品代码零改动。
+- [U3-07 回归 / 白名单审计 / 实现报告](issues/08-u3-07-regression-audit-report.md): 全量 174 files / 2795 tests 绿；产品 diff 仅两个白名单新增文件；实现报告、R3 输入包、Draft PR 描述就绪（未推送）。
 
 ## Not yet specified
 

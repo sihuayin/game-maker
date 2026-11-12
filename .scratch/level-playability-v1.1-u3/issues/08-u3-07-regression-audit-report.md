@@ -1,8 +1,8 @@
 # U3-07 回归 / 白名单审计 / 实现报告
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-07 session 2026-11-12)
 Blocked by: 07
 Map: ../map.md
 Class: U3 / VERIFICATION
@@ -44,4 +44,22 @@ Class: U3 / VERIFICATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 回归全绿、白名单审计通过、实现报告与 R3 输入包就绪；未推送、未建 PR。
+
+| 项 | 结果 |
+| --- | --- |
+| `pnpm build` | 退出码 **0** |
+| `pnpm typecheck` | 退出码 **0** |
+| 定向 gate 测试 | 退出码 **0**；**48 / 48 passed** |
+| `playability-temporal-input.test.ts`（verbose） | 退出码 **0**；**65 / 65 passed**；T-55 / T-57 / T-58 / T-61 / T-62 / T-64 全 ✓ |
+| `pnpm test` | 退出码 **0**；**174 / 174 files，2795 / 2795 tests passed**；2 条已知 `onTaskUpdate` RPC 超时（非断言失败） |
+| 白名单 diff | 只有 `temporal-gate.ts` 与 gate 测试两个新增文件 |
+| `temporal.ts` / `graph.ts` / `reach.ts` / `docs/` / `fixtures/` | **零 diff** |
+| 依赖 / 锁文件 / JSON fixture / barrel | **零 diff** |
+| 实现报告 | [`../reports/07-implementation.md`](../reports/07-implementation.md) |
+| R3 输入包 | [`../reports/07-r3-input-package.md`](../reports/07-r3-input-package.md)（验收项全部留空，无作者结论） |
+| Draft PR 描述 | [`../reports/07-draft-pr.md`](../reports/07-draft-pr.md)（**未推送、未创建**） |
+
+证据：[`../evidence/07-regression-audit.md`](../evidence/07-regression-audit.md)（原始输出 `07-{build,typecheck,gate,architecture,test}.log`，`*.log` 不入库）。
+
+**下游**：U3-R3（独立复核）已 **unblocked**。**该票必须由未参与 U3 实现的独立会话执行**；本会话不启动 R3，也不预判其结论。
