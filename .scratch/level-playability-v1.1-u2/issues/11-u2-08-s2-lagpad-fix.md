@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Owner: —
+Owner: claude (U2-08 fix session 2026-11-12)
 Blocked by: —
 Map: ../map.md
 Class: U2 / FIX
