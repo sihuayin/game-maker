@@ -6,8 +6,8 @@
 //
 //   本模块产出 U2 的底座：基础移动图、相位网格、静态走廊、精确 spawn、到达状态
 //   （U2-01），wait / move 转移、S1–S4、残差等待与工作预算计数（U2-02），
-//   全相位 Winning Set 与终止性（U2-03），以及 U9 安全等待格证书（U2-04）。
-//   **没有** Witness 编码 / 体积（U2-05）；不 import `temporal.ts`（D6 DAG）。
+//   全相位 Winning Set 与终止性（U2-03）、U9 安全等待格证书（U2-04），以及
+//   Witness 编码 / 体积与确定性序列化（U2-05）。不 import `temporal.ts`（D6 DAG）。
 //   入口是纯函数：相同输入 ⇒ 相同输出，不写文件；墙钟只用于 abort；
 //   S1–S4 失败只产生无效转移，不抛未处理异常。
 //
@@ -73,6 +73,10 @@ import type {
   BudgetProfile,
   BudgetStatus,
   DegradationReason,
+  PolicyTermination,
+  Witness,
+  WitnessForm,
+  WitnessTransition,
 } from "./temporal-result.js";
 
 /** @internal 脚点整数格间距 [px]（D3 / D10 冻结：`xStep = 1`）。 */
@@ -1930,4 +1934,660 @@ export function searchU9WaitingCell(input: U9SearchInput): U9Result {
   }
 
   return failed("no-waiting-cell");
+}
+
+// ── U2-05：Witness 编码、体积与确定性 ────────────────────────────────────────
+//
+// 一、编码职责
+//
+//   把 U2-03 的 `WinningSetResult` / U2-04 的 `U9Result` 中**已通过 S1–S4** 的
+//   转移记录压成 D9 `Witness`：`verifications` 是
+//   `[fromFoot, fromK, toFoot, toK, t0, t1, 1]` 的去重表，`policy` 是指向下标的
+//   有序策略表，`termination` / `phaseCoverage` 给出终止性与相位覆盖。
+//   **不组装** `TemporalInternalResult`（入口与完整结果归 U5）；不修改 D9 形状。
+//
+// 二、确定性序列化（体积口径）
+//
+//   `serialized` = 对「Witness **去掉 `volume`**」的六个语义字段做规范化 JSON：
+//   对象键按字典序、数组保留语义顺序、数字用 JSON 的确定性格式、不输出
+//   `undefined`。`volume.bytes` 就是 `serialized` 的 UTF-8 字节数（标准
+//   `TextEncoder`），因此可独立复算：`new TextEncoder().encode(serialized).length`。
+//   `volume` 本身不进入序列化，避免 `bytes` 自指；`volume.transitions` 由
+//   `verifications.length` 给出。同一输入重复编码必须逐字节一致。
+//
+// 三、体积
+//
+//   `volume.transitions = verifications.length`；任一超过
+//   `maxWitnessTransitions` / `maxWitnessBytes` ⇒ `witness-volume`，**不截断**、
+//   不返回部分 Witness。转移上限在构建过程中增量检查，字节上限在序列化后检查。
+//
+// 四、一次一档 lag
+//
+//   入口一次只接受一档 `lagMs` 与一个结果；不接收跨档数组、不做跨档合并。
+//   U9 还会校验 `stay.lagPad` / `stay.hazardSpeed` / 每段 `lagPad` 与传入
+//   `hazard` / `lagMs` 一致，防止把另一档的停留记录拼进来。W 的转移记录不携带
+//   lag；双档隔离由「一次一档」的入口形状与调用方逐档独立调用保证。
+//
+// 五、时间基准
+//
+//   `wait` / `move` 转移（W、U9 接近段、U9 出口段、U9 停留段）统一使用
+//   `witnessPhaseCellBounds(grid, k, 0)` 的**规范相位格时间**；整周期偏移由
+//   重放器按 S4 规则（`prev.t1 === next.t0` 或相差 `periodMs`）补上。U9 的停留段
+//   因此分解为 `k = 0..N−1` 的 N 个单格 `wait`：Hazard 严格以 `P` 周期重复、
+//   玩家在 `s` 静止，`[T_arr, T_arr+P]` 的解析检查与规范相位格逐相位同值，
+//   这不是采样，也不是把 `∀` / `∃` 改写。
+//
+// 六、U9 的段结构
+//
+//   `policy` 的顺序固定为：接近段（相位格升序、链内顺序）→ 停留段（`k` 升序
+//   N 个单格 `wait`）→ 出口段（链内顺序）。段内可按 `(fromFoot, fromK)` 选后继；
+//   跨段允许同一 `(fromFoot, fromK)` 出现不同后继（例如 `(s, j)` 既是停留 wait
+//   的起点，也是出口链的起点），这是 U9 复合证书的语义，不是重复记录。接近段
+//   的残差等待是**整格保守覆盖**而非逐 `φ0` 采样，D9 元组无法表达半格等待，
+//   由 `phaseCoverage.complete`（N 个半开相位格全覆盖）+ 对齐状态承载，不塞进
+//   `verifications`。
+//
+// 七、失败
+//
+//   失败只返回 D9 闭集原因码：体积超限 `witness-volume`；输入结果不完整 /
+//   记录结构不一致 `no-witness-found`（不输出部分 Witness）；非法预算
+//   `invalid-budget`；Hazard / lag 非有限或跨档不一致 `model-out`。
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** @internal U2-05 编码输入：全相位 Winning Set。一次只接受一档 `lagMs`。 */
+export type WinningSetWitnessEncodingRequest = {
+  readonly form: "winning-set";
+  readonly space: WitnessSpace;
+  readonly hazard: WitnessHazard;
+  readonly lagMs: number;
+  /** 只读预算；本入口只用 `maxWitnessTransitions` / `maxWitnessBytes`。 */
+  readonly budget: BudgetProfile;
+  readonly result: WinningSetResult;
+};
+
+/** @internal U2-05 编码输入：U9 安全等待格。一次只接受一档 `lagMs`。 */
+export type U9WitnessEncodingRequest = {
+  readonly form: "u9";
+  readonly space: WitnessSpace;
+  readonly hazard: WitnessHazard;
+  readonly lagMs: number;
+  /** 只读预算；本入口只用 `maxWitnessTransitions` / `maxWitnessBytes`。 */
+  readonly budget: BudgetProfile;
+  readonly result: U9Result;
+};
+
+/** @internal 编码入口的判别联合；两档 lag 必须各自独立调用。 */
+export type WitnessEncodingRequest = WinningSetWitnessEncodingRequest | U9WitnessEncodingRequest;
+
+/** @internal 编码成功：`bytes === UTF-8(serialized).length`。 */
+export type WitnessEncodingSuccess = {
+  readonly ok: true;
+  readonly witness: Witness;
+  /** Witness 去掉 `volume` 后的规范化 JSON；`bytes` 就是它的 UTF-8 长度。 */
+  readonly serialized: string;
+  readonly bytes: number;
+};
+
+/** @internal 编码失败；`reason` 只取 D9 原因码闭集，不带部分 Witness。 */
+export type WitnessEncodingFailure = {
+  readonly ok: false;
+  readonly reason: DegradationReason;
+};
+
+/** @internal 编码结果。 */
+export type WitnessEncodingResult = WitnessEncodingSuccess | WitnessEncodingFailure;
+
+// ── 规范化 JSON（确定性序列化） ─────────────────────────────────────────────
+
+/**
+ * @internal 规范化 JSON：对象键字典序、数组保序、数字用 `JSON.stringify` 的
+ * 确定性格式、跳过 `undefined`。只接受可 JSON 化的纯数据。
+ *
+ * 不依赖对象键的原始枚举顺序（先 `sort()`），也不依赖 `Set` / `Map` 的遍历顺序。
+ */
+const canonicalJson = (value: unknown): string => {
+  if (value === null) return "null";
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw new RangeError("canonical JSON requires finite numbers");
+    }
+    return JSON.stringify(value);
+  }
+  if (typeof value === "string") return JSON.stringify(value);
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => canonicalJson(item)).join(",")}]`;
+  }
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const keys = Object.keys(record).sort();
+    const parts: string[] = [];
+    for (const key of keys) {
+      const item = record[key];
+      if (item === undefined) continue;
+      parts.push(`${JSON.stringify(key)}:${canonicalJson(item)}`);
+    }
+    return `{${parts.join(",")}}`;
+  }
+  throw new TypeError(`canonical JSON cannot encode ${typeof value}`);
+};
+
+// ── 内部辅助：策略表、链式重放、去重 ────────────────────────────────────────
+
+const encodingFailure = (reason: DegradationReason): WitnessEncodingFailure => ({
+  ok: false,
+  reason,
+});
+
+/** @internal 编码出的语义字段；`volume` 在最终序列化之后补。 */
+type EncodedWitnessParts =
+  | {
+      readonly ok: true;
+      readonly form: WitnessForm;
+      readonly verifications: readonly WitnessTransition[];
+      readonly policy: readonly number[];
+      readonly termination: PolicyTermination;
+      readonly phaseCoverage: Witness["phaseCoverage"];
+    }
+  | WitnessEncodingFailure;
+
+/** @internal `coveredPhases` 必须恰好是 `0..N−1`（升序、无缺、无重复）。 */
+const coversAllPhases = (covered: readonly number[], phaseCount: number): boolean => {
+  if (covered.length !== phaseCount) return false;
+  for (let k = 0; k < phaseCount; k++) {
+    if (covered[k] !== k) return false;
+  }
+  return true;
+};
+
+/** @internal 预算的两个 Witness 上限必须是有限非负整数。 */
+const witnessBudgetValid = (budget: BudgetProfile): boolean =>
+  Number.isInteger(budget.maxWitnessTransitions) && budget.maxWitnessTransitions >= 0 &&
+  Number.isInteger(budget.maxWitnessBytes) && budget.maxWitnessBytes >= 0;
+
+/**
+ * @internal 把一条已通过 S1–S4 的转移转成 D9 元组。
+ *
+ * 只接受 `verified: true`、`failure: null`、整数状态、`to.k = (from.k+1) mod N`、
+ * 有限且递增的时间，并要求时间与规范相位格 `witnessPhaseCellBounds(grid, from.k, 0)`
+ * 逐位一致（U2-03 / U2-04 的记录都以 cycle = 0 生成）。任一不满足返回 `null`，
+ * 调用方必须放弃整张 Witness，不得跳过该记录继续。
+ */
+const witnessTransitionTuple = (
+  check: TransitionCheck,
+  grid: WitnessGrid,
+): WitnessTransition | null => {
+  if (!check.verified || check.failure !== null) return null;
+  const { from, to } = check;
+  if (
+    !Number.isInteger(from.footX) || !Number.isInteger(from.k) ||
+    !Number.isInteger(to.footX) || !Number.isInteger(to.k)
+  ) {
+    return null;
+  }
+  if (from.k < 0 || from.k >= grid.phaseSteps) return null;
+  if (to.k !== (from.k + 1) % grid.phaseSteps) return null;
+  if (!Number.isFinite(check.t0) || !Number.isFinite(check.t1) || !(check.t1 > check.t0)) {
+    return null;
+  }
+  const bounds = witnessPhaseCellBounds(grid, from.k, 0);
+  if (check.t0 !== bounds.t0 || check.t1 !== bounds.t1) return null;
+  return [from.footX, from.k, to.footX, to.k, check.t0, check.t1, 1];
+};
+
+/** @internal 编码草稿：去重表 + 策略下标，转移上限增量检查。 */
+type WitnessDraft = {
+  readonly verifications: WitnessTransition[];
+  readonly policy: number[];
+  readonly indexOf: Map<string, number>;
+  readonly maxTransitions: number;
+  overflowed: boolean;
+};
+
+const createWitnessDraft = (maxTransitions: number): WitnessDraft => ({
+  verifications: [],
+  policy: [],
+  indexOf: new Map<string, number>(),
+  maxTransitions,
+  overflowed: false,
+});
+
+/**
+ * @internal 追加一条转移；完全相同的元组只保留第一次出现的下标。
+ *
+ * 去重键含全部七个字段（含时间），因此不会把不同时间 / 不同后继的记录合并。
+ * 输出顺序只由调用方的 push 顺序决定，不遍历 `Map`。
+ */
+const addWitnessTransition = (draft: WitnessDraft, transition: WitnessTransition): number => {
+  const key = transition.join(",");
+  const existing = draft.indexOf.get(key);
+  if (existing !== undefined) return existing;
+  const index = draft.verifications.length;
+  draft.verifications.push(transition);
+  draft.indexOf.set(key, index);
+  draft.policy.push(index);
+  if (draft.verifications.length > draft.maxTransitions) draft.overflowed = true;
+  return index;
+};
+
+/** @internal 状态 → 策略项的稠密查表（状态索引按 `(footX − xLo)·N + k`）。 */
+type PolicyLookup = {
+  readonly entries: readonly (WinningSetPolicyEntry | null)[];
+  readonly ranks: Int32Array;
+};
+
+const buildPolicyLookup = (
+  space: WitnessSpace,
+  policy: readonly WinningSetPolicyEntry[],
+): PolicyLookup | null => {
+  const { xLo, xHi } = space.corridor;
+  const phaseCount = space.grid.phaseSteps;
+  const stateCount = (xHi - xLo + 1) * phaseCount;
+  const entries: (WinningSetPolicyEntry | null)[] =
+    new Array<WinningSetPolicyEntry | null>(stateCount).fill(null);
+  const ranks = new Int32Array(stateCount).fill(-1);
+  for (const entry of policy) {
+    const { footX, k } = entry.state;
+    if (
+      !Number.isInteger(footX) || footX < xLo || footX > xHi ||
+      !Number.isInteger(k) || k < 0 || k >= phaseCount
+    ) {
+      return null;
+    }
+    if (!Number.isInteger(entry.rank) || entry.rank < 0) return null;
+    const index = (footX - xLo) * phaseCount + k;
+    if (entries[index] !== null) return null;
+    entries[index] = entry;
+    ranks[index] = entry.rank;
+  }
+  return { entries, ranks };
+};
+
+/** @internal 沿策略链重放的结果。 */
+type ChainWalk =
+  | { readonly kind: "ok"; readonly steps: number; readonly terminal: WitnessState }
+  | { readonly kind: "fail" }
+  | { readonly kind: "overflow" };
+
+/**
+ * @internal 建立「从任意 winning 状态沿 rank 严格递减的后继走到目标列」的
+ * 重放器。每一步都重新检查：状态命中策略表、转移已验证、`from` 一致、
+ * `to.k` 前进一格、后继 rank = 当前 rank − 1、相邻转移时间按 S4 连续。
+ *
+ * `overflow` 表示 verifications 已超过 `maxWitnessTransitions`，调用方必须
+ * 立即返回 `witness-volume`，不得保留已构造的部分记录。
+ */
+const createChainWalker = (
+  space: WitnessSpace,
+  lookup: PolicyLookup,
+  draft: WitnessDraft,
+) => {
+  const { xLo, xHi } = space.corridor;
+  const grid = space.grid;
+  const phaseCount = grid.phaseSteps;
+  const stateCount = (xHi - xLo + 1) * phaseCount;
+  const indexOf = (footX: number, k: number): number => (footX - xLo) * phaseCount + k;
+  const inRange = (footX: number, k: number): boolean =>
+    Number.isInteger(footX) && footX >= xLo && footX <= xHi &&
+    Number.isInteger(k) && k >= 0 && k < phaseCount;
+
+  return (start: WitnessState): ChainWalk => {
+    let state = start;
+    let previousT1: number | null = null;
+    for (let step = 0; step <= stateCount; step++) {
+      if (!inRange(state.footX, state.k)) return { kind: "fail" };
+      const index = indexOf(state.footX, state.k);
+      const entry = lookup.entries[index];
+      if (entry === undefined || entry === null) return { kind: "fail" };
+      const rank = lookup.ranks[index] as number;
+      if (entry.transition === null) {
+        if (rank !== 0) return { kind: "fail" };
+        return { kind: "ok", steps: step, terminal: state };
+      }
+      const tuple = witnessTransitionTuple(entry.transition, grid);
+      if (tuple === null) return { kind: "fail" };
+      if (tuple[0] !== state.footX || tuple[1] !== state.k) return { kind: "fail" };
+      if (!inRange(tuple[2], tuple[3])) return { kind: "fail" };
+      const targetIndex = indexOf(tuple[2], tuple[3]);
+      if ((lookup.ranks[targetIndex] as number) !== rank - 1) return { kind: "fail" };
+      if (previousT1 !== null) {
+        const offset = previousT1 - tuple[4];
+        if (offset !== 0 && offset !== grid.periodMs) return { kind: "fail" };
+      }
+      previousT1 = tuple[5];
+      addWitnessTransition(draft, tuple);
+      if (draft.overflowed) return { kind: "overflow" };
+      state = { footX: tuple[2], k: tuple[3] };
+    }
+    return { kind: "fail" };
+  };
+};
+
+// ── W：全相位 Winning Set 编码 ──────────────────────────────────────────────
+
+/**
+ * @internal W 编码：从 N 个 spawn 起始相位各沿 rank 严格递减的后继走到 Goal。
+ *
+ * - 起点是 `phases[k].aligned = (spawn.footX, (k+1) mod N)`，N 个格全部要走到
+ *   目标列（rank 0 且无后继）；
+ * - 所有路径用到的转移按「相位格升序 → 链内顺序」去重进 `verifications`；
+ * - `policy` 是这些去重记录的下标（同一张无记忆策略表），重放按
+ *   `(fromFoot, fromK)` 选后继；
+ * - `termination.rank[i]` 是该记录源状态的 rank（后继 rank = 它 − 1，rank 1 的
+ *   后继是 Goal）；rank 严格递减 ⇒ 有限步抵达 Goal。
+ */
+const encodeWinningSetParts = (
+  request: WinningSetWitnessEncodingRequest,
+): EncodedWitnessParts => {
+  const { space, result, budget } = request;
+  const grid = space.grid;
+  const phaseCount = grid.phaseSteps;
+
+  if (result.status !== "complete") {
+    return encodingFailure(result.degradationReason ?? "no-witness-found");
+  }
+  if (
+    !result.phaseCoverage.complete ||
+    result.phaseCoverage.cells !== phaseCount ||
+    !coversAllPhases(result.phaseCoverage.coveredPhases, phaseCount) ||
+    result.phases.length !== phaseCount
+  ) {
+    return encodingFailure("no-witness-found");
+  }
+
+  const lookup = buildPolicyLookup(space, result.policy);
+  if (lookup === null) return encodingFailure("no-witness-found");
+  const draft = createWitnessDraft(budget.maxWitnessTransitions);
+  const walk = createChainWalker(space, lookup, draft);
+
+  for (let k = 0; k < phaseCount; k++) {
+    const phase = result.phases[k];
+    if (phase === undefined || phase.cell !== k || !phase.covered) {
+      return encodingFailure("no-witness-found");
+    }
+    // 残差等待是整格保守覆盖；它没有 D9 元组，但必须已通过才允许编码该格。
+    if (!phase.residualWait.verified || phase.residualWait.failure !== null) {
+      return encodingFailure("no-witness-found");
+    }
+    const aligned = phase.aligned;
+    if (aligned.footX !== space.spawn.footX || aligned.k !== (k + 1) % phaseCount) {
+      return encodingFailure("no-witness-found");
+    }
+    const walked = walk(aligned);
+    if (walked.kind === "overflow") return encodingFailure("witness-volume");
+    if (walked.kind === "fail") return encodingFailure("no-witness-found");
+  }
+
+  // rank 与 policy 一一对应：policy 是去重顺序，verifications 同序。
+  const ranks: number[] = [];
+  for (const transition of draft.verifications) {
+    const index = (transition[0] - space.corridor.xLo) * phaseCount + transition[1];
+    const rank = lookup.ranks[index] as number;
+    if (!Number.isInteger(rank) || rank < 1) return encodingFailure("no-witness-found");
+    ranks.push(rank);
+  }
+
+  return {
+    ok: true,
+    form: "winning-set",
+    verifications: draft.verifications,
+    policy: draft.policy,
+    termination: { kind: "rank", rank: ranks },
+    phaseCoverage: {
+      cells: phaseCount,
+      covered: result.phaseCoverage.coveredPhases.length,
+      complete: true,
+    },
+  };
+};
+
+// ── U9：安全等待格编码 ──────────────────────────────────────────────────────
+
+/**
+ * @internal U9 编码：接近段 `∀k` + 停留段整周期 + 出口段 `∃j`。
+ *
+ * - 接近段：N 个对齐 spawn 状态各自的 `W_{→s}` 链，全部进入 `verifications`；
+ * - 停留段：规范相位格的 N 个单格 `wait`（`k = 0..N−1`，`fromFoot = toFoot = s`），
+ *   覆盖 `[T_arr, T_arr+P]` 的整周期解析检查；`stay.segments` 必须逐段连续、
+ *   无正宽度碰撞，且 pad 与传入 `lagMs` 一致；
+ * - 出口段：只编码 U2-04 选中的 `∃j` 起点与链，**不**把 `∃` 扩成 `∀`；
+ * - `termination.trace.length` 是任一 spawn 相位到 Goal 的最长有限排程
+ *   （接近 rank + 等到出口相位的单格 wait 数 + 出口 rank）。
+ */
+const encodeU9Parts = (
+  request: U9WitnessEncodingRequest,
+): EncodedWitnessParts => {
+  const { space, hazard, lagMs, result, budget } = request;
+  const grid = space.grid;
+  const phaseCount = grid.phaseSteps;
+
+  if (result.status !== "complete") {
+    return encodingFailure(result.degradationReason ?? "no-witness-found");
+  }
+  const { waitingCell, approach, stay, exit } = result;
+  if (waitingCell === null || approach === null || stay === null || exit === null) {
+    return encodingFailure("no-witness-found");
+  }
+  if (
+    !approach.phaseCoverage.complete ||
+    approach.phaseCoverage.cells !== phaseCount ||
+    !coversAllPhases(approach.phaseCoverage.coveredPhases, phaseCount) ||
+    approach.phases.length !== phaseCount
+  ) {
+    return encodingFailure("no-witness-found");
+  }
+  if (approach.targetFootX !== waitingCell.footX) return encodingFailure("no-witness-found");
+  if (!isValidWaitingCell(space, waitingCell.footX)) return encodingFailure("no-witness-found");
+
+  // 停留段必须属于**这一档** hazard / lag，且整周期检查真的通过。
+  const hazardSpeed = triangleMaxRate(hazard.motion);
+  if (stay.periodMs !== grid.periodMs) return encodingFailure("model-out");
+  if (stay.footX !== waitingCell.footX) return encodingFailure("no-witness-found");
+  if (stay.hazardSpeed !== hazardSpeed) return encodingFailure("model-out");
+  if (stay.lagPad !== hazardSpeed * lagMs) return encodingFailure("model-out");
+  if (!Number.isFinite(stay.tArrival) || !Number.isFinite(stay.tEnd)) {
+    return encodingFailure("model-out");
+  }
+  if (!stay.verified || stay.failure !== null || stay.segments.length === 0) {
+    return encodingFailure("no-witness-found");
+  }
+  let cursor = stay.tArrival;
+  for (const segment of stay.segments) {
+    if (segment.t0 !== cursor || !(segment.t1 > segment.t0)) {
+      return encodingFailure("no-witness-found");
+    }
+    if (!Number.isFinite(segment.slope) || !Number.isFinite(segment.lagPad)) {
+      return encodingFailure("model-out");
+    }
+    if (segment.lagPad !== Math.abs(segment.slope) * lagMs) return encodingFailure("model-out");
+    if (segment.collided || segment.collisionIntervals.length > 0) {
+      return encodingFailure("no-witness-found");
+    }
+    cursor = segment.t1;
+  }
+  if (cursor !== stay.tEnd) return encodingFailure("no-witness-found");
+
+  // ① 接近段：∀k。每个相位格的残差等待必须通过，对齐状态必须在 W_{→s} 中走到 s。
+  const lookup = buildPolicyLookup(space, approach.policy);
+  if (lookup === null) return encodingFailure("no-witness-found");
+  const draft = createWitnessDraft(budget.maxWitnessTransitions);
+  const walk = createChainWalker(space, lookup, draft);
+  const approachRanks: number[] = [];
+  let maxCell = -1;
+  let maxArrival = -Infinity;
+  for (let k = 0; k < phaseCount; k++) {
+    const phase = approach.phases[k];
+    if (phase === undefined || phase.cell !== k || !phase.covered) {
+      return encodingFailure("no-witness-found");
+    }
+    if (!phase.residualWait.verified || phase.residualWait.failure !== null) {
+      return encodingFailure("no-witness-found");
+    }
+    if (!Number.isInteger(phase.rank) || phase.rank < 0) {
+      return encodingFailure("no-witness-found");
+    }
+    if (phase.tArrival === null || !Number.isFinite(phase.tArrival)) {
+      return encodingFailure("no-witness-found");
+    }
+    const aligned = phase.aligned;
+    if (aligned.footX !== space.spawn.footX || aligned.k !== (k + 1) % phaseCount) {
+      return encodingFailure("no-witness-found");
+    }
+    const walked = walk(aligned);
+    if (walked.kind === "overflow") return encodingFailure("witness-volume");
+    if (walked.kind === "fail") return encodingFailure("no-witness-found");
+    if (walked.steps !== phase.rank || walked.terminal.footX !== waitingCell.footX) {
+      return encodingFailure("no-witness-found");
+    }
+    approachRanks.push(phase.rank);
+    if (phase.tArrival > maxArrival) {
+      maxArrival = phase.tArrival;
+      maxCell = k;
+    }
+  }
+  if (maxCell < 0 || stay.tArrival !== maxArrival) return encodingFailure("no-witness-found");
+
+  // ② 停留段：规范相位格的 N 个单格 wait。Hazard 严格周期重复、玩家静止，
+  //    因此 [T_arr, T_arr+P] 的整周期解析检查逐相位适用于这 N 格。
+  for (let k = 0; k < phaseCount; k++) {
+    const bounds = witnessPhaseCellBounds(grid, k, 0);
+    const tuple: WitnessTransition = [
+      waitingCell.footX, k, waitingCell.footX, (k + 1) % phaseCount,
+      bounds.t0, bounds.t1, 1,
+    ];
+    addWitnessTransition(draft, tuple);
+    if (draft.overflowed) return encodingFailure("witness-volume");
+  }
+
+  // ③ 出口段：∃j。只编码 U2-04 选中的那一条链，不要求所有相位都能出去。
+  if (
+    exit.footX !== waitingCell.footX ||
+    !Number.isInteger(exit.phase) || exit.phase < 0 || exit.phase >= phaseCount ||
+    !Number.isInteger(exit.rank) || exit.rank < 0 ||
+    exit.policy.length === 0
+  ) {
+    return encodingFailure("no-witness-found");
+  }
+  let expectedFoot = exit.footX;
+  let expectedK = exit.phase;
+  let expectedRank = exit.rank;
+  let previousT1: number | null = null;
+  let terminated = false;
+  for (let i = 0; i < exit.policy.length; i++) {
+    const entry = exit.policy[i];
+    if (entry === undefined) return encodingFailure("no-witness-found");
+    if (
+      entry.state.footX !== expectedFoot ||
+      entry.state.k !== expectedK ||
+      entry.rank !== expectedRank
+    ) {
+      return encodingFailure("no-witness-found");
+    }
+    if (entry.transition === null) {
+      if (i !== exit.policy.length - 1 || entry.rank !== 0) {
+        return encodingFailure("no-witness-found");
+      }
+      if (
+        entry.state.footX !== exit.goalState.footX ||
+        entry.state.k !== exit.goalState.k ||
+        !space.arrival.goalStates.includes(entry.state.footX)
+      ) {
+        return encodingFailure("no-witness-found");
+      }
+      terminated = true;
+      break;
+    }
+    const tuple = witnessTransitionTuple(entry.transition, grid);
+    if (
+      tuple === null ||
+      tuple[0] !== expectedFoot ||
+      tuple[1] !== expectedK
+    ) {
+      return encodingFailure("no-witness-found");
+    }
+    if (previousT1 !== null) {
+      const offset = previousT1 - tuple[4];
+      if (offset !== 0 && offset !== grid.periodMs) return encodingFailure("no-witness-found");
+    }
+    previousT1 = tuple[5];
+    addWitnessTransition(draft, tuple);
+    if (draft.overflowed) return encodingFailure("witness-volume");
+    expectedFoot = tuple[2];
+    expectedK = tuple[3];
+    expectedRank = entry.rank - 1;
+  }
+  if (!terminated) return encodingFailure("no-witness-found");
+
+  // 终止性：每个 spawn 相位都有一条有限排程；取最长者作为 trace 长度。
+  let traceLength = 0;
+  for (let k = 0; k < phaseCount; k++) {
+    const rank = approachRanks[k] as number;
+    const arrivalPhase = (k + 1 + rank) % phaseCount;
+    const waits = (exit.phase - arrivalPhase + phaseCount) % phaseCount;
+    const length = rank + waits + exit.rank;
+    if (!Number.isSafeInteger(length)) return encodingFailure("model-out");
+    if (length > traceLength) traceLength = length;
+  }
+
+  return {
+    ok: true,
+    form: "u9",
+    verifications: draft.verifications,
+    policy: draft.policy,
+    termination: { kind: "trace", finite: true, length: traceLength },
+    phaseCoverage: {
+      cells: phaseCount,
+      covered: approach.phaseCoverage.coveredPhases.length,
+      complete: true,
+    },
+  };
+};
+
+// ── 入口 ────────────────────────────────────────────────────────────────────
+
+/**
+ * @internal 把 W / U9 的验证记录编码为 D9 `Witness`（U2-05）。
+ *
+ * 一次只接受一档 `lagMs` 与其对应结果；两档必须分别调用。体积按
+ * 「Witness 去掉 `volume` 的规范化 JSON」的 UTF-8 字节数计量；任一上限超出
+ * 立即返回 `witness-volume`，不截断、不返回部分 Witness。**不组装**
+ * `TemporalInternalResult`。
+ */
+export function encodeWitness(request: WitnessEncodingRequest): WitnessEncodingResult {
+  if (!witnessBudgetValid(request.budget)) return encodingFailure("invalid-budget");
+  if (!Number.isFinite(request.lagMs) || request.lagMs < 0) {
+    return encodingFailure("model-out");
+  }
+  if (!isFiniteHazard(request.hazard, request.lagMs)) return encodingFailure("model-out");
+
+  const parts = request.form === "winning-set"
+    ? encodeWinningSetParts(request)
+    : encodeU9Parts(request);
+  if (!parts.ok) return parts;
+
+  if (parts.verifications.length > request.budget.maxWitnessTransitions) {
+    return encodingFailure("witness-volume");
+  }
+  // 序列化对象 = Witness 的六个语义字段（不含 volume），避免 bytes 自指。
+  const serialized = canonicalJson({
+    derived: true,
+    form: parts.form,
+    phaseCoverage: parts.phaseCoverage,
+    policy: parts.policy,
+    termination: parts.termination,
+    verifications: parts.verifications,
+  });
+  const bytes = new TextEncoder().encode(serialized).length;
+  if (bytes > request.budget.maxWitnessBytes) return encodingFailure("witness-volume");
+
+  const witness: Witness = {
+    form: parts.form,
+    derived: true,
+    verifications: parts.verifications,
+    policy: parts.policy,
+    termination: parts.termination,
+    phaseCoverage: parts.phaseCoverage,
+    volume: { transitions: parts.verifications.length, bytes },
+  };
+  return { ok: true, witness, serialized, bytes };
 }
