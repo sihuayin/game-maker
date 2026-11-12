@@ -115,6 +115,8 @@ U2-00 初始化与授权台账
 - 2026-11-12 · **U2-01 状态格 / 静态走廊 / 精确 spawn / 到达** — `resolved`；新增 `temporal-witness.ts`（唯一产品改动）：`xStep=1`、`N`/`N_max`/容量/`phaseGridCapped`、`standable-run` 走廊（合法范围裁剪）、`boxFromFoot` 精确 spawn、取整 Goal Rect 内缩 0.5px 到达；失败只用 D9 闭集原因码（`spawn-not-standable` 记为 `gap`，不扩闭集）；build / typecheck / input 65/65 全绿 → [票](issues/02-u2-01-grid-corridor-spawn.md)。U2-02 unblocked。
 - 2026-11-12 · **U2-02 wait / move、S1–S4 与预算计数** — `resolved`；`temporal-witness.ts` 只增：`(footX,k)` 转移（wait / move、`|Δx| ≤ maxStep`、整周期偏移）、S1 扫掠并集连续静态检查、S2 折返点切段 + 分段方向 `lagPad` 的保守加宽盒逐段 `intersectContinuous`、S3 单相位格、S4 链式连续、残差等待整格覆盖（`symbolic / conservative-over-cell`）、`createWitnessWorkBudget`（分列 `statesEnqueued` / `statesVisited` / `edgesChecked`，按 `segmentsTotal` 执行 `maxCutsPerBranch`，墙钟仅 abort）；build / typecheck / input 65/65 全绿 → [票](issues/03-u2-02-wait-move.md)。U2-03 unblocked。
 
+- 2026-11-12 · **U2-03 全相位 Winning Set 与终止性** — `resolved`；`temporal-witness.ts` 只增 `searchWinningSet`（最小不动点 `μX.(Goal ∪ Pre∃(X))`、反向 BFS、Goal rank 0、策略 rank 严格递减）；`N` 个半开相位格先整格残差等待、再检查 `(spawn.footX,(k+1) mod N) ∈ W`；`complete / failed / insufficient`，失败用 D9 `no-witness-found`、耗尽用实际预算原因码，均只导 IE；复用 U9+W 共用 `WitnessWorkBudget`；build / typecheck / input 65/65 全绿 → [票](issues/04-u2-03-winning-set.md)。U2-04 unblocked。
+
 ## Not yet specified
 
 <!-- 路线由已签署授权包 D3 / D10 / §3.5 / §9.2 冻结；无已知雾区。任何新增文件 / 扩权需求 = STOP + HITL，不在此处自行毕业。 -->

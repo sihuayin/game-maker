@@ -940,3 +940,278 @@ export function verifyResidualWait(input: ResidualWaitInput): ResidualWaitCheck 
     budgetStop: null,
   };
 }
+
+// ── U2-03：全相位 Winning Set（最小不动点）与终止性 ─────────────────────────
+//
+// 一、最小不动点，不是最大不动点（D10 §2.5）
+//
+//   W = μX.(Goal ∪ Pre∃(X))。实现是**反向 BFS**：从全部 Goal 状态
+//   `(x_goal, k)`（rank 0）出发，按 FIFO 层次扩展；前驱 `(x, (k−1) mod N)`
+//   只有在一条**已通过 S1–S4** 的 `wait` / `move` 边通向已 winning 的后继时
+//   才进入 W。BFS 层次保证首次加入时的 rank 就是到 Goal 的最少边数；策略只取
+//   这条 rank 严格递减（后继 rank = 当前 rank − 1）的边。这里没有最大不动点
+//   的「安全但永不到达」语义，也不会把闭合的前缀当成证明。
+//
+// 二、全相位覆盖（D3 §5 / D10 §2.3）
+//
+//   每个半开相位格 `C_k` 的第一段是 spawn 原位的**残差等待**：先调用
+//   `verifyResidualWait` 对整格 Hazard 位姿范围做保守验证；通过后，真实 `φ0`
+//   对齐到格点相位 `(k+1) mod N`，因此只需检查
+//   `(spawn.footX, (k+1) mod N) ∈ W`。`N` 个格全部通过才算 `complete`。
+//
+// 三、失败语义（D10 §2.5 / §3）
+//
+//   `winning-set-failed` 只是本模块的**内部状态名**；结果层原因码仍取 D9 闭集：
+//   搜索完成但未覆盖全部格 ⇒ `status: "failed"` + `no-witness-found`；
+//   预算 / 墙钟耗尽 ⇒ `status: "insufficient"` + 实际预算原因码。
+//   **绝不**从失败推导 PU；失败侧不携带部分策略（`policy: []`）。
+//
+// 四、确定性与预算
+//
+//   状态索引 `(x − xLo)·N + k`；Goal 状态按 x 升序、k 升序入队；前驱按 x 升序
+//   枚举（`x = 后继 x` 即 `wait`）。不使用 `Set` / 对象键枚举 / 墙钟排序。
+//   复用调用方的 `WitnessWorkBudget`（U9 + W 共用 NB 预算）：每次 enqueue /
+//   visit / 边检查 / `intersectContinuous` 都经它记账；任一 `BudgetStop`
+//   立即转 `insufficient`，不保留部分 W。
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** @internal W 的终止状态；`failed` / `insufficient` 都只能导出 IE。 */
+export type WinningSetStatus = "complete" | "failed" | "insufficient";
+
+/** @internal 单个相位格的覆盖证据（残差等待 + 对齐后的 spawn 状态）。 */
+export type WinningSetPhaseCoverage = {
+  readonly cell: number;
+  /** 整格残差等待的保守验证结果（`symbolic: true`）。 */
+  readonly residualWait: ResidualWaitCheck;
+  /** 对齐后的 spawn 状态 `(spawn.footX, (k+1) mod N)`。 */
+  readonly aligned: WitnessState;
+  readonly alignedWinning: boolean;
+  /** `residualWait.verified ∧ alignedWinning`。 */
+  readonly covered: boolean;
+};
+
+/**
+ * @internal 一个 winning 状态的 rank 与确定性后继。
+ *
+ * Goal 状态的 `transition` 为 `null`（到达即终止）；其余状态的后继必是
+ * `verified: true` 的 `wait` / `move`，且 `rank(successor) = rank(state) − 1`。
+ */
+export type WinningSetPolicyEntry = {
+  readonly state: WitnessState;
+  readonly rank: number;
+  readonly transition: TransitionCheck | null;
+};
+
+/** @internal 全相位 W 的搜索输入。 */
+export type WinningSetSearchInput = {
+  readonly space: WitnessSpace;
+  readonly hazard: WitnessHazard;
+  readonly lagMs: number;
+  /** U9 + W 共用的 NB 预算；本函数不新建、不重置。 */
+  readonly budget: WitnessWorkBudget;
+};
+
+/** @internal 全相位 W 的搜索结果；失败 / 耗尽侧不携带部分策略。 */
+export type WinningSetResult = {
+  readonly status: WinningSetStatus;
+  /** D9 闭集原因码；`complete` 时为 `null`。 */
+  readonly degradationReason: DegradationReason | null;
+  readonly phaseCoverage: {
+    readonly cells: number;
+    readonly coveredPhases: readonly number[];
+    readonly uncoveredPhases: readonly number[];
+    readonly complete: boolean;
+  };
+  /** 按相位格升序的覆盖证据。 */
+  readonly phases: readonly WinningSetPhaseCoverage[];
+  /** 按状态索引升序；仅 `complete` / `failed` 侧非空。 */
+  readonly policy: readonly WinningSetPolicyEntry[];
+  readonly winningStates: number;
+  readonly budgets: WitnessWorkSnapshot;
+};
+
+/**
+ * @internal 预算快照 → D9 原因码。
+ *
+ * 正常情况下调用方已捕获 `BudgetStop.degradationReason`；这里只兜底
+ * `budget.finish()` 在收尾时新触发的墙钟 abort（唯一没有 `BudgetStop` 的路径）。
+ */
+const budgetReasonOf = (kind: BudgetKind | null): DegradationReason => {
+  switch (kind) {
+    case "state-budget": return "state-budget-exhausted";
+    case "edge-budget": return "edge-budget-exhausted";
+    case "cut-budget": return "cut-budget-exhausted";
+    case "witness-volume": return "witness-volume";
+    case "hop-sample-budget": return "hop-sample-budget";
+    default: return "wall-clock-abort";
+  }
+};
+
+/** @internal `[0, N)` 的相位格列表（升序）。 */
+const allPhaseCells = (phaseCount: number): number[] => {
+  const cells: number[] = [];
+  for (let k = 0; k < phaseCount; k++) cells.push(k);
+  return cells;
+};
+
+/**
+ * @internal 在 1D 静态走廊 × N 相位格上求**最小**不动点，并提取严格递减 rank 的策略。
+ *
+ * 只做 W（D10 §2.5）；不做 U9（U2-04）、不做 Witness 编码 / 体积（U2-05）。
+ * 输入 / 输出都是确定性的：同一 `space` / `hazard` / `lagMs` / 预算 ⇒ 同一结果
+ * （`budgets.wallClockMs` 除外，它不进确定性签名）。
+ */
+export function searchWinningSet(input: WinningSetSearchInput): WinningSetResult {
+  const { space, hazard, lagMs, budget } = input;
+  const grid = space.grid;
+  const phaseCount = grid.phaseSteps;
+  const { xLo, xHi } = space.corridor;
+  const xCount = xHi - xLo + 1;
+  const stateCount = xCount * phaseCount;
+  const stateIndex = (footX: number, k: number): number => (footX - xLo) * phaseCount + k;
+  const stateAt = (index: number): WitnessState => ({
+    footX: xLo + Math.floor(index / phaseCount),
+    k: index % phaseCount,
+  });
+
+  /** 失败 / 耗尽侧：不带任何部分 W 或策略。 */
+  const insufficient = (stop: BudgetStop | null): WinningSetResult => {
+    const budgets = budget.finish();
+    return {
+      status: "insufficient",
+      degradationReason: stop?.degradationReason ?? budgetReasonOf(budgets.budgetKind),
+      phaseCoverage: {
+        cells: phaseCount,
+        coveredPhases: [],
+        uncoveredPhases: allPhaseCells(phaseCount),
+        complete: false,
+      },
+      phases: [],
+      policy: [],
+      winningStates: 0,
+      budgets,
+    };
+  };
+
+  // ① 残差等待先行（D3 §5）：每个 `C_k` 都对整格 Hazard 位姿范围保守验证。
+  //    单格失败只让该相位不可覆盖；预算耗尽则立即 insufficient。
+  const residualWaits: ResidualWaitCheck[] = [];
+  for (let k = 0; k < phaseCount; k++) {
+    const residual = verifyResidualWait({ space, hazard, lagMs, cell: k, budget });
+    if (residual.budgetStop !== null) return insufficient(residual.budgetStop);
+    residualWaits.push(residual);
+  }
+
+  // ② 反向 BFS 求最小不动点：Goal 状态 rank 0，其余状态取「到 Goal 的最少边数」。
+  const rank = new Int32Array(stateCount).fill(-1);
+  const successor = new Array<TransitionCheck | null>(stateCount).fill(null);
+  const queue: number[] = [];
+  let head = 0;
+
+  // Goal 状态与相位无关（D3 §4）；按 x 升序、k 升序入队 ⇒ BFS 第 0 层固定。
+  for (const goalX of space.arrival.goalStates) {
+    for (let k = 0; k < phaseCount; k++) {
+      const index = stateIndex(goalX, k);
+      if (rank[index] !== -1) continue;
+      rank[index] = 0;
+      const enqueued = budget.enqueueState();
+      if (enqueued.stopped) return insufficient(enqueued);
+      queue.push(index);
+    }
+  }
+
+  while (head < queue.length) {
+    const currentIndex = queue[head] as number;
+    head += 1;
+    const visited = budget.visitState();
+    if (visited.stopped) return insufficient(visited);
+
+    const current = stateAt(currentIndex);
+    const currentRank = rank[currentIndex] as number;
+    const previousK = (current.k - 1 + phaseCount) % phaseCount;
+    // 前驱按 x 升序枚举：`x === current.footX` 是 wait，其余是 |Δx| ≤ maxStep 的 move。
+    // 每条候选边都必须通过 U2-02 的 S1–S4 才能进入 W。
+    for (let x = xLo; x <= xHi; x++) {
+      if (x !== current.footX && Math.abs(x - current.footX) > grid.maxStep) continue;
+      const previousIndex = stateIndex(x, previousK);
+      if (rank[previousIndex] !== -1) continue;
+      const previous: WitnessState = { footX: x, k: previousK };
+      const check = verifyTransition({
+        space,
+        hazard,
+        lagMs,
+        from: previous,
+        to: current,
+        budget,
+      });
+      if (check.budgetStop !== null) return insufficient(check.budgetStop);
+      if (!check.verified) continue;
+      // FIFO 层次 ⇒ `currentRank` 是首次到达的最小 rank；策略 rank 严格递减。
+      rank[previousIndex] = currentRank + 1;
+      successor[previousIndex] = check;
+      const enqueued = budget.enqueueState();
+      if (enqueued.stopped) return insufficient(enqueued);
+      queue.push(previousIndex);
+    }
+  }
+
+  // ③ 全相位覆盖：残差等待 + 对齐后的 spawn 状态属于 W；N 个格全过才 complete。
+  const coveredPhases: number[] = [];
+  const uncoveredPhases: number[] = [];
+  const phases: WinningSetPhaseCoverage[] = [];
+  const spawnInCorridor = inStaticCorridor(space.corridor, space.spawn.footX);
+  for (let k = 0; k < phaseCount; k++) {
+    const residualWait = residualWaits[k] as ResidualWaitCheck;
+    const aligned: WitnessState = { footX: space.spawn.footX, k: (k + 1) % phaseCount };
+    const alignedWinning = spawnInCorridor && rank[stateIndex(aligned.footX, aligned.k)] !== -1;
+    const covered = residualWait.verified && alignedWinning;
+    if (covered) coveredPhases.push(k);
+    else uncoveredPhases.push(k);
+    phases.push({ cell: k, residualWait, aligned, alignedWinning, covered });
+  }
+
+  // ④ 策略表：按状态索引升序（x 升序、k 升序）；只含已 winning 状态。
+  const policy: WinningSetPolicyEntry[] = [];
+  let winningStates = 0;
+  for (let index = 0; index < stateCount; index++) {
+    const value = rank[index] as number;
+    if (value === -1) continue;
+    winningStates += 1;
+    policy.push({ state: stateAt(index), rank: value, transition: successor[index] ?? null });
+  }
+
+  // ⑤ 收尾墙钟检查：finish 新触发的 abort 同样只能 IE。
+  const complete = coveredPhases.length === phaseCount;
+  const budgets = budget.finish();
+  if (budgets.budgetStatus !== "complete") {
+    return {
+      status: "insufficient",
+      degradationReason: budgetReasonOf(budgets.budgetKind),
+      phaseCoverage: {
+        cells: phaseCount,
+        coveredPhases: [],
+        uncoveredPhases: allPhaseCells(phaseCount),
+        complete: false,
+      },
+      phases: [],
+      policy: [],
+      winningStates: 0,
+      budgets,
+    };
+  }
+
+  return {
+    status: complete ? "complete" : "failed",
+    degradationReason: complete ? null : "no-witness-found",
+    phaseCoverage: {
+      cells: phaseCount,
+      coveredPhases,
+      uncoveredPhases,
+      complete,
+    },
+    phases,
+    policy,
+    winningStates,
+    budgets,
+  };
+}
