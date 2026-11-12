@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { boxFromFoot } from "../src/playability/geometry.js";
 import { buildMovementGraph } from "../src/playability/graph.js";
+import { trianglePosition } from "../src/playability/temporal-motion.js";
 import {
   computePermanentGate,
   type PermanentGateHalf,
@@ -75,12 +76,12 @@ describe("U3-01 门区半部 API 契约", () => {
     ]);
   });
 
-  it("有效几何返回 COMPLETE，只填 gate，不生成 U4 字段", () => {
+  it("有效几何返回 COMPLETE，填 gate 与 periodCoverage，不生成 U4 字段", () => {
     const result = resultOf();
     expect(result.gateStatus).toBe("COMPLETE");
     expect(result.reason).toBeNull();
     expect(result.gate).not.toBeNull();
-    expect(result.periodCoverage).toBeNull();
+    expect(result.periodCoverage).not.toBeNull();
     expect(result.sideRule).toBeNull();
     expect(result.forbiddenInjection).toBeNull();
     const keys = Object.keys(result);
@@ -103,6 +104,7 @@ describe("U3-01 门区半部 API 契约", () => {
       expect(result.reason).not.toBeNull();
       expect(U3_REASONS).toContain(result.reason);
       expect(result.gate).toBeNull();
+      expect(result.periodCoverage).toBeNull();
     }
   });
 
@@ -113,7 +115,8 @@ describe("U3-01 门区半部 API 契约", () => {
     const side: PermanentGateProof["sideRule"] | null = result.sideRule;
     const injection: PermanentGateProof["forbiddenInjection"] | null = result.forbiddenInjection;
     expect(gate).toEqual(result.gate);
-    expect([period, side, injection]).toEqual([null, null, null]);
+    expect(period).toEqual(result.periodCoverage);
+    expect([side, injection]).toEqual([null, null]);
   });
 
   it("相同输入重复运行结果规范化相等（无随机 / 时间依赖）", () => {
@@ -202,6 +205,60 @@ describe("U3-02 门区闭式几何", () => {
   });
 });
 
+describe("U3-03 全周期覆盖", () => {
+  it("记录 periodMs 与闭式全周期区间（两个解析半周期，不合并）", () => {
+    const result = resultOf();
+    const coverage = result.periodCoverage;
+    if (coverage === null) throw new Error("expected period coverage");
+    expect(coverage.periodMs).toBe(200);
+    expect(coverage.complete).toBe(true);
+    expect(coverage.intervals).toEqual([[0, 100], [100, 200]]);
+  });
+
+  it("极值只在 t = 0 / P/2 / P 取得（含负时间与多周期）", () => {
+    const motion = input().motion;
+    const { at, distance, periodMs } = motion;
+    expect(trianglePosition(motion, 0)).toBe(at.x);
+    expect(trianglePosition(motion, periodMs / 2)).toBe(at.x + distance);
+    expect(trianglePosition(motion, periodMs)).toBe(at.x);
+    expect(trianglePosition(motion, -periodMs)).toBe(at.x);
+    expect(trianglePosition(motion, -periodMs / 2)).toBe(at.x + distance);
+    expect(trianglePosition(motion, 5 * periodMs)).toBe(at.x);
+    expect(trianglePosition(motion, periodMs + periodMs / 2)).toBe(at.x + distance);
+  });
+
+  it("区间相邻且合起来恰好是一个周期（无 pad、无缺口）", () => {
+    const coverage = resultOf().periodCoverage;
+    if (coverage === null) throw new Error("expected period coverage");
+    const first = coverage.intervals[0];
+    const second = coverage.intervals[1];
+    if (first === undefined || second === undefined) throw new Error("expected two intervals");
+    const [firstStart, firstEnd] = first;
+    const [secondStart, secondEnd] = second;
+    expect(firstStart).toBe(0);
+    expect(firstEnd).toBe(secondStart);
+    expect(secondEnd).toBe(coverage.periodMs);
+    expect(firstEnd - firstStart + (secondEnd - secondStart)).toBe(coverage.periodMs);
+  });
+
+  it("周期起终点一致：P 与 0 是同一相位，不产生第二段覆盖", () => {
+    const coverage = resultOf().periodCoverage;
+    if (coverage === null) throw new Error("expected period coverage");
+    expect(coverage.intervals).toHaveLength(2);
+    expect(coverage.intervals[0]?.[0]).toBe(0);
+    expect(coverage.intervals[1]?.[1]).toBe(coverage.periodMs);
+  });
+
+  it("非法周期不产生 complete: true，而是 geometry-untrusted", () => {
+    for (const periodMs of [0, -200, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const result = resultOf(withMotion({ periodMs }));
+      expect(result.gateStatus).toBe("INCOMPLETE");
+      expect(result.reason).toBe("geometry-untrusted");
+      expect(result.periodCoverage).toBeNull();
+    }
+  });
+});
+
 describe("U3 依赖与公共面边界", () => {
   it("temporal-gate.ts 不 import temporal.ts / temporal-witness.ts", () => {
     const source = gateSource();
@@ -236,6 +293,11 @@ describe("U3 依赖与公共面边界", () => {
     expect(source).not.toMatch(/TEMPORAL_LAG_/);
     expect(source).not.toContain("Symbol(");
     expect(source).not.toMatch(/analyze\s*:/);
+  });
+
+  it("门区模块不含采样循环（全周期结果只能来自闭式）", () => {
+    const source = gateSource();
+    expect(source).not.toMatch(/\b(?:for|while)\s*\(/);
   });
 
   it("导出符号全部标 @internal", () => {

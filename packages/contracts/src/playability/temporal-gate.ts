@@ -168,11 +168,53 @@ const gateGeometryOf = (input: PermanentGateInput): GateGeometryCheck => {
 
 // ── 入口 ────────────────────────────────────────────────────────────────────
 
+// ── 全周期覆盖（D4 §1.2–§1.3） ──────────────────────────────────────────────
+
+/** @internal 全周期覆盖判定结果。 */
+type GateCoverageCheck =
+  | { readonly ok: true; readonly coverage: GatePeriodCoverage }
+  | { readonly ok: false; readonly reason: DegradationReason };
+
+/**
+ * @internal
+ * 全周期覆盖记录，只允许**闭式全周期**结果。
+ *
+ * ```text
+ * max p = at + d   （t = P/2）
+ * min p = at       （t = 0 / P）
+ * ```
+ *
+ * 两个半周期各自单调，各自相对门区核心的覆盖在定义上成立；折返点只作解析边界，
+ * 不跨段推断。区间记录一个周期内的绝对时间窗口（ms，端点闭合），**不合并**，
+ * 让「上升段 / 下降段」的解析来源保持可见。
+ *
+ * `intervals` 的语义（D9 未进一步限定，本模块冻结）：周期内门区核心被覆盖的时间
+ * 窗口；有效门区在定义上覆盖整个周期，两段相邻且合起来是 `[0, periodMs]`。
+ *
+ * 采样、子周期或「幸运相位」结果**不得**生成 `complete: true`；非法周期不是
+ * 「未覆盖」，而是 `geometry-untrusted`。
+ */
+const periodCoverageOf = (motion: TriangleMotion): GateCoverageCheck => {
+  const period = motion.periodMs;
+  if (!Number.isFinite(period) || !(period > 0)) {
+    return { ok: false, reason: "geometry-untrusted" };
+  }
+  const half = period / 2;
+  const coverage: GatePeriodCoverage = {
+    periodMs: period,
+    complete: true,
+    intervals: [[0, half], [half, period]],
+  };
+  return { ok: true, coverage };
+};
+
+// ── 入口 ────────────────────────────────────────────────────────────────────
+
 /**
  * @internal
  * U3 门区半部的入口。
  *
- * U3-02 只填 `gate`；`periodCoverage`（U3-03）、`sideRule`（U3-04）与
+ * U3-03 填 `gate` 与 `periodCoverage`；`sideRule`（U3-04）与
  * `forbiddenInjection`（U3-05）仍为 `null`。门区几何有效时 `gateStatus` 为
  * `COMPLETE`，但这只是**门区半部**完成，不代表完整 `PermanentGateProof` ——
  * `graphCut` / hop / 模型闭合归 U4 / U5，**不得**在本模块伪造。
@@ -180,9 +222,11 @@ const gateGeometryOf = (input: PermanentGateInput): GateGeometryCheck => {
 export const computePermanentGate = (input: PermanentGateInput): PermanentGateHalf => {
   const geometry = gateGeometryOf(input);
   if (!geometry.ok) return incomplete(geometry.reason);
+  const coverage = periodCoverageOf(input.motion);
+  if (!coverage.ok) return incomplete(coverage.reason);
   return {
     gate: geometry.gate,
-    periodCoverage: null,
+    periodCoverage: coverage.coverage,
     sideRule: null,
     forbiddenInjection: null,
     gateStatus: "COMPLETE",

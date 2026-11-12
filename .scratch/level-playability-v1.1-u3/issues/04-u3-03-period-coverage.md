@@ -1,8 +1,8 @@
 # U3-03 全周期覆盖
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U3-03 session 2026-11-12)
 Blocked by: 03
 Map: ../map.md
 Class: U3 / IMPLEMENTATION
@@ -41,4 +41,23 @@ Class: U3 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 全周期覆盖记录落地，只来自闭式全周期解析；判侧 / 注入仍未实现。
+
+| 项 | 结果 |
+| --- | --- |
+| 记录 | `{ periodMs: P, complete: true, intervals: [[0, P/2], [P/2, P]] }` |
+| 闭式依据 | `max p = at + d`（`t = P/2`）、`min p = at`（`t = 0 / P`） |
+| 区间语义 | 周期内门区核心被覆盖的绝对时间窗口；两段解析半周期不合并，相邻且合并恰为 `[0, P]` |
+| 采样禁令 | 模块内无 `for` / `while`；采样 / 子周期 / 幸运相位不可能产出 `complete: true` |
+| 非法周期 | `≤0` / 非有限 ⇒ `geometry-untrusted`，`periodCoverage: null` |
+| 无 pad | 不引入 `lagMode` 或 lag pad（属完整 proof）；区间总长 = `P` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0**（首次 typecheck 因测试元组解构 `TS2488` 失败，已修复后复跑） |
+| 定向 gate 测试 | 退出码 **0**；**23 / 23 passed** |
+| `playability-temporal-input.test.ts` | 退出码 **0**；**65 / 65 passed** |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+`intervals` 的语义是 D9 未限定处的本票裁定：取「周期内覆盖时间窗口」，保留两个解析半周期而不合并，避免下游误读为跨折返点推断。
+
+证据：[`../evidence/03-period-coverage.md`](../evidence/03-period-coverage.md)。
+
+**下游**：U3-04（判侧规则）已 **unblocked**。本票未启动 U3-04。
