@@ -29,3 +29,7 @@ Class: I-03 / DECISION
 ### 验收
 
 几何证据 gate 表：证据 / 产生者 / 验证方式 / 失败降级 / 对 NB/PU 的阻断；未闭合项显式列出。
+
+## Answer
+
+（resolved 时填写）

@@ -28,3 +28,7 @@ Class: I-03 / DECISION
 ### 验收
 
 PU 条件表、gate 状态、独立审查 / 授权路径、负向场景、持续 BLOCKED 的机制。
+
+## Answer
+
+（resolved 时填写）

@@ -29,3 +29,7 @@ Class: I-03 / AUDIT
 ### 验收
 
 审查报告完整；逐项结论；证据与 hash；未覆盖项显式；审查会话独立。
+
+## Answer
+
+（resolved 时填写）

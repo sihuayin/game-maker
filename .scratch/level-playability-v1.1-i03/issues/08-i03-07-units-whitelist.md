@@ -30,3 +30,7 @@ Class: I-03 / DECISION
 ### 验收
 
 单元 / 依赖 / 复核点表、逐文件白名单、STOP / 回滚规则、台账空白表。
+
+## Answer
+
+（resolved 时填写）

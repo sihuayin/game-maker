@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-13 开图
+Status: open · 2026-11-13 · I03-00 完成；I03-01 为下一 frontier 票
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -77,6 +77,7 @@ Status: open · 2026-11-13 开图
 
 ## Decisions so far
 
+- [I03-00 初始化、范围冻结、授权台账与包骨架](issues/01-i03-00-init.md): 分支 / base / 授权包 SHA / 输入基线 / 台账 / DRAFT 包骨架就绪；产品目录零 diff；`PUBLIC_NB` / `PUBLIC_PU` 仍 `BLOCKED`；I-03 实施未授权。I03-01 为下一 frontier。
 - [I-03 地图前沿裁定](reports/00-frontier-ruling.md): Q1=A / Q2=分阶段 / Q3=最小面 / Q4=A；Destination 是可签署的 I-03 实施授权包；`PUBLIC_NB` 接线 / 证据准入 ≠ 开放；`PUBLIC_PU` 持续 `BLOCKED`；第一阶段非阻断；实施另开 effort。
 
 ## Not yet specified

@@ -30,3 +30,7 @@ I-03 适配层如何把内部结果映射为公共 `PlayabilityVerdictState` 与
 ### 验收
 
 公共 Verdict / coverage 状态表、聚合规则、IE 不变量、与现有三层的关系、负向场景。
+
+## Answer
+
+（resolved 时填写）

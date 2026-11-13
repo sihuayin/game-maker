@@ -28,3 +28,7 @@ I-03 第一阶段 `publish-gate` 如何消费 `coverage.temporal` / evidence 而
 ### 验收
 
 第一阶段消费规则、未来 gate 变更门槛、负向场景、回滚路径。
+
+## Answer
+
+（resolved 时填写）
