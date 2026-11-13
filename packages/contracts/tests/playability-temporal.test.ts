@@ -4,7 +4,7 @@
 //    追加到同一文件。所有世界都是内存夹具，不读文件系统、不新增 JSON fixture。
 import { describe, expect, it } from "vitest";
 import { parseGameConfig } from "../src/index.js";
-import { analyzeTemporalInternal, determinismSignature } from "../src/playability/temporal.js";
+import { analyzeTemporalInternal, determinismSignature, resolveTwoLagResults } from "../src/playability/temporal.js";
 import type { TemporalInternalResult, BudgetProfile } from "../src/playability/temporal-result.js";
 import {
   canonicalJson,
@@ -295,5 +295,169 @@ describe("U5-01 预算与确定性", () => {
     expect(late.stats.timing.wallClockMs).not.toBe(early.stats.timing.wallClockMs);
     expect(late.stats.determinismSignature).toBe(early.stats.determinismSignature);
     expect(determinismSignature(late)).toBe(determinismSignature(early));
+  });
+});
+
+
+// ── U5-02：预算闭合与降级硬化 ───────────────────────────────────────────────
+//
+// 小型世界：worldW=20、xPositions=19、N_max=4、默认速度 20 px/s。
+const COMPACT_NB: WitnessWorldOptions = {
+  worldW: 20,
+  goalX: 15,
+  goalW: 2,
+  spawnX: 3,
+  hazardX: 10,
+  hazardDistance: 4,
+  hazardPeriodMs: 200,
+  hazardY: 20,
+};
+
+/** 周期 300ms：`maxStates=113` 时 N=5、dt=60，某个相位格内部跨折返点 150。 */
+const CROSSING_NB: WitnessWorldOptions = { ...COMPACT_NB, hazardPeriodMs: 300 };
+
+describe("U5-02 预算闭合与降级硬化", () => {
+  it("[I02-05][AC-08] phaseGridCapped 只是诊断；N ≥ 2 时仍可完成", () => {
+    const result = analyze(COMPACT_NB, { maxStates: 56 });
+    expect(result.stats.grid.phaseSteps).toBe(2);
+    expect(result.stats.grid.N_max).toBe(4);
+    expect(result.stats.grid.phaseGridCapped).toBe(true);
+    expect(result.stats.grid.phaseCapReason).toBe("state-capacity");
+    expect(result.internalResult).toBe("nb-candidate");
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] N < 2 ⇒ grid-resolution-infeasible，不截断到 2", () => {
+    const result = analyze(COMPACT_NB, { maxStates: 37 });
+    expect(result.stats.grid.phaseSteps).toBe(0);
+    expect(reasonOf(result)).toBe("grid-resolution-infeasible");
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] 非法预算 / 超硬上限 ⇒ invalid-budget，不回退默认值", () => {
+    const invalid: Partial<BudgetProfile>[] = [
+      { maxStates: 0 },
+      { maxStates: 1_000_001 },
+      { timeBudgetMs: 0 },
+      { timeBudgetMs: 10_001 },
+      { maxCutsPerCheck: 1_000_001 },
+      { maxCutsPerBranch: 10_000_001 },
+      { maxWitnessTransitions: 1_000_001 },
+      { maxWitnessBytes: 64 * 1024 * 1024 + 1 },
+      { maxHopSamples: 241 },
+      { timeBudgetCheckpointWork: 0 },
+    ];
+    for (const overrides of invalid) {
+      const result = analyze(NB_WORLD, overrides);
+      expect(reasonOf(result), JSON.stringify(overrides)).toBe("invalid-budget");
+      expect(result.stats.budget.budgetStatus).toBe("invalid");
+      expect(result.internalResult).toBe("insufficient-evidence");
+      expectInvariants(result);
+    }
+  });
+
+  it("[I02-05][AC-08] 派生上界溢出 ⇒ budget-bound-overflow", () => {
+    const result = analyze(NB_WORLD, { maxEdges: 2_000_001 });
+    expect(reasonOf(result)).toBe("budget-bound-overflow");
+    expect(result.stats.budget.budgetStatus).toBe("invalid");
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] edge 先于 cut 检查：edge 触顶不被改写为 cut-budget", () => {
+    const result = analyze(NB_WORLD, { maxEdges: 0, maxCutsPerBranch: 1 });
+    expect(reasonOf(result)).toBe("edge-budget-exhausted");
+    expect(result.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "edge-budget",
+    });
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] 折返点预切段：单次 check 不跨折返点，maxCutsPerCheck=0 不误伤 U2", () => {
+    // `verifyTransition` 在调用 intersectContinuous 前已按折返点切段，因此单次
+    // check 的 expectedCuts 恒为 0；它不会伪造 cut-budget。单次上限本身由
+    // playability-temporal-budget.test.ts 的 tracker 级测试覆盖。
+    const result = analyze(CROSSING_NB, { maxStates: 113, maxCutsPerCheck: 0 });
+    expect(result.internalResult).toBe("nb-candidate");
+    expect(result.stats.budget).toMatchObject({ budgetStatus: "complete", budgetKind: null });
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] Witness 体积：恰好达上限通过，多 1 即 witness-volume", () => {
+    const baseline = analyze(NB_WORLD);
+    expect(baseline.certificate.kind).toBe("witness");
+    if (baseline.certificate.kind !== "witness") return;
+    const transitions = baseline.certificate.witness.volume.transitions;
+    const bytes = baseline.certificate.witness.volume.bytes;
+    expect(transitions).toBeGreaterThan(0);
+    expect(bytes).toBeGreaterThan(0);
+
+    const atCap = analyze(NB_WORLD, {
+      maxWitnessTransitions: transitions,
+      maxWitnessBytes: bytes,
+    });
+    expect(atCap.internalResult).toBe("nb-candidate");
+
+    const overTransitions = analyze(NB_WORLD, { maxWitnessTransitions: transitions - 1 });
+    expect(overTransitions.internalResult).toBe("insufficient-evidence");
+    expect(reasonOf(overTransitions)).toBe("witness-volume");
+    expect(overTransitions.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "witness-volume",
+    });
+    expectInvariants(overTransitions);
+
+    const overBytes = analyze(NB_WORLD, { maxWitnessBytes: bytes - 1 });
+    expect(overBytes.internalResult).toBe("insufficient-evidence");
+    expect(reasonOf(overBytes)).toBe("witness-volume");
+    expect(overBytes.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "witness-volume",
+    });
+    expectInvariants(overBytes);
+  });
+
+  it("[I02-05][AC-08] maxHopSamples 生效：cap 绑定 ⇒ hop-sample-budget + 部分证明", () => {
+    const result = analyze(PU_WORLD, { maxHopSamples: 6 });
+    expect(result.internalResult).toBe("insufficient-evidence");
+    expect(reasonOf(result)).toBe("hop-sample-budget");
+    expect(result.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "hop-sample-budget",
+    });
+    expect(result.certificate.kind).toBe("permanent-gate");
+    if (result.certificate.kind !== "permanent-gate") return;
+    expect(result.certificate.status).toBe("INCOMPLETE");
+    expect(result.certificate.proof.hopDoubling.base.cap).toBe(6);
+    expect(result.certificate.proof.hopDoubling.doubled.cap).toBe(6);
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] maxHopSamples 低于采样下限 ⇒ hop-sample-budget，不静默改用默认值", () => {
+    const result = analyze(PU_WORLD, { maxHopSamples: 0 });
+    expect(result.internalResult).toBe("insufficient-evidence");
+    expect(reasonOf(result)).toBe("hop-sample-budget");
+    expect(result.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "hop-sample-budget",
+    });
+    expect(result.certificate.kind).toBe("none");
+    expectInvariants(result);
+  });
+
+  it("[I02-05][AC-08] 「不完整」与「不一致」是不同原因", () => {
+    const incomplete = analyze(NB_WORLD, { maxEdges: 0 });
+    expect(reasonOf(incomplete)).toBe("edge-budget-exhausted");
+    expect(reasonOf(incomplete)).not.toBe("lag-disagreement");
+
+    const disagreement = resolveTwoLagResults(
+      { applicable: true, verdict: "NO_PROVEN_BLOCKER" },
+      { applicable: true, verdict: "PROVEN_UNPLAYABLE" },
+    );
+    expect(disagreement).toEqual({
+      applicable: true,
+      verdict: "INSUFFICIENT_EVIDENCE",
+      degradation: "lag-disagreement",
+    });
   });
 });

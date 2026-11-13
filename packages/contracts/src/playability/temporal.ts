@@ -324,6 +324,26 @@ const primaryReason = (a: DegradationReason, b: DegradationReason): DegradationR
   return a <= b ? a : b;
 };
 
+/** @internal 工作预算类原因 → D9 `BudgetKind`；普通否定证据 / 模型缺口返回 `null`。 */
+const budgetKindOfReason = (reason: DegradationReason): BudgetKind | null => {
+  switch (reason) {
+    case "state-budget-exhausted":
+      return "state-budget";
+    case "edge-budget-exhausted":
+      return "edge-budget";
+    case "cut-budget-exhausted":
+      return "cut-budget";
+    case "witness-volume":
+      return "witness-volume";
+    case "hop-sample-budget":
+      return "hop-sample-budget";
+    case "wall-clock-abort":
+      return "wall-clock-abort";
+    default:
+      return null;
+  }
+};
+
 /** @internal 组装中的可变部分；`finalizeInternal` 负责补 stats 与确定性签名。 */
 type InternalDraft = {
   readonly internalResult: InternalResultState;
@@ -555,8 +575,10 @@ const runPermanentGateProof = (args: {
   readonly manifest: AssetPackManifest;
   readonly space: WitnessSpace;
   readonly hazard: WitnessHazard;
+  /** 生效的 `maxHopSamples`（D5 §3；默认 / 硬上限 240）。 */
+  readonly maxHopSamples: number;
 }): GateProofOutcome => {
-  const { config, manifest, space, hazard } = args;
+  const { config, manifest, space, hazard, maxHopSamples } = args;
   const buildGraph = (forbiddenBoxes: readonly Aabb[]): MovementGraph | null =>
     buildMovementGraph(config, manifest, undefined, { forbiddenBoxes });
 
@@ -590,6 +612,7 @@ const runPermanentGateProof = (args: {
     gateRect,
     move: playerMoveOf(config),
     graph: injected,
+    maxHopSamples,
   });
   const proof = permanentGateProofOf(gate, evasion);
   if (evasion.status === "COMPLETE" && proof !== null) {
@@ -781,6 +804,7 @@ export function analyzeTemporalInternal(input: TemporalInternalInput): TemporalI
     manifest: input.manifest,
     space,
     hazard: mover.hazard,
+    maxHopSamples: profile.maxHopSamples,
   });
   const puTiming: Stats["timing"] = {
     wallClockMs: elapsed(),
@@ -811,13 +835,23 @@ export function analyzeTemporalInternal(input: TemporalInternalInput): TemporalI
       ? { kind: "none" }
       : { kind: "permanent-gate", status: "INCOMPLETE", proof: pu.proof };
 
+  // 工作预算类主因必须把 `budgetStatus` / `budgetKind` 对齐（D9 §4 / §5），
+  // 包括 U4 的 `hop-sample-budget`；不能只在 NB 快照上读取。
+  const reasonKind = budgetKindOfReason(primary);
+  const budgetStatus: BudgetStatus =
+    reasonKind !== null
+      ? reasonKind === "wall-clock-abort" ? "aborted" : "exhausted"
+      : nbDecisive ? nbSnapshot.budgetStatus : "complete";
+  const budgetKind: BudgetKind | null =
+    reasonKind ?? (nbDecisive ? nbSnapshot.budgetKind : null);
+
   return finalizeInternal({
     internalResult: "insufficient-evidence",
     certificate,
     degradationReason: primary,
     secondaryReasons: secondary,
-    budgetStatus: nbDecisive ? nbSnapshot.budgetStatus : "complete",
-    budgetKind: nbDecisive ? nbSnapshot.budgetKind : null,
+    budgetStatus,
+    budgetKind,
     budgetProfile: profile,
     grid,
     work: nbWork,

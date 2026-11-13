@@ -101,6 +101,12 @@ export type PermanentEvasionInput = {
   readonly gateRect: Aabb;
   readonly move: MoveParams;
   readonly graph: MovementGraph;
+  /**
+   * 生效的每弧 hop 采样上限（D5 `maxHopSamples`，默认 / 硬上限 240）。
+   * 调用方（U5 组装层）已用 `resolveBudgetProfile` 校验；低于 `hopSamples` 的
+   * 结构下限 6（或高于 240）时本模块显式降级 `hop-sample-budget`，不改用默认值。
+   */
+  readonly maxHopSamples?: number;
 };
 
 /**
@@ -140,11 +146,31 @@ function graphCutOf(input: PermanentEvasionInput): EvasionGraphCut {
 /** @internal 模型闭合声明（D4 §7 / D9 冻结字面量）。 */
 export const MOVEMENT_MODEL_CLOSURE = "not-proven-air-control" as const;
 
+/** @internal hop 预算无法满足采样下限时的原因码（D9 闭集）。 */
+const HOP_SAMPLE_BUDGET_REASON: DegradationReason = "hop-sample-budget";
+
 // ── hop 双档（D4 §6） ───────────────────────────────────────────────────────
 
 /** @internal 冻结的双档参数（D4 §6.1；主档 = 现行默认）。 */
 const HOP_BASE = { hz: 60, maxSamples: 120 } as const;
 const HOP_DOUBLED = { hz: 120, maxSamples: 240 } as const;
+
+/** @internal `hopSamples` 的结构下限（与 `graph.ts` 的 `Math.max(6, …)` 一致）。 */
+const HOP_MIN_SAMPLES = 6;
+
+/**
+ * @internal 把生效预算折算成两档每弧上限。
+ *
+ * 默认（`undefined`）保持 D4 冻结的 `120 / 240`；显式上限同时约束两档。
+ * 调用方已把值校验到 `[6, 240]`；这里只把主档上限压到 `120`。
+ */
+const hopCapsOf = (maxHopSamples: number | undefined): { base: number; doubled: number } => {
+  const requested = maxHopSamples ?? HOP_DOUBLED.maxSamples;
+  return {
+    base: Math.min(HOP_BASE.maxSamples, requested),
+    doubled: requested,
+  };
+};
 
 type SamplingRun = {
   readonly reached: boolean;
@@ -281,9 +307,29 @@ function degradationReasonOf(args: {
  *   **不要求** `n_doubled = 2·n_base`；cap 绑定、两档不一致、连通性改变 ⇒ `INCOMPLETE`。
  */
 export function computePermanentEvasion(input: PermanentEvasionInput): PermanentEvasionHalf {
+  // hop 预算低于采样原语的结构下限（或高于硬上限）时，无法在不超预算的前提下
+  // 完成双档 BFS ⇒ 显式降级 `hop-sample-budget`，不静默改用默认值。
+  if (
+    input.maxHopSamples !== undefined &&
+    (!Number.isInteger(input.maxHopSamples) ||
+      input.maxHopSamples < HOP_MIN_SAMPLES ||
+      input.maxHopSamples > HOP_DOUBLED.maxSamples)
+  ) {
+    return {
+      graphCut: null,
+      hopDoubling: null,
+      hopSamplingCoverage: null,
+      movementModelClosure: MOVEMENT_MODEL_CLOSURE,
+      status: "INCOMPLETE",
+      reason: HOP_SAMPLE_BUDGET_REASON,
+    };
+  }
   const graphCut = graphCutOf(input);
-  const base = reachWithSampling(input.graph, input.move, input.spawnCell, input.goalRegion, HOP_BASE);
-  const doubled = reachWithSampling(input.graph, input.move, input.spawnCell, input.goalRegion, HOP_DOUBLED);
+  const caps = hopCapsOf(input.maxHopSamples);
+  const baseSampling = { hz: HOP_BASE.hz, maxSamples: caps.base };
+  const doubledSampling = { hz: HOP_DOUBLED.hz, maxSamples: caps.doubled };
+  const base = reachWithSampling(input.graph, input.move, input.spawnCell, input.goalRegion, baseSampling);
+  const doubled = reachWithSampling(input.graph, input.move, input.spawnCell, input.goalRegion, doubledSampling);
 
   // 逐弧覆盖与 cap：两档接受的弧取并集（双档只会因更密采样删边，不会新增弧）。
   const seenArc = new Set<string>();
@@ -295,8 +341,8 @@ export function computePermanentEvasion(input: PermanentEvasionInput): Permanent
     const key = `${arc.ax},${arc.ay},${arc.bx},${arc.by}`;
     if (seenArc.has(key)) continue;
     seenArc.add(key);
-    const n1 = arcSampleCount(input.graph, input.move, arc.ax, arc.ay, arc.bx, arc.by, HOP_BASE.hz, HOP_BASE.maxSamples);
-    const n2 = arcSampleCount(input.graph, input.move, arc.ax, arc.ay, arc.bx, arc.by, HOP_DOUBLED.hz, HOP_DOUBLED.maxSamples);
+    const n1 = arcSampleCount(input.graph, input.move, arc.ax, arc.ay, arc.bx, arc.by, baseSampling.hz, baseSampling.maxSamples);
+    const n2 = arcSampleCount(input.graph, input.move, arc.ax, arc.ay, arc.bx, arc.by, doubledSampling.hz, doubledSampling.maxSamples);
     if (!n1 || !n2) continue;
     maxNBase = Math.max(maxNBase, n1.n);
     maxNDoubled = Math.max(maxNDoubled, n2.n);
@@ -306,8 +352,8 @@ export function computePermanentEvasion(input: PermanentEvasionInput): Permanent
 
   const connectivityPreserved = base.reached === doubled.reached;
   const hopDoubling = {
-    base: summarize(base, maxNBase, HOP_BASE.maxSamples),
-    doubled: summarize(doubled, maxNDoubled, HOP_DOUBLED.maxSamples),
+    base: summarize(base, maxNBase, caps.base),
+    doubled: summarize(doubled, maxNDoubled, caps.doubled),
     connectivityPreserved,
     normalizedCoverage: coverage,
   };

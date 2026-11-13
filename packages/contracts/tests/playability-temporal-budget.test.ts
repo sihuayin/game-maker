@@ -14,6 +14,7 @@ import {
 } from "../src/playability/temporal-budget.js";
 import type { BudgetProfile, TemporalInternalResult } from "../src/playability/temporal-result.js";
 import { determinismSignature } from "../src/playability/temporal.js";
+import { createWitnessWorkBudget } from "../src/playability/temporal-witness.js";
 import {
   budgetProfileFixture,
   canonicalJson,
@@ -318,5 +319,75 @@ describe("I02-01 确定性签名（U1 前置，AC-10）", () => {
     const reordered = JSON.parse(canonicalJson(result)) as TemporalInternalResult;
     expect(determinismSignature(reordered)).toBe(determinismSignature(result));
     expect(canonicalJson(deterministicView(reordered))).toBe(canonicalJson(deterministicView(result)));
+  });
+});
+
+
+// ── U5-02：预算闭合与降级硬化（AC-08） ─────────────────────────────────────
+describe("I02-05 预算闭合与降级硬化（U5-02，AC-08）", () => {
+  it("[I02-05][AC-08] 状态 / edge 触顶后，累计 cut 不得覆盖已有原因", () => {
+    const stateFirst = createWitnessWorkBudget({
+      profile: budgetProfileFixture({ maxStates: 1, maxCutsPerBranch: 1 }),
+      now: () => 0,
+    });
+    expect(stateFirst.enqueueState(2)).toMatchObject({
+      stopped: true, budgetKind: "state-budget", degradationReason: "state-budget-exhausted",
+    });
+    expect(stateFirst.recordCheck(5)).toMatchObject({
+      stopped: true, budgetKind: "state-budget", degradationReason: "state-budget-exhausted",
+    });
+
+    const edgeFirst = createWitnessWorkBudget({
+      profile: budgetProfileFixture({ maxEdges: 1, maxCutsPerBranch: 1 }),
+      now: () => 0,
+    });
+    expect(edgeFirst.checkEdge(2)).toMatchObject({
+      stopped: true, budgetKind: "edge-budget", degradationReason: "edge-budget-exhausted",
+    });
+    expect(edgeFirst.recordCheck(5)).toMatchObject({
+      stopped: true, budgetKind: "edge-budget", degradationReason: "edge-budget-exhausted",
+    });
+  });
+
+  it("[I02-05][AC-08] 刚好达上限不算超限；多 1 即触顶", () => {
+    const states = createWitnessWorkBudget({
+      profile: budgetProfileFixture({ maxStates: 2 }), now: () => 0,
+    });
+    expect(states.enqueueState(2).stopped).toBe(false);
+    expect(states.enqueueState(1)).toMatchObject({ stopped: true, budgetKind: "state-budget" });
+
+    const edges = createWitnessWorkBudget({
+      profile: budgetProfileFixture({ maxEdges: 2 }), now: () => 0,
+    });
+    expect(edges.checkEdge(2).stopped).toBe(false);
+    expect(edges.checkEdge(1)).toMatchObject({ stopped: true, budgetKind: "edge-budget" });
+
+    const perCheck = createWitnessWorkBudget({
+      profile: budgetProfileFixture({ maxCutsPerCheck: 2 }), now: () => 0,
+    });
+    expect(perCheck.recordCheck(2).stopped).toBe(false);
+    expect(perCheck.recordCheck(3)).toMatchObject({ stopped: true, budgetKind: "cut-budget" });
+
+    // maxCutsPerBranch 按 segments = cutPoints + 1 计：1 + 2 = 3 恰好达上限。
+    const branch = createWitnessWorkBudget({
+      profile: budgetProfileFixture({ maxCutsPerBranch: 3 }), now: () => 0,
+    });
+    expect(branch.recordCheck(0).stopped).toBe(false);
+    expect(branch.recordCheck(1).stopped).toBe(false);
+    expect(branch.recordCheck(0)).toMatchObject({ stopped: true, budgetKind: "cut-budget" });
+    expect(branch.snapshot().segmentsTotal).toBe(3);
+  });
+
+  it("[I02-05][AC-08] 累计 cut 与状态 / edge 计数分列，且墙钟不进入语义预算", () => {
+    const budget = createWitnessWorkBudget({
+      profile: budgetProfileFixture(), now: () => 0,
+    });
+    expect(budget.recordCheck(2).stopped).toBe(false);
+    const snapshot = budget.snapshot();
+    expect(snapshot.cutPointsTotal).toBe(2);
+    expect(snapshot.segmentsTotal).toBe(3);
+    expect(snapshot.statesEnqueued).toBe(0);
+    expect(snapshot.edgesChecked).toBe(0);
+    expect(snapshot.wallClockMs).toBe(0);
   });
 });

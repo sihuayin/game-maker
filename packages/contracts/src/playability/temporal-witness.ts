@@ -795,7 +795,19 @@ export function verifyTransition(input: TransitionCheckInput): TransitionCheck {
       t1: b,
       maxCuts: input.budget.profile.maxCutsPerCheck,
     });
-    if (!check.ok) return fail("model-out", cutPoints, segments);
+    if (!check.ok) {
+      // 单次 check 的 `maxCutsPerCheck`（D5 §3.1）是工作预算，不是模型外；
+      // 必须导出 BudgetStop，否则降级原因会被改写成 `model-out`。
+      if (check.reason === "cut-budget") {
+        return fail("budget", cutPoints, segments, {
+          stopped: true,
+          budgetStatus: "exhausted",
+          budgetKind: "cut-budget",
+          degradationReason: "cut-budget-exhausted",
+        });
+      }
+      return fail("model-out", cutPoints, segments);
+    }
     cutPoints += check.cutPoints;
     segments += check.segments;
 
