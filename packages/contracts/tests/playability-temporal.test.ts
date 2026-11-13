@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { parseGameConfig } from "../src/index.js";
 import {
   analyzeTemporalInternal,
+  analyzeTemporalInternalTwoLag,
   determinismSignature,
   resolveTwoLagInternalResults,
   resolveTwoLagResults,
@@ -883,5 +884,176 @@ describe("U5-04 A–J 矩阵", () => {
     // IE 优先级：预算（步骤 5）压过普通否定证据（步骤 7）。
     const budgetFirst = analyze(NB_WORLD, { maxEdges: 0 });
     expect(budgetFirst.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+  });
+});
+
+
+// ── U5-05：双档 lag 证据隔离回归 ────────────────────────────────────────────
+describe("U5-05 双档 lag 证据隔离", () => {
+  const expectBoundary = (result: TemporalInternalResult): void => {
+    expect(result.publicCapability).toBe("BLOCKED");
+    expect(result.publicResult).toBeNull();
+  };
+
+  const baseInput = () => {
+    const { config, manifest } = witnessWorld(NB_WORLD);
+    return {
+      config,
+      manifest,
+      lagMs: 16.67,
+      trustedInput: trustedInputFixture(),
+      testHooks: { now: () => 1000 },
+    } as const;
+  };
+
+  it("[I02-05][AC-09] 两档各自完整执行：独立预算 / 逐档证据可复现", () => {
+    const input = baseInput();
+    const two = analyzeTemporalInternalTwoLag(input, 200);
+    const standaloneFirst = analyzeTemporalInternal(input);
+    const standaloneSecond = analyzeTemporalInternal({ ...input, lagMs: 200 });
+
+    // 先跑主档不会改变第二档；反之亦然（无共享预算 / 证据）。
+    expect(two.first.stats.determinismSignature).toBe(standaloneFirst.stats.determinismSignature);
+    expect(two.second.stats.determinismSignature).toBe(standaloneSecond.stats.determinismSignature);
+    expect(canonicalJson(deterministicView(two.first)))
+      .toBe(canonicalJson(deterministicView(standaloneFirst)));
+    expect(canonicalJson(deterministicView(two.second)))
+      .toBe(canonicalJson(deterministicView(standaloneSecond)));
+
+    // 两档各自都有完整 Witness；证书对象不共享。
+    expect(two.first.certificate.kind).toBe("witness");
+    expect(two.second.certificate.kind).toBe("witness");
+    expect(two.first.certificate).not.toBe(two.second.certificate);
+    expect(two.first.internalResult).toBe("nb-candidate");
+    expect(two.second.internalResult).toBe("nb-candidate");
+
+    // 逐档记录 + D9 合并结果；combined 不扩字段。
+    expect(Object.keys(two).sort()).toEqual(["combined", "first", "second"]);
+    expect(Object.keys(two.combined).sort()).toEqual([
+      "certificate",
+      "diagnostics",
+      "internalResult",
+      "modelConditional",
+      "publicCapability",
+      "publicResult",
+      "stats",
+    ]);
+    expect(two.combined.internalResult).toBe("nb-candidate");
+    expect(two.combined.stats.determinismSignature).toBe(two.first.stats.determinismSignature);
+    expectBoundary(two.first);
+    expectBoundary(two.second);
+    expectBoundary(two.combined);
+  });
+
+  it("[I02-05][AC-09] 两档都因预算不完整 ⇒ 各自保留 edge-budget，不拼成 disagreement", () => {
+    const input = {
+      ...baseInput(),
+      testHooks: { budget: { maxEdges: 0 }, now: () => 1000 },
+    };
+    const two = analyzeTemporalInternalTwoLag(input, 200);
+    for (const result of [two.first, two.second]) {
+      expect(result.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+      expect(result.stats.budget).toMatchObject({
+        budgetStatus: "exhausted",
+        budgetKind: "edge-budget",
+      });
+    }
+    expect(two.combined.internalResult).toBe("insufficient-evidence");
+    expect(two.combined.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+    expect(two.combined.diagnostics.degradationReason).not.toBe("lag-disagreement");
+    expectBoundary(two.combined);
+  });
+
+  it("[I02-05][AC-09] 一档完整、一档 edge 预算耗尽 ⇒ 保留实际原因，不保留乐观档", () => {
+    const complete = analyze(NB_WORLD);
+    const incomplete = analyze(NB_WORLD, { maxEdges: 0 }, 200);
+    for (const combined of [
+      resolveTwoLagInternalResults(complete, incomplete),
+      resolveTwoLagInternalResults(incomplete, complete),
+    ]) {
+      expect(combined.internalResult).toBe("insufficient-evidence");
+      expect(combined.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+      expect(combined.diagnostics.degradationReason).not.toBe("lag-disagreement");
+      expect(combined.stats.budget).toMatchObject({
+        budgetStatus: "exhausted",
+        budgetKind: "edge-budget",
+      });
+      expect(combined.certificate.kind).toBe("none");
+      expectBoundary(combined);
+    }
+  });
+
+  it("[I02-05][AC-09] 一档完整、一档墙钟 abort ⇒ 保留 wall-clock-abort", () => {
+    const complete = analyze(NB_WORLD);
+    const steppingClock = () => {
+      let t = 0;
+      return () => {
+        t += 100;
+        return t;
+      };
+    };
+    const aborted = analyzeWithClock(
+      NB_WORLD,
+      { timeBudgetMs: 10, timeBudgetCheckpointWork: 1 },
+      steppingClock(),
+      200,
+    );
+    expect(aborted.diagnostics.degradationReason).toBe("wall-clock-abort");
+    const combined = resolveTwoLagInternalResults(complete, aborted);
+    expect(combined.internalResult).toBe("insufficient-evidence");
+    expect(combined.diagnostics.degradationReason).toBe("wall-clock-abort");
+    expect(combined.diagnostics.degradationReason).not.toBe("lag-disagreement");
+    expect(combined.stats.budget).toMatchObject({
+      budgetStatus: "aborted",
+      budgetKind: "wall-clock-abort",
+    });
+    expectBoundary(combined);
+  });
+
+  it("[I02-05][AC-09] 两档完整但不一致 ⇒ IE + lag-disagreement，不保留乐观档", () => {
+    const complete = analyze(NB_WORLD);
+    const completeFailure = analyze(NO_GATE_WORLD, {}, 200);
+    expect(complete.certificate.kind).toBe("witness");
+    expect(completeFailure.internalResult).toBe("insufficient-evidence");
+    for (const combined of [
+      resolveTwoLagInternalResults(complete, completeFailure),
+      resolveTwoLagInternalResults(completeFailure, complete),
+    ]) {
+      expect(combined.internalResult).toBe("insufficient-evidence");
+      expect(combined.diagnostics.degradationReason).toBe("lag-disagreement");
+      expect(combined.certificate.kind).toBe("none");
+      expect(combined.stats.budget.budgetStatus).toBe("complete");
+      expectBoundary(combined);
+    }
+  });
+
+  it("[I02-05][AC-09] 两档都因墙钟不完整 ⇒ 合并保留 wall-clock-abort，不伪装", () => {
+    const steppingClock = () => {
+      let t = 0;
+      return () => {
+        t += 100;
+        return t;
+      };
+    };
+    const input = {
+      ...baseInput(),
+      testHooks: {
+        budget: { timeBudgetMs: 10, timeBudgetCheckpointWork: 1 },
+        now: steppingClock(),
+      },
+    };
+    const two = analyzeTemporalInternalTwoLag(input, 200);
+    for (const result of [two.first, two.second]) {
+      expect(result.diagnostics.degradationReason).toBe("wall-clock-abort");
+      expect(result.stats.budget.budgetStatus).toBe("aborted");
+    }
+    expect(two.combined.internalResult).toBe("insufficient-evidence");
+    expect(two.combined.diagnostics.degradationReason).toBe("wall-clock-abort");
+    expect(two.combined.diagnostics.degradationReason).not.toBe("lag-disagreement");
+    expect(two.combined.stats.budget).toMatchObject({
+      budgetStatus: "aborted",
+      budgetKind: "wall-clock-abort",
+    });
+    expectBoundary(two.combined);
   });
 });

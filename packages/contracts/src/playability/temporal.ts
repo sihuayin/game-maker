@@ -928,3 +928,35 @@ export function analyzeTemporalInternal(input: TemporalInternalInput): TemporalI
     timing: puTiming,
   });
 }
+
+// ── U5-05：双档内部入口（@internal）──────────────────────────────────────────
+//
+// D5 §7.2 要求两档分别完整执行、独立预算 / 独立证据，并记录逐档结果；D9
+// `TemporalInternalResult` 不扩字段。本入口把逐档原始结果放在 `first` / `second`，
+// 把 D9 合并结果放在 `combined`，从而在不修改 D9 的前提下满足 per-lag 记录。
+// 不接生产、不发布公共 Verdict。
+
+/** @internal 双档内部结果：逐档原始结果 + D9 合并结果。 */
+export type TemporalTwoLagInternalResult = {
+  readonly first: TemporalInternalResult;
+  readonly second: TemporalInternalResult;
+  readonly combined: TemporalInternalResult;
+};
+
+/**
+ * @internal 双档内部入口：主档 `input.lagMs` + 第二档 `secondLagMs`（默认 200ms）。
+ *
+ * 两档各自调用一次完整的 `analyzeTemporalInternal`，每次创建独立的预算对象与
+ * 证据；不共享 / 拼接转移记录、Witness 或证明。`combined` 只做 D9 组合语义：
+ * - 两档一致 ⇒ 主档结果；
+ * - 两档完整但不一致 ⇒ IE + `lag-disagreement`；
+ * - 任一档不完整 ⇒ IE + 该档实际预算 / abort 原因。
+ */
+export function analyzeTemporalInternalTwoLag(
+  input: TemporalInternalInput,
+  secondLagMs: number = TEMPORAL_LAG_BASELINE_MS,
+): TemporalTwoLagInternalResult {
+  const first = analyzeTemporalInternal(input);
+  const second = analyzeTemporalInternal({ ...input, lagMs: secondLagMs });
+  return { first, second, combined: resolveTwoLagInternalResults(first, second) };
+}

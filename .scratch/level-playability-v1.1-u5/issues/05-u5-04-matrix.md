@@ -71,7 +71,7 @@ A–J 全覆盖且标题带编号；每条断言 `publicCapability` / `publicRes
 ### 已知缺口 / 限制
 
 - I 的不一致用例使用「两个完整但结论不同」的真实单档结果；fixture 参数空间内未找到同一输入在两档 lag 下结论不同的世界。同输入的逐档隔离 / 不跨档拼接回归由 **U5-05** 承担。
-- D5 §7.2 的 `perLagResults` 未进 D9 `TemporalInternalResult`；当前合并结果不携带逐档结果。若 U5-05 / 最终审计要求，需 HITL 裁定是否扩 D9。
+- D5 §7.2 的 `perLagResults` 已由 U5-05 的 `TemporalTwoLagInternalResult`（`first` / `second` / `combined`）提供，不扩 D9。
 - U5-02 的 `stats.work.hopSamplesChecked = 0` 与 U4 独立搜索预算缺口仍在，不影响 A–J 语义结论。
 
 证据：[`../evidence/05-matrix.md`](../evidence/05-matrix.md)。本票未推送 / 建 PR / 合并。

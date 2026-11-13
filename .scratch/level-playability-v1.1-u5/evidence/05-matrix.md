@@ -61,7 +61,7 @@
 ## 已知缺口 / 限制
 
 1. **I 的不一致用例使用「两个完整但结论不同」的真实单档结果**（NB 世界 vs 门区失败世界）来测试合并函数；在 fixture 参数空间内未找到**同一输入**在两档 lag 下结论不同的世界。同输入的逐档证据隔离 / 不跨档拼接回归由 **U5-05** 承担。
-2. **D5 §7.2 的 `perLagResults` 未进 D9 `TemporalInternalResult`**：当前合并结果只保留主档（一致时）或被保留的实际原因（不完整时），不携带两档逐档结果。这是 D5 与 D9 的字段级缺口；若 U5-05 / 最终审计要求逐档结果，需要 HITL 裁定是否扩 D9。
+2. **D5 §7.2 的 `perLagResults`**：U5-05 已用 `TemporalTwoLagInternalResult`（`first` / `second` / `combined`）提供逐档结果，不扩 D9 `TemporalInternalResult`；见 [U5-05 证据](./06-dual-lag.md)。
 3. U5-02 的 `stats.work.hopSamplesChecked = 0` 与 U4 独立搜索预算缺口仍在，不影响 A–J 语义结论。
 4. F 已按增量裁定 08 使用 `none` + `no-permanent-gate`；G 仍保留 `permanent-gate + INCOMPLETE` 部分证明。
 

@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 U5 地�
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `b41f076`（含 U1–U4 全部实现、R1–R4 报告与签署）
 Branch: `wayfinder/level-playability-v1.1-u5`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 · U5-04 完成；U5-05 为下一 frontier 票
+Status: open · 2026-11-13 · U5-05 完成；U5-06 为下一 frontier 票
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U5（I02-05）；**不设 R5**，最终由完成报告 + AC-08～AC-13 + 最终审计 + 用户签署收口。
 >
@@ -130,7 +130,8 @@ U5-00 初始化、增量授权台账与基线
 ## Decisions so far
 
 - [U5 增量裁定 08 — F 证书形状](../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md): 用户 amber 2026-11-13 选择方案 ③：F 使用 `certificate.kind="none"` + IE `no-permanent-gate`，保留 D9 证明完整性，不伪造门区；仅影响 F，不授权公共能力 / I-03。
-- [U5-04 A–J 矩阵](issues/05-u5-04-matrix.md): A–J 十项 + 跨单元组合均有具名测试；新增 `resolveTwoLagInternalResults` 内部双档合并；F 按裁定 08 使用 `none`；每条断言公共边界；新增 11 条，定向 63 / 63，全量 176 files / 2871 tests。**I 的同输入不一致世界未找到（U5-05 承担）；D5 `perLagResults` 未进 D9，需时 HITL。**
+- [U5-05 双档 lag 证据隔离回归](issues/06-u5-05-dual-lag.md): 新增内部 `analyzeTemporalInternalTwoLag`（`first`/`second`/`combined`）；两档独立预算与逐档证据可复现；不完整保留实际预算 / 墙钟原因；完整不一致 ⇒ `lag-disagreement`；per-lag 记录不扩 D9；新增 6 条 AC-09 测试，定向 69 / 69，全量 176 files / 2877 tests。
+- [U5-04 A–J 矩阵](issues/05-u5-04-matrix.md): A–J 十项 + 跨单元组合均有具名测试；新增 `resolveTwoLagInternalResults` 内部双档合并；F 按裁定 08 使用 `none`；每条断言公共边界；新增 11 条，定向 63 / 63，全量 176 files / 2871 tests。**I 的同输入不一致世界未找到（U5-05 承担）；D5 `perLagResults` 已由 U5-05 的 two-lag wrapper 提供，不扩 D9。**
 - [U5-03 墙钟 abort 与确定性](issues/04-u5-03-determinism.md): 零产品改动；注入时钟确定性 abort；签名 / 规范化序列化排除 `wallClockMs` / `detail`；4 世界 × 3 档重复一致；策略 tie-break 零分歧；两个输入跨 3 进程签名 / 序列化一致；新增 7 条测试，全量 176 files / 2860 tests。
 - [U5-02 预算闭合与降级硬化](issues/03-u5-02-budget.md): 工作预算为唯一语义预算；状态 / edge 不被累计 cut 抢占；恰好达上限 / 多 1 边界、非法预算 / 派生溢出、Witness 体积、`maxHopSamples`、`phaseGridCapped` 诊断与双档原因区分均有测试；新增 13 条，全量 176 files / 2853 tests；生产接线零改动。
 - [U5-01 内部结果组装与 dispatch](issues/02-u5-01-assembly.md): `analyzeTemporalInternal` 组装 D9 结果；NB（W）/ PU（门区+注入图+图割+hop）/ G 部分证明 / 模型外 / 预算路径均有测试；build 0、typecheck 0、全量 176 files / 2840 tests；生产接线零改动。F（门区不成立）的证书形状已由 [增量裁定 08](../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md) 解决（方案 ③：`none` + `no-permanent-gate`）。
