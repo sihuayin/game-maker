@@ -1,8 +1,8 @@
 # U5-SIGN 用户签署完成报告
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: amber (user), 2026-11-13
 Blocked by: 10
 Map: ../map.md
 Class: U5 / SIGN
@@ -31,4 +31,16 @@ Class: U5 / SIGN
 
 ## Answer
 
-（resolved 时填写）
+**用户 `amber` 于 2026-11-13 签署 U5。**
+
+| 项 | 值 |
+| --- | --- |
+| 审阅对象 | `.scratch/level-playability-v1.1-i02/reports/U5-completion.md`、`U5-final-audit.md` |
+| 结论 | 接受完成报告与最终审计（AC-08～AC-13 全 PASS，无 FAIL / NOT_RUN）及审计 §6 的限制 / 残余风险 |
+| 已证明清单 | D9 内部组装、预算 / 确定性 / 双档 / A–J 矩阵 / LP-06/07 回归 / 白名单审计 |
+| 仍为 IE / 未闭合清单 | 几何 `partial`、空中控制未闭合、U9 未接线、F 使用 `none`、历史语料全 IE 早退、`hopSamplesChecked` 0、U4 独立搜索预算未实现、同输入 lag 不一致世界未找到、`perLagResults` 由内部 wrapper 提供 |
+| 签署范围 | **仅 U5 / I-02**；地图收口 |
+| 明确不授权 | `PUBLIC_NB` / `PUBLIC_PU`、I-03 接线、推送 / 建 PR / 合并；公共能力由 I-03 独立准入 |
+| 后续 | 不启动 I-03 / 公共能力 / 后续 effort |
+
+**U5 完成不等于公共 NB / PU 能力，也不授权 I-03。** 公共能力仍 `BLOCKED`；生产 PU 仍受几何 `partial` 与空中控制未闭合两项独立阻塞。

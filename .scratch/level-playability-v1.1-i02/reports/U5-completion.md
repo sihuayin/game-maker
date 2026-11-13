@@ -8,7 +8,7 @@
 | 分支 / base | `wayfinder/level-playability-v1.1-u5` ← `wayfinder/level-playability-v1.1-i02` @ `b41f076` |
 | 增量授权 | [07-u5-incremental-authorization.md](./07-u5-incremental-authorization.md)（amber · 2026-11-13；仅 U5 + AC-08～AC-13 + 用户签署；无 R5） |
 | 增量裁定 | [08-u5-f-certificate-decision.md](./08-u5-f-certificate-decision.md)（F 使用 `certificate.kind="none"` + IE `no-permanent-gate`） |
-| 状态 | U5 实施与证据完成；**U5-AUDIT（AC-12 / AC-13）PASS（2026-11-13）**；用户签署待进行 |
+| 状态 | U5 实施与证据完成；**U5-AUDIT（AC-12 / AC-13）PASS（2026-11-13）**；**用户 amber 2026-11-13 签署 U5；地图收口** |
 
 > 本报告只陈述**模型内**结果。`PUBLIC_NB` / `PUBLIC_PU` 仍为 `BLOCKED`，I-03 未接线；
 > 本报告不是公共能力声明，也不授权推送 / 建 PR / 合并。
@@ -141,4 +141,14 @@
 
 ## 8. 完成声明
 
-U5 的**实施与证据**已完成：D9 组装、预算 / 确定性硬化、A–J 矩阵、双档隔离、性能证据、LP 回归与白名单审计均就绪。**独立最终审计（AC-08～AC-13）已于 2026-11-13 PASS，无 FAIL / NOT_RUN**（[`U5-final-audit.md`](./U5-final-audit.md)）。仍待：**用户签署 U5**；在签署前，U5 不视为最终验收，公共能力仍 `BLOCKED`。
+U5 的**实施与证据**已完成：D9 组装、预算 / 确定性硬化、A–J 矩阵、双档隔离、性能证据、LP 回归与白名单审计均就绪。**独立最终审计（AC-08～AC-13）已于 2026-11-13 PASS，无 FAIL / NOT_RUN**（[`U5-final-audit.md`](./U5-final-audit.md)），**用户 amber 于 2026-11-13 签署 U5**。签署范围仅 U5 / I-02；公共能力仍 `BLOCKED`，生产 PU 仍受几何 `partial` 与空中控制未闭合两项独立阻塞。
+
+## 9. 用户签署
+
+| 项 | 值 |
+| --- | --- |
+| 签署人 | **amber**（用户） |
+| 日期 | **2026-11-13** |
+| 结论 | 接受本报告与 [`U5-final-audit.md`](./U5-final-audit.md)；签署 U5。已证明 vs `INSUFFICIENT_EVIDENCE` 清单被接受。 |
+| 范围 | **仅 U5 / I-02**；地图收口。 |
+| 不授权 | `PUBLIC_NB` / `PUBLIC_PU`、I-03 接线、推送 / 建 PR / 合并。 |

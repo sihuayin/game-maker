@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 U5 地�
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `b41f076`（含 U1–U4 全部实现、R1–R4 报告与签署）
 Branch: `wayfinder/level-playability-v1.1-u5`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 · U5-AUDIT 完成（AC-08～AC-13 全 PASS）；U5-SIGN 为下一 frontier 票
+Status: closed · 2026-11-13 · U5-AUDIT PASS；用户 amber 签署 U5；地图收口
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U5（I02-05）；**不设 R5**，最终由完成报告 + AC-08～AC-13 + 最终审计 + 用户签署收口。
 >
@@ -129,7 +129,8 @@ U5-00 初始化、增量授权台账与基线
 
 ## Decisions so far
 
-- [U5-AUDIT 最终审计（AC-12 / AC-13）](issues/10-u5-audit.md): 独立会话现场重跑；**AC-08～AC-13 全部 PASS，无 FAIL / NOT_RUN**；产品 diff 恰好 7 个白名单文件；176 files / 2877 tests；架构 65/65；LP-06/07 逐字段 + stdout 逐字节一致；bench 3 进程摘要一致。限制与残余风险见审计报告 §6。下一步用户签署。
+- [U5-SIGN 用户签署 U5](issues/11-u5-sign.md): 用户 amber 2026-11-13 签署；接受完成报告与最终审计（AC-08～AC-13 PASS）及「已证明 vs INSUFFICIENT_EVIDENCE」清单；范围仅 U5；不授权 `PUBLIC_NB` / `PUBLIC_PU`、I-03、推送 / PR / 合并。地图收口。
+- [U5-AUDIT 最终审计（AC-12 / AC-13）](issues/10-u5-audit.md): 独立会话现场重跑；**AC-08～AC-13 全部 PASS，无 FAIL / NOT_RUN**；产品 diff 恰好 7 个白名单文件；176 files / 2877 tests；架构 65/65；LP-06/07 逐字段 + stdout 逐字节一致；bench 3 进程摘要一致。限制与残余风险见审计报告 §6。用户签署见 U5-SIGN。
 - [U5 增量裁定 08 — F 证书形状](../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md): 用户 amber 2026-11-13 选择方案 ③：F 使用 `certificate.kind="none"` + IE `no-permanent-gate`，保留 D9 证明完整性，不伪造门区；仅影响 F，不授权公共能力 / I-03。
 - [U5-08 白名单审计与完成报告](issues/09-u5-08-audit-report.md): 产品 diff 仅 7 个白名单文件；只读 / 生产 / barrel / 依赖 / JSON 零 diff；架构 65 / 65；全量 176 files / 2877 tests；完成报告、最终审计输入包、Draft PR（未推送）就绪。**U5-AUDIT 已 PASS（2026-11-13）。**
 - [U5-07 LP-06 / LP-07 回归](issues/08-u5-07-lp-regression.md): 两份 acceptance 脚本退出码 0；语料 / 矩阵计数与 U5-00 冻结基线逐项一致；evidence JSON 剔除 `generatedAt` 后逐字段相等；stdout 日志逐字节相同；差异 0，未触发 STOP；全量 176 files / 2877 tests。
