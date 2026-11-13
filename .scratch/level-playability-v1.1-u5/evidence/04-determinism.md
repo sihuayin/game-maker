@@ -100,7 +100,7 @@
 - 真实墙钟 abort 的发生点依赖环境，按 D5 Q1 **不在确定性承诺范围内**；确定性承诺只覆盖「在工作预算内完成」的运行与注入时钟的确定性 abort。
 - U9 不在 U5 组装路径（`coverage.temporal = partial`，D10 §1.1），跨进程完整证书证据由 W 提供；U9 的确定性由 U2 测试覆盖。
 - U5-02 的 `stats.work.hopSamplesChecked = 0` 与 U4 独立搜索预算缺口仍未闭合；它们不影响本票的签名 / 序列化一致性结论。
-- U5-01 登记的 **F（门区不成立）证书形状缺口**仍在，等待 U5-04 前的 HITL 裁定。
+- U5-01 登记的 **F（门区不成立）证书形状缺口**已由 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md) 解决（方案 ③：`none` + `no-permanent-gate`）。
 
 ## 结论
 

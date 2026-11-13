@@ -71,6 +71,7 @@
 - U3 `computePermanentGate` 在门宽 `≤ ε`、y 区间不重叠、判侧失败或注入失败时把四个半部全部置 `null`，不保留部分几何。
 - 因此门区不成立时，组装层**无法如实**构造 `permanent-gate + INCOMPLETE` 证明；当前实现选择 `certificate.kind = "none"` + IE `no-permanent-gate`（D9 §10.5 允许 `none ⇒ IE`），没有伪造门区字段。
 - 这与 U5-04 票面对 F 的字面要求（`permanent-gate` + `INCOMPLETE` + `no-permanent-gate`）不一致，也与 D7 §305「E/F/G 不得压扁成 `none`」不一致。
+- **后续裁定（2026-11-13）**：用户选择方案 ③，F 允许 `certificate.kind = "none"`；见 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md)。以下为当时的待裁定选项，已由该记录收口。
 - 可选的封闭方式（均需 HITL，不在 U5-01 授权内）：
   1. 修改 `temporal-gate.ts`，在 INCOMPLETE 时保留可如实记录的候选几何 / 子检查状态；
   2. 放宽 D9 `PermanentGateProof` 的必填 / `complete: true` 约束；

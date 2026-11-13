@@ -65,4 +65,6 @@ Class: U5 / IMPLEMENTATION
 - `verifyTransition` 的 `cut-budget → BudgetStop` 是防御性修复；U2 预切段后现行搜索不会走到该分支。
 - U5-01 登记的 F（门区不成立）证书形状缺口仍未裁定，需在 U5-04 前 HITL。
 
+**后续裁定（2026-11-13）**：用户选择方案 ③，F 允许 `certificate.kind = "none"` + `no-permanent-gate`；见 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md)。
+
 证据：[`../evidence/03-budget.md`](../evidence/03-budget.md)。本票未推送 / 建 PR / 合并。

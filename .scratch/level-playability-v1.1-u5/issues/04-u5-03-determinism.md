@@ -61,4 +61,6 @@ AC-10 测试通过；墙钟 abort 可确定性触发；跨进程签名一致；�
 - U5-02 的 `stats.work.hopSamplesChecked = 0` 与 U4 独立搜索预算缺口仍在，不影响本票签名 / 序列化结论。
 - U5-01 登记的 **F（门区不成立）证书形状缺口**仍未裁定，需在 U5-04 前 HITL。
 
+**后续裁定（2026-11-13）**：用户选择方案 ③，F 允许 `certificate.kind = "none"` + `no-permanent-gate`；见 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md)。
+
 证据：[`../evidence/04-determinism.md`](../evidence/04-determinism.md)、[`../evidence/04-cross-process.json`](../evidence/04-cross-process.json)。本票未推送 / 建 PR / 合并。

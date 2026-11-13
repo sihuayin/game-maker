@@ -9,13 +9,17 @@ Class: U5 / VERIFICATION
 
 ## Task
 
-新建 `playability-temporal.test.ts`，按授权包 §8.2 落 A–J 矩阵与跨单元组合断言。
+扩展 `playability-temporal.test.ts`（U5-01 已新建），按授权包 §8.2 落 A–J 矩阵与跨单元组合断言。
 
 ### 允许文件
 
-- `packages/contracts/tests/playability-temporal.test.ts`（新建）
+- `packages/contracts/tests/playability-temporal.test.ts`（已存在；U5-01 新建，U5-04 扩展）
 - `packages/contracts/tests/playability-temporal-fixtures.ts`（`TEST_ONLY`）
 - `packages/contracts/src/playability/temporal*.ts`（仅修复测试暴露的缺陷）
+
+> **F 的证书形状**由 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md) 冻结为
+> `insufficient-evidence` + `no-permanent-gate` + `certificate.kind = "none"`；U5-04 **不得**
+> 按授权包 §8.2 的字面 `permanent-gate + INCOMPLETE` 断言，也不得伪造门区字段。
 
 ### 必须完成
 
@@ -24,7 +28,7 @@ Class: U5 / VERIFICATION
    - B 永久门区且无垂直规避 ⇒ `pu-candidate` + `permanent-gate` + `COMPLETE` + 条件 1/3/4/6 `PASS`、2/5 `BLOCKED`；
    - C 证据不足 ⇒ `insufficient-evidence` + 缺口一致；
    - D 折返点临界碰撞；E 等待阶段碰撞 ⇒ 不得 `nb-candidate`；
-   - F 短暂安全窗口 ⇒ `permanent-gate` + `INCOMPLETE` + `no-permanent-gate`；
+   - F 短暂安全窗口 ⇒ `insufficient-evidence` + `no-permanent-gate` + `certificate.kind = "none"`（[增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md)；不得伪造门区证明）；
    - G 垂直规避 ⇒ `INCOMPLETE` + `graph-cut-incomplete` / `hop-doubling-changed` / `movement-model-unclosed`；
    - H 预算超限 ⇒ `budgetStatus="exhausted"` + 对应 `budgetKind`；
    - I 双档 lag 不一致 ⇒ `lag-disagreement`，两档都完整；

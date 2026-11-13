@@ -64,6 +64,8 @@ Class: U5 / IMPLEMENTATION
 
 **F（短暂安全窗口）无法按票面字面要求产出 `permanent-gate + INCOMPLETE`。** D9 `PermanentGateProof` 要求门区四段齐全且 `periodCoverage.complete` 为字面量 `true`；U3 半部在门区失败时把四段全部置 `null`。当前实现选择 `certificate.kind = "none"` + IE `no-permanent-gate`，不伪造门区字段。这与 D7 §305「E/F/G 不得压扁成 `none`」及 U5-04 票面的 F 断言冲突。封闭方式（修改 `temporal-gate.ts` 保留部分诊断 / 放宽 D9 类型 / 用户裁定允许 `none`）均超出 U5-01 授权，需 STOP + HITL。
 
+**后续裁定（2026-11-13）**：用户选择方案 ③，F 允许 `certificate.kind = "none"` + `no-permanent-gate`；见 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md)。
+
 ### 其他限制
 
 - U4 hop / 图割工作计数尚未接入 `stats.work.hopSamplesChecked`；PU 分支暂不消费工作预算（U5-02）。

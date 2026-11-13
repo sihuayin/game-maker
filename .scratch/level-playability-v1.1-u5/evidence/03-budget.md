@@ -85,7 +85,7 @@
 - `stats.work.hopSamplesChecked` 仍为 0：U4 半部未暴露逐弧采样计数，且其六键输出边界已由 R4-06 冻结。U5-06 性能证据会单独记录 hop 采样规模；若审计要求该字段，需要另开白名单缺口裁定。
 - U4 目前没有独立的搜索预算对象（`maxStates` / `maxEdges` 按 D5 只属 U2）；U5-02 只闭合了 `maxHopSamples` 与墙钟 abort-only 的组装层映射。U4 的墙钟总上界（D5 §5.2）留待 U5-06 / 最终审计以证据形式检查。
 - `verifyTransition` 的 `cut-budget → BudgetStop` 映射是防御性修复；U2 预切段后该路径在现行搜索中不可达，真正生效的是 tracker 级 `maxCutsPerCheck`。
-- U5-01 登记的 **F（门区不成立）证书形状缺口**仍在，等待 U5-04 前的 HITL 裁定。
+- U5-01 登记的 **F（门区不成立）证书形状缺口**已由 [增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md) 解决（方案 ③：`none` + `no-permanent-gate`）。
 
 ## 结论
 
