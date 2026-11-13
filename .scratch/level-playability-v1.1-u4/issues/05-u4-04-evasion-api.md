@@ -1,8 +1,8 @@
 # U4-04 图割模块 API 骨架与输入契约
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-04 session 2026-11-13)
 Blocked by: 04
 Map: ../map.md
 Class: U4 / IMPLEMENTATION
@@ -57,3 +57,27 @@ Class: U4 / IMPLEMENTATION
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。** 图割半部 API 骨架与输入契约就位；未实现任何图割 / hop / 模型闭合语义。
+
+| 项 | 结果 |
+| --- | --- |
+| 新增（白名单内） | `packages/contracts/src/playability/temporal-evasion.ts`（108 行，`567899d9…`） |
+| 扩展 | `packages/contracts/tests/playability-temporal-evasion.test.ts`（`54469616…`，11 tests） |
+| 入口 | `computePermanentEvasion(input: PermanentEvasionInput): PermanentEvasionHalf`（`@internal`） |
+| 输入 | `spawnCell`（精确脚点格）/ `goalRegion`（已外扩 0.5px）/ `gateRect`（诊断）/ `move` / 只读 `graph` |
+| 输出 | `graphCut` / `hopDoubling` / `hopSamplingCoverage` / `movementModelClosure` / `status` / `reason`，半部类型取自 D9 索引类型 |
+| 骨架行为 | 恒 `INCOMPLETE` + `graph-cut-incomplete`，三个半部 `null`；`movementModelClosure = "not-proven-air-control"` |
+| 依赖边界 | 只 import `geometry` / `graph` / `temporal-result` 类型；不 import `temporal.ts` / `temporal-gate.ts` / `temporal-witness.ts` |
+| 公共面 | 不进任何 barrel；导出符号全标 `@internal` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 evasion 测试 | 退出码 **0**；**11 / 11 passed** |
+| graph + gate + input | 退出码 **0**；**124 / 124 passed** |
+| `pnpm test` | 退出码 **0**；**175 / 175 files，2806 / 2806 tests passed** |
+| 白名单外改动 | **无**；STOP **未触发** |
+
+证据：[`../evidence/04-evasion-api.md`](../evidence/04-evasion-api.md)（原始输出 `04-*.log`，本地保留不入库）。
+
+**下游**：U4-05（图割判据与 reach 消费）已 **unblocked**。本票未启动 U4-05。

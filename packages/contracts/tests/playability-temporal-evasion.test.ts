@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseGameConfig, playerMoveOf } from "../src/index.js";
 import { buildMovementGraph, hopEdges, hopSamples, hopTargets } from "../src/playability/graph.js";
+import { computePermanentEvasion } from "../src/playability/temporal-evasion.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const MANIFEST = (() => {
@@ -67,5 +68,82 @@ describe("U4-02 graph.ts HopSampling 尾参默认等价", () => {
     expect(doubled!.length).toBeGreaterThan(base!.length);
     expect(doubled![0]).toEqual(base![0]);
     expect(doubled!.at(-1)).toEqual(base!.at(-1));
+  });
+});
+
+
+describe("U4-04 图割半部 API 骨架与输入契约", () => {
+  const INPUT = {
+    spawnCell: START,
+    goalRegion: { x: 64, y: 20, w: 60, h: 40 },
+    gateRect: { x: 54, y: 20, w: 10, h: 40 },
+    move,
+    graph,
+  } as const;
+  const outcome = computePermanentEvasion(INPUT);
+  const source = readFileSync(
+    fileURLToPath(new URL("../src/playability/temporal-evasion.ts", import.meta.url)),
+    "utf8",
+  );
+  // 注释里会提到被禁止的符号名；负向断言只看代码本体。
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+
+  it("骨架恒为 INCOMPLETE + graph-cut-incomplete，三个半部为 null", () => {
+    expect(Object.keys(outcome).sort()).toEqual([
+      "graphCut", "hopDoubling", "hopSamplingCoverage", "movementModelClosure", "reason", "status",
+    ]);
+    expect(outcome.status).toBe("INCOMPLETE");
+    expect(outcome.reason).toBe("graph-cut-incomplete");
+    expect(outcome.graphCut).toBeNull();
+    expect(outcome.hopDoubling).toBeNull();
+    expect(outcome.hopSamplingCoverage).toBeNull();
+    expect(outcome.movementModelClosure).toBe("not-proven-air-control");
+  });
+
+  it("失败原因只取 D9 闭集的 U4 子集", () => {
+    const allowed = new Set([
+      "graph-cut-incomplete", "hop-sample-budget", "hop-doubling-changed",
+      "movement-model-unclosed", "geometry-untrusted",
+    ]);
+    expect(outcome.reason === null || allowed.has(outcome.reason)).toBe(true);
+    expect(source).not.toMatch(/reason\s*:\s*["'](?!graph-cut-incomplete)/);
+  });
+
+  it("确定性与无随机 / 时间依赖", () => {
+    expect(source).not.toMatch(/Math\.random|Date\.now|performance\.now/);
+    expect(JSON.stringify(computePermanentEvasion(INPUT))).toBe(JSON.stringify(outcome));
+  });
+
+  it("依赖边界：不 import temporal.ts / temporal-gate.ts / temporal-witness.ts", () => {
+    const specifiers = [...source.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]);
+    const allowed = new Set([
+      "./geometry.js", "./graph.js", "./temporal-motion.js", "./temporal-budget.js", "./temporal-result.js",
+    ]);
+    expect(specifiers.length).toBeGreaterThan(0);
+    for (const specifier of specifiers) expect(allowed.has(specifier as string), specifier).toBe(true);
+    expect(source).not.toMatch(/from\s+["']\.\/temporal\.js["']/);
+    expect(source).not.toMatch(/from\s+["']\.\/temporal-gate\.js["']/);
+    expect(source).not.toMatch(/from\s+["']\.\/temporal-witness\.js["']/);
+  });
+
+  it("不新增公共 barrel 导出、无 analyze: / Symbol( / TEMPORAL_LAG_", () => {
+    for (const barrel of [
+      "packages/contracts/src/playability/index.ts",
+      "packages/contracts/src/index.ts",
+    ]) {
+      expect(readFileSync(fileURLToPath(new URL(`../../../${barrel}`, import.meta.url)), "utf8"), barrel)
+        .not.toContain("temporal-evasion");
+    }
+    expect(code).not.toMatch(/TEMPORAL_LAG_/);
+    expect(code).not.toContain("Symbol(");
+    expect(source).not.toMatch(/analyze\s*:/);
+  });
+
+  it("骨架不消费 reach / startCells，不做图割", () => {
+    expect(code).not.toContain("assessReachability(");
+    expect(code).not.toContain("startCells(");
+    expect(code).not.toContain("puConditions");
+    expect(code).not.toContain("geometryCoverage");
+    expect(code).not.toContain("lagInvariantByConstruction");
   });
 });

@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-u3` @ `1405c3f`（含 U3 实现、R3 与 U3-SIGN）**+** `wayfinder/level-playability-v1.1-i02` @ `2241e11`（PR #37 合并，含 `HopSampling` 尾参）；**U3 尚未并入 i02**
 Branch: `wayfinder/level-playability-v1.1-u4`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 · PR #37 已合并（`2241e11`）；**U4 执行门解除，待 U4-04**
+Status: open · 2026-11-13 · U4-04 完成；待 U4-05 图割判据
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**用户 2026-11-12 授权的 U4（I02-04：垂直规避图割）；不进入 U5，不改 `reach.ts`，不接生产，不发布公共 Verdict。
 >
@@ -156,6 +156,7 @@ U4-00 初始化与授权台账
 - [U4-01 graph.ts HopSampling 独立增量审批](issues/02-u4-01-graph-approval.md): 用户 `amber` 2026-11-12 批准（命名导出）；仅三项 hop 函数可选尾参，默认 `{60,120}` 逐点不变；`HopSampling` 经 internal barrel 可见但不进包根；U4 执行门仍 `BLOCKED`，待独立 PR 合并。
 - [U4-02 graph.ts HopSampling 尾参实现与默认行为回归](issues/03-u4-02-graph-param-impl.md): 独立分支 `wayfinder/level-playability-v1.1-u4-graph-hop` @ `13b4e3b`；仅 `graph.ts` + 5 条默认等价断言；build/typecheck 0，evasion 5/5，全量 174 files / 2752 tests；**未推送**；U4 执行门仍 `BLOCKED`。
 - [U4-03 graph.ts 尾参独立 PR 推送与合并门](issues/04-u4-03-graph-merge-gate.md): [PR #37](https://github.com/sihuayin/game-maker/pull/37) CI 全绿后合并（`2241e11`，2026-11-13）；u4 分支已并入 i02（`b884a35`）；合并后全量 175 files / 2800 tests 绿。**U4 执行门解除。**
+- [U4-04 图割模块 API 骨架与输入契约](issues/05-u4-04-evasion-api.md): `computePermanentEvasion` 契约冻结；输出仅四个半部 + `status`/`reason`；骨架恒 `INCOMPLETE` + `graph-cut-incomplete`；不 import `temporal.ts` / `temporal-gate.ts`；无 barrel 导出。
 
 ## Not yet specified
 
