@@ -5,7 +5,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseGameConfig, playerMoveOf } from "../src/index.js";
 import { buildMovementGraph, hopEdges, hopSamples, hopTargets } from "../src/playability/graph.js";
-import { computePermanentEvasion, normalPositionsCovered, withExactSpawnSeed } from "../src/playability/temporal-evasion.js";
+import {
+  MOVEMENT_MODEL_CLOSURE, computePermanentEvasion, normalPositionsCovered, withExactSpawnSeed,
+} from "../src/playability/temporal-evasion.js";
 import type { MovementGraph } from "../src/playability/graph.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -243,50 +245,51 @@ describe("U4-05 图割判据与 reach 消费", () => {
 });
 
 
-describe("U4-06 hop 双档与规范化采样覆盖", () => {
-  const SPAWN = { x: 4, y: 20 } as const;
-  // 单位与夹具一致：px/s、px/s²。t = 2v/g = 0.2s，最大跳距 speed·t = 2px。
-  const DEFAULT_MOVE = { speed: 10, jumpVelocity: 90, gravity: 900 } as const;
+const GAP_SPAWN = { x: 4, y: 20 } as const;
+// 单位与夹具一致：px/s、px/s²。t = 2v/g = 0.2s，最大跳距 speed·t = 2px。
+const DEFAULT_MOVE = { speed: 10, jumpVelocity: 90, gravity: 900 } as const;
 
-  // 合成图：左侧地板 x=0..4（脚点线 y=20），右侧平台 x=6..10，x=5 为空域。
-  // 只有 (4,20) → (6,20) 的 hop 弧能跨过缺口。
-  const gapGraph = (forbiddenCells: readonly (readonly [number, number])[] = []): MovementGraph => {
-    const width = 40;
-    const height = 100;
-    const stride = height + 1;
-    const blocked = new Uint8Array((width + 1) * stride);
-    for (let x = 0; x <= 4; x++) blocked[x * stride + 21] = 1;
-    for (let x = 6; x <= 10; x++) blocked[x * stride + 21] = 1;
-    const forbidden = blocked.slice();
-    for (const [x, y] of forbiddenCells) forbidden[x * stride + y] = 1;
-    const standable = new Uint8Array(blocked.length);
-    for (let x = 0; x <= 4; x++) standable[x * stride + 20] = 1;
-    for (let x = 6; x <= 10; x++) standable[x * stride + 20] = 1;
-    const columns = Array.from({ length: width + 1 }, () => [] as number[]);
-    for (let x = 0; x <= 4; x++) columns[x] = [20];
-    for (let x = 6; x <= 10; x++) columns[x] = [20];
-    const inBounds = (x: number, y: number) => x >= 0 && x <= width && y >= 0 && y <= height;
-    return {
-      width, height, stride, blocked, forbidden, standable, columns,
-      player: { size: { w: 4, h: 6 }, anchor: { x: 0.5, y: 1 }, foot: { x: 4, y: 20 }, coverage: "partial" },
-      solids: [], coverage: "partial",
-      freeAt: (x, y) => inBounds(x, y) && forbidden[x * stride + y] === 0,
-      standableAt: (x, y) => inBounds(x, y) && standable[x * stride + y] === 1,
-      startCells: () => [SPAWN],
-    };
+// 合成图：左侧地板 x=0..4（脚点线 y=20），右侧平台 x=6..10，x=5 为空域。
+// 只有 (4,20) → (6,20) 的 hop 弧能跨过缺口。
+const gapGraph = (forbiddenCells: readonly (readonly [number, number])[] = []): MovementGraph => {
+  const width = 40;
+  const height = 100;
+  const stride = height + 1;
+  const blocked = new Uint8Array((width + 1) * stride);
+  for (let x = 0; x <= 4; x++) blocked[x * stride + 21] = 1;
+  for (let x = 6; x <= 10; x++) blocked[x * stride + 21] = 1;
+  const forbidden = blocked.slice();
+  for (const [x, y] of forbiddenCells) forbidden[x * stride + y] = 1;
+  const standable = new Uint8Array(blocked.length);
+  for (let x = 0; x <= 4; x++) standable[x * stride + 20] = 1;
+  for (let x = 6; x <= 10; x++) standable[x * stride + 20] = 1;
+  const columns = Array.from({ length: width + 1 }, () => [] as number[]);
+  for (let x = 0; x <= 4; x++) columns[x] = [20];
+  for (let x = 6; x <= 10; x++) columns[x] = [20];
+  const inBounds = (x: number, y: number) => x >= 0 && x <= width && y >= 0 && y <= height;
+  return {
+    width, height, stride, blocked, forbidden, standable, columns,
+    player: { size: { w: 4, h: 6 }, anchor: { x: 0.5, y: 1 }, foot: { x: 4, y: 20 }, coverage: "partial" },
+    solids: [], coverage: "partial",
+    freeAt: (x, y) => inBounds(x, y) && forbidden[x * stride + y] === 0,
+    standableAt: (x, y) => inBounds(x, y) && standable[x * stride + y] === 1,
+    startCells: () => [GAP_SPAWN],
   };
-  const run = (
-    graph: MovementGraph,
-    goalRegion: { x: number; y: number; w: number; h: number },
-    move: { speed: number; jumpVelocity: number; gravity: number } = DEFAULT_MOVE,
-  ) =>
-    computePermanentEvasion({
-      spawnCell: SPAWN, goalRegion, gateRect: { x: 0, y: 0, w: 1, h: 1 }, move, graph,
-    });
-  const FAR_GOAL = { x: 30, y: 90, w: 2, h: 2 } as const;
+};
+const runGap = (
+  graph: MovementGraph,
+  goalRegion: { x: number; y: number; w: number; h: number },
+  move: { speed: number; jumpVelocity: number; gravity: number } = DEFAULT_MOVE,
+) =>
+  computePermanentEvasion({
+    spawnCell: GAP_SPAWN, goalRegion, gateRect: { x: 0, y: 0, w: 1, h: 1 }, move, graph,
+  });
+const FAR_GOAL = { x: 30, y: 90, w: 2, h: 2 } as const;
+
+describe("U4-06 hop 双档与规范化采样覆盖", () => {
 
   it("两档各自完整跑：记录 n / 端点 / cap，且 F1 ⊆ F2", () => {
-    const half = run(gapGraph(), FAR_GOAL);
+    const half = runGap(gapGraph(), FAR_GOAL);
     expect(half.hopDoubling!.base.cap).toBe(120);
     expect(half.hopDoubling!.doubled.cap).toBe(240);
     expect(half.hopDoubling!.base.n).toBe(12);      // ceil(0.2s · 60Hz)
@@ -305,7 +308,7 @@ describe("U4-06 hop 双档与规范化采样覆盖", () => {
 
   it("覆盖不可证明 ⇒ hop-doubling-changed（n1=7 / n2=13）", () => {
     const move = { speed: 10, jumpVelocity: 47.25, gravity: 900 } as const; // t=0.105s
-    const half = run(gapGraph(), FAR_GOAL, move);
+    const half = runGap(gapGraph(), FAR_GOAL, move);
     expect(half.hopDoubling!.base.n).toBe(7);
     expect(half.hopDoubling!.doubled.n).toBe(13);
     expect(half.hopDoubling!.normalizedCoverage).toBe(false);
@@ -316,14 +319,14 @@ describe("U4-06 hop 双档与规范化采样覆盖", () => {
 
   it("cap 绑定 ⇒ hop-sample-budget", () => {
     const move = { speed: 10, jumpVelocity: 1000, gravity: 900 } as const; // t≈2.22s
-    const half = run(gapGraph(), FAR_GOAL, move);
+    const half = runGap(gapGraph(), FAR_GOAL, move);
     expect(half.status).toBe("INCOMPLETE");
     expect(half.reason).toBe("hop-sample-budget");
   });
 
   it("反例 9：两档都跑，连通性变化被记录（n1=12 粗档跨过缺口，n2=24 密档被否）", () => {
     // 120Hz 独有采样点 (4,17) 落入禁区：粗档弧通过、密档弧被否 ⇒ 右侧平台只在粗档可达。
-    const half = run(gapGraph([[4, 17]]), { x: 6, y: 14, w: 1, h: 1 });
+    const half = runGap(gapGraph([[4, 17]]), { x: 6, y: 14, w: 1, h: 1 });
     expect(half.hopDoubling!.connectivityPreserved).toBe(false);
     expect(half.hopDoubling!.base.endpoints).toContainEqual([6, 20]);
     expect(half.hopDoubling!.doubled.endpoints).not.toContainEqual([6, 20]);
@@ -333,9 +336,90 @@ describe("U4-06 hop 双档与规范化采样覆盖", () => {
   });
 
   it("两档都不可达且覆盖成立 ⇒ COMPLETE、reason = null", () => {
-    const half = run(gapGraph(), FAR_GOAL);
+    const half = runGap(gapGraph(), FAR_GOAL);
     expect(half.hopDoubling!.connectivityPreserved).toBe(true);
     expect(half.status).toBe("COMPLETE");
     expect(half.reason).toBeNull();
+  });
+});
+
+
+describe("U4-07 模型闭合、降级映射与输出边界", () => {
+  const COVER_MOVE = { speed: 10, jumpVelocity: 47.25, gravity: 900 } as const; // t=0.105s
+  const CAP_MOVE = { speed: 10, jumpVelocity: 1000, gravity: 900 } as const;   // t≈2.22s
+  const REACHABLE_GOAL = { x: 6, y: 14, w: 1, h: 1 } as const;
+  const source = readFileSync(
+    fileURLToPath(new URL("../src/playability/temporal-evasion.ts", import.meta.url)),
+    "utf8",
+  );
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const cases = [
+    { name: "clean", half: runGap(gapGraph(), FAR_GOAL) },
+    { name: "reachable", half: runGap(gapGraph(), REACHABLE_GOAL) },
+    { name: "cap", half: runGap(gapGraph(), FAR_GOAL, CAP_MOVE) },
+    { name: "coverage", half: runGap(gapGraph(), FAR_GOAL, COVER_MOVE) },
+  ] as const;
+
+  it("movementModelClosure 恒为 D9 冻结字面量，与 status / reason 无关", () => {
+    expect(MOVEMENT_MODEL_CLOSURE).toBe("not-proven-air-control");
+    for (const { half } of cases) {
+      expect(half.movementModelClosure).toBe(MOVEMENT_MODEL_CLOSURE);
+      expect(half.graphCut!.verdict).toBe("conditional");
+    }
+  });
+
+  it("主降级原因按固定优先级映射，且只取 U4 闭集子集", () => {
+    const reasonOf = (name: string) => cases.find((c) => c.name === name)!.half.reason;
+    expect(reasonOf("clean")).toBeNull();
+    expect(reasonOf("reachable")).toBe("graph-cut-incomplete");
+    expect(reasonOf("cap")).toBe("hop-sample-budget");
+    expect(reasonOf("coverage")).toBe("hop-doubling-changed");
+    const allowed = new Set([
+      "graph-cut-incomplete", "hop-sample-budget", "hop-doubling-changed",
+      "movement-model-unclosed", "geometry-untrusted",
+    ]);
+    for (const { half } of cases) expect(half.reason === null || allowed.has(half.reason)).toBe(true);
+  });
+
+  it("COMPLETE ⇔ reason = null；COMPLETE 也不等于能力授权", () => {
+    for (const { half } of cases) {
+      expect(half.status === "COMPLETE").toBe(half.reason === null);
+      expect(half.movementModelClosure).toBe("not-proven-air-control");
+    }
+  });
+
+  it("输出边界：运行时只有六个键，不夹带 U5 / 公共字段", () => {
+    const forbidden = [
+      "puConditions", "geometryCoverage", "lagMode", "lagInvariantByConstruction",
+      "certificate", "internalResult", "publicCapability", "publicVerdict", "puEligible",
+    ];
+    for (const { half } of cases) {
+      const keys = Object.keys(half);
+      expect(keys.sort()).toEqual([
+        "graphCut", "hopDoubling", "hopSamplingCoverage", "movementModelClosure", "reason", "status",
+      ]);
+      for (const key of forbidden) expect(keys).not.toContain(key);
+    }
+  });
+
+  it("反例 11：不把图割不连通写成 Runtime 不可达", () => {
+    expect(code).not.toMatch(/runtimeUnreachable|provenUnplayable|PROVEN_UNPLAYABLE|runtime-unreachable/);
+    expect(code).toContain('"not-proven-air-control"');
+    expect(code).toContain("graph-cut-incomplete");
+  });
+
+  it("反例 12：模型未闭合 / coverage partial 时不发布 PU 或公共能力", () => {
+    expect(code).not.toMatch(/certificate|internalResult|publicCapability|publicVerdict|puConditions/);
+    expect(code).not.toMatch(/PROVEN_UNPLAYABLE/);
+    for (const { half } of cases) expect(half.movementModelClosure).toBe("not-proven-air-control");
+  });
+
+  it("hopSamplingCoverage.covered 与 hopDoubling.normalizedCoverage 同源", () => {
+    for (const { half } of cases) {
+      expect(half.hopSamplingCoverage!.covered).toBe(half.hopDoubling!.normalizedCoverage);
+      expect(half.hopSamplingCoverage!.method).toBe(
+        half.hopSamplingCoverage!.covered ? "normalized" : "insufficient",
+      );
+    }
   });
 });

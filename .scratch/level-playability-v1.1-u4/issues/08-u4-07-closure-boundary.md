@@ -1,8 +1,8 @@
 # U4-07 模型闭合、降级映射与输出边界
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-07 session 2026-11-13)
 Blocked by: 07
 Map: ../map.md
 Class: U4 / IMPLEMENTATION
@@ -43,3 +43,25 @@ Class: U4 / IMPLEMENTATION
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。** 模型闭合声明、降级原因优先级与 U4 输出边界已收束。
+
+| 项 | 结果 |
+| --- | --- |
+| `movementModelClosure` | 恒为 `"not-proven-air-control"`（D9 冻结），与 `status` / `reason` 无关 |
+| 证据链 | `scene.ts:89` 空中水平控制、`graph.ts` hop 恒速弧、`reach.ts` 60Hz mid-air、`walk-off` 无水平漂移 |
+| 主降级原因 | 固定优先级：图割否决 / 任一档可达 ⇒ `graph-cut-incomplete`；cap ⇒ `hop-sample-budget`；覆盖/不一致 ⇒ `hop-doubling-changed`；全成立 ⇒ `COMPLETE` + `null` |
+| `movement-model-unclosed` | 保留码；U4 不主张 Runtime 不可达，当前不产生该路径 |
+| 输出边界 | 运行时恰六键；无 `puConditions` / `geometryCoverage` / `lagMode` / `lagInvariantByConstruction` / `certificate` / `internalResult` / `publicCapability` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 evasion 测试 | 退出码 **0**；**29 / 29 passed** |
+| graph + gate + input | 退出码 **0**；**124 / 124 passed** |
+| `pnpm test` | 退出码 **0**；**175 / 175 files，2824 / 2824 tests passed** |
+
+覆盖反例 11（不得写成 Runtime 不可达）与反例 12（模型未闭合 / coverage partial 不发布 PU）。
+
+证据：[`../evidence/07-closure-boundary.md`](../evidence/07-closure-boundary.md)。
+
+**下游**：U4-08（测试矩阵与 D4 反例 5、7–12）已 **unblocked**。本票未启动 U4-08。

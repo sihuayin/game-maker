@@ -30,11 +30,21 @@
 //   `graph-cut-incomplete` / `hop-sample-budget` / `hop-doubling-changed` /
 //   `movement-model-unclosed` / `geometry-untrusted`；**不新增原因码**。
 //
-// 五、关键不健全性
+// 五、关键不健全性与模型闭合
 //
 //   `midAirHits = 0` 只作否决证据，**永不**作为「不存在空中触达」的正面证明；
 //   `graphCut.verdict` 只能是 `"conditional"`；图割不连通不得写成
-//   Runtime 不可达（`scene.ts:89` 空中水平控制未闭合）。
+//   Runtime 不可达。`movementModelClosure` 恒为 `"not-proven-air-control"`（D4 §7）：
+//   - `scene.ts:89` 每帧无条件水平加速 ⇒ 空中水平控制未被移动模型闭合；
+//   - `graph.ts` 的 hop 弧只模拟恒定水平速度；
+//   - `reach.ts` 的 mid-air 扫描是 60Hz 保守保护，不是可达性证明；
+//   - `walk-off` 只做同列竖直下落，不建模下落中的水平漂移。
+//
+//   因此本模块**从不**主张 Runtime 不可达、从不发布 PU / 公共 Verdict；
+//   `movement-model-unclosed` 保留给未来要求该主张的调用方（U5 组装层），
+//   U4 自身不产生该路径。输出键固定为六个，不得夹带 `puConditions` /
+//   `geometryCoverage` / `lagMode` / `lagInvariantByConstruction` / `certificate` /
+//   `internalResult` / `publicCapability`。
 // ─────────────────────────────────────────────────────────────────────────────
 import { maxJumpHeight } from "../game-config.js";
 import { boxFromFoot, overlapsStrict } from "./geometry.js";
@@ -126,6 +136,9 @@ function graphCutOf(input: PermanentEvasionInput): EvasionGraphCut {
     evidence: `reach@full; seeds=${assessment.seeds.length}; footpoints=${reachableFootpoints}; goalIntersections=${goalIntersections}; midAirHits=${midAirHits}; verdict=conditional`,
   };
 }
+
+/** @internal 模型闭合声明（D4 §7 / D9 冻结字面量）。 */
+export const MOVEMENT_MODEL_CLOSURE = "not-proven-air-control" as const;
 
 // ── hop 双档（D4 §6） ───────────────────────────────────────────────────────
 
@@ -228,9 +241,37 @@ function summarize(run: SamplingRun, n: number, cap: number): HopSampleSummary {
 }
 
 /**
+ * @internal 主降级原因，**固定优先级**以保证确定性：
+ *
+ * 1. 图割否决（目标被落脚点覆盖，或 `midAirHits > 0`）⇒ `graph-cut-incomplete`；
+ * 2. 任一档判目标可达 ⇒ `graph-cut-incomplete`；
+ * 3. 任一档 cap 绑定 ⇒ `hop-sample-budget`；
+ * 4. 覆盖不可证明 / 两档不一致 / 连通性改变 ⇒ `hop-doubling-changed`；
+ * 5. 全部成立 ⇒ `null`（`COMPLETE`，仍是 `modelConditional`）。
+ *
+ * `movement-model-unclosed` 是本模块的**保留码**：U4 只做模型内计算，从不主张
+ * Runtime 不可达（`scene.ts:89` 空中水平控制未闭合）。若未来调用方要求这种主张，
+ * 必须在此返回该码，并保持 `INCOMPLETE`；U4 当前不产生该路径。
+ */
+function degradationReasonOf(args: {
+  readonly graphCut: EvasionGraphCut;
+  readonly base: SamplingRun;
+  readonly doubled: SamplingRun;
+  readonly capBound: boolean;
+  readonly coverage: boolean;
+  readonly connectivityPreserved: boolean;
+}): DegradationReason | null {
+  if (args.graphCut.goalIntersections > 0 || args.graphCut.midAirHits > 0) return "graph-cut-incomplete";
+  if (args.base.reached || args.doubled.reached) return "graph-cut-incomplete";
+  if (args.capBound) return "hop-sample-budget";
+  if (!args.coverage || !args.connectivityPreserved) return "hop-doubling-changed";
+  return null;
+}
+
+/**
  * @internal
  *
- * **U4-06**：图割 + hop 双档 + 规范化采样覆盖。模型闭合与最终输出边界由 U4-07 收束。
+ * **U4-06 / U4-07**：图割 + hop 双档 + 规范化采样覆盖 + 模型闭合声明与输出边界。
  *
  * 判据（D4 §4 / §6）：
  * - 图割：精确 spawn 出发的可达落脚点不得与 `goalRegion` 严格相交；
@@ -275,17 +316,13 @@ export function computePermanentEvasion(input: PermanentEvasionInput): Permanent
     method: coverage ? ("normalized" as const) : ("insufficient" as const),
   };
 
-  let reason: DegradationReason | null = null;
-  if (graphCut.goalIntersections > 0 || graphCut.midAirHits > 0) reason = "graph-cut-incomplete";
-  else if (base.reached || doubled.reached) reason = "graph-cut-incomplete";
-  else if (capBound) reason = "hop-sample-budget";
-  else if (!coverage || !connectivityPreserved) reason = "hop-doubling-changed";
+  const reason = degradationReasonOf({ graphCut, base, doubled, capBound, coverage, connectivityPreserved });
 
   return {
     graphCut,
     hopDoubling,
     hopSamplingCoverage,
-    movementModelClosure: "not-proven-air-control",
+    movementModelClosure: MOVEMENT_MODEL_CLOSURE,
     status: reason === null ? "COMPLETE" : "INCOMPLETE",
     reason,
   };
