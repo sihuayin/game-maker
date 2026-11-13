@@ -1,8 +1,8 @@
 # U4-06 hop 双档与规范化采样覆盖
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-06 session 2026-11-13)
 Blocked by: 06
 Map: ../map.md
 Class: U4 / IMPLEMENTATION
@@ -61,3 +61,26 @@ Class: U4 / IMPLEMENTATION
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。** hop 60/120Hz 双档与规范化采样覆盖已实现；模型闭合与最终输出边界留给 U4-07。
+
+| 项 | 结果 |
+| --- | --- |
+| 双档参数 | 主档 `{60,120}`、倍档 `{120,240}`（D4 §6.1） |
+| 两档独立完整跑 | `reachWithSampling` 各自完整 BFS；`reach.ts` 只读、不参数化 hop |
+| 规范化覆盖 | `F1 ⊆ F2` 整数交叉乘；**不要求** `n_doubled = 2·n_base` |
+| 记录 | `HopSampleSummary`：`n`（最大每弧采样数）/ `endpoints`（落点去重）/ `cap` |
+| 降级映射 | 图割否决 / 任一档可达 ⇒ `graph-cut-incomplete`；cap 绑定 ⇒ `hop-sample-budget`；覆盖不可证明 / 不一致 ⇒ `hop-doubling-changed`；全成立 ⇒ `COMPLETE` |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 evasion 测试 | 退出码 **0**；**22 / 22 passed** |
+| graph + gate + input | 退出码 **0**；**124 / 124 passed** |
+| `pnpm test` | 退出码 **0**；**175 / 175 files，2817 / 2817 tests passed** |
+| 白名单外改动 | **无** |
+
+覆盖：反例 9（必须两档都跑；用 120Hz 独有采样点构造连通性翻转）、反例 10（判据为 `F1 ⊆ F2`，非 2×）、cap 绑定、覆盖不可证明、双档一致不可达的 `COMPLETE` 路径。
+
+证据：[`../evidence/06-hop-doubling.md`](../evidence/06-hop-doubling.md)。
+
+**下游**：U4-07（模型闭合、降级映射与输出边界）已 **unblocked**。本票未启动 U4-07。

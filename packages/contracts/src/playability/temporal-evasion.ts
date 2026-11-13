@@ -36,10 +36,13 @@
 //   `graphCut.verdict` 只能是 `"conditional"`；图割不连通不得写成
 //   Runtime 不可达（`scene.ts:89` 空中水平控制未闭合）。
 // ─────────────────────────────────────────────────────────────────────────────
+import { maxJumpHeight } from "../game-config.js";
+import { boxFromFoot, overlapsStrict } from "./geometry.js";
 import type { Aabb, Vec } from "./geometry.js";
+import { hopEdges, movementNeighbors } from "./graph.js";
 import type { MovementGraph, MoveParams } from "./graph.js";
 import { assessReachability } from "./reach.js";
-import type { DegradationReason, PermanentGateProof, ProofStatus } from "./temporal-result.js";
+import type { DegradationReason, HopSampleSummary, PermanentGateProof, ProofStatus } from "./temporal-result.js";
 
 // ── 输出半部的类型：直接取自 D9，不另立同义类型 ──────────────────────────────
 
@@ -124,24 +127,166 @@ function graphCutOf(input: PermanentEvasionInput): EvasionGraphCut {
   };
 }
 
+// ── hop 双档（D4 §6） ───────────────────────────────────────────────────────
+
+/** @internal 冻结的双档参数（D4 §6.1；主档 = 现行默认）。 */
+const HOP_BASE = { hz: 60, maxSamples: 120 } as const;
+const HOP_DOUBLED = { hz: 120, maxSamples: 240 } as const;
+
+type SamplingRun = {
+  readonly reached: boolean;
+  readonly footpoints: number;
+  /** 本档实际接受的 hop 弧（起点 + 落点）。 */
+  readonly arcs: readonly { readonly ax: number; readonly ay: number; readonly bx: number; readonly by: number }[];
+};
+
+/**
+ * @internal 用指定采样参数跑一次**完整**可达性检查（不提前终止）。
+ *
+ * ⚠️ `reach.ts` 只读且不参数化 hop 采样（D4 §5），因此这里用同一组
+ * `movementNeighbors` / `hopEdges` 原语做完整 BFS；覆盖语义与 `assessReachability`
+ * 对齐（落脚点盒、walk-off / fall 下落段、hop 弧采样点）。mid-air 不在此处，
+ * 仍由 `reach.ts` 的 60Hz 行为只作否决。
+ */
+function reachWithSampling(
+  graph: MovementGraph,
+  move: MoveParams,
+  start: Vec,
+  goalRegion: Aabb,
+  sampling: { readonly hz?: number; readonly maxSamples?: number },
+): SamplingRun {
+  const playerSize = graph.player.size;
+  const seen = new Set<string>();
+  const queue: Vec[] = [];
+  const arcs: { ax: number; ay: number; bx: number; by: number }[] = [];
+  let reached = false;
+  const coverAt = (x: number, y: number): void => {
+    if (reached) return;
+    if (overlapsStrict(boxFromFoot({ x, y }, playerSize), goalRegion)) reached = true;
+  };
+  const add = (x: number, y: number): void => {
+    const key = `${x},${y}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    queue.push({ x, y });
+    coverAt(x, y);
+  };
+  add(start.x, start.y);
+  for (let head = 0; head < queue.length; head++) {
+    const cell = queue[head]!;
+    for (const edge of movementNeighbors(graph, cell.x, cell.y)) {
+      if (edge.kind !== "walk") {
+        if (edge.x !== cell.x) coverAt(edge.x, cell.y);
+        for (let y = cell.y + 1; y <= edge.y; y++) coverAt(edge.x, y);
+      }
+      add(edge.x, edge.y);
+    }
+    for (const edge of hopEdges(graph, cell.x, cell.y, move, sampling)) {
+      for (const sample of edge.samples) coverAt(sample.x, sample.y);
+      add(edge.x, edge.y);
+      arcs.push({ ax: cell.x, ay: cell.y, bx: edge.x, by: edge.y });
+    }
+  }
+  return { reached, footpoints: seen.size, arcs };
+}
+
+/**
+ * @internal 单条候选弧的每弧采样数（与 `graph.ts` 的 `hopSamples` 同一公式与
+ * 同一有效性条件）。只用于 `F1 ⊆ F2` 的整数判定与 cap 检测；实际采样仍由
+ * `hopEdges` 完成，避免出现第二份采样实现。
+ */
+function arcSampleCount(
+  graph: MovementGraph,
+  move: MoveParams,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+  hz: number,
+  maxSamples: number,
+): { readonly n: number; readonly capped: boolean } | null {
+  if (ay - by > maxJumpHeight(move) || ay - by < -graph.height) return null;
+  const disc = move.jumpVelocity * move.jumpVelocity - 2 * move.gravity * (ay - by);
+  if (disc < 0) return null;
+  const t = (move.jumpVelocity + Math.sqrt(disc)) / move.gravity;
+  if (Math.abs(bx - ax) > move.speed * t) return null;
+  const raw = Math.ceil(t * hz);
+  return { n: Math.max(6, Math.min(maxSamples, raw)), capped: raw > maxSamples };
+}
+
+/** @internal `F1 ⊆ F2`：对每个 `i` 用整数交叉乘判定，不用浮点容差。 */
+export function normalPositionsCovered(n1: number, n2: number): boolean {
+  for (let i = 0; i <= n1; i++) if ((i * n2) % n1 !== 0) return false;
+  return true;
+}
+
+/** @internal D9 摘要的确定性投影：`n` 取该档最大每弧采样数，`endpoints` 为落点集合。 */
+function summarize(run: SamplingRun, n: number, cap: number): HopSampleSummary {
+  const endpoints = [...new Map(run.arcs.map((a) => [`${a.bx},${a.by}`, [a.bx, a.by] as const])).values()]
+    .sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  return { n, endpoints, cap };
+}
+
 /**
  * @internal
  *
- * **U4-05**：已填充图割判据；hop 双档与模型闭合由 U4-06 / U4-07 填充。
- * 因此当前 `status` 恒为 `INCOMPLETE`、`reason` 恒为 `graph-cut-incomplete`
- * （含 hop 半部尚未实现的含义）。
+ * **U4-06**：图割 + hop 双档 + 规范化采样覆盖。模型闭合与最终输出边界由 U4-07 收束。
  *
- * 判据（D4 §4）：精确 spawn 出发的可达落脚点不得与 `goalRegion` 严格相交；
- * `midAirHits > 0` 只作**否决**，`midAirHits = 0` 永不作为正面证明；
- * `verdict` 只能是 `"conditional"`。
+ * 判据（D4 §4 / §6）：
+ * - 图割：精确 spawn 出发的可达落脚点不得与 `goalRegion` 严格相交；
+ *   `midAirHits > 0` 只作**否决**，`midAirHits = 0` 永不作为正面证明；
+ *   `verdict` 只能是 `"conditional"`。
+ * - hop 双档：60 / 120Hz 两档各自独立跑完整可达性；验证 `F1 ⊆ F2`；
+ *   **不要求** `n_doubled = 2·n_base`；cap 绑定、两档不一致、连通性改变 ⇒ `INCOMPLETE`。
  */
 export function computePermanentEvasion(input: PermanentEvasionInput): PermanentEvasionHalf {
+  const graphCut = graphCutOf(input);
+  const base = reachWithSampling(input.graph, input.move, input.spawnCell, input.goalRegion, HOP_BASE);
+  const doubled = reachWithSampling(input.graph, input.move, input.spawnCell, input.goalRegion, HOP_DOUBLED);
+
+  // 逐弧覆盖与 cap：两档接受的弧取并集（双档只会因更密采样删边，不会新增弧）。
+  const seenArc = new Set<string>();
+  let coverage = true;
+  let capBound = false;
+  let maxNBase = 0;
+  let maxNDoubled = 0;
+  for (const arc of [...base.arcs, ...doubled.arcs]) {
+    const key = `${arc.ax},${arc.ay},${arc.bx},${arc.by}`;
+    if (seenArc.has(key)) continue;
+    seenArc.add(key);
+    const n1 = arcSampleCount(input.graph, input.move, arc.ax, arc.ay, arc.bx, arc.by, HOP_BASE.hz, HOP_BASE.maxSamples);
+    const n2 = arcSampleCount(input.graph, input.move, arc.ax, arc.ay, arc.bx, arc.by, HOP_DOUBLED.hz, HOP_DOUBLED.maxSamples);
+    if (!n1 || !n2) continue;
+    maxNBase = Math.max(maxNBase, n1.n);
+    maxNDoubled = Math.max(maxNDoubled, n2.n);
+    if (n1.capped || n2.capped) capBound = true;
+    if (!normalPositionsCovered(n1.n, n2.n)) coverage = false;
+  }
+
+  const connectivityPreserved = base.reached === doubled.reached;
+  const hopDoubling = {
+    base: summarize(base, maxNBase, HOP_BASE.maxSamples),
+    doubled: summarize(doubled, maxNDoubled, HOP_DOUBLED.maxSamples),
+    connectivityPreserved,
+    normalizedCoverage: coverage,
+  };
+  const hopSamplingCoverage = {
+    covered: coverage,
+    method: coverage ? ("normalized" as const) : ("insufficient" as const),
+  };
+
+  let reason: DegradationReason | null = null;
+  if (graphCut.goalIntersections > 0 || graphCut.midAirHits > 0) reason = "graph-cut-incomplete";
+  else if (base.reached || doubled.reached) reason = "graph-cut-incomplete";
+  else if (capBound) reason = "hop-sample-budget";
+  else if (!coverage || !connectivityPreserved) reason = "hop-doubling-changed";
+
   return {
-    graphCut: graphCutOf(input),
-    hopDoubling: null,
-    hopSamplingCoverage: null,
+    graphCut,
+    hopDoubling,
+    hopSamplingCoverage,
     movementModelClosure: "not-proven-air-control",
-    status: "INCOMPLETE",
-    reason: "graph-cut-incomplete",
+    status: reason === null ? "COMPLETE" : "INCOMPLETE",
+    reason,
   };
 }

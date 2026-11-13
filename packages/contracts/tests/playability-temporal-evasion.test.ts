@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseGameConfig, playerMoveOf } from "../src/index.js";
 import { buildMovementGraph, hopEdges, hopSamples, hopTargets } from "../src/playability/graph.js";
-import { computePermanentEvasion, withExactSpawnSeed } from "../src/playability/temporal-evasion.js";
+import { computePermanentEvasion, normalPositionsCovered, withExactSpawnSeed } from "../src/playability/temporal-evasion.js";
 import type { MovementGraph } from "../src/playability/graph.js";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -89,19 +89,24 @@ describe("U4-04 图割半部 API 骨架与输入契约", () => {
   // 注释里会提到被禁止的符号名；负向断言只看代码本体。
   const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
 
-  it("输出形状固定；图割已填充，hop 半部仍为 null", () => {
+  it("输出形状固定；图割与 hop 半部均已填充", () => {
     expect(Object.keys(outcome).sort()).toEqual([
       "graphCut", "hopDoubling", "hopSamplingCoverage", "movementModelClosure", "reason", "status",
     ]);
-    expect(outcome.status).toBe("INCOMPLETE");
-    expect(outcome.reason).toBe("graph-cut-incomplete");
+    expect(["COMPLETE", "INCOMPLETE"]).toContain(outcome.status);
     expect(outcome.graphCut).not.toBeNull();
     expect(Object.keys(outcome.graphCut!).sort()).toEqual([
       "evidence", "goalIntersections", "midAirHits", "reachableFootpoints", "verdict",
     ]);
     expect(outcome.graphCut!.verdict).toBe("conditional");
-    expect(outcome.hopDoubling).toBeNull();
-    expect(outcome.hopSamplingCoverage).toBeNull();
+    expect(outcome.hopDoubling).not.toBeNull();
+    expect(Object.keys(outcome.hopDoubling!).sort()).toEqual([
+      "base", "connectivityPreserved", "doubled", "normalizedCoverage",
+    ]);
+    expect(Object.keys(outcome.hopDoubling!.base).sort()).toEqual(["cap", "endpoints", "n"]);
+    expect(outcome.hopDoubling!.base.cap).toBe(120);
+    expect(outcome.hopDoubling!.doubled.cap).toBe(240);
+    expect(outcome.hopSamplingCoverage).not.toBeNull();
     expect(outcome.movementModelClosure).toBe("not-proven-air-control");
   });
 
@@ -122,7 +127,7 @@ describe("U4-04 图割半部 API 骨架与输入契约", () => {
   it("依赖边界：不 import temporal.ts / temporal-gate.ts / temporal-witness.ts", () => {
     const specifiers = [...source.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]);
     const allowed = new Set([
-      "./geometry.js", "./graph.js", "./reach.js", "./temporal-motion.js", "./temporal-budget.js", "./temporal-result.js",
+      "./geometry.js", "./graph.js", "./reach.js", "./temporal-motion.js", "./temporal-budget.js", "./temporal-result.js", "../game-config.js",
     ]);
     expect(specifiers.length).toBeGreaterThan(0);
     for (const specifier of specifiers) expect(allowed.has(specifier as string), specifier).toBe(true);
@@ -234,5 +239,103 @@ describe("U4-05 图割判据与 reach 消费", () => {
     const b = run(g, { x: 30, y: 10, w: 2, h: 2 }).graphCut!;
     expect(JSON.stringify(a)).toBe(JSON.stringify(b));
     expect(a.evidence).toMatch(/^reach@full; seeds=1; footpoints=\d+; goalIntersections=0; midAirHits=0; verdict=conditional$/);
+  });
+});
+
+
+describe("U4-06 hop 双档与规范化采样覆盖", () => {
+  const SPAWN = { x: 4, y: 20 } as const;
+  // 单位与夹具一致：px/s、px/s²。t = 2v/g = 0.2s，最大跳距 speed·t = 2px。
+  const DEFAULT_MOVE = { speed: 10, jumpVelocity: 90, gravity: 900 } as const;
+
+  // 合成图：左侧地板 x=0..4（脚点线 y=20），右侧平台 x=6..10，x=5 为空域。
+  // 只有 (4,20) → (6,20) 的 hop 弧能跨过缺口。
+  const gapGraph = (forbiddenCells: readonly (readonly [number, number])[] = []): MovementGraph => {
+    const width = 40;
+    const height = 100;
+    const stride = height + 1;
+    const blocked = new Uint8Array((width + 1) * stride);
+    for (let x = 0; x <= 4; x++) blocked[x * stride + 21] = 1;
+    for (let x = 6; x <= 10; x++) blocked[x * stride + 21] = 1;
+    const forbidden = blocked.slice();
+    for (const [x, y] of forbiddenCells) forbidden[x * stride + y] = 1;
+    const standable = new Uint8Array(blocked.length);
+    for (let x = 0; x <= 4; x++) standable[x * stride + 20] = 1;
+    for (let x = 6; x <= 10; x++) standable[x * stride + 20] = 1;
+    const columns = Array.from({ length: width + 1 }, () => [] as number[]);
+    for (let x = 0; x <= 4; x++) columns[x] = [20];
+    for (let x = 6; x <= 10; x++) columns[x] = [20];
+    const inBounds = (x: number, y: number) => x >= 0 && x <= width && y >= 0 && y <= height;
+    return {
+      width, height, stride, blocked, forbidden, standable, columns,
+      player: { size: { w: 4, h: 6 }, anchor: { x: 0.5, y: 1 }, foot: { x: 4, y: 20 }, coverage: "partial" },
+      solids: [], coverage: "partial",
+      freeAt: (x, y) => inBounds(x, y) && forbidden[x * stride + y] === 0,
+      standableAt: (x, y) => inBounds(x, y) && standable[x * stride + y] === 1,
+      startCells: () => [SPAWN],
+    };
+  };
+  const run = (
+    graph: MovementGraph,
+    goalRegion: { x: number; y: number; w: number; h: number },
+    move: { speed: number; jumpVelocity: number; gravity: number } = DEFAULT_MOVE,
+  ) =>
+    computePermanentEvasion({
+      spawnCell: SPAWN, goalRegion, gateRect: { x: 0, y: 0, w: 1, h: 1 }, move, graph,
+    });
+  const FAR_GOAL = { x: 30, y: 90, w: 2, h: 2 } as const;
+
+  it("两档各自完整跑：记录 n / 端点 / cap，且 F1 ⊆ F2", () => {
+    const half = run(gapGraph(), FAR_GOAL);
+    expect(half.hopDoubling!.base.cap).toBe(120);
+    expect(half.hopDoubling!.doubled.cap).toBe(240);
+    expect(half.hopDoubling!.base.n).toBe(12);      // ceil(0.2s · 60Hz)
+    expect(half.hopDoubling!.doubled.n).toBe(24);   // ceil(0.2s · 120Hz)
+    expect(half.hopDoubling!.base.endpoints).toContainEqual([6, 20]);
+    expect(half.hopDoubling!.normalizedCoverage).toBe(true);
+    expect(half.hopSamplingCoverage).toEqual({ covered: true, method: "normalized" });
+  });
+
+  it("反例 10：判据是 F1 ⊆ F2，不是 n_doubled === 2·n_base", () => {
+    expect(normalPositionsCovered(6, 12)).toBe(true);
+    expect(normalPositionsCovered(12, 24)).toBe(true);
+    expect(normalPositionsCovered(6, 18)).toBe(true);   // 3× 也覆盖，不要求恰好 2×
+    expect(normalPositionsCovered(7, 13)).toBe(false);  // 13 不是 7 的倍数
+  });
+
+  it("覆盖不可证明 ⇒ hop-doubling-changed（n1=7 / n2=13）", () => {
+    const move = { speed: 10, jumpVelocity: 47.25, gravity: 900 } as const; // t=0.105s
+    const half = run(gapGraph(), FAR_GOAL, move);
+    expect(half.hopDoubling!.base.n).toBe(7);
+    expect(half.hopDoubling!.doubled.n).toBe(13);
+    expect(half.hopDoubling!.normalizedCoverage).toBe(false);
+    expect(half.hopSamplingCoverage).toEqual({ covered: false, method: "insufficient" });
+    expect(half.status).toBe("INCOMPLETE");
+    expect(half.reason).toBe("hop-doubling-changed");
+  });
+
+  it("cap 绑定 ⇒ hop-sample-budget", () => {
+    const move = { speed: 10, jumpVelocity: 1000, gravity: 900 } as const; // t≈2.22s
+    const half = run(gapGraph(), FAR_GOAL, move);
+    expect(half.status).toBe("INCOMPLETE");
+    expect(half.reason).toBe("hop-sample-budget");
+  });
+
+  it("反例 9：两档都跑，连通性变化被记录（n1=12 粗档跨过缺口，n2=24 密档被否）", () => {
+    // 120Hz 独有采样点 (4,17) 落入禁区：粗档弧通过、密档弧被否 ⇒ 右侧平台只在粗档可达。
+    const half = run(gapGraph([[4, 17]]), { x: 6, y: 14, w: 1, h: 1 });
+    expect(half.hopDoubling!.connectivityPreserved).toBe(false);
+    expect(half.hopDoubling!.base.endpoints).toContainEqual([6, 20]);
+    expect(half.hopDoubling!.doubled.endpoints).not.toContainEqual([6, 20]);
+    expect(half.status).toBe("INCOMPLETE");
+    // 冻结映射：任一档目标可达 ⇒ graph-cut-incomplete（先于 hop 原因）。
+    expect(half.reason).toBe("graph-cut-incomplete");
+  });
+
+  it("两档都不可达且覆盖成立 ⇒ COMPLETE、reason = null", () => {
+    const half = run(gapGraph(), FAR_GOAL);
+    expect(half.hopDoubling!.connectivityPreserved).toBe(true);
+    expect(half.status).toBe("COMPLETE");
+    expect(half.reason).toBeNull();
   });
 });
