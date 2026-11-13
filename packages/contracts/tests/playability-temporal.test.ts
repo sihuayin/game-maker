@@ -5,12 +5,20 @@
 import { describe, expect, it } from "vitest";
 import { parseGameConfig } from "../src/index.js";
 import { analyzeTemporalInternal, determinismSignature, resolveTwoLagResults } from "../src/playability/temporal.js";
+import {
+  createWitnessWorkBudget,
+  resolveWitnessSpace,
+  searchWinningSet,
+  verifyTransition,
+} from "../src/playability/temporal-witness.js";
 import type { TemporalInternalResult, BudgetProfile } from "../src/playability/temporal-result.js";
 import {
+  budgetProfileFixture,
   canonicalJson,
   deterministicView,
   trustedInputFixture,
   witnessConfigRaw,
+  witnessHazard,
   witnessManifest,
   witnessWorld,
   type WitnessWorldOptions,
@@ -28,6 +36,22 @@ const analyze = (
     lagMs,
     trustedInput: trustedInputFixture(),
     testHooks: { budget: overrides, now: () => 1000 },
+  });
+};
+
+const analyzeWithClock = (
+  options: WitnessWorldOptions,
+  overrides: Partial<BudgetProfile>,
+  now: () => number,
+  lagMs = 0,
+): TemporalInternalResult => {
+  const { config, manifest } = witnessWorld(options);
+  return analyzeTemporalInternal({
+    config,
+    manifest,
+    lagMs,
+    trustedInput: trustedInputFixture(),
+    testHooks: { budget: overrides, now },
   });
 };
 
@@ -459,5 +483,156 @@ describe("U5-02 预算闭合与降级硬化", () => {
       verdict: "INSUFFICIENT_EVIDENCE",
       degradation: "lag-disagreement",
     });
+  });
+});
+
+
+// ── U5-03：墙钟 abort 与确定性 ──────────────────────────────────────────────
+describe("U5-03 墙钟 abort 与确定性", () => {
+  it("[I02-05][AC-08][AC-10] 注入时钟确定性触发 wall-clock-abort，且重复运行一致", () => {
+    const budget = { timeBudgetMs: 10, timeBudgetCheckpointWork: 1 };
+    const steppingClock = () => {
+      let t = 0;
+      return () => {
+        t += 100;
+        return t;
+      };
+    };
+    const first = analyzeWithClock(NB_WORLD, budget, steppingClock());
+    const second = analyzeWithClock(NB_WORLD, budget, steppingClock());
+
+    expect(first.internalResult).toBe("insufficient-evidence");
+    expect(reasonOf(first)).toBe("wall-clock-abort");
+    expect(first.stats.budget).toMatchObject({
+      budgetStatus: "aborted",
+      budgetKind: "wall-clock-abort",
+    });
+    expect(second.stats.determinismSignature).toBe(first.stats.determinismSignature);
+    expect(canonicalJson(deterministicView(second))).toBe(canonicalJson(deterministicView(first)));
+    expectInvariants(first);
+  });
+
+  it("[I02-05][AC-10] 同一工作预算下，墙钟不前进则不 abort（abort 只由注入时钟驱动）", () => {
+    const budget = { timeBudgetMs: 10, timeBudgetCheckpointWork: 1 };
+    const noAbort = analyzeWithClock(NB_WORLD, budget, () => 0);
+    expect(noAbort.internalResult).toBe("nb-candidate");
+    expect(noAbort.stats.budget.budgetStatus).toBe("complete");
+    expectInvariants(noAbort);
+  });
+
+  it("[I02-05][AC-10] wallClockMs 不进签名，也不进规范化完整序列化", () => {
+    const fast = analyzeWithClock(NB_WORLD, {}, () => 0);
+    const slowClock = () => {
+      let t = 0;
+      return () => {
+        t += 1;
+        return t;
+      };
+    };
+    const slow = analyzeWithClock(NB_WORLD, {}, slowClock());
+    expect(fast.internalResult).toBe("nb-candidate");
+    expect(slow.internalResult).toBe("nb-candidate");
+    expect(slow.stats.timing.wallClockMs).not.toBe(fast.stats.timing.wallClockMs);
+    expect(slow.stats.determinismSignature).toBe(fast.stats.determinismSignature);
+    expect(canonicalJson(deterministicView(slow))).toBe(canonicalJson(deterministicView(fast)));
+  });
+
+  it("[I02-05][AC-10] diagnostics.detail 不进签名：同类缺口不同细节签名相等", () => {
+    const outOfWorld = analyzeWithClock({ ...NB_WORLD, spawnY: 100 }, {}, () => 1000);
+    const notStandable = analyzeWithClock({ ...NB_WORLD, spawnY: 30 }, {}, () => 1000);
+    expect(reasonOf(outOfWorld)).toBe("spawn-not-on-lattice");
+    expect(reasonOf(notStandable)).toBe("spawn-not-on-lattice");
+    expect(outOfWorld.diagnostics.detail).toBeTruthy();
+    expect(notStandable.diagnostics.detail).toBeTruthy();
+    expect(outOfWorld.diagnostics.detail).not.toBe(notStandable.diagnostics.detail);
+    expect(outOfWorld.stats.determinismSignature).toBe(notStandable.stats.determinismSignature);
+    expect(canonicalJson(deterministicView(outOfWorld)))
+      .toBe(canonicalJson(deterministicView(notStandable)));
+  });
+
+  it("[I02-05][AC-10] 签名覆盖 certificate：改动验证记录即改变签名", () => {
+    const result = analyze(NB_WORLD);
+    expect(result.certificate.kind).toBe("witness");
+    const tampered = JSON.parse(JSON.stringify(result)) as TemporalInternalResult;
+    if (tampered.certificate.kind !== "witness") return;
+    const tuple = tampered.certificate.witness.verifications[0];
+    expect(tuple).toBeDefined();
+    (tuple as unknown as number[])[4] = Number(tuple![4]) + 1;
+    expect(determinismSignature(tampered)).not.toBe(determinismSignature(result));
+  });
+
+  it("[I02-05][AC-10] 四个世界 × 三档 lag：重复运行签名与规范化序列化一致", () => {
+    for (const options of [NB_WORLD, PU_WORLD, EVASION_WORLD, NO_GATE_WORLD]) {
+      for (const lagMs of [0, 16.67, 200]) {
+        const first = analyze(options, {}, lagMs);
+        const second = analyze(options, {}, lagMs);
+        expect(second.stats.determinismSignature, `${lagMs}`)
+          .toBe(first.stats.determinismSignature);
+        expect(canonicalJson(deterministicView(second)))
+          .toBe(canonicalJson(deterministicView(first)));
+        expectInvariants(first);
+      }
+    }
+  });
+
+  it("[I02-05][AC-10] 策略后继 tie-break：同 rank 取最小 footX / k", () => {
+    const world: WitnessWorldOptions = {
+      worldW: 20,
+      goalX: 15,
+      goalW: 2,
+      spawnX: 3,
+      hazardX: 10,
+      hazardDistance: 4,
+      hazardPeriodMs: 200,
+      hazardY: 20,
+      playerSpeed: 90,
+    };
+    const profile = budgetProfileFixture({ maxStates: 38 });
+    const { config, manifest } = witnessWorld(world);
+    const spaceResult = resolveWitnessSpace({ config, manifest, budget: profile, periodMs: 200 });
+    if (!spaceResult.ok) throw new Error(`expected space, got ${spaceResult.reason}`);
+    const space = spaceResult;
+    const hazard = witnessHazard(world);
+    const search = searchWinningSet({
+      space,
+      hazard,
+      lagMs: 0,
+      budget: createWitnessWorkBudget({ profile, now: () => 0 }),
+    });
+    expect(search.status).toBe("complete");
+
+    const byKey = new Map(search.policy.map((entry) => [
+      `${entry.state.footX},${entry.state.k}`,
+      entry,
+    ]));
+    let multi = 0;
+    let violations = 0;
+    for (const entry of search.policy) {
+      if (entry.transition === null) continue;
+      const candidates: { footX: number; k: number }[] = [];
+      const k = (entry.state.k + 1) % space.grid.phaseSteps;
+      for (let x = space.corridor.xLo; x <= space.corridor.xHi; x++) {
+        if (Math.abs(x - entry.state.footX) > space.grid.maxStep) continue;
+        const candidate = byKey.get(`${x},${k}`);
+        if (!candidate || candidate.rank !== entry.rank - 1) continue;
+        const check = verifyTransition({
+          space,
+          hazard,
+          lagMs: 0,
+          from: entry.state,
+          to: { footX: x, k },
+          budget: createWitnessWorkBudget({ profile, now: () => 0 }),
+        });
+        if (check.verified) candidates.push({ footX: x, k });
+      }
+      if (candidates.length > 1) multi += 1;
+      candidates.sort((a, b) => a.footX - b.footX || a.k - b.k);
+      if (candidates.length === 0) continue;
+      const chosen = entry.transition.to;
+      const minimal = candidates[0]!;
+      if (chosen.footX !== minimal.footX || chosen.k !== minimal.k) violations += 1;
+    }
+    expect(multi).toBeGreaterThan(0);
+    expect(violations).toBe(0);
   });
 });

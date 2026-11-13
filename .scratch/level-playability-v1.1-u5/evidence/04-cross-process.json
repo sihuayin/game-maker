@@ -1,0 +1,71 @@
+{
+  "version": "level-playability-v1.1-u5/u5-03-cross-process/v1",
+  "generatedAt": "2026-11-13T09:37:40.354Z",
+  "command": "node .scratch/level-playability-v1.1-u5/scripts/cross-process-determinism.mjs",
+  "lagMs": 0,
+  "cases": [
+    {
+      "caseId": "last-train",
+      "signatureEqual": true,
+      "normalizedEqual": true,
+      "wallClockDiffered": true,
+      "internalResult": "insufficient-evidence",
+      "certificateKind": "none",
+      "runs": [
+        {
+          "process": 1,
+          "clockRateMs": 0,
+          "signature": "e504455e",
+          "wallClockMs": 0,
+          "normalizedSha256": "sha256:f154e646ba5d14c29ab39850744865dc2eeca2c9b67d06f5dd4f4b26855c6c94"
+        },
+        {
+          "process": 2,
+          "clockRateMs": 1,
+          "signature": "e504455e",
+          "wallClockMs": 1,
+          "normalizedSha256": "sha256:f154e646ba5d14c29ab39850744865dc2eeca2c9b67d06f5dd4f4b26855c6c94"
+        },
+        {
+          "process": 3,
+          "clockRateMs": 1,
+          "signature": "e504455e",
+          "wallClockMs": 1,
+          "normalizedSha256": "sha256:f154e646ba5d14c29ab39850744865dc2eeca2c9b67d06f5dd4f4b26855c6c94"
+        }
+      ]
+    },
+    {
+      "caseId": "compact-nb",
+      "signatureEqual": true,
+      "normalizedEqual": true,
+      "wallClockDiffered": true,
+      "internalResult": "nb-candidate",
+      "certificateKind": "witness",
+      "runs": [
+        {
+          "process": 1,
+          "clockRateMs": 0,
+          "signature": "2c4d7930",
+          "wallClockMs": 0,
+          "normalizedSha256": "sha256:da8d07abd86d162da46b6b65cc66f08e3485db4652ed69240c7d1b48b710779a"
+        },
+        {
+          "process": 2,
+          "clockRateMs": 1,
+          "signature": "2c4d7930",
+          "wallClockMs": 67,
+          "normalizedSha256": "sha256:da8d07abd86d162da46b6b65cc66f08e3485db4652ed69240c7d1b48b710779a"
+        },
+        {
+          "process": 3,
+          "clockRateMs": 1,
+          "signature": "2c4d7930",
+          "wallClockMs": 67,
+          "normalizedSha256": "sha256:da8d07abd86d162da46b6b65cc66f08e3485db4652ed69240c7d1b48b710779a"
+        }
+      ]
+    }
+  ],
+  "ok": true
+}
