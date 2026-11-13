@@ -6,7 +6,7 @@
 | 审批人 | **amber** |
 | 日期 | **2026-11-12** |
 | 审批对象 | `packages/contracts/src/playability/graph.ts` @ `sha256:def3fa7132b9142e5f9441f1b5b6f5b6e4d8ef97096bd0db0b2c5b620445e55b` |
-| 提案正文 | [`../level-playability-v1.1-u4/evidence/01-graph-approval-proposal.diff`](../level-playability-v1.1-u4/evidence/01-graph-approval-proposal.diff) @ `sha256:3213ecfe85d344a9a3617ed9d648f7000c437f4992edbacf31fd0f463444c62f` |
+| 提案正文 | [`../level-playability-v1.1-u4/evidence/01-graph-approval-proposal.diff`](../../level-playability-v1.1-u4/evidence/01-graph-approval-proposal.diff) @ `sha256:3213ecfe85d344a9a3617ed9d648f7000c437f4992edbacf31fd0f463444c62f` |
 | 授权上下文 | [05-u4-incremental-authorization.md](./05-u4-incremental-authorization.md)（U4 实施 + R4；`graph.ts` 审批为执行门前置） |
 | 结论 | **批准（命名导出 `HopSampling`）** |
 
