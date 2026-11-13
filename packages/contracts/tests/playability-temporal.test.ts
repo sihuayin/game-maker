@@ -4,7 +4,12 @@
 //    追加到同一文件。所有世界都是内存夹具，不读文件系统、不新增 JSON fixture。
 import { describe, expect, it } from "vitest";
 import { parseGameConfig } from "../src/index.js";
-import { analyzeTemporalInternal, determinismSignature, resolveTwoLagResults } from "../src/playability/temporal.js";
+import {
+  analyzeTemporalInternal,
+  determinismSignature,
+  resolveTwoLagInternalResults,
+  resolveTwoLagResults,
+} from "../src/playability/temporal.js";
 import {
   createWitnessWorkBudget,
   resolveWitnessSpace,
@@ -634,5 +639,249 @@ describe("U5-03 墙钟 abort 与确定性", () => {
     }
     expect(multi).toBeGreaterThan(0);
     expect(violations).toBe(0);
+  });
+});
+
+
+// ── U5-04：A–J 矩阵与跨单元组合 ─────────────────────────────────────────────
+describe("U5-04 A–J 矩阵", () => {
+  const expectPublicBoundary = (result: TemporalInternalResult): void => {
+    expect(result.publicCapability).toBe("BLOCKED");
+    expect(result.publicResult).toBeNull();
+  };
+
+  it("[I02-02][AC-03] A：安全等待窗口 ⇒ nb-candidate + witness COMPLETE", () => {
+    const result = analyze(NB_WORLD);
+    expect(result.internalResult).toBe("nb-candidate");
+    expect(result.certificate.kind).toBe("witness");
+    if (result.certificate.kind !== "witness") return;
+    expect(result.certificate.status).toBe("COMPLETE");
+    expect(result.certificate.witness.phaseCoverage.complete).toBe(true);
+    expect(result.diagnostics.degradationReason).toBeNull();
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-03][AC-05][AC-06][AC-07] B：永久门区且无垂直规避 ⇒ pu-candidate + 六条件", () => {
+    const result = analyze(PU_WORLD);
+    expect(result.internalResult).toBe("pu-candidate");
+    expect(result.certificate.kind).toBe("permanent-gate");
+    if (result.certificate.kind !== "permanent-gate") return;
+    expect(result.certificate.status).toBe("COMPLETE");
+    const proof = result.certificate.proof;
+    const statusOf = (id: string) =>
+      proof.puConditions.find((condition) => condition.id === id)!.status;
+    expect(statusOf("gate-coverage")).toBe("PASS");
+    expect(statusOf("geometry-checked")).toBe("BLOCKED");
+    expect(statusOf("graph-cut")).toBe("PASS");
+    expect(statusOf("hop-doubling")).toBe("PASS");
+    expect(statusOf("model-out-excluded")).toBe("BLOCKED");
+    expect(statusOf("lag-consistent")).toBe("PASS");
+    expect(proof.graphCut.verdict).toBe("conditional");
+    expect(proof.movementModelClosure).toBe("not-proven-air-control");
+    expect(result.diagnostics.degradationReason).toBeNull();
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-05][AC-11] C：几何 / 时序 / 规避证据不足 ⇒ IE + 缺口一致", () => {
+    const spawnGap = analyze({ ...NB_WORLD, spawnY: 100 });
+    expect(spawnGap.internalResult).toBe("insufficient-evidence");
+    expect(spawnGap.diagnostics.degradationReason).toBe("spawn-not-on-lattice");
+    expect(spawnGap.diagnostics.detail).toContain("spawn-box-out-of-world");
+    expectPublicBoundary(spawnGap);
+
+    const gateGap = analyze(NO_GATE_WORLD);
+    expect(gateGap.internalResult).toBe("insufficient-evidence");
+    expect(gateGap.diagnostics.degradationReason).toBe("no-permanent-gate");
+    expect(gateGap.certificate.kind).toBe("none");
+    expectPublicBoundary(gateGap);
+  });
+
+  it("[I02-01][AC-01][AC-02] D：折返点切段与 witness verified 一致", () => {
+    const result = analyze(CROSSING_NB, { maxStates: 113 });
+    expect(result.internalResult).toBe("nb-candidate");
+    expect(result.certificate.kind).toBe("witness");
+    if (result.certificate.kind !== "witness") return;
+    const half = 150; // period 300ms
+    const tuple = result.certificate.witness.verifications.find(
+      (entry) => entry[4] < half && entry[5] > half,
+    );
+    expect(tuple).toBeDefined();
+    if (tuple === undefined) return;
+    expect(tuple[6]).toBe(1);
+
+    const profile = budgetProfileFixture({ maxStates: 113 });
+    const { config, manifest } = witnessWorld(CROSSING_NB);
+    const spaceResult = resolveWitnessSpace({
+      config,
+      manifest,
+      budget: profile,
+      periodMs: 300,
+    });
+    if (!spaceResult.ok) throw new Error(`expected space, got ${spaceResult.reason}`);
+    const check = verifyTransition({
+      space: spaceResult,
+      hazard: witnessHazard(CROSSING_NB),
+      lagMs: 0,
+      from: { footX: tuple[0], k: tuple[1] },
+      to: { footX: tuple[2], k: tuple[3] },
+      budget: createWitnessWorkBudget({ profile, now: () => 0 }),
+    });
+    expect(check.verified).toBe(true);
+    expect(check.t0).toBe(tuple[4]);
+    expect(check.t1).toBe(tuple[5]);
+    // `verifyTransition` 在调用连续求交前已按折返点预切段：跨折返点的相位格
+    // 变成 2 个单调段，因此 transition 级 `cutPoints = 0`、`segments = 2`。
+    expect(check.cutPoints).toBe(0);
+    expect(check.segments).toBe(2);
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-02][AC-03][AC-04] E：等待阶段碰撞 ⇒ 不得 nb-candidate", () => {
+    const result = analyze({ hazardX: 5, hazardDistance: 10 });
+    expect(result.internalResult).not.toBe("nb-candidate");
+    expect(result.internalResult).toBe("insufficient-evidence");
+    expect(result.certificate.kind).toBe("none");
+    const reasons = [
+      result.diagnostics.degradationReason,
+      ...result.diagnostics.secondaryReasons,
+    ];
+    expect(reasons).toContain("no-witness-found");
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-03][AC-05] F：短暂安全窗口 ⇒ IE + no-permanent-gate + certificate none", () => {
+    const result = analyze(NO_GATE_WORLD);
+    expect(result.internalResult).toBe("insufficient-evidence");
+    expect(result.diagnostics.degradationReason).toBe("no-permanent-gate");
+    expect(result.certificate.kind).toBe("none");
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-04][AC-06][AC-07] G：垂直规避 ⇒ permanent-gate INCOMPLETE + 图割原因", () => {
+    const result = analyze(EVASION_WORLD);
+    expect(result.internalResult).toBe("insufficient-evidence");
+    expect(result.certificate.kind).toBe("permanent-gate");
+    if (result.certificate.kind !== "permanent-gate") return;
+    expect(result.certificate.status).toBe("INCOMPLETE");
+    expect([
+      "graph-cut-incomplete",
+      "hop-doubling-changed",
+      "movement-model-unclosed",
+    ]).toContain(result.diagnostics.degradationReason);
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-05][AC-08] H：搜索预算超限 ⇒ IE + exhausted + 对应 budgetKind", () => {
+    const result = analyze(NB_WORLD, { maxEdges: 0 });
+    expect(result.internalResult).toBe("insufficient-evidence");
+    expect(result.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "edge-budget",
+    });
+    expect(result.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+    expectPublicBoundary(result);
+  });
+
+  it("[I02-05][AC-09] I：两档 lag 合并 ⇒ 一致 / 不一致 / 不完整三分", () => {
+    const lagA = analyze(NB_WORLD, {}, 16.67);
+    const lagB = analyze(NB_WORLD, {}, 200);
+    expect(lagA.certificate.kind).toBe("witness");
+    expect(lagB.certificate.kind).toBe("witness");
+
+    const agreed = resolveTwoLagInternalResults(lagA, lagB);
+    expect(agreed.internalResult).toBe("nb-candidate");
+    expect(agreed.diagnostics.degradationReason).toBeNull();
+    expectPublicBoundary(agreed);
+
+    // 组合函数单测：两档完整但结论不同 ⇒ lag-disagreement（同输入的逐档隔离
+    // 回归由 U5-05 承担）。
+    const completeFailure = analyze(NO_GATE_WORLD, {}, 200);
+    expect(completeFailure.internalResult).toBe("insufficient-evidence");
+    expectPublicBoundary(completeFailure);
+    const disagreed = resolveTwoLagInternalResults(lagA, completeFailure);
+    expect(disagreed.internalResult).toBe("insufficient-evidence");
+    expect(disagreed.diagnostics.degradationReason).toBe("lag-disagreement");
+    expect(disagreed.certificate.kind).toBe("none");
+    expectPublicBoundary(disagreed);
+
+    const incomplete = analyze(NB_WORLD, { maxEdges: 0 }, 200);
+    expectPublicBoundary(incomplete);
+    const merged = resolveTwoLagInternalResults(lagA, incomplete);
+    expect(merged.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+    expect(merged.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "edge-budget",
+    });
+    expectPublicBoundary(merged);
+
+    const reversed = resolveTwoLagInternalResults(incomplete, lagA);
+    expect(reversed.diagnostics.degradationReason).toBe("edge-budget-exhausted");
+    expect(reversed.stats.budget).toMatchObject({
+      budgetStatus: "exhausted",
+      budgetKind: "edge-budget",
+    });
+    expectPublicBoundary(reversed);
+  });
+
+  it("[I02-05][AC-10] J：相同输入重复运行 ⇒ determinismSignature 相等", () => {
+    const first = analyze(NB_WORLD);
+    const second = analyze(NB_WORLD);
+    expect(second.stats.determinismSignature).toBe(first.stats.determinismSignature);
+    expect(canonicalJson(deterministicView(second))).toBe(canonicalJson(deterministicView(first)));
+    expectPublicBoundary(first);
+  });
+
+  it("[I02-05][AC-13] 跨单元：NB / PU 互斥、门区 + 图割 + hop 联合、IE 优先级", () => {
+    const results = [
+      analyze(NB_WORLD),
+      analyze(PU_WORLD),
+      analyze(EVASION_WORLD),
+      analyze(NO_GATE_WORLD),
+    ];
+    for (const result of results) {
+      const isNb = result.internalResult === "nb-candidate";
+      const isPu = result.internalResult === "pu-candidate";
+      expect(Number(isNb) + Number(isPu)).toBeLessThanOrEqual(1);
+      expectPublicBoundary(result);
+      if (result.internalResult === "nb-candidate") {
+        expect(result.certificate.kind).toBe("witness");
+      }
+      if (result.internalResult === "pu-candidate") {
+        expect(result.certificate.kind).toBe("permanent-gate");
+      }
+      if (result.internalResult === "insufficient-evidence") {
+        const certificate = result.certificate;
+        expect(certificate.kind === "none" ||
+          (certificate.kind === "permanent-gate" && certificate.status === "INCOMPLETE"))
+          .toBe(true);
+      }
+    }
+
+    // 门区 + 图割 + hop 三者缺一不可。
+    expect(analyze(PU_WORLD).internalResult).toBe("pu-candidate");
+    expect(analyze(EVASION_WORLD).internalResult).not.toBe("pu-candidate");
+    expect(analyze(NO_GATE_WORLD).internalResult).not.toBe("pu-candidate");
+
+    // IE 优先级：模型外（步骤 1）压过非法预算（步骤 4）。
+    const raw = witnessConfigRaw({ hazardY: 20 }) as {
+      entities: { id: string; kind: string; motion?: { axis: string } }[];
+    };
+    raw.entities.find((entity) => entity.id === "hazard")!.motion!.axis = "y";
+    const parsed = parseGameConfig(raw);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const yAxis = analyzeTemporalInternal({
+      config: parsed.value,
+      manifest: witnessManifest({ hazardY: 20 }),
+      lagMs: 0,
+      trustedInput: trustedInputFixture(),
+      testHooks: { budget: { maxStates: 0 }, now: () => 1000 },
+    });
+    expect(yAxis.diagnostics.degradationReason).toBe("model-out");
+    expectPublicBoundary(yAxis);
+
+    // IE 优先级：预算（步骤 5）压过普通否定证据（步骤 7）。
+    const budgetFirst = analyze(NB_WORLD, { maxEdges: 0 });
+    expect(budgetFirst.diagnostics.degradationReason).toBe("edge-budget-exhausted");
   });
 });

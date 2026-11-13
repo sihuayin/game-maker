@@ -1,8 +1,8 @@
 # U5-04 A–J 矩阵
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U5-04 session 2026-11-13)
 Blocked by: 04
 Map: ../map.md
 Class: U5 / VERIFICATION
@@ -49,4 +49,29 @@ A–J 全覆盖且标题带编号；每条断言 `publicCapability` / `publicRes
 
 ## Answer
 
-（resolved 时填写）
+**完成。** A–J 十项与跨单元组合均有具名测试；补齐了 I 所需的内部双档合并函数；F 按增量裁定 08 使用 `none`。
+
+| 项 | 结果 |
+| --- | --- |
+| 产品改动 | `temporal.ts` +约 80：新增 `@internal resolveTwoLagInternalResults`（一致 / 不一致 / 不完整三分）；其余产品文件零改动 |
+| A | `nb-candidate` + `witness/COMPLETE` + `phaseCoverage.complete` |
+| B | `pu-candidate` + `permanent-gate/COMPLETE`；条件 1/3/4/6 PASS、2/5 BLOCKED |
+| C | spawn 缺口 ⇒ `spawn-not-on-lattice` + 具体 gap；门区缺口 ⇒ `no-permanent-gate` + `none` |
+| D | 跨 150ms 折返点 tuple `[4,2,5,3,120,180,1]`；重放 `cutPoints=0` / `segments=2` / `verified=true` |
+| E | IE + `none`；原因集合含 `no-witness-found`；不得 `nb-candidate` |
+| F | IE + `no-permanent-gate` + `certificate.kind="none"`（[增量裁定 08](../../level-playability-v1.1-i02/reports/08-u5-f-certificate-decision.md)） |
+| G | `permanent-gate/INCOMPLETE` + `graph-cut-incomplete` |
+| H | IE + `budgetStatus="exhausted"` + `budgetKind="edge-budget"` |
+| I | 一致 ⇒ nb-candidate；完整不一致 ⇒ IE + `lag-disagreement` + `none`；不完整 ⇒ `edge-budget-exhausted` + `exhausted`（正反顺序均测） |
+| J | 签名 + 剔除 `wallClockMs` / `detail` 的规范化完整序列化一致 |
+| 跨单元 | NB / PU 互斥；PU 三要素缺一不可；`model-out` 压过 `invalid-budget`，预算压过普通否定证据 |
+| 边界 | 每条测试显式断言 `publicCapability="BLOCKED"` / `publicResult=null` |
+| 命令 | `pnpm build` 0；`pnpm typecheck` 0；定向 63 / 63；架构断言 65 / 65；`pnpm test` 176 files / 2871 tests，退出码 0 |
+
+### 已知缺口 / 限制
+
+- I 的不一致用例使用「两个完整但结论不同」的真实单档结果；fixture 参数空间内未找到同一输入在两档 lag 下结论不同的世界。同输入的逐档隔离 / 不跨档拼接回归由 **U5-05** 承担。
+- D5 §7.2 的 `perLagResults` 未进 D9 `TemporalInternalResult`；当前合并结果不携带逐档结果。若 U5-05 / 最终审计要求，需 HITL 裁定是否扩 D9。
+- U5-02 的 `stats.work.hopSamplesChecked = 0` 与 U4 独立搜索预算缺口仍在，不影响 A–J 语义结论。
+
+证据：[`../evidence/05-matrix.md`](../evidence/05-matrix.md)。本票未推送 / 建 PR / 合并。

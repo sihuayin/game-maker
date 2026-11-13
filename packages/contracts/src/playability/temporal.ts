@@ -625,6 +625,76 @@ const runPermanentGateProof = (args: {
   };
 };
 
+/** @internal 单档结果是否完整：未受工作预算 / 墙钟 / Witness 体积限制。 */
+const isCompleteLagResult = (result: TemporalInternalResult): boolean => {
+  const reason = result.diagnostics.degradationReason;
+  if (reason === null) return true;
+  if (reason === "invalid-budget" || reason === "budget-bound-overflow") return false;
+  return budgetKindOfReason(reason) === null;
+};
+
+/**
+ * @internal 两档 lag 内部结果的合并（D9 §5 / D10 §3）。
+ *
+ * - **任一档不完整**（预算 / 墙钟 / 体积）⇒ 合并为 IE，保留该档实际原因，不得伪装成
+ *   `lag-disagreement`；
+ * - **两档都完整但结论不同**（`internalResult` 或主 `degradationReason` 不同）⇒
+ *   IE + `lag-disagreement`，不保留任何一档的证书；
+ * - **两档都完整且结论一致** ⇒ 保留主档（`first`，即 16.67ms 档）的结果。
+ *
+ * 本函数只做 D9 组合语义；逐档证据隔离（不跨档共享 / 拼接 Witness）由 U5-05 回归。
+ * 不新增 `TemporalInternalResult` 字段；`detail` 只作诊断，不进确定性签名。
+ */
+export function resolveTwoLagInternalResults(
+  first: TemporalInternalResult,
+  second: TemporalInternalResult,
+): TemporalInternalResult {
+  const firstComplete = isCompleteLagResult(first);
+  const secondComplete = isCompleteLagResult(second);
+
+  if (!firstComplete || !secondComplete) {
+    const incomplete = !firstComplete ? first : second;
+    const other = !firstComplete ? second : first;
+    const reason = incomplete.diagnostics.degradationReason!;
+    const otherReason = other.diagnostics.degradationReason;
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: reason,
+      secondaryReasons: otherReason === null || otherReason === reason ? [] : [otherReason],
+      budgetStatus: incomplete.stats.budget.budgetStatus,
+      budgetKind: incomplete.stats.budget.budgetKind,
+      budgetProfile: incomplete.stats.budget.budgetProfile,
+      grid: incomplete.stats.grid,
+      work: incomplete.stats.work,
+      timing: incomplete.stats.timing,
+      detail: "one lag incomplete; actual reason preserved",
+    });
+  }
+
+  if (
+    first.internalResult !== second.internalResult ||
+    first.diagnostics.degradationReason !== second.diagnostics.degradationReason
+  ) {
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: "lag-disagreement",
+      budgetStatus: "complete",
+      budgetKind: null,
+      budgetProfile: first.stats.budget.budgetProfile,
+      grid: first.stats.grid,
+      work: first.stats.work,
+      timing: first.stats.timing,
+      detail:
+        `lag results differ: ${first.internalResult}/${first.diagnostics.degradationReason ?? "none"}` +
+        ` vs ${second.internalResult}/${second.diagnostics.degradationReason ?? "none"}`,
+    });
+  }
+
+  return first;
+}
+
 /**
  * @internal I-02 内部入口（D9 §6）。
  *
