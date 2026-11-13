@@ -1,8 +1,8 @@
 # U4-08 测试矩阵与 D4 §11 反例 5、7–12
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-08 session 2026-11-13)
 Blocked by: 08
 Map: ../map.md
 Class: U4 / VERIFICATION
@@ -53,3 +53,27 @@ Class: U4 / VERIFICATION
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。** D4 §11 的 U4 反例（5、7–12）逐条落成具名测试；U3 的 1–4、6、13 不回归。**产品代码零改动。**
+
+| 项 | 结果 |
+| --- | --- |
+| 反例 5 | `goalRegion` 未外扩 ⇒ `goalIntersections=0`；外扩 0.5px 后 `=1` |
+| 反例 7 | `midAirHits=1` 只作否决，`verdict` 仍 `conditional` |
+| 反例 8 | 精确 spawn，`evidence` 记录 `seeds=1` |
+| 反例 9 | 两档都跑；`connectivityPreserved=false`，端点分别审计 |
+| 反例 10 | 判据为 `F1 ⊆ F2`；`(6,18)` 覆盖、`(7,13)` 不覆盖 |
+| 反例 11 | 代码无 Runtime 不可达主张 |
+| 反例 12 | 无 `certificate` / `publicCapability` / `puConditions` |
+| U3 反例 1–4、6、13 | gate **48 / 48**，未回归 |
+| `pnpm build` / `pnpm typecheck` | 退出码 **0** / **0** |
+| 定向 evasion 测试 | 退出码 **0**；**36 / 36 passed** |
+| gate + graph + input | 退出码 **0**；**124 / 124 passed** |
+| `pnpm test` | 退出码 **0**；**175 / 175 files，2831 / 2831 tests passed** |
+| 产品代码改动 | **无**（仅测试文件） |
+
+证据：[`../evidence/08-tests.md`](../evidence/08-tests.md)。
+
+**下游**：U4-09（回归 / 白名单审计 / R4 输入包）已 **unblocked**。本票未启动 U4-09。

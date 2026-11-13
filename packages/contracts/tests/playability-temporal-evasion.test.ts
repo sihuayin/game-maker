@@ -160,68 +160,69 @@ describe("U4-04 图割半部 API 骨架与输入契约", () => {
 });
 
 
-describe("U4-05 图割判据与 reach 消费", () => {
-  const MOVE = { speed: 0.05, jumpVelocity: 0.3, gravity: 0.003 } as const;
-  const SPAWN = { x: 2, y: 20 } as const;
+const CLIFF_MOVE = { speed: 0.05, jumpVelocity: 0.3, gravity: 0.003 } as const;
+const CLIFF_SPAWN = { x: 2, y: 20 } as const;
 
-  // 合成图：40×100。上层地板 x=0..5（脚点线 y=20），下层只有 x=6 一格（脚点线 y=90），
-  // 其余为空域；玩家 4×6，跳跃顶点约 y=5。这样：
-  //   - walk-off 从 (5,20) 掉到 (6,90)，fall 弧可在空中向右漂移；
-  //   - hop 只能落回 x=6，覆盖不到右侧空域 ⇒ 目标可被 fall 弧「空中触达」。
-  const synthGraph = (): MovementGraph => {
-    const width = 40;
-    const height = 100;
-    const stride = height + 1;
-    const blocked = new Uint8Array((width + 1) * stride);
-    for (let x = 0; x <= 5; x++) blocked[x * stride + 21] = 1;
-    blocked[6 * stride + 91] = 1;
-    const forbidden = blocked.slice();
-    const standable = new Uint8Array(blocked.length);
-    for (let x = 0; x <= 5; x++) standable[x * stride + 20] = 1;
-    standable[6 * stride + 90] = 1;
-    const columns = Array.from({ length: width + 1 }, () => [] as number[]);
-    for (let x = 0; x <= 5; x++) columns[x] = [20];
-    columns[6] = [90];
-    const inBounds = (x: number, y: number) => x >= 0 && x <= width && y >= 0 && y <= height;
-    return {
-      width, height, stride, blocked, forbidden, standable, columns,
-      player: { size: { w: 4, h: 6 }, anchor: { x: 0.5, y: 1 }, foot: { x: 2, y: 20 }, coverage: "partial" },
-      solids: [],
-      coverage: "partial",
-      freeAt: (x, y) => inBounds(x, y) && forbidden[x * stride + y] === 0,
-      standableAt: (x, y) => inBounds(x, y) && standable[x * stride + y] === 1,
-      startCells: () => [SPAWN],
-    };
+// 合成图：40×100。上层地板 x=0..5（脚点线 y=20），下层只有 x=6 一格（脚点线 y=90），
+// 其余为空域；玩家 4×6，跳跃顶点约 y=5。这样：
+//   - walk-off 从 (5,20) 掉到 (6,90)，fall 弧可在空中向右漂移；
+//   - hop 只能落回 x=6，覆盖不到右侧空域 ⇒ 目标可被 fall 弧「空中触达」。
+const cliffGraph = (): MovementGraph => {
+  const width = 40;
+  const height = 100;
+  const stride = height + 1;
+  const blocked = new Uint8Array((width + 1) * stride);
+  for (let x = 0; x <= 5; x++) blocked[x * stride + 21] = 1;
+  blocked[6 * stride + 91] = 1;
+  const forbidden = blocked.slice();
+  const standable = new Uint8Array(blocked.length);
+  for (let x = 0; x <= 5; x++) standable[x * stride + 20] = 1;
+  standable[6 * stride + 90] = 1;
+  const columns = Array.from({ length: width + 1 }, () => [] as number[]);
+  for (let x = 0; x <= 5; x++) columns[x] = [20];
+  columns[6] = [90];
+  const inBounds = (x: number, y: number) => x >= 0 && x <= width && y >= 0 && y <= height;
+  return {
+    width, height, stride, blocked, forbidden, standable, columns,
+    player: { size: { w: 4, h: 6 }, anchor: { x: 0.5, y: 1 }, foot: { x: 2, y: 20 }, coverage: "partial" },
+    solids: [],
+    coverage: "partial",
+    freeAt: (x, y) => inBounds(x, y) && forbidden[x * stride + y] === 0,
+    standableAt: (x, y) => inBounds(x, y) && standable[x * stride + y] === 1,
+    startCells: () => [CLIFF_SPAWN],
   };
-  const run = (graph: MovementGraph, goalRegion: { x: number; y: number; w: number; h: number }) =>
-    computePermanentEvasion({
-      spawnCell: SPAWN,
-      goalRegion,
-      gateRect: { x: 0, y: 0, w: 1, h: 1 },
-      move: MOVE,
-      graph,
-    });
+};
+const runCliff = (graph: MovementGraph, goalRegion: { x: number; y: number; w: number; h: number }) =>
+  computePermanentEvasion({
+    spawnCell: CLIFF_SPAWN,
+    goalRegion,
+    gateRect: { x: 0, y: 0, w: 1, h: 1 },
+    move: CLIFF_MOVE,
+    graph,
+  });
+
+describe("U4-05 图割判据与 reach 消费", () => {
 
   it("精确 spawn：输入图的 startCells 宽松多起点被覆盖为单一种子", () => {
-    const g = synthGraph();
-    const loose = { ...g, startCells: () => [SPAWN, { x: 30, y: 94 }] };
-    const half = run(loose, { x: 30, y: 10, w: 2, h: 2 });
+    const g = cliffGraph();
+    const loose = { ...g, startCells: () => [CLIFF_SPAWN, { x: 30, y: 94 }] };
+    const half = runCliff(loose, { x: 30, y: 10, w: 2, h: 2 });
     expect(half.graphCut!.evidence).toContain("seeds=1");
     expect(withExactSpawnSeed(g, { x: 4, y: 20 }).startCells()).toEqual([{ x: 4, y: 20 }]);
     // 只替换种子函数，其余静态底座共享。
-    expect(withExactSpawnSeed(g, SPAWN).freeAt(3, 20)).toBe(g.freeAt(3, 20));
-    expect(withExactSpawnSeed(g, SPAWN).width).toBe(g.width);
+    expect(withExactSpawnSeed(g, CLIFF_SPAWN).freeAt(3, 20)).toBe(g.freeAt(3, 20));
+    expect(withExactSpawnSeed(g, CLIFF_SPAWN).width).toBe(g.width);
   });
 
   it("可达目标：落脚点覆盖 => goalIntersections=1，verdict 仍为 conditional", () => {
-    const half = run(synthGraph(), { x: 2, y: 14, w: 4, h: 6 });
+    const half = runCliff(cliffGraph(), { x: 2, y: 14, w: 4, h: 6 });
     expect(half.graphCut!.goalIntersections).toBe(1);
     expect(half.graphCut!.verdict).toBe("conditional");
     expect(half.status).toBe("INCOMPLETE");
   });
 
   it("不可达目标：无落脚点、无空中触达 => 0 / 0，图割半部照常产出", () => {
-    const half = run(synthGraph(), { x: 30, y: 10, w: 2, h: 2 });
+    const half = runCliff(cliffGraph(), { x: 30, y: 10, w: 2, h: 2 });
     expect(half.graphCut!.goalIntersections).toBe(0);
     expect(half.graphCut!.midAirHits).toBe(0);
     expect(half.graphCut!.verdict).toBe("conditional");
@@ -229,16 +230,16 @@ describe("U4-05 图割判据与 reach 消费", () => {
   });
 
   it("mid-air 仅触达：midAirHits=1 且落脚点未覆盖（只作否决，不是正面证明）", () => {
-    const half = run(synthGraph(), { x: 10, y: 50, w: 1, h: 2 });
+    const half = runCliff(cliffGraph(), { x: 10, y: 50, w: 1, h: 2 });
     expect(half.graphCut!.goalIntersections).toBe(0);
     expect(half.graphCut!.midAirHits).toBe(1);
     expect(half.graphCut!.verdict).toBe("conditional");
   });
 
   it("evidence 确定性且 verdict 恒 conditional", () => {
-    const g = synthGraph();
-    const a = run(g, { x: 30, y: 10, w: 2, h: 2 }).graphCut!;
-    const b = run(g, { x: 30, y: 10, w: 2, h: 2 }).graphCut!;
+    const g = cliffGraph();
+    const a = runCliff(g, { x: 30, y: 10, w: 2, h: 2 }).graphCut!;
+    const b = runCliff(g, { x: 30, y: 10, w: 2, h: 2 }).graphCut!;
     expect(JSON.stringify(a)).toBe(JSON.stringify(b));
     expect(a.evidence).toMatch(/^reach@full; seeds=1; footpoints=\d+; goalIntersections=0; midAirHits=0; verdict=conditional$/);
   });
@@ -420,6 +421,62 @@ describe("U4-07 模型闭合、降级映射与输出边界", () => {
       expect(half.hopSamplingCoverage!.method).toBe(
         half.hopSamplingCoverage!.covered ? "normalized" : "insufficient",
       );
+    }
+  });
+});
+
+
+describe("U4-08 D4 §11 反例矩阵（U4 部分：5、7–12）", () => {
+  const source = readFileSync(
+    fileURLToPath(new URL("../src/playability/temporal-evasion.ts", import.meta.url)),
+    "utf8",
+  );
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const BRIDGE_GOAL = { x: 6, y: 14, w: 1, h: 1 } as const;
+
+  it("反例 5：goalRegion 必须已外扩 0.5px；未外扩会漏判 0.3px 的边界接触", () => {
+    const pristine = runGap(gapGraph(), { x: 3, y: 20.2, w: 1, h: 1 });
+    const inflated = runGap(gapGraph(), { x: 3, y: 19.7, w: 1, h: 1 });
+    expect(pristine.graphCut!.goalIntersections).toBe(0);
+    expect(inflated.graphCut!.goalIntersections).toBe(1);
+    // mid-air 是独立否决项（此处粗档弧在缺口上空漂移会命中），不改变「未覆盖」这一事实。
+  });
+
+  it("反例 7：midAirHits 只作否决证据，不作「不存在空中触达」的正面证明", () => {
+    const half = runCliff(cliffGraph(), { x: 10, y: 50, w: 1, h: 2 });
+    expect(half.graphCut!.goalIntersections).toBe(0);
+    expect(half.graphCut!.midAirHits).toBe(1);
+    expect(half.graphCut!.verdict).toBe("conditional");
+    expect(half.reason).toBe("graph-cut-incomplete");
+  });
+
+  it("反例 8：精确 spawn 出发，不用 startCells 的宽松多起点", () => {
+    const loose = { ...gapGraph(), startCells: () => [GAP_SPAWN, { x: 9, y: 20 }] };
+    const half = runGap(loose, FAR_GOAL);
+    expect(half.graphCut!.evidence).toContain("seeds=1");
+  });
+
+  it("反例 9：两档都跑，不只看倍档或单条 hop 边", () => {
+    const half = runGap(gapGraph([[4, 17]]), BRIDGE_GOAL);
+    expect(half.hopDoubling!.connectivityPreserved).toBe(false);
+    expect(half.hopDoubling!.base.endpoints).toContainEqual([6, 20]);
+    expect(half.hopDoubling!.doubled.endpoints).not.toContainEqual([6, 20]);
+  });
+
+  it("反例 10：判据是 F1 ⊆ F2，不是 n_doubled === 2·n_base", () => {
+    expect(normalPositionsCovered(6, 18)).toBe(true);
+    expect(normalPositionsCovered(7, 13)).toBe(false);
+  });
+
+  it("反例 11：不把图割不连通写成 Runtime 不可达", () => {
+    expect(code).not.toMatch(/runtimeUnreachable|provenUnplayable|PROVEN_UNPLAYABLE|runtime-unreachable/);
+    expect(code).toContain('"not-proven-air-control"');
+  });
+
+  it("反例 12：模型未闭合 / coverage partial 时不发布 PU 或公共能力", () => {
+    expect(code).not.toMatch(/certificate|internalResult|publicCapability|publicVerdict|puConditions/);
+    for (const goal of [FAR_GOAL, BRIDGE_GOAL]) {
+      expect(runGap(gapGraph(), goal).movementModelClosure).toBe("not-proven-air-control");
     }
   });
 });

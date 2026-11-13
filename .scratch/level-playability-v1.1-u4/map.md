@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-u3` @ `1405c3f`（含 U3 实现、R3 与 U3-SIGN）**+** `wayfinder/level-playability-v1.1-i02` @ `2241e11`（PR #37 合并，含 `HopSampling` 尾参）；**U3 尚未并入 i02**
 Branch: `wayfinder/level-playability-v1.1-u4`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 · U4-07 完成；待 U4-08 测试矩阵与反例
+Status: open · 2026-11-13 · U4-08 完成；待 U4-09 回归与 R4 输入包
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**用户 2026-11-12 授权的 U4（I02-04：垂直规避图割）；不进入 U5，不改 `reach.ts`，不接生产，不发布公共 Verdict。
 >
@@ -160,6 +160,7 @@ U4-00 初始化与授权台账
 - [U4-05 图割判据与 reach 消费](issues/06-u4-05-graph-cut.md): 精确 spawn + `assessReachability(..., {full:true})`；`graphCut.verdict` 恒 `conditional`；`midAirHits=0` 只作否决；测试覆盖反例 7/8；evasion 16/16，全量 175 files / 2811 tests。
 - [U4-06 hop 双档与规范化采样覆盖](issues/07-u4-06-hop-doubling.md): 60/120Hz 两档各自完整 BFS；`F1 ⊆ F2` 整数交叉乘（非 2×）；cap / 覆盖 / 不一致降级；测试覆盖反例 9/10；evasion 22/22，全量 175 files / 2817 tests。
 - [U4-07 模型闭合、降级映射与输出边界](issues/08-u4-07-closure-boundary.md): `movementModelClosure` 恒 `not-proven-air-control`；主降级原因固定优先级；运行时恰六键、无 U5 / 公共字段；覆盖反例 11/12；evasion 29/29，全量 175 files / 2824 tests。
+- [U4-08 测试矩阵与 D4 §11 反例 5、7–12](issues/09-u4-08-tests.md): 七条反例各有具名测试；U3 反例 1–4、6、13 经 gate 48/48 确认不回归；产品代码零改动；evasion 36/36，全量 175 files / 2831 tests。
 
 ## Not yet specified
 
