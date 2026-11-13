@@ -22,6 +22,7 @@ import { parseAssetPack, parseGameConfig } from "../src/index.js";
 import type { AssetPackManifest } from "../src/assetpack.js";
 import type { GameConfig } from "../src/game-config.js";
 import type { WitnessHazard } from "../src/playability/temporal-witness.js";
+import type { TrustedAtlasInput } from "../src/playability/temporal-input.js";
 
 export type TriangleMotionArgs = {
   readonly atX?: number;
@@ -425,6 +426,16 @@ export const witnessWorld = (
   config: witnessConfig(options),
   manifest: witnessManifest(options),
 });
+
+/**
+ * TEST_ONLY `TrustedAtlasInput` 占位。
+ *
+ * 组装层（`analyzeTemporalInternal`）不消费 `trustedInput`：品牌校验由 I-01 的
+ * `auditPlayabilityTemporal` 在公共入口完成。这里只满足内部入口的类型，不伪造
+ * 任何原子几何；测试若需要真实品牌，请走 `verifyTemporalInput`。
+ */
+export const trustedInputFixture = (): TrustedAtlasInput =>
+  ({ frames: new Map(), assets: new Set(), files: [] } as unknown as TrustedAtlasInput);
 
 /** 与 config 中 hazard 实体一致的 `WitnessHazard`（motion + manifest 盒）。 */
 export const witnessHazard = (options: WitnessWorldOptions = {}): WitnessHazard => {

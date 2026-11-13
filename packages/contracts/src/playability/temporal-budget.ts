@@ -123,6 +123,9 @@ export function resolveBudgetProfile(args: {
   if (!isNonNegativeInteger(args.maxBranching) || args.maxBranching < 1) {
     return { ok: false, degradationReason: "invalid-budget" };
   }
+  if (!Number.isSafeInteger(args.maxBranching)) {
+    return { ok: false, degradationReason: "budget-bound-overflow" };
+  }
   for (const [, value] of values) {
     if (!Number.isFinite(value) || !isNonNegativeInteger(value)) {
       return { ok: false, degradationReason: "invalid-budget" };
