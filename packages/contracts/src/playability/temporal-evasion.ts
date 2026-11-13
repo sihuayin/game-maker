@@ -38,6 +38,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import type { Aabb, Vec } from "./geometry.js";
 import type { MovementGraph, MoveParams } from "./graph.js";
+import { assessReachability } from "./reach.js";
 import type { DegradationReason, PermanentGateProof, ProofStatus } from "./temporal-result.js";
 
 // ── 输出半部的类型：直接取自 D9，不另立同义类型 ──────────────────────────────
@@ -90,15 +91,53 @@ export type PermanentEvasionInput = {
 };
 
 /**
+ * @internal 把图的 `startCells()` 钉成 D3 的**精确** spawn 脚点格。
+ *
+ * `assessReachability` 的种子默认来自 `startCells()`（出生点附近一个身位内的宽松
+ * 多起点）；PU 图割只允许从精确 spawn 出发（D4 §4），因此这里覆盖种子函数，
+ * 其余字段（solid / blocked / forbidden / player / columns）全部原样共享。
+ */
+export function withExactSpawnSeed(graph: MovementGraph, spawnCell: Vec): MovementGraph {
+  return { ...graph, startCells: () => [spawnCell] };
+}
+
+/** @internal U4 图割判据（不对外承诺语义细节；半部形状取自 D9）。 */
+function graphCutOf(input: PermanentEvasionInput): EvasionGraphCut {
+  const seeded = withExactSpawnSeed(input.graph, input.spawnCell);
+  // `full: true`：走完整 BFS，不因目标提前覆盖而停；`midAir` 用 reach.ts 现有
+  // 60Hz 行为，只作否决证据（D4 §4），不参与 hop 双档参数化。
+  const assessment = assessReachability(
+    seeded,
+    input.move,
+    [{ id: "goal-region", rect: input.goalRegion }],
+    { full: true },
+  );
+  const reachableFootpoints = assessment.seen.size;
+  const goalIntersections = assessment.covered.size;
+  const midAirHits = assessment.midAir.size;
+  return {
+    verdict: "conditional",
+    reachableFootpoints,
+    goalIntersections,
+    midAirHits,
+    evidence: `reach@full; seeds=${assessment.seeds.length}; footpoints=${reachableFootpoints}; goalIntersections=${goalIntersections}; midAirHits=${midAirHits}; verdict=conditional`,
+  };
+}
+
+/**
  * @internal
  *
- * **U4-04 骨架**：目前恒返回 `INCOMPLETE` + `graph-cut-incomplete`，三个半部为
- * `null`。图割判据由 U4-05 填充，hop 双档由 U4-06，模型闭合与降级映射由 U4-07。
+ * **U4-05**：已填充图割判据；hop 双档与模型闭合由 U4-06 / U4-07 填充。
+ * 因此当前 `status` 恒为 `INCOMPLETE`、`reason` 恒为 `graph-cut-incomplete`
+ * （含 hop 半部尚未实现的含义）。
+ *
+ * 判据（D4 §4）：精确 spawn 出发的可达落脚点不得与 `goalRegion` 严格相交；
+ * `midAirHits > 0` 只作**否决**，`midAirHits = 0` 永不作为正面证明；
+ * `verdict` 只能是 `"conditional"`。
  */
 export function computePermanentEvasion(input: PermanentEvasionInput): PermanentEvasionHalf {
-  void input;
   return {
-    graphCut: null,
+    graphCut: graphCutOf(input),
     hopDoubling: null,
     hopSamplingCoverage: null,
     movementModelClosure: "not-proven-air-control",
