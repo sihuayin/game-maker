@@ -8,7 +8,7 @@
 | 分支 / base | `wayfinder/level-playability-v1.1-u5` ← `wayfinder/level-playability-v1.1-i02` @ `b41f076` |
 | 增量授权 | [07-u5-incremental-authorization.md](./07-u5-incremental-authorization.md)（amber · 2026-11-13；仅 U5 + AC-08～AC-13 + 用户签署；无 R5） |
 | 增量裁定 | [08-u5-f-certificate-decision.md](./08-u5-f-certificate-decision.md)（F 使用 `certificate.kind="none"` + IE `no-permanent-gate`） |
-| 状态 | U5 实施与证据完成；最终审计（AC-12 / AC-13）与用户签署待进行 |
+| 状态 | U5 实施与证据完成；**U5-AUDIT（AC-12 / AC-13）PASS（2026-11-13）**；用户签署待进行 |
 
 > 本报告只陈述**模型内**结果。`PUBLIC_NB` / `PUBLIC_PU` 仍为 `BLOCKED`，I-03 未接线；
 > 本报告不是公共能力声明，也不授权推送 / 建 PR / 合并。
@@ -17,7 +17,7 @@
 
 - U5-00 ～ U5-08 全部完成：基线 / 增量授权、D9 组装、预算硬化、确定性、A–J 矩阵、双档隔离、性能证据、LP-06/07 回归、白名单审计与本报告。
 - 内部结果可产出 D9 `nb-candidate` / `pu-candidate` / `insufficient-evidence`；`publicCapability` 恒 `"BLOCKED"`、`publicResult` 恒 `null`。
-- AC-08 ～ AC-13 的作者侧状态均为 **PASS**，但附有本报告 §5 的明确限制；最终审计必须独立复核。
+- AC-08 ～ AC-13 的作者侧状态均为 **PASS**，但附有本报告 §5 的明确限制；**独立最终审计（2026-11-13）已 PASS，无 FAIL / NOT_RUN**（见 `U5-final-audit.md`）。
 - LP-06/07 与 U5-00 冻结基线逐项、逐字节一致（除 `generatedAt`）。
 - 产品改动严格落在授权包 §5.2 白名单；`PUBLIC_NB` / `PUBLIC_PU`、I-03、推送 / PR / 合并均未授权。
 
@@ -137,7 +137,8 @@
 - LP 回归：`../../level-playability-v1.1-u5/evidence/07-lp-regression.md`
 - 白名单审计：`../../level-playability-v1.1-u5/evidence/08-audit.md`
 - 最终审计输入包：`../../level-playability-v1.1-u5/reports/09-audit-input-package.md`
+- 最终审计报告：`./U5-final-audit.md`
 
 ## 8. 完成声明
 
-U5 的**实施与证据**已完成：D9 组装、预算 / 确定性硬化、A–J 矩阵、双档隔离、性能证据、LP 回归与白名单审计均就绪。仍待：**独立最终审计（AC-12 / AC-13）** 与 **用户签署 U5**；在两者完成前，U5 不视为最终验收，公共能力仍 `BLOCKED`。
+U5 的**实施与证据**已完成：D9 组装、预算 / 确定性硬化、A–J 矩阵、双档隔离、性能证据、LP 回归与白名单审计均就绪。**独立最终审计（AC-08～AC-13）已于 2026-11-13 PASS，无 FAIL / NOT_RUN**（[`U5-final-audit.md`](./U5-final-audit.md)）。仍待：**用户签署 U5**；在签署前，U5 不视为最终验收，公共能力仍 `BLOCKED`。
