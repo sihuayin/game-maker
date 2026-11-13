@@ -57,3 +57,5 @@ PR 已合并并记录 commit；u4 分支已 rebase；`graph.ts` 默认行为回�
 证据：[`../evidence/03-graph-merge.md`](../evidence/03-graph-merge.md)。
 
 **下游**：U4-04（图割模块 API 骨架与输入契约）已 **unblocked**。本票未启动 U4-04。
+
+**后续更新（2026-11-13）**：U3 已完整并入 i02（PR #36 + PR #38，`d1cee1c`）；ticket 中的「U3 尚未并入 i02」为当时状态，现已解除。

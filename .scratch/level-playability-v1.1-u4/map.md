@@ -5,7 +5,7 @@ Tracker: local-markdown
 Effort: level-playability-v1.1-u4
 Authority: [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md) @ `sha256:797cd6fc7b299e22b6e90b9ef8a9567376ea3a914d70f8b6f1fc0f9a6ecedc56`（已签署；U4 由 `BLOCKED` 转为本图待实施）
 Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权 U4 并开图」· 范围**仅 U4 实施 + R4 复核门 + `graph.ts` `HopSampling` 独立审批前置**（依据 R3 PASS 与 U3-SIGN 2026-11-12）；记录落点 `.scratch/level-playability-v1.1-i02/reports/05-u4-incremental-authorization.md`（U4-00 创建）
-Baseline: `wayfinder/level-playability-v1.1-u3` @ `1405c3f`（含 U3 实现、R3 与 U3-SIGN）**+** `wayfinder/level-playability-v1.1-i02` @ `2241e11`（PR #37 合并，含 `HopSampling` 尾参）；**U3 尚未并入 i02**
+Baseline: `wayfinder/level-playability-v1.1-i02` @ `d1cee1c`（PR #36 合并 U3 实现、PR #38 合并 R3 / U3-SIGN 台账、PR #37 合并 `graph.ts` `HopSampling` 尾参）
 Branch: `wayfinder/level-playability-v1.1-u4`
 PR target: `wayfinder/level-playability-v1.1-i02`
 Status: closed · 2026-11-13 收口（R4 PASS + 用户签署 U4-SIGN）
@@ -99,7 +99,7 @@ U4 **不生成、不伪造**：`puConditions`、`geometryCoverage`、`lagMode`�
 - R4 复核会话必须与实现会话隔离；不得读作者总结 / PASS 结论 / 调试笔记。
 - U4-09 准备 Draft PR 描述与证据，但**不推送、不创建 PR**。
 - 不自动合并；R4 通过 + 用户签署后才讨论 PR 后续。
-- U3 尚未并入 i02：u4 分支已 merge i02 @ `2241e11`（保留 U3 提交）；U3 合并后，U4 PR 只需呈现本单元增量。
+- U3 与 `graph.ts` 尾参均已并入 i02（`d1cee1c`）；u4 分支相对 i02 的产品 diff 只有 U4 两个白名单文件，无需 rebase。
 
 ### 冻结的扫描约束
 
