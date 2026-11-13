@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-u3` @ `1405c3f`（含 U3 实现、R3 与 U3-SIGN）**+** `wayfinder/level-playability-v1.1-i02` @ `2241e11`（PR #37 合并，含 `HopSampling` 尾参）；**U3 尚未并入 i02**
 Branch: `wayfinder/level-playability-v1.1-u4`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 · U4-09 完成；待 U4-R4 独立复核
+Status: open · 2026-11-13 · R4 PASS，待 U4-SIGN 用户签署
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**用户 2026-11-12 授权的 U4（I02-04：垂直规避图割）；不进入 U5，不改 `reach.ts`，不接生产，不发布公共 Verdict。
 >
@@ -162,6 +162,7 @@ U4-00 初始化与授权台账
 - [U4-07 模型闭合、降级映射与输出边界](issues/08-u4-07-closure-boundary.md): `movementModelClosure` 恒 `not-proven-air-control`；主降级原因固定优先级；运行时恰六键、无 U5 / 公共字段；覆盖反例 11/12；evasion 29/29，全量 175 files / 2824 tests。
 - [U4-08 测试矩阵与 D4 §11 反例 5、7–12](issues/09-u4-08-tests.md): 七条反例各有具名测试；U3 反例 1–4、6、13 经 gate 48/48 确认不回归；产品代码零改动；evasion 36/36，全量 175 files / 2831 tests。
 - [U4-09 回归 / 白名单审计 / R4 输入包](issues/10-u4-09-regression-audit-report.md): 全量 175 files / 2831 tests 绿；U4 产品 diff 仅两个白名单新增文件；实现报告、R4 输入包、Draft PR 描述就绪（未推送）。
+- [U4-R4 独立复核](issues/11-u4-r4-review.md): fresh-context 复核人独立审计 `b884a35..0cf2e5b` 并重跑全部命令，R4-01…R4-08 全 **PASS**（无 FAIL / NOT_RUN）；hash 与授权包 SHA 匹配；R4 PASS 不授权 U5 / 推送 / PR。
 
 ## Not yet specified
 
