@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-12 · 指令原文「授权
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `c0d6981`（已含 U1、U2；U2 经 PR #34 并入）
 Branch: `wayfinder/level-playability-v1.1-u3`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-12 开图
+Status: closed · 2026-11-12 收口（R3 PASS + 用户签署 U3-SIGN）
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U3（I02-03：永久门区证明）；不进入 U4–U5，不改 `graph.ts` / `reach.ts`，不接生产。
 >
@@ -134,6 +134,8 @@ U3-00 初始化与授权台账
 - [U3-05 forbiddenInjection](issues/06-u3-05-forbidden-injection.md): 原始 `gateRect` 经 `buildGraph` 注入一次，`expandedRect` 记录；同源 / 掩码 / `standable` 逐项校验，预扩张与不同源 ⇒ `geometry-untrusted`。输入契约新增 `buildGraph` 回调（需 R3 关注）。
 - [U3-06 测试矩阵与 D4 反例](issues/07-u3-06-tests.md): gate 测试收束为 48 条；D4 §11 的 1–4、6、13 全部有断言，产品代码零改动。
 - [U3-07 回归 / 白名单审计 / 实现报告](issues/08-u3-07-regression-audit-report.md): 全量 174 files / 2795 tests 绿；产品 diff 仅两个白名单新增文件；实现报告、R3 输入包、Draft PR 描述就绪（未推送）。
+- [U3-R3 独立复核](issues/09-u3-r3-review.md): fresh-context 复核人独立审计 `c0d6981..d479816` 并重跑全部命令，R3-01…R3-08 全 **PASS**（无 FAIL / NOT_RUN）；产品 diff 仅两个新增文件，hash 与授权包 SHA 均匹配；R3 PASS 不授权 U4 / 推送 / PR。
+- [U3-SIGN 用户签署 R3](issues/10-u3-sign.md): 用户 `amber` 2026-11-12 签署，接受 R3 PASS；范围仅 U3 / I-02 R3；地图收口。**签署不授权 U4 / U5、公共 NB / PU、I-03、推送 / PR / 合并。**
 
 ## Not yet specified
 
