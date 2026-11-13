@@ -1,8 +1,8 @@
 # U4-03 graph.ts 尾参独立 PR 推送与合并门
 
 Type: task
-Status: in-progress
-Owner: claude (U4-03 session 2026-11-12) / merge pending user confirmation
+Status: resolved
+Owner: claude (U4-03 session 2026-11-12/13) + amber (merge authorization)
 Blocked by: 03
 Map: ../map.md
 Class: U4 / APPROVAL (HITL)
@@ -36,3 +36,24 @@ PR 已合并并记录 commit；u4 分支已 rebase；`graph.ts` 默认行为回�
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。PR #37 已合并，U4 执行门解除。**
+
+| 项 | 结果 |
+| --- | --- |
+| PR | [#37 U4: graph.ts HopSampling tail param](https://github.com/sihuayin/game-maker/pull/37) |
+| 状态 | **MERGED** · 2026-11-13T01:31:51Z（merge commit） |
+| 合并 commit | `2241e1192b26466b50d0e918d543aaf47cd340a8` |
+| i02 HEAD | `2241e11` |
+| CI | `check` 35s ✅ / `test` 5m1s ✅ / `typecheck` 50s ✅ |
+| 用户指令 | 2026-11-12 授权「CI 绿后合并」 |
+| u4 分支 | merge i02 @ `2241e11` → 本地 merge commit `b884a35`（保留 U3 提交；U3 尚未并入 i02） |
+| 合并后复跑 | build / typecheck 0；graph+evasion+gate+input **129 / 129**；全量 **175 files / 2800 tests**，退出码 **0** |
+
+**执行门**：独立审批（U4-01）+ 独立 PR 先合并（U4-03）均已完成 ⇒ **U4 实施解锁**。
+
+证据：[`../evidence/03-graph-merge.md`](../evidence/03-graph-merge.md)。
+
+**下游**：U4-04（图割模块 API 骨架与输入契约）已 **unblocked**。本票未启动 U4-04。

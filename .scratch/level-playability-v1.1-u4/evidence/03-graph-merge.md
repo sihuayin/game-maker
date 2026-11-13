@@ -16,3 +16,34 @@
 
 - 本 PR 只含 `graph.ts` 尾参与默认等价测试；**不是 U4 实施 PR**，不授权 U4。
 - 合并前 U4 执行门保持 `BLOCKED`。
+
+## 合并结果（2026-11-13）
+
+| 项 | 值 |
+| --- | --- |
+| PR #37 状态 | **MERGED** · 2026-11-13T01:31:51Z |
+| 合并方式 | merge commit |
+| 合并 commit | `2241e1192b26466b50d0e918d543aaf47cd340a8` |
+| i02 HEAD（合并后） | `2241e11`（PR #37 merge） |
+| CI | `check` 35s ✅ / `test` 5m1s ✅ / `typecheck` 50s ✅ |
+| u4 分支并入 i02 | 本地 merge commit `b884a35`（`U4: take merged graph.ts tail param from i02`） |
+
+> **基准确认**：U3 仍未并入 i02；因此 u4 分支采用「把已合并的 i02 merge 进 u4」而不是 rebase，以保留 U3 提交。待 U3 并入 i02 后，U4 PR 只需呈现本单元增量。
+
+## 合并后复跑（u4 分支 @ `b884a35`）
+
+| 命令 | 退出码 | 结果 |
+| --- | ---: | --- |
+| `pnpm build` | **0** | 通过 |
+| `pnpm typecheck` | **0** | 通过 |
+| graph + evasion + gate + temporal-input | **0** | 4 files / **129 tests passed**（11 + 5 + 48 + 65） |
+| `pnpm test` | **0** | **175 files / 2800 tests passed**；2 条 `onTaskUpdate` RPC 超时（非断言失败） |
+
+## 执行门状态
+
+U4 执行门的两项条件均已满足：
+
+1. `graph.ts` `HopSampling` 独立书面审批（U4-01，amber，2026-11-12）；
+2. 独立 PR #37 先合并（2026-11-13）。
+
+⇒ **U4 实施解锁**，下一 frontier 为 U4-04（图割模块 API 骨架与输入契约）。
