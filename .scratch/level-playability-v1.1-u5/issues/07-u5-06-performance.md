@@ -1,8 +1,8 @@
 # U5-06 性能证据
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U5-06 session 2026-11-13)
 Blocked by: 06
 Map: ../map.md
 Class: U5 / EVIDENCE
@@ -38,4 +38,26 @@ Class: U5 / EVIDENCE
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 冻结路径脚本已创建并复跑；记录语料 SHA / freeze、环境、两档分布、`phaseGridCapped` / N 分布与 3 进程确定性摘要。**只作证据，不接 CI，不改变任何语义预算或证明结论。**
+
+| 项 | 结果 |
+| --- | --- |
+| 脚本 | `.scratch/level-playability-v1.1-i02/scripts/bench-temporal.mjs`（冻结路径） |
+| 输出 | `.scratch/level-playability-v1.1-u5/evidence/06-performance.json` |
+| 语料 | inventory SHA `sha256:ba1d051a…f74f`；freeze `sha256:25e6c891…983d`；usable 150 / unique pairs 96 / unique configs 20；实际分析 20；解析排除 0 |
+| 环境 | Node v22.23.2 · Darwin 24.6.0 · arm64 · Apple M4 · 10 cores · 16 GiB |
+| 历史语料 | **20 / 20 `insufficient-evidence`，全部在输入 / 几何阶段早退**；states / edges / cuts p50=max=0；`N` 分布 `{"0":20}`；`phaseGridCapped` 0；预算触顶 0；wallMs p50 1 / max 4（第一档） |
+| 关键发现 | 19 关历史语料在 I-02 模型下不进入相位网格 / 搜索；不能用来证明生产搜索预算分布。完成报告必须原样写明 |
+| Synthetic sanity | `synthetic-nb`：nb-candidate，N=4，states 76 / edges 64 / segments 64 / witness 44 转移·1251 B；`synthetic-pu`：pu-candidate，N=4，states 114 / edges 111 / segments 111；仅作脚本 sanity，不冒充生产语料 |
+| 跨进程 | 父 + 2 子共 3 进程摘要 `sha256:2909f2b3…7aac`，三次相同；`equal: true` |
+| 命令 | `pnpm build` 0；`pnpm typecheck` 0；架构断言 65 / 65；预算 26 / 26；bench 退出码 0；`pnpm test` 176 files / 2877 tests，退出码 0 |
+
+### 已知限制
+
+- 历史语料全部早退，搜索分布为 0；synthetic 世界只作 sanity，不是生产预算证据。
+- `wallClockMs` 依赖环境，不构成通过条件；不接 CI 门禁。
+- `hopSamplesChecked` 仍为 0（U5-02 已知缺口）；U4 图割 / hop 的耗时只体现在 synthetic PU 的总 `wallMs`。
+- 不得用重跑 / 扩预算 / 换算法掩盖失败；语义结论仍由 `playability-temporal.test.ts` / `playability-temporal-budget.test.ts` 承担。
+- F 已按增量裁定 08 使用 `none` + `no-permanent-gate`。
+
+证据：[`../evidence/06-performance.md`](../evidence/06-performance.md)、[`../evidence/06-performance.json`](../evidence/06-performance.json)。本票未推送 / 建 PR / 合并。
