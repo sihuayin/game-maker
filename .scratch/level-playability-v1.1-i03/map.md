@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-13 · I03-01 完成；I03-02 为下一 frontier 票
+Status: open · 2026-11-13 · I03-02 完成；frontier：I03-03 / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -77,6 +77,7 @@ Status: open · 2026-11-13 · I03-01 完成；I03-02 为下一 frontier 票
 
 ## Decisions so far
 
+- [I03-02 公共 Verdict 与 coverage 语义](issues/03-i03-02-verdict-coverage.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；内部 nb/pu-candidate 在 `PUBLIC_*` BLOCKED 时一律映射 IE；替换 `moving-hazard-phase` gap 为能力门控 temporal 层；`coverage.temporal` 适用即约束；现有三层 PU/IE 优先；temporal 非阻断。未改产品代码。
 - [I03-01 I-02 内部结果 → 公共证据映射](issues/02-i03-01-evidence-mapping.md): Q1=A / Q2=A / Q3=B / Q4=A / Q5=A；公共 evidence 用 model/lag/degradation/limits 摘要 + `kind:"temporal"` witness；`coverage.temporal` 用 `checked|partial|unknown`；D9 20 码 many-to-one 到 13 个公共 degradation 值；`lag.perLag` 两档结论；judgmentId `PLAYABILITY_TEMPORAL_EVIDENCE` 非阻断。未改产品代码。
 - [I03-00 初始化、范围冻结、授权台账与包骨架](issues/01-i03-00-init.md): 分支 / base / 授权包 SHA / 输入基线 / 台账 / DRAFT 包骨架就绪；产品目录零 diff；`PUBLIC_NB` / `PUBLIC_PU` 仍 `BLOCKED`；I-03 实施未授权。I03-01 为下一 frontier。
 - [I-03 地图前沿裁定](reports/00-frontier-ruling.md): Q1=A / Q2=分阶段 / Q3=最小面 / Q4=A；Destination 是可签署的 I-03 实施授权包；`PUBLIC_NB` 接线 / 证据准入 ≠ 开放；`PUBLIC_PU` 持续 `BLOCKED`；第一阶段非阻断；实施另开 effort。
