@@ -1,8 +1,8 @@
 # U4-09 回归 / 白名单审计 / R4 输入包
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U4-09 session 2026-11-13)
 Blocked by: 09
 Map: ../map.md
 Class: U4 / VERIFICATION
@@ -47,3 +47,28 @@ Class: U4 / VERIFICATION
 ## Answer
 
 （resolved 时填写）
+
+## Answer
+
+**完成。** 回归全绿、白名单审计通过、实现报告与 R4 输入包就绪；未推送、未建 PR。
+
+| 项 | 结果 |
+| --- | --- |
+| `pnpm build` | 退出码 **0** |
+| `pnpm typecheck` | 退出码 **0** |
+| evasion 定向 | 退出码 **0**；**36 / 36 passed** |
+| gate 回归 | 退出码 **0**；**48 / 48 passed** |
+| graph 回归 | 退出码 **0**；**11 / 11 passed** |
+| temporal-input verbose | 退出码 **0**；**65 / 65 passed**；T-55/57/58/61/62/64 全 ✓ |
+| `pnpm test` | 退出码 **0**；**175 / 175 files，2831 / 2831 tests passed**；2 条 `onTaskUpdate` RPC 超时（非断言失败） |
+| U4 白名单 diff | `b884a35..HEAD` 仅 `temporal-evasion.ts`（新增）与 evasion 测试（新增） |
+| `graph.ts` | `13b4e3b..HEAD` 零 diff（只来自 PR #37） |
+| `temporal.ts` / `reach.ts` / `docs/` / `fixtures/` | **零 diff** |
+| 依赖 / 锁文件 / JSON fixture / barrel | **零 diff** |
+| 实现报告 | [`../reports/09-implementation.md`](../reports/09-implementation.md) |
+| R4 输入包 | [`../reports/09-r4-input-package.md`](../reports/09-r4-input-package.md)（验收项留空，无作者结论） |
+| Draft PR 描述 | [`../reports/09-draft-pr.md`](../reports/09-draft-pr.md)（**未推送、未创建**） |
+
+证据：[`../evidence/09-regression-audit.md`](../evidence/09-regression-audit.md)（原始输出 `09-*.log`，不入库）。
+
+**下游**：U4-R4（独立复核）已 **unblocked**。**该票必须由未参与 U4 实现的独立会话执行**；本会话不启动 R4，也不预判其结论。
