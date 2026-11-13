@@ -18,10 +18,48 @@
 //   保守 IE，不判为不适用。验证范围 = player + 配置引用的 hazard / pickup / goal。
 // ─────────────────────────────────────────────────────────────────────────────
 import type { AssetPackManifest } from "../assetpack.js";
+import { FALLBACK_ANCHOR, playerMoveOf } from "../game-config.js";
 import type { GameConfig } from "../game-config.js";
+import type { Aabb } from "./geometry.js";
+import { expandBox } from "./geometry.js";
+import { buildMovementGraph } from "./graph.js";
+import type { MovementGraph } from "./graph.js";
+import { runtimeEntityGeometry } from "./profile.js";
+import {
+  BUDGET_DEFAULTS,
+  deriveMaxBranching,
+  deriveMaxEdges,
+  resolveBudgetProfile,
+} from "./temporal-budget.js";
+import { computePermanentEvasion } from "./temporal-evasion.js";
+import type { PermanentEvasionHalf } from "./temporal-evasion.js";
+import { computePermanentGate } from "./temporal-gate.js";
+import type { PermanentGateHalf } from "./temporal-gate.js";
+import type { HazardBoxSpec, TriangleMotion } from "./temporal-motion.js";
+import type {
+  BudgetKind,
+  BudgetProfile,
+  BudgetStatus,
+  Certificate,
+  DegradationReason,
+  Diagnostics,
+  GeometryCoverage,
+  InternalBudget,
+  InternalResultState,
+  PermanentGateProof,
+  PuCondition,
+  Stats,
+  TemporalInternalResult,
+} from "./temporal-result.js";
+import {
+  createWitnessWorkBudget,
+  encodeWitness,
+  resolveWitnessSpace,
+  searchWinningSet,
+} from "./temporal-witness.js";
+import type { WitnessHazard, WitnessSpace, WitnessWorkSnapshot } from "./temporal-witness.js";
 import type { PlayabilityVerdictState } from "./verdict.js";
 import { isTrustedAtlasInput, type TrustedAtlasInput } from "./temporal-input.js";
-import type { InternalBudget, TemporalInternalResult } from "./temporal-result.js";
 
 /** 逐帧延迟（约 60Hz）。I01-04：唯一具名常量，不复用 mechanic.ts 的帧余量常量。 */
 export const TEMPORAL_LAG_MS = 16.67;
@@ -120,8 +158,9 @@ export function resolveTwoLagResults(a: TemporalAuditResult, b: TemporalAuditRes
 // ⚠️ 这些符号**不**进 `playability/index.ts` / `contracts/src/index.ts`：`api.ts` 只按
 //   名字转出 I-01 的公共编排，不转出内部入口。`testHooks` 不是生产参数。
 //
-// ⚠️ `analyzeTemporalInternal` **不在 U1 实现**：本票只建立入口类型与签名辅助，
-//   不新增任何分析结果、不接生产 Verdict。U1 的 `certificate` 恒为 `{ kind: "none" }`。
+// ⚠️ `analyzeTemporalInternal` 的实现在 U5-01 组装层补齐：它把 U2（Witness / W）、
+//   U3（门区半部）、U4（图割半部）汇成 D9 内部结果。仍然**不接生产**、不发布
+//   公共 Verdict；`publicCapability` 恒为 `"BLOCKED"`、`publicResult` 恒为 `null`。
 
 /** @internal I-02 内部入口输入；`start / goal / corridor` 由 `GameConfig` + profile 派生。 */
 export type TemporalInternalInput = {
@@ -189,4 +228,599 @@ export function determinismSignature(result: TemporalInternalResult): string {
       secondaryReasons: result.diagnostics.secondaryReasons,
     },
   }));
+}
+
+
+// ── U5-01：D9 内部结果组装（@internal）──────────────────────────────────────
+//
+// 组装顺序：模型适用性 → 预算 → U2 状态格 → NB（∀φ0 Winning Set）→ PU（U3 门区 + U4 图割）。
+//
+//   - NB 与 PU 是独立证明分支；任一完整成立即可给出内部候选，二者都不成立才 IE。
+//   - NB 候选由 `∀φ0` Winning Set 承载（D10 §2）：I-02 的 `coverage.temporal` 恒为
+//     `partial`，D10 §1.1 要求 U9 的 `checked` 前置不成立，因此 U9 不参与组装；这不是
+//     把 U9 改写成非必要。
+//   - 任何预算 / 模型 / 几何缺口都只降级为 IE；不伪造部分证书，不发布公共 Verdict。
+//   - 门区半部 INCOMPLETE 时 `PermanentGateProof` 没有可如实填充的完整字段，因此
+//     证书为 `none`（D9 §10.5）；只有门区 COMPLETE 而图割 / hop 不完整时才保留
+//     `permanent-gate + INCOMPLETE` 的部分证明。
+
+/** @internal 内部几何可信度；I-02 内恒为 manifest 元数据 + 未验证 Runtime 体。 */
+const GEOMETRY_COVERAGE: GeometryCoverage = {
+  chain: "manifest+atlas-metadata",
+  runtimeBody: "unverified",
+  coverage: "partial",
+};
+
+/** @internal 未建立状态格时的网格快照。 */
+const emptyGrid = (): Stats["grid"] => ({
+  phaseSteps: 0,
+  dtMs: 0,
+  xStep: 1,
+  xPositions: 0,
+  stateCapacity: 0,
+  phaseGridCapped: false,
+  phaseCapReason: null,
+  N_max: 0,
+});
+
+const emptyWork = (): Stats["work"] => ({
+  statesEnqueued: 0,
+  statesVisited: 0,
+  edgesChecked: 0,
+  cutPointsTotal: 0,
+  segmentsTotal: 0,
+  hopSamplesChecked: 0,
+  witnessTransitions: 0,
+  witnessBytes: 0,
+  maxBranching: 0,
+  workUnitsSinceLastCheckpoint: 0,
+});
+
+/** @internal 非法预算 / 早期失败时仍要给出可审计预算快照。 */
+const fallbackBudgetProfile = (): BudgetProfile => ({
+  ...BUDGET_DEFAULTS,
+  maxEdges: deriveMaxEdges(BUDGET_DEFAULTS.maxStates, 2),
+});
+
+const elapsedSince = (now: () => number, startedAt: number): number =>
+  Math.max(0, now() - startedAt);
+
+/** @internal 二次原因去重并按字典序稳定排序（locale-independent）。 */
+const sortedReasons = (reasons: readonly DegradationReason[]): readonly DegradationReason[] => {
+  const unique = [...new Set(reasons)];
+  unique.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return unique;
+};
+
+/** @internal 跨分支主原因优先级：预算 > 模型 / 几何 > 普通否定证据。 */
+const reasonRank = (reason: DegradationReason): number => {
+  switch (reason) {
+    case "invalid-budget":
+    case "budget-bound-overflow":
+      return 0;
+    case "wall-clock-abort":
+    case "state-budget-exhausted":
+    case "edge-budget-exhausted":
+    case "cut-budget-exhausted":
+    case "witness-volume":
+    case "hop-sample-budget":
+      return 1;
+    case "model-out":
+    case "geometry-untrusted":
+    case "spawn-not-on-lattice":
+    case "goal-not-representable":
+    case "goal-rect-degenerate":
+    case "grid-resolution-infeasible":
+      return 2;
+    default:
+      return 3;
+  }
+};
+
+const primaryReason = (a: DegradationReason, b: DegradationReason): DegradationReason => {
+  const rankA = reasonRank(a);
+  const rankB = reasonRank(b);
+  if (rankA !== rankB) return rankA < rankB ? a : b;
+  return a <= b ? a : b;
+};
+
+/** @internal 组装中的可变部分；`finalizeInternal` 负责补 stats 与确定性签名。 */
+type InternalDraft = {
+  readonly internalResult: InternalResultState;
+  readonly certificate: Certificate;
+  readonly degradationReason: DegradationReason | null;
+  readonly secondaryReasons?: readonly DegradationReason[];
+  readonly budgetStatus: BudgetStatus;
+  readonly budgetKind: BudgetKind | null;
+  readonly budgetProfile: BudgetProfile;
+  readonly grid?: Stats["grid"];
+  readonly work?: Stats["work"];
+  readonly timing?: Stats["timing"];
+  readonly detail?: string;
+};
+
+const finalizeInternal = (draft: InternalDraft): TemporalInternalResult => {
+  const stats: Stats = {
+    grid: draft.grid ?? emptyGrid(),
+    work: draft.work ?? emptyWork(),
+    timing: draft.timing ?? {
+      wallClockMs: 0,
+      timeBudgetCheckpointWork: draft.budgetProfile.timeBudgetCheckpointWork,
+    },
+    budget: {
+      budgetProfile: draft.budgetProfile,
+      budgetStatus: draft.budgetStatus,
+      budgetKind: draft.budgetKind,
+    },
+    determinismSignature: "",
+  };
+  const result: TemporalInternalResult = {
+    internalResult: draft.internalResult,
+    modelConditional: true,
+    publicCapability: "BLOCKED",
+    publicResult: null,
+    certificate: draft.certificate,
+    stats,
+    diagnostics: {
+      degradationReason: draft.degradationReason,
+      secondaryReasons: sortedReasons(draft.secondaryReasons ?? []),
+      ...(draft.detail === undefined ? {} : { detail: draft.detail }),
+    },
+  };
+  return {
+    ...result,
+    stats: { ...stats, determinismSignature: determinismSignature(result) },
+  };
+};
+
+/** @internal 单移动 Hazard 的解析结果；失败只用 D9 闭集原因码。 */
+type MoverResolution =
+  | { readonly ok: true; readonly motion: TriangleMotion; readonly hazard: WitnessHazard }
+  | { readonly ok: false; readonly reason: DegradationReason };
+
+/**
+ * @internal 解析 I-02 唯一支持的移动模型：单个、沿 X 轴、`cycle` 三角波 Hazard。
+ *
+ * 模型外（Y 轴 / 多移动 Hazard / Moving Platform / Danger 联合）一律 `model-out`；
+ * Hazard 资源或几何不可解一律 `geometry-untrusted`。不做静默近似。
+ */
+const resolveMover = (config: GameConfig, manifest: AssetPackManifest): MoverResolution => {
+  const hazards = config.entities.filter(
+    (entity) => entity.kind === "hazard" && entity.motion !== undefined,
+  );
+  if (hazards.length !== 1) return { ok: false, reason: "model-out" };
+  const entity = hazards[0]!;
+  const motion = entity.motion!;
+  if (motion.axis !== "x") return { ok: false, reason: "model-out" };
+  if (config.entities.some((other) => other.kind === "solid" && other.motion !== undefined)) {
+    return { ok: false, reason: "model-out" };
+  }
+  if (config.entities.some((other) => other.kind === "danger" && other.strike !== undefined)) {
+    return { ok: false, reason: "model-out" };
+  }
+
+  const asset = manifest.assets.find((candidate) => candidate.id === entity.asset);
+  const geometry = runtimeEntityGeometry(entity, manifest);
+  if (!asset || !geometry) return { ok: false, reason: "geometry-untrusted" };
+  if (!Number.isFinite(motion.periodMs) || motion.periodMs <= 0) {
+    return { ok: false, reason: "grid-resolution-infeasible" };
+  }
+
+  const triangle: TriangleMotion = {
+    at: { x: entity.at.x, y: entity.at.y },
+    distance: motion.distance,
+    periodMs: motion.periodMs,
+  };
+  const box: HazardBoxSpec = {
+    size: { w: geometry.box.w, h: geometry.box.h },
+    anchor: asset.anchor ?? FALLBACK_ANCHOR,
+  };
+  return { ok: true, motion: triangle, hazard: { motion: triangle, box } };
+};
+
+const gridOf = (space: WitnessSpace): Stats["grid"] => ({
+  phaseSteps: space.grid.phaseSteps,
+  dtMs: space.grid.dtMs,
+  xStep: space.grid.xStep,
+  xPositions: space.grid.xPositions,
+  stateCapacity: space.grid.stateCapacity,
+  phaseGridCapped: space.grid.phaseGridCapped,
+  phaseCapReason: space.grid.phaseCapReason,
+  N_max: space.grid.N_max,
+});
+
+const workOf = (
+  snapshot: WitnessWorkSnapshot,
+  maxBranching: number,
+  witnessTransitions = 0,
+  witnessBytes = 0,
+): Stats["work"] => ({
+  statesEnqueued: snapshot.statesEnqueued,
+  statesVisited: snapshot.statesVisited,
+  edgesChecked: snapshot.edgesChecked,
+  cutPointsTotal: snapshot.cutPointsTotal,
+  segmentsTotal: snapshot.segmentsTotal,
+  hopSamplesChecked: 0,
+  witnessTransitions,
+  witnessBytes,
+  maxBranching,
+  workUnitsSinceLastCheckpoint: snapshot.workUnitsSinceLastCheckpoint,
+});
+
+/**
+ * @internal PU 六条件逐条状态（D4 §8 / D9 §3）。
+ *
+ * `geometry-checked` / `model-out-excluded` 恒 `BLOCKED`；其余四项只有在对应证明
+ * 完整时才是 `PASS`。禁止用单个布尔替代。
+ */
+const puConditionsOf = (
+  gate: PermanentGateHalf,
+  evasion: PermanentEvasionHalf | null,
+): readonly PuCondition[] => {
+  const gatePass =
+    gate.gateStatus === "COMPLETE" && gate.gate !== null && gate.periodCoverage !== null;
+  const evasionEvidence = evasion?.graphCut ?? null;
+  const graphPass = evasion !== null && evasion.status === "COMPLETE" && evasionEvidence !== null;
+  const hopPass =
+    graphPass &&
+    evasion !== null &&
+    evasion.hopDoubling !== null &&
+    evasion.hopDoubling.connectivityPreserved &&
+    evasion.hopDoubling.normalizedCoverage;
+
+  const conditions: PuCondition[] = [
+    gatePass
+      ? {
+          id: "gate-coverage",
+          status: "PASS",
+          evidence: `closed-form-full-period; width=${gate.gate!.width}; periodMs=${gate.periodCoverage!.periodMs}`,
+        }
+      : { id: "gate-coverage", status: "INSUFFICIENT_EVIDENCE" },
+    {
+      id: "geometry-checked",
+      status: "BLOCKED",
+      blockedReason: "runtime-body-unverified; coverage=partial",
+    },
+    graphPass
+      ? { id: "graph-cut", status: "PASS", evidence: evasionEvidence!.evidence }
+      : { id: "graph-cut", status: "INSUFFICIENT_EVIDENCE" },
+    hopPass
+      ? {
+          id: "hop-doubling",
+          status: "PASS",
+          evidence: "base/doubled complete; F1⊆F2; connectivity preserved",
+        }
+      : { id: "hop-doubling", status: "INSUFFICIENT_EVIDENCE" },
+    {
+      id: "model-out-excluded",
+      status: "BLOCKED",
+      blockedReason: "movement-model-not-proven-air-control",
+    },
+    {
+      id: "lag-consistent",
+      status: "PASS",
+      evidence: "gate-independent; witness-only; lagInvariantByConstruction",
+    },
+  ];
+  return conditions;
+};
+
+/** @internal 只有门区半部与图割半部都能如实填充时才构造 `PermanentGateProof`。 */
+const permanentGateProofOf = (
+  gate: PermanentGateHalf,
+  evasion: PermanentEvasionHalf,
+): PermanentGateProof | null => {
+  if (
+    gate.gate === null || gate.periodCoverage === null ||
+    gate.sideRule === null || gate.forbiddenInjection === null ||
+    evasion.graphCut === null || evasion.hopDoubling === null ||
+    evasion.hopSamplingCoverage === null
+  ) {
+    return null;
+  }
+  return {
+    gate: gate.gate,
+    periodCoverage: gate.periodCoverage,
+    sideRule: gate.sideRule,
+    forbiddenInjection: gate.forbiddenInjection,
+    graphCut: evasion.graphCut,
+    hopDoubling: evasion.hopDoubling,
+    hopSamplingCoverage: evasion.hopSamplingCoverage,
+    movementModelClosure: evasion.movementModelClosure,
+    puConditions: puConditionsOf(gate, evasion),
+    geometryCoverage: {
+      hazard: GEOMETRY_COVERAGE,
+      player: GEOMETRY_COVERAGE,
+      graph: GEOMETRY_COVERAGE,
+    },
+    lagMode: "gate-independent; witness-only",
+    lagInvariantByConstruction: true,
+  };
+};
+
+type GateProofOutcome = {
+  readonly status: "COMPLETE" | "INCOMPLETE";
+  readonly reason: DegradationReason | null;
+  readonly proof: PermanentGateProof | null;
+};
+
+/**
+ * @internal 跑 PU 分支：门区半部（U3）→ forbidden 注入图 → 图割半部（U4）。
+ *
+ * 图割必须消费**注入了原始 `gateRect`** 的图（D4 §3 / §4）；`gateRect` 的扩张只由
+ * `graph.ts` 完成一次，本层不预扩张。
+ */
+const runPermanentGateProof = (args: {
+  readonly config: GameConfig;
+  readonly manifest: AssetPackManifest;
+  readonly space: WitnessSpace;
+  readonly hazard: WitnessHazard;
+}): GateProofOutcome => {
+  const { config, manifest, space, hazard } = args;
+  const buildGraph = (forbiddenBoxes: readonly Aabb[]): MovementGraph | null =>
+    buildMovementGraph(config, manifest, undefined, { forbiddenBoxes });
+
+  const gate = computePermanentGate({
+    motion: hazard.motion,
+    hazard: hazard.box,
+    playerSize: space.playerSize,
+    spawnBox: space.spawn.box,
+    goalRect: space.arrival.goalRect,
+    graph: space.graph,
+    buildGraph,
+  });
+  if (gate.gateStatus !== "COMPLETE" || gate.gate === null || gate.sideRule === null) {
+    return { status: "INCOMPLETE", reason: gate.reason ?? "no-permanent-gate", proof: null };
+  }
+
+  const gateRect: Aabb = {
+    x: gate.gate.L,
+    y: gate.gate.y,
+    w: gate.gate.width,
+    h: gate.gate.height,
+  };
+  const injected = buildGraph([gateRect]);
+  if (injected === null) {
+    return { status: "INCOMPLETE", reason: "geometry-untrusted", proof: null };
+  }
+
+  const evasion = computePermanentEvasion({
+    spawnCell: { x: space.spawn.footX, y: space.spawn.footY },
+    goalRegion: gate.sideRule.goalRegion,
+    gateRect,
+    move: playerMoveOf(config),
+    graph: injected,
+  });
+  const proof = permanentGateProofOf(gate, evasion);
+  if (evasion.status === "COMPLETE" && proof !== null) {
+    return { status: "COMPLETE", reason: null, proof };
+  }
+  return {
+    status: "INCOMPLETE",
+    reason: evasion.reason ?? "graph-cut-incomplete",
+    proof,
+  };
+};
+
+/**
+ * @internal I-02 内部入口（D9 §6）。
+ *
+ * 单档 `lagMs`；两档分别调用、分别完整分析（D10 / §8.5）。`testHooks.budget` 只用于
+ * 专项测试且不得高于硬上限；`testHooks.now` 只参与墙钟 abort。
+ *
+ * 输出边界：`internalResult` 是**模型内候选**，`publicCapability` 恒 `"BLOCKED"`、
+ * `publicResult` 恒 `null`；不接生产、不发布公共 Verdict。
+ */
+export function analyzeTemporalInternal(input: TemporalInternalInput): TemporalInternalResult {
+  const now = input.testHooks?.now ?? Date.now;
+  const startedAt = now();
+  const elapsed = (): number => elapsedSince(now, startedAt);
+  const overrides = input.testHooks?.budget;
+
+  // 单档 lag 的运行时兜底；I-01 已在公共入口校验，这里防止直接调用绕过。
+  if (typeof input.lagMs !== "number" || !Number.isFinite(input.lagMs) || input.lagMs < 0) {
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: "model-out",
+      budgetStatus: "invalid",
+      budgetKind: null,
+      budgetProfile: fallbackBudgetProfile(),
+      timing: {
+        wallClockMs: elapsed(),
+        timeBudgetCheckpointWork: BUDGET_DEFAULTS.timeBudgetCheckpointWork,
+      },
+      detail: "lagMs must be finite and non-negative",
+    });
+  }
+
+  const mover = resolveMover(input.config, input.manifest);
+  if (!mover.ok) {
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: mover.reason,
+      budgetStatus: "complete",
+      budgetKind: null,
+      budgetProfile: fallbackBudgetProfile(),
+      timing: {
+        wallClockMs: elapsed(),
+        timeBudgetCheckpointWork: BUDGET_DEFAULTS.timeBudgetCheckpointWork,
+      },
+    });
+  }
+
+  // 先解析一版预算只为状态格读取 `maxStates`；最终预算在拿到网格后按 D5 重算。
+  const provisional = resolveBudgetProfile({ maxBranching: 2, overrides });
+  if (!provisional.ok) {
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: provisional.degradationReason,
+      budgetStatus: "invalid",
+      budgetKind: null,
+      budgetProfile: fallbackBudgetProfile(),
+      timing: {
+        wallClockMs: elapsed(),
+        timeBudgetCheckpointWork: BUDGET_DEFAULTS.timeBudgetCheckpointWork,
+      },
+    });
+  }
+
+  const spaceResult = resolveWitnessSpace({
+    config: input.config,
+    manifest: input.manifest,
+    budget: provisional.profile,
+    periodMs: mover.motion.periodMs,
+  });
+  if (!spaceResult.ok) {
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: spaceResult.reason,
+      budgetStatus: "complete",
+      budgetKind: null,
+      budgetProfile: provisional.profile,
+      timing: {
+        wallClockMs: elapsed(),
+        timeBudgetCheckpointWork: provisional.profile.timeBudgetCheckpointWork,
+      },
+      detail: `witness-space: ${spaceResult.gap}`,
+    });
+  }
+  const space = spaceResult;
+  const grid = gridOf(space);
+
+  const maxBranching = deriveMaxBranching({
+    maxSpeed: space.grid.maxSpeedPxPerMs,
+    periodMs: space.grid.periodMs,
+    phaseSteps: space.grid.phaseSteps,
+    xStep: space.grid.xStep,
+  });
+  const resolved = resolveBudgetProfile({ maxBranching, overrides });
+  if (!resolved.ok) {
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: resolved.degradationReason,
+      budgetStatus: "invalid",
+      budgetKind: null,
+      budgetProfile: fallbackBudgetProfile(),
+      grid,
+      timing: {
+        wallClockMs: elapsed(),
+        timeBudgetCheckpointWork: BUDGET_DEFAULTS.timeBudgetCheckpointWork,
+      },
+    });
+  }
+  const profile = resolved.profile;
+
+  // ── NB 分支：∀φ0 Winning Set（D10 §2）────────────────────────────────────
+  const nbBudget = createWitnessWorkBudget({ profile, now });
+  const winning = searchWinningSet({
+    space,
+    hazard: mover.hazard,
+    lagMs: input.lagMs,
+    budget: nbBudget,
+  });
+  const nbSnapshot = winning.budgets;
+  const nbTiming: Stats["timing"] = {
+    wallClockMs: nbSnapshot.wallClockMs,
+    timeBudgetCheckpointWork: nbSnapshot.timeBudgetCheckpointWork,
+  };
+  const nbWork = workOf(nbSnapshot, maxBranching);
+
+  if (winning.status === "complete") {
+    const encoded = encodeWitness({
+      form: "winning-set",
+      space,
+      hazard: mover.hazard,
+      lagMs: input.lagMs,
+      budget: profile,
+      result: winning,
+    });
+    if (encoded.ok) {
+      return finalizeInternal({
+        internalResult: "nb-candidate",
+        certificate: { kind: "witness", status: "COMPLETE", witness: encoded.witness },
+        degradationReason: null,
+        budgetStatus: nbSnapshot.budgetStatus,
+        budgetKind: nbSnapshot.budgetKind,
+        budgetProfile: profile,
+        grid,
+        work: workOf(nbSnapshot, maxBranching, encoded.witness.volume.transitions, encoded.witness.volume.bytes),
+        timing: nbTiming,
+      });
+    }
+
+    // W 已证明 NB；编码失败只降级 IE，绝不再去主张 PU（否则会产出假 PU）。
+    const encodeBudget: { status: BudgetStatus; kind: BudgetKind | null } =
+      encoded.reason === "witness-volume"
+        ? { status: "exhausted", kind: "witness-volume" }
+        : encoded.reason === "invalid-budget"
+          ? { status: "invalid", kind: null }
+          : { status: nbSnapshot.budgetStatus, kind: nbSnapshot.budgetKind };
+    return finalizeInternal({
+      internalResult: "insufficient-evidence",
+      certificate: { kind: "none" },
+      degradationReason: encoded.reason,
+      budgetStatus: encodeBudget.status,
+      budgetKind: encodeBudget.kind,
+      budgetProfile: profile,
+      grid,
+      work: nbWork,
+      timing: nbTiming,
+      detail: "winning-set search complete but witness encoding failed",
+    });
+  }
+  const nbReason: DegradationReason = winning.degradationReason ?? "no-witness-found";
+
+  // ── PU 分支：门区 + 图割 ─────────────────────────────────────────────────
+  const pu = runPermanentGateProof({
+    config: input.config,
+    manifest: input.manifest,
+    space,
+    hazard: mover.hazard,
+  });
+  const puTiming: Stats["timing"] = {
+    wallClockMs: elapsed(),
+    timeBudgetCheckpointWork: profile.timeBudgetCheckpointWork,
+  };
+
+  if (pu.status === "COMPLETE" && pu.proof !== null) {
+    return finalizeInternal({
+      internalResult: "pu-candidate",
+      certificate: { kind: "permanent-gate", status: "COMPLETE", proof: pu.proof },
+      degradationReason: null,
+      budgetStatus: "complete",
+      budgetKind: null,
+      budgetProfile: profile,
+      grid,
+      work: nbWork,
+      timing: puTiming,
+    });
+  }
+
+  const primary = pu.reason === null ? nbReason : primaryReason(nbReason, pu.reason);
+  const secondary = [nbReason, pu.reason].filter(
+    (reason): reason is DegradationReason => reason !== null && reason !== primary,
+  );
+  const nbDecisive = primary === nbReason;
+  const certificate: Certificate =
+    pu.proof === null
+      ? { kind: "none" }
+      : { kind: "permanent-gate", status: "INCOMPLETE", proof: pu.proof };
+
+  return finalizeInternal({
+    internalResult: "insufficient-evidence",
+    certificate,
+    degradationReason: primary,
+    secondaryReasons: secondary,
+    budgetStatus: nbDecisive ? nbSnapshot.budgetStatus : "complete",
+    budgetKind: nbDecisive ? nbSnapshot.budgetKind : null,
+    budgetProfile: profile,
+    grid,
+    work: nbWork,
+    timing: puTiming,
+  });
 }

@@ -1,8 +1,8 @@
 # U5-01 内部结果组装与 dispatch
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U5-01 session 2026-11-13)
 Blocked by: 01
 Map: ../map.md
 Class: U5 / IMPLEMENTATION
@@ -43,4 +43,30 @@ Class: U5 / IMPLEMENTATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** `analyzeTemporalInternal` 已实现并组装 D9 `TemporalInternalResult` / `PermanentGateProof`；生产接线零改动，未发布公共 Verdict。
+
+| 项 | 结果 |
+| --- | --- |
+| 产品改动 | `temporal.ts` +637 / −3（内部入口 + 组装 helper）；`temporal-result.ts` 零改动 |
+| 测试 | 新建 `playability-temporal.test.ts`；`TEST_ONLY` fixtures 增加 `trustedInputFixture` |
+| NB | `∀φ0` Winning Set 完整 ⇒ `nb-candidate` + `witness/COMPLETE`；U9 因 `coverage.temporal = partial`（D10 §1.1）不参与组装 |
+| PU | 门区 + 注入图 + 图割 + hop 全部完整 ⇒ `pu-candidate` + `permanent-gate/COMPLETE`；六条件 1/3/4/6 `PASS`、2/5 `BLOCKED` |
+| G | 门区完整、图割不完整 ⇒ `permanent-gate/INCOMPLETE` + `graph-cut-incomplete`，保留部分证明 |
+| 门区不成立 | IE `no-permanent-gate`，`certificate.kind = "none"`（不为失真的门区伪造证明） |
+| 模型外 | Y 轴 / 多移动 Hazard / Moving Platform / Danger `strike` ⇒ IE `model-out` |
+| 预算 | 非法 / 溢出 ⇒ IE `invalid-budget` / `budget-bound-overflow`；edge 触顶 ⇒ IE `edge-budget-exhausted` |
+| 确定性 | 重复运行签名与规范化完整序列化一致；`wallClockMs` / `detail` 不进签名 |
+| 架构断言 | T-55 / T-57 / T-58 / T-61 / T-62 / T-64 全 ✓（65 / 65） |
+| 命令 | `pnpm build` 0；`pnpm typecheck` 0；定向 9 / 9；`pnpm test` 176 files / 2840 tests，退出码 0 |
+| 白名单 | 仅 `temporal.ts`、`playability-temporal-fixtures.ts`、新建 `playability-temporal.test.ts`；其余白名单 / 只读 / 生产文件零 diff |
+
+### 必须在 U5-04 前裁定的缺口
+
+**F（短暂安全窗口）无法按票面字面要求产出 `permanent-gate + INCOMPLETE`。** D9 `PermanentGateProof` 要求门区四段齐全且 `periodCoverage.complete` 为字面量 `true`；U3 半部在门区失败时把四段全部置 `null`。当前实现选择 `certificate.kind = "none"` + IE `no-permanent-gate`，不伪造门区字段。这与 D7 §305「E/F/G 不得压扁成 `none`」及 U5-04 票面的 F 断言冲突。封闭方式（修改 `temporal-gate.ts` 保留部分诊断 / 放宽 D9 类型 / 用户裁定允许 `none`）均超出 U5-01 授权，需 STOP + HITL。
+
+### 其他限制
+
+- U4 hop / 图割工作计数尚未接入 `stats.work.hopSamplesChecked`；PU 分支暂不消费工作预算（U5-02）。
+- U9 不参与组装是 D10 §1.1 的直接结果，不是把 U9 改写为非必要。
+
+证据：[`../evidence/02-assembly.md`](../evidence/02-assembly.md)。本票未推送 / 建 PR / 合并。

@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 U5 地�
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `b41f076`（含 U1–U4 全部实现、R1–R4 报告与签署）
 Branch: `wayfinder/level-playability-v1.1-u5`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 · U5-00 完成；U5-01 为下一 frontier 票
+Status: open · 2026-11-13 · U5-01 完成；U5-02 为下一 frontier 票
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U5（I02-05）；**不设 R5**，最终由完成报告 + AC-08～AC-13 + 最终审计 + 用户签署收口。
 >
@@ -129,6 +129,7 @@ U5-00 初始化、增量授权台账与基线
 
 ## Decisions so far
 
+- [U5-01 内部结果组装与 dispatch](issues/02-u5-01-assembly.md): `analyzeTemporalInternal` 组装 D9 结果；NB（W）/ PU（门区+注入图+图割+hop）/ G 部分证明 / 模型外 / 预算路径均有测试；build 0、typecheck 0、全量 176 files / 2840 tests；生产接线零改动。**F（门区不成立）的 `permanent-gate + INCOMPLETE` 与 D9 类型冲突，已在票内登记为 U5-04 前需 HITL 裁定的缺口。**
 - [U5-00 初始化、增量授权台账与基线](issues/01-u5-00-init.md): 基线全绿（build/typecheck 0；175 files / 2831 tests）；增量授权 07 就绪，仅 U5 实施 + AC-08～AC-13 + 用户签署（无 R5）；产品目录零 diff；LP-06/07 复跑与冻结基线逐字段一致。
 
 ## Not yet specified
