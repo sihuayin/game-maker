@@ -1,8 +1,8 @@
 # U5-07 LP-06 / LP-07 回归
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (U5-07 session 2026-11-13)
 Blocked by: 07
 Map: ../map.md
 Class: U5 / VERIFICATION
@@ -40,4 +40,21 @@ Class: U5 / VERIFICATION
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 两份 LP-06 脚本退出码均为 0；与 U5-00 冻结基线逐项、逐字节一致；差异为零，未触发 STOP。
+
+| 项 | 结果 |
+| --- | --- |
+| `acceptance-corpus.mjs` | 退出码 **0**；usableConfigs 150 / uniquePairs 96 / uniqueConfigs 20 / evaluatedPairs 96 / uniqueContentPairs 31；pair PU36/IE36/NPB24；historicalDefects 3；falsePositives 0；insufficient 6 |
+| `acceptance-matrix.mjs` | 退出码 **0**；cases 39（23/6/10）；legalPairs 33；results 39；final IE11/PU19/NPB9；expectedMismatch 9；layerExpectedMismatch 2 |
+| 基线比较 | 两份 evidence JSON 剔除 `generatedAt` 后与 `HEAD` 逐字段相等；`stdout` 日志与 U5-00 基线**逐字节相同** |
+| 差异 | **0**；未触发 STOP |
+| 工作区 | 复跑后将 `.scratch/level-playability-v1-p1/evidence/06-*.json` 恢复为 `HEAD`；无产品 / 脚本 / 语料 diff |
+| 命令 | `pnpm build` 0；`pnpm typecheck` 0；架构断言 65 / 65；`pnpm test` 176 files / 2877 tests，退出码 0 |
+
+### 已知限制
+
+- LP-06/07 仍是既有非 vitest 回归，不在 CI 门禁内；本票未迁移、未改造、未包装成 I-02 测试。
+- I-02 不接生产；两种语料都不覆盖时序内部结果，“不变”是预期结果，不是时序能力证据。
+- F 已按增量裁定 08 使用 `none` + `no-permanent-gate`。
+
+证据：[`../evidence/07-lp-regression.md`](../evidence/07-lp-regression.md)。本票未推送 / 建 PR / 合并。
