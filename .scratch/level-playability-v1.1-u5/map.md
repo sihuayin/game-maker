@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 U5 地�
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `b41f076`（含 U1–U4 全部实现、R1–R4 报告与签署）
 Branch: `wayfinder/level-playability-v1.1-u5`
 PR target: `wayfinder/level-playability-v1.1-i02`
-Status: open · 2026-11-13 开图
+Status: open · 2026-11-13 · U5-00 完成；U5-01 为下一 frontier 票
 
 > **执行型 effort。** 本图 override wayfinder 默认的 plan-only：票是执行切片，不是纯决策。执行范围**严格等于**已签署授权包的 U5（I02-05）；**不设 R5**，最终由完成报告 + AC-08～AC-13 + 最终审计 + 用户签署收口。
 >
@@ -129,7 +129,7 @@ U5-00 初始化、增量授权台账与基线
 
 ## Decisions so far
 
-<!-- 关票后在此追加一行：名称链接 + 一句结论摘要 -->
+- [U5-00 初始化、增量授权台账与基线](issues/01-u5-00-init.md): 基线全绿（build/typecheck 0；175 files / 2831 tests）；增量授权 07 就绪，仅 U5 实施 + AC-08～AC-13 + 用户签署（无 R5）；产品目录零 diff；LP-06/07 复跑与冻结基线逐字段一致。
 
 ## Not yet specified
 
