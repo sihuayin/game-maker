@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-03A 完成；frontier：I03-03B / I03-03C / I03-06
+Status: open · 2026-11-14 · I03-03B 完成；frontier：I03-03B2 / I03-03C / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -86,6 +86,7 @@ Status: open · 2026-11-14 · I03-03A 完成；frontier：I03-03B / I03-03C / I0
 
 ## Decisions so far
 
+- [I03-03B 几何 probe 固定夹具矩阵](issues/14-i03-03b-fixtures.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；last-train/v2 + scratch v4 副本；hazard 2 帧 / player 8 帧 + body / graph terrain + luggage + player box；10 个单变量几何负例；正例全 checked、geometry-mismatch ⇒ untrusted、missing/env/nondeterministic ⇒ partial；scratch 夹具 + hash + 可重建。新增 I03-03B2。
 - [I03-03A 几何 probe 证据格式与 hash](issues/13-i03-03a-probe-format.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；真实浏览器 + 现有 demo；一次运行一个逐帧 JSON；零容差 + 坐标归一化；Atlas/结果 SHA-256；失败码闭集 + class；probe 是证据生成器、退出 0 不等于 checked；新增环境独立 / 夹具先冻结 / 证据不自证三条约束。未实现 probe。
 - [I03-03 几何 / Runtime hitbox 证据 gate](issues/04-i03-03-geometry-gate.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；公共 `coverage.geometry` 汇总 + 三份明细；构建期 Atlas/PNG + 运行时 Phaser probe 两层证据；NB 需 hazard+player（图割再加 graph），PU 需三份全 checked + I-00 六条件；`partial` 只是覆盖状态；probe 只读、不新增依赖、`profile.ts`/`graph.ts` 只读。新增 I03-03A/B/C。
 - [I03-02 公共 Verdict 与 coverage 语义](issues/03-i03-02-verdict-coverage.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；内部 nb/pu-candidate 在 `PUBLIC_*` BLOCKED 时一律映射 IE；替换 `moving-hazard-phase` gap 为能力门控 temporal 层；`coverage.temporal` 适用即约束；现有三层 PU/IE 优先；temporal 非阻断。未改产品代码。
@@ -119,6 +120,7 @@ I03-00 初始化 / 范围冻结 / 台账 / 包骨架
   ├─ I03-03 几何 / Runtime hitbox 证据 gate
   │    ├─ I03-03A 几何 probe 证据格式与 hash
   │    ├─ I03-03B 几何 probe 固定夹具矩阵
+  │    │    └─ I03-03B2 逐行 fixture manifest
   │    └─ I03-03C 几何证据独立复核标准
   │         ├─ I03-04
   │         └─ I03-05
