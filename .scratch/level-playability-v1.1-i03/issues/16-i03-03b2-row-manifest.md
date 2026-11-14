@@ -3,11 +3,13 @@
 Type: task
 Status: open
 Owner: —
-Blocked by: 14
+Blocked by: 14, 17
 Map: ../map.md
 Class: I-03 / TASK
 
 ## Task
+
+> **STOP（2026-11-14）**：player / graph 的几何行无法在零容差下冻结——`config.player.at` 的脚点 / 锚点解释在 D2、`profile.ts`、`temporal-witness.ts`、demo 之间不一致。详见 [`../reports/03b2-player-coordinate-finding.md`](../reports/03b2-player-coordinate-finding.md)。本票 blocked by I03-03B2a。
 
 把 I03-03B 的夹具设计落成**逐行 fixture manifest**：每个 frame / body 的 expected 值、来源、hash 与负例变异配方。**不实现 probe，不修改产品 fixture。**
 

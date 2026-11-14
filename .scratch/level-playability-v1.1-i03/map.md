@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-03B 完成；frontier：I03-03B2 / I03-03C / I03-06
+Status: open · 2026-11-14 · I03-03B2 blocked by I03-03B2a（玩家脚点/锚点约定）；frontier：I03-03B2a / I03-03C / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -120,7 +120,8 @@ I03-00 初始化 / 范围冻结 / 台账 / 包骨架
   ├─ I03-03 几何 / Runtime hitbox 证据 gate
   │    ├─ I03-03A 几何 probe 证据格式与 hash
   │    ├─ I03-03B 几何 probe 固定夹具矩阵
-  │    │    └─ I03-03B2 逐行 fixture manifest
+  │    │    └─ I03-03B2a 玩家脚点 / 锚点坐标约定
+  │    │         └─ I03-03B2 逐行 fixture manifest
   │    └─ I03-03C 几何证据独立复核标准
   │         ├─ I03-04
   │         └─ I03-05
