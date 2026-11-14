@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-03 完成；frontier：I03-03A / I03-03B / I03-03C / I03-06
+Status: open · 2026-11-14 · I03-03A 完成；frontier：I03-03B / I03-03C / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -86,6 +86,7 @@ Status: open · 2026-11-14 · I03-03 完成；frontier：I03-03A / I03-03B / I03
 
 ## Decisions so far
 
+- [I03-03A 几何 probe 证据格式与 hash](issues/13-i03-03a-probe-format.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；真实浏览器 + 现有 demo；一次运行一个逐帧 JSON；零容差 + 坐标归一化；Atlas/结果 SHA-256；失败码闭集 + class；probe 是证据生成器、退出 0 不等于 checked；新增环境独立 / 夹具先冻结 / 证据不自证三条约束。未实现 probe。
 - [I03-03 几何 / Runtime hitbox 证据 gate](issues/04-i03-03-geometry-gate.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；公共 `coverage.geometry` 汇总 + 三份明细；构建期 Atlas/PNG + 运行时 Phaser probe 两层证据；NB 需 hazard+player（图割再加 graph），PU 需三份全 checked + I-00 六条件；`partial` 只是覆盖状态；probe 只读、不新增依赖、`profile.ts`/`graph.ts` 只读。新增 I03-03A/B/C。
 - [I03-02 公共 Verdict 与 coverage 语义](issues/03-i03-02-verdict-coverage.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；内部 nb/pu-candidate 在 `PUBLIC_*` BLOCKED 时一律映射 IE；替换 `moving-hazard-phase` gap 为能力门控 temporal 层；`coverage.temporal` 适用即约束；现有三层 PU/IE 优先；temporal 非阻断。未改产品代码。
 - [I03-01 I-02 内部结果 → 公共证据映射](issues/02-i03-01-evidence-mapping.md): Q1=A / Q2=A / Q3=B / Q4=A / Q5=A；公共 evidence 用 model/lag/degradation/limits 摘要 + `kind:"temporal"` witness；`coverage.temporal` 用 `checked|partial|unknown`；D9 20 码 many-to-one 到 13 个公共 degradation 值；`lag.perLag` 两档结论；judgmentId `PLAYABILITY_TEMPORAL_EVIDENCE` 非阻断。未改产品代码。
