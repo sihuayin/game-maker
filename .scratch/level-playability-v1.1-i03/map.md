@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-03B2 完成；frontier：I03-03C / I03-06
+Status: open · 2026-11-14 · I03-03C 完成；frontier：I03-04 / I03-05 / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -86,6 +86,7 @@ Status: open · 2026-11-14 · I03-03B2 完成；frontier：I03-03C / I03-06
 
 ## Decisions so far
 
+- [I03-03C 几何证据独立复核标准](issues/15-i03-03c-probe-review.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；fresh 独立会话；完整证据链 12 项；hazard/player/graph × required rows 逐项 PASS/FAIL/NOT_RUN；同环境重跑 + `normalizedResult` hash；环境不匹配只是 partial / environment-mismatch；复核 PASS 只表示证据支持分项，不设置 coverage.geometry / 不开放 NB/PU。正例行口径 14。
 - [I03-03B2 逐行 fixture manifest](issues/16-i03-03b2-row-manifest.md): 14 正例行（hazard 2 / player 8 帧 + body 1 / graph 3）+ 10 个单变量负例 recipe；v4 归一化 manifest、源 / 归一化 hash、重建脚本；未物化副本、未实现 probe、未改产品 fixture。下一 frontier I03-03C。
 - [I03-03B2a 玩家脚点/锚点坐标约定](issues/17-i03-03b2a-player-coordinate.md): Q1=A / Q2=A / Q3=A；`player.at` = 锚点，player box = `boxFromFoot(footOf(...))` 不取整；last-train `(24,204.4,32,48)`；witness 在 I-03 实施单元修正（整数 lattice + 常量 foot 偏移，分数 foot 不可表达 ⇒ STOP）；runtime body 零容差。B2 解除阻塞。
 - [I03-03B 几何 probe 固定夹具矩阵](issues/14-i03-03b-fixtures.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；last-train/v2 + scratch v4 副本；hazard 2 帧 / player 8 帧 + body / graph terrain + luggage + player box；10 个单变量几何负例；正例全 checked、geometry-mismatch ⇒ untrusted、missing/env/nondeterministic ⇒ partial；scratch 夹具 + hash + 可重建。新增 I03-03B2。
