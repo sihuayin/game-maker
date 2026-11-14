@@ -212,3 +212,7 @@ AC 表（逐项）、负向矩阵、回归清单、证据格式、未覆盖项�
 - **I03-10**：独立审查授权包与验收矩阵的一致性；核对 required 属性、L1–L8、退出码语义。
 - **I03-11**：用户签署整包；单签不构成 U1–U5 授权，也不开放能力。
 - **I03-PU-Air-Control-Closure**：条件 5 独立闭合；完成后只把 AC-11 从 `NOT_RUN` 推进到可执行，不自动 ADMITTED / OPEN。
+
+## Comments
+
+- 2026-11-14（I03-10 F2 修正）：AC-15 的负例计数由 10 更新为 11（含 `body-bounds-mismatch`）；AC-15 仍为 phase-1 `NOT_RUN`、非 required。

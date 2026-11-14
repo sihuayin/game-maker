@@ -149,3 +149,7 @@ Class: I-03 / DECISION
 - **I03-04 / I03-05**：等待 B2 / C 完成后再判定几何准入。
 - **I03-06**：可并行，不依赖夹具实现。
 - **I03-07 / I03-08 / I03-09**：白名单、验收矩阵、授权包组装。
+
+## Comments
+
+- 2026-11-14（I03-10 F2 修正）：负例矩阵由 10 增至 11，新增 `body-bounds-mismatch`（player body bounds x +0.5 px，size/offset 不变）；原 Q3“10 个 geometry failure code”口径修正为“10 个 geometry-mismatch + 1 个 missing-evidence”。证据见 `.scratch/level-playability-v1.1-i03/evidence/10-f2-correction.md`。

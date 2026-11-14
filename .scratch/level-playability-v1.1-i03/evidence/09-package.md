@@ -1,5 +1,8 @@
 # I03-09 授权包组装证据
 
+> **2026-11-14 后续修正（I03-10 F2）**：本文件保留 I03-09 组装时的 audit 快照；授权包 / 审查输入包在 F2 修正后已变更。当前 hash 见 [`10-f2-correction.md`](10-f2-correction.md)。审计表第 7 行的负例计数已按修正记录标为 11。
+>
+
 | 项 | 值 |
 | --- | --- |
 | 票 | I03-09 授权包组装与一致性审计 |
@@ -8,7 +11,9 @@
 | Base | `wayfinder/level-playability-v1.1-i02` @ `2b57f2a` |
 | 授权包 | `docs/v7.8/移动-I03.md` |
 | 授权包 SHA-256 | `0edf5005d52f50ccbaa52be85f9b4ed34b904aacc6b51d7eec72be6ee2863c14` |
+| 授权包 SHA-256（I03-10 F2 修正后） | `2f89d572008b538be5871fef11d9f539e16829d1f4ceafe6e25a8a250fb9a52e` |
 | 审查输入包 | `.scratch/level-playability-v1.1-i03/reports/09-review-input-package.md`（`sha256:5c6e2be47207944643267dd8713c290727b087c033b641abc7289b05171b5944`） |
+| 审查输入包（I03-10 F2 修正后） | `.scratch/level-playability-v1.1-i03/reports/09-review-input-package.md`（`sha256:1227d1f3c78dda382cd4f6c6560740f512ac3fc4a131a33a35b436da5fda7abd`） |
 | I-02 授权包 SHA-256 | `797cd6fc7b299e22b6e90b9ef8a9567376ea3a914d70f8b6f1fc0f9a6ecedc56`（未修改） |
 
 ## 1. 组装输入
@@ -36,7 +41,7 @@
 | 4 | 前沿裁定 Q1–Q4 | 包 §0.3 / §1 / §7 | PASS |
 | 5 | NB 三阶段 | 包 §1.2 / §8 | PASS |
 | 6 | PU 独立链 + 六条件 + 条件 5 | 包 §1.3 / §9 | PASS |
-| 7 | 几何四状态 + 14 正例行 + 10 负例 | 包 §1.4 / §6 | PASS |
+| 7 | 几何四状态 + 14 正例行 + 11 负例（I03-10 F2 修正） | 包 §1.4 / §6 | PASS |
 | 8 | 公共 degradation 13 值 | 解析 `PublicTemporalDegradation` | PASS（13） |
 | 9 | Verdict 映射 / 优先级 / 冲突 | 包 §4 | PASS |
 | 10 | 发布门闭集 + G1–G11 | 包 §7 | PASS |

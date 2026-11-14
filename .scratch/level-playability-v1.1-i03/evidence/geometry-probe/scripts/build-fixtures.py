@@ -307,6 +307,9 @@ negatives.append(recipe("body-size-mismatch", "geometry-mismatch",
 negatives.append(recipe("body-offset-mismatch", "geometry-mismatch",
     {"target": "player", "body": {"offset": {"x": 1, "y": 0}}}, ["player", "graph"],
     {"hazard": "checked", "player": "partial", "graph": "partial"}))
+negatives.append(recipe("body-bounds-mismatch", "geometry-mismatch",
+    {"target": "player", "body": {"bounds": {"x": 24.5, "y": 204.4, "w": 32, "h": 48}}}, ["player", "graph"],
+    {"hazard": "checked", "player": "partial", "graph": "partial"}))
 negatives.append(recipe("graph-solid-mismatch", "geometry-mismatch",
     {"target": "luggage", "box": {"x": 480, "y": 210, "w": 42, "h": 40}}, ["graph"],
     {"hazard": "checked", "player": "checked", "graph": "partial"}))

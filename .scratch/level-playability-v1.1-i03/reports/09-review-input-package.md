@@ -33,7 +33,7 @@
 ### 2.3 几何与证据
 
 9. 几何四状态、`coverage.geometry` 汇总规则、两层证据缺一不可。
-10. 正例行 14（hazard 2 / player 8 帧 + body 1 / graph 3）、负例 10、失败码闭集与 class 映射。
+10. 正例行 14（hazard 2 / player 8 帧 + body 1 / graph 3）、负例 11（10 个 geometry-mismatch + 1 个 missing-evidence；含 `body-bounds-mismatch`）、失败码闭集与 class 映射。
 11. 玩家坐标约定（`at` = anchor；`playerBox=(24,204.4,32,48)`；零容差；整数 lattice + 常量 foot 偏移）。
 12. I03-03C 独立复核标准（12 项、分项 PASS、环境不匹配 / 非确定性处理、复核权限边界）。
 

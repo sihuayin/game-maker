@@ -8,11 +8,12 @@
 | 分支 / HEAD | `wayfinder/level-playability-v1.1-i03` @ `69a336e3705ccaaef44df7ddde1a99a372156f9c` |
 | Base | `wayfinder/level-playability-v1.1-i02` @ `2b57f2afdc09c50cb423663fb16914e2e98e7f8d` |
 | 环境 | Darwin 24.6.0 arm64 · Node v22.23.2 · pnpm 10.7.1 |
-| 审查对象 | `docs/v7.8/移动-I03.md` · `sha256:0edf5005d52f50ccbaa52be85f9b4ed34b904aacc6b51d7eec72be6ee2863c14` |
-| 审查输入包 | `.scratch/level-playability-v1.1-i03/reports/09-review-input-package.md` · `sha256:5c6e2be47207944643267dd8713c290727b087c033b641abc7289b05171b5944` |
-| 组装证据 | `.scratch/level-playability-v1.1-i03/evidence/09-package.md` · `sha256:0c92bf2e8841529b68a7f1940632182a046dd467e08cf8aec8bbbc75c3d1acaa` |
+| 审查对象 | `docs/v7.8/移动-I03.md` · `sha256:2f89d572008b538be5871fef11d9f539e16829d1f4ceafe6e25a8a250fb9a52e`（F2 修正后） |
+| 审查输入包 | `.scratch/level-playability-v1.1-i03/reports/09-review-input-package.md` · `sha256:1227d1f3c78dda382cd4f6c6560740f512ac3fc4a131a33a35b436da5fda7abd`（F2 修正后） |
+| 组装证据 | `.scratch/level-playability-v1.1-i03/evidence/09-package.md` · `sha256:c0948b9f7dc0bc09fcee7a7128de70381d1c3df67938314177c2f7ba3d8cf6a5`（含 F2 修正注记） |
+| F2 修正证据 | `.scratch/level-playability-v1.1-i03/evidence/10-f2-correction.md` · `sha256:17ea5f9137b9dbf3dbf7ab715fc26e598c0ee419ff94794a9b974584086a8c2a` |
 | 上游授权包 | `docs/v7.8/移动-I02.md` · `sha256:797cd6fc7b299e22b6e90b9ef8a9567376ea3a914d70f8b6f1fc0f9a6ecedc56`（未修改） |
-| 结论 | **PASS（23/23 检查项）**；0 项会改变冻结语义 / 能力状态 / 实施授权边界的阻断性缺陷；6 项非阻断发现（F1–F6），其中 F2 建议签署前修正或在签署记录中显式接受 |
+| 结论 | **PASS（23/23 检查项）**；0 项会改变冻结语义 / 能力状态 / 实施授权边界的阻断性缺陷；6 项发现（F1–F6），**F2 / F6 已按用户裁定修正**，F1 / F3 / F4 / F5 为非阻断文字 / 流程问题 |
 
 > **本报告只判断授权包是否适合交付用户签署。** 它不授权 I-03 实施、不授权 U1–U5、
 > 不设置 `coverage.geometry`、不开放 `PUBLIC_NB` / `PUBLIC_PU`。
@@ -33,9 +34,10 @@
 
 | 检查 | 命令 / 方法 | 结果 |
 | --- | --- | --- |
-| 授权包 hash | `shasum -a 256 docs/v7.8/移动-I03.md` | `0edf5005…`，与 I03-09 证据一致 |
-| 审查输入包 hash | `shasum -a 256 …/09-review-input-package.md` | `5c6e2be4…`，与证据一致 |
-| 组装证据 hash | `shasum -a 256 …/evidence/09-package.md` | `0c92bf2e…`，与 I03-09 Answer 一致 |
+| 授权包 hash | `shasum -a 256 docs/v7.8/移动-I03.md` | `2f89d572…`（F2 修正后）；I03-09 组装时 `0edf5005…` |
+| 审查输入包 hash | `shasum -a 256 …/09-review-input-package.md` | `1227d1f3…`（F2 修正后） |
+| 组装证据 hash | `shasum -a 256 …/evidence/09-package.md` | `c0948b9f…`（含 F2 修正注记；I03-09 原 `0c92bf2e…`） |
+| F2 修正证据 hash | `shasum -a 256 …/evidence/10-f2-correction.md` | `17ea5f91…` |
 | I-02 授权包 hash | `shasum -a 256 docs/v7.8/移动-I02.md` | `797cd6fc…`，与已签署 hash 一致 |
 | 产品树零 diff | `git diff --stat 2b57f2a -- packages fixtures` | 空 |
 | 远端分支 | `git branch -r \| grep i03` | 无 `origin/…i03`；未推送 |
@@ -69,7 +71,7 @@
 | R07 | 条件 5 由 I03-PU-Air-Control-Closure 独立闭合；未用 U4 图割 / `midAirHits=0` / NB 替代（2.2.7） | **PASS** | §9.3；`midAirHits=0` 与 conditional 图割被明示排除；该票 Answer 冻结证据合同但条件 5 仍未闭合，包未误写为 PASS |
 | R08 | 假 NB / 假 PU 全局关闭、基线失效、关闭优先级、不可逆向推导（2.2.8） | **PASS** | §8.6 / §9.5 / §9.6；含 `algorithmVersion / geometryBaseline / proofRulesVersion / fixtureVersion / puAdmissionRulesVersion` |
 | R09 | 几何四状态、`coverage.geometry` 汇总、两层证据缺一不可（2.3.9） | **PASS** | §1.4 / §6.1 / §6.2；构建期 Atlas + 运行时 Phaser probe 两层 |
-| R10 | 正例行 14、负例 10、失败码闭集与 class 映射（2.3.10） | **PASS（见 F2）** | 14 = hazard 2 + player 8 帧 + body 1 + graph 3；manifest 实为 10 = 9 geometry-mismatch + 1 missing-evidence；§6.6 的“7 个 geometry-mismatch”描述不准确；`body-bounds-mismatch` 在 §6.5 闭集内但无冻结负例 |
+| R10 | 正例行 14、负例 11（10 geometry-mismatch + 1 missing-evidence）、失败码闭集与 class 映射（2.3.10） | **PASS** | 14 = hazard 2 + player 8 帧 + body 1 + graph 3；11 = 10 geometry-mismatch（含 `body-bounds-mismatch` 0.5 px recipe）+ 1 missing-evidence；F2 已修正 |
 | R11 | 玩家坐标约定（锚点 / `playerBox=(24,204.4,32,48)` / 零容差 / 整数 lattice + 常量 foot 偏移）（2.3.11） | **PASS** | §6.7；与 I03-03B2a Answer 逐项一致；分数 foot 不可表达 ⇒ STOP + HITL |
 | R12 | I03-03C 独立复核标准（12 项、分项 PASS、环境 / 非确定性处理、权限边界）（2.3.12） | **PASS** | §6.8；12 项与 I03-03C Answer 一致；复核 PASS 不设置 `coverage.geometry`、不开放能力 |
 | R13 | 第一阶段拒稿输入闭集三项；无新增 throw；时序证据不产 `CommandError`（2.4.13） | **PASS（见 F3）** | §7.2；源码 `assertPublishableQa` 无 temporal throw；但“只允许三项抛错”未列出既有的缺报告 / 报告解析 / 候选查找 throw |
@@ -101,10 +103,12 @@
   - 源 pack tree hash = `sha256:570535deff5c2f4e1626b2680a4b555f631e51d6d87721507a0a1f6e2feb7383`；
   - 源 manifest hash = `sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689`；
   - 归一化 manifest hash = `sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98`；
-  - 源 config hash = `sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3`。
-- 与包 §6.6、I03-03B2 Answer、evidence/03b2-fixture-manifest.md 完全一致。
-- 逐行解析 manifest：正例 **14**（hazard 2 / player 9 含 body 1 / graph 3）；负例 **10**（9 个 `geometry-mismatch` + 1 个 `missing-evidence`）。
-- 结论：hash 与正例行数 **PASS**；负例组成描述 **见 F2**。
+  - 源 config hash = `sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3`；
+  - 重建脚本 hash = `sha256:4253bbbb4c849d94654239f90c074e7d3161d07c97a8ed7beb3ba5a4c7a3ea66`（F2 修正后；旧 `1b58e35e…`）；
+  - fixture manifest hash = `sha256:dd880628176f617819752d0d866c6adc923238e706444f20bbe0807e1e87943b`（F2 修正后；旧 `3b7196b3…`）。
+- 与包 §6.6、I03-03B2 Answer、evidence/03b2-fixture-manifest.md 在 F2 修正后一致。
+- 逐行解析 manifest：正例 **14**（hazard 2 / player 9 含 body 1 / graph 3）；负例 **11**（10 个 `geometry-mismatch`，含 `body-bounds-mismatch`，+ 1 个 `missing-evidence`）。
+- 结论：hash、正例行数、负例组成均 **PASS**；F2 已修正。
 
 ### IV-3：冻结输入与产品树未被修改（自选理由：授权包的全部权威来自“不改 I-02、不改产品、只组装文档”）
 
@@ -143,15 +147,19 @@
 - **影响**：同一份包内存在两套 `N1–N6`（§3.7 映射负例 vs §10.3 验收负例）；审查输入包 §4 的全文件 `grep -cE '^\| N[0-9]+ \|'` 会返回 24 而不是 18。实施 / 复核引用 “N1” 时可能指错表。
 - **建议**：把 §3.7 的映射负例改为独立前缀（如 M1–M6），并把 §4.7 改为“I03-02 N1–N10 → 本包 V1–V10”；或至少在 §3.7 标题明确“本节 N1–N6 与 §10.3 N1–N18 无关”。非阻断。
 
-### F2（中 / 夹具描述与覆盖）：§6.6 的负例组成与冻结 manifest 不一致；`body-bounds-mismatch` 无冻结负例
+### F2（中 → 已修正 / 夹具描述与覆盖）：§6.6 的负例组成与冻结 manifest 不一致；`body-bounds-mismatch` 无冻结负例
 
-- **位置**：包 §6.6（第 472–482 行）；§6.5（第 463–470 行）；`evidence/03b2-fixture-manifest.md:48-66`；`fixtures/manifest.json` 的 `negative[]`。
-- **事实**：
-  - §6.6 写“负例 10：7 个 geometry-mismatch + `atlas-missing` + body-size / body-offset / graph-solid override”。按加法读为 7 + 1 + 3 = 11；冻结 manifest 实际为 **10**。
-  - manifest 的 class 组成为 **9 个 `geometry-mismatch` + 1 个 `missing-evidence`**（codes：`frame-missing`、`frame-size-mismatch`、`anchor-mismatch`、`trimmed`、`rotated`、`atlas-hash-mismatch`、`atlas-missing`、`body-size-mismatch`、`body-offset-mismatch`、`graph-solid-mismatch`）。
-  - §6.5 失败码闭集包含 `body-bounds-mismatch`，但上述 10 个冻结负例没有它。
-- **影响**：包对冻结夹具矩阵的描述不准确；未来 probe 实现会有一个闭集内的失败码没有被冻结负例覆盖。由于 AC-15 是 phase-1 `NOT_RUN`、probe 尚未实现，这不改变当前 gate；但它会影响未来 probe / I03-03C 复核的完整性。
-- **建议**：把 §6.6 改写为“10 = 9 geometry-mismatch + 1 missing-evidence”；在实施方案中为 `body-bounds-mismatch` 增加一个冻结 recipe（或显式在 L4 / §14 声明该码未被负例覆盖并说明理由）。建议在用户签署前修正或由用户在签署记录中显式接受。
+- **位置**：包 §6.6；§6.5；`evidence/03b2-fixture-manifest.md`；`fixtures/manifest.json` 的 `negative[]`。
+- **原始事实**：
+  - §6.6 原写“负例 10：7 个 geometry-mismatch + `atlas-missing` + body-size / body-offset / graph-solid override”。按加法读为 7 + 1 + 3 = 11；冻结 manifest 原为 **10**。
+  - manifest 原 class 组成为 **9 个 `geometry-mismatch` + 1 个 `missing-evidence`**；§6.5 失败码闭集包含 `body-bounds-mismatch`，但上述 10 个冻结负例没有它。
+- **用户裁定**：2026-11-14 选择 1，**先修正 F2，再进入 I03-11 签署；不接受将其作为已知限制带入签署。**
+- **修正后**：
+  - 新增 `body-bounds-mismatch` recipe：`target="player"`，`body.bounds.x=24.5`（canonical 24.0，仅 +0.5 px），size / offset 不变。
+  - manifest 现为 **11** 个负例：**10 个 `geometry-mismatch` + 1 个 `missing-evidence`**。
+  - 包 §6.6、§10.2 AC-15、§16 第 7 行与审查输入包 item 10 均同步为 11；§6.6 加入修正说明。
+  - 新 script hash `4253bbbb…`、manifest hash `dd880628…`；见 [`evidence/10-f2-correction.md`](../evidence/10-f2-correction.md)（`sha256:17ea5f91…`）。
+- **结论**：**F2 关闭。** 仍不改变当前 gate（AC-15 仍 `NOT_RUN`、probe 未实现），但冻结矩阵现已覆盖 §6.5 闭集中的 `body-bounds-mismatch`。
 
 ### F3（低 / 措辞精度）：§7.2 “只允许从现有三项检查抛错”未覆盖既有输入 / 报告定位 throw
 
@@ -174,12 +182,12 @@
 - **影响**：AC-21 与 §10.4 的“19 关 IE 不回归”在验收时无法直接对应到 LP-06 的 20 个 config；不过包同时要求“LP-06/07 原命令重跑与冻结基线逐项一致”，实际比较仍以冻结输出为准。
 - **建议**：在 §10.4 / AC-21 / L5 明确“19 个 x 轴移动 Hazard / 20 个唯一 config / 96 个 pair”，或直接引用 LP-06 的 `counts` 字段。非阻断。
 
-### F6（低 / 证据卫生）：`evidence/03b2-fixture-manifest.md` 仍留有“13 rows / 10 negatives”
+### F6（低 → 已修正 / 证据卫生）：`evidence/03b2-fixture-manifest.md` 的旧命令结果行
 
-- **位置**：`evidence/03b2-fixture-manifest.md:77` 的命令结果行。
-- **事实**：同一文件的“正例行（14）”表和冻结 manifest 都是 14 行；该命令结果行仍是 13→14 修正前的旧文本。
-- **影响**：不影响授权包正文（包写 14），但会误导复核人以为 manifest 仍为 13 行。
-- **建议**：改为“14 rows / 10 negatives（2026-11-14 由 13 修正为 14）”。非阻断。
+- **位置**：`evidence/03b2-fixture-manifest.md:77`。
+- **原始事实**：同一文件的“正例行（14）”表和冻结 manifest 都是 14 行；该命令结果行仍是 13→14 修正前的旧文本。
+- **修正后**：命令结果行已改为 `14 rows / 11 negatives`（同时反映 F2 新增的 `body-bounds-mismatch`）；负例表与 hash 已同步。
+- **结论**：**F6 关闭。**
 
 ## 7. 未覆盖项与限制
 
@@ -198,7 +206,7 @@
 
 - 未发现会改变六条冻结边界、公共 Verdict / coverage 语义、发布门拒稿行为、NB / PU 准入链、实施授权边界或能力状态的阻断性缺陷。
 - 审查对象仍是 `ASSEMBLED / UNSIGNED`；`PUBLIC_NB` / `PUBLIC_PU` 仍 `BLOCKED`；I-03 实施仍 `NOT_AUTHORIZED`。
-- 6 项发现均为非阻断的文档 / 可追溯性 / 夹具描述问题。建议在用户签署前修正 **F2**（§6.6 负例组成与 `body-bounds-mismatch` 覆盖），或由用户在 I03-11 签署记录中显式接受；F1 / F3 / F4 / F5 / F6 建议一并做文字修正。
+- 6 项发现均为文档 / 可追溯性 / 夹具描述问题。**F2 已按用户裁定修正**（11 负例，含 `body-bounds-mismatch`；见 `evidence/10-f2-correction.md`），**F6 一并修正**；F1 / F3 / F4 / F5 仍为非阻断，建议作为后续文字 / 流程清理，不影响签署。
 - 本审查 **不**表示 I-03 已实施、**不**授权 U1–U5、**不**开放公共能力、**不**设置 `coverage.geometry`。授权包签署只建立后续实施依据。
 
 | 项 | 值 |
@@ -206,9 +214,9 @@
 | 审查人 | claude（I03-10 独立会话） |
 | 日期 | 2026-11-14 |
 | 审查基线 | `wayfinder/level-playability-v1.1-i03` @ `69a336e` |
-| 审查对象 hash | `sha256:0edf5005d52f50ccbaa52be85f9b4ed34b904aacc6b51d7eec72be6ee2863c14` |
-| 复跑命令 | `pnpm test` / `pnpm build` / `pnpm check:deps` / `pnpm check:links` / LP-06 / LP-07，全部退出码 0 |
-| 结论 | **PASS**；F1–F6 非阻断，F2 建议签署前修正或显式接受 |
+| 审查对象 hash | `sha256:2f89d572008b538be5871fef11d9f539e16829d1f4ceafe6e25a8a250fb9a52e`（F2 修正后） |
+| 复跑命令 | `pnpm test` / `pnpm build` / `pnpm check:deps` / `pnpm check:links` / LP-06 / LP-07 / `python3 …/build-fixtures.py`，全部退出码 0（fixture：14 rows / 11 negatives） |
+| 结论 | **PASS**；F2 / F6 已修正，F1 / F3 / F4 / F5 非阻断 |
 | 权限边界 | 不授权实施 / 单元 / probe / fixture；不开放 `PUBLIC_NB` / `PUBLIC_PU` |
 
 **独立签署：**我确认本报告的逐项判断来自我自己的重读、重算与重跑，不依赖作者摘要或审查输入包的自述；我未参与 I-03 授权包的撰写或组装。

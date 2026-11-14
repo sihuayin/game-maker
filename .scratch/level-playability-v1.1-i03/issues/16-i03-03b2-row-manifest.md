@@ -59,3 +59,7 @@ Class: I-03 / TASK
 | 产品改动 | **无**；仅 `.scratch` 证据 |
 
 证据：[`../evidence/03b2-fixture-manifest.md`](../evidence/03b2-fixture-manifest.md)。**下游**：I03-03C（独立复核标准）为下一 frontier；I03-06 可并行；probe 实现仍不授权。
+
+## Comments
+
+- 2026-11-14（I03-10 F2 修正）：负例由 10 增至 11，新增 `body-bounds-mismatch`；manifest / script / evidence 03b2 hash 已重算。原 Answer 的“10 个负例 / 7 个 geometry-mismatch”保留为历史，当前口径以修正证据为准。

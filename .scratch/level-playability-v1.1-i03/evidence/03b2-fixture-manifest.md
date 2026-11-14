@@ -12,7 +12,7 @@
 
 | 文件 | 说明 |
 | --- | --- |
-| `.scratch/.../geometry-probe/fixtures/manifest.json` | 逐行 fixture manifest + 10 个负例配方 |
+| `.scratch/.../geometry-probe/fixtures/manifest.json` | 逐行 fixture manifest + 11 个负例配方 |
 | `.scratch/.../geometry-probe/fixtures/last-train-v4/manifest.json` | v2 → v4 归一化 manifest（只读派生） |
 | `.scratch/.../geometry-probe/fixtures/normalization.json` | 归一化变换记录 |
 | `.scratch/.../geometry-probe/scripts/build-fixtures.py` | 确定性重建脚本（只写 manifest / 行 / recipe，不复制 pack） |
@@ -28,8 +28,8 @@
 | 归一化 manifest hash | `sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98` |
 | v4 parse | **ok**（`parseAssetPack` 现场验证） |
 | 重跑 | `python3 .scratch/.../geometry-probe/scripts/build-fixtures.py` |
-| 脚本 hash | `sha256:1b58e35ea5e6e21432334e77ac0881b7740067e0b9b9ea77b359e031e725304f` |
-| fixture manifest hash | `sha256:3b7196b3cefb48caba46b6a4d9319814a3d58e9dc6d9d6170b17388af6028278` |
+| 脚本 hash | `sha256:4253bbbb4c849d94654239f90c074e7d3161d07c97a8ed7beb3ba5a4c7a3ea66` |
+| fixture manifest hash | `sha256:dd880628176f617819752d0d866c6adc923238e706444f20bbe0807e1e87943b` |
 | normalization hash | `sha256:e88f5a350a8cb596884b46cd0ffe8620691ab22cf8004e8b6e41eed0ec70d227` |
 
 ## 正例行（14）
@@ -45,7 +45,7 @@
 - B2a 约定已应用：`at` = 锚点；`playerBox = boxFromFoot(footOf(...))`，不取整。
 - 未加入 goal / pickup frame（不属于本轮 geometry gate 必需分项）。
 
-## 负例（10，单变量）
+## 负例（11，单变量）
 
 | code | class | affected | expected summary |
 | --- | --- | --- | --- |
@@ -58,13 +58,16 @@
 | `atlas-missing` | missing-evidence | hazard, player | `partial` |
 | `body-size-mismatch` | geometry-mismatch | player, graph | `untrusted` |
 | `body-offset-mismatch` | geometry-mismatch | player, graph | `untrusted` |
+| `body-bounds-mismatch` | geometry-mismatch | player, graph | `untrusted` |
 | `graph-solid-mismatch` | geometry-mismatch | graph | `untrusted` |
 
 - 帧级负例在变异后同步更新 manifest `files[]` 中 atlas JSON checksum，避免 `atlas-hash-mismatch` 抢占失败码。
 - `atlas-hash-mismatch` 只改 atlas `meta`，不更新 manifest checksum。
 - `atlas-missing` 只删 atlas JSON；输出 hash 为 `null`。
-- body-size / body-offset / graph-solid 是 **runtime / audit override recipe**，不复制 pack；recipe hash 已记录。
+- body-size / body-offset / body-bounds / graph-solid 是 **runtime / audit override recipe**，不复制 pack；recipe hash 已记录。
 - `environment-mismatch` / `nondeterministic` = review-only；`probe-not-run` = 执行缺失，均不伪造几何夹具。
+
+> **2026-11-14 I03-10 F2 修正**：负例由 10 增至 11，新增 `body-bounds-mismatch`（body bounds x +0.5 px，size / offset 不变）；脚本 / manifest hash 已重算。此前“7 个 geometry-mismatch”的组成描述更正为 10 个 geometry-mismatch + 1 个 missing-evidence。
 
 ## 未物化声明
 
@@ -74,7 +77,7 @@
 
 | 命令 | 退出码 | 结果 |
 | --- | ---: | --- |
-| `python3 .../build-fixtures.py` | **0** | 13 rows / 10 negatives；manifest 写出 |
+| `python3 .../build-fixtures.py` | **0** | 14 rows / 11 negatives；manifest 写出 |
 | `node --input-type=module` `parseAssetPack(last-train-v4/manifest.json)` | **0** | `parse true` |
 
 ## 边界

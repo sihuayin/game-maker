@@ -331,6 +331,44 @@
     },
     {
       "class": "geometry-mismatch",
+      "code": "body-bounds-mismatch",
+      "expected": {
+        "affected": [
+          "player",
+          "graph"
+        ],
+        "coverage": {
+          "graph": "partial",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "body-bounds-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "baseAtlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "baseManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "kind": "runtime-override",
+        "override": {
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.5,
+              "y": 204.4
+            }
+          },
+          "target": "player"
+        }
+      },
+      "output": {
+        "recipeHash": "sha256:c4f648db5df489a6ef7a008efc8470fc7aae22f0ae5d7a5bee0bfd5493e855fd"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
       "code": "graph-solid-mismatch",
       "expected": {
         "affected": [
