@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-PU-Air-Control-Closure 完成；frontier：I03-10
+Status: open · 2026-11-14 · I03-10 完成；frontier：I03-11
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -88,6 +88,7 @@ Status: open · 2026-11-14 · I03-PU-Air-Control-Closure 完成；frontier：I03
 
 ## Decisions so far
 
+- [I03-10 授权包独立审查](issues/11-i03-10-review.md): 独立会话完成；23/23 PASS（0 FAIL / 0 NOT_RUN）；5 条自选关键断言（D9 20→13 映射完整、夹具 hash/行数独立重建一致、冻结输入 / 产品树零 diff、LP-06/07 复跑语义一致、当前源码事实逐条核对）；`pnpm test` 176 files / 2877 tests + build / deps / links 全部退出 0；6 项非阻断发现 F1–F6，F2（§6.6 负例组成与 `body-bounds-mismatch` 未覆盖）建议签署前修正或由用户显式接受；审查 PASS 不授权实施 / probe / 能力开放。下一 frontier I03-11。报告：[`reports/I03-review.md`](reports/I03-review.md)。
 - [I03-PU-Air-Control-Closure — 空中控制与模型外规避闭合证据](issues/18-i03-pu-air-control.md): Q1=B / Q2=A / Q3=A / Q4=A / Q5=A / Q6–Q10 通过；有界控制包络 E（全速空中水平控制、仅地面单跳、walk-off 漂移；无二段跳/冲刺/墙跳/梯子/y 轴输入/移动平台落点）；条件 5 PASS 需**垂直包容 A + 保守弧线扫掠 B**，运行时采样只作支持；17 条 C1–C17；fresh 独立复核 + E1/E2/E3；条件 5 仍未闭合、`PUBLIC_PU` 仍 `BLOCKED`；A/B 证明实现不在 I-03 最小面。
 - [I03-09 授权包组装与一致性审计](issues/10-i03-09-assemble.md): 完成；`docs/v7.8/移动-I03.md` §0–§17（ASSEMBLED / UNSIGNED，`sha256:0edf5005…`）；审查输入包 `reports/09-review-input-package.md`（`sha256:5c6e2be4…`）；证据 `evidence/09-package.md`；21 项一致性审计全 PASS（六边界 6/6、AC 21/required 19、N1–N18、白名单、Ledger 空白、I-02 hash 未变、产品零 diff、链接全通）；显式未闭合：PU 条件 2/5、AC-11/15 `NOT_RUN`、Runtime hitbox 未证、probe 未实现；未实施、未开放、未推送。下一 frontier I03-10。
 - [I03-08 验收矩阵、负向测试、回归与证据格式](issues/09-i03-08-acceptance.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=全冻结 / Q6–Q9 通过；21 条 AC（6 组，required 19；AC-11 PU 六条件与 AC-15 真实 probe 预先非 required、phase-1 NOT_RUN）；严格逐项 PASS/FAIL/NOT_RUN、禁止通过率；18 条负向 N1–N18；全量 vitest + build + deps + links + T-55..T-65 + LP-06/07 原命令；E1/E2/E3；报告 `reports/I03-acceptance.md`；退出码 0/1/2，0 ≠ 通过；L1–L8 固定披露；验收层不补实现、不放宽判据、不改 gate、不把 NOT_RUN 当通过。
