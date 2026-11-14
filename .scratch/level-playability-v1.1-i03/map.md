@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-04 完成；frontier：I03-05 / I03-06
+Status: open · 2026-11-14 · I03-05 完成；frontier：I03-06 / I03-PU-Air-Control-Closure
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -70,7 +70,7 @@ Status: open · 2026-11-14 · I03-04 完成；frontier：I03-05 / I03-06
 
 ### PU 独立链
 
-`PUBLIC_PU` 至少需要：`coverage.geometry = checked`、空中控制 / 模型外规避闭合、hop 图割与加倍采样完整、I-00 六项条件全部满足、独立审查与增量授权。**不得因 NB 通过而推导 PU 可用。**
+`PUBLIC_PU` 采用 WIRED / ADMITTED / OPEN 三阶段；I-00 六条件逐项 `PASS / BLOCKED / INSUFFICIENT_EVIDENCE / NOT_RUN`，任一非 PASS 不得 ADMITTED。条件 5（模型外规避）由 [I03-PU-Air-Control-Closure](issues/18-i03-pu-air-control.md) 独立闭合；条件 2（几何）由 I03-03 系列承担。**不得因 NB 通过而推导 PU 可用；`midAirHits=0` / conditional 图割不构成条件 5 正面证据。**
 
 ### 第一阶段发布行为
 
@@ -88,6 +88,7 @@ Status: open · 2026-11-14 · I03-04 完成；frontier：I03-05 / I03-06
 
 ## Decisions so far
 
+- [I03-05 PUBLIC_PU 独立准入链](issues/06-i03-05-pu-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN；六条件逐项 PASS/BLOCKED/IE/NOT_RUN，任一非 PASS 不得 ADMITTED；条件 2 几何、条件 5 模型外当前硬阻断；条件 5 新建 I03-PU-Air-Control-Closure；固定 PU admission 夹具；全局 gate + 假 PU 全局关闭 + 证据基线失效；NB 不得推导 PU。
 - [I03-04 PUBLIC_NB 三阶段准入链](issues/05-i03-04-nb-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN 状态机；阶段 2 需几何 hazard+player（图割加 graph）+ temporal checked + 两档完整一致 + witness COMPLETE + 预算/确定性/体积/映射 + 固定 admission 夹具；阶段 3 需独立复核 + 用户授权 + 全局 gate OPEN；逐关仍须证据准入；假 NB 全局关闭 + 证据基线失效；关闭优先于缓存/历史/逐关结果。
 - [I03-03C 几何证据独立复核标准](issues/15-i03-03c-probe-review.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；fresh 独立会话；完整证据链 12 项；hazard/player/graph × required rows 逐项 PASS/FAIL/NOT_RUN；同环境重跑 + `normalizedResult` hash；环境不匹配只是 partial / environment-mismatch；复核 PASS 只表示证据支持分项，不设置 coverage.geometry / 不开放 NB/PU。正例行口径 14。
 - [I03-03B2 逐行 fixture manifest](issues/16-i03-03b2-row-manifest.md): 14 正例行（hazard 2 / player 8 帧 + body 1 / graph 3）+ 10 个单变量负例 recipe；v4 归一化 manifest、源 / 归一化 hash、重建脚本；未物化副本、未实现 probe、未改产品 fixture。下一 frontier I03-03C。
@@ -131,6 +132,7 @@ I03-00 初始化 / 范围冻结 / 台账 / 包骨架
   │    └─ I03-03C 几何证据独立复核标准
   │         ├─ I03-04
   │         └─ I03-05
+  │              └─ I03-PU-Air-Control-Closure（条件 5；未闭合前 PU 不得 ADMITTED/OPEN）
   ├─ I03-07 实施单元 / 复核点 / 白名单 / 回滚（需 I03-04 / I03-05 / I03-06）
   └─ I03-08 验收矩阵 / 负向测试 / 回归（需 I03-01 ～ I03-06）
        └─ I03-09 授权包组装与一致性审计（需 I03-07 / I03-08）
