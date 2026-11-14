@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-09 完成；frontier：I03-10 / I03-PU-Air-Control-Closure
+Status: open · 2026-11-14 · I03-PU-Air-Control-Closure 完成；frontier：I03-10
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -88,6 +88,7 @@ Status: open · 2026-11-14 · I03-09 完成；frontier：I03-10 / I03-PU-Air-Con
 
 ## Decisions so far
 
+- [I03-PU-Air-Control-Closure — 空中控制与模型外规避闭合证据](issues/18-i03-pu-air-control.md): Q1=B / Q2=A / Q3=A / Q4=A / Q5=A / Q6–Q10 通过；有界控制包络 E（全速空中水平控制、仅地面单跳、walk-off 漂移；无二段跳/冲刺/墙跳/梯子/y 轴输入/移动平台落点）；条件 5 PASS 需**垂直包容 A + 保守弧线扫掠 B**，运行时采样只作支持；17 条 C1–C17；fresh 独立复核 + E1/E2/E3；条件 5 仍未闭合、`PUBLIC_PU` 仍 `BLOCKED`；A/B 证明实现不在 I-03 最小面。
 - [I03-09 授权包组装与一致性审计](issues/10-i03-09-assemble.md): 完成；`docs/v7.8/移动-I03.md` §0–§17（ASSEMBLED / UNSIGNED，`sha256:0edf5005…`）；审查输入包 `reports/09-review-input-package.md`（`sha256:5c6e2be4…`）；证据 `evidence/09-package.md`；21 项一致性审计全 PASS（六边界 6/6、AC 21/required 19、N1–N18、白名单、Ledger 空白、I-02 hash 未变、产品零 diff、链接全通）；显式未闭合：PU 条件 2/5、AC-11/15 `NOT_RUN`、Runtime hitbox 未证、probe 未实现；未实施、未开放、未推送。下一 frontier I03-10。
 - [I03-08 验收矩阵、负向测试、回归与证据格式](issues/09-i03-08-acceptance.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=全冻结 / Q6–Q9 通过；21 条 AC（6 组，required 19；AC-11 PU 六条件与 AC-15 真实 probe 预先非 required、phase-1 NOT_RUN）；严格逐项 PASS/FAIL/NOT_RUN、禁止通过率；18 条负向 N1–N18；全量 vitest + build + deps + links + T-55..T-65 + LP-06/07 原命令；E1/E2/E3；报告 `reports/I03-acceptance.md`；退出码 0/1/2，0 ≠ 通过；L1–L8 固定披露；验收层不补实现、不放宽判据、不改 gate、不把 NOT_RUN 当通过。
 - [I03-07 实施单元、复核点、白名单与回滚](issues/08-i03-07-units-whitelist.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A / Q6–Q10 通过（Q7-11 修订）；五单元 U1→U2→U4→U5→U3；U4 接 `analyzeTemporalInternalTwoLag` 经 U1 适配器、T-58 按新语义改写并保留禁止路径；U3 gap 替换最后执行；逐文件白名单（禁 glob，记操作类型与限定目的，`api.ts` 跨 U1/U2 非一次性授权）；12 条 STOP（墙钟仅 abort-only）；五道复核门 + 修改前后基线快照；U4/U5/U3 回滚演练、U3→U5→U4→U2→U1 逆序正式回滚；Ledger 空白表入 `docs/v7.8/移动-I03.md`；关闭 ≠ 开放能力，U1–U5 各需增量授权。
@@ -118,6 +119,7 @@ Status: open · 2026-11-14 · I03-09 完成；frontier：I03-10 / I03-PU-Air-Con
 - **I-04 / 后续 effort / 实施 PR / 推送 / 合并**。
 - **修改已签署的 I-02 授权包或 U5 结果**。
 - **把 I-02 的内部 `nb-candidate` / `pu-candidate` 直接写成公共 Verdict**。
+- **PU 条件 5 的生产证明实现**（垂直包容 A / 保守弧线扫掠 B、新增证明模块、`temporal-gate.ts` 扩展）：本图只冻结[证据合同](issues/18-i03-pu-air-control.md)，实施另开 effort。
 
 ## 依赖图
 
