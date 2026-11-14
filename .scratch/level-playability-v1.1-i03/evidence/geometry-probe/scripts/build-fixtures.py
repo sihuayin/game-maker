@@ -142,21 +142,32 @@ for name in [f["name"] for f in hero["frames"]]:
         "expected": {
             "size": hero_size,
             "anchor": hero_anchor,
-            "box": player_box,
-            "foot": player_foot,
             "frameBounds": f["frame"],
             "sourceSize": f["sourceSize"],
             "trimmed": f["trimmed"],
             "rotated": f["rotated"],
-            "body": {
-                "size": hero_size,
-                "offset": {"x": 0, "y": 0},
-                "bounds": player_box,
-                "foot": player_foot,
-            },
         },
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract",
+        "source": "manifest.size/anchor + atlas frame",
     })
+
+# spawn body is a separate row (not attached to each frame), so the count is
+# 8 frame rows + 1 body row; it must not become an implicit/duplicated check.
+rows.append({
+    "dimension": "player",
+    "bodyId": "player",
+    "expected": {
+        "size": hero_size,
+        "box": player_box,
+        "foot": player_foot,
+        "body": {
+            "size": hero_size,
+            "offset": {"x": 0, "y": 0},
+            "bounds": player_box,
+            "foot": player_foot,
+        },
+    },
+    "source": "footOf + boxFromFoot + scene.ts body contract",
+})
 
 terrain = config["terrain"][0]
 rows.append({

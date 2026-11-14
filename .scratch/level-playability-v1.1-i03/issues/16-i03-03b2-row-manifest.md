@@ -44,12 +44,14 @@ Class: I-03 / TASK
 
 **完成。** 逐行 fixture manifest、v4 归一化计划、10 个负例配方与 hashes 已冻结；**未物化二进制副本、未实现 probe、未修改产品 fixture**。
 
+> **2026-11-14 修正**：正例行由 13 明确为 **14**——player 的 8 个帧行与 spawn body 分成 1 个独立行；13 不是必要检查项上限。manifest / 证据 / hash 已重建。
+
 | 项 | 结果 |
 | --- | --- |
 | 源 pack tree hash | `sha256:570535deff5c2f4e1626b2680a4b555f631e51d6d87721507a0a1f6e2feb7383` |
 | 源 manifest hash | `sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689` |
 | 归一化 manifest hash | `sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98`（v4 parse ok） |
-| 正例行 | **13**：hazard 2 / player 8 / graph 3；player canonical box `(24,204.4,32,48)`、foot `(40,252.4)` |
+| 正例行 | **14**：hazard 2 / player 8 帧 + player body 1 / graph 3；canonical player box `(24,204.4,32,48)`、foot `(40,252.4)` |
 | 负例 | **10** 个单变量 recipe：7 个 geometry-mismatch（player/hazard/graph 按 affected）+ `atlas-missing` missing-evidence + body-size / body-offset / graph-solid override |
 | Review-only | `environment-mismatch` / `nondeterministic`；`probe-not-run` 不造夹具 |
 | 重建 | `python3 .scratch/.../geometry-probe/scripts/build-fixtures.py`；确定性写出 manifest |

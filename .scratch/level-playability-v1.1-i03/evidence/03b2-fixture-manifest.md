@@ -28,19 +28,20 @@
 | 归一化 manifest hash | `sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98` |
 | v4 parse | **ok**（`parseAssetPack` 现场验证） |
 | 重跑 | `python3 .scratch/.../geometry-probe/scripts/build-fixtures.py` |
-| 脚本 hash | `sha256:76837809cf1304490812ed52a92670a079a737b21d57054f920abd507523e7bb` |
-| fixture manifest hash | `sha256:911eb2645eb5721dd7fe0e5771033f2d7b7c459706a4686a8067b5fa6876702a` |
+| 脚本 hash | `sha256:1b58e35ea5e6e21432334e77ac0881b7740067e0b9b9ea77b359e031e725304f` |
+| fixture manifest hash | `sha256:3b7196b3cefb48caba46b6a4d9319814a3d58e9dc6d9d6170b17388af6028278` |
 | normalization hash | `sha256:e88f5a350a8cb596884b46cd0ffe8620691ab22cf8004e8b6e41eed0ec70d227` |
 
-## 正例行（13）
+## 正例行（14）
 
 | 分项 | 行数 | 对象 |
 | --- | ---: | --- |
 | hazard | 2 | `hazard-sweeping-carriage.sweep1` / `.sweep2`；box `(768,202,64,48)`；frame/source/anchor |
-| player | 8 | `player-traveler.idle1..2 / run1..4 / jump1..2`；size `32×48`、anchor `.5,.95`、frame bounds；canonical box `(24,204.4,32,48)`、foot `(40,252.4)`；body size/offset/bounds/foot |
+| player | 9 | 8 帧（`idle1..2 / run1..4 / jump1..2`）+ **1 个独立 spawn body 行**；frame rows 记 size/anchor/frame bounds；body row 记 size/offset/bounds/foot；canonical box `(24,204.4,32,48)`、foot `(40,252.4)` |
 | graph | 3 | `terrain#0` `(0,250,1440,20)`；`luggage` `(480,210,40,40)`；player box/foot |
 
 - 每帧 / 每个 body 一行；无抽样。
+- **行定义**：14 = hazard 2 + player 8 帧 + player body 1 + graph 3；`13` 不是必要检查项的上限；spawn body 是独立行，不附着于每个 frame row。
 - B2a 约定已应用：`at` = 锚点；`playerBox = boxFromFoot(footOf(...))`，不取整。
 - 未加入 goal / pickup frame（不属于本轮 geometry gate 必需分项）。
 

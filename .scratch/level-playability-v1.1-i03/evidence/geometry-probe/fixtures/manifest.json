@@ -455,36 +455,6 @@
             "x": 0.5,
             "y": 0.95
           },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
-          },
           "frameBounds": {
             "h": 48,
             "w": 32,
@@ -503,7 +473,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.idle1",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -512,36 +482,6 @@
           "anchor": {
             "x": 0.5,
             "y": 0.95
-          },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
           },
           "frameBounds": {
             "h": 48,
@@ -561,7 +501,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.idle2",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -570,36 +510,6 @@
           "anchor": {
             "x": 0.5,
             "y": 0.95
-          },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
           },
           "frameBounds": {
             "h": 48,
@@ -619,7 +529,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.run1",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -628,36 +538,6 @@
           "anchor": {
             "x": 0.5,
             "y": 0.95
-          },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
           },
           "frameBounds": {
             "h": 48,
@@ -677,7 +557,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.run2",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -686,36 +566,6 @@
           "anchor": {
             "x": 0.5,
             "y": 0.95
-          },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
           },
           "frameBounds": {
             "h": 48,
@@ -735,7 +585,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.run3",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -744,36 +594,6 @@
           "anchor": {
             "x": 0.5,
             "y": 0.95
-          },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
           },
           "frameBounds": {
             "h": 48,
@@ -793,7 +613,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.run4",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -802,36 +622,6 @@
           "anchor": {
             "x": 0.5,
             "y": 0.95
-          },
-          "body": {
-            "bounds": {
-              "h": 48,
-              "w": 32,
-              "x": 24.0,
-              "y": 204.4
-            },
-            "foot": {
-              "x": 40.0,
-              "y": 252.4
-            },
-            "offset": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "h": 48,
-              "w": 32
-            }
-          },
-          "box": {
-            "h": 48,
-            "w": 32,
-            "x": 24.0,
-            "y": 204.4
-          },
-          "foot": {
-            "x": 40.0,
-            "y": 252.4
           },
           "frameBounds": {
             "h": 48,
@@ -851,7 +641,7 @@
           "trimmed": false
         },
         "frameName": "player-traveler.jump1",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "manifest.size/anchor + atlas frame"
       },
       {
         "assetId": "player-traveler",
@@ -861,6 +651,30 @@
             "x": 0.5,
             "y": 0.95
           },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 32,
+            "y": 144
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.jump2",
+        "source": "manifest.size/anchor + atlas frame"
+      },
+      {
+        "bodyId": "player",
+        "dimension": "player",
+        "expected": {
           "body": {
             "bounds": {
               "h": 48,
@@ -891,25 +705,12 @@
             "x": 40.0,
             "y": 252.4
           },
-          "frameBounds": {
-            "h": 48,
-            "w": 32,
-            "x": 32,
-            "y": 144
-          },
-          "rotated": false,
           "size": {
             "h": 48,
             "w": 32
-          },
-          "sourceSize": {
-            "h": 48,
-            "w": 32
-          },
-          "trimmed": false
+          }
         },
-        "frameName": "player-traveler.jump2",
-        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+        "source": "footOf + boxFromFoot + scene.ts body contract"
       },
       {
         "bodyId": "terrain#0",
