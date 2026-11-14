@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-06 完成；frontier：I03-07 / I03-08 / I03-PU-Air-Control-Closure
+Status: open · 2026-11-14 · I03-07 完成；frontier：I03-08 / I03-PU-Air-Control-Closure
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -88,6 +88,7 @@ Status: open · 2026-11-14 · I03-06 完成；frontier：I03-07 / I03-08 / I03-P
 
 ## Decisions so far
 
+- [I03-07 实施单元、复核点、白名单与回滚](issues/08-i03-07-units-whitelist.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A / Q6–Q10 通过（Q7-11 修订）；五单元 U1→U2→U4→U5→U3；U4 接 `analyzeTemporalInternalTwoLag` 经 U1 适配器、T-58 按新语义改写并保留禁止路径；U3 gap 替换最后执行；逐文件白名单（禁 glob，记操作类型与限定目的，`api.ts` 跨 U1/U2 非一次性授权）；12 条 STOP（墙钟仅 abort-only）；五道复核门 + 修改前后基线快照；U4/U5/U3 回滚演练、U3→U5→U4→U2→U1 逆序正式回滚；Ledger 空白表入 `docs/v7.8/移动-I03.md`；关闭 ≠ 开放能力，U1–U5 各需增量授权。
 - [I03-06 publish-gate 消费规则](issues/07-i03-06-publish-gate.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A / Q6=A / Q7=A / Q8=B / Q9=A / Q10=A / Q11=全冻结；第一阶段只记录 I03-01 公共时序证据（`PublishGateResult.temporal` 诊断字段），不参与判定；拒稿输入闭集三项、无新增 throw；不落盘、不进 CLI/MCP、不升契约；publish-gate 不读 capability gate；无 flag / revert-only；未来拒稿变更四项同时满足 + 另开授权 effort；默认关闭 + gate kill switch + 基线失效；现有断言零改动；G1–G11 负向矩阵 + 变异测试。
 - [I03-05 PUBLIC_PU 独立准入链](issues/06-i03-05-pu-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN；六条件逐项 PASS/BLOCKED/IE/NOT_RUN，任一非 PASS 不得 ADMITTED；条件 2 几何、条件 5 模型外当前硬阻断；条件 5 新建 I03-PU-Air-Control-Closure；固定 PU admission 夹具；全局 gate + 假 PU 全局关闭 + 证据基线失效；NB 不得推导 PU。
 - [I03-04 PUBLIC_NB 三阶段准入链](issues/05-i03-04-nb-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN 状态机；阶段 2 需几何 hazard+player（图割加 graph）+ temporal checked + 两档完整一致 + witness COMPLETE + 预算/确定性/体积/映射 + 固定 admission 夹具；阶段 3 需独立复核 + 用户授权 + 全局 gate OPEN；逐关仍须证据准入；假 NB 全局关闭 + 证据基线失效；关闭优先于缓存/历史/逐关结果。
@@ -104,7 +105,7 @@ Status: open · 2026-11-14 · I03-06 完成；frontier：I03-07 / I03-08 / I03-P
 
 ## Not yet specified
 
-无已知雾区。所有可陈述的授权包决策已拆票（见下）。实施期的执行顺序、PR 拆分、Runtime 证据工具属于后续实施 effort，不在本图；feature flag 形态已由 I03-06 冻结。
+无已知雾区。所有可陈述的授权包决策已拆票（见下）。Runtime 证据工具属于后续实施 effort，不在本图；feature flag 形态、执行顺序与 PR 拆分已分别由 I03-06 / I03-07 冻结。
 
 ## Out of scope
 
