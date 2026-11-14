@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-05 完成；frontier：I03-06 / I03-PU-Air-Control-Closure
+Status: open · 2026-11-14 · I03-06 完成；frontier：I03-07 / I03-08 / I03-PU-Air-Control-Closure
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -88,6 +88,7 @@ Status: open · 2026-11-14 · I03-05 完成；frontier：I03-06 / I03-PU-Air-Con
 
 ## Decisions so far
 
+- [I03-06 publish-gate 消费规则](issues/07-i03-06-publish-gate.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A / Q6=A / Q7=A / Q8=B / Q9=A / Q10=A / Q11=全冻结；第一阶段只记录 I03-01 公共时序证据（`PublishGateResult.temporal` 诊断字段），不参与判定；拒稿输入闭集三项、无新增 throw；不落盘、不进 CLI/MCP、不升契约；publish-gate 不读 capability gate；无 flag / revert-only；未来拒稿变更四项同时满足 + 另开授权 effort；默认关闭 + gate kill switch + 基线失效；现有断言零改动；G1–G11 负向矩阵 + 变异测试。
 - [I03-05 PUBLIC_PU 独立准入链](issues/06-i03-05-pu-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN；六条件逐项 PASS/BLOCKED/IE/NOT_RUN，任一非 PASS 不得 ADMITTED；条件 2 几何、条件 5 模型外当前硬阻断；条件 5 新建 I03-PU-Air-Control-Closure；固定 PU admission 夹具；全局 gate + 假 PU 全局关闭 + 证据基线失效；NB 不得推导 PU。
 - [I03-04 PUBLIC_NB 三阶段准入链](issues/05-i03-04-nb-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN 状态机；阶段 2 需几何 hazard+player（图割加 graph）+ temporal checked + 两档完整一致 + witness COMPLETE + 预算/确定性/体积/映射 + 固定 admission 夹具；阶段 3 需独立复核 + 用户授权 + 全局 gate OPEN；逐关仍须证据准入；假 NB 全局关闭 + 证据基线失效；关闭优先于缓存/历史/逐关结果。
 - [I03-03C 几何证据独立复核标准](issues/15-i03-03c-probe-review.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；fresh 独立会话；完整证据链 12 项；hazard/player/graph × required rows 逐项 PASS/FAIL/NOT_RUN；同环境重跑 + `normalizedResult` hash；环境不匹配只是 partial / environment-mismatch；复核 PASS 只表示证据支持分项，不设置 coverage.geometry / 不开放 NB/PU。正例行口径 14。
@@ -103,7 +104,7 @@ Status: open · 2026-11-14 · I03-05 完成；frontier：I03-06 / I03-PU-Air-Con
 
 ## Not yet specified
 
-无已知雾区。所有可陈述的授权包决策已拆票（见下）。实施期的执行顺序、PR 拆分、feature flag 形态、Runtime 证据工具属于后续实施 effort，不在本图。
+无已知雾区。所有可陈述的授权包决策已拆票（见下）。实施期的执行顺序、PR 拆分、Runtime 证据工具属于后续实施 effort，不在本图；feature flag 形态已由 I03-06 冻结。
 
 ## Out of scope
 
