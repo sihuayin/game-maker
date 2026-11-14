@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-08 完成；frontier：I03-09 / I03-PU-Air-Control-Closure
+Status: open · 2026-11-14 · I03-09 完成；frontier：I03-10 / I03-PU-Air-Control-Closure
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -88,6 +88,7 @@ Status: open · 2026-11-14 · I03-08 完成；frontier：I03-09 / I03-PU-Air-Con
 
 ## Decisions so far
 
+- [I03-09 授权包组装与一致性审计](issues/10-i03-09-assemble.md): 完成；`docs/v7.8/移动-I03.md` §0–§17（ASSEMBLED / UNSIGNED，`sha256:0edf5005…`）；审查输入包 `reports/09-review-input-package.md`（`sha256:5c6e2be4…`）；证据 `evidence/09-package.md`；21 项一致性审计全 PASS（六边界 6/6、AC 21/required 19、N1–N18、白名单、Ledger 空白、I-02 hash 未变、产品零 diff、链接全通）；显式未闭合：PU 条件 2/5、AC-11/15 `NOT_RUN`、Runtime hitbox 未证、probe 未实现；未实施、未开放、未推送。下一 frontier I03-10。
 - [I03-08 验收矩阵、负向测试、回归与证据格式](issues/09-i03-08-acceptance.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=全冻结 / Q6–Q9 通过；21 条 AC（6 组，required 19；AC-11 PU 六条件与 AC-15 真实 probe 预先非 required、phase-1 NOT_RUN）；严格逐项 PASS/FAIL/NOT_RUN、禁止通过率；18 条负向 N1–N18；全量 vitest + build + deps + links + T-55..T-65 + LP-06/07 原命令；E1/E2/E3；报告 `reports/I03-acceptance.md`；退出码 0/1/2，0 ≠ 通过；L1–L8 固定披露；验收层不补实现、不放宽判据、不改 gate、不把 NOT_RUN 当通过。
 - [I03-07 实施单元、复核点、白名单与回滚](issues/08-i03-07-units-whitelist.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A / Q6–Q10 通过（Q7-11 修订）；五单元 U1→U2→U4→U5→U3；U4 接 `analyzeTemporalInternalTwoLag` 经 U1 适配器、T-58 按新语义改写并保留禁止路径；U3 gap 替换最后执行；逐文件白名单（禁 glob，记操作类型与限定目的，`api.ts` 跨 U1/U2 非一次性授权）；12 条 STOP（墙钟仅 abort-only）；五道复核门 + 修改前后基线快照；U4/U5/U3 回滚演练、U3→U5→U4→U2→U1 逆序正式回滚；Ledger 空白表入 `docs/v7.8/移动-I03.md`；关闭 ≠ 开放能力，U1–U5 各需增量授权。
 - [I03-06 publish-gate 消费规则](issues/07-i03-06-publish-gate.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A / Q6=A / Q7=A / Q8=B / Q9=A / Q10=A / Q11=全冻结；第一阶段只记录 I03-01 公共时序证据（`PublishGateResult.temporal` 诊断字段），不参与判定；拒稿输入闭集三项、无新增 throw；不落盘、不进 CLI/MCP、不升契约；publish-gate 不读 capability gate；无 flag / revert-only；未来拒稿变更四项同时满足 + 另开授权 effort；默认关闭 + gate kill switch + 基线失效；现有断言零改动；G1–G11 负向矩阵 + 变异测试。
@@ -146,6 +147,8 @@ I03-00 初始化 / 范围冻结 / 台账 / 包骨架
 ## 证据落点
 
 - 前沿裁定：`reports/00-frontier-ruling.md`
-- 授权包草案：`docs/v7.8/移动-I03.md`（I03-09 创建；本图不预先填写结论）
+- 授权包：`docs/v7.8/移动-I03.md`（I03-09 组装；ASSEMBLED / UNSIGNED；`sha256:0edf5005d52f50ccbaa52be85f9b4ed34b904aacc6b51d7eec72be6ee2863c14`）
+- 审查输入包：`reports/09-review-input-package.md`（I03-10 输入；无作者结论）
+- 组装证据：`evidence/09-package.md`
 - 审查报告：`reports/I03-review.md`（I03-10）
 - 本图证据：`.scratch/level-playability-v1.1-i03/`
