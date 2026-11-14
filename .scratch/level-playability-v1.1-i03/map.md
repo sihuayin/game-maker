@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-14 · I03-03C 完成；frontier：I03-04 / I03-05 / I03-06
+Status: open · 2026-11-14 · I03-04 完成；frontier：I03-05 / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -49,13 +49,15 @@ Status: open · 2026-11-14 · I03-03C 完成；frontier：I03-04 / I03-05 / I03-
 - **Q4 = A**：第一阶段只增加 `coverage.temporal` 与 evidence，不改变拒稿行为；未来 gate 变更需另开审查。
 - 完整裁定见 [`reports/00-frontier-ruling.md`](reports/00-frontier-ruling.md)。
 
-### NB 三状态（不得混用）
+### NB 三阶段（不得混用）
 
-1. **接线完成**：生产链路能消费内部 NB 候选 + Witness。
-2. **证据准入通过**：几何可信度、时序覆盖、lag 语义、Witness 完整性等全部通过。
-3. **`PUBLIC_NB` 开放**：只有第 2 项通过 + 独立审查 + 授权，才允许发布公共 `NO_PROVEN_BLOCKER`。
+| 阶段 | 名称 | 公共 gate |
+| --- | --- | --- |
+| 1 | **WIRED** 接线完成 | `BLOCKED`；时序结果只作 IE / 非结论证据 |
+| 2 | **ADMITTED** 证据准入通过 | `BLOCKED`；证据满足准入，但未授权发布 |
+| 3 | **OPEN** 公共能力开放 | `OPEN`；逐关仍须通过阶段 2 证据准入 |
 
-**接线完成 ≠ 证据准入 ≠ 公共开放。** 当前 `coverage.geometry = partial`，Runtime hitbox 未闭合；I-03 授权包必须把几何证据补齐列为独立 gate。
+**接线完成 ≠ 证据准入 ≠ 公共开放。** 假 NB ⇒ 全局 gate 关闭 + 证据失效 + 相关结果退回 IE；关闭优先于缓存 / 历史产物 / 逐关准入。
 
 ### 几何四状态（I03-03）
 
@@ -86,6 +88,7 @@ Status: open · 2026-11-14 · I03-03C 完成；frontier：I03-04 / I03-05 / I03-
 
 ## Decisions so far
 
+- [I03-04 PUBLIC_NB 三阶段准入链](issues/05-i03-04-nb-admission.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；WIRED / ADMITTED / OPEN 状态机；阶段 2 需几何 hazard+player（图割加 graph）+ temporal checked + 两档完整一致 + witness COMPLETE + 预算/确定性/体积/映射 + 固定 admission 夹具；阶段 3 需独立复核 + 用户授权 + 全局 gate OPEN；逐关仍须证据准入；假 NB 全局关闭 + 证据基线失效；关闭优先于缓存/历史/逐关结果。
 - [I03-03C 几何证据独立复核标准](issues/15-i03-03c-probe-review.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；fresh 独立会话；完整证据链 12 项；hazard/player/graph × required rows 逐项 PASS/FAIL/NOT_RUN；同环境重跑 + `normalizedResult` hash；环境不匹配只是 partial / environment-mismatch；复核 PASS 只表示证据支持分项，不设置 coverage.geometry / 不开放 NB/PU。正例行口径 14。
 - [I03-03B2 逐行 fixture manifest](issues/16-i03-03b2-row-manifest.md): 14 正例行（hazard 2 / player 8 帧 + body 1 / graph 3）+ 10 个单变量负例 recipe；v4 归一化 manifest、源 / 归一化 hash、重建脚本；未物化副本、未实现 probe、未改产品 fixture。下一 frontier I03-03C。
 - [I03-03B2a 玩家脚点/锚点坐标约定](issues/17-i03-03b2a-player-coordinate.md): Q1=A / Q2=A / Q3=A；`player.at` = 锚点，player box = `boxFromFoot(footOf(...))` 不取整；last-train `(24,204.4,32,48)`；witness 在 I-03 实施单元修正（整数 lattice + 常量 foot 偏移，分数 foot 不可表达 ⇒ STOP）；runtime body 零容差。B2 解除阻塞。
