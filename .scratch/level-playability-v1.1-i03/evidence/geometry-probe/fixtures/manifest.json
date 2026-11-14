@@ -1,0 +1,990 @@
+{
+  "base": {
+    "atlasHashes": {
+      "delivery/atlas.animations.json": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+      "delivery/atlas.animations.png": "sha256:f258c05e6b93f5616108cae00d41812528173a0ea4906d674e3ca98255fedf54",
+      "delivery/atlas.backgrounds.json": "sha256:cc8c7861ecff8e53652131ad8f93e26dedf0d06a25da7b4d34b18a08f015dc29",
+      "delivery/atlas.backgrounds.png": "sha256:ddc5b3637e61bac739f883ec367e2bd97a19a36d7a1a2d940954980ce91a943a",
+      "delivery/atlas.sprites.json": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+      "delivery/atlas.sprites.png": "sha256:fcaf00ee75c4cae7a8988fc1839f073c3f4e841a28fe5af97db1fca3770afab6",
+      "delivery/atlas.ui.json": "sha256:544d803612a66ab3125a71b487f694381693e168d1688ab2a68351c941648ea8",
+      "delivery/atlas.ui.png": "sha256:10c80d20d5befad0a0e72f3f46a3d5be810bcb97d8a8c433a0196a659e763b77"
+    },
+    "normalization": {
+      "format": "assetpack/v4",
+      "normalizedManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98",
+      "normalizedManifestPath": ".scratch/level-playability-v1.1-i03/evidence/geometry-probe/fixtures/last-train-v4/manifest.json",
+      "note": "manifest-only normalization; delivery/authoring files stay in the frozen v2 pack",
+      "provenance": {
+        "mode": "generated"
+      },
+      "sourceManifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689"
+    },
+    "sourceConfig": "fixtures/game-configs/last-train.json",
+    "sourceConfigHash": "sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+    "sourceManifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+    "sourcePack": "fixtures/packs/last-train/v2",
+    "sourcePackHash": "sha256:570535deff5c2f4e1626b2680a4b555f631e51d6d87721507a0a1f6e2feb7383"
+  },
+  "negative": [
+    {
+      "class": "geometry-mismatch",
+      "code": "frame-missing",
+      "expected": {
+        "affected": [
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "frame-missing",
+        "summary": "untrusted"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "frame": "player-traveler.idle1",
+        "kind": "delete-frame",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": "sha256:3e986771ed5e29b35df74b87161705baeb6fef7945787f90cd72c90a0a82240a",
+        "manifestChecksumUpdated": true,
+        "manifestHash": "sha256:622b1e5b0b3d3bce73e429c57aa396090c61fac84853021cd0311d6fdeb1cc30"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "frame-size-mismatch",
+      "expected": {
+        "affected": [
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "frame-size-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "after": 33,
+        "before": 32,
+        "field": "sourceSize.w",
+        "frame": "player-traveler.idle1",
+        "kind": "set-frame-sourceSize",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": "sha256:cceead3515d422f8d55a7e6b8385b6fe42db7c68b6aa985088c318bd85820ec4",
+        "manifestChecksumUpdated": true,
+        "manifestHash": "sha256:9a3f4a799616225a88ab0e1e24105148d4af2de1350fcc15e9812b54b4f127ad"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "anchor-mismatch",
+      "expected": {
+        "affected": [
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "anchor-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "after": 0.55,
+        "before": 0.5,
+        "field": "anchor.x",
+        "frame": "player-traveler.idle1",
+        "kind": "set-frame-anchor",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": "sha256:b5714f35e376d66b62bf40915dbdd7b2cccf5b96c10a72de9edc178ef662a0dc",
+        "manifestChecksumUpdated": true,
+        "manifestHash": "sha256:66f27ebe06f63493ba42e27ef07cf782499d41253a75daa2a6c1586b83037cc3"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "trimmed",
+      "expected": {
+        "affected": [
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "trimmed",
+        "summary": "untrusted"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "after": true,
+        "before": false,
+        "field": "trimmed",
+        "frame": "player-traveler.idle1",
+        "kind": "set-frame-flag",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": "sha256:cec832e6f1c9599eeb751cd2943d2e6ca9749d7d736b531128415d0878c30542",
+        "manifestChecksumUpdated": true,
+        "manifestHash": "sha256:72915674f1948ef1a4b6383ede1d48a1c8fb2ef7c4e67e719a8c5a24e7583ecf"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "rotated",
+      "expected": {
+        "affected": [
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "rotated",
+        "summary": "untrusted"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "after": true,
+        "before": false,
+        "field": "rotated",
+        "frame": "player-traveler.idle1",
+        "kind": "set-frame-flag",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": "sha256:05304b0497df6dfefbbd233a7b2e204e721d56b743b170dd72f919c48a227427",
+        "manifestChecksumUpdated": true,
+        "manifestHash": "sha256:5e8204d4207655f6baa1eb9b15afe611883a83b1850dff886cc468fac43d81da"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "atlas-hash-mismatch",
+      "expected": {
+        "affected": [
+          "hazard",
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "partial",
+          "player": "partial"
+        },
+        "failureCode": "atlas-hash-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "field": "meta.app",
+        "kind": "mutate-atlas-meta-leave-manifest-checksum",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": "sha256:722115476e8706ca0a96742efe2af67df58c23277b84d87e64ebabcacd7eeb6e",
+        "manifestChecksumUpdated": false,
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      }
+    },
+    {
+      "class": "missing-evidence",
+      "code": "atlas-missing",
+      "expected": {
+        "affected": [
+          "hazard",
+          "player"
+        ],
+        "coverage": {
+          "graph": "checked",
+          "hazard": "partial",
+          "player": "partial"
+        },
+        "failureCode": "atlas-missing",
+        "summary": "partial"
+      },
+      "input": {
+        "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "atlasPath": "delivery/atlas.animations.json",
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "kind": "delete-file",
+        "path": "delivery/atlas.animations.json"
+      },
+      "output": {
+        "atlasHash": null,
+        "manifestChecksumUpdated": false,
+        "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "body-size-mismatch",
+      "expected": {
+        "affected": [
+          "player",
+          "graph"
+        ],
+        "coverage": {
+          "graph": "partial",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "body-size-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "baseAtlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "baseManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "kind": "runtime-override",
+        "override": {
+          "body": {
+            "size": {
+              "h": 48,
+              "w": 34
+            }
+          },
+          "target": "player"
+        }
+      },
+      "output": {
+        "recipeHash": "sha256:7ebdf9b9e9f70d6b3119ae492be5e8b0d99cbdcb19f574472d0fd790107967ce"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "body-offset-mismatch",
+      "expected": {
+        "affected": [
+          "player",
+          "graph"
+        ],
+        "coverage": {
+          "graph": "partial",
+          "hazard": "checked",
+          "player": "partial"
+        },
+        "failureCode": "body-offset-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "baseAtlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "baseManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "kind": "runtime-override",
+        "override": {
+          "body": {
+            "offset": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "target": "player"
+        }
+      },
+      "output": {
+        "recipeHash": "sha256:3bfb21a3e9ede7414377c7e3c5584acce7c0979f379365d3b4839c10bcf4a0c4"
+      }
+    },
+    {
+      "class": "geometry-mismatch",
+      "code": "graph-solid-mismatch",
+      "expected": {
+        "affected": [
+          "graph"
+        ],
+        "coverage": {
+          "graph": "partial",
+          "hazard": "checked",
+          "player": "checked"
+        },
+        "failureCode": "graph-solid-mismatch",
+        "summary": "untrusted"
+      },
+      "input": {
+        "baseAtlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+        "baseManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+      },
+      "mutation": {
+        "kind": "runtime-override",
+        "override": {
+          "box": {
+            "h": 40,
+            "w": 42,
+            "x": 480,
+            "y": 210
+          },
+          "target": "luggage"
+        }
+      },
+      "output": {
+        "recipeHash": "sha256:31cc9746d875d31397ee0623def8ead59b01fb1f746864b382ba58aa391fbca0"
+      }
+    }
+  ],
+  "noFixture": [
+    {
+      "code": "probe-not-run",
+      "note": "execution missing; not a geometry mutation"
+    }
+  ],
+  "positive": {
+    "dimensions": [
+      "hazard",
+      "player",
+      "graph"
+    ],
+    "fixtureId": "last-train-v4",
+    "rows": [
+      {
+        "assetId": "hazard-sweeping-carriage",
+        "dimension": "hazard",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "box": {
+            "h": 48,
+            "w": 64,
+            "x": 768,
+            "y": 202
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 64,
+            "x": 0,
+            "y": 0
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 64
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 64
+          },
+          "trimmed": false
+        },
+        "frameName": "hazard-sweeping-carriage.sweep1",
+        "source": "manifest.size/anchor + atlas frame + entityBox"
+      },
+      {
+        "assetId": "hazard-sweeping-carriage",
+        "dimension": "hazard",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "box": {
+            "h": 48,
+            "w": 64,
+            "x": 768,
+            "y": 202
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 64,
+            "x": 0,
+            "y": 48
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 64
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 64
+          },
+          "trimmed": false
+        },
+        "frameName": "hazard-sweeping-carriage.sweep2",
+        "source": "manifest.size/anchor + atlas frame + entityBox"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 0,
+            "y": 96
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.idle1",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 32,
+            "y": 96
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.idle2",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 0,
+            "y": 192
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.run1",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 32,
+            "y": 192
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.run2",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 0,
+            "y": 240
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.run3",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 32,
+            "y": 240
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.run4",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 0,
+            "y": 144
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.jump1",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "assetId": "player-traveler",
+        "dimension": "player",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 0.95
+          },
+          "body": {
+            "bounds": {
+              "h": 48,
+              "w": 32,
+              "x": 24.0,
+              "y": 204.4
+            },
+            "foot": {
+              "x": 40.0,
+              "y": 252.4
+            },
+            "offset": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "h": 48,
+              "w": 32
+            }
+          },
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "frameBounds": {
+            "h": 48,
+            "w": 32,
+            "x": 32,
+            "y": 144
+          },
+          "rotated": false,
+          "size": {
+            "h": 48,
+            "w": 32
+          },
+          "sourceSize": {
+            "h": 48,
+            "w": 32
+          },
+          "trimmed": false
+        },
+        "frameName": "player-traveler.jump2",
+        "source": "manifest.size/anchor + footOf + boxFromFoot + scene.ts body contract"
+      },
+      {
+        "bodyId": "terrain#0",
+        "dimension": "graph",
+        "expected": {
+          "box": {
+            "h": 20,
+            "w": 1440,
+            "x": 0,
+            "y": 250
+          }
+        },
+        "source": "config.terrain[0]"
+      },
+      {
+        "bodyId": "luggage",
+        "dimension": "graph",
+        "expected": {
+          "anchor": {
+            "x": 0.5,
+            "y": 1
+          },
+          "box": {
+            "h": 40,
+            "w": 40,
+            "x": 480,
+            "y": 210
+          },
+          "size": {
+            "h": 40,
+            "w": 40
+          }
+        },
+        "source": "config entity + manifest.size/anchor + entityBox"
+      },
+      {
+        "bodyId": "player",
+        "dimension": "graph",
+        "expected": {
+          "box": {
+            "h": 48,
+            "w": 32,
+            "x": 24.0,
+            "y": 204.4
+          },
+          "foot": {
+            "x": 40.0,
+            "y": 252.4
+          },
+          "size": {
+            "h": 48,
+            "w": 32
+          }
+        },
+        "source": "runtimePlayerGeometry (footOf + boxFromFoot)"
+      }
+    ]
+  },
+  "reviewOnly": [
+    {
+      "class": "environment",
+      "code": "environment-mismatch",
+      "note": "review-level; do not compare across environments"
+    },
+    {
+      "class": "nondeterministic",
+      "code": "nondeterministic",
+      "note": "same environment rerun must be byte-identical"
+    }
+  ],
+  "storage": {
+    "copies": "not materialized by B2; implementation must materialize from base + recipes",
+    "manifest": ".scratch/level-playability-v1.1-i03/evidence/geometry-probe/fixtures/manifest.json",
+    "positive": ".scratch/level-playability-v1.1-i03/evidence/geometry-probe/fixtures/last-train-v4/manifest.json",
+    "rebuild": ".scratch/level-playability-v1.1-i03/evidence/geometry-probe/scripts/build-fixtures.py"
+  },
+  "version": "i03-geometry-probe-fixtures/v1"
+}

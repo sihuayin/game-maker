@@ -1,0 +1,10 @@
+{
+  "format": "assetpack/v4",
+  "normalizedManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98",
+  "normalizedManifestPath": ".scratch/level-playability-v1.1-i03/evidence/geometry-probe/fixtures/last-train-v4/manifest.json",
+  "note": "manifest-only normalization; delivery/authoring files stay in the frozen v2 pack",
+  "provenance": {
+    "mode": "generated"
+  },
+  "sourceManifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689"
+}

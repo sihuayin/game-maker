@@ -1,14 +1,16 @@
 # I03-03B2 逐行 fixture manifest
 
 Type: task
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (I03-03B2 session 2026-11-14)
 Blocked by: 14
 Map: ../map.md
 Class: I-03 / TASK
 
 ## Task
 
+> **本票只冻结 manifest / 归一化计划 / 变异配方；不物化二进制副本、不实现 probe。**
+>
 > **B2a 已裁定（2026-11-14）**：`player.at` = 锚点；player box = `boxFromFoot(footOf(...))`，不取整；last-train 为 `(24,204.4,32,48)`；witness 修正 / `.95` 回归 / 零容差见 [I03-03B2a](17-i03-03b2a-player-coordinate.md)。本票已解除阻塞。
 
 把 I03-03B 的夹具设计落成**逐行 fixture manifest**：每个 frame / body 的 expected 值、来源、hash 与负例变异配方。**不实现 probe，不修改产品 fixture。**
@@ -40,4 +42,18 @@ Class: I-03 / TASK
 
 ## Answer
 
-（resolved 时填写）
+**完成。** 逐行 fixture manifest、v4 归一化计划、10 个负例配方与 hashes 已冻结；**未物化二进制副本、未实现 probe、未修改产品 fixture**。
+
+| 项 | 结果 |
+| --- | --- |
+| 源 pack tree hash | `sha256:570535deff5c2f4e1626b2680a4b555f631e51d6d87721507a0a1f6e2feb7383` |
+| 源 manifest hash | `sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689` |
+| 归一化 manifest hash | `sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98`（v4 parse ok） |
+| 正例行 | **13**：hazard 2 / player 8 / graph 3；player canonical box `(24,204.4,32,48)`、foot `(40,252.4)` |
+| 负例 | **10** 个单变量 recipe：7 个 geometry-mismatch（player/hazard/graph 按 affected）+ `atlas-missing` missing-evidence + body-size / body-offset / graph-solid override |
+| Review-only | `environment-mismatch` / `nondeterministic`；`probe-not-run` 不造夹具 |
+| 重建 | `python3 .scratch/.../geometry-probe/scripts/build-fixtures.py`；确定性写出 manifest |
+| 未物化 | 不复制二进制 pack；未来实施单元按 base + normalization + recipe 物化 |
+| 产品改动 | **无**；仅 `.scratch` 证据 |
+
+证据：[`../evidence/03b2-fixture-manifest.md`](../evidence/03b2-fixture-manifest.md)。**下游**：I03-03C（独立复核标准）为下一 frontier；I03-06 可并行；probe 实现仍不授权。
