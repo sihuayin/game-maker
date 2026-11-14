@@ -8,7 +8,7 @@ Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
 PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: open · 2026-11-13 · I03-02 完成；frontier：I03-03 / I03-06
+Status: open · 2026-11-14 · I03-03 完成；frontier：I03-03A / I03-03B / I03-03C / I03-06
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -57,6 +57,15 @@ Status: open · 2026-11-13 · I03-02 完成；frontier：I03-03 / I03-06
 
 **接线完成 ≠ 证据准入 ≠ 公共开放。** 当前 `coverage.geometry = partial`，Runtime hitbox 未闭合；I-03 授权包必须把几何证据补齐列为独立 gate。
 
+### 几何四状态（I03-03）
+
+1. **时序分析已接线**：I-02 内部结果可以被 I-03 消费。
+2. **几何覆盖已检查**：相应分项具有构建期 + 运行时两层证据。
+3. **证据准入通过**：对应能力消费的几何分项全部满足要求。
+4. **公共能力开放**：仍须独立复核与显式授权。
+
+`coverage.geometry` 只是汇总，不能替代 NB/PU 的分项准入判断；四者不得混用。
+
 ### PU 独立链
 
 `PUBLIC_PU` 至少需要：`coverage.geometry = checked`、空中控制 / 模型外规避闭合、hop 图割与加倍采样完整、I-00 六项条件全部满足、独立审查与增量授权。**不得因 NB 通过而推导 PU 可用。**
@@ -77,6 +86,7 @@ Status: open · 2026-11-13 · I03-02 完成；frontier：I03-03 / I03-06
 
 ## Decisions so far
 
+- [I03-03 几何 / Runtime hitbox 证据 gate](issues/04-i03-03-geometry-gate.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；公共 `coverage.geometry` 汇总 + 三份明细；构建期 Atlas/PNG + 运行时 Phaser probe 两层证据；NB 需 hazard+player（图割再加 graph），PU 需三份全 checked + I-00 六条件；`partial` 只是覆盖状态；probe 只读、不新增依赖、`profile.ts`/`graph.ts` 只读。新增 I03-03A/B/C。
 - [I03-02 公共 Verdict 与 coverage 语义](issues/03-i03-02-verdict-coverage.md): Q1=A / Q2=A / Q3=A / Q4=A / Q5=A；内部 nb/pu-candidate 在 `PUBLIC_*` BLOCKED 时一律映射 IE；替换 `moving-hazard-phase` gap 为能力门控 temporal 层；`coverage.temporal` 适用即约束；现有三层 PU/IE 优先；temporal 非阻断。未改产品代码。
 - [I03-01 I-02 内部结果 → 公共证据映射](issues/02-i03-01-evidence-mapping.md): Q1=A / Q2=A / Q3=B / Q4=A / Q5=A；公共 evidence 用 model/lag/degradation/limits 摘要 + `kind:"temporal"` witness；`coverage.temporal` 用 `checked|partial|unknown`；D9 20 码 many-to-one 到 13 个公共 degradation 值；`lag.perLag` 两档结论；judgmentId `PLAYABILITY_TEMPORAL_EVIDENCE` 非阻断。未改产品代码。
 - [I03-00 初始化、范围冻结、授权台账与包骨架](issues/01-i03-00-init.md): 分支 / base / 授权包 SHA / 输入基线 / 台账 / DRAFT 包骨架就绪；产品目录零 diff；`PUBLIC_NB` / `PUBLIC_PU` 仍 `BLOCKED`；I-03 实施未授权。I03-01 为下一 frontier。
@@ -106,8 +116,11 @@ I03-00 初始化 / 范围冻结 / 台账 / 包骨架
   │         ├─ I03-05 PUBLIC_PU 独立准入链
   │         └─ I03-06 publish-gate 消费规则
   ├─ I03-03 几何 / Runtime hitbox 证据 gate
-  │    ├─ I03-04
-  │    └─ I03-05
+  │    ├─ I03-03A 几何 probe 证据格式与 hash
+  │    ├─ I03-03B 几何 probe 固定夹具矩阵
+  │    └─ I03-03C 几何证据独立复核标准
+  │         ├─ I03-04
+  │         └─ I03-05
   ├─ I03-07 实施单元 / 复核点 / 白名单 / 回滚（需 I03-04 / I03-05 / I03-06）
   └─ I03-08 验收矩阵 / 负向测试 / 回归（需 I03-01 ～ I03-06）
        └─ I03-09 授权包组装与一致性审计（需 I03-07 / I03-08）
