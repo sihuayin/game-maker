@@ -15,6 +15,7 @@ Class: I-03-IMPL / U4
 - `analyzeTemporalInternalTwoLag` 经 U1 适配器接入；`runTemporalAudit` 保持同步 / 不抛 / 不改退出码；
 - 双档运行、确定性证据、AC-10 / AC-18 / AC-19、T-56 / T-57 / T-58 / T-60 / T-61 / T-62 / T-64；
 - U4 专属门：T-58 允许路径 + 禁止路径；stub 负向覆盖；双档可重放确定性；
+- **真实 analyzer → U1 adapter 集成 smoke（必需，来自 I03-IMPL-02 Q4）**：必须证明 `analyzeTemporalInternalTwoLag` 的真实结果可被 U1 `toPublicTemporalEvidence` 直接消费；不得用测试专用转换层掩盖类型 / 字段漂移；在 U4 的 assets 授权范围内完成；
 - **回滚演练**（revert 后跑相关测试，保留日志与 hash）；
 - 独立复核输入、E1 / E2 / E3、不变量快照；
 - **明确：本 brief 不写代码**。
@@ -22,3 +23,7 @@ Class: I-03-IMPL / U4
 ## Answer
 
 （resolved 时填写）
+
+## Comments
+
+- 2026-11-15 I03-IMPL-02 Q4 裁定：真实 analyzer → adapter smoke 从 U1 移入 U4，作为 U4 必需验收项；U1 不引入跨包依赖。
