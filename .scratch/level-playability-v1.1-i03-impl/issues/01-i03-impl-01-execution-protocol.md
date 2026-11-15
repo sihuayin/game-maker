@@ -1,8 +1,8 @@
 # I03-IMPL-01 执行协议与授权拓扑
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (I03-IMPL-01 session 2026-11-15)
 Blocked by: —
 Map: ../map.md
 Class: I-03-IMPL / PROTOCOL
@@ -20,4 +20,20 @@ Class: I-03-IMPL / PROTOCOL
 
 ## Answer
 
-（resolved 时填写）
+**Q1–Q6 = A，执行协议冻结。** 协议资产：[`reports/01-execution-protocol.md`](../reports/01-execution-protocol.md) · `sha256:b9e14b5ffddf8d075fdc895bd5638eadf21b2fdbbe27e1e4aea24359a7c86fd2`。
+
+| 题 | 冻结结果 |
+| --- | --- |
+| Q1 | 授权记录先 docs PR 合入 `main`，再切单元分支 |
+| Q2 | fresh subagent / 独立会话 + 独立输入包 + 独立复核报告 |
+| Q3 | 授权 docs PR → 单元实现 / 复核 / 签署 → 单元 PR → 独立 Ledger PR |
+| Q4 | 固定证据目录、不变量 before/after、隔离回滚演练、STOP 文件 |
+| Q5 | 独立 docs-only Ledger PR + 去掉目标行后 byte-compare |
+| Q6 | 独立协议资产 + 统一单元 brief 清单 |
+
+### 关键边界
+
+- 本票只冻结协议；**不授权任何单元**、不改产品代码、不开放 `PUBLIC_NB` / `PUBLIC_PU`。
+- 每单元仍需独立授权记录 + 独立复核 + 用户签署 + Ledger 更新。
+- docs-only Ledger 例外仅 §12.2 目标行；§1–§11 / §13–§17 / §12.1 / 产品代码全部锁住。
+- 下一 frontier：I03-IMPL-02 U1 brief。
