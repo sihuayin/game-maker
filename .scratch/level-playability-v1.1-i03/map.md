@@ -7,8 +7,8 @@ Authority: [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md) @ `sha256:
 Incremental authorization: 用户 `amber` · 2026-11-13 · 指令「开 I-03 新地图」· 范围**仅授权包规划与签署准备**；不实施生产修改；实施另开 effort
 Baseline: `wayfinder/level-playability-v1.1-i02` @ `2b57f2a`（U5 已合并）
 Branch: `wayfinder/level-playability-v1.1-i03`
-PR target: `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）
-Status: closed · 2026-11-15 · I03-11 用户签署完成（amber，2026-11-15）；I-03 授权包 SIGNED；地图收口
+PR target: 原计划 `wayfinder/level-playability-v1.1-i02`（仅授权包 / 文档）；实际 PR #41 → `main`（用户 2026-11-15 明确指令；merge commit `0202917`）
+Status: closed · 2026-11-15 · I03-11 用户签署完成（amber，2026-11-15）；I-03 授权包 SIGNED；地图收口；PR #41 已合并到 main
 
 > **规划型 effort。** Destination 是**可签署的 I-03 实施授权包**，不是生产代码修改。
 > 本图不执行 `ops.ts` / `publish-gate` / `mechanic.ts` / `api.ts` / `contracts` 的实施改动；
@@ -88,7 +88,7 @@ Status: closed · 2026-11-15 · I03-11 用户签署完成（amber，2026-11-15�
 
 ## Decisions so far
 
-- [I03-11 用户签署 I-03 授权包](issues/12-i03-11-sign.md): 用户 `amber` 于 2026-11-15 签署；范围**仅 I-03 授权包**（签署前 `sha256:2f89d572…`；签署后含签署栏 `sha256:f45332be…`）；依据独立审查报告（`sha256:40af4b4b…`，PASS 23/23；F2 已修正）与 F2 修正证据（`sha256:17ea5f91…`）；结论：批准作为后续实施 effort 的规划依据；**不自动授权 U1–U5、不开放 `PUBLIC_NB` / `PUBLIC_PU`**；U1–U5 仍 `NOT_AUTHORIZED`、两能力仍 `BLOCKED`；I-03 实施仍 `NOT_AUTHORIZED`；**地图收口**。签署记录：[`evidence/11-signature.md`](evidence/11-signature.md)。
+- [I03-11 用户签署 I-03 授权包](issues/12-i03-11-sign.md): 用户 `amber` 于 2026-11-15 签署；范围**仅 I-03 授权包**（签署前 `sha256:2f89d572…`；签署后含签署栏 `sha256:f45332be…`）；依据独立审查报告（`sha256:40af4b4b…`，PASS 23/23；F2 已修正）与 F2 修正证据（`sha256:17ea5f91…`）；结论：批准作为后续实施 effort 的规划依据；**不自动授权 U1–U5、不开放 `PUBLIC_NB` / `PUBLIC_PU`**；U1–U5 仍 `NOT_AUTHORIZED`、两能力仍 `BLOCKED`；I-03 实施仍 `NOT_AUTHORIZED`；**地图收口**。签署记录：[`evidence/11-signature.md`](evidence/11-signature.md)。**2026-11-15 后续：PR #41 已合并到 `main`**（merge commit `0202917`；CI `check` / `evidence` / `test` / `typecheck` 全 pass；合并范围 129 files / +20161 / -9，含 I-02 U5 产品工作 11 files；该合并为用户明确指令，超出地图原 Out of scope）。
 - [I03-10 授权包独立审查](issues/11-i03-10-review.md): 独立会话完成；23/23 PASS（0 FAIL / 0 NOT_RUN）；5 条自选关键断言；`pnpm test` 176 files / 2877 tests + build / deps / links + LP-06/07 + fixture 重建全部退出 0；6 项发现 F1–F6，**F2 已按用户裁定修正**（负例 10 → 11 = 10 geometry-mismatch + 1 missing-evidence，新增 `body-bounds-mismatch`；包 §6.6 / AC-15 / §16、审查输入包、manifest / script / evidence 03b2 同步），F6 一并修正；F1 / F3 / F4 / F5 为非阻断。审查 PASS 不授权实施 / probe / 能力开放。下一 frontier I03-11。报告：[`reports/I03-review.md`](reports/I03-review.md)；F2 证据：[`evidence/10-f2-correction.md`](evidence/10-f2-correction.md)。
 - [I03-PU-Air-Control-Closure — 空中控制与模型外规避闭合证据](issues/18-i03-pu-air-control.md): Q1=B / Q2=A / Q3=A / Q4=A / Q5=A / Q6–Q10 通过；有界控制包络 E（全速空中水平控制、仅地面单跳、walk-off 漂移；无二段跳/冲刺/墙跳/梯子/y 轴输入/移动平台落点）；条件 5 PASS 需**垂直包容 A + 保守弧线扫掠 B**，运行时采样只作支持；17 条 C1–C17；fresh 独立复核 + E1/E2/E3；条件 5 仍未闭合、`PUBLIC_PU` 仍 `BLOCKED`；A/B 证明实现不在 I-03 最小面。
 - [I03-09 授权包组装与一致性审计](issues/10-i03-09-assemble.md): 完成；`docs/v7.8/移动-I03.md` §0–§17（ASSEMBLED / UNSIGNED，`sha256:0edf5005…`；**I03-10 F2 修正后 `2f89d572…`**）；审查输入包 `reports/09-review-input-package.md`（`sha256:5c6e2be4…`；**I03-10 F2 修正后 `1227d1f3…`**）；证据 `evidence/09-package.md`；21 项一致性审计全 PASS（六边界 6/6、AC 21/required 19、N1–N18、白名单、Ledger 空白、I-02 hash 未变、产品零 diff、链接全通）；显式未闭合：PU 条件 2/5、AC-11/15 `NOT_RUN`、Runtime hitbox 未证、probe 未实现；未实施、未开放、未推送。下一 frontier I03-10。
