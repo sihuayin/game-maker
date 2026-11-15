@@ -1,0 +1,41 @@
+--- a/packages/contracts/src/playability/graph.ts
++++ b/packages/contracts/src/playability/graph.ts
+@@ (HopEdge 类型之后、hopSamples 之前)
++/** 跳跃弧采样参数。缺省（或只给一项）时，每一项都回落到现行 60Hz / cap 120 行为。 */
++export type HopSampling = { readonly hz?: number; readonly maxSamples?: number };
++
++const DEFAULT_HOP_SAMPLING = { hz: 60, maxSamples: 120 } as const;
++
++function resolveHopSampling(
++  sampling: HopSampling | undefined,
++): { hz: number; maxSamples: number } {
++  return {
++    hz: sampling?.hz ?? DEFAULT_HOP_SAMPLING.hz,
++    maxSamples: sampling?.maxSamples ?? DEFAULT_HOP_SAMPLING.maxSamples,
++  };
++}
+@@ export function hopSamples(
+-  graph: MovementGraph, ax: number, ay: number, bx: number, by: number, move: MoveParams,
++  graph: MovementGraph, ax: number, ay: number, bx: number, by: number, move: MoveParams,
++  sampling?: HopSampling,
+ ): Vec[] | null {
+@@ 采样数计算
+-  const n = Math.max(6, Math.min(120, Math.ceil(t * 60)));
++  const { hz, maxSamples } = resolveHopSampling(sampling);
++  const n = Math.max(6, Math.min(maxSamples, Math.ceil(t * hz)));
+@@ export function hopEdges(
+-export function hopEdges(graph: MovementGraph, x: number, y: number, move: MoveParams): HopEdge[] {
++export function hopEdges(
++  graph: MovementGraph, x: number, y: number, move: MoveParams, sampling?: HopSampling,
++): HopEdge[] {
+@@ hopEdges 内部调用
+-      const samples = hopSamples(graph, x, y, bx, by, move);
++      const samples = hopSamples(graph, x, y, bx, by, move, sampling);
+@@ export function hopTargets
+-export function hopTargets(graph: MovementGraph, x: number, y: number, move: MoveParams): Vec[] {
+-  return hopEdges(graph, x, y, move).map((edge) => ({ x: edge.x, y: edge.y }));
++export function hopTargets(
++  graph: MovementGraph, x: number, y: number, move: MoveParams, sampling?: HopSampling,
++): Vec[] {
++  return hopEdges(graph, x, y, move, sampling).map((edge) => ({ x: edge.x, y: edge.y }));
+ }

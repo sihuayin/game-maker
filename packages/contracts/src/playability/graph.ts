@@ -217,6 +217,23 @@ export function movementNeighbors(graph: MovementGraph, x: number, y: number): M
 export type HopEdge = { readonly x: number; readonly y: number; readonly samples: readonly Vec[] };
 
 /**
+ * 跳跃弧采样参数。缺省（或只给一项）时，每一项都回落到现行 60Hz / cap 120 行为。
+ * ⚠️ 这是 U4 双档检查的**唯一**采样旋钮；`reach.ts` 的 mid-air 扫描不消费它。
+ */
+export type HopSampling = { readonly hz?: number; readonly maxSamples?: number };
+
+const DEFAULT_HOP_SAMPLING = { hz: 60, maxSamples: 120 } as const;
+
+function resolveHopSampling(
+  sampling: HopSampling | undefined,
+): { hz: number; maxSamples: number } {
+  return {
+    hz: sampling?.hz ?? DEFAULT_HOP_SAMPLING.hz,
+    maxSamples: sampling?.maxSamples ?? DEFAULT_HOP_SAMPLING.maxSamples,
+  };
+}
+
+/**
  * 从落脚点 A 跳到落脚点 B 的**整条抛物线采样**；撞进实心体或根本够不着时返回 `null`。
  *
  * ⚠️ 全仓只有这一处算跳跃弧：`hopTargets` 与 LP-02 的覆盖判定都从它取采样。
@@ -224,6 +241,7 @@ export type HopEdge = { readonly x: number; readonly y: number; readonly samples
  */
 export function hopSamples(
   graph: MovementGraph, ax: number, ay: number, bx: number, by: number, move: MoveParams,
+  sampling?: HopSampling,
 ): Vec[] | null {
   const apex = maxJumpHeight(move);
   const dh = ay - by;                                  // 正 = 落点更高
@@ -234,7 +252,8 @@ export function hopSamples(
   const dx = bx - ax;
   if (Math.abs(dx) > move.speed * t) return null;
 
-  const n = Math.max(6, Math.min(120, Math.ceil(t * 60)));
+  const { hz, maxSamples } = resolveHopSampling(sampling);
+  const n = Math.max(6, Math.min(maxSamples, Math.ceil(t * hz)));
   const samples: Vec[] = [];
   for (let i = 0; i <= n; i++) {
     const f = i / n;
@@ -250,7 +269,9 @@ export function hopSamples(
 }
 
 /** 从落脚点能跳到的所有落脚点（含整条弧的采样；按需计算，不预物化）。 */
-export function hopEdges(graph: MovementGraph, x: number, y: number, move: MoveParams): HopEdge[] {
+export function hopEdges(
+  graph: MovementGraph, x: number, y: number, move: MoveParams, sampling?: HopSampling,
+): HopEdge[] {
   const maxDx = Math.ceil(jumpSpan(move, graph.height));
   const out: HopEdge[] = [];
   for (let dx = -maxDx; dx <= maxDx; dx++) {
@@ -258,7 +279,7 @@ export function hopEdges(graph: MovementGraph, x: number, y: number, move: MoveP
     if (bx < 0 || bx > graph.width) continue;
     for (const by of graph.columns[bx] ?? []) {
       if (bx === x && by === y) continue;
-      const samples = hopSamples(graph, x, y, bx, by, move);
+      const samples = hopSamples(graph, x, y, bx, by, move, sampling);
       if (samples) out.push({ x: bx, y: by, samples });
     }
   }
@@ -269,8 +290,10 @@ export function hopEdges(graph: MovementGraph, x: number, y: number, move: MoveP
  * 从落脚点跳出去能落到的落脚点（按需计算）。
  * ⚠️ 与 `auditReachability` 是同一条抛物线；两种写法会漂移，LP-02 接线时必须只留这一份。
  */
-export function hopTargets(graph: MovementGraph, x: number, y: number, move: MoveParams): Vec[] {
-  return hopEdges(graph, x, y, move).map((edge) => ({ x: edge.x, y: edge.y }));
+export function hopTargets(
+  graph: MovementGraph, x: number, y: number, move: MoveParams, sampling?: HopSampling,
+): Vec[] {
+  return hopEdges(graph, x, y, move, sampling).map((edge) => ({ x: edge.x, y: edge.y }));
 }
 
 /** BFS 可达集（键 `"x,y"`）。`includeHop=false` 只走地面移动，给 LP-01 的测试与调试用。 */
