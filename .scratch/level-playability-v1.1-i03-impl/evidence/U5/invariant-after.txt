@@ -1,4 +1,4 @@
-# U5 invariant AFTER (head d8b5df1)
+# U5 invariant AFTER (product head 739076a)
 
 $ shasum -a 256 packages/contracts/src/playability/public-verdict.ts
 ec67f5a7737e711ef4d25fb52fadc7c210eb50c23de9fe8eac3c3175d493a18c  packages/contracts/src/playability/public-verdict.ts
@@ -10,28 +10,17 @@ $ shasum -a 256 packages/assets/src/ops.ts
 6105ca7248b15eb8fcdedd77b620e17df196c56a1341dd4c33e4948a0be028dc  packages/assets/src/ops.ts
 $ shasum -a 256 packages/pipeline/src/create-game.ts
 d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
-$ git rev-parse d8b5df1:packages/cli
+$ git rev-parse 739076a:packages/cli
 084c5c20441ed1d114ba773b8a41f2198afe98ca
-$ git rev-parse d8b5df1:packages/mcp
+$ git rev-parse 739076a:packages/mcp
 5e3abfaf3d8da592722471b6d127bf31fa40826e
 
 $ git diff --stat 41df0d3 -- packages/contracts/src/playability/public-verdict.ts packages/contracts/src/playability/api.ts packages/contracts/src/playability/verdict.ts packages/assets/src/ops.ts packages/pipeline/src/create-game.ts packages/cli packages/mcp
 
-$ git diff --stat 41df0d3
- .../evidence/U5/SHA256SUMS                         |   9 +
- .../evidence/U5/build.log                          |  17 +
- .../evidence/U5/check-deps.log                     |   5 +
- .../evidence/U5/check-links.log                    |   5 +
- .../evidence/U5/commands.log                       |  41 ++
- .../evidence/U5/invariant-after.txt                |  20 +
- .../evidence/U5/invariant-before.txt               |  40 ++
- .../evidence/U5/rollback-drill.log                 | 580 +++++++++++++++++++++
- .../evidence/U5/targeted-test-output.txt           |  19 +
- .../evidence/U5/test-output.txt                    | 542 +++++++++++++++++++
- .../reports/U5-review-input.md                     |  73 +++
- packages/pipeline/src/publish-gate.ts              |  63 ++-
- packages/pipeline/tests/publish-gate.test.ts       | 199 ++++++-
- 13 files changed, 1596 insertions(+), 17 deletions(-)
+$ git diff --stat 41df0d3 -- packages
+ packages/pipeline/src/publish-gate.ts        |  63 +++++++--
+ packages/pipeline/tests/publish-gate.test.ts | 201 ++++++++++++++++++++++++++-
+ 2 files changed, 247 insertions(+), 17 deletions(-)
 
 $ grep -n "temporal" packages/pipeline/src/publish-gate.ts
 70:  readonly temporal?: PublishGateTemporalEvidence;

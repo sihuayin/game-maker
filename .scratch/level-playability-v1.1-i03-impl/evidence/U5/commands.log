@@ -1,19 +1,23 @@
 # I03-U5 evidence commands
-date: 2026-11-16T13:57:37Z
+date: 2026-11-16T14:25:36Z
 uname: Darwin 24.6.0 arm64
 node: v22.23.2
 pnpm: 10.7.1
 base: 41df0d3
 code head: fcea791
-code/test head: d8b5df1 (G3 amended)
+product code/test head: 739076a (fcea791 + 57ff6de + e792e47 G3 + df3564f CI typecheck + main merge)
 
 $ pnpm exec vitest run packages/pipeline/tests/publish-gate.test.ts
 exit 0; 1 file / 29 tests passed
 output: evidence/U5/targeted-test-output.txt
 
 $ pnpm test
-exit 0; 178 files / 2945 tests passed; 2 vitest-worker "onTaskUpdate" timeout warnings (runner-level, not failures)
+exit 0; 178 files / 2945 tests passed; 3 vitest-worker "onTaskUpdate" timeout warnings (runner-level, not failures)
 output: evidence/U5/test-output.txt
+
+$ pnpm typecheck
+exit 0 (tsc -b + per-package tsconfig.spec.json)
+output: evidence/U5/typecheck.log
 
 $ pnpm build
 exit 0
@@ -24,27 +28,16 @@ exit 0; 10 packages
 output: evidence/U5/check-deps.log
 
 $ pnpm check:links
-exit 0; 1252 docs / 4159 links
+  ✅ 相对链接零断裂（1253 份文档 · 4159 条链接）
 output: evidence/U5/check-links.log
 
-$ git diff --stat 41df0d3
- .../evidence/U5/SHA256SUMS                         |   9 +
- .../evidence/U5/build.log                          |  17 +
- .../evidence/U5/check-deps.log                     |   5 +
- .../evidence/U5/check-links.log                    |   5 +
- .../evidence/U5/commands.log                       |  30 ++
- .../evidence/U5/invariant-after.txt                |  53 ++
- .../evidence/U5/invariant-before.txt               |  40 ++
- .../evidence/U5/rollback-drill.log                 | 572 +++++++++++++++++++++
- .../evidence/U5/targeted-test-output.txt           |  19 +
- .../evidence/U5/test-output.txt                    | 542 +++++++++++++++++++
- .../reports/U5-review-input.md                     |  73 +++
- packages/pipeline/src/publish-gate.ts              |  63 ++-
- packages/pipeline/tests/publish-gate.test.ts       | 199 ++++++-
- 13 files changed, 1610 insertions(+), 17 deletions(-)
+$ git diff --stat 41df0d3 -- packages
+ packages/pipeline/src/publish-gate.ts        |  63 +++++++--
+ packages/pipeline/tests/publish-gate.test.ts | 201 ++++++++++++++++++++++++++-
+ 2 files changed, 247 insertions(+), 17 deletions(-)
 
-$ U5 rollback drill (branch wayfinder/i03-u5-rollback-drill, from d8b5df1)
-revert d8b5df1 + 57ff6de + fcea791 -> product tree equals base 41df0d3
+$ U5 rollback drill (branch wayfinder/i03-u5-rollback-drill, from 739076a)
+revert df3564f + e792e47 + 57ff6de + fcea791 -> product tree equals base 41df0d3
 $ pnpm exec vitest run packages/pipeline/tests/publish-gate.test.ts
 exit 0; 1 file / 17 tests passed (original suite)
 $ pnpm test
