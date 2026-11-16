@@ -592,6 +592,8 @@ describe("I. 架构与结构断言", () => {
       .flatMap((p) => [...textOf(REL(p)).matchAll(/analyze:\s*([A-Za-z_$][\w$]*)/g)]
         .map((m) => ({ file: REL(p), value: m[1] })));
     expect(hits).toEqual([{ file: "packages/assets/src/ops.ts", value: "stubTemporalAnalyzer" }]);
+    const realAnalyzer = textOf("packages/assets/src/ops.ts").match(/analyzeTemporalInternalTwoLag\s*\(/g) ?? [];
+    expect(realAnalyzer).toHaveLength(1);
     expect(textOf("packages/contracts/src/playability/temporal.ts")).toMatch(/export function stubTemporalAnalyzer\(/);
   });
 
