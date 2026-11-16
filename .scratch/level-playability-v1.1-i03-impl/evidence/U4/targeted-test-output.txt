@@ -1,12 +1,58 @@
 
  RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
 
- ✓ packages/contracts/tests/playability-temporal-input.test.ts (65 tests) 50ms
- ✓ packages/assets/tests/ops.test.ts (20 tests) 1342ms
-   ✓ §U4 runTemporalAudit real wiring > 真实 analyzer → U1 adapter → U2 mapper；gate BLOCKED 仍公共 IE  1242ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts (65 tests) 41ms
+ ✓ packages/assets/tests/ops.test.ts (21 tests) 119ms
+ ✓ packages/assets/tests/compile-runtime.test.ts (43 tests) 84977ms
+   ✓ 编译：一次调用 → 一份落盘的配置 > 上游给一份合法配置 → 落盘 v1，校验全过，账上是 `compile-runtime`  2575ms
+   ✓ 编译：一次调用 → 一份落盘的配置 > **绝不覆盖**：编两次就是 v1 与 v2  4919ms
+   ✓ 编译：一次调用 → 一份落盘的配置 > 回报里给出**下一步命令**  2470ms
+   ✓ ⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档） > 引用了包里没有的资源 → `invalid`，而且**一个字节都没落**  1438ms
+   ✓ ⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档） > 消息要点出「**模型错、重采样后仍没写对**」—— 与「层覆盖是确定性的」分得开  1657ms
+   ✓ ⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档） > **模型拿世界坐标写 HUD** → 抓出来（世界宽 1440，屏幕只有 480）—— 它最容易犯的错  4074ms
+   ✓ ⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档） > ⚠️ 而**锚点语义**下 `at.y = 地面线` 的写法**不该被误报**（票 48 修掉的那个 bug）  2749ms
+   ✓ ⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档） > recipe-config-gap-v1 票 13：实体底边摆出界 ⇒ 确定性钳回世界内、照常出包  2574ms
+   ✓ ⚠️ **业务校验的「模型错」⇒ 重采样、抛、且不落盘**（票 10：引用/自洽/HUD 是模型错，与 schema 同档） > entity-identity-v1 票 03：config 缺 sourceIntent（设计实体没被覆盖）→ 模型错、重采样、不落盘  4093ms
+   ✓ 失败的路 > ⚠️ **模型错（引用/自洽/HUD）才重采样**：引用解不到 ⇒ 三发重采样，账上三趟都记着（票 10）  1653ms
+   ✓ 失败的路 > 模型错**第一发、第二发写对** ⇒ `attempts: 2`、出包（票 10 的重采样收口）  3266ms
+   ✓ §问话面：发出去的那一发 > 强制工具调用 · schema 是**本契约的 v4 镜像**（8 键、封口）· 内容只有一段文本  2669ms
+   ✓ §问话面：发出去的那一发 > ⚠️ **手感那一节把数给出去**（票 21）—— 而那些数是**从契约推的**，不是抄进提示词的字面量  2726ms
+   ✓ §问话面：发出去的那一发 > ⚠️ 骨架那句「位置、尺寸、锚点是一整套」在**横版那一发**里（票 93 · 调用点见证）  2688ms
+   ✓ §问话面：发出去的那一发 > ⚠️ **设计层那 12 个 ① 档字段逐个具名**进提示词（票 10 的裁定：具名插值在下游 —— 本步是下游之一）  2710ms
+   ✓ §问话面：发出去的那一发 > 清单里**带 `scale9Borders` 的那件标着「九宫格」**，并写明声明尺寸可不同（票 85 · 正向）  2710ms
+   ✓ §问话面：发出去的那一发 > 清单里**没有 `scale9Borders` 的那件标着「非九宫格」**，并写明声明尺寸必须一致（票 85 · 反向）  2688ms
+   ✓ §资源清单：每条资产行都带 manifest 的 `role`（D-02） > 横版清单：**每条资产行**都带 manifest 的 role（正向）  2699ms
+   ✓ §资源清单：每条资产行都带 manifest 的 `role`（D-02） > 同一 fixture 包：横版与塔防 body 印的是**同一组 role**（parity）  2701ms
+   ✓ §资源清单：每条资产行都带 manifest 的 `role`（D-02） > role 里的换行折成单空格 —— 清单保持「一行一资源」（边界）  2742ms
+   ✓ §资源清单：每条资产行都带 manifest 的 `role`（D-02） > 空 role 印 `（role 为空）`，行结构不破（边界）  2814ms
+   ✓ §哪一关 / 哪一代外壳 > `levelId` 省略 = 设计层的第一关；给了一个不存在的 ⇒ `usage`  2746ms
+   ✓ ⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 `world.size`） > 阳性：**恰好两条**硬失败、不落盘、账上是 `attempts: 1` 且**不出现 `schema`**  2689ms
+   ✓ ⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 `world.size`） > ⭐ 那条 message **逐字**就是站点侧钉的那一个（同一个函数）+ 四样数一个不少  2705ms
+   ✓ ⭐ 票 65：**层盖不住世界**提前到 `config` 步（吃真实 `world.size`） > ⚠️ **不误伤**（(乙) 与 (甲) 的分界）：世界不比视口宽 ⇒ 不平铺 + 非零视差**照常放行**  812ms
+   ✓ §B-02：不可达的 config 在编译期硬拒、不重采样 > 可达的 `last-train` 夹具：编译照常通过（不误拒）  2637ms
+   ✓ entity-identity-v1.1 票 06：错误归属拒绝 + 关卡作用域（编译期、零付费） > E2E-A：跨桶兼容错误（enemy 被做成 pickup）→ 模型错、重采样、不落盘、不触下游  4635ms
+   ✓ entity-identity-v1.1 票 06：错误归属拒绝 + 关卡作用域（编译期、零付费） > E2E-C：level-a 只覆盖本关 e-a/res-a（不要求 level-b 的 e-b/res-b）→ 通过  2777ms
+   ✓ entity-identity-v1.1 票 06：错误归属拒绝 + 关卡作用域（编译期、零付费） > E2E-C：同一份配置编 level-b → 覆盖失败（e-b/res-b 缺失）+ wrong-scope（e-a/res-a 越界）  4086ms
+   ✓ §D-03：包根因硬拒 / config 可修反馈 > 包内无 ui（hud 所需能力不存在）⇒ **1 发**、`invalid`、指向清单、**不写「模型错」**  1356ms
+   ✓ §D-03：包根因硬拒 / config 可修反馈 > config 可修（幻觉 id，但包里**有同 kind 资产**）⇒ 3 发；第 2/3 发带上一发的 where/message  1645ms
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
 
- Test Files  2 passed (2)
-      Tests  85 passed (85)
-   Start at  20:09:00
-   Duration  8.30s (transform 4.16s, setup 0ms, collect 10.20s, tests 1.39s, environment 0ms, prepare 1.14s)
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: [vitest-worker]: Timeout calling "onTaskUpdate"
+ ❯ Object.onTimeoutError node_modules/.pnpm/vitest@3.2.7_@types+node@22.20.4/node_modules/vitest/dist/chunks/rpc.-pEldfrD.js:53:10
+ ❯ Timeout._onTimeout node_modules/.pnpm/vitest@3.2.7_@types+node@22.20.4/node_modules/vitest/dist/chunks/index.B521nVV-.js:59:62
+ ❯ listOnTimeout node:internal/timers:585:17
+ ❯ processTimers node:internal/timers:521:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  3 passed (3)
+      Tests  129 passed (129)
+     Errors  1 error
+   Start at  20:53:19
+   Duration  86.20s (transform 1.07s, setup 0ms, collect 2.19s, tests 85.14s, environment 0ms, prepare 175ms)
 

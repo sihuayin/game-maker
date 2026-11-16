@@ -1,4 +1,4 @@
-# U4 invariant AFTER (working tree)
+# U4 invariant AFTER (decision A amended code)
 
 $ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal-result.ts
 8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
@@ -17,8 +17,8 @@ $ shasum -a 256 packages/contracts/src/playability/temporal.ts
 
 $ git diff --stat a0688be -- packages/contracts/src/playability/temporal-result.ts packages/contracts/src/playability/temporal.ts
 
-$ git diff --stat a0688be..9b21f2d
- packages/assets/src/ops.ts                         | 110 +++++++++++++++++++--
- packages/assets/tests/ops.test.ts                  | 107 +++++++++++++++++++-
+$ git diff --stat a0688be..ce6ce63
+ packages/assets/src/ops.ts                         | 125 +++++++++++++++++++--
+ packages/assets/tests/ops.test.ts                  | 118 ++++++++++++++++++-
  .../tests/playability-temporal-input.test.ts       |   2 +
- 3 files changed, 207 insertions(+), 12 deletions(-)
+ 3 files changed, 233 insertions(+), 12 deletions(-)
