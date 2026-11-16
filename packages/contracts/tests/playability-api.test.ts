@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseGameConfig } from "../src/index.js";
 import type { GameConfig } from "../src/game-config.js";
-import { auditPlayability, playabilityIssues } from "../src/playability/api.js";
+import { auditPlayability, playabilityIssues, toPublicTemporalEvidence } from "../src/playability/api.js";
+import type { PublicTemporalDegradation, TemporalCoverageState } from "../src/playability/api.js";
 import { auditSpatial } from "../src/playability/spatial.js";
 import { auditMechanic } from "../src/playability/mechanic.js";
 import { auditCompletion } from "../src/playability/completion.js";
@@ -111,5 +112,26 @@ describe("§三层组合与 coverage", () => {
       .map((e) => e.target).sort();
     const api = apiOf("goal-inside-luggage").evidence.map((e) => e.target).sort();
     expect(new Set(api)).toEqual(new Set(direct));
+  });
+});
+
+describe("§U1 公共 temporal evidence 导出 / 非时序回归", () => {
+  it("适配器与公共类型已导出", () => {
+    expect(typeof toPublicTemporalEvidence).toBe("function");
+    const coverage: TemporalCoverageState = "checked";
+    const degradation: PublicTemporalDegradation = "invalid-input";
+    expect([coverage, degradation]).toEqual(["checked", "invalid-input"]);
+  });
+
+  it("非时序 evidence 不携带 model / lag / degradation / limits / temporal", () => {
+    const verdict = apiOf("static-hazard-seals-path");
+    expect(verdict.evidence.length).toBeGreaterThan(0);
+    for (const evidence of verdict.evidence) {
+      expect("model" in evidence).toBe(false);
+      expect("lag" in evidence).toBe(false);
+      expect("degradation" in evidence).toBe(false);
+      expect("limits" in evidence).toBe(false);
+      expect(evidence.coverage.temporal).toBeUndefined();
+    }
   });
 });
