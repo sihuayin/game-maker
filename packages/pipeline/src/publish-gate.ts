@@ -24,7 +24,8 @@ import { createHash } from "node:crypto";
 import {
   auditPlayability, CommandError, formatIssues, parseAssetPack, parseGameConfig, playabilityIssues, QA_JUDGEMENTS, QAReportSchema,
   qaVerdict, TD_CONFIG_FORMAT,
-  type AssetPackManifest, type QAReport,
+  type AssetPackManifest, type PlayabilityEvidence, type PlayabilityVerdictState, type QAReport,
+  type TemporalCoverageState,
 } from "@game-maker/contracts";
 import { runTemporalAudit } from "@game-maker/assets";
 
@@ -51,10 +52,22 @@ export type PublishGateOptions = {
   outRoot?: string;
 };
 
+/** 发布闸的时序诊断快照。⚠️ 不属于发布契约：形状可变、不参与放行 / 拒稿。 */
+export type PublishGateTemporalEvidence =
+  | { readonly applicable: false }
+  | {
+      readonly applicable: true;
+      readonly coverage: TemporalCoverageState;
+      readonly verdict: PlayabilityVerdictState;
+      readonly evidence: readonly PlayabilityEvidence[];
+    };
+
 export type PublishGateResult = {
   report: QAReport;
   reportPath: string;
   manifest: AssetPackManifest;
+  /** 诊断字段；未运行 config 检查时缺省。 */
+  readonly temporal?: PublishGateTemporalEvidence;
 };
 
 const MANIFEST = "manifest.json";
@@ -132,25 +145,42 @@ function subjectProblem(report: QAReport, manifest: AssetPackManifest, checksum:
  *  ⚠️ `configPath` 缺省 ⇒ 跳过（库调用 / 既有测试）；四个发布入口都传它（CLI build/site、
  *     MCP create_game/assemble_site）—— 缺省不得成为发布入口的逃逸路径。
  */
+type ConfigProblemResult = {
+  readonly problem?: string;
+  readonly temporal?: PublishGateTemporalEvidence;
+};
+
 function configProblem(
   configPath: string | undefined,
   manifest: AssetPackManifest,
   packDir: string,
-): string | undefined {
-  if (configPath === undefined) return undefined;
+): ConfigProblemResult {
+  if (configPath === undefined) return {};
   let raw: unknown;
-  try { raw = JSON.parse(fs.readFileSync(configPath, "utf8")); } catch { return undefined; }
+  try { raw = JSON.parse(fs.readFileSync(configPath, "utf8")); } catch { return {}; }
   const parsed = parseGameConfig(raw);
-  if (!parsed.ok) return undefined;
-  const hard = playabilityIssues(auditPlayability(parsed.value, manifest)).filter((i) => i.severity === "error");
+  if (!parsed.ok) return {};
+
+  const audit = auditPlayability(parsed.value, manifest);
+  const hard = playabilityIssues(audit).filter((i) => i.severity === "error");
   if (hard.length > 0) {
-    return `**这份 config 过不了可玩性判定**（${hard.length} 条硬失败）：\n`
-      + hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n");
+    return {
+      problem: `**这份 config 过不了可玩性判定**（${hard.length} 条硬失败）：\n`
+        + hard.slice(0, 6).map((i) => `  · ${i.where}: ${i.message}`).join("\n"),
+    };
   }
 
-  // I-01：可信时序输入接线（只接通、不消费；Q8=A）。时序 IE 不产生任何 problem 文案。
-  runTemporalAudit({ config: parsed.value, manifest, packDir });
-  return undefined;
+  // U5：只记录时序诊断，不参与放行 / 拒稿；把已有 audit 传给 U4，避免重复三维审计。
+  const report = runTemporalAudit({ config: parsed.value, manifest, packDir, existingAudit: audit });
+  const temporal: PublishGateTemporalEvidence = report.applicable
+    ? {
+        applicable: true,
+        coverage: report.coverage,
+        verdict: report.publicVerdict.verdict,
+        evidence: report.evidence,
+      }
+    : { applicable: false };
+  return { temporal };
 }
 
 /** 判据层面的放行条件：**没有 error，且六条全跑过**。
@@ -228,10 +258,13 @@ export function assertPublishableQa(opts: PublishGateOptions): PublishGateResult
 
   // ── config 自身的可达性（P1 · publish-gate）：报告全绿也不能替一份走不通的 config 放行 ──
   //   ⚠️ 显式报告与 auto 查找两条分支在这里汇合 ⇒ 只调一次。
-  const unreachable = configProblem(opts.configPath, manifest, opts.packDir);
-  if (unreachable !== undefined)
-    throw new CommandError("invalid", `${unreachable}\nconfig：${path.resolve(opts.configPath!)}\n报告：${reportPath}\n${subjectLine}\n`
+  const configResult = configProblem(opts.configPath, manifest, opts.packDir);
+  if (configResult.problem !== undefined)
+    throw new CommandError("invalid", `${configResult.problem}\nconfig：${path.resolve(opts.configPath!)}\n报告：${reportPath}\n${subjectLine}\n`
       + "⚠️ 发布闸会**现场重跑**可达性：报告只钉包身份，不能证明这份 config 走不走得通。");
 
-  return { report, reportPath, manifest };
+  return {
+    report, reportPath, manifest,
+    ...(configResult.temporal !== undefined ? { temporal: configResult.temporal } : {}),
+  };
 }
