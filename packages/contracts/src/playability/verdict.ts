@@ -30,10 +30,92 @@ export type PlayabilityVerdictState =
 
 export type CoverageState = "checked" | "partial" | "not-checked";
 
+/** 时序覆盖状态；与 I-00 §8 的 checked / partial / unknown 逐字一致。 */
+export type TemporalCoverageState = "checked" | "partial" | "unknown";
+
+/** 公共时序退化原因闭集（D9 内部原因码的 many-to-one 摘要）。 */
+export type PublicTemporalDegradation =
+  | "invalid-input" | "model-out" | "geometry-untrusted"
+  | "budget-exhausted" | "witness-volume" | "hop-sample-budget"
+  | "wall-clock-abort" | "lag-disagreement" | "no-witness"
+  | "no-permanent-gate" | "graph-cut-incomplete"
+  | "hop-doubling-changed" | "movement-model-unclosed";
+
+/** 公共几何摘要；I-02 内恒为 manifest 元数据 + 未验证 Runtime 体。 */
+export type PublicGeometryCoverage = {
+  readonly chain: "manifest+atlas-metadata";
+  readonly runtimeBody: "unverified";
+  readonly coverage: "partial";
+};
+
+/** 公共 PU 条件摘要；只在 permanent-gate evidence 上出现。 */
+export type PublicPuCondition = {
+  readonly id:
+    | "gate-coverage" | "geometry-checked" | "graph-cut"
+    | "hop-doubling" | "model-out-excluded" | "lag-consistent";
+  readonly status: "PASS" | "BLOCKED" | "INSUFFICIENT_EVIDENCE" | "NOT_RUN";
+  readonly evidence?: string;
+  readonly blockedReason?: string;
+};
+
+/** 公共时序模型摘要；不含完整 proof / witness / stats。 */
+export type TemporalModelEvidence = {
+  readonly conditional: true;
+  readonly geometryCoverage: {
+    readonly hazard: PublicGeometryCoverage;
+    readonly player: PublicGeometryCoverage;
+    readonly graph: PublicGeometryCoverage;
+  };
+  readonly movementModelClosure: "not-proven-air-control";
+  /** 仅 permanent-gate 证据携带；NB / IE 缺省。 */
+  readonly puConditions?: readonly PublicPuCondition[];
+};
+
+/** 单档 lag 结论摘要；不含逐档 Witness / proof / stats。 */
+export type TemporalLagConclusion = {
+  readonly lagMs: number;
+  readonly internalResult: "nb-candidate" | "pu-candidate" | "insufficient-evidence";
+  readonly certificateKind: "witness" | "permanent-gate" | "none";
+  readonly certificateStatus: "COMPLETE" | "INCOMPLETE";
+  readonly degradation: PublicTemporalDegradation | null;
+};
+
+/** 双档 lag 证据；`perLag` 恰好 [主档, 基准档]。 */
+export type TemporalLagEvidence = {
+  readonly mode: "gate-independent; witness-only";
+  readonly invariantByConstruction: true;
+  readonly perLag: readonly TemporalLagConclusion[];
+};
+
+/** 公共退化摘要；`COMPLETE` ⇒ reason=null、secondary=[]。 */
+export type TemporalDegradationEvidence = {
+  readonly reason: PublicTemporalDegradation | null;
+  readonly secondary: readonly PublicTemporalDegradation[];
+};
+
+/** 紧凑预算 / 工作摘要；不含完整 Stats。 */
+export type TemporalLimitsEvidence = {
+  readonly budgetStatus: "complete" | "exhausted" | "aborted" | "invalid";
+  readonly budgetKind:
+    | "state-budget" | "edge-budget" | "cut-budget"
+    | "witness-volume" | "hop-sample-budget" | "wall-clock-abort" | null;
+  readonly witnessTransitions: number;
+  readonly witnessBytes: number;
+  readonly maxWitnessTransitions: number;
+  readonly maxWitnessBytes: number;
+  readonly hopSamplesChecked: number;
+  readonly maxHopSamples: number;
+  readonly geometryCoverage: "partial";
+};
+
 export type PlayabilityCoverage = {
   readonly spatial: CoverageState;
   readonly mechanic: CoverageState;
   readonly completion: CoverageState;
+  /** 仅时序 evidence 设置；缺省由消费者按 unknown 处理。 */
+  readonly temporal?: TemporalCoverageState;
+  /** 几何汇总；明细在 model.geometryCoverage。 */
+  readonly geometry?: CoverageState;
 };
 
 /**
@@ -69,6 +151,13 @@ export type PlayabilityWitness =
       readonly speed: number; readonly playerWidth: number;
       readonly side: "near->far"; readonly fullColumnCut: true;
       readonly targetRegion: Aabb;
+    }
+  | {
+      readonly kind: "temporal";
+      readonly result: "nb-candidate" | "pu-candidate" | "insufficient-evidence";
+      readonly certificateKind: "witness" | "permanent-gate" | "none";
+      readonly certificateStatus: "COMPLETE" | "INCOMPLETE";
+      readonly degradation: PublicTemporalDegradation | null;
     };
 
 export type PlayabilityEvidence = {
@@ -81,6 +170,11 @@ export type PlayabilityEvidence = {
   readonly witness: PlayabilityWitness;
   readonly coverage: PlayabilityCoverage;
   readonly assetId?: string;
+  /** 仅 temporal evidence 设置；非时序 evidence 不出现这些字段。 */
+  readonly model?: TemporalModelEvidence;
+  readonly lag?: TemporalLagEvidence;
+  readonly degradation?: TemporalDegradationEvidence;
+  readonly limits?: TemporalLimitsEvidence;
   readonly expected?: unknown;
   readonly actual?: unknown;
 };
