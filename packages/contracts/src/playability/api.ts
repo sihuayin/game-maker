@@ -120,8 +120,13 @@ export function playabilityIssues(verdict: PlayabilityVerdict): ConfigIssue[] {
 export type { FixedRuntimeProfile } from "./profile.js";
 export { FIXED_RUNTIME_PROFILE } from "./profile.js";
 export type {
-  PlayabilityCoverage, PlayabilityEvidence, PlayabilityVerdictState,
+  PlayabilityCoverage, PlayabilityEvidence, PlayabilityVerdictState, PlayabilityWitness,
+  TemporalCoverageState, PublicTemporalDegradation, PublicGeometryCoverage, PublicPuCondition,
+  TemporalModelEvidence, TemporalLagConclusion, TemporalLagEvidence,
+  TemporalDegradationEvidence, TemporalLimitsEvidence,
 } from "./verdict.js";
+export { toPublicTemporalEvidence } from "./temporal-evidence.js";
+export type { ToPublicTemporalEvidenceArgs } from "./temporal-evidence.js";
 
 // ── I-01：可信时序输入与双档编排（@internal）────────────────────────────────
 //
@@ -130,9 +135,12 @@ export type {
 // ⚠️ `isTrustedAtlasInput` 与失败码类型**不转出**：它们只在 contracts 内部/测试使用，
 //   把公共面压到最小。
 export {
-  auditPlayabilityTemporal, resolveTwoLagResults, stubTemporalAnalyzer, temporalScope,
+  analyzeTemporalInternalTwoLag, auditPlayabilityTemporal, resolveTwoLagResults,
+  stubTemporalAnalyzer, temporalScope,
   TEMPORAL_LAG_BASELINE_MS, TEMPORAL_LAG_MS,
 } from "./temporal.js";
-export type { TemporalAnalyzer, TemporalAuditResult } from "./temporal.js";
+export type {
+  TemporalAnalyzer, TemporalAuditResult, TemporalTwoLagInternalResult,
+} from "./temporal.js";
 export { verifyTemporalInput } from "./temporal-input.js";
 export type { TrustedAtlasInput } from "./temporal-input.js";
