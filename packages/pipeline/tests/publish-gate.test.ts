@@ -6,9 +6,31 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterAll, describe, expect, it } from "vitest";
-import { CommandError, QA_JUDGEMENTS, QA_REPORT_FORMAT } from "@game-maker/contracts";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { CommandError, QA_JUDGEMENTS, QA_REPORT_FORMAT, type PlayabilityEvidence } from "@game-maker/contracts";
+import type { TemporalAuditReport } from "@game-maker/assets";
 import { assertPublishableQa, manifestChecksumOf } from "../src/publish-gate.js";
+
+const mocks = vi.hoisted(() => ({
+  useFake: false,
+  report: null as TemporalAuditReport | null,
+  calls: 0,
+}));
+
+vi.mock("@game-maker/assets", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@game-maker/assets")>();
+  return {
+    ...actual,
+    runTemporalAudit: (args: Parameters<typeof actual.runTemporalAudit>[0]) => {
+      mocks.calls += 1;
+      return mocks.useFake && mocks.report !== null
+        ? mocks.report
+        : actual.runTemporalAudit(args);
+    },
+  };
+});
+
+beforeEach(() => { mocks.useFake = false; mocks.report = null; mocks.calls = 0; });
 
 const ROOT = path.resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const PACK = path.join(ROOT, "fixtures/packs/last-train/v2");
@@ -206,5 +228,180 @@ describe("§P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（�
     const badConfig = path.join(d, "not-a-config.json");
     fs.writeFileSync(badConfig, "{ 这不是 JSON\n");
     expect(assertPublishableQa({ packDir: PACK, configPath: badConfig, outRoot: out })).toBeDefined();
+  });
+});
+
+describe("§U5 发布闸时序诊断（非阻断）", () => {
+  const LAST_TRAIN_CONFIG = path.join(ROOT, "fixtures/game-configs/last-train.json");
+  type TemporalWitness = Extract<PlayabilityEvidence["witness"], { kind: "temporal" }>;
+  const temporalWitness = (result: TemporalWitness["result"]): TemporalWitness => ({
+    kind: "temporal", result, certificateKind: "witness",
+    certificateStatus: "COMPLETE", degradation: null,
+  });
+  const TEMPORAL_EVIDENCE: PlayabilityEvidence = {
+    judgmentId: "PLAYABILITY_TEMPORAL_EVIDENCE",
+    target: "objective.gate",
+    detail: "temporal synthetic",
+    witness: temporalWitness("nb-candidate"),
+    coverage: { spatial: "checked", mechanic: "checked", completion: "checked", temporal: "checked", geometry: "partial" },
+  };
+  const PUBLIC_VERDICT = {
+    verdict: "INSUFFICIENT_EVIDENCE" as const,
+    evidence: [TEMPORAL_EVIDENCE],
+    coverage: { spatial: "checked" as const, mechanic: "checked" as const, completion: "checked" as const, temporal: "checked" as const },
+  };
+  const fakeReport = (
+    over: Partial<Extract<TemporalAuditReport, { applicable: true }>> = {},
+  ): TemporalAuditReport => ({
+    applicable: true,
+    verdict: "INSUFFICIENT_EVIDENCE",
+    coverage: "checked",
+    evidence: [TEMPORAL_EVIDENCE],
+    publicVerdict: PUBLIC_VERDICT,
+    ...over,
+  });
+
+  it("G1/G4：真实 last-train ⇒ temporal 诊断存在且公共 verdict IE", () => {
+    const out = tmp();
+    writeReport(out, report());
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got).toBeDefined();
+    expect(got?.temporal?.applicable).toBe(true);
+    if (got?.temporal?.applicable !== true) throw new Error("expected applicable temporal");
+    expect(["checked", "partial", "unknown"]).toContain(got.temporal.coverage);
+    expect(got.temporal.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(got.temporal.evidence.length).toBeGreaterThan(0);
+    expect(got.temporal.evidence[0]?.witness.kind).toBe("temporal");
+  }, 120_000);
+
+  it("G6：未传 configPath ⇒ temporal 字段缺席（未运行 ≠ 不适用）", () => {
+    const out = tmp();
+    writeReport(out, report());
+    const got = assertPublishableQa({ packDir: PACK, outRoot: out });
+    expect(got).toBeDefined();
+    expect("temporal" in (got ?? {})).toBe(false);
+    expect(mocks.calls).toBe(0);
+  });
+
+  it("G7：无移动 Hazard ⇒ {applicable:false}", () => {
+    const d = tmp();
+    const out = path.join(d, "out");
+    const config = JSON.parse(fs.readFileSync(LAST_TRAIN_CONFIG, "utf8")) as {
+      entities: { kind?: string; motion?: unknown }[];
+    };
+    config.entities = config.entities.filter((entity) => entity.motion === undefined);
+    const noMotion = path.join(d, "no-motion.json");
+    fs.writeFileSync(noMotion, JSON.stringify(config, null, 2) + "\n");
+    writeReport(out, report());
+    const got = assertPublishableQa({ packDir: PACK, configPath: noMotion, outRoot: out });
+    expect(got?.temporal).toEqual({ applicable: false });
+  });
+
+  it("G2：nb-candidate + gate BLOCKED ⇒ 放行，公共映射 IE", () => {
+    const out = tmp();
+    writeReport(out, report());
+    mocks.useFake = true;
+    mocks.report = fakeReport();
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toMatchObject({ applicable: true, verdict: "INSUFFICIENT_EVIDENCE" });
+  }, 120_000);
+
+  it("G3：pu-candidate + gate BLOCKED ⇒ 放行，公共映射 IE", () => {
+    const out = tmp();
+    writeReport(out, report());
+    const puEvidence: PlayabilityEvidence = {
+      ...TEMPORAL_EVIDENCE,
+      witness: temporalWitness("pu-candidate"),
+    };
+    mocks.useFake = true;
+    mocks.report = fakeReport({
+      evidence: [puEvidence],
+      publicVerdict: { ...PUBLIC_VERDICT, evidence: [puEvidence] },
+    });
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toMatchObject({ applicable: true, verdict: "INSUFFICIENT_EVIDENCE" });
+    if (got?.temporal?.applicable !== true) throw new Error("expected applicable temporal");
+    expect(got.temporal.evidence[0]?.witness).toMatchObject({ kind: "temporal", result: "pu-candidate" });
+  }, 120_000);
+
+  it("G10 / 变异守卫：temporal PROVEN_UNPLAYABLE + checked 仍不放行、不抛", () => {
+    const out = tmp();
+    writeReport(out, report());
+    mocks.useFake = true;
+    mocks.report = fakeReport({
+      coverage: "checked",
+      publicVerdict: { ...PUBLIC_VERDICT, verdict: "PROVEN_UNPLAYABLE" },
+    });
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toMatchObject({ applicable: true, verdict: "PROVEN_UNPLAYABLE", coverage: "checked" });
+  }, 120_000);
+
+  it("G11：证据缺省按 unknown 记录，绝不当作 checked", () => {
+    const out = tmp();
+    writeReport(out, report());
+    mocks.useFake = true;
+    mocks.report = fakeReport({ coverage: "unknown", evidence: [] });
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toMatchObject({ applicable: true, coverage: "unknown", evidence: [] });
+  }, 120_000);
+
+  it("applicable:false 不被读成 PU / NB", () => {
+    const out = tmp();
+    writeReport(out, report());
+    mocks.useFake = true;
+    mocks.report = { applicable: false };
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toEqual({ applicable: false });
+  }, 120_000);
+
+  it("G5：降级报告（IE / unknown）⇒ 不抛，按记录值输出", () => {
+    const out = tmp();
+    writeReport(out, report());
+    mocks.useFake = true;
+    mocks.report = fakeReport({ coverage: "unknown", evidence: [] });
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toMatchObject({
+      applicable: true,
+      verdict: "INSUFFICIENT_EVIDENCE",
+      coverage: "unknown",
+    });
+  }, 120_000);
+
+  it("G8：硬失败早退 ⇒ 照旧拒稿，且 temporal 未运行（字段缺席）", () => {
+    const d = tmp();
+    const out = path.join(d, "out");
+    writeReport(out, report());
+    const config = JSON.parse(fs.readFileSync(LAST_TRAIN_CONFIG, "utf8")) as {
+      world: { size: { w: number; h: number } };
+      terrain: { x: number; y: number; w: number; h: number }[];
+    };
+    config.terrain.push({ x: 300, y: 0, w: 100, h: config.world.size.h });
+    const blocked = path.join(d, "blocked.json");
+    fs.writeFileSync(blocked, JSON.stringify(config, null, 2) + "\n");
+    mocks.useFake = true;
+    mocks.report = fakeReport();
+    const e = errOf(() => assertPublishableQa({ packDir: PACK, configPath: blocked, outRoot: out }));
+    expect(e.kind).toBe("invalid");
+    expect(e.message).toMatch(/这份 config 过不了可玩性判定/);
+    expect(mocks.calls).toBe(0);
+  });
+
+  it("G9：QA 报告先拒稿 ⇒ 照旧拒稿，且 temporal 未运行（字段缺席）", () => {
+    const out = tmp();
+    writeReport(out, report({
+      failures: [{ judgement: "reachability", target: "e-pickup-1", detail: "跳不到", severity: "error" }],
+    }));
+    mocks.useFake = true;
+    mocks.report = fakeReport();
+    const e = errOf(() => assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out }));
+    expect(e.kind).toBe("invalid");
+    expect(e.message).toMatch(/QA 判据没过/);
+    expect(mocks.calls).toBe(0);
+  });
+
+  it("源级：CommandError / playabilityIssues 不消费 temporal", () => {
+    const source = fs.readFileSync(path.join(ROOT, "packages/pipeline/src/publish-gate.ts"), "utf8");
+    expect(source).not.toMatch(/throw new CommandError\([^;]*temporal/s);
+    expect(source).not.toMatch(/playabilityIssues\([^)]*temporal/s);
   });
 });
