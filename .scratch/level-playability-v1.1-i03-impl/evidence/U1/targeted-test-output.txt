@@ -1,0 +1,18 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts (24 tests) 6ms
+ ✓ packages/contracts/tests/playability-api.test.ts (11 tests) 6961ms
+   ✓ §整关三态与 issue 映射 > 无阻断：层 verdict 组合为 NO_PROVEN，coverage.spatial 仍诚实记 partial  653ms
+   ✓ §整关三态与 issue 映射 > 机制阻断：PROVEN，静止 hazard 的 message 进 issue  945ms
+   ✓ §整关三态与 issue 映射 > 跨层去重：chest-overlapping-hazard 只留一条 gate error（机制优先）  672ms
+   ✓ §整关三态与 issue 映射 > `playabilityIssues` 只由 PROVEN 派生：NO_PROVEN / INSUFFICIENT 一律空  657ms
+   ✓ §三层组合与 coverage > 组合结果包含三个维度的 coverage  917ms
+   ✓ §三层组合与 coverage > completion 复用 spatial/mechanic：直接调用三层与统一入口的阻断集合一致  1798ms
+   ✓ §U1 公共 temporal evidence 导出 / 非时序回归 > 非时序 evidence 不携带 model / lag / degradation / limits / temporal  888ms
+
+ Test Files  2 passed (2)
+      Tests  35 passed (35)
+   Start at  18:00:55
+   Duration  10.82s (transform 343ms, setup 0ms, collect 499ms, tests 6.97s, environment 0ms, prepare 189ms)
+
