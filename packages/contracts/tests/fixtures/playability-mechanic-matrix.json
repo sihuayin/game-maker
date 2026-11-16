@@ -870,10 +870,10 @@
     },
     {
       "caseId": "wide-patrol",
-      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "expectedGap": "moving-hazard-phase",
-      "failureLocation": "coverage.mechanic",
+      "expectedGap": null,
+      "failureLocation": null,
       "legalPair": "static-hazard-seals-path",
       "evidence": [
         [
@@ -881,7 +881,7 @@
           "naivePatrolSweepAddsError"
         ]
       ],
-      "note": "宽巡逻是合法设计；整段扫掠当实心会误报，V1 不注册巡逻判据",
+      "note": "机制层不再记 moving-hazard-phase；公共 IE 由 temporal 层 + U2 mapper 承担。",
       "config": {
         "format": "game-config/v1",
         "world": {

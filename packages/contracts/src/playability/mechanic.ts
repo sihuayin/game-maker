@@ -14,7 +14,8 @@
 //     这只用了「速度上界 + idle 下界」，不需要时序搜索。
 //
 //   其余一律 `INSUFFICIENT_EVIDENCE`（gap，不产 error）：
-//     巡逻 hazard（相位需要时间展开）、moving-platform（运行时未实现）、
+//     moving-platform（运行时未实现）——
+//     巡逻 / 移动 hazard 不再由机制层记 gap，由 temporal 层承载；
 //     被 hazard / danger 包住的目标（收集跨复位保留、回调顺序不可证）、
 //     多 danger 联合、非全高 danger、薄 hazard、mid-air touch-only。
 //
@@ -111,12 +112,11 @@ export function auditMechanic(
   const baseReachable = (i: number): boolean => base.covered.has(i) || base.midAir.has(i);
   const spawnBox = boxFromFoot(graph.player.foot, graph.player.size);
 
-  // ── 机制覆盖面：巡逻 / moving-platform 先记 gap（不参与 A/B 的硬拒）────────
+  // ── 机制覆盖面：moving-platform 记 gap（不参与 A/B 的硬拒）────────────────
+  //    moving hazard 由 temporal 层承载；机制层不再记 moving-hazard-phase。
   const allHazards = config.entities.filter((e) => e.kind === "hazard");
   const staticHazards = allHazards.filter((e) => !e.motion);
-  const movingHazards = allHazards.filter((e) => e.motion);
   const movingSolids = config.entities.filter((e) => e.kind === "solid" && e.motion);
-  if (movingHazards.length > 0) addGap("moving-hazard-phase");
   if (movingSolids.length > 0) addGap("moving-platform-unsupported");
 
   // ── 静止 hazard 几何（运行时帧几何；禁用 e.body）────────────────────────
