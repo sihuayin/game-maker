@@ -1,0 +1,42 @@
+# U5 invariant AFTER (head 57ff6de)
+
+$ shasum -a 256 packages/contracts/src/playability/public-verdict.ts
+ec67f5a7737e711ef4d25fb52fadc7c210eb50c23de9fe8eac3c3175d493a18c  packages/contracts/src/playability/public-verdict.ts
+$ shasum -a 256 packages/contracts/src/playability/api.ts
+52ccef05a19ba9f7b6e8840ecae61c42174539e5d62c6b872c3478abce1c4811  packages/contracts/src/playability/api.ts
+$ shasum -a 256 packages/contracts/src/playability/verdict.ts
+343f8e24eb75516c13358b4b7bfafdf103488efb47d1b4e393210f1340350c00  packages/contracts/src/playability/verdict.ts
+$ shasum -a 256 packages/assets/src/ops.ts
+6105ca7248b15eb8fcdedd77b620e17df196c56a1341dd4c33e4948a0be028dc  packages/assets/src/ops.ts
+$ shasum -a 256 packages/pipeline/src/create-game.ts
+d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
+$ git rev-parse 57ff6de:packages/cli
+084c5c20441ed1d114ba773b8a41f2198afe98ca
+$ git rev-parse 57ff6de:packages/mcp
+5e3abfaf3d8da592722471b6d127bf31fa40826e
+
+$ git diff --stat 41df0d3 -- packages/contracts/src/playability/public-verdict.ts packages/contracts/src/playability/api.ts packages/contracts/src/playability/verdict.ts packages/assets/src/ops.ts packages/pipeline/src/create-game.ts packages/cli packages/mcp
+
+$ git diff --stat 41df0d3
+ packages/pipeline/src/publish-gate.ts        |  63 +++++++---
+ packages/pipeline/tests/publish-gate.test.ts | 181 ++++++++++++++++++++++++++-
+ 2 files changed, 227 insertions(+), 17 deletions(-)
+
+$ grep -n "temporal" packages/pipeline/src/publish-gate.ts
+70:  readonly temporal?: PublishGateTemporalEvidence;
+150:  readonly temporal?: PublishGateTemporalEvidence;
+175:  const temporal: PublishGateTemporalEvidence = report.applicable
+183:  return { temporal };
+268:    ...(configResult.temporal !== undefined ? { temporal: configResult.temporal } : {}),
+
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal-result.ts
+8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
+44:  readonly publicCapability: "BLOCKED";
+45:  readonly publicResult: null;
+
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal.ts
+163://   公共 Verdict；`publicCapability` 恒为 `"BLOCKED"`、`publicResult` 恒为 `null`。
+380:    publicCapability: "BLOCKED",
+381:    publicResult: null,
+704: * 输出边界：`internalResult` 是**模型内候选**，`publicCapability` 恒 `"BLOCKED"`、
+705: * `publicResult` 恒 `null`；不接生产、不发布公共 Verdict。

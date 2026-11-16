@@ -1,0 +1,40 @@
+# U5 invariant BEFORE (base 41df0d3)
+
+$ git show 41df0d3:packages/contracts/src/playability/public-verdict.ts | shasum -a 256
+ec67f5a7737e711ef4d25fb52fadc7c210eb50c23de9fe8eac3c3175d493a18c  packages/contracts/src/playability/public-verdict.ts
+$ git show 41df0d3:packages/contracts/src/playability/api.ts | shasum -a 256
+52ccef05a19ba9f7b6e8840ecae61c42174539e5d62c6b872c3478abce1c4811  packages/contracts/src/playability/api.ts
+$ git show 41df0d3:packages/contracts/src/playability/verdict.ts | shasum -a 256
+343f8e24eb75516c13358b4b7bfafdf103488efb47d1b4e393210f1340350c00  packages/contracts/src/playability/verdict.ts
+$ git show 41df0d3:packages/assets/src/ops.ts | shasum -a 256
+6105ca7248b15eb8fcdedd77b620e17df196c56a1341dd4c33e4948a0be028dc  packages/assets/src/ops.ts
+$ git show 41df0d3:packages/pipeline/src/create-game.ts | shasum -a 256
+d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
+$ git rev-parse 41df0d3:packages/cli
+084c5c20441ed1d114ba773b8a41f2198afe98ca
+$ git rev-parse 41df0d3:packages/mcp
+5e3abfaf3d8da592722471b6d127bf31fa40826e
+
+$ git show 41df0d3:packages/pipeline/src/publish-gate.ts | grep -n "export type PublishGateResult" -A5
+54:export type PublishGateResult = {
+55-  report: QAReport;
+56-  reportPath: string;
+57-  manifest: AssetPackManifest;
+58-};
+59-
+
+$ git show 41df0d3:packages/pipeline/src/publish-gate.ts | grep -n "runTemporalAudit"
+29:import { runTemporalAudit } from "@game-maker/assets";
+152:  runTemporalAudit({ config: parsed.value, manifest, packDir });
+
+$ git show 41df0d3:packages/contracts/src/playability/temporal-result.ts | grep -n "publicCapability\|publicResult"
+8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
+44:  readonly publicCapability: "BLOCKED";
+45:  readonly publicResult: null;
+
+$ git show 41df0d3:packages/contracts/src/playability/temporal.ts | grep -n "publicCapability\|publicResult"
+163://   公共 Verdict；`publicCapability` 恒为 `"BLOCKED"`、`publicResult` 恒为 `null`。
+380:    publicCapability: "BLOCKED",
+381:    publicResult: null,
+704: * 输出边界：`internalResult` 是**模型内候选**，`publicCapability` 恒 `"BLOCKED"`、
+705: * `publicResult` 恒 `null`；不接生产、不发布公共 Verdict。

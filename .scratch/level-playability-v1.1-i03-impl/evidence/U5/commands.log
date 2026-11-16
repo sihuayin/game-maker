@@ -1,0 +1,41 @@
+# I03-U5 evidence commands
+date: 2026-11-16T13:41:08Z
+uname: Darwin 24.6.0 arm64
+node: v22.23.2
+pnpm: 10.7.1
+base: 41df0d3
+code head: fcea791
+code/test head: 57ff6de
+
+$ pnpm exec vitest run packages/pipeline/tests/publish-gate.test.ts
+exit 0; 1 file / 28 tests passed
+output: evidence/U5/targeted-test-output.txt
+
+$ pnpm test
+exit 0; 178 files / 2944 tests passed; 3 vitest-worker "onTaskUpdate" timeout warnings (runner-level, not failures)
+output: evidence/U5/test-output.txt
+
+$ pnpm build
+exit 0
+output: evidence/U5/build.log
+
+$ pnpm check:deps
+exit 0; 10 packages
+output: evidence/U5/check-deps.log
+
+$ pnpm check:links
+exit 0; 1250 docs / 4159 links
+output: evidence/U5/check-links.log
+
+$ git diff --stat 41df0d3
+ packages/pipeline/src/publish-gate.ts        |  63 +++++++---
+ packages/pipeline/tests/publish-gate.test.ts | 181 ++++++++++++++++++++++++++-
+ 2 files changed, 227 insertions(+), 17 deletions(-)
+
+$ U5 rollback drill (branch wayfinder/i03-u5-rollback-drill, from 57ff6de)
+revert 57ff6de + fcea791 -> base 41df0d3
+$ pnpm exec vitest run packages/pipeline/tests/publish-gate.test.ts
+exit 0; 1 file / 17 tests passed (original suite)
+$ pnpm test
+exit 0; 178 files / 2933 tests passed; 4 runner warnings
+output: evidence/U5/rollback-drill.log
