@@ -355,7 +355,7 @@ describe("§U4 runTemporalAudit real wiring", () => {
   });
 
   it("真实 analyzer → U1 adapter → U2 mapper；gate BLOCKED 仍公共 IE", () => {
-    const report = runTemporalAudit({ config, manifest, packDir: U4_PACK });
+    const report = runTemporalAudit({ config, manifest, packDir: U4_PACK, existingAudit });
     expect(report.applicable).toBe(true);
     if (!report.applicable) throw new Error("expected applicable");
     expect(report.verdict).toBe("INSUFFICIENT_EVIDENCE");
@@ -366,6 +366,17 @@ describe("§U4 runTemporalAudit real wiring", () => {
     expect(report.evidence[0]?.lag?.perLag).toHaveLength(2);
     expect(report.evidence[0]?.model?.conditional).toBe(true);
   }, 240_000);
+
+  it("无 existingAudit（create-game 路径）⇒ legacy-only，不跑真实分析", () => {
+    const report = runTemporalAudit({ config, manifest, packDir: U4_PACK });
+    expect(report.applicable).toBe(true);
+    if (!report.applicable) throw new Error("expected applicable");
+    expect(report.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(report.coverage).toBe("unknown");
+    expect(report.evidence).toEqual([]);
+    expect(report.publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(report.publicVerdict.coverage).toEqual({ spatial: "not-checked", mechanic: "not-checked", completion: "not-checked" });
+  });
 
   it("existingAudit 可复用", () => {
     const report = runTemporalAudit({ config, manifest, packDir: U4_PACK, existingAudit });
