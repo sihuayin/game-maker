@@ -53,7 +53,8 @@ const layerRank = (judgmentId: string): number =>
     : judgmentId.startsWith("PLAYABILITY_MECHANIC_") ? 1
       : 2;
 
-const isBlocking = (judgmentId: string): boolean => !SPATIAL_NON_BLOCKING.has(judgmentId);
+const isBlocking = (judgmentId: string): boolean =>
+  judgmentId !== "PLAYABILITY_TEMPORAL_EVIDENCE" && !SPATIAL_NON_BLOCKING.has(judgmentId);
 
 /**
  * 三层组合的可玩性判定。
@@ -144,3 +145,12 @@ export type {
 } from "./temporal.js";
 export { verifyTemporalInput } from "./temporal-input.js";
 export type { TrustedAtlasInput } from "./temporal-input.js";
+
+// ── U2：能力门 + 公共 Verdict 映射（@internal）────────────────────────────
+export {
+  mapPublicVerdict, PHASE1_CAPABILITY_ADMISSION, PHASE1_CAPABILITY_GATE,
+  PublicVerdictConflictError,
+} from "./public-verdict.js";
+export type {
+  CapabilityAdmission, PublicCapabilityGate, PublicVerdictInput, PublicVerdictResult,
+} from "./public-verdict.js";
