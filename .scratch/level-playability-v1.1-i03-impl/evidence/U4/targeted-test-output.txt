@@ -1,0 +1,12 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts (65 tests) 50ms
+ ✓ packages/assets/tests/ops.test.ts (20 tests) 1342ms
+   ✓ §U4 runTemporalAudit real wiring > 真实 analyzer → U1 adapter → U2 mapper；gate BLOCKED 仍公共 IE  1242ms
+
+ Test Files  2 passed (2)
+      Tests  85 passed (85)
+   Start at  20:09:00
+   Duration  8.30s (transform 4.16s, setup 0ms, collect 10.20s, tests 1.39s, environment 0ms, prepare 1.14s)
+

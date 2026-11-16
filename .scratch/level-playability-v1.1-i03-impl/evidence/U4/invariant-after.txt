@@ -1,0 +1,24 @@
+# U4 invariant AFTER (working tree)
+
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal-result.ts
+8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
+44:  readonly publicCapability: "BLOCKED";
+45:  readonly publicResult: null;
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal.ts
+163://   公共 Verdict；`publicCapability` 恒为 `"BLOCKED"`、`publicResult` 恒为 `null`。
+380:    publicCapability: "BLOCKED",
+381:    publicResult: null,
+704: * 输出边界：`internalResult` 是**模型内候选**，`publicCapability` 恒 `"BLOCKED"`、
+705: * `publicResult` 恒 `null`；不接生产、不发布公共 Verdict。
+$ shasum -a 256 packages/contracts/src/playability/temporal-result.ts
+04e3c37ca140fa09b3ea1eabf0d0d3336c06cdda2cdeafde719c5b44c6d343fc  packages/contracts/src/playability/temporal-result.ts
+$ shasum -a 256 packages/contracts/src/playability/temporal.ts
+6df8475822717d7e06a611e2e539785a3f8c9f67719e93d07e03d6373ef7ce53  packages/contracts/src/playability/temporal.ts
+
+$ git diff --stat a0688be -- packages/contracts/src/playability/temporal-result.ts packages/contracts/src/playability/temporal.ts
+
+$ git diff --stat a0688be..9b21f2d
+ packages/assets/src/ops.ts                         | 110 +++++++++++++++++++--
+ packages/assets/tests/ops.test.ts                  | 107 +++++++++++++++++++-
+ .../tests/playability-temporal-input.test.ts       |   2 +
+ 3 files changed, 207 insertions(+), 12 deletions(-)
