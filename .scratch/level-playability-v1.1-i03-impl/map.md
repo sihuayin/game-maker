@@ -7,7 +7,7 @@ Authority: [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md) @ 签署�
 Baseline: `main` @ `e31df2f`
 Branch: `wayfinder/level-playability-v1.1-i03-impl`
 PR target: `main`（地图 / 票 docs-only；单元代码另开 PR）
-Status: open · 2026-11-15 · I03-IMPL-03 完成；frontier：I03-IMPL-04
+Status: open · 2026-11-16 · I03-IMPL-04 完成；frontier：I03-IMPL-05
 
 > **规划型 effort（Q1=A）。** 本图只产执行治理 brief，不修改产品代码、不执行 U1–U5、不开放 `PUBLIC_NB` / `PUBLIC_PU`。
 > 执行由未来的独立会话按单元 brief 进行；每个单元仍是独立 branch / 独立 PR / 独立复核 / 独立授权。
@@ -63,6 +63,7 @@ Status: open · 2026-11-15 · I03-IMPL-03 完成；frontier：I03-IMPL-04
 
 ## Decisions so far
 
+- [I03-IMPL-04 U4 执行 brief](issues/04-i03-impl-u4.md): Q1–Q9=A（Q8 有条件：evidence-only commit，不预授权 `.scratch` 进产品 PR）；旧 stub + 真实权威路径；`TemporalAuditReport` 旧字段兼容 + 新 `coverage/evidence/publicVerdict`；optional `existingAudit`；分层 catch / phase-1 冲突不可达；T-58 改写、T-57/T-61 保持；3 commit slices；U4 实际回滚演练；不构成 U4 实施授权；下一 frontier I03-IMPL-05 U5 brief。
 - [I03-IMPL-03 U2 执行 brief](issues/03-i03-impl-u2.md): Q1–Q7=A；gate + admission 双重检查（`gate=OPEN` ≠ admission）；`mapPublicVerdict` 判别联合输入；evidence 替换旧 temporal（`applicable:false` 也移除）；coverage 三维取 existing、缺证据不伪造 geometry；冲突异常覆盖 NB / PU candidate（Q7=A）；2 commit slices；完整 synthetic 矩阵；不构成 U2 实施授权；下一 frontier I03-IMPL-04 U4 brief。
 - [I03-IMPL-02 U1 执行 brief](issues/02-i03-impl-u1.md): Q1–Q6=A；Q3 依赖前置检查 PASS（`TemporalTwoLagInternalResult` 在 contracts `temporal.ts:940`；见 `reports/U1-dependency-check.md`）；Q4 真实 analyzer smoke 移交 U4（U4 票已加必需集成验收项）；brief 覆盖公共 temporal 类型 / 纯适配器 `toPublicTemporalEvidence` / 3 commit slices / synthetic 矩阵 + API 回归 / U1 证据与独立复核 / 回滚文档化；**不构成 U1 实施授权**；下一 frontier I03-IMPL-03 U2 brief。
 - [I03-IMPL-01 执行协议与授权拓扑](issues/01-i03-impl-01-execution-protocol.md): Q1–Q6=A；协议 [`reports/01-execution-protocol.md`](reports/01-execution-protocol.md)（`sha256:b9e14b5ffddf8d075fdc895bd5638eadf21b2fdbbe27e1e4aea24359a7c86fd2`）冻结授权记录 / 独立复核 / 单元 PR + Ledger 顺序 / 证据与回滚 / docs-only Ledger 例外 / 单元 brief 清单；不授权任何单元、不改产品代码；下一 frontier I03-IMPL-02 U1 brief。
