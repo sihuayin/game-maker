@@ -1,0 +1,51 @@
+# U2 invariant AFTER (working tree)
+
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal-result.ts
+8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
+44:  readonly publicCapability: "BLOCKED";
+45:  readonly publicResult: null;
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal.ts
+163://   公共 Verdict；`publicCapability` 恒为 `"BLOCKED"`、`publicResult` 恒为 `null`。
+380:    publicCapability: "BLOCKED",
+381:    publicResult: null,
+704: * 输出边界：`internalResult` 是**模型内候选**，`publicCapability` 恒 `"BLOCKED"`、
+705: * `publicResult` 恒 `null`；不接生产、不发布公共 Verdict。
+$ shasum -a 256 packages/contracts/src/playability/temporal-result.ts
+04e3c37ca140fa09b3ea1eabf0d0d3336c06cdda2cdeafde719c5b44c6d343fc  packages/contracts/src/playability/temporal-result.ts
+$ shasum -a 256 packages/contracts/src/playability/temporal.ts
+6df8475822717d7e06a611e2e539785a3f8c9f67719e93d07e03d6373ef7ce53  packages/contracts/src/playability/temporal.ts
+
+$ git diff --stat 848dedb -- packages/contracts/src/playability/temporal-result.ts packages/contracts/src/playability/temporal.ts
+
+$ grep -A1 "const isBlocking" packages/contracts/src/playability/api.ts
+const isBlocking = (judgmentId: string): boolean =>
+  judgmentId !== "PLAYABILITY_TEMPORAL_EVIDENCE" && !SPATIAL_NON_BLOCKING.has(judgmentId);
+
+$ git diff 848dedb -- packages/contracts/src/playability/api.ts
+diff --git a/packages/contracts/src/playability/api.ts b/packages/contracts/src/playability/api.ts
+index c7c7a48..a4e5b25 100644
+--- a/packages/contracts/src/playability/api.ts
++++ b/packages/contracts/src/playability/api.ts
+@@ -53,7 +53,8 @@ const layerRank = (judgmentId: string): number =>
+     : judgmentId.startsWith("PLAYABILITY_MECHANIC_") ? 1
+       : 2;
+ 
+-const isBlocking = (judgmentId: string): boolean => !SPATIAL_NON_BLOCKING.has(judgmentId);
++const isBlocking = (judgmentId: string): boolean =>
++  judgmentId !== "PLAYABILITY_TEMPORAL_EVIDENCE" && !SPATIAL_NON_BLOCKING.has(judgmentId);
+ 
+ /**
+  * 三层组合的可玩性判定。
+@@ -144,3 +145,12 @@ export type {
+ } from "./temporal.js";
+ export { verifyTemporalInput } from "./temporal-input.js";
+ export type { TrustedAtlasInput } from "./temporal-input.js";
++
++// ── U2：能力门 + 公共 Verdict 映射（@internal）────────────────────────────
++export {
++  mapPublicVerdict, PHASE1_CAPABILITY_ADMISSION, PHASE1_CAPABILITY_GATE,
++  PublicVerdictConflictError,
++} from "./public-verdict.js";
++export type {
++  CapabilityAdmission, PublicCapabilityGate, PublicVerdictInput, PublicVerdictResult,
++} from "./public-verdict.js";
