@@ -233,14 +233,16 @@ describe("§P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（�
 
 describe("§U5 发布闸时序诊断（非阻断）", () => {
   const LAST_TRAIN_CONFIG = path.join(ROOT, "fixtures/game-configs/last-train.json");
+  type TemporalWitness = Extract<PlayabilityEvidence["witness"], { kind: "temporal" }>;
+  const temporalWitness = (result: TemporalWitness["result"]): TemporalWitness => ({
+    kind: "temporal", result, certificateKind: "witness",
+    certificateStatus: "COMPLETE", degradation: null,
+  });
   const TEMPORAL_EVIDENCE: PlayabilityEvidence = {
     judgmentId: "PLAYABILITY_TEMPORAL_EVIDENCE",
     target: "objective.gate",
     detail: "temporal synthetic",
-    witness: {
-      kind: "temporal", result: "nb-candidate", certificateKind: "witness",
-      certificateStatus: "COMPLETE", degradation: null,
-    },
+    witness: temporalWitness("nb-candidate"),
     coverage: { spatial: "checked", mechanic: "checked", completion: "checked", temporal: "checked", geometry: "partial" },
   };
   const PUBLIC_VERDICT = {
@@ -309,7 +311,7 @@ describe("§U5 发布闸时序诊断（非阻断）", () => {
     writeReport(out, report());
     const puEvidence: PlayabilityEvidence = {
       ...TEMPORAL_EVIDENCE,
-      witness: { ...TEMPORAL_EVIDENCE.witness, result: "pu-candidate" },
+      witness: temporalWitness("pu-candidate"),
     };
     mocks.useFake = true;
     mocks.report = fakeReport({
