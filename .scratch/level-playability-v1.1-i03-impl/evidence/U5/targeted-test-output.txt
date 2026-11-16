@@ -1,18 +1,19 @@
 
  RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
 
- ✓ packages/pipeline/tests/publish-gate.test.ts (28 tests) 10881ms
-   ✓ §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > 可达 config ⇒ 照常放行（不误拒手写 config）  1333ms
-   ✓ §U5 发布闸时序诊断（非阻断） > G1/G4：真实 last-train ⇒ temporal 诊断存在且公共 verdict IE  1338ms
-   ✓ §U5 发布闸时序诊断（非阻断） > G7：无移动 Hazard ⇒ {applicable:false}  1156ms
-   ✓ §U5 发布闸时序诊断（非阻断） > G2/G3：公共 IE 诊断不改变放行  1292ms
-   ✓ §U5 发布闸时序诊断（非阻断） > G10 / 变异守卫：temporal PROVEN_UNPLAYABLE + checked 仍不放行、不抛  1283ms
-   ✓ §U5 发布闸时序诊断（非阻断） > G11：证据缺省按 unknown 记录，绝不当作 checked  1370ms
-   ✓ §U5 发布闸时序诊断（非阻断） > applicable:false 不被读成 PU / NB  1351ms
-   ✓ §U5 发布闸时序诊断（非阻断） > G5：降级报告（IE / unknown）⇒ 不抛，按记录值输出  1341ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts (29 tests) 12076ms
+   ✓ §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > 可达 config ⇒ 照常放行（不误拒手写 config）  1313ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G1/G4：真实 last-train ⇒ temporal 诊断存在且公共 verdict IE  1297ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G7：无移动 Hazard ⇒ {applicable:false}  1157ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G2：nb-candidate + gate BLOCKED ⇒ 放行，公共映射 IE  1300ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G3：pu-candidate + gate BLOCKED ⇒ 放行，公共映射 IE  1302ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G10 / 变异守卫：temporal PROVEN_UNPLAYABLE + checked 仍不放行、不抛  1259ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G11：证据缺省按 unknown 记录，绝不当作 checked  1347ms
+   ✓ §U5 发布闸时序诊断（非阻断） > applicable:false 不被读成 PU / NB  1353ms
+   ✓ §U5 发布闸时序诊断（非阻断） > G5：降级报告（IE / unknown）⇒ 不抛，按记录值输出  1333ms
 
  Test Files  1 passed (1)
-      Tests  28 passed (28)
-   Start at  21:34:57
-   Duration  12.21s (transform 880ms, setup 0ms, collect 1.02s, tests 10.88s, environment 0ms, prepare 40ms)
+      Tests  29 passed (29)
+   Start at  21:54:31
+   Duration  13.82s (transform 1.02s, setup 0ms, collect 989ms, tests 12.08s, environment 0ms, prepare 216ms)
 

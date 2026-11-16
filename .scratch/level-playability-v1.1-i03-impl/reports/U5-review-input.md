@@ -13,8 +13,8 @@
 | 授权包 | `docs/v7.8/移动-I03.md` · 签署前 `2f89d572…` / 签署后 `f45332be…` / 当前 `5e3fa97f4ae855ef37a18c3aabd708ed28f250af1184c466eaadc890935d6f24` |
 | Base | `41df0d3`（树与 `main` `f4e6ce7` 相同） |
 | **Code head** | **`fcea791`** |
-| **Code/test head** | **`57ff6de`** |
-| Code/test diff range | `41df0d3..57ff6de` |
+| **Code/test head** | **`d8b5df1`**（G3 amended；test-only） |
+| Code/test diff range | `41df0d3..d8b5df1` |
 | 环境 | 见 `evidence/U5/commands.log`（OS / Node / pnpm） |
 
 ## 2. 改动文件（code/test diff，2 个）
@@ -22,7 +22,7 @@
 | 文件 | 操作 |
 | --- | --- |
 | `packages/pipeline/src/publish-gate.ts` | `PublishGateTemporalEvidence`；`PublishGateResult.temporal?`；`configProblem` 结构化返回；消费 U4 `TemporalAuditReport` |
-| `packages/pipeline/tests/publish-gate.test.ts` | G1–G11 + 变异守卫；fake report 默认委托实际 `runTemporalAudit` |
+| `packages/pipeline/tests/publish-gate.test.ts` | G1–G11 + 变异守卫；G2 / G3 各自独立 fake；fake report 默认委托实际 `runTemporalAudit` |
 
 只读 / 未修改：`packages/contracts/**`、`packages/assets/**`、`packages/cli/**`、`packages/mcp/**`、`packages/pipeline/src/create-game.ts`、fixtures、`scripts/**`、`docs/**`、`package.json` / lockfile / tsconfig。
 
@@ -32,11 +32,11 @@
 | --- | --- |
 | 证据目录 | `.scratch/level-playability-v1.1-i03-impl/evidence/U5/` |
 | 文件 hash | `evidence/U5/SHA256SUMS` |
-| 目标测试 | `evidence/U5/targeted-test-output.txt` · 1 file / 28 tests · exit 0 |
-| 全量测试 | `evidence/U5/test-output.txt` · 178 files / 2944 tests · exit 0 · 3 条 vitest-worker `onTaskUpdate` 超时告警（runner 噪声，非失败） |
+| 目标测试 | `evidence/U5/targeted-test-output.txt` · 1 file / 29 tests · exit 0 |
+| 全量测试 | `evidence/U5/test-output.txt` · 178 files / 2945 tests · exit 0 · 2 条 vitest-worker `onTaskUpdate` 超时告警（runner 噪声，非失败） |
 | build / deps / links | `build.log` / `check-deps.log` / `check-links.log` · exit 0 |
 | 不变量 | `invariant-before.txt`（base）/ `invariant-after.txt`（head） |
-| 回滚演练 | `rollback-drill.log` · 分支 `wayfinder/i03-u5-rollback-drill` · revert `57ff6de` + `fcea791` 回 base `41df0d3` · 目标 17 tests / 全量 2933 tests · exit 0 |
+| 回滚演练 | `rollback-drill.log` · 分支 `wayfinder/i03-u5-rollback-drill` · revert `d8b5df1` + `57ff6de` + `fcea791` 回 base `41df0d3` · 目标 17 tests / 全量 2933 tests · exit 0 |
 
 ## 4. 可复跑命令
 
@@ -60,7 +60,7 @@ pnpm check:links
    - 变异守卫：fake `PROVEN_UNPLAYABLE` + `coverage:"checked"` 不放行、不抛；源级 `CommandError` / `playabilityIssues` 不消费 `temporal`；
    - G1–G11 与 fake report 的对应关系；fake report 满足真实 `TemporalAuditReport` 类型、无 `as any`；mock 默认委托实际 `runTemporalAudit`；
    - 发布行为 / 退出码 / 报告落盘不变；`PUBLIC_NB` / `PUBLIC_PU` 仍 `BLOCKED`；`publicCapability` / `publicResult` 不变；无契约版本升级；
-   - 目标 28 tests、全量 178 files / 2944 tests、build / deps / links 全过；
+   - 目标 29 tests、全量 178 files / 2945 tests、build / deps / links 全过；
    - 回滚演练真实、隔离、回 base 后目标 17 / 全量 2933，delivery 分支未被污染。
 4. 至少 2 条自选关键断言，记录理由与结果。
 5. 逐项 `PASS / FAIL / NOT_RUN`；不得用总通过率替代。
