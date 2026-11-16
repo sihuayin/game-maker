@@ -8,6 +8,10 @@ import { describe, expect, it } from "vitest";
 import { parseAssetPack, parseGameConfig } from "../src/index.js";
 import type { GameConfig, GameEntity } from "../src/game-config.js";
 import { auditMechanic, MECHANIC_JUDGMENTS } from "../src/playability/mechanic.js";
+import { auditPlayability, playabilityIssues } from "../src/playability/api.js";
+import {
+  mapPublicVerdict, PHASE1_CAPABILITY_ADMISSION, PHASE1_CAPABILITY_GATE,
+} from "../src/playability/public-verdict.js";
 import type { PlayabilityEvidence } from "../src/playability/verdict.js";
 
 const FIXTURE = fileURLToPath(new URL("./fixtures/playability-mechanic-matrix.json", import.meta.url));
@@ -130,10 +134,25 @@ describe("§A：静止 hazard 封路（反事实）", () => {
     expect(result.gaps.some((g) => g.missing === "target-inside-hazard" && g.target === "near-body-edge")).toBe(false);
   });
 
-  it("巡逻 hazard ⇒ moving-hazard-phase gap，不报 A", () => {
+  it("巡逻 hazard ⇒ 机制层不记 moving-hazard-phase，也不报 A", () => {
     const result = mechanicOf("wide-patrol");
-    expect(result.gaps.map((g) => g.missing)).toContain("moving-hazard-phase");
+    expect(result.gaps.map((g) => g.missing)).not.toContain("moving-hazard-phase");
     expect(result.evidence).toEqual([]);
+    expect(result.verdict).toBe("NO_PROVEN_BLOCKER");
+    expect(result.coverage).toBe("checked");
+  });
+
+  it("moving-platform-unsupported 仍保留（clone wide-patrol + moving solid）", () => {
+    const c = cloneOf("wide-patrol");
+    c.entities.push({
+      id: "moving-lift", kind: "solid", at: { x: 900, y: 250 }, asset: "prop-luggage-pile",
+      motion: { kind: "cycle", axis: "y", distance: 20, periodMs: 2000 },
+    });
+    const result = auditMechanic(c, MANIFEST);
+    expect(result.gaps.map((g) => g.missing)).toContain("moving-platform-unsupported");
+    expect(result.gaps.map((g) => g.missing)).not.toContain("moving-hazard-phase");
+    expect(result.coverage).toBe("partial");
+    expect(result.verdict).toBe("INSUFFICIENT_EVIDENCE");
   });
 });
 
@@ -249,5 +268,96 @@ describe("§coverage 与证据不足", () => {
     const result = auditMechanic(c, MANIFEST);
     expect(result.coverage).toBe("checked");
     expect(result.verdict).toBe("NO_PROVEN_BLOCKER");
+  });
+});
+
+describe("§U3：temporal 接管 moving hazard", () => {
+  const layerOf = (id: string) => auditPlayability(configOf(caseOf(id).config), MANIFEST);
+  const temporalEvidence = (
+    result: "nb-candidate" | "pu-candidate" | "insufficient-evidence",
+    temporal: "checked" | "partial" | "unknown",
+  ): PlayabilityEvidence => ({
+    judgmentId: "PLAYABILITY_TEMPORAL_EVIDENCE",
+    target: "objective.gate",
+    detail: "temporal synthetic",
+    witness: {
+      kind: "temporal",
+      result,
+      certificateKind: result === "insufficient-evidence" ? "none" : "witness",
+      certificateStatus: result === "insufficient-evidence" ? "INCOMPLETE" : "COMPLETE",
+      degradation: result === "insufficient-evidence" ? "no-witness" : null,
+    },
+    coverage: {
+      spatial: "checked", mechanic: "checked", completion: "checked",
+      temporal, geometry: "partial",
+    },
+  });
+  const mapPhase1 = (
+    existing: ReturnType<typeof auditPlayability>,
+    temporal: { readonly applicable: false } | { readonly applicable: true; readonly evidence?: PlayabilityEvidence },
+  ) => mapPublicVerdict({
+    existing, temporal, gate: PHASE1_CAPABILITY_GATE, admission: PHASE1_CAPABILITY_ADMISSION,
+  });
+
+  it("wide-patrol：机制层无旧 gap；层内 NB + mechanic checked；公共 IE", () => {
+    const mechanic = mechanicOf("wide-patrol");
+    expect(mechanic.gaps.map((g) => g.missing)).not.toContain("moving-hazard-phase");
+    expect(mechanic.verdict).toBe("NO_PROVEN_BLOCKER");
+    expect(mechanic.coverage).toBe("checked");
+    expect(mechanic.evidence).toEqual([]);
+
+    const layer = layerOf("wide-patrol");
+    expect(layer.verdict).toBe("NO_PROVEN_BLOCKER");
+    expect(layer.coverage.mechanic).toBe("checked");
+
+    const publicVerdict = mapPhase1(layer, {
+      applicable: true, evidence: temporalEvidence("nb-candidate", "checked"),
+    });
+    expect(publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(publicVerdict.coverage.temporal).toBe("checked");
+  });
+
+  it("applicable + partial / unknown ⇒ 公共 IE", () => {
+    const layer = layerOf("wide-patrol");
+    for (const temporal of ["partial", "unknown"] as const) {
+      const publicVerdict = mapPhase1(layer, {
+        applicable: true, evidence: temporalEvidence("nb-candidate", temporal),
+      });
+      expect(publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+      expect(publicVerdict.coverage.temporal).toBe(temporal);
+    }
+  });
+
+  it("applicable 但无 evidence ⇒ temporal unknown ⇒ 公共 IE", () => {
+    const publicVerdict = mapPhase1(layerOf("wide-patrol"), { applicable: true });
+    expect(publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(publicVerdict.coverage.temporal).toBe("unknown");
+    expect(publicVerdict.evidence).toEqual([]);
+  });
+
+  it("不适用（danger-wide-idle）⇒ 保留 existing，无 temporal 字段", () => {
+    const layer = layerOf("danger-wide-idle");
+    expect(layer.verdict).toBe("NO_PROVEN_BLOCKER");
+    const publicVerdict = mapPhase1(layer, { applicable: false });
+    expect(publicVerdict.verdict).toBe(layer.verdict);
+    expect(publicVerdict.coverage.temporal).toBeUndefined();
+    expect(publicVerdict.coverage.geometry).toBeUndefined();
+  });
+
+  it("第一阶段 gate BLOCKED：nb / pu candidate 均不产公共 NB / PU", () => {
+    const layer = layerOf("wide-patrol");
+    for (const result of ["nb-candidate", "pu-candidate"] as const) {
+      const publicVerdict = mapPhase1(layer, {
+        applicable: true, evidence: temporalEvidence(result, "checked"),
+      });
+      expect(publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    }
+  });
+
+  it("公共 IE 上 playabilityIssues 为空；temporal evidence 非阻断", () => {
+    const publicVerdict = mapPhase1(layerOf("wide-patrol"), {
+      applicable: true, evidence: temporalEvidence("nb-candidate", "checked"),
+    });
+    expect(playabilityIssues(publicVerdict)).toEqual([]);
   });
 });
