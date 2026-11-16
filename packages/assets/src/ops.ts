@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  analyzeTemporalInternalTwoLag, auditConfigPipeline, auditPlayability, auditPlayabilityTemporal,
+  analyzeTemporalInternalTwoLag, auditConfigPipeline, auditPlayabilityTemporal,
   CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE,
   entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, jumpSpan, MASTER_RATIOS_FILE, mapPublicVerdict,
   maxJumpHeight, PHASE1_CAPABILITY_ADMISSION, PHASE1_CAPABILITY_GATE,
@@ -1021,13 +1021,7 @@ function readTrustedAtlasInput(
   return verifyTemporalInput({ manifest, assetIds, atlases, digest: atlasDigest });
 }
 
-/**
- * 读一次可信输入 → 两档各调一次入口 → 比较 → 返回。
- *
- * ⚠️ **同步**：`assertPublishableQa` 是同步 API，改成 `async` 会破坏公共签名。
- * ⚠️ **绝不抛**：任何未知异常收敛为最保守的 IE；I-01 接线不得改变既有退出码。
- * ⚠️ **适用才读盘**：没有移动 Hazard 时不产生任何文件 I/O。
- */
+/** U4 报告：legacy 字段 + 权威公共字段；`create-game` 走 legacy-only，U5 必须传入 `existingAudit`。 */
 export type TemporalAuditReport =
   | { readonly applicable: false }
   | {
@@ -1041,11 +1035,11 @@ export type TemporalAuditReport =
       readonly publicVerdict: PlayabilityVerdict;
     };
 
-const MINIMAL_PUBLIC_VERDICT: PlayabilityVerdict = {
+const MINIMAL_PUBLIC_VERDICT: PlayabilityVerdict = Object.freeze({
   verdict: "INSUFFICIENT_EVIDENCE",
-  evidence: [],
-  coverage: { spatial: "not-checked", mechanic: "not-checked", completion: "not-checked" },
-};
+  evidence: Object.freeze([]),
+  coverage: Object.freeze({ spatial: "not-checked", mechanic: "not-checked", completion: "not-checked" }),
+});
 
 function temporalFailure(existingAudit: PlayabilityVerdict, legacy?: TemporalAuditResult): TemporalAuditReport {
   const verdict = legacy?.applicable === true ? legacy.verdict : "INSUFFICIENT_EVIDENCE";
@@ -1060,6 +1054,15 @@ function temporalFailure(existingAudit: PlayabilityVerdict, legacy?: TemporalAud
   };
 }
 
+/**
+ * 读一次可信输入 → 两档各调一次入口 → 比较 → 返回。
+ *
+ * ⚠️ **同步**：`assertPublishableQa` 是同步 API，改成 `async` 会破坏公共签名。
+ * ⚠️ **绝不抛**：任何未知异常收敛为最保守的 IE；I-01 接线不得改变既有退出码。
+ * ⚠️ **适用才读盘**：没有移动 Hazard 时不产生任何文件 I/O。
+ * ⚠️ **真实分析只在 `existingAudit` 存在时运行**：`create-game` 不传 ⇒ legacy-only；
+ *    U5 publish-gate 必须传入其已有 audit，才能得到真实公共 evidence / verdict。
+ */
 export function runTemporalAudit(args: {
   config: GameConfig;
   manifest: AssetPackManifest;
@@ -1070,9 +1073,9 @@ export function runTemporalAudit(args: {
     const scope = temporalScope(args.config);
     if (!scope.applicable) return { applicable: false };
 
-    const existingAudit = args.existingAudit ?? auditPlayability(args.config, args.manifest);
+    const existingAudit = args.existingAudit;
     const trusted = readTrustedAtlasInput(args.packDir, args.manifest, scope.assetIds);
-    if (!trusted.ok) return temporalFailure(existingAudit);
+    if (!trusted.ok) return temporalFailure(existingAudit ?? MINIMAL_PUBLIC_VERDICT);
 
     // legacy stub 路径：只产旧 verdict / degradation；失败不阻断真实路径。
     let legacy: TemporalAuditResult = { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
@@ -1084,6 +1087,18 @@ export function runTemporalAudit(args: {
       legacy = resolveTwoLagResults(at(TEMPORAL_LAG_MS), at(TEMPORAL_LAG_BASELINE_MS));
     } catch {
       legacy = { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
+    }
+
+    if (existingAudit === undefined) {
+      // create-game / legacy 调用方：只接通、丢结果；不跑真实 analyzer，避免慢路径。
+      return {
+        applicable: true,
+        verdict: legacy.applicable ? legacy.verdict : "INSUFFICIENT_EVIDENCE",
+        ...(legacy.applicable && legacy.degradation !== undefined ? { degradation: legacy.degradation } : {}),
+        coverage: "unknown",
+        evidence: [],
+        publicVerdict: MINIMAL_PUBLIC_VERDICT,
+      };
     }
 
     // 真实权威路径：内部两档 → U1 adapter → U2 mapper；失败收敛为 IE/unknown。
