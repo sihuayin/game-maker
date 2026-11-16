@@ -7,7 +7,7 @@ Authority: [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md) @ 签署�
 Baseline: `main` @ `e31df2f`
 Branch: `wayfinder/level-playability-v1.1-i03-impl`
 PR target: `main`（地图 / 票 docs-only；单元代码另开 PR）
-Status: open · 2026-11-16 · I03-IMPL-06 完成；frontier：I03-IMPL-07
+Status: closed · 2026-11-16 · I03-IMPL-07 完成；7/7 票；实施治理计划收口
 
 > **规划型 effort（Q1=A）。** 本图只产执行治理 brief，不修改产品代码、不执行 U1–U5、不开放 `PUBLIC_NB` / `PUBLIC_PU`。
 > 执行由未来的独立会话按单元 brief 进行；每个单元仍是独立 branch / 独立 PR / 独立复核 / 独立授权。
@@ -63,6 +63,7 @@ Status: open · 2026-11-16 · I03-IMPL-06 完成；frontier：I03-IMPL-07
 
 ## Decisions so far
 
+- [I03-IMPL-07 验收与关闭计划](issues/07-i03-impl-acceptance.md): Q1–Q7=A；独立验收会话 / 原始证据复核；AC-01–AC-21 逐项映射（required 19；AC-11/15 `NOT_RUN`）；完整回归 + LP-06/07（20 configs / 96 pairs / 19 个 x 轴 Hazard）+ 跨进程确定性；报告固定路径 + `PASS / FAIL / INCOMPLETE` + 退出码 `0/1/2`（exit 2 = invalid input，Q7=A）；规划地图收口 ≠ 实施收口；不写代码 / 不跑验收 / 不开放能力。**规划地图收口。**
 - [I03-IMPL-06 U3 执行 brief](issues/06-i03-impl-u3.md): Q1–Q7=A；移除 `moving-hazard-phase` gap，`wide-patrol` 层内允许 NB + checked，公共 IE 由 temporal + U2 mapper 承担；只改 `wide-patrol` fixture 行；temporal takeover 测试（适用 / 非适用 / 缺失）+ moving-platform / 其他语义回归；3 commit slices（含独立 evidence-only）；U3 必须实际回滚演练；不构成 U3 实施授权；下一 frontier I03-IMPL-07 验收 / 关闭计划。
 - [I03-IMPL-05 U5 执行 brief](issues/05-i03-impl-u5.md): Q1–Q6=A；`configProblem` 结构化返回；temporal 字段缺席 / `applicable:false` / `applicable:true` 三态严格区分；诊断只取 U4 `TemporalAuditReport` 的 `coverage` / `publicVerdict.verdict` / `evidence`；复用本次 `existingAudit`；G1–G11 + fake report + 变异守卫；3 commit slices（含独立 evidence-only commit）；U5 必须回滚演练；不构成 U5 实施授权；下一 frontier I03-IMPL-06 U3 brief。
 - [I03-IMPL-04 U4 执行 brief](issues/04-i03-impl-u4.md): Q1–Q9=A（Q8 有条件：evidence-only commit，不预授权 `.scratch` 进产品 PR）；旧 stub + 真实权威路径；`TemporalAuditReport` 旧字段兼容 + 新 `coverage/evidence/publicVerdict`；optional `existingAudit`；分层 catch / phase-1 冲突不可达；T-58 改写、T-57/T-61 保持；3 commit slices；U4 实际回滚演练；不构成 U4 实施授权；下一 frontier I03-IMPL-05 U5 brief。
@@ -72,7 +73,7 @@ Status: open · 2026-11-16 · I03-IMPL-06 完成；frontier：I03-IMPL-07
 
 ## Not yet specified
 
-无已知雾区。U1–U5 的执行 brief 已拆票；执行中的 STOP / HITL 按授权包 §11.3 / §13 处理，不预先拆票。若某个 brief 暴露新的接口 / 测试决策，在该 brief 票内解决。
+无已知雾区。U1–U5 的执行 brief 与验收 / 关闭计划均已完成；规划地图于 2026-11-16 收口。实施与最终验收另开 effort，按协议 §2 / §9 执行。
 
 ## Out of scope
 
