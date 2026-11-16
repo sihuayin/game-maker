@@ -9,10 +9,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import {
-  auditConfigPipeline, auditPlayabilityTemporal, CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE,
-  entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, jumpSpan, MASTER_RATIOS_FILE, maxJumpHeight,
+  analyzeTemporalInternalTwoLag, auditConfigPipeline, auditPlayabilityTemporal,
+  CharacterDNAFileSchema, ConfigToolSchema, DEFAULT_PLAYER_MOVE,
+  entityBox, FALLBACK_ANCHOR, formatIssues, GameDesignSpecSchema, jumpSpan, MASTER_RATIOS_FILE, mapPublicVerdict,
+  maxJumpHeight, PHASE1_CAPABILITY_ADMISSION, PHASE1_CAPABILITY_GATE,
   resolveTwoLagResults, stubTemporalAnalyzer, TEMPORAL_LAG_BASELINE_MS, TEMPORAL_LAG_MS, temporalScope,
-  verifyTemporalInput, type TemporalAuditResult,
+  toPublicTemporalEvidence, verifyTemporalInput,
+  type PlayabilityEvidence, type PlayabilityVerdict, type PlayabilityVerdictState,
+  type TemporalAuditResult, type TemporalCoverageState,
   parseAssetPack, parseAssetPlan, parseGameConfig, parseLedger, parseMasterRatios, parseRecipe, PLATFORMER_V1,
   DESIGN_BUCKET_ASSET_KINDS,
   PLAYER_ACTION_NAMES,
@@ -1017,30 +1021,131 @@ function readTrustedAtlasInput(
   return verifyTemporalInput({ manifest, assetIds, atlases, digest: atlasDigest });
 }
 
+/** U4 报告：legacy 字段 + 权威公共字段；`create-game` 走 legacy-only，U5 必须传入 `existingAudit`。 */
+export type TemporalAuditReport =
+  | { readonly applicable: false }
+  | {
+      readonly applicable: true;
+      /** legacy 字段：来自旧 stub 路径，保留兼容。 */
+      readonly verdict: PlayabilityVerdictState;
+      readonly degradation?: "lag-invalid" | "lag-disagreement";
+      /** 权威公共字段：来自真实路径。 */
+      readonly coverage: TemporalCoverageState;
+      readonly evidence: readonly PlayabilityEvidence[];
+      readonly publicVerdict: PlayabilityVerdict;
+    };
+
+const MINIMAL_PUBLIC_VERDICT: PlayabilityVerdict = Object.freeze({
+  verdict: "INSUFFICIENT_EVIDENCE",
+  evidence: Object.freeze([]),
+  coverage: Object.freeze({ spatial: "not-checked", mechanic: "not-checked", completion: "not-checked" }),
+});
+
+function temporalFailure(existingAudit: PlayabilityVerdict, legacy?: TemporalAuditResult): TemporalAuditReport {
+  const verdict = legacy?.applicable === true ? legacy.verdict : "INSUFFICIENT_EVIDENCE";
+  const degradation = legacy?.applicable === true ? legacy.degradation : undefined;
+  return {
+    applicable: true,
+    verdict,
+    ...(degradation !== undefined ? { degradation } : {}),
+    coverage: "unknown",
+    evidence: [],
+    publicVerdict: existingAudit,
+  };
+}
+
 /**
  * 读一次可信输入 → 两档各调一次入口 → 比较 → 返回。
  *
  * ⚠️ **同步**：`assertPublishableQa` 是同步 API，改成 `async` 会破坏公共签名。
  * ⚠️ **绝不抛**：任何未知异常收敛为最保守的 IE；I-01 接线不得改变既有退出码。
  * ⚠️ **适用才读盘**：没有移动 Hazard 时不产生任何文件 I/O。
+ * ⚠️ **真实分析只在 `existingAudit` 存在时运行**：`create-game` 不传 ⇒ legacy-only；
+ *    U5 publish-gate 必须传入其已有 audit，才能得到真实公共 evidence / verdict。
  */
 export function runTemporalAudit(args: {
   config: GameConfig;
   manifest: AssetPackManifest;
   packDir: string;
-}): TemporalAuditResult {
+  existingAudit?: PlayabilityVerdict;
+}): TemporalAuditReport {
   try {
     const scope = temporalScope(args.config);
     if (!scope.applicable) return { applicable: false };
+
+    const existingAudit = args.existingAudit;
     const trusted = readTrustedAtlasInput(args.packDir, args.manifest, scope.assetIds);
-    if (!trusted.ok) return { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
-    const at = (lagMs: number): TemporalAuditResult =>
-      auditPlayabilityTemporal(args.config, args.manifest, {
-        lagMs, trustedInput: trusted.value, analyze: stubTemporalAnalyzer,
+    if (!trusted.ok) return temporalFailure(existingAudit ?? MINIMAL_PUBLIC_VERDICT);
+
+    // legacy stub 路径：只产旧 verdict / degradation；失败不阻断真实路径。
+    let legacy: TemporalAuditResult = { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
+    try {
+      const at = (lagMs: number): TemporalAuditResult =>
+        auditPlayabilityTemporal(args.config, args.manifest, {
+          lagMs, trustedInput: trusted.value, analyze: stubTemporalAnalyzer,
+        });
+      legacy = resolveTwoLagResults(at(TEMPORAL_LAG_MS), at(TEMPORAL_LAG_BASELINE_MS));
+    } catch {
+      legacy = { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
+    }
+
+    if (existingAudit === undefined) {
+      // create-game / legacy 调用方：只接通、丢结果；不跑真实 analyzer，避免慢路径。
+      return {
+        applicable: true,
+        verdict: legacy.applicable ? legacy.verdict : "INSUFFICIENT_EVIDENCE",
+        ...(legacy.applicable && legacy.degradation !== undefined ? { degradation: legacy.degradation } : {}),
+        coverage: "unknown",
+        evidence: [],
+        publicVerdict: MINIMAL_PUBLIC_VERDICT,
+      };
+    }
+
+    // 真实权威路径：内部两档 → U1 adapter → U2 mapper；失败收敛为 IE/unknown。
+    try {
+      const input = {
+        config: args.config,
+        manifest: args.manifest,
+        lagMs: TEMPORAL_LAG_MS,
+        trustedInput: trusted.value,
+      };
+      const twoLag = analyzeTemporalInternalTwoLag(input, TEMPORAL_LAG_BASELINE_MS);
+      const movers = args.config.entities.filter(
+        (entity) => entity.kind === "hazard" && entity.motion !== undefined,
+      );
+      const assetId = movers.length === 1 ? movers[0]?.asset : undefined;
+      const evidence = toPublicTemporalEvidence({
+        twoLag,
+        firstLagMs: TEMPORAL_LAG_MS,
+        secondLagMs: TEMPORAL_LAG_BASELINE_MS,
+        existingCoverage: existingAudit.coverage,
+        ...(assetId !== undefined ? { assetId } : {}),
       });
-    return resolveTwoLagResults(at(TEMPORAL_LAG_MS), at(TEMPORAL_LAG_BASELINE_MS));
+      const publicVerdict = mapPublicVerdict({
+        existing: existingAudit,
+        temporal: { applicable: true, evidence },
+        gate: PHASE1_CAPABILITY_GATE,
+        admission: PHASE1_CAPABILITY_ADMISSION,
+      });
+      return {
+        applicable: true,
+        verdict: legacy.applicable ? legacy.verdict : "INSUFFICIENT_EVIDENCE",
+        ...(legacy.applicable && legacy.degradation !== undefined ? { degradation: legacy.degradation } : {}),
+        coverage: publicVerdict.coverage.temporal ?? "unknown",
+        evidence: [evidence],
+        publicVerdict,
+      };
+    } catch {
+      return temporalFailure(existingAudit, legacy);
+    }
   } catch {
-    return { applicable: true, verdict: "INSUFFICIENT_EVIDENCE" };
+    return {
+      applicable: true,
+      verdict: "INSUFFICIENT_EVIDENCE",
+      coverage: "unknown",
+      evidence: [],
+      publicVerdict: MINIMAL_PUBLIC_VERDICT,
+    };
   }
 }
 

@@ -5,9 +5,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
-import { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, packAssets } from "../src/index.js";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { CommandError, EXIT, exitCodeOfError, failureDirOfError, ledgerOfError, packAssets, runTemporalAudit, type TemporalAuditReport } from "../src/index.js";
 import { encodePNG } from "../src/png.js";
+import { parseAssetPack, parseGameConfig, type PlayabilityVerdict, type TemporalAuditResult } from "@game-maker/contracts";
 
 const STYLE = {
   id: "style-ref",
@@ -328,4 +329,117 @@ describe("⚠️ 判断失败也带账与失败现场（票 48）", () => {
     //   所以这条断言问的是「**它指的那个目录真的在磁盘上吗**」，而不是「它的形状对不对」。
     expect(fs.existsSync(path.resolve(outRoot, kept!)), `现场不在：${kept}`).toBe(true);
   });
+});
+
+describe("§U4 runTemporalAudit real wiring", () => {
+  const REPO = path.resolve(".");
+  const U4_PACK = path.join(REPO, "fixtures/packs/last-train/v2");
+  const config = (() => {
+    const parsed = parseGameConfig(JSON.parse(fs.readFileSync(path.join(REPO, "fixtures/game-configs/last-train.json"), "utf8")));
+    if (!parsed.ok) throw new Error("last-train config：" + parsed.errors.join("；"));
+    return parsed.value;
+  })();
+  const manifest = (() => {
+    const parsed = parseAssetPack(JSON.parse(fs.readFileSync(path.join(U4_PACK, "manifest.json"), "utf8")));
+    if (!parsed.ok) throw new Error("last-train manifest：" + parsed.errors.join("；"));
+    return parsed.value;
+  })();
+  const existingAudit: PlayabilityVerdict = {
+    verdict: "NO_PROVEN_BLOCKER",
+    evidence: [],
+    coverage: { spatial: "checked", mechanic: "checked", completion: "checked" },
+  };
+
+  it("TemporalAuditReport 对旧 TemporalAuditResult 兼容", () => {
+    expectTypeOf<TemporalAuditReport>().toMatchTypeOf<TemporalAuditResult>();
+  });
+
+  it("真实 analyzer → U1 adapter → U2 mapper；gate BLOCKED 仍公共 IE", () => {
+    const report = runTemporalAudit({ config, manifest, packDir: U4_PACK, existingAudit });
+    expect(report.applicable).toBe(true);
+    if (!report.applicable) throw new Error("expected applicable");
+    expect(report.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(report.publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(["checked", "partial", "unknown"]).toContain(report.coverage);
+    expect(report.evidence).toHaveLength(1);
+    expect(report.evidence[0]?.witness.kind).toBe("temporal");
+    expect(report.evidence[0]?.lag?.perLag).toHaveLength(2);
+    expect(report.evidence[0]?.model?.conditional).toBe(true);
+  }, 240_000);
+
+  it("无 existingAudit（create-game 路径）⇒ legacy-only，不跑真实分析", () => {
+    const report = runTemporalAudit({ config, manifest, packDir: U4_PACK });
+    expect(report.applicable).toBe(true);
+    if (!report.applicable) throw new Error("expected applicable");
+    expect(report.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(report.coverage).toBe("unknown");
+    expect(report.evidence).toEqual([]);
+    expect(report.publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+    expect(report.publicVerdict.coverage).toEqual({ spatial: "not-checked", mechanic: "not-checked", completion: "not-checked" });
+  });
+
+  it("existingAudit 可复用", () => {
+    const report = runTemporalAudit({ config, manifest, packDir: U4_PACK, existingAudit });
+    expect(report.applicable).toBe(true);
+    if (!report.applicable) throw new Error("expected applicable");
+    expect(report.publicVerdict).toBeDefined();
+    expect(report.evidence).toHaveLength(1);
+  }, 240_000);
+
+  it("无移动 Hazard ⇒ applicable:false，不跑审计", () => {
+    const noMotion = structuredClone(config);
+    for (const entity of noMotion.entities) {
+      if (entity.kind === "hazard") delete (entity as { motion?: unknown }).motion;
+    }
+    expect(runTemporalAudit({ config: noMotion, manifest, packDir: U4_PACK })).toEqual({ applicable: false });
+  });
+
+  it("trusted 输入不可用 ⇒ IE / unknown / 空 evidence，不抛", () => {
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), "gm-u4-empty-"));
+    try {
+      const report = runTemporalAudit({ config, manifest, packDir: empty, existingAudit });
+      expect(report.applicable).toBe(true);
+      if (!report.applicable) throw new Error("expected applicable");
+      expect(report.coverage).toBe("unknown");
+      expect(report.evidence).toEqual([]);
+      expect(report.publicVerdict).toBe(existingAudit);
+    } finally {
+      fs.rmSync(empty, { recursive: true, force: true });
+    }
+  });
+
+  it("真实 analyzer 抛错 ⇒ IE / unknown，不抛", async () => {
+    vi.resetModules();
+    vi.doMock("@game-maker/contracts", async (importOriginal) => {
+      const actual = await importOriginal<typeof import("@game-maker/contracts")>();
+      return {
+        ...actual,
+        analyzeTemporalInternalTwoLag: () => {
+          throw new Error("injected-real-analyzer-throw");
+        },
+      };
+    });
+    try {
+      const { runTemporalAudit: run } = await import("../src/index.js");
+      const report = run({ config, manifest, packDir: U4_PACK, existingAudit });
+      expect(report.applicable).toBe(true);
+      if (!report.applicable) throw new Error("expected applicable");
+      expect(report.coverage).toBe("unknown");
+      expect(report.evidence).toEqual([]);
+      expect(report.publicVerdict).toBe(existingAudit);
+    } finally {
+      vi.doUnmock("@game-maker/contracts");
+      vi.resetModules();
+    }
+  }, 240_000);
+
+  it("公共 evidence / verdict 可重放确定性", () => {
+    const a = runTemporalAudit({ config, manifest, packDir: U4_PACK, existingAudit });
+    const b = runTemporalAudit({ config, manifest, packDir: U4_PACK, existingAudit });
+    expect(a.applicable && b.applicable).toBe(true);
+    if (!a.applicable || !b.applicable) throw new Error("expected applicable");
+    expect(a.publicVerdict).toEqual(b.publicVerdict);
+    expect(a.coverage).toBe(b.coverage);
+    expect(a.evidence).toEqual(b.evidence);
+  }, 300_000);
 });
