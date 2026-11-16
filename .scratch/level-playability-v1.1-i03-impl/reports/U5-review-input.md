@@ -13,7 +13,7 @@
 | 授权包 | `docs/v7.8/移动-I03.md` · 签署前 `2f89d572…` / 签署后 `f45332be…` / 当前 `5e3fa97f4ae855ef37a18c3aabd708ed28f250af1184c466eaadc890935d6f24` |
 | Base | `41df0d3`（树与 `main` `f4e6ce7` 相同） |
 | **Code head** | **`fcea791`** |
-| 复核报告 | `reports/U5-review.md` · `sha256:7b6d8023…`（G3 前 PASS）；`reports/U5-review-rerun.md` · `sha256:6ce87eb3…`（G3 amended PASS） |
+| 复核报告 | `reports/U5-review.md` · `sha256:7b6d8023…`（G3 前 PASS）；`reports/U5-review-rerun.md` · `sha256:6ce87eb3…`（G3 amended PASS）；`reports/U5-review-final.md` · `sha256:e0eae056…`（最终 PASS） |
 | **Code/test head** | **`739076a`**（G3 + CI typecheck 修正 + `main` 合并；产品源码仍 `fcea791`） |
 | Code/test diff range | `41df0d3..739076a` |
 | 环境 | 见 `evidence/U5/commands.log`（OS / Node / pnpm） |
@@ -52,7 +52,7 @@ pnpm check:links
 ## 5. 复核人必须独立完成
 
 1. 现场核对授权包 / 审查报告 / U5 授权记录 / brief 的完整 hash；核对 `evidence/U5/SHA256SUMS`。
-2. 检查 `41df0d3..57ff6de` diff 是否**只**落在 U5 两行白名单；确认 contracts / assets / CLI / MCP / `create-game.ts` / fixtures 零 diff；确认 `publish-gate.test.ts` 既有断言未被改动（只新增 import / mock / 用例）。
+2. 检查 `41df0d3..739076a` diff 是否**只**落在 U5 两行白名单；确认 contracts / assets / CLI / MCP / `create-game.ts` / fixtures 零 diff；确认 `publish-gate.test.ts` 既有断言未被改动（只新增 import / mock / 用例）。
 3. 逐项检查：
    - `configProblem` 结构化返回：`configPath` 缺省 / 解析失败 ⇒ `{}`（字段缺席）；硬失败 ⇒ `{problem}` 且不调用 temporal；通过 ⇒ `{temporal}`；条件 spread，无 `temporal: undefined`；
    - 三态语义：缺席 = 未运行；`{applicable:false}` = 已运行不适用；`{applicable:true,...}` = 已运行适用；`applicable:false` 不被读成 PU / NB；
