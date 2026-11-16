@@ -1,0 +1,28 @@
+# I03-U4 evidence commands
+date: 2026-11-16T12:09:09Z
+uname: Darwin 24.6.0 arm64
+node: v22.23.2
+pnpm: 10.7.1
+base: a0688be
+code/test head: 9b21f2d
+
+$ pnpm exec vitest run packages/assets/tests/ops.test.ts packages/contracts/tests/playability-temporal-input.test.ts
+exit 0; 2 files / 85 tests passed
+output: evidence/U4/targeted-test-output.txt
+
+$ pnpm test
+exit 0; 178 files / 2932 tests passed; 3 vitest-worker "onTaskUpdate" timeout warnings (runner-level, not failures)
+output: evidence/U4/test-output.txt
+
+$ pnpm build
+exit 0
+$ pnpm check:deps
+exit 0; 10 packages
+$ pnpm check:links
+exit 0; 1249 docs / 4159 links
+
+$ U4 rollback drill (branch wayfinder/i03-u4-rollback-drill)
+revert 9b21f2d + 0b2ac97 -> base a0688be
+$ pnpm test
+exit 0; 178 files / 2925 tests passed; 3 runner warnings
+output: evidence/U4/rollback-drill.log
