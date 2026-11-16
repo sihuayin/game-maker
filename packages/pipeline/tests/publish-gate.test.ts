@@ -295,13 +295,31 @@ describe("§U5 发布闸时序诊断（非阻断）", () => {
     expect(got?.temporal).toEqual({ applicable: false });
   });
 
-  it("G2/G3：公共 IE 诊断不改变放行", () => {
+  it("G2：nb-candidate + gate BLOCKED ⇒ 放行，公共映射 IE", () => {
     const out = tmp();
     writeReport(out, report());
     mocks.useFake = true;
     mocks.report = fakeReport();
     const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
     expect(got?.temporal).toMatchObject({ applicable: true, verdict: "INSUFFICIENT_EVIDENCE" });
+  }, 120_000);
+
+  it("G3：pu-candidate + gate BLOCKED ⇒ 放行，公共映射 IE", () => {
+    const out = tmp();
+    writeReport(out, report());
+    const puEvidence: PlayabilityEvidence = {
+      ...TEMPORAL_EVIDENCE,
+      witness: { ...TEMPORAL_EVIDENCE.witness, result: "pu-candidate" },
+    };
+    mocks.useFake = true;
+    mocks.report = fakeReport({
+      evidence: [puEvidence],
+      publicVerdict: { ...PUBLIC_VERDICT, evidence: [puEvidence] },
+    });
+    const got = assertPublishableQa({ packDir: PACK, configPath: LAST_TRAIN_CONFIG, outRoot: out });
+    expect(got?.temporal).toMatchObject({ applicable: true, verdict: "INSUFFICIENT_EVIDENCE" });
+    if (got?.temporal?.applicable !== true) throw new Error("expected applicable temporal");
+    expect(got.temporal.evidence[0]?.witness).toMatchObject({ kind: "temporal", result: "pu-candidate" });
   }, 120_000);
 
   it("G10 / 变异守卫：temporal PROVEN_UNPLAYABLE + checked 仍不放行、不抛", () => {
