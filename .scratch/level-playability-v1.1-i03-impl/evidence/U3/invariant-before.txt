@@ -1,0 +1,37 @@
+# U3 invariant BEFORE (base 7b973a7)
+
+$ git show 7b973a7:packages/contracts/src/playability/api.ts | shasum -a 256
+52ccef05a19ba9f7b6e8840ecae61c42174539e5d62c6b872c3478abce1c4811  packages/contracts/src/playability/api.ts
+$ git show 7b973a7:packages/contracts/src/playability/verdict.ts | shasum -a 256
+343f8e24eb75516c13358b4b7bfafdf103488efb47d1b4e393210f1340350c00  packages/contracts/src/playability/verdict.ts
+$ git show 7b973a7:packages/contracts/src/playability/public-verdict.ts | shasum -a 256
+ec67f5a7737e711ef4d25fb52fadc7c210eb50c23de9fe8eac3c3175d493a18c  packages/contracts/src/playability/public-verdict.ts
+$ git show 7b973a7:packages/contracts/src/playability/temporal-evidence.ts | shasum -a 256
+ec7844aa420a09deb4796635a1089d9562ea59943e5ae505aeb89a7aac154e81  packages/contracts/src/playability/temporal-evidence.ts
+$ git show 7b973a7:packages/contracts/src/playability/temporal.ts | shasum -a 256
+6df8475822717d7e06a611e2e539785a3f8c9f67719e93d07e03d6373ef7ce53  packages/contracts/src/playability/temporal.ts
+$ git show 7b973a7:packages/contracts/src/playability/temporal-result.ts | shasum -a 256
+04e3c37ca140fa09b3ea1eabf0d0d3336c06cdda2cdeafde719c5b44c6d343fc  packages/contracts/src/playability/temporal-result.ts
+$ git show 7b973a7:packages/assets/src/ops.ts | shasum -a 256
+6105ca7248b15eb8fcdedd77b620e17df196c56a1341dd4c33e4948a0be028dc  packages/assets/src/ops.ts
+$ git show 7b973a7:packages/pipeline/src/publish-gate.ts | shasum -a 256
+72786d2bce3d612af730af05560cf3b49d0123f16b5f7dddf0300c6274cfc28a  packages/pipeline/src/publish-gate.ts
+$ git show 7b973a7:packages/pipeline/src/create-game.ts | shasum -a 256
+d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
+$ git rev-parse 7b973a7:packages/cli
+084c5c20441ed1d114ba773b8a41f2198afe98ca
+$ git rev-parse 7b973a7:packages/mcp
+5e3abfaf3d8da592722471b6d127bf31fa40826e
+
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal-result.ts
+8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
+44:  readonly publicCapability: "BLOCKED";
+45:  readonly publicResult: null;
+
+$ grep -n "PHASE1_CAPABILITY_GATE\|PHASE1_CAPABILITY_ADMISSION" packages/contracts/src/playability/public-verdict.ts
+25:export const PHASE1_CAPABILITY_GATE = Object.freeze({
+30:export const PHASE1_CAPABILITY_ADMISSION = Object.freeze({
+
+$ grep -n "moving-hazard-phase" packages/contracts/src/playability/mechanic.ts
+117:  const movingHazards = allHazards.filter((e) => e.motion);
+119:  if (movingHazards.length > 0) addGap("moving-hazard-phase");

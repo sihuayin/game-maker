@@ -1,0 +1,40 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/contracts/tests/playability-mechanic.test.ts (32 tests) 28939ms
+   ✓ §矩阵机制类用例（生产化） > static-hazard-seals-path ⇒ 层内 PROVEN_UNPLAYABLE  840ms
+   ✓ §矩阵机制类用例（生产化） > wide-patrol ⇒ 层内 NO_PROVEN_BLOCKER  541ms
+   ✓ §矩阵机制类用例（生产化） > danger-full-wall ⇒ 层内 PROVEN_UNPLAYABLE  868ms
+   ✓ §矩阵机制类用例（生产化） > danger-wide-idle ⇒ 层内 NO_PROVEN_BLOCKER  830ms
+   ✓ §矩阵机制类用例（生产化） > pickup-in-static-hazard ⇒ 层内 PROVEN_UNPLAYABLE  837ms
+   ✓ §矩阵机制类用例（生产化） > moving-platform ⇒ 层内 INSUFFICIENT_EVIDENCE  578ms
+   ✓ §矩阵机制类用例（生产化） > 被 hazard 包住的 pickup 不被硬拒，但同一 hazard 后面的目标仍可被 A 证明  835ms
+   ✓ §A：静止 hazard 封路（反事实） > 可跳过的静止 hazard 不报（合法边界）  1090ms
+   ✓ §A：静止 hazard 封路（反事实） > witness 可机检：列出 blocker 与反事实  836ms
+   ✓ §A：静止 hazard 封路（反事实） > 出生点在静止 hazard 里 ⇒ 只记 gap，不报 A  519ms
+   ✓ §A：静止 hazard 封路（反事实） > hazard 的 `body` 被 Runtime 忽略：按帧几何（16×16）判，不用 200×200 body  1191ms
+   ✓ §A：静止 hazard 封路（反事实） > 巡逻 hazard ⇒ 机制层不记 moving-hazard-phase，也不报 A  519ms
+   ✓ §A：静止 hazard 封路（反事实） > moving-platform-unsupported 仍保留（clone wide-patrol + moving solid）  531ms
+   ✓ §B：全高 danger 安全窗口 > 全高 + 窄 idle ⇒ PATH_NO_SAFE_WINDOW，witness 带 idle/required  877ms
+   ✓ §B：全高 danger 安全窗口 > 宽 idle ⇒ 不报（合法边界）  878ms
+   ✓ §B：全高 danger 安全窗口 > 非全高 danger（16×16，可跳过）⇒ 不报 B，记 non-full-column gap  1059ms
+   ✓ §B：全高 danger 安全窗口 > 出生点在 danger 里 ⇒ gap，不报  596ms
+   ✓ §B：全高 danger 安全窗口 > 目标被 danger 包住 ⇒ gap，不硬拒  526ms
+   ✓ §B：全高 danger 安全窗口 > 多个 danger ⇒ multiple-dangers-unproven，不报  596ms
+   ✓ §B：全高 danger 安全窗口 > requiredMs 落在 idle + 1 帧边界内 ⇒ gap，不报  961ms
+   ✓ §A/B 去重 > 同一目标被 A/B 同时证明 ⇒ 只留一条（A 优先），另一条并入 detail  1383ms
+   ✓ §coverage 与证据不足 > 只有 danger 且 B 有结论 ⇒ mechanic checked  1960ms
+   ✓ §coverage 与证据不足 > moving-platform ⇒ moving-platform-unsupported gap  637ms
+   ✓ §coverage 与证据不足 > 无机制实体 ⇒ checked / NO_PROVEN_BLOCKER  651ms
+   ✓ §U3：temporal 接管 moving hazard > wide-patrol：机制层无旧 gap；层内 NB + mechanic checked；公共 IE  1894ms
+   ✓ §U3：temporal 接管 moving hazard > applicable + partial / unknown ⇒ 公共 IE  1217ms
+   ✓ §U3：temporal 接管 moving hazard > applicable 但无 evidence ⇒ temporal unknown ⇒ 公共 IE  1283ms
+   ✓ §U3：temporal 接管 moving hazard > 不适用（danger-wide-idle）⇒ 保留 existing，无 temporal 字段  1655ms
+   ✓ §U3：temporal 接管 moving hazard > 第一阶段 gate BLOCKED：nb / pu candidate 均不产公共 NB / PU  1286ms
+   ✓ §U3：temporal 接管 moving hazard > 公共 IE 上 playabilityIssues 为空；temporal evidence 非阻断  1306ms
+
+ Test Files  1 passed (1)
+      Tests  32 passed (32)
+   Start at  22:57:39
+   Duration  60.29s (transform 2.92s, setup 0ms, collect 5.96s, tests 28.94s, environment 0ms, prepare 1.42s)
+
