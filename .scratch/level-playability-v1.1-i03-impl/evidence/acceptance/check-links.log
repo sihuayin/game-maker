@@ -1,0 +1,5 @@
+
+> game-maker@0.0.0 check:links /Volumes/shy/some-projects/game-maker
+> node scripts/check-links.mjs
+
+✅ 相对链接零断裂（1253 份文档 · 4159 条链接）

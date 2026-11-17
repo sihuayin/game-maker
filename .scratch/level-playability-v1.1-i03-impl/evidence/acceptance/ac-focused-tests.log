@@ -1,0 +1,312 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §D9 → 13 个公共 degradation > 20 个内部码完整 many-to-one，公共值恰好 13 个 2ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §D9 → 13 个公共 degradation > 仅含于内部的原因码不出现在公共输出 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §D9 → 13 个公共 degradation > secondary 去重后按字典序 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §D9 → 13 个公共 degradation > COMPLETE ⇒ reason null、secondary [] 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §coverage.temporal 三态 > 两档 complete 且无 unknown 主因 ⇒ checked 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §coverage.temporal 三态 > 一档预算耗尽 ⇒ partial 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §coverage.temporal 三态 > model-out / invalid-input / geometry-untrusted ⇒ unknown 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §coverage.temporal 三态 > 两档 complete 但 lag-disagreement ⇒ checked（coverage 只表示分析完成） 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §coverage.temporal 三态 > 既有三维 coverage 原样保留；geometry summary 恒 partial 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §lag / limits / witness > perLag 恰好两项、顺序固定、含 lagMs、不含 witness 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §lag / limits / witness > limits 从内部 stats 取；hopSamplesChecked 如实取 0 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §lag / limits / witness > certificate none ⇒ INCOMPLETE；public witness 仍是 temporal 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > P1 nb-candidate + witness COMPLETE ⇒ temporal evidence，不是公共 Verdict 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > P2 pu-candidate + permanent-gate COMPLETE ⇒ 六项 puConditions 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > P3 IE + no-witness ⇒ IE 摘要，不产生安全结论 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > P4 预算耗尽 ⇒ coverage partial / budgetStatus exhausted 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > N1–N3：适配器不产生公共 Verdict 字段 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > N4：coverage.temporal=checked 不把 geometry 推成 checked 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > N5：非法输入 / 缺失值不静默填 checked / COMPLETE 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §映射正 / 负例 > N6：不携带完整 proof / Witness / Stats / 原始 D9 码 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §边界 > 未知内部码 ⇒ invalid-input，不原样透传 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §边界 > 不修改输入 twoLag / existingCoverage 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §边界 > assetId 仅在有非空值时输出 0ms
+ ✓ packages/contracts/tests/playability-temporal-evidence.test.ts > §边界 > invalid lag ⇒ RangeError 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > existing PU / IE 优先；not applicable 保留 existing 1ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > applicable + 无 evidence ⇒ temporal unknown ⇒ IE；不设置 geometry 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > partial / unknown ⇒ IE 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > checked + 内部 IE ⇒ IE 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > NB candidate：gate BLOCKED ⇒ IE；OPEN+admitted ⇒ NB；OPEN+未准入 ⇒ IE 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > PU candidate：gate BLOCKED ⇒ IE；OPEN+admitted ⇒ PU；OPEN+未准入 ⇒ IE 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §能力门 / admission 双重检查 > NB / PU admission 独立：一方准入不使另一方开放 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §existing PU 与 temporal candidate 冲突 > V7：existing PU + NB candidate + gate.nb OPEN + admitted ⇒ conflict 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §existing PU 与 temporal candidate 冲突 > PU candidate 分支：existing PU + gate.pu OPEN + admitted ⇒ conflict 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §existing PU 与 temporal candidate 冲突 > gate OPEN 但 admission false ⇒ 不冲突，保留 existing PU 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §existing PU 与 temporal candidate 冲突 > gate BLOCKED ⇒ 不冲突，保留 existing PU 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §existing PU 与 temporal candidate 冲突 > 冲突摘要不含原始 D9 码 / 完整证据 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §优先级 / 证据合并 / coverage > existing IE + candidate + OPEN+admitted ⇒ 保持 IE（V8） 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §优先级 / 证据合并 / coverage > 旧 temporal evidence 一律移除；新 evidence 只追加一次 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §优先级 / 证据合并 / coverage > applicable:false 也移除旧 temporal evidence 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §优先级 / 证据合并 / coverage > coverage 三维始终取 existing；evidence 三维不得覆盖 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §优先级 / 证据合并 / coverage > evidence 无 geometry ⇒ 不伪造 unknown；有 geometry ⇒ 复制 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §优先级 / 证据合并 / coverage > 输入无 mutation 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §playabilityIssues / 导出 / 常量 > temporal evidence 不产 issue；existing 阻断 evidence 仍产 issue 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §playabilityIssues / 导出 / 常量 > 公共 IE / NB 结果不产 issue 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §playabilityIssues / 导出 / 常量 > api.ts 导出 U2 mapper / 常量 / 冲突异常 0ms
+ ✓ packages/contracts/tests/playability-public-verdict.test.ts > §playabilityIssues / 导出 / 常量 > 第一阶段常量冻结 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-01 正常 Atlas 读取与 SHA 校验 3ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-02 范围只含 player + 引用 hazard/pickup/goal 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-03 多资产共用 atlas 去重 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-04 未引用资产损坏不影响 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-05 引用资产缺失 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-06 文件缺失 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-07 SHA 不符 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-08 JSON 无效 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-09 顶层多余字段 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-10 PNG checksum 不参与 JSON 校验 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-11 同一路径两份不同字节 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-12 meta 路径逃逸 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-13 帧缺失 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-14 sourceSize 不符（单帧） 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-15 sourceSize 不符（多帧第 2 帧） 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-16 anchor 缺失 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-17 anchor 不符 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-18 anchor 容差内 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-19 anchor 容差外 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-20 rotated: true 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-21 trimmed: true 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-22 rotated/trimmed 省略 ⇒ 默认 false 3ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > D. 累积、去重与全有或全无 > T-23 多失败累积并按 (code, atlasPath, assetId, frameName) 排序 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > D. 累积、去重与全有或全无 > T-24 全有或全无 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > D. 累积、去重与全有或全无 > T-25 同一帧同时 sourceSize + anchor 错 ⇒ 两个 code 各一条 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-26 digest 与解析消费同一份字节对象 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-27 不访问磁盘：路径不存在但提供了字节 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-28 文件替换：旧字节 + 旧 digest ⇒ 仍通过 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-29 文件替换：新字节 + 旧 digest ⇒ checksum mismatch 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-30 普通对象冒充 ⇒ false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-31 同名 Symbol 冒充 ⇒ false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-32 structuredClone 丢失 brand ⇒ false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-33 真 brand ⇒ true 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-34 伪造 hitbox/body/尺寸/垂直规避 ⇒ IE，analyzer 不被调用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-35 阳性对照：真 brand + PU analyzer ⇒ PU 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-36 阳性对照：真 brand + NB analyzer ⇒ NB 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-37 lagMs 缺失 ⇒ IE + lag-invalid，analyzer 不被调用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-38 null / 字符串 / NaN / ±Infinity / 负数 ⇒ IE + lag-invalid 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-39 0 合法 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-40 非法 lag 优先于适用性 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-41 两档都不适用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-42 一档适用一档不适用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-43 两档 verdict 相同 ⇒ 保留 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-44 两档 verdict 不同 ⇒ IE + lag-disagreement 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-45 lag-invalid 优先于 lag-disagreement 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-46 只比 verdict 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-47 无移动 Hazard ⇒ applicable false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-48 X 轴移动 Hazard ⇒ applicable true 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-49 Y 轴移动 Hazard ⇒ applicable true，stub 返回 IE 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-50 多个移动 Hazard ⇒ applicable true，stub 返回 IE 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-51 只有静止 Hazard ⇒ applicable false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-52 范围排除 solid / danger / chest / decor 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-53 去重与稳定排序 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-54 stub 永不 PU / NB 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-55 contracts 源码不含 node:fs / node:crypto 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-56 verifyTemporalInput 生产调用者只有 ops.ts 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-57 auditPlayabilityTemporal 生产调用者只有 ops.ts 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-58 生产 analyze 实参只有 stubTemporalAnalyzer 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-59 readTrustedAtlasInput 不是 export 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-60 runTemporalAudit 与 assertPublishableQa 保持同步 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-61 三处生产接线各至少一次 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-62 常量唯一且不复用 FRAME_MARGIN_MS 3ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-63 lagMs 无默认值 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-64 brand Symbol 只在 temporal-input.ts 铸造 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-65 入口没有几何 / 规避声明参数 0ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 内部结果组装形状 > [I02-05][AC-13] 顶层字段固定为 D9 七项，公共能力恒 BLOCKED 12ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 内部结果组装形状 > [I02-05][AC-11] 模型外输入（Y 轴移动 / 多移动 Hazard）⇒ IE + model-out 2ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 NB 分支 > [I02-01][AC-03] 全相位 Winning Set 成立 ⇒ nb-candidate + witness COMPLETE 6ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 PU 分支与六条件 > [I02-04][AC-05][AC-06][AC-07] 门区 + 图割 + hop 完整 ⇒ pu-candidate 22ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 PU 分支与六条件 > [I02-04][AC-06] 门区成立但图割不成立 ⇒ permanent-gate INCOMPLETE + graph-cut-incomplete 15ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 PU 分支与六条件 > [I02-03][AC-05] 门区不成立（无恒覆盖核心）⇒ IE + no-permanent-gate，不伪造证明 2ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 预算与确定性 > [I02-05][AC-08] edge 预算触顶 ⇒ IE + exhausted + edge-budget 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 预算与确定性 > [I02-05][AC-10] 相同输入重复运行：签名与规范化完整序列化一致 40ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-01 预算与确定性 > [I02-05][AC-10] wallClockMs / detail 不进入确定性签名 4ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] phaseGridCapped 只是诊断；N ≥ 2 时仍可完成 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] N < 2 ⇒ grid-resolution-infeasible，不截断到 2 0ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] 非法预算 / 超硬上限 ⇒ invalid-budget，不回退默认值 4ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] 派生上界溢出 ⇒ budget-bound-overflow 0ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] edge 先于 cut 检查：edge 触顶不被改写为 cut-budget 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] 折返点预切段：单次 check 不跨折返点，maxCutsPerCheck=0 不误伤 U2 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] Witness 体积：恰好达上限通过，多 1 即 witness-volume 6ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] maxHopSamples 生效：cap 绑定 ⇒ hop-sample-budget + 部分证明 4ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] maxHopSamples 低于采样下限 ⇒ hop-sample-budget，不静默改用默认值 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-02 预算闭合与降级硬化 > [I02-05][AC-08] 「不完整」与「不一致」是不同原因 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-08][AC-10] 注入时钟确定性触发 wall-clock-abort，且重复运行一致 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-10] 同一工作预算下，墙钟不前进则不 abort（abort 只由注入时钟驱动） 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-10] wallClockMs 不进签名，也不进规范化完整序列化 4ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-10] diagnostics.detail 不进签名：同类缺口不同细节签名相等 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-10] 签名覆盖 certificate：改动验证记录即改变签名 2ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-10] 四个世界 × 三档 lag：重复运行签名与规范化序列化一致 85ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-03 墙钟 abort 与确定性 > [I02-05][AC-10] 策略后继 tie-break：同 rank 取最小 footX / k 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-02][AC-03] A：安全等待窗口 ⇒ nb-candidate + witness COMPLETE 2ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-03][AC-05][AC-06][AC-07] B：永久门区且无垂直规避 ⇒ pu-candidate + 六条件 6ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-05][AC-11] C：几何 / 时序 / 规避证据不足 ⇒ IE + 缺口一致 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-01][AC-01][AC-02] D：折返点切段与 witness verified 一致 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-02][AC-03][AC-04] E：等待阶段碰撞 ⇒ 不得 nb-candidate 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-03][AC-05] F：短暂安全窗口 ⇒ IE + no-permanent-gate + certificate none 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-04][AC-06][AC-07] G：垂直规避 ⇒ permanent-gate INCOMPLETE + 图割原因 7ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-05][AC-08] H：搜索预算超限 ⇒ IE + exhausted + 对应 budgetKind 0ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-05][AC-09] I：两档 lag 合并 ⇒ 一致 / 不一致 / 不完整三分 3ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-05][AC-10] J：相同输入重复运行 ⇒ determinismSignature 相等 3ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-04 A–J 矩阵 > [I02-05][AC-13] 跨单元：NB / PU 互斥、门区 + 图割 + hop 联合、IE 优先级 33ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-05 双档 lag 证据隔离 > [I02-05][AC-09] 两档各自完整执行：独立预算 / 逐档证据可复现 5ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-05 双档 lag 证据隔离 > [I02-05][AC-09] 两档都因预算不完整 ⇒ 各自保留 edge-budget，不拼成 disagreement 0ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-05 双档 lag 证据隔离 > [I02-05][AC-09] 一档完整、一档 edge 预算耗尽 ⇒ 保留实际原因，不保留乐观档 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-05 双档 lag 证据隔离 > [I02-05][AC-09] 一档完整、一档墙钟 abort ⇒ 保留 wall-clock-abort 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-05 双档 lag 证据隔离 > [I02-05][AC-09] 两档完整但不一致 ⇒ IE + lag-disagreement，不保留乐观档 1ms
+ ✓ packages/contracts/tests/playability-temporal.test.ts > U5-05 双档 lag 证据隔离 > [I02-05][AC-09] 两档都因墙钟不完整 ⇒ 合并保留 wall-clock-abort，不伪装 0ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > 无阻断：层 verdict 组合为 NO_PROVEN，coverage.spatial 仍诚实记 partial 710ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 没有兜底：上游不可达就是失败（2026-09-25 拆掉降级链） > 上游不可达 → CommandError("upstream")，退出码 3 —— 不是 1，也不再是 0 8ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 没有兜底：上游不可达就是失败（2026-09-25 拆掉降级链） > 失败的那次既不留包目录、也不吃版本号 0ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 没有兜底：上游不可达就是失败（2026-09-25 拆掉降级链） > ⚠️ 而**一笔都没成功**时也不留空现场（票 01） 0ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 没有兜底：上游不可达就是失败（2026-09-25 拆掉降级链） > 上游正常 → 出包（stub fetch，不碰真网络）；失败一次后重试成功也不算降级 5ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 失败现场：一次失败就是几笔**已经付过钱**的调用（票 01） > 上游第二次挂掉 ⇒ `CommandError` 上带着**失败现场的路径**，里面躺着第一份的产物 2ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 失败时报的是**真实发出的笔数**，不是「回来的那些」（票 05） > ⚠️ 一笔**发了 2 趟**然后失败 ⇒ 账上那笔的 `attempts` 是 **2**（既不是上限 3，也不是发出时的 1） 2ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 失败时报的是**真实发出的笔数**，不是「回来的那些」（票 05） > ⚠️ 闸门**拒掉的**那几笔**没发出去** ⇒ 不许记进账（判据：报出来的 === 真实发出的） 2ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 失败时报的是**真实发出的笔数**，不是「回来的那些」（票 05） > 第 2 笔挂掉 ⇒ 账上**恰好 2 笔**（第 1 笔回来的 + 第 2 笔发出去的） 4ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 「带参考图」在某家协议上会**静默地不成立**（票 13 的 Q6） > dashscope-mcp + 清单里**真有图要递**（母版）⇒ **开跑前**拒，且说得出是哪一张 1ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 「带参考图」在某家协议上会**静默地不成立**（票 13 的 Q6） > dashscope-mcp + 世界风格图（`referenceImage`）⇒ 同样拒（它也是要递出去的一张图） 0ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 「带参考图」在某家协议上会**静默地不成立**（票 13 的 Q6） > ⚠️ **`styleRef` 不是图，永远不触发** —— 只有它的时候照跑（撞死在死上游上，不是 `usage`） 3ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 「带参考图」在某家协议上会**静默地不成立**（票 13 的 Q6） > 换一个支持参考图的协议（gemini）⇒ 不拒 —— 这条只针对那一家 2ms
+ ✓ packages/assets/tests/ops.test.ts > ⚠️ 判断失败也带账与失败现场（票 48） > 生出来一张**全透明**的图 ⇒ 撞上 `pack.ts` 那条判断：裸 `Error` + 退出码 1 + 账 + 现场 8ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > TemporalAuditReport 对旧 TemporalAuditResult 兼容 0ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > 真实 analyzer → U1 adapter → U2 mapper；gate BLOCKED 仍公共 IE 15ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > 无 existingAudit（create-game 路径）⇒ legacy-only，不跑真实分析 1ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > existingAudit 可复用 4ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > 无移动 Hazard ⇒ applicable:false，不跑审计 0ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > trusted 输入不可用 ⇒ IE / unknown / 空 evidence，不抛 0ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > 真实 analyzer 抛错 ⇒ IE / unknown，不抛 69ms
+ ✓ packages/assets/tests/ops.test.ts > §U4 runTemporalAudit real wiring > 公共 evidence / verdict 可重放确定性 7ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > 空间阻断：PROVEN，一条 error / 目标，不带 code 189ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > fixture 覆盖 6 个机制类用例，config / manifest 全部可解析 2ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > static-hazard-seals-path ⇒ 层内 PROVEN_UNPLAYABLE 962ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §放行：报告属于当前包、六条全跑、无 error > 规范 out 树自动查找 6ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §放行：报告属于当前包、六条全跑、无 error > ⚠️ 多个候选：按 subject 精确匹配（旧的 v1 报告不能给 v2 放行） 3ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §放行：报告属于当前包、六条全跑、无 error > 显式 `qaReportPath`：包 / 报告在 out 树之外也能用（C 只负责定位，身份仍由 A 校验） 2ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §放行：报告属于当前包、六条全跑、无 error > ⚠️ `warning` 不阻断（与 error / incomplete 分开） 3ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §放行：报告属于当前包、六条全跑、无 error > ⚠️ TD 配置显式跳过（P2 例外）—— 没有报告也放行**闸**，装配器自己继续 0ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > 缺报告：退 4，文案写清查过哪里、怎么修 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > 没有 outRoot 且没有显式报告 ⇒ 拒（不猜） 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > ⚠️ 旧报告没有 subject ⇒ 拒（「无法证明」不是「通过」） 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > 旧 pack version ⇒ 拒，文案同时报「报告属于谁」与「当前包是谁」 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > manifestChecksum 不符 ⇒ 拒（同 id/version 的声明被改过） 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > error ⇒ 拒，详情带判据与目标 3ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §拒绝：缺报告 / 身份不符 / error / incomplete > ⚠️ incomplete（模拟一条 runner 没跑）⇒ 拒，点名缺哪条 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > 显式报告分支：绿报告 + config B ⇒ `invalid`，文案是「这份 config 过不了可玩性判定」 132ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > auto 查找分支：同样现场重跑（两条分支共用） 151ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13） > 七项落在 `run/v1/`，`characterRef` 被注入、参考图也拷了进来 36ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13） > plan sidecar 跟着落进 run；route 与 Recipe 的 source.kind 逐项一致（v3 票 09） 20ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13） > `intent.md` 是**原样字节**（§13 的原话：不做规范化） 22ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13） > 账：`run-ledger/v1`，理解段那五发都在（`plan-assets` 也在） 14ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13） > 空色板 VWS ⇒ 在 `analyze-intent` 之前拒（exit 4），下游一发都不发；现场留着 VWS 2ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第一段：理解 ⇒ `run/v<N>/`（Q1/Q2/Q3/Q13） > 五发都走了**强制工具调用**（R16：五个工具名各一次） 15ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > wide-patrol ⇒ 层内 NO_PROVEN_BLOCKER 669ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > 机制阻断：PROVEN，静止 hazard 的 message 进 issue 1072ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > 完成性阻断：PROVEN，target 是 gate 340ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15） > 产 `pack/v1` 与 `run/v1/game-config.json`；首次 attempt 的包版本**与 run 对齐** 1373ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > danger-full-wall ⇒ 层内 PROVEN_UNPLAYABLE 1231ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > 可达 config ⇒ 照常放行（不误拒手写 config） 1675ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > 跨层去重：chest-overlapping-hazard 只留一条 gate error（机制优先） 970ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15） > parseReusedConfig：有效 config 通过；坏 schema / 缺 asset ⇒ invalid（票 21） 1376ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > 非阻断诊断（SPAWN_IN_TERRAIN）不产 issue 2ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §整关三态与 issue 映射 > `playabilityIssues` 只由 PROVEN 派生：NO_PROVEN / INSUFFICIENT 一律空 846ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > danger-wide-idle ⇒ 层内 NO_PROVEN_BLOCKER 1446ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > `configPath` 缺省 ⇒ 跳过（库调用 / 既有测试的边界） 3ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §P1 · publish-gate：过不了可玩性判定的 config ⇒ 拒（绿报告也不能放行） > config 解析失败 ⇒ 跳过，由装配器报自己的 schema 错 1ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G1/G4：真实 last-train ⇒ temporal 诊断存在且公共 verdict IE 1695ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §三层组合与 coverage > 组合结果包含三个维度的 coverage 1134ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15） > 构建返回机制覆盖核心：config 层来自实际 config；probe 未执行（票 08） 1378ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > pickup-in-static-hazard ⇒ 层内 PROVEN_UNPLAYABLE 1250ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G6：未传 configPath ⇒ temporal 字段缺席（未运行 ≠ 不适用） 2ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G7：无移动 Hazard ⇒ {applicable:false} 1418ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > moving-platform ⇒ 层内 INSUFFICIENT_EVIDENCE 782ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15） > ⚠️ 包内带一份 `authoring/visual-world.json`，而且它**进了 `files[]`**（Q15 α：靠 files[] 白拿 checksum） 1344ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §三层组合与 coverage > completion 复用 spatial/mechanic：直接调用三层与统一入口的阻断集合一致 2227ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §矩阵机制类用例（生产化） > 被 hazard 包住的 pickup 不被硬拒，但同一 hazard 后面的目标仍可被 A 证明 1265ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G2：nb-candidate + gate BLOCKED ⇒ 放行，公共映射 IE 1631ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15） > 账：`run/` 那份是**链级并集**（理解段 + 构建），而包里那份只记包自己的 1470ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §U1 公共 temporal evidence 导出 / 非时序回归 > 适配器与公共类型已导出 0ms
+ ✓ packages/contracts/tests/playability-api.test.ts > §U1 公共 temporal evidence 导出 / 非时序回归 > 非时序 evidence 不携带 model / lag / degradation / limits / temporal 1180ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G3：pu-candidate + gate BLOCKED ⇒ 放行，公共映射 IE 1592ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A：静止 hazard 封路（反事实） > 可跳过的静止 hazard 不报（合法边界） 1663ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §第二段：构建 —— **只吃 runDir**（Q2/Q5/Q6/Q14/Q15） > 旧 run 没有 sidecar ⇒ build 照常（pack 不读它；不推断历史理由） 1267ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A：静止 hazard 封路（反事实） > witness 可机检：列出 blocker 与反事实 1076ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G10 / 变异守卫：temporal PROVEN_UNPLAYABLE + checked 仍不放行、不抛 1364ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A：静止 hazard 封路（反事实） > 出生点在静止 hazard 里 ⇒ 只记 gap，不报 A 659ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 1 · Run 身份 > ⚠️ 清单里的 `id` 与运行目录名不一致 ⇒ **拒**（否则产物会劈到两个 gameId 下） 13ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 2 · 构建 attempt 的版本 > 首次 attempt 与 run 对齐（`pack/v1`）；**第二次** attempt ⇒ `pack/v2`，而 run 仍是 `v1` 2292ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G11：证据缺省按 unknown 记录，绝不当作 checked 1446ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A：静止 hazard 封路（反事实） > hazard 的 `body` 被 Runtime 忽略：按帧几何（16×16）判，不用 200×200 body 1517ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 2 · 构建 attempt 的版本 > ⚠️ **子步骤禁止自行计算**：`buildAssetPack({version: 7})` 就落在 `v7`（哪怕 v1..v3 都在） 67ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 3 · recipe 磁盘真相 > ⚠️ 人改过磁盘上那份清单 ⇒ 构建段用的是**改过的那份**（内存里根本没有第二份） 1233ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A：静止 hazard 封路（反事实） > 巡逻 hazard ⇒ 机制层不记 moving-hazard-phase，也不报 A 723ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 3 · recipe 磁盘真相 > 人改清单删掉一件敌人资源 ⇒ 构建段在 `pack` 之前拒（exit 4），一个包都不产 15ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 3 · recipe 磁盘真相 > 篡改包内一个文件 ⇒ 在 config / QA / site 之前 `invalid`（exit 4）；原包保留 93ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > applicable:false 不被读成 PU / NB 1502ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A：静止 hazard 封路（反事实） > moving-platform-unsupported 仍保留（clone wide-patrol + moving solid） 697ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 3 · recipe 磁盘真相 > 检查点拿到的是**磁盘上那一份**：`createGame` 的 `onRecipe` 在构建之前被调，且改得动 1336ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 4 · character 引用完整性（**三条链都要真的响**） > ① 清单里有 `characterId` 而 `characterRef` 缺席 ⇒ 生成开始前拒（票 15 的 Q18） 35ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 4 · character 引用完整性（**三条链都要真的响**） > ② 给了基因文件、而那个 `characterId` 不在里面 ⇒ 拒（票 13 落在 `pack` 的那条） 16ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 4 · character 引用完整性（**三条链都要真的响**） > ③ 母版画布的宽高比与引用它的资产不一致 ⇒ 拒（票 11 落在契约里的那条） 13ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §invariant 5 · 失败现场保留 > ⚠️ 理解段挂 ⇒ 现场里有**已经跑完那几步**的产物，而且**不消耗版本号** 15ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 55 · 被拒的设计**也**留现场（`design-attempts.json`） > 阳性 · schema 档：**三发各自的原始入参**都在现场里，而且读得回来 3ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 55 · 被拒的设计**也**留现场（`design-attempts.json`） > 阳性 · R12 档：那一发**照样**留原话，且 `rejections` 与抛出去那份**同一份事实** 2ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 55 · 被拒的设计**也**留现场（`design-attempts.json`） > ⚠️ 密钥钉子：落下来的东西里**不含**密钥（不许只靠「它今天恰好只在请求头里」） 3ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 55 · 被拒的设计**也**留现场（`design-attempts.json`） > ⚠️ 上游死在**第 2 发** ⇒ 第 1 发那份入参**不跟着丢**（判据不是「抛的是哪个类」） 6ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 55 · 被拒的设计**也**留现场（`design-attempts.json`） > 阴性 · **一个入参都没拿到** ⇒ 不写（连一个空容器都不留） 5ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 55 · 被拒的设计**也**留现场（`design-attempts.json`） > 阴性 · 成功路径一个字节不变 —— 哪怕这一跑**重采样过**、内存里真有过一份原始入参 35ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G5：降级报告（IE / unknown）⇒ 不抛，按记录值输出 1794ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 全高 + 窄 idle ⇒ PATH_NO_SAFE_WINDOW，witness 带 idle/required 1421ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G8：硬失败早退 ⇒ 照旧拒稿，且 temporal 未运行（字段缺席） 179ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > G9：QA 报告先拒稿 ⇒ 照旧拒稿，且 temporal 未运行（字段缺席） 2ms
+ ✓ packages/pipeline/tests/publish-gate.test.ts > §U5 发布闸时序诊断（非阻断） > 源级：CommandError / playabilityIssues 不消费 temporal 0ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 60 · 死在第一步也留现场（`visual-world-attempts.json`） > 阳性 · **死在第一步**：现场里有 `intent.md`（那一步真走到了）与三发各自的原始入参 3ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 60 · 死在第一步也留现场（`visual-world-attempts.json`） > 阴性 · **第一步成了、第二步才死** ⇒ 第一发那份容器**不出现**（它只属于抛出来的那一圈） 2ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 60 · 死在第一步也留现场（`visual-world-attempts.json`） > ⚠️ 密钥钉子：落下来的东西里**不含**密钥（不许只靠「它今天恰好只在请求头里」） 2ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 60 · 死在第一步也留现场（`visual-world-attempts.json`） > 阴性 · **一个入参都没拿到**（连工具块都没有）⇒ 不写（连一个空容器都不留） 3ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 60 · 死在第一步也留现场（`visual-world-attempts.json`） > 阴性 · 成功路径一个字节不变 —— 哪怕这一跑在**第一步**重采样过、内存里真有过一份原始入参 32ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3） > ⚠️ 不给 ⇒ 跑默认的合成器 —— 干净包 7/7、裁决 `pass` 1378ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 宽 idle ⇒ 不报（合法边界） 1117ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3） > ⚠️ **`qa: null` ⇒ 缺席**（返回里没有 `qa`、run 里没有 `qa-report.json`）—— 不是「跑了但没问题」 997ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 非全高 danger（16×16，可跳过）⇒ 不报 B，记 non-full-column gap 1304ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 目标都在近侧 ⇒ 不需要穿越，不报 186ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3） > 给了 ⇒ 跑、**pipeline 落盘**、返回里带着那份报告 1009ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 出生点在 danger 里 ⇒ gap，不报 651ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 目标被 danger 包住 ⇒ gap，不硬拒 566ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA：**默认跑**，只有 `null` 关得掉（票 20 的 Q3） > ⚠️ 一份**过不了契约**的报告 ⇒ 当场拒（那是**我们自己的 bug**，不是模型没生成好） 1023ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > 多个 danger ⇒ multiple-dangers-unproven，不报 648ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的 Q4） > ⚠️ QA 报硬失败 ⇒ 抛 `invalid`（= 退出码 4），而报告**已经在磁盘上** 998ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §B：全高 danger 安全窗口 > requiredMs 落在 idle + 1 帧边界内 ⇒ gap，不报 1010ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的 Q4） > ⚠️ incomplete（一条 runner 没跑）⇒ 拒、报告先落盘 —— 「没查」不许读成「通过」 982ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §QA 的硬失败：**报告先落盘、再阻断**（R3 · 票 20 的 Q4） > ⚠️ 文案里带着**报告路径**与失败详情 —— 走异常那一路也丢不掉它（票 20 的 Q5） 1009ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §A/B 去重 > 同一目标被 A/B 同时证明 ⇒ 只留一条（A 优先），另一条并入 detail 1479ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §两段各报自己那几步（Q6 的进度） > 理解段报 6 步、构建段报 3 步（QA 默认在，所以是 pack → config → qa） 2088ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §coverage 与证据不足 > 只有 danger 且 B 有结论 ⇒ mechanic checked 2034ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §coverage 与证据不足 > moving-platform ⇒ moving-platform-unsupported gap 635ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 61 · 玩家那条链**端到端**（清单 ⇒ 包 ⇒ 配置引用） > 阳性：`p-body` **一件**、三路齐备且各 ≥2 帧，而落盘的配置三格**互不相同**且都解得到 1102ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §coverage 与证据不足 > 无机制实体 ⇒ checked / NO_PROVEN_BLOCKER 636ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 61 · 玩家那条链**端到端**（清单 ⇒ 包 ⇒ 配置引用） > 阴性：清单缺一路 ⇒ 链**死在理解段**、退 4，而 `pack/` 那一步**一步都没走** 12ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §票 61 · 玩家那条链**端到端**（清单 ⇒ 包 ⇒ 配置引用） > ⚠️ **配方完全正确也拦不住**的那一档：配置三格填同一个名字 ⇒ 死在配置那一步，退 4 941ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §v3 视觉 QA 接口：free inspect 观察进 QA 报告 > 成功：inspect ok（含源图/目标尺寸段），review unavailable；七判据与 qaVerdict 不变 1118ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §U3：temporal 接管 moving hazard > wide-patrol：机制层无旧 gap；层内 NB + mechanic checked；公共 IE 1977ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §v3 视觉 QA 接口：free inspect 观察进 QA 报告 > inspect 抛错：unavailable + build 继续；七判据与 qaVerdict 不变；reason 不带路径 1074ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §U3：temporal 接管 moving hazard > applicable + partial / unknown ⇒ 公共 IE 1290ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P0-05b 像素阈值入 QA（票 03 裁定 A+） > 长宽比 52.4% ⇒ constructive-constraint error；发布被拒，报告先落盘 1055ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §U3：temporal 接管 moving hazard > applicable 但无 evidence ⇒ temporal unknown ⇒ 公共 IE 1350ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P0-05b 像素阈值入 QA（票 03 裁定 A+） > 色板外 30% ⇒ palette-binding error；发布被拒 1047ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P0-05b 像素阈值入 QA（票 03 裁定 A+） > 色板外 16.02% ⇒ 只作 observation：不阻断，报告里看得见 1051ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §U3：temporal 接管 moving hazard > 不适用（danger-wide-idle）⇒ 保留 existing，无 temporal 字段 1681ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P0-05b 像素阈值入 QA（票 03 裁定 A+） > 无 sourceSizes ⇒ 报告写明「没跑（unavailable）」，不记绿 1083ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §U3：temporal 接管 moving hazard > 第一阶段 gate BLOCKED：nb / pu candidate 均不产公共 NB / PU 1371ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入口 > 阴性：reuseConfig 带**屏幕空间越界**（schema + 引用族都过）⇒ invalid（退出码 4） 1501ms
+ ✓ packages/contracts/tests/playability-mechanic.test.ts > §U3：temporal 接管 moving hazard > 公共 IE 上 playabilityIssues 为空；temporal evidence 非阻断 1355ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入口 > 阴性：reuseConfig 把九宫格声明改成 1×1（Q4 的新判据）⇒ invalid，点名 hud.panel.size 1429ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入口 > 阴性：reuseConfig 带**不可达**（地形被一道满高的墙切断）⇒ invalid（退出码 4），在 QA 之前 1223ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §P1 · Q5：reuseConfig / runBuild 共用同一个确定性复验入口 > 阳性：原样复用一份合法 config ⇒ 照常构建（不误拒） 1551ms
+ ✓ packages/pipeline/tests/create-game.test.ts > §D-01：自定义 viewport 贯通理解（VDS / 规划提示词）与构建（编译提示词） > viewport 400×240：VDS、规划提示词、编译提示词逐次相等；默认路径不变 1073ms
+
+ Test Files  9 passed (9)
+      Tests  303 passed (303)
+   Start at  11:33:35
+   Duration  40.36s (transform 2.14s, setup 0ms, collect 6.03s, tests 96.87s, environment 1ms, prepare 699ms)
+

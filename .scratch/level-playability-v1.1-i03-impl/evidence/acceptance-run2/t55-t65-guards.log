@@ -1,0 +1,74 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-01 正常 Atlas 读取与 SHA 校验 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-02 范围只含 player + 引用 hazard/pickup/goal 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-03 多资产共用 atlas 去重 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-04 未引用资产损坏不影响 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > A. 正向与验证范围 > T-05 引用资产缺失 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-06 文件缺失 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-07 SHA 不符 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-08 JSON 无效 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-09 顶层多余字段 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-10 PNG checksum 不参与 JSON 校验 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-11 同一路径两份不同字节 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > B. 文件、checksum 与 schema > T-12 meta 路径逃逸 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-13 帧缺失 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-14 sourceSize 不符（单帧） 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-15 sourceSize 不符（多帧第 2 帧） 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-16 anchor 缺失 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-17 anchor 不符 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-18 anchor 容差内 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-19 anchor 容差外 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-20 rotated: true 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-21 trimmed: true 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > C. 逐帧几何 > T-22 rotated/trimmed 省略 ⇒ 默认 false 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > D. 累积、去重与全有或全无 > T-23 多失败累积并按 (code, atlasPath, assetId, frameName) 排序 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > D. 累积、去重与全有或全无 > T-24 全有或全无 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > D. 累积、去重与全有或全无 > T-25 同一帧同时 sourceSize + anchor 错 ⇒ 两个 code 各一条 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-26 digest 与解析消费同一份字节对象 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-27 不访问磁盘：路径不存在但提供了字节 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-28 文件替换：旧字节 + 旧 digest ⇒ 仍通过 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > E. TOCTOU 与纯函数边界 > T-29 文件替换：新字节 + 旧 digest ⇒ checksum mismatch 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-30 普通对象冒充 ⇒ false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-31 同名 Symbol 冒充 ⇒ false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-32 structuredClone 丢失 brand ⇒ false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-33 真 brand ⇒ true 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-34 伪造 hitbox/body/尺寸/垂直规避 ⇒ IE，analyzer 不被调用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-35 阳性对照：真 brand + PU analyzer ⇒ PU 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > F. brand 与伪造声明 > T-36 阳性对照：真 brand + NB analyzer ⇒ NB 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-37 lagMs 缺失 ⇒ IE + lag-invalid，analyzer 不被调用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-38 null / 字符串 / NaN / ±Infinity / 负数 ⇒ IE + lag-invalid 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-39 0 合法 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-40 非法 lag 优先于适用性 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-41 两档都不适用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-42 一档适用一档不适用 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-43 两档 verdict 相同 ⇒ 保留 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-44 两档 verdict 不同 ⇒ IE + lag-disagreement 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-45 lag-invalid 优先于 lag-disagreement 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > G. lagMs 与两档降级 > T-46 只比 verdict 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-47 无移动 Hazard ⇒ applicable false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-48 X 轴移动 Hazard ⇒ applicable true 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-49 Y 轴移动 Hazard ⇒ applicable true，stub 返回 IE 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-50 多个移动 Hazard ⇒ applicable true，stub 返回 IE 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-51 只有静止 Hazard ⇒ applicable false 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-52 范围排除 solid / danger / chest / decor 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-53 去重与稳定排序 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > H. 适用性与范围 > T-54 stub 永不 PU / NB 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-55 contracts 源码不含 node:fs / node:crypto 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-56 verifyTemporalInput 生产调用者只有 ops.ts 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-57 auditPlayabilityTemporal 生产调用者只有 ops.ts 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-58 生产 analyze 实参只有 stubTemporalAnalyzer 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-59 readTrustedAtlasInput 不是 export 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-60 runTemporalAudit 与 assertPublishableQa 保持同步 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-61 三处生产接线各至少一次 1ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-62 常量唯一且不复用 FRAME_MARGIN_MS 3ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-63 lagMs 无默认值 0ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-64 brand Symbol 只在 temporal-input.ts 铸造 2ms
+ ✓ packages/contracts/tests/playability-temporal-input.test.ts > I. 架构与结构断言 > T-65 入口没有几何 / 规避声明参数 0ms
+
+ Test Files  1 passed (1)
+      Tests  65 passed (65)
+   Start at  12:22:38
+   Duration  1.20s (transform 249ms, setup 0ms, collect 144ms, tests 36ms, environment 0ms, prepare 175ms)
+

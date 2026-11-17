@@ -1,0 +1,45 @@
+
+ RUN  v3.2.7 /Volumes/shy/some-projects/game-maker
+
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-02 graph.ts HopSampling 尾参默认等价 > 夹具在起点至少有一条跳跃弧（否则本组断言无意义） 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-02 graph.ts HopSampling 尾参默认等价 > hopSamples：无参 ≡ 显式默认 ≡ 单项缺省 17ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-02 graph.ts HopSampling 尾参默认等价 > hopEdges / hopTargets：显式默认与无参结果一致 5ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-02 graph.ts HopSampling 尾参默认等价 > 默认档结果可稳定序列化（重复调用逐字节一致） 1ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-02 graph.ts HopSampling 尾参默认等价 > 倍档参数生效：120Hz / cap 240 在长弧上采样更密，端点不变（不要求精确 2×） 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-04 图割半部 API 骨架与输入契约 > 输出形状固定；图割与 hop 半部均已填充 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-04 图割半部 API 骨架与输入契约 > 失败原因只取 D9 闭集的 U4 子集 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-04 图割半部 API 骨架与输入契约 > 确定性与无随机 / 时间依赖 1054ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-04 图割半部 API 骨架与输入契约 > 依赖边界：不 import temporal.ts / temporal-gate.ts / temporal-witness.ts 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-04 图割半部 API 骨架与输入契约 > 不新增公共 barrel 导出、无 analyze: / Symbol( / TEMPORAL_LAG_ 1ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-04 图割半部 API 骨架与输入契约 > 不调用 startCells()，不生成 U5 字段 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-05 图割判据与 reach 消费 > 精确 spawn：输入图的 startCells 宽松多起点被覆盖为单一种子 8ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-05 图割判据与 reach 消费 > 可达目标：落脚点覆盖 => goalIntersections=1，verdict 仍为 conditional 2ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-05 图割判据与 reach 消费 > 不可达目标：无落脚点、无空中触达 => 0 / 0，图割半部照常产出 1ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-05 图割判据与 reach 消费 > mid-air 仅触达：midAirHits=1 且落脚点未覆盖（只作否决，不是正面证明） 2ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-05 图割判据与 reach 消费 > evidence 确定性且 verdict 恒 conditional 3ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-06 hop 双档与规范化采样覆盖 > 两档各自完整跑：记录 n / 端点 / cap，且 F1 ⊆ F2 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-06 hop 双档与规范化采样覆盖 > 反例 10：判据是 F1 ⊆ F2，不是 n_doubled === 2·n_base 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-06 hop 双档与规范化采样覆盖 > 覆盖不可证明 ⇒ hop-doubling-changed（n1=7 / n2=13） 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-06 hop 双档与规范化采样覆盖 > cap 绑定 ⇒ hop-sample-budget 4ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-06 hop 双档与规范化采样覆盖 > 反例 9：两档都跑，连通性变化被记录（n1=12 粗档跨过缺口，n2=24 密档被否） 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-06 hop 双档与规范化采样覆盖 > 两档都不可达且覆盖成立 ⇒ COMPLETE、reason = null 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > movementModelClosure 恒为 D9 冻结字面量，与 status / reason 无关 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > 主降级原因按固定优先级映射，且只取 U4 闭集子集 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > COMPLETE ⇔ reason = null；COMPLETE 也不等于能力授权 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > 输出边界：运行时只有六个键，不夹带 U5 / 公共字段 1ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > 反例 11：不把图割不连通写成 Runtime 不可达 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > 反例 12：模型未闭合 / coverage partial 时不发布 PU 或公共能力 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-07 模型闭合、降级映射与输出边界 > hopSamplingCoverage.covered 与 hopDoubling.normalizedCoverage 同源 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 5：goalRegion 必须已外扩 0.5px；未外扩会漏判 0.3px 的边界接触 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 7：midAirHits 只作否决证据，不作「不存在空中触达」的正面证明 2ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 8：精确 spawn 出发，不用 startCells 的宽松多起点 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 9：两档都跑，不只看倍档或单条 hop 边 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 10：判据是 F1 ⊆ F2，不是 n_doubled === 2·n_base 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 11：不把图割不连通写成 Runtime 不可达 0ms
+ ✓ packages/contracts/tests/playability-temporal-evasion.test.ts > U4-08 D4 §11 反例矩阵（U4 部分：5、7–12） > 反例 12：模型未闭合 / coverage partial 时不发布 PU 或公共能力 0ms
+
+ Test Files  1 passed (1)
+      Tests  36 passed (36)
+   Start at  11:40:19
+   Duration  3.95s (transform 915ms, setup 0ms, collect 2.34s, tests 1.10s, environment 0ms, prepare 275ms)
+
