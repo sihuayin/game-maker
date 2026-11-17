@@ -402,7 +402,9 @@ describe("§U4 runTemporalAudit real wiring", () => {
       if (!report.applicable) throw new Error("expected applicable");
       expect(report.coverage).toBe("unknown");
       expect(report.evidence).toEqual([]);
-      expect(report.publicVerdict).toBe(existingAudit);
+      expect(report.publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+      expect(report.publicVerdict.coverage.temporal).toBe("unknown");
+      expect(report.publicVerdict.evidence).toEqual([]);
     } finally {
       fs.rmSync(empty, { recursive: true, force: true });
     }
@@ -426,7 +428,9 @@ describe("§U4 runTemporalAudit real wiring", () => {
       if (!report.applicable) throw new Error("expected applicable");
       expect(report.coverage).toBe("unknown");
       expect(report.evidence).toEqual([]);
-      expect(report.publicVerdict).toBe(existingAudit);
+      expect(report.publicVerdict.verdict).toBe("INSUFFICIENT_EVIDENCE");
+      expect(report.publicVerdict.coverage.temporal).toBe("unknown");
+      expect(report.publicVerdict.evidence).toEqual([]);
     } finally {
       vi.doUnmock("@game-maker/contracts");
       vi.resetModules();

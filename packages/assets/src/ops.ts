@@ -1050,7 +1050,14 @@ function temporalFailure(existingAudit: PlayabilityVerdict, legacy?: TemporalAud
     ...(degradation !== undefined ? { degradation } : {}),
     coverage: "unknown",
     evidence: [],
-    publicVerdict: existingAudit,
+    // 降级路径没有 temporal evidence ⇒ mapper 记 temporal:"unknown" ⇒ IE；
+    // 不得把 existing 的 NB 直接复制成公共 verdict（§4.2 / AC-07）。
+    publicVerdict: mapPublicVerdict({
+      existing: existingAudit,
+      temporal: { applicable: true },
+      gate: PHASE1_CAPABILITY_GATE,
+      admission: PHASE1_CAPABILITY_ADMISSION,
+    }),
   };
 }
 
