@@ -1,0 +1,224 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "bg-dusk-halt",
+  "frame": "sky",
+  "viewBox": [
+    0,
+    0,
+    480,
+    270
+  ],
+  "expectedSize": [
+    480,
+    270
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:0",
+      "x": 0,
+      "y": 0,
+      "w": 480,
+      "h": 270
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 0,
+      "w": 480,
+      "h": 70,
+      "colors": [
+        "palette:0",
+        "palette:6"
+      ],
+      "ratio": 0.35,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 0,
+      "y": 70,
+      "w": 480,
+      "h": 200
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 70,
+      "w": 480,
+      "h": 120,
+      "colors": [
+        "palette:6",
+        "palette:0"
+      ],
+      "ratio": 0.4,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "circle",
+      "fill": "palette:4",
+      "cx": 120,
+      "cy": 96,
+      "r": 30
+    },
+    {
+      "op": "circle",
+      "fill": "palette:5",
+      "cx": 120,
+      "cy": 96,
+      "r": 22
+    },
+    {
+      "op": "rect",
+      "fill": "palette:7",
+      "x": 0,
+      "y": 112,
+      "w": 480,
+      "h": 14
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 112,
+      "w": 480,
+      "h": 14,
+      "colors": [
+        "palette:7",
+        "palette:6"
+      ],
+      "ratio": 0.5,
+      "pattern": "checker"
+    },
+    {
+      "op": "poly",
+      "fill": "palette:7",
+      "points": [
+        [
+          0,
+          126
+        ],
+        [
+          70,
+          74
+        ],
+        [
+          120,
+          110
+        ],
+        [
+          170,
+          64
+        ],
+        [
+          230,
+          116
+        ],
+        [
+          300,
+          80
+        ],
+        [
+          360,
+          118
+        ],
+        [
+          420,
+          72
+        ],
+        [
+          480,
+          120
+        ],
+        [
+          480,
+          126
+        ]
+      ]
+    },
+    {
+      "op": "poly",
+      "fill": "palette:6",
+      "points": [
+        [
+          0,
+          140
+        ],
+        [
+          60,
+          104
+        ],
+        [
+          110,
+          132
+        ],
+        [
+          160,
+          98
+        ],
+        [
+          220,
+          138
+        ],
+        [
+          290,
+          108
+        ],
+        [
+          350,
+          140
+        ],
+        [
+          410,
+          104
+        ],
+        [
+          480,
+          142
+        ],
+        [
+          480,
+          150
+        ],
+        [
+          0,
+          150
+        ]
+      ]
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 120,
+      "w": 480,
+      "h": 30,
+      "colors": [
+        "palette:7",
+        "palette:6"
+      ],
+      "ratio": 0.45,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "x": 0,
+      "y": 160,
+      "w": 480,
+      "h": 110
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 160,
+      "w": 480,
+      "h": 110,
+      "colors": [
+        "palette:6",
+        "palette:7"
+      ],
+      "ratio": 0.3,
+      "pattern": "bayer4"
+    }
+  ]
+}

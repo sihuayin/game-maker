@@ -1,0 +1,31 @@
+{
+  "class": "geometry-mismatch",
+  "code": "frame-missing",
+  "expected": {
+    "affected": [
+      "player"
+    ],
+    "coverage": {
+      "graph": "checked",
+      "hazard": "checked",
+      "player": "partial"
+    },
+    "failureCode": "frame-missing",
+    "summary": "untrusted"
+  },
+  "input": {
+    "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+    "atlasPath": "delivery/atlas.animations.json",
+    "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+  },
+  "mutation": {
+    "frame": "player-traveler.idle1",
+    "kind": "delete-frame",
+    "path": "delivery/atlas.animations.json"
+  },
+  "output": {
+    "atlasHash": "sha256:3e986771ed5e29b35df74b87161705baeb6fef7945787f90cd72c90a0a82240a",
+    "manifestChecksumUpdated": true,
+    "manifestHash": "sha256:622b1e5b0b3d3bce73e429c57aa396090c61fac84853021cd0311d6fdeb1cc30"
+  }
+}

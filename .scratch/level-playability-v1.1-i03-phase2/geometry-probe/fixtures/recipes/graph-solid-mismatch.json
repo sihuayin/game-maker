@@ -1,0 +1,35 @@
+{
+  "class": "geometry-mismatch",
+  "code": "graph-solid-mismatch",
+  "expected": {
+    "affected": [
+      "graph"
+    ],
+    "coverage": {
+      "graph": "partial",
+      "hazard": "checked",
+      "player": "checked"
+    },
+    "failureCode": "graph-solid-mismatch",
+    "summary": "untrusted"
+  },
+  "input": {
+    "baseAtlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+    "baseManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+  },
+  "mutation": {
+    "kind": "runtime-override",
+    "override": {
+      "box": {
+        "h": 40,
+        "w": 42,
+        "x": 480,
+        "y": 210
+      },
+      "target": "luggage"
+    }
+  },
+  "output": {
+    "recipeHash": "sha256:31cc9746d875d31397ee0623def8ead59b01fb1f746864b382ba58aa391fbca0"
+  }
+}

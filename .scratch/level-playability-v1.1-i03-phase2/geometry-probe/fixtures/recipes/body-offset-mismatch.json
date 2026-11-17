@@ -1,0 +1,36 @@
+{
+  "class": "geometry-mismatch",
+  "code": "body-offset-mismatch",
+  "expected": {
+    "affected": [
+      "player",
+      "graph"
+    ],
+    "coverage": {
+      "graph": "partial",
+      "hazard": "checked",
+      "player": "partial"
+    },
+    "failureCode": "body-offset-mismatch",
+    "summary": "untrusted"
+  },
+  "input": {
+    "baseAtlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+    "baseManifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+  },
+  "mutation": {
+    "kind": "runtime-override",
+    "override": {
+      "body": {
+        "offset": {
+          "x": 1,
+          "y": 0
+        }
+      },
+      "target": "player"
+    }
+  },
+  "output": {
+    "recipeHash": "sha256:3bfb21a3e9ede7414377c7e3c5584acce7c0979f379365d3b4839c10bcf4a0c4"
+  }
+}

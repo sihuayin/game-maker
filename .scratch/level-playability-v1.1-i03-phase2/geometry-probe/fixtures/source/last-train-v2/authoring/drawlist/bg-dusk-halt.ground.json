@@ -1,0 +1,140 @@
+{
+  "format": "drawlist+curve/v1",
+  "id": "bg-dusk-halt",
+  "frame": "ground",
+  "viewBox": [
+    0,
+    0,
+    480,
+    270
+  ],
+  "expectedSize": [
+    480,
+    270
+  ],
+  "ops": [
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 0,
+      "y": 216,
+      "w": 480,
+      "h": 24
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 216,
+      "w": 480,
+      "h": 24,
+      "colors": [
+        "palette:2",
+        "palette:6"
+      ],
+      "ratio": 0.25,
+      "pattern": "bayer4"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 0,
+      "y": 240,
+      "w": 480,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 0,
+      "y": 244,
+      "w": 480,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 0,
+      "y": 250,
+      "w": 480,
+      "h": 6
+    },
+    {
+      "op": "rect",
+      "fill": "palette:2",
+      "x": 0,
+      "y": 256,
+      "w": 480,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 0,
+      "y": 260,
+      "w": 480,
+      "h": 4
+    },
+    {
+      "op": "rect",
+      "fill": "palette:1",
+      "x": 0,
+      "y": 264,
+      "w": 480,
+      "h": 6
+    },
+    {
+      "op": "dither",
+      "x": 0,
+      "y": 244,
+      "w": 480,
+      "h": 20,
+      "colors": [
+        "palette:1",
+        "palette:3"
+      ],
+      "ratio": 0.45,
+      "pattern": "bayer2"
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 20,
+      "y": 244,
+      "w": 14,
+      "h": 20
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 140,
+      "y": 244,
+      "w": 14,
+      "h": 20
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 260,
+      "y": 244,
+      "w": 14,
+      "h": 20
+    },
+    {
+      "op": "rect",
+      "fill": "palette:3",
+      "x": 380,
+      "y": 244,
+      "w": 14,
+      "h": 20
+    },
+    {
+      "op": "rect",
+      "fill": "palette:6",
+      "opacity": 0.6,
+      "x": 0,
+      "y": 248,
+      "w": 480,
+      "h": 2
+    }
+  ]
+}

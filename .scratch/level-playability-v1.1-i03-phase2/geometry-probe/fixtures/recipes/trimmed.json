@@ -1,0 +1,34 @@
+{
+  "class": "geometry-mismatch",
+  "code": "trimmed",
+  "expected": {
+    "affected": [
+      "player"
+    ],
+    "coverage": {
+      "graph": "checked",
+      "hazard": "checked",
+      "player": "partial"
+    },
+    "failureCode": "trimmed",
+    "summary": "untrusted"
+  },
+  "input": {
+    "atlasHash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+    "atlasPath": "delivery/atlas.animations.json",
+    "manifestHash": "sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98"
+  },
+  "mutation": {
+    "after": true,
+    "before": false,
+    "field": "trimmed",
+    "frame": "player-traveler.idle1",
+    "kind": "set-frame-flag",
+    "path": "delivery/atlas.animations.json"
+  },
+  "output": {
+    "atlasHash": "sha256:cec832e6f1c9599eeb751cd2943d2e6ca9749d7d736b531128415d0878c30542",
+    "manifestChecksumUpdated": true,
+    "manifestHash": "sha256:72915674f1948ef1a4b6383ede1d48a1c8fb2ef7c4e67e719a8c5a24e7583ecf"
+  }
+}
