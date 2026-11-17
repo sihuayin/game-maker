@@ -1,4 +1,4 @@
-# U3 invariant AFTER (head b02b2ce)
+# U3 invariant AFTER (head 55f7117)
 
 $ shasum -a 256 packages/contracts/src/playability/api.ts
 52ccef05a19ba9f7b6e8840ecae61c42174539e5d62c6b872c3478abce1c4811  packages/contracts/src/playability/api.ts
@@ -13,19 +13,19 @@ $ shasum -a 256 packages/contracts/src/playability/temporal.ts
 $ shasum -a 256 packages/contracts/src/playability/temporal-result.ts
 04e3c37ca140fa09b3ea1eabf0d0d3336c06cdda2cdeafde719c5b44c6d343fc  packages/contracts/src/playability/temporal-result.ts
 $ shasum -a 256 packages/assets/src/ops.ts
-6105ca7248b15eb8fcdedd77b620e17df196c56a1341dd4c33e4948a0be028dc  packages/assets/src/ops.ts
+587dca3e44467b1d251c0a95ec637980d125bab36141a375f80a7f134bd56c58  packages/assets/src/ops.ts
 $ shasum -a 256 packages/pipeline/src/publish-gate.ts
 72786d2bce3d612af730af05560cf3b49d0123f16b5f7dddf0300c6274cfc28a  packages/pipeline/src/publish-gate.ts
 $ shasum -a 256 packages/pipeline/src/create-game.ts
 d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
-$ git rev-parse b02b2ce:packages/cli
+$ git rev-parse 55f7117:packages/cli
 084c5c20441ed1d114ba773b8a41f2198afe98ca
-$ git rev-parse b02b2ce:packages/mcp
+$ git rev-parse 55f7117:packages/mcp
 5e3abfaf3d8da592722471b6d127bf31fa40826e
 
-$ git diff --stat 7b973a7 -- packages/contracts/src/playability/api.ts packages/contracts/src/playability/verdict.ts packages/contracts/src/playability/public-verdict.ts packages/contracts/src/playability/temporal-evidence.ts packages/contracts/src/playability/temporal.ts packages/contracts/src/playability/temporal-result.ts packages/assets/src/ops.ts packages/pipeline/src/publish-gate.ts packages/pipeline/src/create-game.ts packages/cli packages/mcp
+$ git diff --stat 0e3a456 -- packages/contracts/src/playability/api.ts packages/contracts/src/playability/verdict.ts packages/contracts/src/playability/public-verdict.ts packages/contracts/src/playability/temporal-evidence.ts packages/contracts/src/playability/temporal.ts packages/contracts/src/playability/temporal-result.ts packages/assets/src/ops.ts packages/pipeline/src/publish-gate.ts packages/pipeline/src/create-game.ts packages/cli packages/mcp
 
-$ git diff --stat 7b973a7
+$ git diff --stat 0e3a456 -- packages
  packages/contracts/src/playability/mechanic.ts     |   8 +-
  .../fixtures/playability-mechanic-matrix.json      |   8 +-
  .../contracts/tests/playability-mechanic.test.ts   | 114 ++++++++++++++++++++-

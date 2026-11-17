@@ -10,10 +10,12 @@
 | 单元 | U3（contracts `mechanic.ts` gap 替换；temporal 层接管 moving hazard） |
 | 授权记录 | `.scratch/level-playability-v1.1-i03-impl/reports/U3-incremental-authorization.md` |
 | 单元 brief | `.scratch/level-playability-v1.1-i03-impl/issues/06-i03-impl-u3.md` |
-| 授权包 | `docs/v7.8/移动-I03.md` · 签署前 `2f89d572…` / 签署后 `f45332be…` / 当前 `8a8349b1f26f20d08a6c7573875ed5d0a070d240158c183f1b75721b6ecaf917` |
-| Base | `7b973a7` |
-| Code/test head | `b02b2ce` |
-| Code/test diff range | `7b973a7..b02b2ce` |
+| 授权包 | `docs/v7.8/移动-I03.md` · 签署前 `2f89d572…` / 签署后 `f45332be…` / 当前 `46cf181237f1dd3bf3bc30f839c62abb37f1f90787020ffcb445df8790b8c308`（U4 amendment-02 Ledger 后） |
+| U4 修订 | `reports/U4-brief-amendment-02.md`；review `reports/U4-amendment-02-review.md` · `sha256:ab15775230b1b1fbc7c5e1928979059fc495d1621261e56e066727f90c3bd09e` |
+| 前一轮复核 | `reports/U3-review.md` · `sha256:57607f39a67356eb8ba997047bb4722654f4ff39d1715c730f0bab5c0e77163d`（FAIL：A2 降级 publicVerdict） |
+| Base | `0e3a456`（main，含 U4 amendment-02） |
+| Code/test head | `55f7117`（U3 commits + merge main） |
+| Code/test diff range | `0e3a456..55f7117` |
 | 环境 | 见 `evidence/U3/commands.log` |
 
 ## 2. 改动文件（code/test diff，3 个）
@@ -33,10 +35,10 @@
 | 证据目录 | `.scratch/level-playability-v1.1-i03-impl/evidence/U3/` |
 | 文件 hash | `evidence/U3/SHA256SUMS` |
 | 目标测试 | `targeted-test-output.txt` · 1 file / 32 tests · exit 0 |
-| 全量测试 | `test-output.txt` · 178 files / 2952 tests · exit 0 · 2 条 vitest-worker 告警（runner 噪声） |
+| 全量测试 | `test-output.txt` · 178 files / 2952 tests · exit 0 · 3 条 vitest-worker 告警（runner 噪声） |
 | typecheck / build / deps / links | 各自日志 · exit 0 |
 | 不变量 | `invariant-before.txt` / `invariant-after.txt` |
-| 回滚演练 | `rollback-drill.log` · 分支 `wayfinder/i03-u3-rollback-drill` · revert `b02b2ce` + `5ecb049` 回 base `7b973a7` · 目标 25 / 全量 2945 · exit 0 |
+| 回滚演练 | `rollback-drill.log` · 分支 `wayfinder/i03-u3-rollback-drill-v2` · revert `b02b2ce` + `5ecb049` 回 base `0e3a456` · 目标 25 / 全量 2945 · exit 0 |
 
 ## 4. 可复跑命令
 
@@ -52,7 +54,7 @@ pnpm check:links
 ## 5. 复核人必须独立完成
 
 1. 核对授权包 / 授权记录 / brief 的完整 hash；核对 `evidence/U3/SHA256SUMS`。
-2. 检查 `7b973a7..b02b2ce` diff 是否**只**落在白名单三文件；`api.ts` / `verdict.ts` / `public-verdict.ts` / U1 / U4 / U5 / CLI / MCP / `create-game.ts` 零 diff；fixture 仅 `wide-patrol` 行变化（其余五行逐字不变）。
+2. 检查 `0e3a456..55f7117` diff 是否**只**落在白名单三文件；`api.ts` / `verdict.ts` / `public-verdict.ts` / U1 / U4 / U5 / CLI / MCP / `create-game.ts` 零 diff；fixture 仅 `wide-patrol` 行变化（其余五行逐字不变）。
 3. 逐项检查：
    - `mechanic.ts` 精确删除 `movingHazards` 与 `moving-hazard-phase`；`allHazards` / `staticHazards` / `movingSolids` 保留；`moving-platform-unsupported` 仍在；
    - `wide-patrol`：机制层 `NO_PROVEN_BLOCKER` + `coverage.mechanic="checked"` + evidence 为空；公共层经 `mapPublicVerdict` + `PHASE1_CAPABILITY_GATE` / `ADMISSION` ⇒ IE；
@@ -60,6 +62,7 @@ pnpm check:links
    - 第一阶段 gate `BLOCKED`：nb / pu candidate 均不产公共 NB / PU；
    - synthetic temporal evidence 符合 U1 真实类型、无 `as any`；测试走真实 `mapPublicVerdict`；
    - 公共 IE 上 `playabilityIssues` 为空；temporal evidence 非阻断；
+   - **A2 回归（前一轮 FAIL）**：trusted 输入不可用 / analyzer 抛错且 existing NB ⇒ `runTemporalAudit` 的 `publicVerdict` 为 IE、`coverage` unknown、evidence []；U5 诊断不得再记录 NB；
    - 其他 mechanic 语义不变：静止 hazard A、danger B、moving-platform、6 例矩阵其余行；
    - 目标 32 / 全量 2952、`pnpm typecheck` 0、build / deps / links 0；
    - 回滚演练隔离、产品树回 base、目标 25 / 全量 2945，delivery 分支未被污染。

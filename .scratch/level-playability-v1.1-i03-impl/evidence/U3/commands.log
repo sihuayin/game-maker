@@ -1,21 +1,21 @@
-# I03-U3 evidence commands
-date: 2026-11-16T15:17:08Z
+# I03-U3 evidence commands (after U4 amendment-02)
+date: 2026-11-17T02:58:14Z
 uname: Darwin 24.6.0 arm64
 node: v22.23.2
 pnpm: 10.7.1
-base: 7b973a7
-code/test head: b02b2ce (5ecb049 mechanic+fixture; b02b2ce tests)
+base: 0e3a456 (main incl. U4 amendment-02)
+code/test head: 55f7117 (merge main; U3 commits b02b2ce/5ecb049)
 
 $ pnpm exec vitest run packages/contracts/tests/playability-mechanic.test.ts
 exit 0; 1 file / 32 tests passed
 output: evidence/U3/targeted-test-output.txt
 
 $ pnpm test
-exit 0; 178 files / 2952 tests passed; 2 vitest-worker "onTaskUpdate" timeout warnings (runner-level, not failures)
+exit 0; 178 files / 2952 tests passed; 3 vitest-worker "onTaskUpdate" timeout warnings (runner-level)
 output: evidence/U3/test-output.txt
 
 $ pnpm typecheck
-exit 0 (tsc -b + per-package tsconfig.spec.json)
+exit 0
 output: evidence/U3/typecheck.log
 
 $ pnpm build
@@ -27,17 +27,17 @@ exit 0; 10 packages
 output: evidence/U3/check-deps.log
 
 $ pnpm check:links
-  ✅ 相对链接零断裂（1251 份文档 · 4159 条链接）
+  ✅ 相对链接零断裂（1254 份文档 · 4159 条链接）
 output: evidence/U3/check-links.log
 
-$ git diff --stat 7b973a7
+$ git diff --stat 0e3a456 -- packages
  packages/contracts/src/playability/mechanic.ts     |   8 +-
  .../fixtures/playability-mechanic-matrix.json      |   8 +-
  .../contracts/tests/playability-mechanic.test.ts   | 114 ++++++++++++++++++++-
  3 files changed, 120 insertions(+), 10 deletions(-)
 
-$ U3 rollback drill (branch wayfinder/i03-u3-rollback-drill, from b02b2ce)
-revert b02b2ce + 5ecb049 -> product tree equals base 7b973a7
+$ U3 rollback drill (branch wayfinder/i03-u3-rollback-drill-v2, from 55f7117)
+revert b02b2ce + 5ecb049 -> product tree equals base 0e3a456
 $ pnpm exec vitest run packages/contracts/tests/playability-mechanic.test.ts
 exit 0; 1 file / 25 tests passed (pre-U3 suite)
 $ pnpm test

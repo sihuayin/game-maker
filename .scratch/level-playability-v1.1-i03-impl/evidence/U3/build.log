@@ -5,13 +5,13 @@
 Scope: 10 of 11 workspace projects
 packages/demo bundle$ esbuild src/shell/entry.ts --bundle --platform=browser --format=iife --target=es2022 --minify --outfile=dist/shell.js
 packages/demo bundle:   dist/shell.js  1.6mb ⚠️
-packages/demo bundle: ⚡ Done in 6569ms
+packages/demo bundle: ⚡ Done in 378ms
 packages/demo bundle: Done
 packages/cli bundle$ esbuild src/cli.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/cli.mjs --external:vite --external:phaser
 packages/mcp bundle$ esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.mjs --external:vite --external:phaser
-packages/mcp bundle:   dist/server.mjs  1.6mb ⚠️
-packages/mcp bundle: ⚡ Done in 1221ms
 packages/cli bundle:   dist/cli.mjs  1.8mb ⚠️
-packages/cli bundle: ⚡ Done in 1221ms
+packages/cli bundle: ⚡ Done in 67ms
+packages/mcp bundle:   dist/server.mjs  1.6mb ⚠️
+packages/mcp bundle: ⚡ Done in 67ms
 packages/cli bundle: Done
 packages/mcp bundle: Done
