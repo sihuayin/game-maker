@@ -1,0 +1,4 @@
+$ git status --porcelain -- packages fixtures
+exit: 0
+$ git diff --stat -- packages fixtures
+exit: 0

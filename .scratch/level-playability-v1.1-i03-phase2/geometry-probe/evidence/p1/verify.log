@@ -1,0 +1,12 @@
+PASS source tree sha256:570535deff5c2f4e1626b2680a4b555f631e51d6d87721507a0a1f6e2feb7383
+PASS source manifest sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689
+PASS normalized manifest sha256:19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98
+PASS fixture manifest sha256:dd880628176f617819752d0d866c6adc923238e706444f20bbe0807e1e87943b
+PASS normalization sha256:e88f5a350a8cb596884b46cd0ffe8620691ab22cf8004e8b6e41eed0ec70d227
+positive rows: 14 expected 14
+negative recipes: 11 expected 11
+dimensions: {'hazard': 2, 'player': 9, 'graph': 3}
+codes: frame-missing,frame-size-mismatch,anchor-mismatch,trimmed,rotated,atlas-hash-mismatch,atlas-missing,body-size-mismatch,body-offset-mismatch,body-bounds-mismatch,graph-solid-mismatch
+recipe files: 11
+delivery copies: 8
+RESULT: PASS

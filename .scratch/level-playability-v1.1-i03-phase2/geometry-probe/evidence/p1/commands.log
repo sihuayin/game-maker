@@ -1,0 +1,57 @@
+# P1 commands and exit codes (2026-11-17)
+
+repo: /Volumes/shy/some-projects/game-maker
+branch: wayfinder/i03-phase2-probe-evidence
+base main: 324ca13166662b309069c43599047a5c1d9b692f
+authorization: .scratch/level-playability-v1.1-i03-phase2/reports/P1-incremental-authorization.md
+P1 fixtures/scripts commit: 8a0bb6758efa9d71148ac67c0dd0e5253306e061
+
+## setup
+$ mkdir -p geometry-probe/{contract,fixtures/source,scripts,evidence/p1}
+  exit 0
+$ cp -R fixtures/packs/last-train/v2 geometry-probe/fixtures/source/last-train-v2
+  exit 0
+$ cp .scratch/level-playability-v1.1-i03/issues/13-i03-03a-probe-format.md geometry-probe/contract/I03-03A-probe-format.md
+  exit 0
+$ cp <phase-2 build-fixtures.py> geometry-probe/scripts/build-fixtures.py
+  exit 0
+$ cp <materialize-recipes.py> geometry-probe/scripts/materialize-recipes.py
+  exit 0
+
+## rebuild 1
+$ python3 geometry-probe/scripts/build-fixtures.py
+  exit 0
+  stdout: rows 14 negative 11 basePackHash sha256:570535...
+
+## rebuild 2
+$ python3 geometry-probe/scripts/build-fixtures.py
+  exit 0
+  stdout: rows 14 negative 11 basePackHash sha256:570535...
+$ diff -r evidence/p1/rebuild-1 evidence/p1/rebuild-2
+  exit 0 (empty output)
+
+## recipes + delivery copies
+$ python3 geometry-probe/scripts/materialize-recipes.py
+  exit 0
+$ cp source/last-train-v2/delivery/atlas.{animations,backgrounds,sprites,ui}.{json,png} fixtures/last-train-v4/delivery/
+  exit 0
+
+## verification
+$ python3 <verify-fixtures inline script>  (see verify.log)
+  exit 0  RESULT: PASS
+$ git status --porcelain -- packages fixtures
+  exit 0 (empty output = product fixtures/packages unchanged)
+$ git diff --stat -- packages fixtures
+  exit 0 (empty output)
+
+## script diff (frozen vs phase-2 copy)
+$ diff -u .scratch/level-playability-v1.1-i03/evidence/geometry-probe/scripts/build-fixtures.py geometry-probe/scripts/build-fixtures.py
+  see script-diff.txt
+
+## hashes
+$ shasum -a 256 geometry-probe/fixtures/manifest.json
+  dd880628176f617819752d0d866c6adc923238e706444f20bbe0807e1e87943b
+$ shasum -a 256 geometry-probe/fixtures/normalization.json
+  e88f5a350a8cb596884b46cd0ffe8620691ab22cf8004e8b6e41eed0ec70d227
+$ shasum -a 256 geometry-probe/fixtures/last-train-v4/manifest.json
+  19f4da6fb9bf25b96b48b96e2e44bb1773ad0c1222dc865f72e77a56fc85cb98

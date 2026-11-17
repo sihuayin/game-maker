@@ -1,0 +1,54 @@
+--- .scratch/level-playability-v1.1-i03/evidence/geometry-probe/scripts/build-fixtures.py	2026-11-14 23:03:32
++++ .scratch/level-playability-v1.1-i03-phase2/geometry-probe/scripts/build-fixtures.py	2026-11-17 23:15:38
+@@ -5,22 +5,26 @@
+ - reads the frozen `fixtures/packs/last-train/v2` and game config;
+ - writes a v4-normalized manifest under `fixtures/last-train-v4/`;
+ - enumerates every required positive frame / body row with expected values;
+-- records 10 negative mutation recipes + input/output hashes;
++- records 11 negative mutation recipes + input/output hashes;
+ - does NOT copy binary packs and does NOT implement the probe.
+ 
+ Rebuild:
+-  python3 .scratch/level-playability-v1.1-i03/evidence/geometry-probe/scripts/build-fixtures.py
++  python3 .scratch/level-playability-v1.1-i03-phase2/geometry-probe/scripts/build-fixtures.py
+ """
+ import hashlib
+ import json
+ from pathlib import Path
+ 
+-ROOT = Path(__file__).resolve().parents[5]
++ROOT = Path(__file__).resolve().parents[4]
+ PACK = ROOT / "fixtures/packs/last-train/v2"
+ CONFIG = ROOT / "fixtures/game-configs/last-train.json"
+ HERE = Path(__file__).resolve().parent.parent
+ OUT = HERE / "fixtures"
+ NORMALIZED = OUT / "last-train-v4"
++# The frozen manifest records the I03-03B2 evidence paths. P1 keeps those
++# recorded strings byte-identical while materializing the same bytes under
++# the Phase-2 geometry-probe tree.
++RECORDED = ".scratch/level-playability-v1.1-i03/evidence/geometry-probe"
+ MANIFEST_OUT = OUT / "manifest.json"
+ NORMALIZATION_OUT = OUT / "normalization.json"
+ 
+@@ -93,7 +97,7 @@
+         "provenance": {"mode": raw_manifest["provenance"]["mode"]},
+         "note": "manifest-only normalization; delivery/authoring files stay in the frozen v2 pack",
+         "sourceManifestHash": sha_file(PACK / "manifest.json"),
+-        "normalizedManifestPath": (NORMALIZED / "manifest.json").relative_to(ROOT).as_posix(),
++        "normalizedManifestPath": f"{RECORDED}/fixtures/last-train-v4/manifest.json",
+         "normalizedManifestHash": sha_bytes(normalized_bytes),
+     },
+     "atlasHashes": atlas_hashes,
+@@ -331,9 +335,9 @@
+         {"code": "probe-not-run", "note": "execution missing; not a geometry mutation"},
+     ],
+     "storage": {
+-        "positive": (NORMALIZED / "manifest.json").relative_to(ROOT).as_posix(),
+-        "manifest": MANIFEST_OUT.relative_to(ROOT).as_posix(),
+-        "rebuild": ".scratch/level-playability-v1.1-i03/evidence/geometry-probe/scripts/build-fixtures.py",
++        "positive": f"{RECORDED}/fixtures/last-train-v4/manifest.json",
++        "manifest": f"{RECORDED}/fixtures/manifest.json",
++        "rebuild": f"{RECORDED}/scripts/build-fixtures.py",
+         "copies": "not materialized by B2; implementation must materialize from base + recipes",
+     },
+ }
