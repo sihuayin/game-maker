@@ -1,0 +1,46 @@
+# U4 amendment-02 invariant AFTER (head ea29cd9)
+
+$ shasum -a 256 packages/contracts/src/playability/mechanic.ts
+0f60760f89453d1380a8756e4bd0bdf66969b239c5af8543533599d99e2668da  packages/contracts/src/playability/mechanic.ts
+$ shasum -a 256 packages/contracts/src/playability/api.ts
+52ccef05a19ba9f7b6e8840ecae61c42174539e5d62c6b872c3478abce1c4811  packages/contracts/src/playability/api.ts
+$ shasum -a 256 packages/contracts/src/playability/public-verdict.ts
+ec67f5a7737e711ef4d25fb52fadc7c210eb50c23de9fe8eac3c3175d493a18c  packages/contracts/src/playability/public-verdict.ts
+$ shasum -a 256 packages/contracts/src/playability/verdict.ts
+343f8e24eb75516c13358b4b7bfafdf103488efb47d1b4e393210f1340350c00  packages/contracts/src/playability/verdict.ts
+$ shasum -a 256 packages/pipeline/src/publish-gate.ts
+72786d2bce3d612af730af05560cf3b49d0123f16b5f7dddf0300c6274cfc28a  packages/pipeline/src/publish-gate.ts
+$ shasum -a 256 packages/pipeline/src/create-game.ts
+d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
+$ git rev-parse ea29cd9:packages/cli
+084c5c20441ed1d114ba773b8a41f2198afe98ca
+$ git rev-parse ea29cd9:packages/mcp
+5e3abfaf3d8da592722471b6d127bf31fa40826e
+
+$ git diff --stat 90eb81c -- packages/contracts/src/playability/mechanic.ts packages/contracts/src/playability/api.ts packages/contracts/src/playability/public-verdict.ts packages/contracts/src/playability/verdict.ts packages/pipeline/src/publish-gate.ts packages/pipeline/src/create-game.ts packages/cli packages/mcp
+
+$ git diff --stat 90eb81c
+ packages/assets/src/ops.ts        | 9 ++++++++-
+ packages/assets/tests/ops.test.ts | 8 ++++++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+$ grep -n "publicVerdict" -A6 packages/assets/src/ops.ts | sed -n "/temporalFailure/,+16p"
+function temporalFailure(existingAudit: PlayabilityVerdict, legacy?: TemporalAuditResult): TemporalAuditReport {
+  const verdict = legacy?.applicable === true ? legacy.verdict : "INSUFFICIENT_EVIDENCE";
+  const degradation = legacy?.applicable === true ? legacy.degradation : undefined;
+  return {
+    applicable: true,
+    verdict,
+    ...(degradation !== undefined ? { degradation } : {}),
+    coverage: "unknown",
+    evidence: [],
+    // 降级路径没有 temporal evidence ⇒ mapper 记 temporal:"unknown" ⇒ IE；
+    // 不得把 existing 的 NB 直接复制成公共 verdict（§4.2 / AC-07）。
+    publicVerdict: mapPublicVerdict({
+      existing: existingAudit,
+      temporal: { applicable: true },
+      gate: PHASE1_CAPABILITY_GATE,
+      admission: PHASE1_CAPABILITY_ADMISSION,
+    }),
+  };
+}

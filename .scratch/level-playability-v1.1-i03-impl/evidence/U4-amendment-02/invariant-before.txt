@@ -1,0 +1,32 @@
+# U4 amendment-02 invariant BEFORE (base 90eb81c)
+
+$ git show 90eb81c:packages/contracts/src/playability/mechanic.ts | shasum -a 256
+0f60760f89453d1380a8756e4bd0bdf66969b239c5af8543533599d99e2668da  packages/contracts/src/playability/mechanic.ts
+$ git show 90eb81c:packages/contracts/src/playability/api.ts | shasum -a 256
+52ccef05a19ba9f7b6e8840ecae61c42174539e5d62c6b872c3478abce1c4811  packages/contracts/src/playability/api.ts
+$ git show 90eb81c:packages/contracts/src/playability/public-verdict.ts | shasum -a 256
+ec67f5a7737e711ef4d25fb52fadc7c210eb50c23de9fe8eac3c3175d493a18c  packages/contracts/src/playability/public-verdict.ts
+$ git show 90eb81c:packages/contracts/src/playability/verdict.ts | shasum -a 256
+343f8e24eb75516c13358b4b7bfafdf103488efb47d1b4e393210f1340350c00  packages/contracts/src/playability/verdict.ts
+$ git show 90eb81c:packages/pipeline/src/publish-gate.ts | shasum -a 256
+72786d2bce3d612af730af05560cf3b49d0123f16b5f7dddf0300c6274cfc28a  packages/pipeline/src/publish-gate.ts
+$ git show 90eb81c:packages/pipeline/src/create-game.ts | shasum -a 256
+d4f5edf7729fc8ca56144c8abaefa53d7c7a318c07a87164c7d835fa9fc72a5b  packages/pipeline/src/create-game.ts
+$ git rev-parse 90eb81c:packages/cli
+084c5c20441ed1d114ba773b8a41f2198afe98ca
+$ git rev-parse 90eb81c:packages/mcp
+5e3abfaf3d8da592722471b6d127bf31fa40826e
+
+$ git show 90eb81c:packages/assets/src/ops.ts | grep -n "publicVerdict: existingAudit" -B4 -A2
+1049-    verdict,
+1050-    ...(degradation !== undefined ? { degradation } : {}),
+1051-    coverage: "unknown",
+1052-    evidence: [],
+1053:    publicVerdict: existingAudit,
+1054-  };
+1055-}
+
+$ grep -n "publicCapability\|publicResult" packages/contracts/src/playability/temporal-result.ts
+8://   `PROVEN_UNPLAYABLE`。`publicCapability` 恒为 `"BLOCKED"`、`publicResult`
+44:  readonly publicCapability: "BLOCKED";
+45:  readonly publicResult: null;

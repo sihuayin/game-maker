@@ -1,0 +1,44 @@
+# I03-U4 amendment-02 evidence commands
+date: 2026-11-17T02:17:12Z
+uname: Darwin 24.6.0 arm64
+node: v22.23.2
+pnpm: 10.7.1
+base: 90eb81c
+code/test head: ea29cd9 (d8002df ops.ts; ea29cd9 tests)
+
+$ pnpm exec vitest run packages/assets/tests/ops.test.ts
+exit 0; 1 file / 21 tests passed
+output: evidence/U4-amendment-02/targeted-test-output.txt
+
+$ pnpm test
+exit 0; 178 files / 2945 tests passed; 5 vitest-worker "onTaskUpdate" timeout warnings (runner-level, not failures)
+output: evidence/U4-amendment-02/test-output.txt
+
+$ pnpm typecheck
+exit 0
+output: evidence/U4-amendment-02/typecheck.log
+
+$ pnpm build
+exit 0
+output: evidence/U4-amendment-02/build.log
+
+$ pnpm check:deps
+exit 0; 10 packages
+output: evidence/U4-amendment-02/check-deps.log
+
+$ pnpm check:links
+  ✅ 相对链接零断裂（1253 份文档 · 4159 条链接）
+output: evidence/U4-amendment-02/check-links.log
+
+$ git diff --stat 90eb81c
+ packages/assets/src/ops.ts        | 9 ++++++++-
+ packages/assets/tests/ops.test.ts | 8 ++++++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+$ U4 amendment-02 rollback drill (branch wayfinder/i03-u4-amendment-02-rollback-drill, from ea29cd9)
+revert ea29cd9 + d8002df -> product tree equals base 90eb81c
+$ pnpm exec vitest run packages/assets/tests/ops.test.ts
+exit 0; 1 file / 21 tests passed (pre-fix assertions)
+$ pnpm test
+exit 0; 178 files / 2945 tests passed
+output: evidence/U4-amendment-02/rollback-drill.log
