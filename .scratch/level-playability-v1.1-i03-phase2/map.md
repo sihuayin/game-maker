@@ -3,18 +3,18 @@
 Labels: wayfinder:map
 Tracker: local-markdown
 Effort: level-playability-v1.1-i03-phase2
-Authority: [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md) @ `sha256:2bbe7c5534ecb2e28db28657d58de9be54007963c1d4f69f8883568fdc0478f8`（SIGNED）+ [`docs/v7.8/移动-I03-phase2.md`](../../docs/v7.8/移动-I03-phase2.md)（**UNSIGNED 草案**；签署后 hash 成为 Phase-2 授权基线）+ [`reports/00-execution-protocol.md`](reports/00-execution-protocol.md)
+Authority: [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md) @ `sha256:2bbe7c5534ecb2e28db28657d58de9be54007963c1d4f69f8883568fdc0478f8`（SIGNED）+ [`docs/v7.8/移动-I03-phase2.md`](../../docs/v7.8/移动-I03-phase2.md)（**SIGNED 2026-11-17，amber**；签署前 `sha256:0a3ee4a3…`；签署后 `sha256:100d0221db759cf2ce64835665691c410c76e6223ee8f9049655db6021537b21`；见 [`reports/00-annex-signature.md`](reports/00-annex-signature.md)）+ [`reports/00-execution-protocol.md`](reports/00-execution-protocol.md)
 Baseline: `main` @ `dd10dff7dbd1f44d468fcea037aa9b6853671424`（phase-1 INCOMPLETE 关闭后）
 Branch: `wayfinder/level-playability-v1.1-i03-phase2`
 PR target: `main`（地图 / 票 / 协议 / annex 均 docs-only）
-Status: open · 2026-11-17 · P0 resolved；7 张票；frontier = P1（BLOCKED：待 annex 用户签署 + P1 增量授权）
+Status: open · 2026-11-17 · P0 resolved；annex SIGNED；7 张票；frontier = P1（BLOCKED：待 P1 增量授权）
 
 > **规划型 effort（Q4=A）。** 本图只产 Phase-2 执行治理资产（协议、annex 草案、逐单元 brief、验收计划），不写产品代码、不运行 probe、不物化夹具、不执行 P7 验收。
 > Phase-2 实施由后续独立会话按单元授权执行；每个单元仍是独立授权记录 / 独立分支 / 独立复核 / 用户签署 / 独立 Ledger 行。
 
 ## Destination
 
-**Phase-2 执行治理计划完成：P0 协议 + UNSIGNED annex + P1–P6 逐单元执行 brief + P7 全量验收计划全部明确，可交给独立执行会话按单元授权实施；本图不修改产品代码、不运行 probe、不开放 `PUBLIC_NB` / `PUBLIC_PU`。**
+**Phase-2 执行治理计划完成：P0 协议 + SIGNED annex（签署前 `0a3ee4a3…`）+ P1–P6 逐单元执行 brief + P7 全量验收计划全部明确，可交给独立执行会话按单元授权实施；本图不修改产品代码、不运行 probe、不开放 `PUBLIC_NB` / `PUBLIC_PU`。**
 
 ## Notes
 
@@ -28,7 +28,7 @@ Status: open · 2026-11-17 · P0 resolved；7 张票；frontier = P1（BLOCKED�
 
 ## Decisions so far
 
-- [Phase-2 执行协议、UNSIGNED annex 与 Ledger 模型](issues/01-phase2-protocol.md): 冻结 P1–P6 授权模型、5 行 Ledger、P7 独立验收授权；annex 未签署前不得启动任何单元。
+- [Phase-2 执行协议、UNSIGNED annex 与 Ledger 模型](issues/01-phase2-protocol.md): 冻结 P1–P6 授权模型、5 行 Ledger、P7 独立验收授权；annex 已于 2026-11-17 由 amber 签署（签署前 `0a3ee4a3…`，签署后 `100d0221…`）；P1–P6、P7 仍需独立授权。
 
 ## Not yet specified
 

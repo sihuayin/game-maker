@@ -14,3 +14,7 @@ Class: I-03-Phase2 / P1
 必须覆盖：`geometry-probe/{contract,fixtures,scripts,evidence/p1}` 结构；F2 manifest hash `dd880628176f617819752d0d866c6adc923238e706444f20bbe0807e1e87943b`；14 正例行（hazard 2 / player 8 帧 + body 1 / graph 3）；原始 fixture 只读与受控副本关系；audit 分支 `wayfinder/i03-phase2-probe-evidence` 的提交与 hash 记录；P1 独立复核与用户签署；回滚；**本 brief 不写实现**。
 
 约束：见 `reports/00-execution-protocol.md` §4 与 annex §4；产品 `packages/**` / `fixtures/**` 零改动。
+
+## Comments
+
+- 2026-11-17：Phase-2 annex 已由 amber 签署（签署前 `0a3ee4a3…`；签署后 hash 见 `reports/00-annex-signature.md`）。P1 仍为 BLOCKED：需 P1 独立增量授权记录 + 用户签署后才能开工。
