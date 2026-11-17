@@ -120,7 +120,7 @@ type NbFixtureAttestation = {
 | `budget` | `evidence.limits` | `budgetStatus="complete"` 且 `budgetKind=null` | `exhausted` / `aborted` / `budgetKind≠null`（含 `wall-clock-abort`）/ `hopSamplesChecked > maxHopSamples` | `budgetStatus="invalid"` | `limits` 缺失 |
 | `determinism` | `determinism` | `runs ≥ 2`、`equal=true`、两 hash 均 `sha256:<64hex>` | `equal=false` | `runs < 2` 或 hash 形状不合法 | `determinism` 缺失 |
 | `witness-volume` | `evidence.limits` + `degradation.reason` | `witnessTransitions ≤ maxWitnessTransitions` 且 `witnessBytes ≤ maxWitnessBytes` 且 `degradation.reason ≠ "witness-volume"` | 任一越界或 `degradation.reason="witness-volume"` | — | `limits` 缺失 |
-| `public-mapping` | 见 §5 | 全部映射检查成立 | 自称 checked / 混入 PU 条件 / 明确否定结果 | — | `evidence` 缺失 |
+| `public-mapping` | 见 §5 | 全部映射检查成立 | 无 `p3-signed` 背书的 checked / 组件与 attestation 不一致 / 混入 PU 条件 / 明确否定结果 | — | `evidence` 缺失 |
 | `admission-fixtures` | `fixtures` | `admissionSetStatus="PASS"` 且两 hash 等于冻结常量 | 状态 `FAIL` 或任一 hash 不匹配 | — | `NOT_RUN` / 缺失 |
 
 **责任边界（互不代偿）**：
@@ -140,9 +140,17 @@ type NbFixtureAttestation = {
 - `coverage.temporal = "checked"`；
 - 降级一致：`COMPLETE ⇒ degradation.reason = null && secondary = []`；`INCOMPLETE ⇒ degradation.reason ≠ null`；
 - `model.conditional = true` 且 `movementModelClosure = "not-proven-air-control"`；
-- **防伪**：公共 evidence 的 `coverage.geometry` 不得为 `"checked"`；`model.geometryCoverage.{hazard,player,graph}` 必须保持 `chain="manifest+atlas-metadata"`、`runtimeBody="unverified"`、`coverage="partial"`；`model.puConditions` 不得出现。
+- `model.puConditions` 不得出现（PU 条件进入 NB ⇒ `BLOCKED`）；
+- **防伪（2026-11-17 与 P6 联动修订）**：
+  - 公共 evidence **未**声称 checked / verified（`coverage.geometry` 缺省或为 `"partial"` / `"not-checked"` / `"unknown"`，且 `model.geometryCoverage.*.runtimeBody` 均为 `"unverified"`）⇒ 可接受；admission 的几何事实只来自 `attestations.geometry`。
+  - 公共 evidence **一旦**声称 checked / verified（`coverage.geometry === "checked"`，或任一 `model.geometryCoverage.*.coverage === "checked"` / `runtimeBody === "verified"`）⇒ 必须同时满足：
+    1. `attestations.geometry.source === "p3-signed"`；
+    2. `attestations.geometry.review.a/b/c` 均 `PASS` 且 `ref` 非空；
+    3. 逐组件一致：对 hazard / player / graph，`model.geometryCoverage[axis].coverage` 等于该组件状态（`not-applicable` 记 `unknown`），`runtimeBody === (status === "checked" ? "verified" : "unverified")`；
+    4. `evidence.coverage.geometry` 与 `limits.geometryCoverage` 等于按 P6 合并规则（任一 unknown ⇒ unknown；否则任一 partial ⇒ partial；否则全 checked ⇒ checked）得到的聚合值。
+  - 任一不一致或缺少背书 ⇒ `BLOCKED`（伪造 / 错配）。
 
-违背防伪或错通道（PU 条件进入 NB） ⇒ `BLOCKED`；`witness.result` 为 `insufficient-evidence` / `pu-candidate` ⇒ `BLOCKED`。
+错通道（PU 条件进入 NB） ⇒ `BLOCKED`；`witness.result` 为 `insufficient-evidence` / `pu-candidate` ⇒ `BLOCKED`。
 
 ### 6. 夹具矩阵
 
@@ -168,7 +176,7 @@ type NbFixtureAttestation = {
 
 1. **矩阵行驱动**：17 行逐行断言 `admitted` 与逐条件 `status`；断言 `rows.length===17` 与 id 集合；负例单变量证明。
 2. **十条件四态**：每条规则至少 `PASS / BLOCKED / INSUFFICIENT_EVIDENCE / NOT_RUN` 各一个单元用例，构造输入使目标规则翻转、其余九项不受影响。
-3. **防伪**：自称 `coverage.geometry:"checked"` / `runtimeBody:"verified"` / 夹带 `model.puConditions` ⇒ `public-mapping = BLOCKED`；graph 与 `graphInvolved` 矛盾 ⇒ BLOCKED；`determinism.equal=false` ⇒ BLOCKED。
+3. **防伪（修订）**：无 `p3-signed` 背书的 checked / verified、组件状态与 attestation 不一致、或夹带 `model.puConditions` ⇒ `public-mapping = BLOCKED`；正例：`source:"p3-signed"` + 完整 review + 逐项一致 ⇒ `public-mapping = PASS`（P6 enriched evidence 可进入 admission）；graph 与 `graphInvolved` 矛盾 ⇒ BLOCKED；`determinism.equal=false` ⇒ BLOCKED。
 4. **gate `BLOCKED` 负向**：十项全 PASS + **未修改的** `mapPublicVerdict` + `PHASE1_CAPABILITY_GATE` ⇒ 公共 verdict 仍 `INSUFFICIENT_EVIDENCE`；对照用假设 `OPEN` gate + `{ nb: admitted }` ⇒ `NO_PROVEN_BLOCKER`，证明结果可被 P5 消费。
 5. **冻结 hash**：重算矩阵文件 SHA-256 === `NB_ADMISSION_MATRIX_HASH`；`NB_PROBE_FIXTURE_MANIFEST_HASH` 字面量 === `sha256:dd880628…`。
 
@@ -180,7 +188,7 @@ P4 阶段 **AC-10 保持 `NOT_RUN`**：
 
 - synthetic 正例只证明十项判定规则可实现，不替代 P3 签署的真实 checked 几何；
 - 真实 checked 几何正例由 P3 完成后经 P6 / P7 验证；
-- 任何把 AC-10 标 `PASS`、把 `coverage.geometry` 设成 `checked`、或打开 gate 的行为 ⇒ STOP。
+- 任何把 AC-10 标 `PASS`、在 P4 代码里合成 / 写入 geometry 字段、或打开 gate 的行为 ⇒ STOP；读取 P6 提供的 enriched evidence 做一致性校验不在 P4 实施范围内，仅作为判定输入。
 
 ### 9. 白名单
 
@@ -201,7 +209,7 @@ P4 阶段 **AC-10 保持 `NOT_RUN`**：
 4. 矩阵行数 ≠ 17 或单变量证明失败；
 5. `NB_ADMISSION_MATRIX_HASH` 与文件实际 hash 不一致；
 6. `NB_PROBE_FIXTURE_MANIFEST_HASH` ≠ `sha256:dd880628…`；
-7. 把 AC-10 标 PASS、把 `coverage.geometry` 设成 `checked`、或打开 gate；
+7. 把 AC-10 标 PASS、在 P4 代码里合成 / 写入 geometry 字段、允许无 `p3-signed` 背书的 checked、或打开 gate；
 8. `admission.ts` 引入文件 I/O、新依赖或读取 `.scratch`；
 9. 为让测试通过而修改规则语义 / 输入契约；
 10. 回滚演练未全绿。
@@ -253,3 +261,5 @@ P4 阶段 **AC-10 保持 `NOT_RUN`**：
 ## Comments
 
 - 2026-11-17：grilling 三轮 Q1–Q17 全部裁定 A；brief 冻结。P4 实施仍待 P1 完成 + P4 增量授权。
+
+- 2026-11-17 P6 联动修订：`public-mapping` 的防伪条款由“公共 evidence 一律不得 checked”改为“无 `p3-signed` 背书与逐项一致性的 checked 才 BLOCKED”。原因：P6 需把 P3 签署后的真实 checked 几何写入同一份 temporal evidence；按原文两者无法同时成立。P4 尚未实施，修订在实施前完成。
