@@ -7,7 +7,7 @@ Authority: [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md) @ `sha256:
 Baseline: `main` @ `dd10dff7dbd1f44d468fcea037aa9b6853671424`（phase-1 INCOMPLETE 关闭后）
 Branch: `wayfinder/level-playability-v1.1-i03-phase2`
 PR target: `main`（地图 / 票 / 协议 / annex 均 docs-only）
-Status: open · 2026-11-17 · P0/P1/P2/P4/P5/P6 resolved；annex SIGNED；规划 frontier = P7（未 claim；P7 执行仍待 P2–P6 全部完成 + 单独授权；P1–P6 实施待各自增量授权）
+Status: planning complete · 2026-11-17 · P0–P7 全部 resolved；annex SIGNED；无 open ticket；P1–P6 实施待各自增量授权，P7 执行待 P2–P6 完成 + 单独授权
 
 > **规划型 effort（Q4=A）。** 本图只产 Phase-2 执行治理资产（协议、annex 草案、逐单元 brief、验收计划），不写产品代码、不运行 probe、不物化夹具、不执行 P7 验收。
 > Phase-2 实施由后续独立会话按单元授权执行；每个单元仍是独立授权记录 / 独立分支 / 独立复核 / 用户签署 / 独立 Ledger 行。
@@ -34,10 +34,11 @@ Status: open · 2026-11-17 · P0/P1/P2/P4/P5/P6 resolved；annex SIGNED；规划
 - [P4 · NB admission machinery brief](issues/04-p4-nb-admission.md): 证据级十项准入判定（`assessNbAdmission`，恒返 10 项、永不 throw）；attestation 输入 + 防伪不变量（checked 需 `p3-signed` 背书并与 evidence 逐项一致，2026-11-17 P6 联动修订）；17 行冻结矩阵与 matrix-hash / probe-manifest-hash 分离；gate `BLOCKED` 负向用未修改的 `mapPublicVerdict` 证明；AC-10 在 P4 保持 `NOT_RUN`；P4 实施待 P1 完成 + 增量授权。
 - [P5 · Global gate close brief](issues/05-p5-gate-close.md): 单调削弱式 gate 关闭（`resolveCapabilityGate`）：判别联合关闭事件、假 NB/PU 独立关闭、基线失效任一轴值匹配即关闭、关闭优先于声明 OPEN；`public-verdict.ts` 零 diff、生产仍用 phase-1 常量；10 行场景矩阵；P5 实施待 P4 完成 + 增量授权。
 - [P6 · AC-14 几何证据消费 brief](issues/06-p6-ac14-consumption.md): 显式 `GeometryEvidenceInput` → `resolveGeometryEvidence` 保守合并（unknown > partial > checked；checked 需完整 review + hash）；`verdict.ts` 仅 geometry 类型放宽；`toPublicTemporalEvidence` / `runTemporalAudit` 可选透传；P4 防伪规则同步修订为 checked 需 `p3-signed` 背书；AC-14 在 P6 保持 `NOT_RUN`；P6 实施待 P3 完成 + 增量授权。
+- [P7 · Phase-2 全量验收计划](issues/07-p7-acceptance.md): fresh 独立会话重跑 AC-01–AC-21（19 required）；AC-10→P4、AC-12→P5、AC-14→P6、AC-15→P2+P3（非 required）；固定报告 `phase2-acceptance.md`；覆盖 G1–G11 / N1–N18 / T-55–T-65 / LP-06/07 / 跨进程确定性 / L1–L8；退出码 0/1/2、状态 PASS/FAIL/INCOMPLETE；不修补证据、不开放能力；P7 执行待单独授权。
 
 ## Not yet specified
 
-无已知雾区。7 张票已覆盖 Phase-2 全部规划决策；P1–P7 的实现细节进入各自的执行 brief。
+无。7 张票全部 resolved；规划 destination 已达成。P1–P6 实施与 P7 验收执行不在本图内，待各自增量授权。
 
 ## Out of scope
 
