@@ -1,6 +1,6 @@
 {
   "version": "level-playability-v1-p1/lp06-corpus-regression/v1",
-  "generatedAt": "2026-11-06T07:58:11.147Z",
+  "generatedAt": "2026-11-17T04:09:06.823Z",
   "inventory": {
     "version": "level-playability-corpus-inventory/v1",
     "freeze": "sha256:25e6c891cbb01e456433e104862bc9f03c8404f92fec10acdc93700aca00983d",
@@ -16,21 +16,22 @@
   },
   "pairVerdicts": {
     "PROVEN_UNPLAYABLE": 36,
-    "INSUFFICIENT_EVIDENCE": 36,
-    "NO_PROVEN_BLOCKER": 24
+    "NO_PROVEN_BLOCKER": 54,
+    "INSUFFICIENT_EVIDENCE": 6
   },
   "configVerdicts": {
     "PROVEN_UNPLAYABLE": 8,
-    "INSUFFICIENT_EVIDENCE": 6
+    "NO_PROVEN_BLOCKER": 6
   },
   "playabilityConfigVerdicts": {
-    "INSUFFICIENT_EVIDENCE": 11,
+    "INSUFFICIENT_EVIDENCE": 2,
+    "NO_PROVEN_BLOCKER": 9,
     "PROVEN_UNPLAYABLE": 3
   },
   "allConfigVerdicts": {
     "PROVEN_UNPLAYABLE": 9,
-    "INSUFFICIENT_EVIDENCE": 9,
-    "NO_PROVEN_BLOCKER": 2
+    "NO_PROVEN_BLOCKER": 10,
+    "INSUFFICIENT_EVIDENCE": 1
   },
   "historicalDefects": [
     {
@@ -81,14 +82,14 @@
       "paths": [
         "out/__probe-timeout/last-train/game-configs/v1.json"
       ],
-      "final": "INSUFFICIENT_EVIDENCE"
+      "final": "NO_PROVEN_BLOCKER"
     },
     {
       "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
       "paths": [
         "out/__probe-timeout/last-train/game-configs/v2.json"
       ],
-      "final": "INSUFFICIENT_EVIDENCE"
+      "final": "NO_PROVEN_BLOCKER"
     },
     {
       "contentHash": "sha256:86c2740dae54aacbc62c6141c21e342f77ad4e09d743c93457ec879337363182",
@@ -170,7 +171,7 @@
       "existingAudit": [
         "entity \"chest-1\""
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+      "playabilityVerdict": "NO_PROVEN_BLOCKER"
     },
     {
       "contentHash": "sha256:f278cceabec01b1ac2d19fa2c3c6453fa120d3c95de3f11bf70e7781a0dae999",
@@ -199,7 +200,7 @@
         "entity \"chest-1\"",
         "entity \"chest-2\""
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+      "playabilityVerdict": "NO_PROVEN_BLOCKER"
     },
     {
       "contentHash": "sha256:6a92944240b349bfe3d52a9b6696f7c0ae10d81a58cc4794394d4e39fa8c1ad6",
@@ -223,87 +224,10 @@
       "existingAudit": [
         "entity \"chest-1\""
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE"
+      "playabilityVerdict": "NO_PROVEN_BLOCKER"
     }
   ],
-  "insufficient": [
-    {
-      "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
-      "paths": [
-        "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
-        ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
-        ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
-        ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-hazard/site/v1/game-config.json",
-        ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/site/v1/game-config.json",
-        ".scratch/p0-00-audit/runs/2026-10-20a-head-replay/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
-        ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
-        ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
-        ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
-        ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-hazard/site/v1/game-config.json",
-        ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1/game-config.json",
-        ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-hazard/site/v1/game-config.json",
-        ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/site/v1/game-config.json",
-        ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-hazard/site/v1/game-config.json",
-        ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json"
-      ],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
-    },
-    {
-      "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
-      "paths": [
-        "out/__probe/last-train/site/v1/game-config.json",
-        "out/drawlist-coveraged/site/v1/game-config.json",
-        "out/last-train/site/v1/game-config.json",
-        "out/last-train-gpt/site/v1/game-config.json",
-        "out/r6-drawlist/site/v1/game-config.json",
-        "out/r6-image/site/v1/game-config.json",
-        "fixtures/game-configs/last-train.json",
-        ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json"
-      ],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
-    },
-    {
-      "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
-      "paths": [
-        "out/last-train/game-configs/v1.json"
-      ],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
-    },
-    {
-      "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
-      "paths": [
-        ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
-        ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json"
-      ],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
-    },
-    {
-      "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
-      "paths": [
-        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json"
-      ],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
-    },
-    {
-      "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
-      "paths": [
-        ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json"
-      ],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
-    }
-  ],
+  "insufficient": [],
   "configs": [
     {
       "contentHash": "sha256:124a6ef36a74234114d447307341297f0a49ea65ba43e31c3915624083dff015",
@@ -324,8 +248,7 @@
       ],
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       },
       "layers": {
         "spatial": {
@@ -345,9 +268,6 @@
           "gaps": [
             {
               "missing": "gate-missing"
-            },
-            {
-              "missing": "moving-hazard-phase"
             }
           ]
         },
@@ -384,16 +304,14 @@
       ],
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -402,14 +320,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
+          "verdict": "NO_PROVEN_BLOCKER",
           "coverage": "partial",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -433,16 +347,14 @@
       ],
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -451,14 +363,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -475,16 +383,14 @@
       ],
       "historical": false,
       "probe": true,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -493,14 +399,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -517,16 +419,14 @@
       ],
       "historical": false,
       "probe": true,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -535,14 +435,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -559,16 +455,14 @@
       ],
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -577,14 +471,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -602,16 +492,14 @@
       ],
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -620,14 +508,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
+          "verdict": "NO_PROVEN_BLOCKER",
           "coverage": "partial",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -648,14 +532,12 @@
       "finals": [
         "PROVEN_UNPLAYABLE"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [
         "entity \"chest-1\""
       ],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -664,14 +546,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
+          "verdict": "NO_PROVEN_BLOCKER",
           "coverage": "partial",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -851,15 +729,13 @@
       "finals": [
         "PROVEN_UNPLAYABLE"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [
         "entity \"chest-1\"",
         "entity \"chest-2\""
       ],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -868,14 +744,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -906,8 +778,7 @@
       ],
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       },
       "layers": {
         "spatial": {
@@ -927,9 +798,6 @@
           "gaps": [
             {
               "missing": "gate-missing"
-            },
-            {
-              "missing": "moving-hazard-phase"
             }
           ]
         },
@@ -952,16 +820,14 @@
       ],
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -970,14 +836,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -994,16 +856,14 @@
       ],
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
       "finals": [
-        "INSUFFICIENT_EVIDENCE"
+        "NO_PROVEN_BLOCKER"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1012,14 +872,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1055,7 +911,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "target-inside-hazard": 1,
         "suppressed-by-spatial-or-mechanic": 1
       },
@@ -1080,9 +935,6 @@
             }
           ],
           "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            },
             {
               "missing": "target-inside-hazard",
               "target": "pickup-scrap-5"
@@ -1158,7 +1010,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "suppressed-by-spatial-or-mechanic": 1
       },
       "layers": {
@@ -1189,11 +1040,7 @@
               "target": "entity \"gate-1\""
             }
           ],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -1283,14 +1130,12 @@
       "finals": [
         "PROVEN_UNPLAYABLE"
       ],
-      "playabilityVerdict": "INSUFFICIENT_EVIDENCE",
+      "playabilityVerdict": "NO_PROVEN_BLOCKER",
       "existingAudit": [
         "entity \"chest-1\""
       ],
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      },
+      "gaps": {},
       "layers": {
         "spatial": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1299,14 +1144,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1349,7 +1190,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "suppressed-by-spatial-or-mechanic": 1
       },
       "layers": {
@@ -1376,11 +1216,7 @@
               "target": "entity \"gate\""
             }
           ],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -1406,8 +1242,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -1416,12 +1251,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/__probe/last-train/site/v1/game-config.json",
@@ -1429,12 +1262,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": true,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/__probe-timeout/last-train/game-configs/v1.json",
@@ -1442,12 +1273,10 @@
       "contentHash": "sha256:cb8fc9b337b11df87ebd6a10aafef9ef703ea1d7cf0d8db14ba3b12e716efe52",
       "historical": false,
       "probe": true,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/__probe-timeout/last-train/game-configs/v2.json",
@@ -1455,12 +1284,10 @@
       "contentHash": "sha256:cda795d879504afa9cf288e37b0344c39827df24b24853d5cc4466c61bbde448",
       "historical": false,
       "probe": true,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/drawlist-coveraged/site/v1/game-config.json",
@@ -1468,12 +1295,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/last-train/game-configs/v1.json",
@@ -1481,12 +1306,10 @@
       "contentHash": "sha256:06f153d5fbdc5b8e77cb4ba4b3a99785bed68fc35ca72e3523d113dab01e6007",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/last-train/site/v1/game-config.json",
@@ -1494,12 +1317,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/last-train-gpt/site/v1/game-config.json",
@@ -1507,12 +1328,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/r6-drawlist/site/v1/game-config.json",
@@ -1520,12 +1339,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "out/r6-image/site/v1/game-config.json",
@@ -1533,12 +1350,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": "fixtures/game-configs/last-train.json",
@@ -1546,12 +1361,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
@@ -1559,12 +1372,10 @@
       "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config.json",
@@ -1572,12 +1383,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
@@ -1585,12 +1394,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/site/v2/game-config.json",
@@ -1598,12 +1405,10 @@
       "contentHash": "sha256:3688dc1845e415f0b2a8aa54318f86154374e6d29f6e371768ca87cc5413701a",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -1612,11 +1417,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
@@ -1682,11 +1485,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
@@ -1755,8 +1556,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -1766,11 +1566,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
@@ -1778,12 +1576,10 @@
       "contentHash": "sha256:7cdb122ff11333fc3ae723319112a46099a7beb7a45a2a88734748655c461335",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -1791,12 +1587,10 @@
       "contentHash": "sha256:05c53a50548870ba2f8f483de554eff6042316d22d73d1e29d55c9626ba5cdde",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke/out/wasteland-scavenger-recipe/site/v1/game-config.json",
@@ -1805,11 +1599,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke2/out/wasteland-scavenger-recipe/site/v1/game-config.json",
@@ -1818,11 +1610,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/smoke3/out/wasteland-scavenger-recipe/site/v1/game-config.json",
@@ -1831,11 +1621,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r4/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -1844,11 +1632,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/game-maker-v2/experiments/72-two-shell-size/site/last-train/site/v1/game-config.json",
@@ -1856,12 +1642,10 @@
       "contentHash": "sha256:303efaa6c5d63195ed543fff15832fac447011f3282dcc25880e657292ef6f8f",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
@@ -1884,7 +1668,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "target-inside-hazard": 1,
         "suppressed-by-spatial-or-mechanic": 1
       }
@@ -1920,7 +1703,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "suppressed-by-spatial-or-mechanic": 1
       }
     },
@@ -1955,7 +1737,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "suppressed-by-spatial-or-mechanic": 1
       }
     },
@@ -2026,8 +1807,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -2036,12 +1816,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/generic-playtest-v1/evidence/self-test-run/out/self-test-scenarios/site/v1/game-config.json",
@@ -2049,12 +1827,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/intent-to-mechanics-v1/runs/2026-10-23-free-acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
@@ -2176,12 +1952,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/freeze/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2190,11 +1964,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/runs/09-hazard-contact-frozen/assembled/hazard-frozen/site/v1/game-config.json",
@@ -2203,11 +1975,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/avoid-danger/site/v1/game-config.json",
@@ -2330,11 +2100,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket10-writeback/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2343,11 +2111,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket11-prepare-reject/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2356,11 +2122,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket11-success/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2369,11 +2133,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket12-default/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2382,11 +2144,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket12-nondefault/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2395,11 +2155,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket17-dry-run/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2408,11 +2166,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2421,11 +2177,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket19-reuse-e2e2/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2434,11 +2188,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/ticket21-reuse-config-e2e/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2447,11 +2199,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-02-second-demo-v2/work/wasteland-scavenger-recipe/run/v1/game-config.json",
@@ -2460,11 +2210,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-construction-v1/runs/2026-10-22-final/playable/negative-gate/config-gate-missing.json",
@@ -2476,8 +2224,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -2486,12 +2233,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-construction-v1/runs/2026-10-22-ticket-10/negative-gate/config-gate-missing.json",
@@ -2503,8 +2248,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -2513,12 +2257,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/p0-construction-v1/runs/2026-10-23-ticket-10/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
@@ -2526,12 +2268,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/playtest-v1/runs/2026-10-27-self-test/gate/config-gate-missing.json",
@@ -2543,8 +2283,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -2553,12 +2292,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/playtest-v1/runs/2026-10-27-self-test/out/self-test-scenarios/site/v1/game-config.json",
@@ -2566,12 +2303,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/playtest-v1/runs/2026-10-28-self-test/gate/config-gate-missing.json",
@@ -2583,8 +2318,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -2593,12 +2327,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/playtest-v1/runs/2026-10-28-self-test/out/self-test-scenarios/site/v1/game-config.json",
@@ -2606,12 +2338,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/playtest-v1/runs/2026-10-29-self-test/gate/config-gate-missing.json",
@@ -2623,8 +2353,7 @@
       "global": "INSUFFICIENT_EVIDENCE",
       "blockers": [],
       "gaps": {
-        "gate-missing": 3,
-        "moving-hazard-phase": 1
+        "gate-missing": 3
       }
     },
     {
@@ -2633,12 +2362,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/playtest-v1/runs/2026-10-29-self-test/out/self-test-scenarios/site/v1/game-config.json",
@@ -2646,12 +2373,10 @@
       "contentHash": "sha256:441f6dc64a3b97e6c506bae500c8aed321a6b299774399a95ea7c9196dfdb8de",
       "historical": false,
       "probe": false,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "final": "NO_PROVEN_BLOCKER",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
@@ -2660,11 +2385,9 @@
       "historical": false,
       "probe": false,
       "final": "PROVEN_UNPLAYABLE",
-      "global": "INSUFFICIENT_EVIDENCE",
+      "global": "NO_PROVEN_BLOCKER",
       "blockers": [],
-      "gaps": {
-        "moving-hazard-phase": 1
-      }
+      "gaps": {}
     },
     {
       "path": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
@@ -2692,7 +2415,6 @@
         }
       ],
       "gaps": {
-        "moving-hazard-phase": 1,
         "suppressed-by-spatial-or-mechanic": 1
       }
     }

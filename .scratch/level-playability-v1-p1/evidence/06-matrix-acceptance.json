@@ -1,6 +1,6 @@
 {
   "version": "level-playability-v1-p1/lp06-matrix-acceptance/v1",
-  "generatedAt": "2026-11-06T07:54:17.792Z",
+  "generatedAt": "2026-11-17T04:10:31.376Z",
   "matrixSource": "level-playability-test-matrix/v1 → production fixtures (spatial/mechanic/completion)",
   "counts": {
     "cases": 39,
@@ -9,29 +9,29 @@
     "completion": 10
   },
   "finalDistribution": {
-    "INSUFFICIENT_EVIDENCE": 11,
+    "NO_PROVEN_BLOCKER": 17,
     "PROVEN_UNPLAYABLE": 19,
-    "NO_PROVEN_BLOCKER": 9
+    "INSUFFICIENT_EVIDENCE": 3
   },
   "attributionDistribution": {
-    "none-insufficient": 11,
+    "none": 17,
     "spatial": 12,
-    "none": 9,
+    "none-insufficient": 3,
     "existing-audit": 2,
     "mechanic": 4,
     "completion": 1
   },
   "expectedFinalDistribution": {
-    "NO_PROVEN_BLOCKER": 16,
+    "NO_PROVEN_BLOCKER": 17,
     "PROVEN_UNPLAYABLE": 17,
-    "INSUFFICIENT_EVIDENCE": 6
+    "INSUFFICIENT_EVIDENCE": 5
   },
   "legalPairs": [
     {
       "caseId": "gap-200",
       "legalPair": "gap-40",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "gap-40",
@@ -42,8 +42,8 @@
     {
       "caseId": "wall-100",
       "legalPair": "wall-40",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "wall-40",
@@ -54,8 +54,8 @@
     {
       "caseId": "pickup-120",
       "legalPair": "pickup-50",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "pickup-50",
@@ -84,8 +84,8 @@
     {
       "caseId": "chest-inside-luggage-range0",
       "legalPair": "chest-inside-luggage-range30",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "chest-inside-luggage-range30",
@@ -96,8 +96,8 @@
     {
       "caseId": "pickup-inside-luggage",
       "legalPair": "pickup-on-luggage",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "pickup-on-luggage",
@@ -108,38 +108,38 @@
     {
       "caseId": "pickup-body-override-inside",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "moving-solid-sweep",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "spawn-deep-terrain",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "spawn-no-foothold",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "spawn-in-solid",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "target-out-of-world",
       "legalPair": "target-at-edge",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "target-at-edge",
@@ -156,8 +156,8 @@
     {
       "caseId": "static-hazard-seals-path",
       "legalPair": "wide-patrol",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "wide-patrol",
@@ -180,14 +180,14 @@
     {
       "caseId": "pickup-in-static-hazard",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "moving-platform",
       "legalPair": "baseline-last-train",
-      "verdict": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient"
+      "verdict": "NO_PROVEN_BLOCKER",
+      "attribution": "none"
     },
     {
       "caseId": "gate-midair-jumpthrough",
@@ -227,244 +227,6 @@
     }
   ],
   "expectedMismatch": [
-    {
-      "caseId": "baseline-last-train",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
-    {
-      "caseId": "gap-40",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
-    {
-      "caseId": "wall-40",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
-    {
-      "caseId": "pickup-50",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
-    {
-      "caseId": "chest-inside-luggage-range30",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
-    {
-      "caseId": "pickup-on-luggage",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
-    {
-      "caseId": "target-at-edge",
-      "group": "spatial",
-      "expectedVerdict": "NO_PROVEN_BLOCKER",
-      "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
-      "existingAudit": [],
-      "layers": {
-        "spatial": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": []
-        },
-        "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
-          "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
-        },
-        "completion": {
-          "verdict": "NO_PROVEN_BLOCKER",
-          "coverage": "checked",
-          "evidence": [],
-          "gaps": []
-        }
-      },
-      "completionSuppressed": false
-    },
     {
       "caseId": "two-one-way-branches",
       "group": "completion",
@@ -568,14 +330,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -610,15 +368,12 @@
         },
         "mechanic": {
           "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "coverage": "checked",
           "evidence": [],
           "gaps": [
             {
               "missing": "target-out-of-world",
               "target": "signal"
-            },
-            {
-              "missing": "moving-hazard-phase"
             }
           ]
         },
@@ -643,8 +398,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -654,14 +409,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -710,14 +461,10 @@
           ]
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -737,8 +484,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -748,14 +495,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -795,14 +538,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -822,8 +561,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -833,14 +572,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -872,14 +607,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -899,8 +630,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -910,14 +641,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -949,14 +676,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -1100,14 +823,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -1127,8 +846,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -1138,14 +857,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1177,14 +892,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -1204,8 +915,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -1215,14 +926,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1254,14 +961,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "INSUFFICIENT_EVIDENCE",
@@ -1435,14 +1138,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1477,15 +1176,12 @@
         },
         "mechanic": {
           "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "coverage": "checked",
           "evidence": [],
           "gaps": [
             {
               "missing": "target-out-of-world",
               "target": "signal"
-            },
-            {
-              "missing": "moving-hazard-phase"
             }
           ]
         },
@@ -1508,8 +1204,8 @@
       "group": "spatial",
       "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -1519,14 +1215,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
@@ -1626,10 +1318,10 @@
     {
       "caseId": "wide-patrol",
       "group": "mechanic",
-      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedVerdict": "NO_PROVEN_BLOCKER",
       "expectedJudgmentId": null,
-      "final": "INSUFFICIENT_EVIDENCE",
-      "attribution": "none-insufficient",
+      "final": "NO_PROVEN_BLOCKER",
+      "attribution": "none",
       "existingAudit": [],
       "layers": {
         "spatial": {
@@ -1639,14 +1331,10 @@
           "gaps": []
         },
         "mechanic": {
-          "verdict": "INSUFFICIENT_EVIDENCE",
-          "coverage": "partial",
+          "verdict": "NO_PROVEN_BLOCKER",
+          "coverage": "checked",
           "evidence": [],
-          "gaps": [
-            {
-              "missing": "moving-hazard-phase"
-            }
-          ]
+          "gaps": []
         },
         "completion": {
           "verdict": "NO_PROVEN_BLOCKER",
