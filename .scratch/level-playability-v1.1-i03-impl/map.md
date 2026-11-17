@@ -7,7 +7,7 @@ Authority: [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md) @ 签署�
 Baseline: `main` @ `e31df2f`
 Branch: `wayfinder/level-playability-v1.1-i03-impl`
 PR target: `main`（地图 / 票 docs-only；单元代码另开 PR）
-Status: closed · 2026-11-16 · I03-IMPL-07 完成；7/7 票；实施治理计划收口
+Status: closed · 2026-11-17 · I-03 实施 phase-1 验收 INCOMPLETE（required PASS 16 / FAIL 0 / NOT_RUN 3）；U1–U5 已签署/合并/Ledger；PUBLIC_NB/PU BLOCKED
 
 > **规划型 effort（Q1=A）。** 本图只产执行治理 brief，不修改产品代码、不执行 U1–U5、不开放 `PUBLIC_NB` / `PUBLIC_PU`。
 > 执行由未来的独立会话按单元 brief 进行；每个单元仍是独立 branch / 独立 PR / 独立复核 / 独立授权。
