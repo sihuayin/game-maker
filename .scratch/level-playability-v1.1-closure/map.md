@@ -6,7 +6,7 @@ Effort: level-playability-v1.1-closure
 Authority: [`docs/v7.8/移动.md`](../../docs/v7.8/移动.md)（V1.1 PRD）· [`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)（集成契约）· [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（判定核心）· [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md)（公共接线/准入，SIGNED）· [`docs/v7.8/移动-I03-phase2.md`](../../docs/v7.8/移动-I03-phase2.md)（SIGNED 2026-11-17）· [`I03-PU-Air-Control-Closure`](../level-playability-v1.1-i03/issues/18-i03-pu-air-control.md)（PU 条件 5 合同）· [`Phase-2 地图`](../level-playability-v1.1-i03-phase2/map.md)（P1–P7 规划；P1 CLOSED）
 Baseline: `main` @ `16c0375f1df726c13c58a8e1febbb6b77dfac942`（P1 CLOSED 后）
 Predecessor: `level-playability-v1.1-i03-phase2`（planning complete；P1 CLOSED）
-Status: working · 2026-11-18 · 10 tickets（1 research + 9 decisions；FIX 为包内第 5 单元，不占地图票）；前沿 = `08-sequencing` ∥ `09-closure-dod`；`01`–`07` / `10` resolved；本图只规划，不执行任何单元
+Status: working · 2026-11-18 · 11 tickets（1 research + 9 decisions + 1 task；FIX 为包内第 5 单元，不占地图票）；前沿 = `11-fix-witness-binding`；`01`–`08` / `10` resolved；`09` 等 `11`；本图只规划，不执行任何单元
 
 ## Destination
 
@@ -60,10 +60,11 @@ Status: working · 2026-11-18 · 10 tickets（1 research + 9 decisions；FIX 为
 - [I-05 时序 NB/PU 案例缺口与 fixture 授权](issues/10-i05-temporal-fixtures.md): Q1=A 三案例硬要求；新增包内 **FIX** 单元（`移动-收口.md` §5.1）生产真实时序 NB / PU / IE；真实案例四条件（真实 pack + 至少一条正式流程 + 确定性 + 零付费）；可行性门先行，`INFEASIBLE` / 失败不降标准，I-05 与 closure `INCOMPLETE`；FIX 是 I-05 前置、不阻塞 PU-ADMIT；证据归属隔离；FIX 仍 `NOT_AUTHORIZED`。
 - [I-05 Pipeline 验收与最终收口报告 brief](issues/05-i05-brief.md): Pipeline 验收 = 诊断存在 / 可追溯 / 不误伤放行，不参与决策；零付费，优先 `build --reuse-*` + `publish-gate`；FIX 三案例为主、`last-train` 冒烟；两阶段 5A（I-04+FIX）/ 5B（+PU-ADMIT）；最终报告唯一路径 `reports/V1.1-closure.md`，签署后只可 addendum；证据两次零容差 + SHA256SUMS；不重跑已签署证据。Brief @ `sha256:ae638f47…`。
 - [PU-ADMIT 六条件准入验收 brief](issues/07-pu-admit-brief.md): 纯消费/纯判定；三类准入证据清单（合成正例 / false-PU 负例 / 真实 IE 负例）冻结且不自动覆盖 I-03 §9.4 完整夹具；`ADMITTED` 资格 = 六条件 PASS ∧ 夹具门 PASS ∧ fresh 复核 PASS；条件 2 只消费 P6、条件 5 只消费 PU-C5；P7 / AC-11 不变；`eligible=false` 可签署收尾；brief @ `sha256:f48e6202…`。
+- [五 Wave 依赖与并行边界](issues/08-sequencing.md): Wave 1 `P2 ∥ P4 ∥ PU-C5 ∥ FIX-A`；Wave 2 `P5 ∥ P6`；Wave 3 `P7 ∥ PU-ADMIT`；Wave 4 `I-04 ∥ FIX-B`；Wave 5 `I-05 5A→5B`。Wave = 拓扑层非屏障、无独立状态；授权硬边与排期前置分离；唯一暴露时序证据的正式路径是 `publish-gate`；FIX witness 绑内部 candidate（`11` 收敛措辞）；关键路径 P2→P3→P6→P7→I-04→I-05 ≈ 11–15 会话。
 
 ## Not yet specified
 
-- 最终收口声明的措辞、支持范围与残余风险清单（等 `04`–`09`）。
+- 最终收口声明的措辞、支持范围与残余风险清单（等 `09`）。
 
 ## Out of scope
 
