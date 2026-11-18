@@ -6,7 +6,7 @@ Effort: level-playability-v1.1-closure
 Authority: [`docs/v7.8/移动.md`](../../docs/v7.8/移动.md)（V1.1 PRD）· [`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)（集成契约）· [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（判定核心）· [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md)（公共接线/准入，SIGNED）· [`docs/v7.8/移动-I03-phase2.md`](../../docs/v7.8/移动-I03-phase2.md)（SIGNED 2026-11-17）· [`I03-PU-Air-Control-Closure`](../level-playability-v1.1-i03/issues/18-i03-pu-air-control.md)（PU 条件 5 合同）· [`Phase-2 地图`](../level-playability-v1.1-i03-phase2/map.md)（P1–P7 规划；P1 CLOSED）
 Baseline: `main` @ `16c0375f1df726c13c58a8e1febbb6b77dfac942`（P1 CLOSED 后）
 Predecessor: `level-playability-v1.1-i03-phase2`（planning complete；P1 CLOSED）
-Status: working · 2026-11-18 · 10 tickets（1 research + 9 decisions）；前沿 = `06-pu-c5-brief` / `10-i05-temporal-fixtures`；`01` / `02` / `03` / `04-i04-brief` resolved；本图只规划，不执行任何单元
+Status: working · 2026-11-18 · 10 tickets（1 research + 9 decisions）；前沿 = `10-i05-temporal-fixtures`；`01` / `02` / `03` / `04-i04-brief` / `06-pu-c5-brief` resolved；本图只规划，不执行任何单元
 
 ## Destination
 
@@ -53,9 +53,10 @@ Status: working · 2026-11-18 · 10 tickets（1 research + 9 decisions）；前�
 ## Decisions so far
 
 - [存量覆盖盘点：I-04 / I-05 / PU 条件 2/5 的证据差集](issues/01-coverage-inventory.md): I-04 PARTIAL（PASS 6 / PARTIAL 7）；I-05 PARTIAL（19 mover 全 IE；时序 NB/PU = 0；静态层 NB 11 / PU 3 / IE 2）；PU 1/3/4/6 仅合成 `PU_WORLD` PASS、2/5 BLOCKED；PU-C5 C1–C17 多为 PARTIAL/MISSING。
-- [收口授权包与 Ledger 拓扑](issues/02-authorization-package.md): 冻结 `docs/v7.8/移动-收口.md` 结构（镜像 Phase-2 §0–§14，4 单元 / 4 行 Ledger）；包签署只建立逐单元申请依据；硬依赖边归本票、五 Wave 归 `08`；产品代码默认零改动，audit / 产品相邻 / docs-only 三类回滚；继承 12+4 条 STOP 并追加 6 条。草案 UNSIGNED；`03` 后 @ `sha256:396618bd…`。
+- [收口授权包与 Ledger 拓扑](issues/02-authorization-package.md): 冻结 `docs/v7.8/移动-收口.md` 结构（镜像 Phase-2 §0–§14，4 单元 / 4 行 Ledger）；包签署只建立逐单元申请依据；硬依赖边归本票、五 Wave 归 `08`；产品代码默认零改动，audit / 产品相邻 / docs-only 三类回滚；继承 12+4 条 STOP 并追加 6 条。草案 UNSIGNED；`06` 后 @ `sha256:4402561a…`。
 - [Out of scope 与不变量](issues/03-out-of-scope.md): 六类固定归属 + 四列排除表；PRD 非目标只列关键子集并声明 §2.2 为唯一权威；P2–P7 只消费已签署产物；fixture 新建另票授权且 I-05 不得自建；行为四档（读取 / 只读执行 / 证据写入 / 修改）；增量授权须列「不触碰项」并做双门检查；§1/§10/§13 单点存放。§13 已核对 I-02 / I-03 精确措辞，gate 状态与 `publicCapability` 字段分开。
 - [I-04 负向与回归验收 brief](issues/04-i04-brief.md): I-04 = 受限测试补齐 + 只读验收扫描 + 独立复核；只增两个测试文件与扫描脚本，不改产品 / 既有测试 / fixtures；G-01 正向核对 deferred（NOT_RUN，不计 required）；G-03 写支持范围 + 具名 unknown-phase 负例；G-05 补 moving platform / danger strike `model-out` 测试；19 关双层扫描（L1 全量 + L2 qa-report 子集）；LP-06/07 在干净 worktree 原样复跑；判定 `PASS/FAIL/INCOMPLETE`、退出码 0/1/2。Brief @ `sha256:94c7677d…`。
+- [PU-C5 空中控制证据生产 brief](issues/06-pu-c5-brief.md): 纯证据生产（纯 audit）；required C1–C15、C16/C17 为规则项；A 垂直包容 + B 保守弧线扫掠在 scratch 实现，只读复用 `maxJumpHeight`；探针复用 `probe-harness.mjs`、同环境两次零容差；scratch-only audit 夹具不进 `fixtures/**`；复核报告保留合同路径；证据 PASS 不改 gate / 产品常量；回滚 = 丢弃 audit 分支。Brief @ `sha256:696dbfaf…`。
 
 ## Not yet specified
 
