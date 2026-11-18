@@ -6,7 +6,7 @@ Effort: level-playability-v1.1-closure
 Authority: [`docs/v7.8/移动.md`](../../docs/v7.8/移动.md)（V1.1 PRD）· [`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)（集成契约）· [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（判定核心）· [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md)（公共接线/准入，SIGNED）· [`docs/v7.8/移动-I03-phase2.md`](../../docs/v7.8/移动-I03-phase2.md)（SIGNED 2026-11-17）· [`I03-PU-Air-Control-Closure`](../level-playability-v1.1-i03/issues/18-i03-pu-air-control.md)（PU 条件 5 合同）· [`Phase-2 地图`](../level-playability-v1.1-i03-phase2/map.md)（P1–P7 规划；P1 CLOSED）
 Baseline: `main` @ `16c0375f1df726c13c58a8e1febbb6b77dfac942`（P1 CLOSED 后）
 Predecessor: `level-playability-v1.1-i03-phase2`（planning complete；P1 CLOSED）
-Status: charting complete · 2026-11-18 · 10 tickets（1 research + 9 decisions）；前沿 = `02-authorization-package` / `03-out-of-scope` / `10-i05-temporal-fixtures`；`01-coverage-inventory` resolved；本图只规划，不执行任何单元
+Status: working · 2026-11-18 · 10 tickets（1 research + 9 decisions）；前沿 = `04-i04-brief` / `06-pu-c5-brief` / `10-i05-temporal-fixtures`；`01-coverage-inventory` / `02-authorization-package` / `03-out-of-scope` resolved；本图只规划，不执行任何单元
 
 ## Destination
 
@@ -53,10 +53,11 @@ Status: charting complete · 2026-11-18 · 10 tickets（1 research + 9 decisions
 ## Decisions so far
 
 - [存量覆盖盘点：I-04 / I-05 / PU 条件 2/5 的证据差集](issues/01-coverage-inventory.md): I-04 PARTIAL（PASS 6 / PARTIAL 7）；I-05 PARTIAL（19 mover 全 IE；时序 NB/PU = 0；静态层 NB 11 / PU 3 / IE 2）；PU 1/3/4/6 仅合成 `PU_WORLD` PASS、2/5 BLOCKED；PU-C5 C1–C17 多为 PARTIAL/MISSING。
+- [收口授权包与 Ledger 拓扑](issues/02-authorization-package.md): 冻结 `docs/v7.8/移动-收口.md` 结构（镜像 Phase-2 §0–§14，4 单元 / 4 行 Ledger）；包签署只建立逐单元申请依据；硬依赖边归本票、五 Wave 归 `08`；产品代码默认零改动，audit / 产品相邻 / docs-only 三类回滚；继承 12+4 条 STOP 并追加 6 条。草案 UNSIGNED；`03` 后 @ `sha256:396618bd…`。
+- [Out of scope 与不变量](issues/03-out-of-scope.md): 六类固定归属 + 四列排除表；PRD 非目标只列关键子集并声明 §2.2 为唯一权威；P2–P7 只消费已签署产物；fixture 新建另票授权且 I-05 不得自建；行为四档（读取 / 只读执行 / 证据写入 / 修改）；增量授权须列「不触碰项」并做双门检查；§1/§10/§13 单点存放。§13 已核对 I-02 / I-03 精确措辞，gate 状态与 `publicCapability` 字段分开。
 
 ## Not yet specified
 
-- 收口授权包的基线/不可变规则与各单元证据路径约定（等 `02-authorization-package`）。
 - I-04 是否允许新增测试文件（等 `04-i04-brief`）。
 - PU-ADMIT 与 P7 / AC-11 的关系细节（等 `07-pu-admit-brief`）。
 - 最终收口声明的措辞、支持范围与残余风险清单（等 `04`–`09`）。
