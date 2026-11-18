@@ -1,8 +1,8 @@
 # I-05 Pipeline 验收与最终收口报告 brief
 
 Type: grilling
-Status: open
-Owner: —
+Status: resolved
+Owner: claude (wayfinder session 2026-11-18)
 Blocked by: 01, 02, 04, 10
 Map: ../map.md
 Class: V1.1-CLOSURE / UNIT-BRIEF
@@ -28,3 +28,25 @@ Class: V1.1-CLOSURE / UNIT-BRIEF
 - I-05 启动前置：I-04 合并 / 签署 / Ledger + FIX 合并 / 签署 / Ledger。
 - FIX `INFEASIBLE` / 失败 ⇒ I-05 与 closure 均为 `INCOMPLETE`；DoD「Pipeline 真实流程验收通过」保持未勾选；最终报告显式写「时序能力未在真实关卡验证」。
 - 禁止用静态层 NB/PU 或合成 `PU_WORLD` 冒充真实案例；同一证据只服务一个结论（FIX 的 PU witness 归 I-05）。
+
+## Answer
+
+**Q1–Q8 = 用户裁定（2026-11-18，全部采纳）。** I-05 职责收窄为：**验证真实 Pipeline 中时序诊断确实产生、可追溯，并且不改变既有放行行为**；不借收口验收扩展产品决策语义。
+
+交付：
+
+- [`reports/I05-brief.md`](../reports/I05-brief.md) @ `sha256:ae638f47f4e9d9e4f6ab00c3a97b846ee1575326ea6f3121508af2a986d201c4`（145 行，冻结；I-05 仍 `NOT_AUTHORIZED`）。
+- `docs/v7.8/移动-收口.md` §5.2 已由占位改为 I-05 授权面；§2 单元表补 5B 前置；包 hash `232f4900…`。
+
+| # | 冻结 |
+| --- | --- |
+| Q1 | Pipeline 验收 = 诊断存在 + 可追溯 + 不误伤放行；**不**要求 temporal 参与决策 |
+| Q2 | 零付费硬约束；每案例至少一条完整正式路径（优先 `build --reuse-*` + `publish-gate`）；`create` 仅在无付费上游时用；需付费的路径记 `NOT_RUN` |
+| Q3 | FIX 三案例为主证据；`last-train` 为额外 IE 冒烟（支持证据，不重复计入） |
+| Q4 | 最终报告唯一路径 `reports/V1.1-closure.md`；签署 `V1.1-closure-signature.md`；签署后不可改写，只能 addendum；包内旧 `final-closure.md` 表述已收敛 |
+| Q5 | 单元内两阶段：5A Pipeline 验收（I-04 + FIX 后）；5B 最终报告（PU-ADMIT 签署后）；一行 Ledger、两个门 |
+| Q6 | 证据 `evidence/i05/<case>/`：commands.log、run1/run2、diff.json、qa-report、inputs、SHA256SUMS；两次重复零容差 |
+| Q7 | 逐项 `PASS / FAIL / NOT_RUN`；单元 `PASS / INCOMPLETE / FAIL`；退出码 0 / 1 / 2；closure 由单元结果推导；PASS 不开放 gate |
+| Q8 | 白名单只增 `scripts/i05-*.mjs`、`evidence/i05/**`、`V1.1-closure*.md`、`I05-review.md`；不重跑 I-04 / FIX / PU-ADMIT，按签署 hash 引用；`acceptance-run2` 不引用 |
+
+**未做**：未跑 Pipeline、未写最终报告、未改产品代码。**下游**：前沿仅剩 `07-pu-admit-brief`；`08-sequencing` / `09-closure-dod` 仍等 `07`。
