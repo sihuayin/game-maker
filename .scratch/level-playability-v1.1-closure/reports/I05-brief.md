@@ -66,6 +66,13 @@ I-05 = **验收 / 证据阶段**，不新增算法、不扩展产品决策语义
 3. 需要付费才能跑的路径记 `NOT_RUN` 并写明原因，不伪造、不降级为单元测试冒充。
 4. `qa-report` 逐案例记录；temporal 字段缺失是**已知事实**，不得写成「已交付时序诊断」。
 
+### 3.3 witness 绑定口径（`11-fix-witness-binding`，2026-11-18）
+
+- 时序诊断的判定字段固定为 `publish-gate` 结果内 `temporal.evidence[].witness.result`（内部 `nb-candidate` / `pu-candidate` / `insufficient-evidence`），**不是**公共 verdict。
+- 公共 verdict 仍为 `INSUFFICIENT_EVIDENCE`、`publicCapability="BLOCKED"`、`publicResult=null`：生产调用硬编码 gate / admission（`packages/assets/src/ops.ts:1058-1059`、`:1134-1135`；`packages/contracts/src/playability/public-verdict.ts:75-82`）。报告不得把公共 verdict 写成 `NO_PROVEN_BLOCKER` / `PROVEN_UNPLAYABLE`。
+- `create` / `build` 的 legacy 调用丢弃时序结果（`packages/assets/src/ops.ts:1099-1109`），`qa-report` 无 temporal 字段（`packages/contracts/src/qa.ts:283-300`）⇒ 不能单独满足 §3.1「诊断存在」；唯一正式证据路径是 `build --reuse-*` → `publish-gate`。
+- 本口径只收窄措辞，不改 §6 判定规则与八条 Q 裁定。
+
 ## 4. 证据格式与确定性
 
 落点：`.scratch/level-playability-v1.1-closure/evidence/i05/<case>/`，每个案例含：

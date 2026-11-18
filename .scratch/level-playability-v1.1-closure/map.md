@@ -6,7 +6,7 @@ Effort: level-playability-v1.1-closure
 Authority: [`docs/v7.8/移动.md`](../../docs/v7.8/移动.md)（V1.1 PRD）· [`docs/v7.8/移动-I00.md`](../../docs/v7.8/移动-I00.md)（集成契约）· [`docs/v7.8/移动-I02.md`](../../docs/v7.8/移动-I02.md)（判定核心）· [`docs/v7.8/移动-I03.md`](../../docs/v7.8/移动-I03.md)（公共接线/准入，SIGNED）· [`docs/v7.8/移动-I03-phase2.md`](../../docs/v7.8/移动-I03-phase2.md)（SIGNED 2026-11-17）· [`I03-PU-Air-Control-Closure`](../level-playability-v1.1-i03/issues/18-i03-pu-air-control.md)（PU 条件 5 合同）· [`Phase-2 地图`](../level-playability-v1.1-i03-phase2/map.md)（P1–P7 规划；P1 CLOSED）
 Baseline: `main` @ `16c0375f1df726c13c58a8e1febbb6b77dfac942`（P1 CLOSED 后）
 Predecessor: `level-playability-v1.1-i03-phase2`（planning complete；P1 CLOSED）
-Status: working · 2026-11-18 · 11 tickets（1 research + 9 decisions + 1 task；FIX 为包内第 5 单元，不占地图票）；前沿 = `11-fix-witness-binding`；`01`–`08` / `10` resolved；`09` 等 `11`；本图只规划，不执行任何单元
+Status: planning complete · 2026-11-18 · 11 tickets 全部 resolved（1 research + 9 decisions + 1 task）；无 open ticket；`移动-收口.md` §0–§14 已全部填充，仍 UNSIGNED；5 个收口单元仍 `NOT_AUTHORIZED`；本图只规划，不执行任何单元
 
 ## Destination
 
@@ -53,7 +53,7 @@ Status: working · 2026-11-18 · 11 tickets（1 research + 9 decisions + 1 task�
 ## Decisions so far
 
 - [存量覆盖盘点：I-04 / I-05 / PU 条件 2/5 的证据差集](issues/01-coverage-inventory.md): I-04 PARTIAL（PASS 6 / PARTIAL 7）；I-05 PARTIAL（19 mover 全 IE；时序 NB/PU = 0；静态层 NB 11 / PU 3 / IE 2）；PU 1/3/4/6 仅合成 `PU_WORLD` PASS、2/5 BLOCKED；PU-C5 C1–C17 多为 PARTIAL/MISSING。
-- [收口授权包与 Ledger 拓扑](issues/02-authorization-package.md): 冻结 `docs/v7.8/移动-收口.md` 结构（镜像 Phase-2 §0–§14，4 单元 / 4 行 Ledger）；包签署只建立逐单元申请依据；硬依赖边归本票、五 Wave 归 `08`；产品代码默认零改动，audit / 产品相邻 / docs-only 三类回滚；继承 12+4 条 STOP 并追加 6 条。草案 UNSIGNED；`05` 后 @ `sha256:232f4900…`、`07` 后 @ `sha256:45e35c61…`（5 单元 / 5 行 Ledger）。
+- [收口授权包与 Ledger 拓扑](issues/02-authorization-package.md): 冻结 `docs/v7.8/移动-收口.md` 结构（镜像 Phase-2 §0–§14，4 单元 / 4 行 Ledger）；包签署只建立逐单元申请依据；硬依赖边归本票、五 Wave 归 `08`；产品代码默认零改动，audit / 产品相邻 / docs-only 三类回滚；继承 12+4 条 STOP 并追加 6 条。草案 UNSIGNED；`05` 后 @ `sha256:232f4900…`、`07` 后 @ `sha256:45e35c61…`、`11` 后 @ `sha256:e1dc14d0…`、`09` 后 @ `sha256:baa2fce5…`（5 单元 / 5 行 Ledger）。
 - [Out of scope 与不变量](issues/03-out-of-scope.md): 六类固定归属 + 四列排除表；PRD 非目标只列关键子集并声明 §2.2 为唯一权威；P2–P7 只消费已签署产物；fixture 新建另票授权且 I-05 不得自建；行为四档（读取 / 只读执行 / 证据写入 / 修改）；增量授权须列「不触碰项」并做双门检查；§1/§10/§13 单点存放。§13 已核对 I-02 / I-03 精确措辞，gate 状态与 `publicCapability` 字段分开。
 - [I-04 负向与回归验收 brief](issues/04-i04-brief.md): I-04 = 受限测试补齐 + 只读验收扫描 + 独立复核；只增两个测试文件与扫描脚本，不改产品 / 既有测试 / fixtures；G-01 正向核对 deferred（NOT_RUN，不计 required）；G-03 写支持范围 + 具名 unknown-phase 负例；G-05 补 moving platform / danger strike `model-out` 测试；19 关双层扫描（L1 全量 + L2 qa-report 子集）；LP-06/07 在干净 worktree 原样复跑；判定 `PASS/FAIL/INCOMPLETE`、退出码 0/1/2。Brief @ `sha256:94c7677d…`。
 - [PU-C5 空中控制证据生产 brief](issues/06-pu-c5-brief.md): 纯证据生产（纯 audit）；required C1–C15、C16/C17 为规则项；A 垂直包容 + B 保守弧线扫掠在 scratch 实现，只读复用 `maxJumpHeight`；探针复用 `probe-harness.mjs`、同环境两次零容差；scratch-only audit 夹具不进 `fixtures/**`；复核报告保留合同路径；证据 PASS 不改 gate / 产品常量；回滚 = 丢弃 audit 分支。Brief @ `sha256:696dbfaf…`。
@@ -62,9 +62,13 @@ Status: working · 2026-11-18 · 11 tickets（1 research + 9 decisions + 1 task�
 - [PU-ADMIT 六条件准入验收 brief](issues/07-pu-admit-brief.md): 纯消费/纯判定；三类准入证据清单（合成正例 / false-PU 负例 / 真实 IE 负例）冻结且不自动覆盖 I-03 §9.4 完整夹具；`ADMITTED` 资格 = 六条件 PASS ∧ 夹具门 PASS ∧ fresh 复核 PASS；条件 2 只消费 P6、条件 5 只消费 PU-C5；P7 / AC-11 不变；`eligible=false` 可签署收尾；brief @ `sha256:f48e6202…`。
 - [五 Wave 依赖与并行边界](issues/08-sequencing.md): Wave 1 `P2 ∥ P4 ∥ PU-C5 ∥ FIX-A`；Wave 2 `P5 ∥ P6`；Wave 3 `P7 ∥ PU-ADMIT`；Wave 4 `I-04 ∥ FIX-B`；Wave 5 `I-05 5A→5B`。Wave = 拓扑层非屏障、无独立状态；授权硬边与排期前置分离；唯一暴露时序证据的正式路径是 `publish-gate`；FIX witness 绑内部 candidate（`11` 收敛措辞）；关键路径 P2→P3→P6→P7→I-04→I-05 ≈ 11–15 会话。
 
+- [FIX witness 绑定口径与收口措辞收敛](issues/11-fix-witness-binding.md): §5.1 的 FIX 判据改绑 `publish-gate` 内部 `witness.result`（`nb-candidate` / `pu-candidate` / `insufficient-evidence`），公共 verdict 恒 IE、gate 恒 `BLOCKED`；正式证据路径固定 `build --reuse-*` → `publish-gate`；§8 报告 / 签署路径改回 `V1.1-closure*.md`；包 hash `sha256:e1dc14d0…`（UNSIGNED）。
+
+- [V1.1 Closure DoD 追溯矩阵](issues/09-closure-dod.md): D1–D10 全 required；项态 `PASS / FAIL / NOT_RUN`；closure 优先级 `FAIL` > `INCOMPLETE` > `PASS`，FIX 为唯一例外（`FAIL` / `INFEASIBLE` 只降 `INCOMPLETE`）；D3 只认 I-02 + I-04；D8 绑 `publish-gate` 内部 `witness.result`；能力声明逐字 + 五限定；报告八节、I-05 5B 签署；R1–R9（R9 = Phase-2 / P7 依赖）；包 §11 已填，hash `sha256:baa2fce5…`。
+
 ## Not yet specified
 
-- 最终收口声明的措辞、支持范围与残余风险清单（等 `09`）。
+无。destination 已达成；后续执行归各单元独立授权会话。
 
 ## Out of scope
 
