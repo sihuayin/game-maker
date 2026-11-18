@@ -21,3 +21,10 @@ Class: V1.1-CLOSURE / UNIT-BRIEF
 6. **与 I-04 / PU-ADMIT 的关系**：I-05 消费 I-04 的回归结果与 PU-ADMIT 的六条件资格，不重复跑。
 
 产出：I-05 unit brief；不实施、不跑 Pipeline、不写最终报告。
+
+## Context（`10-i05-temporal-fixtures` 裁定，2026-11-18）
+
+- I-05 要求**真实时序 NB / PU / IE 各一例**；案例由收口包 **FIX 单元**（`docs/v7.8/移动-收口.md` §5.1）生产，不在 I-05 内自建。
+- I-05 启动前置：I-04 合并 / 签署 / Ledger + FIX 合并 / 签署 / Ledger。
+- FIX `INFEASIBLE` / 失败 ⇒ I-05 与 closure 均为 `INCOMPLETE`；DoD「Pipeline 真实流程验收通过」保持未勾选；最终报告显式写「时序能力未在真实关卡验证」。
+- 禁止用静态层 NB/PU 或合成 `PU_WORLD` 冒充真实案例；同一证据只服务一个结论（FIX 的 PU witness 归 I-05）。

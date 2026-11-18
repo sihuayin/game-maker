@@ -21,3 +21,10 @@ Class: V1.1-CLOSURE / UNIT-BRIEF
 6. **证据 / 复核**：报告路径、fresh 独立复核、用户签署、STOP 条件。
 
 产出：PU-ADMIT unit brief；不实施、不判定任何真实关卡。
+
+## Context（`10-i05-temporal-fixtures` 裁定，2026-11-18）
+
+- PU-ADMIT **不要求**真实 PU 案例；FIX 的真实 PU witness 只能作支持证据，不得计入 `ADMITTED` 资格。
+- 条件 5 只消费 PU-C5 的签署证据；六条件资格只在本单元判定；两者与 FIX 证据互不重复计入。
+- PU-ADMIT 不被 FIX 阻塞：前置仍为收口包签署 + PU-C5 合并 / 签署 / Ledger + P6 签署证据（若采用）。
+- `PUBLIC_PU` 仍 `BLOCKED`；资格 ≠ `ADMITTED` ≠ `OPEN`。
