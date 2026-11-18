@@ -3,7 +3,7 @@
 Type: grilling
 Status: open
 Owner: —
-Blocked by: 01, 04, 05, 06, 07
+Blocked by: 01, 04, 05, 06, 07, 11
 Map: ../map.md
 Class: V1.1-CLOSURE / DECISION
 
