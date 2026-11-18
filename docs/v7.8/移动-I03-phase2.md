@@ -226,7 +226,7 @@ Phase-2 只维护本表；不修改 I-03 §12.2。空白字段 = 尚未授权或
 
 | 单元 | 文件（操作 / 目的） | 增量授权状态 | 实施 SHA | 复核证据路径 + hash | 批准人 | 日期 | 回滚目标 SHA | 回滚演练证据 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| P1 |  | 未授权 |  |  |  |  |  |  |  |
+| P1 | `.scratch/level-playability-v1.1-i03-phase2/geometry-probe/**` 新增：probe 契约冻结 + 夹具物化；产品文件零改动 | 已授权 / 已实施 / 已签署（P1 CLOSED） | `8a0bb67`（fixtures/scripts）+ `0b21984`（evidence） | `.scratch/level-playability-v1.1-i03-phase2/reports/P1-review.md` @ `sha256:2ae8d427f741189b6da7d6e5e2f301ee19c2aa8d635bf691775daeb856278931`（PASS 12/12） | amber | 2026-11-18 | `324ca13166662b309069c43599047a5c1d9b692f` | N/A：纯 audit 产物；回滚即丢弃 `wayfinder/i03-phase2-probe-evidence` 分支，产品无需回滚 | P1 闭合不授权 P2；`PUBLIC_NB` / `PUBLIC_PU` 仍 BLOCKED；脚本路径适配已由复核列为知情项 |
 | P2 |  | 未授权 |  |  |  |  |  |  |  |
 | P4 |  | 未授权 |  |  |  |  |  |  |  |
 | P5 |  | 未授权 |  |  |  |  |  |  |  |
