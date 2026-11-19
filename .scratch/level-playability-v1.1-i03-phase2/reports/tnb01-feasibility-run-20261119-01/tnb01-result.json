@@ -1,0 +1,228 @@
+{
+  "configHash": "sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+  "manifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+  "scope": {
+    "applicable": true,
+    "assetIds": [
+      "hazard-sweeping-carriage",
+      "pickup-suitcase",
+      "player-traveler",
+      "signal-endlight"
+    ]
+  },
+  "atlases": [
+    {
+      "path": "delivery/atlas.animations.json",
+      "bytes": 5910,
+      "hash": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+    },
+    {
+      "path": "delivery/atlas.sprites.json",
+      "bytes": 1402,
+      "hash": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+    }
+  ],
+  "verify": {
+    "ok": true,
+    "files": [
+      {
+        "path": "delivery/atlas.animations.json",
+        "bytes": 5910,
+        "checksum": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+      },
+      {
+        "path": "delivery/atlas.sprites.json",
+        "bytes": 1402,
+        "checksum": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+      }
+    ],
+    "assets": [
+      "hazard-sweeping-carriage",
+      "pickup-suitcase",
+      "player-traveler",
+      "signal-endlight"
+    ],
+    "frameCount": 15
+  },
+  "stage": "model",
+  "lagMs": [
+    16.67,
+    200
+  ],
+  "result": {
+    "first": {
+      "internalResult": "insufficient-evidence",
+      "modelConditional": true,
+      "publicCapability": "BLOCKED",
+      "publicResult": null,
+      "certificate": {
+        "kind": "none"
+      },
+      "stats": {
+        "grid": {
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "xStep": 1,
+          "xPositions": 0,
+          "stateCapacity": 0,
+          "phaseGridCapped": false,
+          "phaseCapReason": null,
+          "N_max": 0
+        },
+        "work": {
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "cutPointsTotal": 0,
+          "segmentsTotal": 0,
+          "hopSamplesChecked": 0,
+          "witnessTransitions": 0,
+          "witnessBytes": 0,
+          "maxBranching": 0,
+          "workUnitsSinceLastCheckpoint": 0
+        },
+        "timing": {
+          "wallClockMs": 5,
+          "timeBudgetCheckpointWork": 1024
+        },
+        "budget": {
+          "budgetProfile": {
+            "maxStates": 500000,
+            "maxEdges": 1000000,
+            "timeBudgetMs": 2000,
+            "maxCutsPerCheck": 1000000,
+            "maxCutsPerBranch": 5000000,
+            "maxWitnessTransitions": 1000000,
+            "maxWitnessBytes": 67108864,
+            "maxHopSamples": 240,
+            "timeBudgetCheckpointWork": 1024
+          },
+          "budgetStatus": "complete",
+          "budgetKind": null
+        },
+        "determinismSignature": "e504455e"
+      },
+      "diagnostics": {
+        "degradationReason": "goal-not-representable",
+        "secondaryReasons": [],
+        "detail": "witness-space: goal-outside-corridor"
+      }
+    },
+    "second": {
+      "internalResult": "insufficient-evidence",
+      "modelConditional": true,
+      "publicCapability": "BLOCKED",
+      "publicResult": null,
+      "certificate": {
+        "kind": "none"
+      },
+      "stats": {
+        "grid": {
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "xStep": 1,
+          "xPositions": 0,
+          "stateCapacity": 0,
+          "phaseGridCapped": false,
+          "phaseCapReason": null,
+          "N_max": 0
+        },
+        "work": {
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "cutPointsTotal": 0,
+          "segmentsTotal": 0,
+          "hopSamplesChecked": 0,
+          "witnessTransitions": 0,
+          "witnessBytes": 0,
+          "maxBranching": 0,
+          "workUnitsSinceLastCheckpoint": 0
+        },
+        "timing": {
+          "wallClockMs": 1,
+          "timeBudgetCheckpointWork": 1024
+        },
+        "budget": {
+          "budgetProfile": {
+            "maxStates": 500000,
+            "maxEdges": 1000000,
+            "timeBudgetMs": 2000,
+            "maxCutsPerCheck": 1000000,
+            "maxCutsPerBranch": 5000000,
+            "maxWitnessTransitions": 1000000,
+            "maxWitnessBytes": 67108864,
+            "maxHopSamples": 240,
+            "timeBudgetCheckpointWork": 1024
+          },
+          "budgetStatus": "complete",
+          "budgetKind": null
+        },
+        "determinismSignature": "e504455e"
+      },
+      "diagnostics": {
+        "degradationReason": "goal-not-representable",
+        "secondaryReasons": [],
+        "detail": "witness-space: goal-outside-corridor"
+      }
+    },
+    "combined": {
+      "internalResult": "insufficient-evidence",
+      "modelConditional": true,
+      "publicCapability": "BLOCKED",
+      "publicResult": null,
+      "certificate": {
+        "kind": "none"
+      },
+      "stats": {
+        "grid": {
+          "phaseSteps": 0,
+          "dtMs": 0,
+          "xStep": 1,
+          "xPositions": 0,
+          "stateCapacity": 0,
+          "phaseGridCapped": false,
+          "phaseCapReason": null,
+          "N_max": 0
+        },
+        "work": {
+          "statesEnqueued": 0,
+          "statesVisited": 0,
+          "edgesChecked": 0,
+          "cutPointsTotal": 0,
+          "segmentsTotal": 0,
+          "hopSamplesChecked": 0,
+          "witnessTransitions": 0,
+          "witnessBytes": 0,
+          "maxBranching": 0,
+          "workUnitsSinceLastCheckpoint": 0
+        },
+        "timing": {
+          "wallClockMs": 5,
+          "timeBudgetCheckpointWork": 1024
+        },
+        "budget": {
+          "budgetProfile": {
+            "maxStates": 500000,
+            "maxEdges": 1000000,
+            "timeBudgetMs": 2000,
+            "maxCutsPerCheck": 1000000,
+            "maxCutsPerBranch": 5000000,
+            "maxWitnessTransitions": 1000000,
+            "maxWitnessBytes": 67108864,
+            "maxHopSamples": 240,
+            "timeBudgetCheckpointWork": 1024
+          },
+          "budgetStatus": "complete",
+          "budgetKind": null
+        },
+        "determinismSignature": "e504455e"
+      },
+      "diagnostics": {
+        "degradationReason": "goal-not-representable",
+        "secondaryReasons": [],
+        "detail": "witness-space: goal-outside-corridor"
+      }
+    }
+  }
+}
