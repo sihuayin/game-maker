@@ -1,0 +1,905 @@
+{
+  "version": "candidate-discovery/v1",
+  "rows": [
+    {
+      "config": ".scratch/asset-integration-v1/runs/2026-10-20e-site/game-config-mid.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20e-site/out/ruin-scavenger-extraction-assets/pack/v6/manifest.json",
+      "historical": "spawn-not-on-lattice",
+      "configHash": "sha256:540c8f647378bd5b539fe1e7ece01dd7c03e6cd1d4fd41590862d3255c85a283",
+      "manifestHash": "sha256:387347aa8a9c8a5c832d08f1c95617952f0a07308db128c4e5c86386676b1ee4",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "clean-water",
+          "extraction-point",
+          "hazard-terrain",
+          "scavenger-actor",
+          "scrap-resource",
+          "wasteland-enemy"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-patrol",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+          "expected": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d",
+          "expected": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "spawn-not-on-lattice",
+        "gap": "spawn-box-overlaps-solid"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/entity-identity-v1/runs/2026-10-25-e2e-r2/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:bb144bbf3718a61b4a51791f37f70b569a4b0715d398e17b5f540c0626c92b63",
+      "manifestHash": "sha256:5ccc72d6ff35b2aeda0ada3e2b513365d62fb51f2343010a931ba50b161e7282",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "chest",
+          "enemy-wasteland",
+          "hazard-spikes",
+          "resource-item",
+          "scavenger-hero"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3600
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:d096a9557046f2ea2ce89b1a1ceb6fa6381b8f864aed9cc7a0081e12b4c2d019",
+          "expected": "sha256:d096a9557046f2ea2ce89b1a1ceb6fa6381b8f864aed9cc7a0081e12b4c2d019"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:56afddb630694cec16278afad8226bfedf93c81e7d0af6c42a5aedaeeeea2122",
+          "expected": "sha256:56afddb630694cec16278afad8226bfedf93c81e7d0af6c42a5aedaeeeea2122"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/site/v1/game-config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/avoid-danger/pack/v2/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:be9147a354c7592b4b2552d1dd90b836e133c52e79a01bf54e13f1372aacc9cd",
+      "manifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": false,
+        "assetIds": [
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/site/v1/game-config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/collect-pickup/pack/v2/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:758d50aadae37e1ea9ab0b5efb799c779fae2acc1759841eb83825bad3926cd1",
+      "manifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": false,
+        "assetIds": [
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/site/v1/game-config.json",
+      "manifest": ".scratch/evidence-integrity-v1/runs/2026-10-29T05-04-57Z-final-acceptance/acceptance/probe/assembled/open-chest/pack/v2/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:001cdbac85e2f95dc46314104a9d8a9f373f76761ec23168ae5e6b189ba5f5e2",
+      "manifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": false,
+        "assetIds": [
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-final/artifacts/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:455d9c7fc982e4d4c3c5b32ff4a94f1dd99f5e85b8adcb0f59af521f3b757dcd",
+      "manifestHash": "sha256:a162942de2a65a549be6958f0739f900df0625e0fa957872425bd9a53aa7feb3",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "scavenger-hero",
+          "wasteland-patroller",
+          "wasteland-platform-tile",
+          "wasteland-scraps"
+        ]
+      },
+      "movers": [
+        {
+          "id": "patroller-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        },
+        {
+          "id": "patroller-2",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3500
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd",
+          "expected": "sha256:7871b8ffc7b4b488c8ef2ef87225c67158af242a31742e8c87ede768b5301fdd"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746",
+          "expected": "sha256:fcdcd1d8713f04e9309426fbb515ff8ec41fe517a12db2624efebe54d513f746"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/fpvs-v1-final/runs/2026-10-28-regression-closure/self-test-run/gate/config-gate-missing.json",
+      "manifest": ".scratch/asset-integration-v1/runs/2026-10-20a-olive-palette/ruin-scavenger-extraction-assets/pack/v2/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:29b4ac87a141487a1fca717229a4c98cd60925c6ce40be2ec83128686b01d323",
+      "manifestHash": "sha256:410d20180117e2b0a643e63e63b3c30503ad5efbba42e740f13110e3e7a1837d",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "clean-water",
+          "extraction-point",
+          "hazard-terrain",
+          "scavenger-actor",
+          "scrap-resource",
+          "wasteland-enemy"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-patrol",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+          "expected": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d",
+          "expected": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "gate-missing"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r2/wasteland-scavenger-assets/pack/v1/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:20f64bc82570659f97342c2b521db51451589936ee1b8b83239263f6282a4c1e",
+      "manifestHash": "sha256:a7c11fdeaaebd629255bbc0bbd3f14891ed84eb161e5025a46a69dafc4e859f7",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "entity-scrap-resource",
+          "entity-treasure-chest",
+          "entity-wasteland-enemy",
+          "player-scavenger",
+          "tile-platform"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        },
+        {
+          "id": "enemy-2",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3500
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:7e8e219c54058c28dcf5a0c8d6040419378a2ccda47df8b038e4c7a431d831fa",
+          "expected": "sha256:7e8e219c54058c28dcf5a0c8d6040419378a2ccda47df8b038e4c7a431d831fa"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:3af944c8492ed2ff883ea01ce2fe530ed6176a88306a01655a03a100b3190330",
+          "expected": "sha256:3af944c8492ed2ff883ea01ce2fe530ed6176a88306a01655a03a100b3190330"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/run/v1/game-config.json",
+      "manifest": ".scratch/fpvs-v1-p0/runs/2026-10-26-e2e-r3/wasteland-scavenger-recipe/pack/v1/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:9fda5917353bbd16bdc19353b4f82a71c2b604523de56476ded184958773144d",
+      "manifestHash": "sha256:66caebde149254623fa587dc1d58e1942a2aebdfb01b727bcbf5409f3b895d4d",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "entity-chest",
+          "entity-enemy",
+          "entity-resource",
+          "scavenger-hero",
+          "station-platform"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        },
+        {
+          "id": "enemy-2",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 2500
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:8593daf5ec0b9ef6c098e086213df1d6c3b9f5e715e494a5149b44417d33ab4b",
+          "expected": "sha256:8593daf5ec0b9ef6c098e086213df1d6c3b9f5e715e494a5149b44417d33ab4b"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:9c6a26f900ec6f9585bc956c76b2e3a0dce042bc991b0659d4c9b23fd6ecd616",
+          "expected": "sha256:9c6a26f900ec6f9585bc956c76b2e3a0dce042bc991b0659d4c9b23fd6ecd616"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/run/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-13h/ruined-city-scavenger/pack/v1/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:bae4a7ed5b24fda4a18f50d44feb2e20d1136d2ed78caacfe5fbdd03e5cebdd1",
+      "manifestHash": "sha256:7a6be8a996a997788369cb08b346bc9ab71b72da8970e26364d85c1eca6571c7",
+      "manifestFormat": "assetpack/v3",
+      "normalized": true,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "enemy-patroller",
+          "hazard-current-debris",
+          "hazard-spikes",
+          "player-scavenger",
+          "prop-goal-marker",
+          "resource-node-scrap",
+          "resource-node-water"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-patrol-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:aaf65b0746d753fe0d810ab5d727644d6394541fa8064e9346f19cdff4e2f2d7",
+          "expected": "sha256:aaf65b0746d753fe0d810ab5d727644d6394541fa8064e9346f19cdff4e2f2d7"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:d620c1539f15fbafc787141e95b74051546d9da98436ce53719d681a9bfa0256",
+          "expected": "sha256:d620c1539f15fbafc787141e95b74051546d9da98436ce53719d681a9bfa0256"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/game-maker-v2/experiments/e2e-wasteland/raw/run-out-2026-10-17d/wasteland-scavenger-assets/pack/v1/manifest.json",
+      "historical": "spawn-not-on-lattice",
+      "configHash": "sha256:3c7629b1b8041123fce5dbaa1f84fd7082ec4f41edf8967dac579c6b5dc735b2",
+      "manifestHash": "sha256:d9b7a652ef56d6a29eeca6b4db5c65d6582c8904e143ae13bbc1d93b4ac6d69c",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "chest-ruined-city",
+          "enemy-wasteland",
+          "hazard-spike-rubble",
+          "player-scavenger",
+          "scrap-resource"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:7f45ed03b4e243a3bdbabf39236c90a879fecb42369954aff8ee246617641908",
+          "expected": "sha256:7f45ed03b4e243a3bdbabf39236c90a879fecb42369954aff8ee246617641908"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:4c5fc05bcfc73fa49d0bf7b8710c5ecf13a457b4b66c30557c8969268907c4dc",
+          "expected": "sha256:4c5fc05bcfc73fa49d0bf7b8710c5ecf13a457b4b66c30557c8969268907c4dc"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "spawn-not-on-lattice",
+        "gap": "spawn-box-overlaps-solid"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/site/v1/game-config.json",
+      "manifest": ".scratch/p0-02-second-demo-v2/runs/09-probe-all/assembled/hazard-contact/pack/v2/manifest.json",
+      "historical": "model-out",
+      "configHash": "sha256:2fd9914b485e0cf88161282f40a354beeceae6ba1df598d0c40a306380f7e9fb",
+      "manifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": false,
+        "assetIds": [
+          "hazard-sweeping-carriage",
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "model-prefilter"
+    },
+    {
+      "config": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/run/v1/game-config.json",
+      "manifest": ".scratch/recipe-config-gap-v1/runs/2026-10-23-p0-final/wasteland-scavenger-assets/pack/v4/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:94a32745584e56cead1ebb82c98152010266c9374520ccf4e284939f3073d06b",
+      "manifestHash": "sha256:aa090167a3ce1ee1714cb3f1c5e55a1651be77f80780ab3590edd79808ffbede",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "enemy-scavenger",
+          "exit-gate",
+          "hero",
+          "resource-item"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3600
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:f88367dfa66988473d45546ea4fdd7522961fcb30bbd0e74d08df53ca2b9540e",
+          "expected": "sha256:f88367dfa66988473d45546ea4fdd7522961fcb30bbd0e74d08df53ca2b9540e"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:a2a427376a31e692f13afcabc9b05bd0cce4a2cdcba814dec44da284906f6cb4",
+          "expected": "sha256:a2a427376a31e692f13afcabc9b05bd0cce4a2cdcba814dec44da284906f6cb4"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/run/v1/game-config.json",
+      "manifest": ".scratch/visual-design-impl-v1/runs/2026-10-25-e2e-v4pro-promptfix/wasteland-scavenger/pack/v1/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:7f53bfc8a2e52391ef48365570e8c87acfb4ddf0dbae7e621b00e53ba13d4f7f",
+      "manifestHash": "sha256:24a0013c103e12168eea874c678f130d6b56c7444c4528e97b0ee736429dae3d",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "chest",
+          "danger-hazard",
+          "enemy-wasteland",
+          "resource-pickup",
+          "scavenger"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-1",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3600
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:53ab3941f3b9f6df7acf3b7d0e07216722cf6ed1816c531c40d413b622d52bcc",
+          "expected": "sha256:53ab3941f3b9f6df7acf3b7d0e07216722cf6ed1816c531c40d413b622d52bcc"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:042822e780f4c8be868d794c022d1df61c1a733d6b6505617a3cdc41da23b2dd",
+          "expected": "sha256:042822e780f4c8be868d794c022d1df61c1a733d6b6505617a3cdc41da23b2dd"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "out/__p03-smoke/negative-gate/config-gate-missing.json",
+      "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:ffda50a379a0dd612940d3413b9686087503eecb5ea6320519e778469e0274ec",
+      "manifestHash": "sha256:e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "clean-water",
+          "extraction-point",
+          "hazard-terrain",
+          "scavenger-actor",
+          "scrap-resource",
+          "wasteland-enemy"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-patrol",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+          "expected": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d",
+          "expected": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "gate-missing"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/site/v1/game-config.json",
+      "manifest": "out/__p03-smoke/out/ruin-scavenger-extraction-assets/pack/v7/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:78fe11d72ac0f15c05031fa131a48951292b9dcb2dd69747b2bce26c5b1de42e",
+      "manifestHash": "sha256:e620cd7eed22dda5b2316a70db006b0a84a1b6d58853f4733f1abaeeffd38326",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "clean-water",
+          "extraction-point",
+          "hazard-terrain",
+          "scavenger-actor",
+          "scrap-resource",
+          "wasteland-enemy"
+        ]
+      },
+      "movers": [
+        {
+          "id": "enemy-patrol",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3",
+          "expected": "sha256:aa7533cc58f2cc5ca4f33200f6a18912f778d760218ba91447106142304e78a3"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d",
+          "expected": "sha256:b53a4f4a2bfdacf328533e8700a003af6cd69ea3994518e3cff674b8729d250d"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "out/__probe-timeout/last-train/game-configs/v1.json",
+      "manifest": "out/__probe/empty/pack/v2/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:74b75606ce930d25e475aaf84efd1cd5b8fc1a6c3eaad75658c3af3fffd91df7",
+      "manifestHash": "sha256:b3d9fa29f3503bd8941ec346767c7dfdc79be3b5801ce6144146bf7eb1c353b2",
+      "manifestFormat": "assetpack/v2",
+      "normalized": true,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "hazard-sweeping-carriage",
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [
+        {
+          "id": "mover",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 4000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "out/__probe-timeout/last-train/game-configs/v2.json",
+      "manifest": "out/__probe/empty/pack/v2/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:886393fe70c3506692962a975781757679407b5c1fc9123f03c8c697c77cb420",
+      "manifestHash": "sha256:b3d9fa29f3503bd8941ec346767c7dfdc79be3b5801ce6144146bf7eb1c353b2",
+      "manifestFormat": "assetpack/v2",
+      "normalized": true,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "hazard-sweeping-carriage",
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [
+        {
+          "id": "sweeper",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 3000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "out/__probe/last-train/site/v1/game-config.json",
+      "manifest": "out/__probe/last-train/pack/v2/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+      "manifestHash": "sha256:b3d9fa29f3503bd8941ec346767c7dfdc79be3b5801ce6144146bf7eb1c353b2",
+      "manifestFormat": "assetpack/v2",
+      "normalized": true,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "hazard-sweeping-carriage",
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [
+        {
+          "id": "carriage",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 4000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "out/last-train/game-configs/v1.json",
+      "manifest": "out/last-train/pack/v17/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:d1415d119b25991b36dd72f70e766f09af971c083b7db1fed23d4ad7356a961e",
+      "manifestHash": "sha256:a17be8d0811638f7b9e89b29735e9930cc1637826411338402a9ef82b2c84a6a",
+      "manifestFormat": "assetpack/v2",
+      "normalized": true,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "hazard-sweeping-carriage",
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [
+        {
+          "id": "sweeping-carriage",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 2600
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    },
+    {
+      "config": "fixtures/game-configs/last-train.json",
+      "manifest": "fixtures/packs/last-train/v2/manifest.json",
+      "historical": "goal-not-representable",
+      "configHash": "sha256:d2786ee38793c47f682be58f13f2f4912ca811684fad0bc7356212d79bf011e3",
+      "manifestHash": "sha256:145cb28d73e5723a458c2cffc7f3b362fa3009f8647ac879dad1ec819ffbd689",
+      "manifestFormat": "assetpack/v4",
+      "normalized": false,
+      "scope": {
+        "applicable": true,
+        "assetIds": [
+          "hazard-sweeping-carriage",
+          "pickup-suitcase",
+          "player-traveler",
+          "signal-endlight"
+        ]
+      },
+      "movers": [
+        {
+          "id": "carriage",
+          "axis": "x",
+          "kind": "cycle",
+          "periodMs": 4000
+        }
+      ],
+      "atlases": [
+        {
+          "path": "delivery/atlas.animations.json",
+          "sha256": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d",
+          "expected": "sha256:6874ae923c2ee8287e4d4e534e8498b0ef5e108460364151e39d4dcfb766c86d"
+        },
+        {
+          "path": "delivery/atlas.sprites.json",
+          "sha256": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554",
+          "expected": "sha256:51b7fbca9718e2b839b3086108f736b9fd0c999595336735ca59efc4d875b554"
+        }
+      ],
+      "status": "geometry-fail",
+      "geometry": {
+        "ok": false,
+        "reason": "goal-not-representable",
+        "gap": "goal-outside-corridor"
+      },
+      "note": "early exit prevents downstream geometric values"
+    }
+  ]
+}
